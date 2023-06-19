@@ -1,0 +1,13 @@
+{
+  "Author": "Glyceri",
+  "Name": "Pet Nicknames",
+  "Punchline": "Give your pets cute nicknames",
+  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
+  "InternalName": "petNamer",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "sample",
+    "plugin",
+    "goats"
+  ]
+}
