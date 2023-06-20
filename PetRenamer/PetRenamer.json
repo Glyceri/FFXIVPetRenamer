@@ -2,7 +2,7 @@
   "Author": "Glyceri",
   "Name": "Pet Nicknames",
   "Punchline": "Give your pets cute nicknames",
-  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
+  "Description": "Use /petname for more settings.",
   "InternalName": "petNamer",
   "ApplicableVersion": "any",
   "Tags": [

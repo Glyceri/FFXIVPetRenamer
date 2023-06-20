@@ -1,13 +1,10 @@
 using Dalamud.Game.Command;
-using System.IO;
 using Dalamud.Interface.Windowing;
 using PetRenamer.Windows;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
-using System.Linq;
-using System;
 
 namespace PetRenamer
 {
@@ -49,11 +46,9 @@ namespace PetRenamer
 
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
             ConfigWindow = new ConfigWindow(this);
-            MainWindow = new MainWindow(this, goatImage);
+            MainWindow = new MainWindow(this);
             
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);

@@ -9,12 +9,11 @@ namespace PetRenamer.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private TextureWrap GoatImage;
     private PetRenamerPlugin Plugin;
 
     public static string testText = "Pet Name";
 
-    public MainWindow(PetRenamerPlugin plugin, TextureWrap goatImage) : base(
+    public MainWindow(PetRenamerPlugin plugin) : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
@@ -23,14 +22,13 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
-        this.GoatImage = goatImage;
         this.Plugin = plugin;
 
     }
 
     public void Dispose()
     {
-        this.GoatImage.Dispose();
+        
     }
 
     byte[] tempName = new byte[64];
