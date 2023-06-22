@@ -5,6 +5,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
+using PetRenamer;
 
 namespace PetRenamer
 {
@@ -12,21 +13,25 @@ namespace PetRenamer
     {
         public const int ffxivNameSize = 64;
 
-        public string Name => "Pet Nicknames";
+        public string Name =>
+#if DEBUG
+            "Pet Nicknames [DEBUG]";
+#else
+            "Pet Nicknames";
+#endif
+
         private const string CommandName = "/petname";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
-        public WindowSystem WindowSystem = new("Pet Nicknames");
+        public WindowSystem WindowSystem = new WindowSystem("Pet Nicknames");
         public Framework framework { get; init; }
-        public SigScanner sigScanner { get; init; }
+
+        Utils utils { get; set; }
 
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
-
-
-        public byte[] petName = new byte[PetRenamerPlugin.ffxivNameSize];
 
         Test test { get; init; }
 
@@ -37,18 +42,19 @@ namespace PetRenamer
             [RequiredVersion("1.0")] SigScanner sigScanner)
         {
 
-            test = new Test(this, sigScanner);
+
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface, this);
 
-
+            utils = new Utils(this);
+            test = new Test(this, utils, sigScanner);
             // you might normally want to embed resources and load them from the manifest stream
 
             ConfigWindow = new ConfigWindow(this);
-            MainWindow = new MainWindow(this);
+            MainWindow = new MainWindow(this, utils);
             
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
@@ -97,6 +103,7 @@ namespace PetRenamer
 
         public void OnUpdate(Framework frameWork)
         {
+            Globals.CurrentIDChanged = false;
             test.Update(framework);
         }
     }

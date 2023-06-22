@@ -1,5 +1,6 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using PetRenamer.Core.Serialization;
 using System;
 
 namespace PetRenamer
@@ -9,7 +10,7 @@ namespace PetRenamer
     {
         public int Version { get; set; } = 0;
 
-        public string CustomPetName { get; set; } = string.Empty;
+        public SerializableNickname[]? nicknames = null;
 
         // the below exist just to make saving less cumbersome
         [NonSerialized]
@@ -22,14 +23,7 @@ namespace PetRenamer
             this.PluginInterface = pluginInterface;
             this.plugin = plugin;
 
-            int counter = 0;
-
-            foreach (char c in CustomPetName)
-            {
-                plugin.petName[counter] = (byte)c;
-                counter++;
-                if (counter == 64) break;
-            }
+            if(nicknames == null) nicknames = new SerializableNickname[0];
         }
 
         public void Save()

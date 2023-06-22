@@ -20,9 +20,12 @@ namespace PetRenamer.Core
 
         [PluginService] GameObjectManager gameObjectManager { get; set; }   
 
-        public Test(PetRenamerPlugin basePlugin, SigScanner sigScanner)
+        Utils utils { get; set; }
+
+        public Test(PetRenamerPlugin basePlugin, Utils utils, SigScanner sigScanner)
         {
             this.plugin = basePlugin;
+            this.utils = utils;
         }
 
 
@@ -30,17 +33,31 @@ namespace PetRenamer.Core
         {
 
             GameObjectStruct* me = GameObjectManager.GetGameObjectByIndex(0);
+            if (me == null) return;
             FFCompanion* meCompanion = (FFCompanion*)me;
+            if (meCompanion == null) return;
 
             FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
+            int lastID = Globals.CurrentID;
+            Globals.CurrentID = -1;
+            Globals.CurrentName = string.Empty;
             if (playerCompanion == null) return;
 
-            if (plugin.petName[0] == 0) return;
+            int id = playerCompanion->Character.CharacterData.ModelCharaId;
+            if(lastID != id)
+            {
+                Globals.CurrentIDChanged = true;
+            }
+            Globals.CurrentID = id;
+
+            if (!utils.Contains(Globals.CurrentID)) return;
+
+            Globals.CurrentName = utils.GetName(Globals.CurrentID);
+
+            if (Globals.CurrentName[0] == 0) return;
 
             byte* name = playerCompanion->Character.GameObject.Name;
-            Marshal.Copy(plugin.petName, 0, (nint)name, 64);
-
-            MainWindow.testText = playerCompanion->Character.ModelCharaId.ToString();
+            Marshal.Copy(utils.GetBytes(Globals.CurrentName), 0, (nint)name, 64);
         }
     }
 }
