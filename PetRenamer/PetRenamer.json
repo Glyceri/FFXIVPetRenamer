@@ -6,8 +6,11 @@
   "InternalName": "petNamer",
   "ApplicableVersion": "any",
   "Tags": [
-    "sample",
+    "Pet",
     "plugin",
-    "goats"
+    "Rename",
+    "Nickname",
+    "Text",
+    "Name"
   ]
 }
