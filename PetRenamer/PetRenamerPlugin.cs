@@ -22,9 +22,9 @@ namespace PetRenamer
 
         public bool Debug =>
 #if DEBUG
-            false;
-#else
             true;
+#else
+            false;
 #endif
 
         private const string CommandName = "/petname";
