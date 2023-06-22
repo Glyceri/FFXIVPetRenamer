@@ -56,7 +56,7 @@ namespace PetRenamer.Core
 
             if (Globals.CurrentName[0] == 0) return;
 
-            byte* name = playerCompanion->Character.GameObject.Name;
+            byte* name = playerCompanion->Character.GameObject.GetName();
             Marshal.Copy(utils.GetBytes(Globals.CurrentName), 0, (nint)name, 64);
         }
     }

@@ -19,17 +19,14 @@ public class MainWindow : Window, IDisposable
     public MainWindow(PetRenamerPlugin plugin, Utils utils) : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-
         this.SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(375, 330),
-            MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
+            MinimumSize = new Vector2(400, 120),
+            MaximumSize = new Vector2(400, 120)
         };
 
         this.Plugin = plugin;
         this.utils = utils;
-
-       
     }
 
     public void Dispose()
@@ -54,14 +51,13 @@ public class MainWindow : Window, IDisposable
     {
         if(Globals.CurrentIDChanged) OnOpen();
 
-        //tempText = string.Empty;
+        if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
+
         ImGui.InputText(tempText, tempName, 64);
 
         string internalTempText = utils.FromBytes(tempName);
 
-        // ImGui.Text($"The random config bool is {this.Plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
-
-        ImGui.Text(Globals.CurrentID.ToString());
+        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
 
         if (ImGui.Button("Save Name"))
         {
