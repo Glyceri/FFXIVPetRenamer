@@ -20,6 +20,13 @@ namespace PetRenamer
             "Pet Nicknames";
 #endif
 
+        public bool Debug =>
+#if DEBUG
+            false;
+#else
+            true;
+#endif
+
         private const string CommandName = "/petname";
 
         private DalamudPluginInterface PluginInterface { get; init; }

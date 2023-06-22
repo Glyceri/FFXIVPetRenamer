@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Xml.Linq;
 using Dalamud.Game;
@@ -19,10 +21,11 @@ public class MainWindow : Window, IDisposable
     public MainWindow(PetRenamerPlugin plugin, Utils utils) : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
+        this.Size = new Vector2(400, 140);
         this.SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(400, 120),
-            MaximumSize = new Vector2(400, 120)
+            MinimumSize = new Vector2(400, 140),            
+            MaximumSize = new Vector2(400, 220)
         };
 
         this.Plugin = plugin;
@@ -53,19 +56,21 @@ public class MainWindow : Window, IDisposable
 
         if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
 
-        ImGui.InputText(tempText, tempName, 64);
+        ImGui.TextColored(new Vector4(1,0,1,1), $"Current Pet Name: {tempText}");
+        ImGui.InputText(string.Empty, tempName, 64);
 
         string internalTempText = utils.FromBytes(tempName);
 
-        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
+
 
         if (ImGui.Button("Save Name"))
         {
             tempText = internalTempText;
             if (!utils.Contains(Globals.CurrentID))
             {
-                Plugin.Configuration.nicknames = new SerializableNickname[1];
-                Plugin.Configuration.nicknames[0] = new SerializableNickname(Globals.CurrentID, internalTempText);
+                List<SerializableNickname> nicknames = Plugin.Configuration.nicknames!.ToList();
+                nicknames.Add(new SerializableNickname(Globals.CurrentID, internalTempText));
+                Plugin.Configuration.nicknames = nicknames.ToArray();
             }
 
             SerializableNickname nick = utils.GetNickname(Globals.CurrentID);
@@ -76,13 +81,23 @@ public class MainWindow : Window, IDisposable
             Plugin.Configuration.Save();
         }
 
-        //ImGui.Spacing();
+        if(ImGui.Button("Remove Nickname"))
+        {
+            if (utils.Contains(Globals.CurrentID))
+            {
+                List<SerializableNickname> nicknames = Plugin.Configuration.nicknames!.ToList();
+                for (int i = nicknames.Count - 1; i >= 0; i--)
+                {
+                    if (nicknames[i].ID == Globals.CurrentID)
+                        nicknames.RemoveAt(i);
+                }
+                Plugin.Configuration.nicknames = nicknames.ToArray();
+                Plugin.Configuration.Save();
+                OnOpen();
+            }
+        }
 
-
-
-        /* ImGui.Text("Have a goat:");
-         ImGui.Indent(55);
-         ImGui.Image(this.GoatImage.ImGuiHandle, new Vector2(this.GoatImage.Width, this.GoatImage.Height));
-         ImGui.Unindent(55);*/
+        if(Plugin.Debug)
+        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
     }
 }
