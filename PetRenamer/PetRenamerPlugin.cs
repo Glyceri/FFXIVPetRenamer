@@ -29,7 +29,7 @@ namespace PetRenamer
 
         private const string CommandName = "/petname";
 
-        private DalamudPluginInterface PluginInterface { get; init; }
+        public DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new WindowSystem("Pet Nicknames");
@@ -39,6 +39,7 @@ namespace PetRenamer
 
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
+        public CreditsWindow CreditsWindow { get; init; }
 
         Test test { get; init; }
 
@@ -62,9 +63,11 @@ namespace PetRenamer
 
             ConfigWindow = new ConfigWindow(this);
             MainWindow = new MainWindow(this, utils);
+            CreditsWindow = new CreditsWindow(this);
             
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
+            WindowSystem.AddWindow(CreditsWindow);
 
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
@@ -88,6 +91,7 @@ namespace PetRenamer
             
             ConfigWindow.Dispose();
             MainWindow.Dispose();
+            CreditsWindow.Dispose();
 
             this.CommandManager.RemoveHandler(CommandName);
         }
