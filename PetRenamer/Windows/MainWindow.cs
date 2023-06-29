@@ -102,7 +102,12 @@ public class MainWindow : Window, IDisposable
             }
         }
 
-        if (Plugin.Debug)
-            ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
+        if (ImGui.Button("Credits"))
+        {
+            Plugin.CreditsWindow.IsOpen = true;
+        }
+
+        if(Plugin.Debug)
+        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
     }
 }
