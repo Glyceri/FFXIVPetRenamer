@@ -8,12 +8,14 @@ namespace PetRenamer.Windows;
 public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
+    private PetRenamerPlugin plugin;
 
     public ConfigWindow(PetRenamerPlugin plugin) : base(
-        "A Wonderful Configuration Window",
+        "Global petname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
+        this.plugin = plugin;   
         this.Size = new Vector2(232, 75);
         this.SizeCondition = ImGuiCond.Always;
 
@@ -24,13 +26,10 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        // can't ref a property, so use a local copy
-        /*var configValue = this.Configuration.SomePropertyToBeSavedAndWithADefault;
-        if (ImGui.Checkbox("Random Config Bool", ref configValue))
+        ImGui.Checkbox("Display Custom Names", ref Configuration.displayCustomNames);
+        if(ImGui.Button("Clear All Names"))
         {
-            this.Configuration.SomePropertyToBeSavedAndWithADefault = configValue;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
-            this.Configuration.Save();
-        }*/
+            new ConfirmPopup("Are you sure you want to clear all Nicknames?", (outcome) => { if (outcome) { Configuration.ClearNicknames(); } }, plugin, this);
+        }
     }
 }

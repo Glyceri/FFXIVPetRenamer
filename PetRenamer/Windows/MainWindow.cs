@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Xml.Linq;
+using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using ImGuiNET;
 using ImGuiScene;
+using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel;
 using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
 
@@ -20,12 +24,13 @@ public class MainWindow : Window, IDisposable
 
     public MainWindow(PetRenamerPlugin plugin, Utils utils) : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
-    {
+    {        
+
         this.Size = new Vector2(400, 140);
         this.SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(400, 140),            
-            MaximumSize = new Vector2(400, 220)
+            MinimumSize = new Vector2(400, 140),
+            MaximumSize = new Vector2(400, 11220)
         };
 
         this.Plugin = plugin;
@@ -52,11 +57,11 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        if(Globals.CurrentIDChanged) OnOpen();
+        if (Globals.CurrentIDChanged) OnOpen();
 
         if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
-
-        ImGui.TextColored(new Vector4(1,0,1,1), $"Current Pet Name: {tempText}");
+        
+        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Current Pet Name: {tempText}");
         ImGui.InputText(string.Empty, tempName, 64);
 
         string internalTempText = utils.FromBytes(tempName);
@@ -74,14 +79,14 @@ public class MainWindow : Window, IDisposable
             }
 
             SerializableNickname nick = utils.GetNickname(Globals.CurrentID);
-            if(nick != null)
+            if (nick != null)
                 nick.Name = internalTempText;
 
 
             Plugin.Configuration.Save();
         }
 
-        if(ImGui.Button("Remove Nickname"))
+        if (ImGui.Button("Remove Nickname"))
         {
             if (utils.Contains(Globals.CurrentID))
             {
@@ -97,7 +102,7 @@ public class MainWindow : Window, IDisposable
             }
         }
 
-        if(Plugin.Debug)
-        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
+        if (Plugin.Debug)
+            ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
     }
 }

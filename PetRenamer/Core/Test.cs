@@ -1,4 +1,3 @@
-using System;
 using Dalamud.Game;
 using Dalamud.IoC;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
@@ -6,15 +5,10 @@ using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using GameObjectStruct = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using System.Runtime.InteropServices;
-using Dalamud.Game.Text.SeStringHandling;
-
-using Lumina.Excel.GeneratedSheets;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using PetRenamer.Windows;
 
 namespace PetRenamer.Core
 {
-    public class Test
+    public class CompanionNamer
     {
         PetRenamerPlugin plugin;
 
@@ -22,7 +16,7 @@ namespace PetRenamer.Core
 
         Utils utils { get; set; }
 
-        public Test(PetRenamerPlugin basePlugin, Utils utils, SigScanner sigScanner)
+        public CompanionNamer(PetRenamerPlugin basePlugin, Utils utils, SigScanner sigScanner)
         {
             this.plugin = basePlugin;
             this.utils = utils;
@@ -43,7 +37,14 @@ namespace PetRenamer.Core
             Globals.CurrentName = string.Empty;
             if (playerCompanion == null) return;
 
-            int id = playerCompanion->Character.CharacterData.ModelCharaId;
+            if (Globals.RedrawPet)
+            {
+                playerCompanion->Character.GameObject.DisableDraw();
+                playerCompanion->Character.GameObject.EnableDraw();
+                Globals.RedrawPet = false;
+            }
+
+            int id = playerCompanion->Character.CharacterData.ModelSkeletonId;
             if(lastID != id)
             {
                 Globals.CurrentIDChanged = true;

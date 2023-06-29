@@ -6,6 +6,10 @@ using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
 using PetRenamer;
+using Dalamud.Data;
+using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel;
+using FFXIVClientStructs.FFXIV.Common.Log;
 
 namespace PetRenamer
 {
@@ -34,19 +38,21 @@ namespace PetRenamer
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new WindowSystem("Pet Nicknames");
         public Framework framework { get; init; }
+        public DataManager dataManager { get; init; }
 
         Utils utils { get; set; }
 
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
 
-        Test test { get; init; }
+        CompanionNamer test { get; init; }
 
         public PetRenamerPlugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager,
             [RequiredVersion("1.0")] Framework framework,
-            [RequiredVersion("1.0")] SigScanner sigScanner)
+            [RequiredVersion("1.0")] SigScanner sigScanner,
+            [RequiredVersion("1.0")] DataManager dataManager)
         {
 
 
@@ -56,8 +62,8 @@ namespace PetRenamer
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface, this);
 
-            utils = new Utils(this);
-            test = new Test(this, utils, sigScanner);
+            utils = new Utils(this, dataManager);
+            test = new CompanionNamer(this, utils, sigScanner);
             // you might normally want to embed resources and load them from the manifest stream
 
             ConfigWindow = new ConfigWindow(this);

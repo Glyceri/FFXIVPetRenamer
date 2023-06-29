@@ -1,3 +1,8 @@
+using Dalamud.Data;
+using ImGuiNET;
+using Lumina.Excel;
+using Lumina.Excel.GeneratedSheets;
+using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
 using System;
 using System.Text;
@@ -7,13 +12,27 @@ namespace PetRenamer
     public class Utils
     {
         PetRenamerPlugin plugin;
+        ExcelSheet<Companion> petSheet;
 
 
-        public Utils(PetRenamerPlugin plugin)
+
+        public Utils(PetRenamerPlugin plugin, DataManager dataManager)
         {
             this.plugin = plugin;
+            petSheet = dataManager.GetExcelSheet<Companion>()!;
         }
 
+        public string GetCurrentPetName()
+        {
+            foreach (Companion pet in petSheet)
+            {
+                if (pet == null) continue;
+
+                if (pet.Model.Value.Model == Globals.CurrentID)
+                    return pet.Singular.ToString();
+            }
+            return string.Empty;
+        }
 
         public bool Contains(int ID)
         {
