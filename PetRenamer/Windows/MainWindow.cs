@@ -61,7 +61,7 @@ public class MainWindow : Window, IDisposable
 
         if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
         
-        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Current Pet Name: {tempText}");
+        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {utils.GetCurrentPetName()} is named: {tempText}");
         ImGui.InputText(string.Empty, tempName, 64);
 
         string internalTempText = utils.FromBytes(tempName);
@@ -100,11 +100,6 @@ public class MainWindow : Window, IDisposable
                 Plugin.Configuration.Save();
                 OnOpen();
             }
-        }
-
-        if (ImGui.Button("Credits"))
-        {
-            Plugin.CreditsWindow.IsOpen = true;
         }
 
         if(Plugin.Debug)

@@ -5,6 +5,7 @@ using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace PetRenamer
@@ -80,5 +81,7 @@ namespace PetRenamer
         }
 
         public byte[] GetBytes(int ID) => GetBytes(GetName(ID));
+
+        public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
     }
 }

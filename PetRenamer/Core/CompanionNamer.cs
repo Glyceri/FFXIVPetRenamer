@@ -5,6 +5,8 @@ using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using GameObjectStruct = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using System.Runtime.InteropServices;
+using System.Numerics;
+using Dalamud.Game.Gui.Toast;
 
 namespace PetRenamer.Core
 {
@@ -12,7 +14,7 @@ namespace PetRenamer.Core
     {
         PetRenamerPlugin plugin;
 
-        [PluginService] GameObjectManager gameObjectManager { get; set; }   
+        [PluginService] GameObjectManager gameObjectManager { get; set; }
 
         Utils utils { get; set; }
 
@@ -37,28 +39,34 @@ namespace PetRenamer.Core
             Globals.CurrentName = string.Empty;
             if (playerCompanion == null) return;
 
-            if (Globals.RedrawPet)
-            {
-                playerCompanion->Character.GameObject.DisableDraw();
-                playerCompanion->Character.GameObject.EnableDraw();
-                Globals.RedrawPet = false;
-            }
+
 
             int id = playerCompanion->Character.CharacterData.ModelSkeletonId;
-            if(lastID != id)
-            {
-                Globals.CurrentIDChanged = true;
-            }
+            if (lastID != id) Globals.CurrentIDChanged = true;
+            
             Globals.CurrentID = id;
 
+            if (!plugin.Configuration.displayCustomNames) return;
             if (!utils.Contains(Globals.CurrentID)) return;
 
             Globals.CurrentName = utils.GetName(Globals.CurrentID);
 
-            if (Globals.CurrentName[0] == 0) return;
+            string usedName = Globals.CurrentName;
 
             byte* name = playerCompanion->Character.GameObject.GetName();
-            Marshal.Copy(utils.GetBytes(Globals.CurrentName), 0, (nint)name, 64);
+
+            //if (!plugin.Configuration.displayCustomNames)
+                //usedName = utils.MakeTitleCase(utils.GetCurrentPetName());
+            Marshal.Copy(utils.GetBytes(usedName), 0, (nint)name, 64);
+
+
+            if (Globals.RedrawPet)
+            {
+                playerCompanion->Character.GameObject.DisableDraw();
+                playerCompanion->Character.GameObject.EnableDraw();
+            }
+
+            Globals.RedrawPet = false;
         }
     }
 }
