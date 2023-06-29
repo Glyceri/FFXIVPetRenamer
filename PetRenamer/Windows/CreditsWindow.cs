@@ -16,7 +16,7 @@ namespace PetRenamer.Windows
        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
        ImGuiWindowFlags.NoScrollWithMouse)
         {
-            this.Size = new Vector2(512, 612);
+            this.Size = new Vector2(524, 612);
             this.SizeCondition = ImGuiCond.Always;
 
             string brunoPath = Path.Combine(plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "Bruno.png");

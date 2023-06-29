@@ -1,4 +1,5 @@
 using Dalamud.Configuration;
+using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
@@ -33,6 +34,8 @@ namespace PetRenamer
         {
             nicknames = new SerializableNickname[0];
             Save();
+            foreach (Window window in plugin.WindowSystem.Windows)
+                window.IsOpen = false;
         }
 
         public void Save()

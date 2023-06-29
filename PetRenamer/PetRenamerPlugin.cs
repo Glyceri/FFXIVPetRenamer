@@ -5,11 +5,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
-using PetRenamer;
 using Dalamud.Data;
-using Lumina.Excel.GeneratedSheets;
-using Lumina.Excel;
-using FFXIVClientStructs.FFXIV.Common.Log;
 
 namespace PetRenamer
 {
@@ -31,10 +27,10 @@ namespace PetRenamer
             false;
 #endif
 
-        private const string CommandName = "/petname";
+        const string CommandName = "/petname";
 
         public DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
+        CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new WindowSystem("Pet Nicknames");
         public Framework framework { get; init; }
@@ -42,11 +38,11 @@ namespace PetRenamer
 
         Utils utils { get; set; }
 
-        private ConfigWindow ConfigWindow { get; init; }
-        private MainWindow MainWindow { get; init; }
+        ConfigWindow ConfigWindow { get; init; }
+        MainWindow MainWindow { get; init; }
         public CreditsWindow CreditsWindow { get; init; }
 
-        CompanionNamer test { get; init; }
+        CompanionNamer companionNamer { get; init; }
 
         public PetRenamerPlugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -57,15 +53,14 @@ namespace PetRenamer
         {
 
 
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
+            PluginInterface = pluginInterface;
+            CommandManager = commandManager;
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface, this);
+            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Configuration.Initialize(PluginInterface, this);
 
             utils = new Utils(this, dataManager);
-            test = new CompanionNamer(this, utils, sigScanner);
-            // you might normally want to embed resources and load them from the manifest stream
+            companionNamer = new CompanionNamer(this, utils, sigScanner);
 
             ConfigWindow = new ConfigWindow(this);
             MainWindow = new MainWindow(this, utils);
@@ -75,31 +70,28 @@ namespace PetRenamer
             WindowSystem.AddWindow(MainWindow);
             WindowSystem.AddWindow(CreditsWindow);
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Type /petname to open the petname window. \n" +
                 "Leave the field blank to add no custom name to your pet. \n" +
                 "Enter a name if you DO want a pet name.\n" +
-                "You may need to resummon your pet for the name to update."
+                "You may need to resummon your pet/or look away from it for a moment for the name to update."
             });
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            PluginInterface.UiBuilder.Draw += DrawUI;
+            PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
             framework.Update += OnUpdate;
         }
 
         public void Dispose()
         {
-            this.WindowSystem.RemoveAllWindows();
-
-            //framework.Update -= OnUpdate;
+            WindowSystem.RemoveAllWindows();
             
-            ConfigWindow.Dispose();
             MainWindow.Dispose();
             CreditsWindow.Dispose();
 
-            this.CommandManager.RemoveHandler(CommandName);
+            CommandManager.RemoveHandler(CommandName);
         }
 
         private void OnCommand(string command, string args)
@@ -110,7 +102,7 @@ namespace PetRenamer
 
         private void DrawUI()
         {
-            this.WindowSystem.Draw();
+            WindowSystem.Draw();
         }
 
         public void DrawConfigUI()
@@ -121,7 +113,7 @@ namespace PetRenamer
         public void OnUpdate(Framework frameWork)
         {
             Globals.CurrentIDChanged = false;
-            test.Update(framework);
+            companionNamer.Update(framework);
         }
     }
 }
