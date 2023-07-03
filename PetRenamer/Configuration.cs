@@ -1,48 +1,34 @@
 using Dalamud.Configuration;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin;
 using PetRenamer.Core;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using System;
 
-namespace PetRenamer
+namespace PetRenamer;
+
+[Serializable]
+public class Configuration : IPluginConfiguration
 {
-    [Serializable]
-    public class Configuration : IPluginConfiguration
+    public int Version { get; set; } = 2;
+
+    public SerializableNickname[]? users = null;
+
+    public bool displayCustomNames = true;
+
+    public void Initialize()
     {
-        public int Version { get; set; } = 1;
+        if(users == null) users = new SerializableNickname[0];
+    }
 
-        public SerializableNickname[]? nicknames = null;
+    public void ClearNicknames()
+    {
+        PluginLink.WindowHandler.CloseAllWindows();
+        users = new SerializableNickname[0];
+        Save();
+    }
 
-        public bool displayCustomNames = true;
-
-        // the below exist just to make saving less cumbersome
-        [NonSerialized]
-        private DalamudPluginInterface? PluginInterface;
-        [NonSerialized]
-        private PetRenamerPlugin plugin;
-
-        public void Initialize(DalamudPluginInterface pluginInterface, PetRenamerPlugin plugin)
-        {
-            this.PluginInterface = pluginInterface;
-            this.plugin = plugin;
-
-            if(nicknames == null) nicknames = new SerializableNickname[0];
-        }
-
-        public void ClearNicknames()
-        {
-            nicknames = new SerializableNickname[0];
-            Save();
-            foreach (Window window in plugin.WindowSystem.Windows)
-                window.IsOpen = false;
-        }
-
-        public void Save()
-        {
-            if (PluginInterface == null) return;
-            this.PluginInterface?.SavePluginConfig(this);
-            Globals.RedrawPet = true;
-        }
+    public void Save()
+    {
+        PluginLink.DalamudPlugin.SavePluginConfig(this);
     }
 }
