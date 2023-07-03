@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Glyceri</Authors>
     <Company></Company>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Description>A pet nickname plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Glyceri/FFXIVPetRenamer</PackageProjectUrl>
@@ -60,12 +60,4 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\res\Bruno.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
-
 </Project>

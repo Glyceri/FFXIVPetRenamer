@@ -1,5 +1,4 @@
 using Dalamud.Configuration;
-using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using System;
