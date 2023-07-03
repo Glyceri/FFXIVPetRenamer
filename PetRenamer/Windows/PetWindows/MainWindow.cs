@@ -17,8 +17,7 @@ public class MainWindow : PetWindow
     SheetUtils sheetUtils;
     NicknameUtils nicknameUtils;
 
-    public MainWindow() : base(
-        "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public MainWindow() : base("Pet Nickname", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         Size = new Vector2(300, 140);
         SizeConstraints = new WindowSizeConstraints
