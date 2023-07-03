@@ -2,6 +2,7 @@ using Dalamud.Configuration;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using PetRenamer.Core;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using System;
 
@@ -22,10 +23,10 @@ namespace PetRenamer
         [NonSerialized]
         private PetRenamerPlugin plugin;
 
-        public void Initialize(DalamudPluginInterface pluginInterface, PetRenamerPlugin plugin)
+        public void Initialize(DalamudPluginInterface pluginInterface)
         {
             this.PluginInterface = pluginInterface;
-            this.plugin = plugin;
+            this.plugin = PluginLink.PetRenamerPlugin;
 
             if(nicknames == null) nicknames = new SerializableNickname[0];
         }
@@ -34,8 +35,7 @@ namespace PetRenamer
         {
             nicknames = new SerializableNickname[0];
             Save();
-            foreach (Window window in plugin.WindowSystem.Windows)
-                window.IsOpen = false;
+            PluginLink.WindowHandler.CloseAllWindows();
         }
 
         public void Save()

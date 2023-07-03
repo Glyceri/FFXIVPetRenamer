@@ -1,29 +1,22 @@
-using Dalamud.Game;
-using Dalamud.IoC;
-using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using GameObjectStruct = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using System.Runtime.InteropServices;
-using System.Numerics;
-using Dalamud.Game.Gui.Toast;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core
 {
     public class CompanionNamer
     {
-        PetRenamerPlugin plugin;
+        StringUtils stringUtils;
+        NicknameUtils nicknameUtils;
 
-        [PluginService] GameObjectManager gameObjectManager { get; set; }
-
-        Utils utils { get; set; }
-
-        public CompanionNamer(PetRenamerPlugin basePlugin, Utils utils, SigScanner sigScanner)
+        public CompanionNamer()
         {
-            this.plugin = basePlugin;
-            this.utils = utils;
+            stringUtils = PluginLink.Utils.Get<StringUtils>();
+            nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
         }
-
 
         public unsafe void Update(Dalamud.Game.Framework frameWork)
         {
@@ -46,18 +39,15 @@ namespace PetRenamer.Core
             
             Globals.CurrentID = id;
 
-            if (!plugin.Configuration.displayCustomNames) return;
-            if (!utils.Contains(Globals.CurrentID)) return;
+            if (!PluginLink.Configuration.displayCustomNames) return;
+            if (!nicknameUtils.Contains(Globals.CurrentID)) return;
 
-            Globals.CurrentName = utils.GetName(Globals.CurrentID);
+            Globals.CurrentName = stringUtils.GetName(Globals.CurrentID);
 
             string usedName = Globals.CurrentName;
 
             byte* name = playerCompanion->Character.GameObject.GetName();
-
-            //if (!plugin.Configuration.displayCustomNames)
-                //usedName = utils.MakeTitleCase(utils.GetCurrentPetName());
-            Marshal.Copy(utils.GetBytes(usedName), 0, (nint)name, 64);
+            Marshal.Copy(stringUtils.GetBytes(usedName), 0, (nint)name, PluginConstants.ffxivNameSize);
 
 
             if (Globals.RedrawPet)

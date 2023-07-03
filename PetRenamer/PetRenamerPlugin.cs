@@ -6,71 +6,29 @@ using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
 using Dalamud.Data;
+using PetRenamer.Core.Handlers;
 
 namespace PetRenamer
 {
     public sealed class PetRenamerPlugin : IDalamudPlugin
     {
-        public const int ffxivNameSize = 64;
-
-        public string Name =>
-#if DEBUG
-            "Pet Nicknames [DEBUG]";
-#else
-            "Pet Nicknames";
-#endif
-
-        public bool Debug =>
-#if DEBUG
-            true;
-#else
-            false;
-#endif
-
-        const string CommandName = "/petname";
-
-        public DalamudPluginInterface PluginInterface { get; init; }
-        CommandManager CommandManager { get; init; }
-        public Configuration Configuration { get; init; }
-        public WindowSystem WindowSystem = new WindowSystem("Pet Nicknames");
-        public Framework framework { get; init; }
-        public DataManager dataManager { get; init; }
-
-        Utils utils { get; set; }
-
-        ConfigWindow ConfigWindow { get; init; }
-        MainWindow MainWindow { get; init; }
-        public CreditsWindow CreditsWindow { get; init; }
+        public string Name => PluginConstants.pluginName;
+        public bool Debug => true;
 
         CompanionNamer companionNamer { get; init; }
 
-        public PetRenamerPlugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager,
-            [RequiredVersion("1.0")] Framework framework,
-            [RequiredVersion("1.0")] SigScanner sigScanner,
-            [RequiredVersion("1.0")] DataManager dataManager)
+        public PetRenamerPlugin(DalamudPluginInterface dalamud)
         {
+            PluginHandlers.Start(dalamud);
+            PluginLink.Start(dalamud, this);
 
+            companionNamer = new CompanionNamer();
 
-            PluginInterface = pluginInterface;
-            CommandManager = commandManager;
+            PluginLink.WindowHandler.AddWindow<ConfigWindow>();
+            PluginLink.WindowHandler.AddWindow<MainWindow>();
+            PluginLink.WindowHandler.AddWindow<CreditsWindow>();
 
-            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize(PluginInterface, this);
-
-            utils = new Utils(this, dataManager);
-            companionNamer = new CompanionNamer(this, utils, sigScanner);
-
-            ConfigWindow = new ConfigWindow(this);
-            MainWindow = new MainWindow(this, utils);
-            CreditsWindow = new CreditsWindow(this);
-            
-            WindowSystem.AddWindow(ConfigWindow);
-            WindowSystem.AddWindow(MainWindow);
-            WindowSystem.AddWindow(CreditsWindow);
-
-            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            PluginHandlers.CommandManager.AddHandler(PluginConstants.mainCommand, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Type /petname to open the petname window. \n" +
                 "Leave the field blank to add no custom name to your pet. \n" +
@@ -78,42 +36,40 @@ namespace PetRenamer
                 "You may need to resummon your pet/or look away from it for a moment for the name to update."
             });
 
-            PluginInterface.UiBuilder.Draw += DrawUI;
-            PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            PluginHandlers.PluginInterface.UiBuilder.Draw += DrawUI;
+            PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
-            framework.Update += OnUpdate;
+            PluginHandlers.Framework.Update += OnUpdate;
         }
 
         public void Dispose()
         {
-            WindowSystem.RemoveAllWindows();
-            
-            MainWindow.Dispose();
-            CreditsWindow.Dispose();
+            PluginLink.WindowHandler.RemoveAllWindows();
 
-            CommandManager.RemoveHandler(CommandName);
+            PluginHandlers.CommandManager.RemoveHandler(PluginConstants.mainCommand);
         }
+
+       
 
         private void OnCommand(string command, string args)
         {
-            // in response to the slash command, just display our main ui
-            MainWindow.IsOpen = true;
+            PluginLink.WindowHandler.GetWindow<MainWindow>().IsOpen = true;
         }
 
         private void DrawUI()
         {
-            WindowSystem.Draw();
+            PluginLink.WindowHandler.GetWindow<MainWindow>().Draw();
         }
 
         public void DrawConfigUI()
         {
-            ConfigWindow.IsOpen = true;
+            PluginLink.WindowHandler.GetWindow<ConfigWindow>().IsOpen = true;
         }
 
         public void OnUpdate(Framework frameWork)
         {
             Globals.CurrentIDChanged = false;
-            companionNamer.Update(framework);
+            companionNamer.Update(PluginHandlers.Framework);
         }
     }
 }
