@@ -14,20 +14,22 @@ namespace PetRenamer.Windows.PetWindows;
 public class MainWindow : PetWindow
 {
     StringUtils stringUtils;
+    SheetUtils sheetUtils;
     NicknameUtils nicknameUtils;
 
     public MainWindow() : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(400, 140);
+        Size = new Vector2(300, 140);
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(400, 140),
-            MaximumSize = new Vector2(400, 11220)
+            MinimumSize = new Vector2(300, 140),
+            MaximumSize = new Vector2(300, 200)
         };
 
         stringUtils = PluginLink.Utils.Get<StringUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
+        sheetUtils = PluginLink.Utils.Get<SheetUtils>();
     }
 
     byte[] tempName = new byte[PluginConstants.ffxivNameSize];
@@ -49,21 +51,19 @@ public class MainWindow : PetWindow
 
         if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
 
-        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {PluginLink.Utils.Get<SheetUtils>().GetCurrentPetName()} is named: {tempText}");
+        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} is named: {tempText}");
         ImGui.InputText(string.Empty, tempName, PluginConstants.ffxivNameSize);
 
         string internalTempText = stringUtils.FromBytes(tempName);
-
-
 
         if (ImGui.Button("Save Nickname"))
         {
             tempText = internalTempText;
             if (!nicknameUtils.Contains(Globals.CurrentID))
             {
-                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
+                List<SerializableNickname> nicknames = PluginLink.Configuration.users!.ToList();
                 nicknames.Add(new SerializableNickname(Globals.CurrentID, internalTempText));
-                PluginLink.Configuration.nicknames = nicknames.ToArray();
+                PluginLink.Configuration.users = nicknames.ToArray();
             }
 
             SerializableNickname nick = nicknameUtils.GetNickname(Globals.CurrentID);
@@ -78,13 +78,13 @@ public class MainWindow : PetWindow
         {
             if (nicknameUtils.Contains(Globals.CurrentID))
             {
-                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
+                List<SerializableNickname> nicknames = PluginLink.Configuration.users!.ToList();
                 for (int i = nicknames.Count - 1; i >= 0; i--)
                 {
                     if (nicknames[i].ID == Globals.CurrentID)
                         nicknames.RemoveAt(i);
                 }
-                PluginLink.Configuration.nicknames = nicknames.ToArray();
+                PluginLink.Configuration.users = nicknames.ToArray();
                 PluginLink.Configuration.Save();
                 OnOpen();
             }

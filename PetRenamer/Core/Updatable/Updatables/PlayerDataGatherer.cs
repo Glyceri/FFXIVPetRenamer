@@ -1,28 +1,36 @@
-using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
+﻿using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using GameObjectStruct = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
-using System.Runtime.InteropServices;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
+using System.Runtime.InteropServices;
+using System;
+using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
+using GameObjectStruct = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 
-namespace PetRenamer.Core
+namespace PetRenamer.Core.Updatable.Updatables
 {
-    public class CompanionNamer
+    [Updatable]
+    internal class PlayerDataGatherer : Updatable
     {
         StringUtils stringUtils;
         NicknameUtils nicknameUtils;
 
-        public CompanionNamer()
+        public PlayerDataGatherer()
         {
             stringUtils = PluginLink.Utils.Get<StringUtils>();
             nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
         }
 
-        public unsafe void Update(Dalamud.Game.Framework frameWork)
+        public override unsafe void Update(Framework frameWork)
         {
-
             GameObjectStruct* me = GameObjectManager.GetGameObjectByIndex(0);
             if (me == null) return;
+            byte[] nameBytes = new byte[64];
+            IntPtr intPtr = (nint)me->GetName();
+            Globals.CurrentUserGender = me->Gender;
+            Marshal.Copy(intPtr, nameBytes, 0, PluginConstants.ffxivNameSize);
+            Globals.CurrentUserName = PluginLink.Utils.Get<StringUtils>().FromBytes(nameBytes);
             FFCompanion* meCompanion = (FFCompanion*)me;
             if (meCompanion == null) return;
 
@@ -36,7 +44,7 @@ namespace PetRenamer.Core
 
             int id = playerCompanion->Character.CharacterData.ModelSkeletonId;
             if (lastID != id) Globals.CurrentIDChanged = true;
-            
+
             Globals.CurrentID = id;
 
             if (!PluginLink.Configuration.displayCustomNames) return;

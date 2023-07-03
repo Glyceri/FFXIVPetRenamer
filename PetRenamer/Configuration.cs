@@ -4,33 +4,32 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using System;
 
-namespace PetRenamer
+namespace PetRenamer;
+
+[Serializable]
+public class Configuration : IPluginConfiguration
 {
-    [Serializable]
-    public class Configuration : IPluginConfiguration
+    public int Version { get; set; } = 2;
+
+    public SerializableNickname[]? users = null;
+
+    public bool displayCustomNames = true;
+
+    public void Initialize()
     {
-        public int Version { get; set; } = 2;
+        if(users == null) users = new SerializableNickname[0];
+    }
 
-        public SerializableNickname[]? nicknames = null;
+    public void ClearNicknames()
+    {
+        PluginLink.WindowHandler.CloseAllWindows();
+        users = new SerializableNickname[0];
+        Save();
+    }
 
-        public bool displayCustomNames = true;
-
-        public void Initialize()
-        {
-            if(nicknames == null) nicknames = new SerializableNickname[0];
-        }
-
-        public void ClearNicknames()
-        {
-            PluginLink.WindowHandler.CloseAllWindows();
-            nicknames = new SerializableNickname[0];
-            Save();
-        }
-
-        public void Save()
-        {
-            PluginLink.DalamudPlugin.SavePluginConfig(this);
-            Globals.RedrawPet = true;
-        }
+    public void Save()
+    {
+        PluginLink.DalamudPlugin.SavePluginConfig(this);
+        Globals.RedrawPet = true;
     }
 }

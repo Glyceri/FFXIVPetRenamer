@@ -10,7 +10,6 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 public class ConfigWindow : PetWindow
 {
-
     public ConfigWindow() : base(
         "Global petname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |

@@ -2,28 +2,29 @@ using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Utilization.Attributes;
 
-namespace PetRenamer.Utilization.UtilsModule
+namespace PetRenamer.Utilization.UtilsModule;
+
+[UtilsDeclarable]
+internal class SheetUtils : UtilsRegistryType
 {
-    internal class SheetUtils : UtilsRegistryType
+    ExcelSheet<Companion> petSheet { get; set; } = null!;
+
+    internal override void OnRegistered()
     {
-        ExcelSheet<Companion> petSheet { get; set; } = null!;
+        petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
+    }
 
-        internal override void OnRegistered()
+    public string GetCurrentPetName()
+    {
+        foreach (Companion pet in petSheet)
         {
-            petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
-        }
+            if (pet == null) continue;
 
-        public string GetCurrentPetName()
-        {
-            foreach (Companion pet in petSheet)
-            {
-                if (pet == null) continue;
-
-                if (pet.Model.Value!.Model == Globals.CurrentID)
-                    return pet.Singular.ToString();
-            }
-            return string.Empty;
+            if (pet.Model.Value!.Model == Globals.CurrentID)
+                return pet.Singular.ToString();
         }
+        return string.Empty;
     }
 }

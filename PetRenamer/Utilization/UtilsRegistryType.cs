@@ -1,10 +1,10 @@
+using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Core.Handlers;
 
-namespace PetRenamer.Utilization
+namespace PetRenamer.Utilization;
+
+internal class UtilsRegistryType : IRegistryElement
 {
-    internal class UtilsRegistryType
-    {
-        protected Utils Utils => PluginLink.Utils;
-        internal virtual void OnRegistered() { }
-    }
+    protected UtilsHandler Utils => PluginLink.Utils;
+    internal virtual void OnRegistered() { }
 }
