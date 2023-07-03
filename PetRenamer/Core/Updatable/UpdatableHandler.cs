@@ -25,7 +25,6 @@ namespace PetRenamer.Core.Updatable
 
         void MainUpdate(Framework framework)
         {
-            Globals.CurrentIDChanged = false;
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);
         }

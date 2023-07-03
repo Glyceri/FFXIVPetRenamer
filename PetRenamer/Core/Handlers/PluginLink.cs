@@ -26,5 +26,6 @@ internal class PluginLink
         WindowHandler = new WindowsHandler();
         CommandHandler = new CommandHandler();
         UpdatableHandler = new UpdatableHandler();
+        WindowHandler.Initialize();
     }
 }

@@ -7,7 +7,6 @@ namespace PetRenamer;
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
     public string Name => PluginConstants.pluginName;
-    public bool Debug => true;
 
     public PetRenamerPlugin(DalamudPluginInterface dalamud)
     {

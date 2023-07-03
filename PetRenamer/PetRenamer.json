@@ -2,7 +2,7 @@
   "Author": "Glyceri",
   "Name": "Pet Nicknames",
   "Punchline": "Give your pets cute nicknames",
-  "Description": "Use /petname for more settings.",
+  "Description": "Use /petname to give your pet a nickname.",
   "InternalName": "petNamer",
   "ApplicableVersion": "any",
   "Tags": [

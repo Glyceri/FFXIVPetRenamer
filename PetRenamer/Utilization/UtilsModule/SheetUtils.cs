@@ -18,11 +18,15 @@ internal class SheetUtils : UtilsRegistryType
 
     public string GetCurrentPetName()
     {
+        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        if (playerData == null) return string.Empty;
+        if (playerData!.Value.companionData == null) return string.Empty;
+
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
 
-            if (pet.Model.Value!.Model == Globals.CurrentID)
+            if (pet.Model.Value!.Model == playerData!.Value.companionData!.Value.currentModelID)
                 return pet.Singular.ToString();
         }
         return string.Empty;

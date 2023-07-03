@@ -79,4 +79,16 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
 
         windowSystem.Draw();
     }
+
+    bool initialized = false;
+
+    internal void Initialize()
+    {
+        if (initialized) return;
+        initialized = true;
+
+        foreach (PetWindow element in elements)
+            if(element is InitializablePetWindow initWindow)
+                initWindow.OnInitialized();
+    }
 }

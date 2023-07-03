@@ -20,6 +20,6 @@ namespace PetRenamer.Core.Serialization
             this.homeworld = homeworld;
         }
 
-        public override string ToString() => $"username:{username},nicknames:{nicknames}";
+        public override string ToString() => $"username:{username},nicknames:{nicknames},gender:{gender},homeworld:{homeworld}";
     }
 }

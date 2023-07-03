@@ -4,6 +4,7 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -31,6 +32,15 @@ internal class StringUtils : UtilsRegistryType
 
         return bytes;
     }
+
+    public unsafe byte[] GetBytes(byte* bytePtr)
+    {
+        byte[] nameBytes = new byte[PluginConstants.ffxivNameSize];
+        IntPtr intPtr = (nint)bytePtr;
+        Marshal.Copy(intPtr, nameBytes, 0, PluginConstants.ffxivNameSize);
+        return nameBytes;
+    }
+
 
     public byte[] GetBytes(int ID) => GetBytes(GetName(ID));
     public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);

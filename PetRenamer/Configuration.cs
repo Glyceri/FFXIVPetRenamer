@@ -30,6 +30,5 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         PluginLink.DalamudPlugin.SavePluginConfig(this);
-        Globals.RedrawPet = true;
     }
 }

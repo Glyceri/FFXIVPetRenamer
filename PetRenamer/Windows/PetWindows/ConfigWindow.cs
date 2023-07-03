@@ -23,7 +23,6 @@ public class ConfigWindow : PetWindow
     {
         if (ImGui.Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames))
         {
-            Globals.RedrawPet = true;
             PluginLink.Configuration.Save();
         }
 
