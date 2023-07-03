@@ -39,9 +39,7 @@ namespace PetRenamer
             PluginLink.WindowHandler.RemoveAllWindows();
 
             PluginHandlers.CommandManager.RemoveHandler(PluginConstants.mainCommand);
-        }
-
-       
+        }  
 
         private void OnCommand(string command, string args)
         {

@@ -9,8 +9,6 @@ namespace PetRenamer.Utilization.UtilsModule
 {
     internal class StringUtils : UtilsRegistryType
     {
-        public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
-
         public string GetName(int ID)
         {
             foreach (SerializableNickname nickname in PluginLink.Configuration.nicknames!)
@@ -33,7 +31,7 @@ namespace PetRenamer.Utilization.UtilsModule
         }
 
         public byte[] GetBytes(int ID) => GetBytes(GetName(ID));
-
+        public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
         public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
     }
 }

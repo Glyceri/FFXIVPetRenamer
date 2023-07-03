@@ -9,7 +9,7 @@ namespace PetRenamer
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
-        public int Version { get; set; } = 1;
+        public int Version { get; set; } = 2;
 
         public SerializableNickname[]? nicknames = null;
 
@@ -22,9 +22,9 @@ namespace PetRenamer
 
         public void ClearNicknames()
         {
+            PluginLink.WindowHandler.CloseAllWindows();
             nicknames = new SerializableNickname[0];
             Save();
-            PluginLink.WindowHandler.CloseAllWindows();
         }
 
         public void Save()

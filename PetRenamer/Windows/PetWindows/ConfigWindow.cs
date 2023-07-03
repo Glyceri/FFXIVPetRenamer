@@ -27,12 +27,14 @@ public class ConfigWindow : PetWindow
             PluginLink.Configuration.Save();
         }
 
-        /*if(ImGui.Button("Clear All Nicknames"))
-            new ConfirmPopup("Are you sure you want to clear all Nicknames?", 
-                (outcome) => { if (outcome) { PluginLink.Configuration.ClearNicknames(); } }
-                , this);*/
+        if(ImGui.Button("Clear All Nicknames")) 
+            PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
+                "Are you sure you want to clear all Nicknames?",
+                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknames(); } }
+                , this);
+        
 
         if (ImGui.Button("Credits"))
-            PluginLink.WindowHandler.GetWindow<CreditsWindow>().IsOpen = true;
+            PluginLink.WindowHandler.OpenWindow<CreditsWindow>();
     }
 }

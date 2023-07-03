@@ -1,6 +1,6 @@
 using System;
 
-namespace PetRenamer.Core.Exceptions
+namespace PetRenamer.Utilization.Exceptions
 {
     public class UtilsNotFoundException : Exception
     {

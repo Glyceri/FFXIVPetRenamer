@@ -14,31 +14,17 @@ namespace PetRenamer.Windows.Handler
         public WindowSystem WindowSystem { get => windowSystem; }
 
         List<PetWindow> petWindows = new List<PetWindow>();
+        List<TemporaryPetWindow> temporaryPetWindows = new List<TemporaryPetWindow>();
 
         public WindowsHandler()
         {
-            PluginHandlers.PluginInterface.UiBuilder.Draw += windowSystem.Draw;
+            PluginHandlers.PluginInterface.UiBuilder.Draw += Draw;
             AutoAddWindows();
         }
-
         ~WindowsHandler()
         {
-            PluginHandlers.PluginInterface.UiBuilder.Draw -= windowSystem.Draw;
-        }
-
-        void AutoAddWindows()
-        {
-            Type petWindowType = typeof(PetWindow);
-            Assembly petWindowAssembly = Assembly.GetAssembly(petWindowType)!;
-            Type[] petWindowInheritedTypes = petWindowAssembly.GetTypes().Where(t =>
-                t.IsClass &&
-                !t.IsAbstract &&
-                t.IsSubclassOf(typeof(PetWindow)) &&
-                t.GetCustomAttribute<PersistentPetWindowAttribute>() != null)
-            .ToArray();
-
-            foreach (Type type in petWindowInheritedTypes)
-                AddWindow(type);
+            PluginHandlers.PluginInterface.UiBuilder.Draw -= Draw;
+            RemoveAllWindows();
         }
 
         public PetWindow GetWindow(Type windowType)
@@ -49,7 +35,6 @@ namespace PetRenamer.Windows.Handler
 
             return null!;
         }
-
         public PetWindow AddWindow(Type windowType)
         {
             PetWindow petWindow = GetWindow(windowType);
@@ -62,6 +47,18 @@ namespace PetRenamer.Windows.Handler
 
         public T GetWindow<T>() where T : PetWindow => (T)GetWindow(typeof(T));
         public T AddWindow<T>() where T : PetWindow => (T)AddWindow(typeof(T));
+
+        public T AddTemporaryWindow<T>(string message, Action<object> callback, Window blackenedWindow = null!) where T : TemporaryPetWindow
+        {
+            TemporaryPetWindow petWindow = (Activator.CreateInstance(typeof(T), new object[3] { message, callback, blackenedWindow }) as TemporaryPetWindow)!;
+            temporaryPetWindows.Add(petWindow);
+            windowSystem.AddWindow(petWindow);
+            return (T)petWindow;
+        }
+
+        public void ToggleWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = !GetWindow<T>().IsOpen;
+        public void CloseWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = false;
+        public void OpenWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = true;
 
         public void RemoveAllWindows()
         {
@@ -77,6 +74,33 @@ namespace PetRenamer.Windows.Handler
         {
             foreach (PetWindow window in petWindows)
                 window.IsOpen = false;
+        }
+
+        public void Draw()
+        {
+            for (int i = temporaryPetWindows.Count - 1; i >= 0; i--)
+                if (temporaryPetWindows[i].closed)
+                {
+                    windowSystem.RemoveWindow(temporaryPetWindows[i]);
+                    temporaryPetWindows.RemoveAt(i);
+                }
+
+            windowSystem.Draw();
+        }
+
+        void AutoAddWindows()
+        {
+            Type petWindowType = typeof(PetWindow);
+            Assembly petWindowAssembly = Assembly.GetAssembly(petWindowType)!;
+            Type[] petWindowInheritedTypes = petWindowAssembly.GetTypes().Where(t =>
+                t.IsClass &&
+                !t.IsAbstract &&
+                t.IsSubclassOf(typeof(PetWindow)) &&
+                t.GetCustomAttribute<PersistentPetWindowAttribute>() != null)
+            .ToArray();
+
+            foreach (Type type in petWindowInheritedTypes)
+                AddWindow(type);
         }
     }
 }

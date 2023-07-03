@@ -21,7 +21,7 @@ namespace PetRenamer.Windows.PetWindows
             Size = new Vector2(524, 612);
             SizeCondition = ImGuiCond.Always;
 
-            var brunoPath = Path.Combine(PluginHandlers.PluginInterface.AssemblyLocation.Directory?.FullName!, "Bruno.png");
+            string brunoPath = Path.Combine(PluginHandlers.PluginInterface.AssemblyLocation.Directory?.FullName!, "Bruno.png");
 
             bruno = PluginHandlers.PluginInterface.UiBuilder.LoadImage(brunoPath);
         }

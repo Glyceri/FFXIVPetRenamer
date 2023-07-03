@@ -1,4 +1,4 @@
-using PetRenamer.Core.Exceptions;
+using PetRenamer.Utilization.Exceptions;
 using System;
 using System.Collections.Generic;
 

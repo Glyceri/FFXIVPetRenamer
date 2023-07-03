@@ -6,6 +6,7 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
+using System.Collections.Generic;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -51,7 +52,7 @@ public class MainWindow : PetWindow
         ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {PluginLink.Utils.Get<SheetUtils>().GetCurrentPetName()} is named: {tempText}");
         ImGui.InputText(string.Empty, tempName, PluginConstants.ffxivNameSize);
 
-        var internalTempText = stringUtils.FromBytes(tempName);
+        string internalTempText = stringUtils.FromBytes(tempName);
 
 
 
@@ -60,12 +61,12 @@ public class MainWindow : PetWindow
             tempText = internalTempText;
             if (!nicknameUtils.Contains(Globals.CurrentID))
             {
-                var nicknames = PluginLink.Configuration.nicknames!.ToList();
+                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
                 nicknames.Add(new SerializableNickname(Globals.CurrentID, internalTempText));
                 PluginLink.Configuration.nicknames = nicknames.ToArray();
             }
 
-            var nick = nicknameUtils.GetNickname(Globals.CurrentID);
+            SerializableNickname nick = nicknameUtils.GetNickname(Globals.CurrentID);
             if (nick != null)
                 nick.Name = internalTempText;
 
@@ -77,8 +78,8 @@ public class MainWindow : PetWindow
         {
             if (nicknameUtils.Contains(Globals.CurrentID))
             {
-                var nicknames = PluginLink.Configuration.nicknames!.ToList();
-                for (var i = nicknames.Count - 1; i >= 0; i--)
+                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
+                for (int i = nicknames.Count - 1; i >= 0; i--)
                 {
                     if (nicknames[i].ID == Globals.CurrentID)
                         nicknames.RemoveAt(i);
