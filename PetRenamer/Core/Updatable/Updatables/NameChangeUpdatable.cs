@@ -4,7 +4,6 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
 using System.Runtime.InteropServices;
-using System.Xml.Linq;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
