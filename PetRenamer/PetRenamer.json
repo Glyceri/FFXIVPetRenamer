@@ -13,5 +13,6 @@
     "Text",
     "Name"
   ],
-  "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png"
+  "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png",
+  "RepoUrl": "https://github.com/Glyceri/FFXIVPetRenamer"
 }
