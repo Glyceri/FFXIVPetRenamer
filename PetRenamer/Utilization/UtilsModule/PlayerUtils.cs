@@ -36,7 +36,8 @@ internal struct PlayerData
 {
     StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     unsafe GameObject* playerGameObject;
-    unsafe internal string playerName => stringUtils.FromBytes(stringUtils.GetBytes(playerGameObject->Name));
+    unsafe internal string playerName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal byte* namePtr;
     internal ushort homeWorld;
     internal byte gender;
 
@@ -45,6 +46,7 @@ internal struct PlayerData
     unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
+        this.namePtr = playerGameObject->Name;
         this.gender = gender;
         this.homeWorld = homeWorld;
         this.companionData = companionData;
@@ -55,11 +57,13 @@ internal struct CompanionData
 {
     StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     unsafe internal FFCompanion* companion;
-    unsafe internal string currentCompanionName => stringUtils.FromBytes(stringUtils.GetBytes(companion->Character.GameObject.Name));
+    unsafe internal string currentCompanionName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal byte* namePtr;
     internal int currentModelID;
 
     unsafe public CompanionData(FFCompanion* companion, int currentModelID)
     {
+        this.namePtr = companion->Character.GameObject.Name;
         this.companion = companion;
         this.currentModelID = currentModelID;
     }

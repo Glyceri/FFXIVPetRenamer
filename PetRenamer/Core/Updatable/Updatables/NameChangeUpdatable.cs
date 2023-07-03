@@ -63,58 +63,11 @@ internal class NameChangeUpdatable : Updatable
             SerializableNickname nickname = nicknameUtils.GetNickname(currentID);
 
             onCompanionChange?.Invoke(playerData, nickname);
-
         }
 
         if (!PluginLink.Configuration.displayCustomNames || currentName.Trim().Normalize().ToLower().Length == 0)
             currentName = sheetUtils.GetCurrentPetName();
 
-        Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerData!.Value.companionData!.Value.companion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+        Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerData!.Value.companionData!.Value.namePtr, PluginConstants.ffxivNameSize);
     }
-
-    /*
-    public override unsafe void Update(Framework frameWork)
-    {
-        GameObjectStruct* me = GameObjectManager.GetGameObjectByIndex(0);
-        if (me == null) return;
-        byte[] nameBytes = new byte[64];
-        IntPtr intPtr = (nint)me->GetName();
-        Globals.CurrentUserGender = me->Gender;
-        Marshal.Copy(intPtr, nameBytes, 0, PluginConstants.ffxivNameSize);
-        Globals.CurrentUserName = stringUtils.FromBytes(nameBytes);
-        FFCompanion* meCompanion = (FFCompanion*)me;
-        if (meCompanion == null) return;
-
-        FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
-        int lastID = Globals.CurrentID;
-        Globals.CurrentID = -1;
-        Globals.CurrentName = string.Empty;
-        if (playerCompanion == null) return;
-
-
-
-        int id = playerCompanion->Character.CharacterData.ModelSkeletonId;
-        if (lastID != id) Globals.CurrentIDChanged = true;
-
-        Globals.CurrentID = id;
-
-        if (!PluginLink.Configuration.displayCustomNames) return;
-        if (!nicknameUtils.Contains(Globals.CurrentID)) return;
-
-        Globals.CurrentName = stringUtils.GetName(Globals.CurrentID);
-
-        string usedName = Globals.CurrentName;
-
-        byte* name = playerCompanion->Character.GameObject.GetName();
-        Marshal.Copy(stringUtils.GetBytes(usedName), 0, (nint)name, PluginConstants.ffxivNameSize);
-
-
-        if (Globals.RedrawPet)
-        {
-            playerCompanion->Character.GameObject.DisableDraw();
-            playerCompanion->Character.GameObject.EnableDraw();
-        }
-
-        Globals.RedrawPet = false;
-    }*/
 }
