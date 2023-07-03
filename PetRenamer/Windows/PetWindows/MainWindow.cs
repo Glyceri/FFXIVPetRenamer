@@ -56,7 +56,7 @@ public class MainWindow : PetWindow
 
 
 
-        if (ImGui.Button("Save Name"))
+        if (ImGui.Button("Save Nickname"))
         {
             tempText = internalTempText;
             if (!nicknameUtils.Contains(Globals.CurrentID))

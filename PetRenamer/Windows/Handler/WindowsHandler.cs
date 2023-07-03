@@ -42,8 +42,12 @@ namespace PetRenamer.Windows.Handler
             petWindow = (Activator.CreateInstance(windowType) as PetWindow)!;
             windowSystem.AddWindow(petWindow);
             petWindows.Add(petWindow);
+            if (windowType.GetCustomAttribute<ConfigPetWindowAttribute>() != null)
+                PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(windowType);
             return petWindow;
         }
+
+
 
         public T GetWindow<T>() where T : PetWindow => (T)GetWindow(typeof(T));
         public T AddWindow<T>() where T : PetWindow => (T)AddWindow(typeof(T));
@@ -59,6 +63,10 @@ namespace PetRenamer.Windows.Handler
         public void ToggleWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = !GetWindow<T>().IsOpen;
         public void CloseWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = false;
         public void OpenWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = true;
+
+        public void ToggleWindow(Type windowType) => GetWindow(windowType).IsOpen = !GetWindow(windowType).IsOpen;
+        public void CloseWindow(Type windowType) => GetWindow(windowType).IsOpen = false;
+        public void OpenWindow(Type windowType) => GetWindow(windowType).IsOpen = true;
 
         public void RemoveAllWindows()
         {

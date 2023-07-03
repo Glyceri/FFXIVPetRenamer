@@ -6,6 +6,7 @@ using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
+[ConfigPetWindow]
 [PersistentPetWindow]
 public class ConfigWindow : PetWindow
 {
