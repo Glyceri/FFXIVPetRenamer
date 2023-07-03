@@ -1,12 +1,12 @@
-using System;
 using System.Numerics;
-using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Windows.Attributes;
 
-namespace PetRenamer.Windows;
+namespace PetRenamer.Windows.PetWindows;
 
+[PersistentPetWindow]
 public class ConfigWindow : PetWindow
 {
 
@@ -26,7 +26,7 @@ public class ConfigWindow : PetWindow
             Globals.RedrawPet = true;
             PluginLink.Configuration.Save();
         }
-        
+
         /*if(ImGui.Button("Clear All Nicknames"))
             new ConfirmPopup("Are you sure you want to clear all Nicknames?", 
                 (outcome) => { if (outcome) { PluginLink.Configuration.ClearNicknames(); } }

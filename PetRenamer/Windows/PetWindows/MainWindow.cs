@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
@@ -7,19 +5,21 @@ using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
 
-namespace PetRenamer.Windows;
+namespace PetRenamer.Windows.PetWindows;
 
-public class MainWindow : PetWindow, IDisposable
+[PersistentPetWindow]
+public class MainWindow : PetWindow
 {
     StringUtils stringUtils;
     NicknameUtils nicknameUtils;
 
     public MainWindow() : base(
         "Pet Name", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
-    {        
-        this.Size = new Vector2(400, 140);
-        this.SizeConstraints = new WindowSizeConstraints
+    {
+        Size = new Vector2(400, 140);
+        SizeConstraints = new WindowSizeConstraints
         {
             MinimumSize = new Vector2(400, 140),
             MaximumSize = new Vector2(400, 11220)
@@ -27,11 +27,6 @@ public class MainWindow : PetWindow, IDisposable
 
         stringUtils = PluginLink.Utils.Get<StringUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
-    }
-
-    public void Dispose()
-    {
-
     }
 
     byte[] tempName = new byte[PluginConstants.ffxivNameSize];
@@ -52,11 +47,11 @@ public class MainWindow : PetWindow, IDisposable
         if (Globals.CurrentIDChanged) OnOpen();
 
         if (Globals.CurrentID == -1) { ImGui.Text("Please spawn a pet!"); return; }
-        
+
         ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {PluginLink.Utils.Get<SheetUtils>().GetCurrentPetName()} is named: {tempText}");
         ImGui.InputText(string.Empty, tempName, PluginConstants.ffxivNameSize);
 
-        string internalTempText = stringUtils.FromBytes(tempName);
+        var internalTempText = stringUtils.FromBytes(tempName);
 
 
 
@@ -65,12 +60,12 @@ public class MainWindow : PetWindow, IDisposable
             tempText = internalTempText;
             if (!nicknameUtils.Contains(Globals.CurrentID))
             {
-                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
+                var nicknames = PluginLink.Configuration.nicknames!.ToList();
                 nicknames.Add(new SerializableNickname(Globals.CurrentID, internalTempText));
                 PluginLink.Configuration.nicknames = nicknames.ToArray();
             }
 
-            SerializableNickname nick = nicknameUtils.GetNickname(Globals.CurrentID);
+            var nick = nicknameUtils.GetNickname(Globals.CurrentID);
             if (nick != null)
                 nick.Name = internalTempText;
 
@@ -82,8 +77,8 @@ public class MainWindow : PetWindow, IDisposable
         {
             if (nicknameUtils.Contains(Globals.CurrentID))
             {
-                List<SerializableNickname> nicknames = PluginLink.Configuration.nicknames!.ToList();
-                for (int i = nicknames.Count - 1; i >= 0; i--)
+                var nicknames = PluginLink.Configuration.nicknames!.ToList();
+                for (var i = nicknames.Count - 1; i >= 0; i--)
                 {
                     if (nicknames[i].ID == Globals.CurrentID)
                         nicknames.RemoveAt(i);
@@ -94,7 +89,7 @@ public class MainWindow : PetWindow, IDisposable
             }
         }
 
-        if(PluginLink.PetRenamerPlugin.Debug)
-        ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
+        if (PluginLink.PetRenamerPlugin.Debug)
+            ImGui.Text("Current Pet ID: " + Globals.CurrentID.ToString());
     }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetRenamer.Windows
+namespace PetRenamer.Windows.PetWindows
 {
     public class ConfirmPopup : Window
     {
@@ -16,18 +16,18 @@ namespace PetRenamer.Windows
         string message;
         Window blackenedWindow;
 
-        public ConfirmPopup(string message, Action<bool> callback, Window blackenedWindow = null) : base(message, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        public ConfirmPopup(string message, Action<bool> callback, Window blackenedWindow = null!) : base(message, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
         {
-            this.Size = new Vector2(400, 110);
-            this.SizeCondition = ImGuiCond.Always;
-            if(blackenedWindow != null)
-                this.Position = blackenedWindow.Position;
+            Size = new Vector2(400, 110);
+            SizeCondition = ImGuiCond.Always;
+            if (blackenedWindow != null)
+                Position = blackenedWindow.Position;
             this.callback = callback;
             this.message = message;
-            this.blackenedWindow = blackenedWindow;
+            this.blackenedWindow = blackenedWindow!;
             IsOpen = true;
 
-           // PluginLink.PetRenamerPlugin.WindowSystem.AddWindow(this);
+            // PluginLink.PetRenamerPlugin.WindowSystem.AddWindow(this);
         }
 
         public override void Draw()

@@ -1,12 +1,9 @@
 using Dalamud.Game.Command;
-using Dalamud.Interface.Windowing;
-using PetRenamer.Windows;
-using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Game;
 using PetRenamer.Core;
-using Dalamud.Data;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer
 {
@@ -24,10 +21,6 @@ namespace PetRenamer
 
             companionNamer = new CompanionNamer();
 
-            PluginLink.WindowHandler.AddWindow<ConfigWindow>();
-            PluginLink.WindowHandler.AddWindow<MainWindow>();
-            PluginLink.WindowHandler.AddWindow<CreditsWindow>();
-
             PluginHandlers.CommandManager.AddHandler(PluginConstants.mainCommand, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Type /petname to open the petname window. \n" +
@@ -36,7 +29,6 @@ namespace PetRenamer
                 "You may need to resummon your pet/or look away from it for a moment for the name to update."
             });
 
-            PluginHandlers.PluginInterface.UiBuilder.Draw += DrawUI;
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
             PluginHandlers.Framework.Update += OnUpdate;
@@ -54,11 +46,6 @@ namespace PetRenamer
         private void OnCommand(string command, string args)
         {
             PluginLink.WindowHandler.GetWindow<MainWindow>().IsOpen = true;
-        }
-
-        private void DrawUI()
-        {
-            PluginLink.WindowHandler.GetWindow<MainWindow>().Draw();
         }
 
         public void DrawConfigUI()

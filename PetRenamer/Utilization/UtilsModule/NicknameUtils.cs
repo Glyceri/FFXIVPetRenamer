@@ -24,7 +24,7 @@ namespace PetRenamer.Utilization.UtilsModule
                     return PluginLink.Configuration.nicknames[i];
             }
 
-            return null;
+            return null!;
         }
     }
 }

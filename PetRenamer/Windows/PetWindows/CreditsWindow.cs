@@ -1,13 +1,14 @@
-using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using ImGuiScene;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Windows.Attributes;
 using System;
 using System.IO;
 
-namespace PetRenamer.Windows
+namespace PetRenamer.Windows.PetWindows
 {
+    [PersistentPetWindow]
     public class CreditsWindow : PetWindow, IDisposable
     {
         TextureWrap bruno;
@@ -17,16 +18,16 @@ namespace PetRenamer.Windows
        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
        ImGuiWindowFlags.NoScrollWithMouse)
         {
-            this.Size = new Vector2(524, 612);
-            this.SizeCondition = ImGuiCond.Always;
+            Size = new Vector2(524, 612);
+            SizeCondition = ImGuiCond.Always;
 
-            string brunoPath = Path.Combine(PluginHandlers.PluginInterface.AssemblyLocation.Directory?.FullName!, "Bruno.png");
+            var brunoPath = Path.Combine(PluginHandlers.PluginInterface.AssemblyLocation.Directory?.FullName!, "Bruno.png");
 
             bruno = PluginHandlers.PluginInterface.UiBuilder.LoadImage(brunoPath);
         }
 
-        public void Dispose()
-        {
+        protected override void OnDispose()
+        { 
             bruno.Dispose();
         }
 

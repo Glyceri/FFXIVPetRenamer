@@ -1,6 +1,4 @@
 using Dalamud.Configuration;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
@@ -17,17 +15,8 @@ namespace PetRenamer
 
         public bool displayCustomNames = true;
 
-        // the below exist just to make saving less cumbersome
-        [NonSerialized]
-        private DalamudPluginInterface? PluginInterface;
-        [NonSerialized]
-        private PetRenamerPlugin plugin;
-
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public void Initialize()
         {
-            this.PluginInterface = pluginInterface;
-            this.plugin = PluginLink.PetRenamerPlugin;
-
             if(nicknames == null) nicknames = new SerializableNickname[0];
         }
 
@@ -40,8 +29,7 @@ namespace PetRenamer
 
         public void Save()
         {
-            if (PluginInterface == null) return;
-            this.PluginInterface?.SavePluginConfig(this);
+            PluginLink.DalamudPlugin.SavePluginConfig(this);
             Globals.RedrawPet = true;
         }
     }

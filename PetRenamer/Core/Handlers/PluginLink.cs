@@ -10,15 +10,16 @@ namespace PetRenamer.Core.Handlers
         internal static Utils Utils { get; set; } = null!;
         internal static PetRenamerPlugin PetRenamerPlugin { get; set; } = null!;
         internal static WindowsHandler WindowHandler { get; set; } = null!;
+        internal static DalamudPluginInterface DalamudPlugin { get; set; } = null!;
 
         internal static void Start(DalamudPluginInterface dalamud, PetRenamerPlugin petPlugin)
         {
+            DalamudPlugin = dalamud;
             PetRenamerPlugin = petPlugin;
-            WindowHandler = new WindowsHandler();
-            Configuration = PluginHandlers.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize(dalamud);
             Utils = new Utils();
-
+            Configuration = PluginHandlers.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Configuration.Initialize();
+            WindowHandler = new WindowsHandler();
         }
     }
 }
