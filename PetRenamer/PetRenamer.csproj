@@ -29,14 +29,6 @@
     <DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
   </PropertyGroup>
 
-<Target Name="PackagePlugin" AfterTargets="Build">
-    <DalamudPackager
-        ProjectDir="$(ProjectDir)"
-        OutputPath="$(OutputPath)"
-        AssemblyName="$(AssemblyName)"
-    />
-</Target>
-
   <ItemGroup>
     <PackageReference Include="DalamudPackager" Version="2.1.11" />
     <Reference Include="FFXIVClientStructs">
