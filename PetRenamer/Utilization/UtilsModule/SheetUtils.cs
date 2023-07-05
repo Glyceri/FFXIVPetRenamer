@@ -1,6 +1,5 @@
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
-using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.Attributes;
 

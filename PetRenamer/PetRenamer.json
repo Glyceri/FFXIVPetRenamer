@@ -3,7 +3,7 @@
   "Name": "Pet Nicknames",
   "Punchline": "Give your pets cute nicknames",
   "Description": "Use /petname to give your pet a nickname.",
-  "InternalName": "petNamer",
+  "InternalName": "PetRenamer",
   "ApplicableVersion": "any",
   "Tags": [
     "Pet",
@@ -13,5 +13,6 @@
     "Text",
     "Name"
   ],
-  "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png"
+  "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png",
+  "RepoUrl": "https://github.com/Glyceri/FFXIVPetRenamer"
 }
