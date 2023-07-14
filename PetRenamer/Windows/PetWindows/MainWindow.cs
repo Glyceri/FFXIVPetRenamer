@@ -21,12 +21,12 @@ public class MainWindow : InitializablePetWindow
 
     int gottenID = -1;
 
-    public MainWindow() : base("Pet Nickname", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(300, 140);
+        Size = new Vector2(300, 180);
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(300, 140),
+            MinimumSize = new Vector2(300, 180),
             MaximumSize = new Vector2(300, 200)
         };
 
@@ -50,7 +50,7 @@ public class MainWindow : InitializablePetWindow
 
     public override void Draw()
     {
-        if (gottenID == -1) { ImGui.Text("Please spawn a pet!"); return; }
+        if (gottenID == -1) { ImGui.Text("Please spawn a Minion!"); return; }
 
         ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} is named: {tempText}");
         ImGui.InputText(string.Empty, tempName, PluginConstants.ffxivNameSize);
@@ -89,6 +89,8 @@ public class MainWindow : InitializablePetWindow
                 OnOpen();
             }
         }
+
+        ImGui.Text("Resummon your minion or simply look away from it for a moment to apply the nickname.");
     }
 
     void OnChange(PlayerData? playerData, SerializableNickname nickname)
