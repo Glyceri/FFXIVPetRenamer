@@ -11,7 +11,7 @@ namespace PetRenamer.Windows.PetWindows;
 public class ConfigWindow : PetWindow
 {
     public ConfigWindow() : base(
-        "Global petname Settings",
+        "Global minionname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {

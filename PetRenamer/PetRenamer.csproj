@@ -28,10 +28,10 @@
    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
     <DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.11" />
-  </ItemGroup>
+  
+   <ItemGroup>
+     <PackageReference Include="DalamudPackager" Version="2.1.11" />
+   </ItemGroup>
   
   <ItemGroup>
     <Reference Include="FFXIVClientStructs">

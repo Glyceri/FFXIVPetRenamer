@@ -15,12 +15,16 @@ internal class CommandHandler : RegistryBase<PetCommand, PetCommandAttribute>
     {
         PetCommandAttribute attribute = element.GetType().GetCustomAttribute<PetCommandAttribute>()!;
         PluginHandlers.CommandManager.AddHandler(attribute.command, new CommandInfo(element.OnCommand) { HelpMessage = attribute.description, ShowInHelp = attribute.showInHelp });
+        foreach(string extraCommand in attribute.extraCommands)
+            PluginHandlers.CommandManager.AddHandler(extraCommand, new CommandInfo(element.OnCommand) { HelpMessage = attribute.description, ShowInHelp = false });
     }
 
     protected override void OnElementDestroyed(PetCommand element)
     {
         PetCommandAttribute attribute = element.GetType().GetCustomAttribute<PetCommandAttribute>()!;
         PluginHandlers.CommandManager.RemoveHandler(attribute.command);
+        foreach (string extraCommand in attribute.extraCommands)
+            PluginHandlers.CommandManager.RemoveHandler(extraCommand);
     }
 
     public void ClearAllCommands() => ClearAllElements();
