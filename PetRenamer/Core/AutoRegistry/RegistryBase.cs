@@ -29,6 +29,9 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
             OnElementCreation(createdElement);
             elements.Add(createdElement);
         }
+
+        foreach (T element in elements)
+            OnLateElementCreation(element);
     }
 
     public T GetElement(Type elementType)
@@ -53,5 +56,6 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
 
     protected virtual void OnTypeArrayCreation(Type[] types) { }
     protected virtual void OnElementCreation(T element) { }
+    protected virtual void OnLateElementCreation(T element) { }
     protected virtual void OnElementDestroyed(T element) { }
 }

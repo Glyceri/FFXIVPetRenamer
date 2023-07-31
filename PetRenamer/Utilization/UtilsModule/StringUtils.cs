@@ -4,6 +4,7 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -12,6 +13,8 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class StringUtils : UtilsRegistryType
 {
+    MathUtils mathUtils { get; set; } = null!;
+
     public string GetName(int ID)
     {
         foreach (SerializableNickname nickname in PluginLink.Configuration.users!)
@@ -45,4 +48,21 @@ internal class StringUtils : UtilsRegistryType
     public byte[] GetBytes(int ID) => GetBytes(GetName(ID));
     public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
+    public bool CharIsValidForName(char c) 
+    {
+        mathUtils = mathUtils != null ? mathUtils : mathUtils = PluginLink.Utils.Get<MathUtils>();
+        bool isValid = false;
+        if (mathUtils.IsInRange(c, 97, 122)) isValid = true;
+        if (mathUtils.IsInRange(c, 65, 90)) isValid = true;
+        if (mathUtils.IsInRange(c, 48, 57)) isValid = true;
+        if (c == 32 || c == 39) isValid = true;
+        return isValid;
+    }
+    public bool StringIsInvalidForName(string s)
+    {
+        foreach(char c in s)
+            if(!CharIsValidForName(c)) 
+                return true;
+        return false;
+    }
 }
