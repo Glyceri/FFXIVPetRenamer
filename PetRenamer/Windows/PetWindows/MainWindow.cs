@@ -6,7 +6,6 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Updatable.Updatables;
-using System.IO;
 using System.Collections.Generic;
 using PetRenamer.Utilization.Utils;
 using System.Linq;
@@ -27,13 +26,14 @@ public class MainWindow : InitializablePetWindow
     string lastValidName = string.Empty;
     string tempText = string.Empty;
 
-    public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(300, 180);
+        Size = new Vector2(300, 145);
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(300, 180),
-            MaximumSize = new Vector2(300, 200)
+            MinimumSize = new Vector2(300, 145),
+            MaximumSize = new Vector2(300, 145),
+           
         };
 
         stringUtils         = PluginLink.Utils.Get<StringUtils>();
@@ -65,8 +65,10 @@ public class MainWindow : InitializablePetWindow
 
     void DrawPetNameField()
     {
-        if(tempText.Length == 0) ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} does not have a name!");
-        else ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} is named: {tempText}");
+        string basePetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(gottenID));
+
+        if (tempText.Length == 0) ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {basePetName} does not have a name!");
+        else ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {basePetName} is named: {tempText}");
         ImGui.InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
 
         tempName = tempName.Trim();
@@ -131,6 +133,13 @@ public class MainWindow : InitializablePetWindow
         if (playerData == null) return;
         if (playerData!.Value.companionData == null) return;
         gottenID = playerData!.Value.companionData!.Value.currentModelID;
+        OnOpen();
+    }
+
+    public void OpenForId(int ID)
+    {
+        gottenID = ID;
+        IsOpen = true;
         OnOpen();
     }
 

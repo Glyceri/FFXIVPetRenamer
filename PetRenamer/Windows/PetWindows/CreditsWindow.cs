@@ -11,7 +11,7 @@ public class CreditsWindow : PetWindow
    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
    ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(300, 100);
+        Size = new Vector2(300, 75);
         SizeCondition = ImGuiCond.Always;
     }
 

@@ -10,9 +10,9 @@ public class ConfirmPopup : TemporaryPetWindow
     string message;
     Window blackenedWindow;
 
-    public ConfirmPopup(string message, Action<object> callback, Window blackenedWindow = null!) : base(message, callback, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public ConfirmPopup(string message, Action<object> callback, Window blackenedWindow = null!) : base(message, callback, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar)
     {
-        Size = new Vector2(400, 110);
+        Size = new Vector2(290, 140);
         SizeCondition = ImGuiCond.Always;
         if (blackenedWindow != null)
             Position = blackenedWindow.Position;

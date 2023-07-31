@@ -12,10 +12,9 @@ public class ConfigWindow : PetWindow
 {
     public ConfigWindow() : base(
         "Global minionname Settings",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse)
+        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(232, 150);
+        Size = new Vector2(232, 115);
         SizeCondition = ImGuiCond.Always;
     }
 

@@ -21,11 +21,16 @@ internal class SheetUtils : UtilsRegistryType
         if (playerData == null) return string.Empty;
         if (playerData!.Value.companionData == null) return string.Empty;
 
+        return GetPetName(playerData!.Value.companionData!.Value.currentModelID);
+    }
+
+    public string GetPetName(int id)
+    {
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
 
-            if (pet.Model.Value!.Model == playerData!.Value.companionData!.Value.currentModelID)
+            if (pet.Model.Value!.Model == id)
                 return pet.Singular.ToString();
         }
         return string.Empty;
