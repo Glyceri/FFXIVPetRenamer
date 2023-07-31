@@ -65,7 +65,8 @@ public class MainWindow : InitializablePetWindow
 
     void DrawPetNameField()
     {
-        ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} is named: {tempText}");
+        if(tempText.Length == 0) ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} does not have a name!");
+        else ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {stringUtils.MakeTitleCase(sheetUtils.GetCurrentPetName())} is named: {tempText}");
         ImGui.InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
 
         tempName = tempName.Trim();
@@ -114,12 +115,13 @@ public class MainWindow : InitializablePetWindow
             configurationUtils.SetNickname(gottenID, internalTempText);
             OnOpen();
         }
+        ImGui.SameLine(0, 1f);
         if (ImGui.Button("Remove Nickname"))
         {
             configurationUtils.RemoveNickname(gottenID);
             OnOpen();
         }
-        ImGui.Text("Resummon your minion or simply look away from it\nfor a moment to apply the nickname.");
+        ImGui.TextColored(new Vector4(0.8f, 0.8f, 0.8f, 1.0f),"Resummon your minion or simply look away from it\nfor a moment to apply the nickname.");
     }
 
     void OnChange(PlayerData? playerData, SerializableNickname nickname)
