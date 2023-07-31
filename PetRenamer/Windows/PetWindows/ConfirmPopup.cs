@@ -28,8 +28,11 @@ public class ConfirmPopup : TemporaryPetWindow
 
         bool? outcome = null;
 
+        
         if (ImGui.Button("Yes")) outcome = true;
+        ImGui.SameLine();
         if (ImGui.Button("No")) outcome = false;
+        //ImGui.NewLine();
         if (outcome == null) return;
 
         IsOpen = false;

@@ -7,4 +7,5 @@ internal class UtilsRegistryType : IRegistryElement
 {
     protected UtilsHandler Utils => PluginLink.Utils;
     internal virtual void OnRegistered() { }
+    internal virtual void OnLateRegistered() { }
 }

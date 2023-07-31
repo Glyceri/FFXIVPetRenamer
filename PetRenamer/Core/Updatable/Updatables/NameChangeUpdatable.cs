@@ -47,12 +47,14 @@ internal class NameChangeUpdatable : Updatable
     {
         PlayerData? playerData = playerUtils.GetPlayerData();
         int currentID = -1;
-        string currentName = null!;
+        string currentName;
+
         if (playerData == null) return;
         if (playerData!.Value.companionData != null)
             currentID = playerData!.Value.companionData!.Value.currentModelID;
         SerializableNickname serializableNickname = nicknameUtils.GetNickname(currentID);
-        if (serializableNickname != null) currentName = serializableNickname.Name;
+        if (serializableNickname == null) currentName = sheetUtils.GetCurrentPetName();
+        else currentName = serializableNickname.Name;
 
         if (currentID != lastID || currentName != lastName)
         {
