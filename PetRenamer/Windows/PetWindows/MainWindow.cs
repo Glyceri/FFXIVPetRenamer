@@ -33,7 +33,6 @@ public class MainWindow : InitializablePetWindow
         {
             MinimumSize = new Vector2(300, 145),
             MaximumSize = new Vector2(300, 145),
-           
         };
 
         stringUtils         = PluginLink.Utils.Get<StringUtils>();

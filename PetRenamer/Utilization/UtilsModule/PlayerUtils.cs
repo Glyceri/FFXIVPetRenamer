@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+﻿using Dalamud.Game.ClientState;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.Attributes;
@@ -27,7 +28,7 @@ internal class PlayerUtils : UtilsRegistryType
         if(playerCompanion != null)
             data = new CompanionData(playerCompanion, playerCompanion->Character.CharacterData.ModelSkeletonId);
 
-        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, data);
+        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, data);
     }
 }
 
@@ -40,16 +41,20 @@ internal struct PlayerData
     unsafe internal byte* namePtr;
     internal ushort homeWorld;
     internal byte gender;
+    internal int race;
+    internal int tribe;
 
     internal CompanionData? companionData;
 
-    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, CompanionData? companionData)
+    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
         this.namePtr = playerGameObject->Name;
         this.gender = gender;
         this.homeWorld = homeWorld;
         this.companionData = companionData;
+        this.race = race;
+        this.tribe = tribe;
     }
 }
 

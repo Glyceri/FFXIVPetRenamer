@@ -1,4 +1,5 @@
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 
@@ -10,4 +11,12 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     public void Dispose() => OnDispose();
     protected virtual void OnDispose() { }
+
+    protected static class Styling
+    {
+        public static Vector2 ListButton = new Vector2(150, 25);
+        public static Vector2 ListNameButton = new Vector2(480, 25);
+        public static Vector2 ListIDField = new Vector2(75, 25);
+        public static Vector2 SmallButton = new Vector2(25, 25);
+    }
 }
