@@ -1,8 +1,8 @@
 {
   "Author": "Glyceri",
   "Name": "Pet Nicknames",
-  "Punchline": "Give your pets cute nicknames",
-  "Description": "Use /petname to give your pet a nickname.",
+  "Punchline": "Give your minions cute nicknames",
+  "Description": "Use /minionname to give your minion a nickname.",
   "InternalName": "PetRenamer",
   "ApplicableVersion": "any",
   "Tags": [
@@ -11,7 +11,8 @@
     "Rename",
     "Nickname",
     "Text",
-    "Name"
+    "Name",
+    "Minion"
   ],
   "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png",
   "RepoUrl": "https://github.com/Glyceri/FFXIVPetRenamer"
