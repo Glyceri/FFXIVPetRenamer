@@ -45,6 +45,7 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe public override void Update(Framework frameWork)
     {
+        if (!playerUtils.PlayerDataAvailable()) return;
         PlayerData? playerData = playerUtils.GetPlayerData();
         int currentID = -1;
         string currentName;
