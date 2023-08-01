@@ -17,7 +17,7 @@ internal class ConfigurationUtils : UtilsRegistryType
         if (!PluginLink.Utils.Get<NicknameUtils>().ContainsLocal(forPet))
         {
             List<SerializableNickname> nicknames = PluginLink.Configuration.serializableUsers[0]!.nicknames.ToList();
-            nicknames.Add(new SerializableNickname(forPet, nickname));
+            nicknames.Insert(0, (new SerializableNickname(forPet, nickname)));
             PluginLink.Configuration.serializableUsers[0]!.nicknames = nicknames.ToArray();
         }
 

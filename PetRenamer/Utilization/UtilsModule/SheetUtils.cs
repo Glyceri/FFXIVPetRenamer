@@ -1,9 +1,9 @@
-using Dalamud.Game.ClientState.Objects.Types;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
-using Lumina.Text;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
+using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -42,6 +42,28 @@ internal class SheetUtils : UtilsRegistryType
                 return pet.Singular.ToString();
         }
         return string.Empty;
+    }
+
+    public List<SerializableNickname> GetThoseThatContain(string querry)
+    {
+        querry = querry.ToLower().Trim();
+        List<SerializableNickname> serializableNicknames = new List<SerializableNickname>();
+        if(querry.Length == 0) return serializableNicknames;
+
+        foreach (Companion pet in petSheet)
+        {
+            if (pet == null) continue;
+            int petModel = pet.Model.Value!.Model;
+            string petName = pet.Singular.ToString();
+
+            if (petModel <= 0) continue;
+            if (petName.Length == 0) continue;
+
+            if (petModel.ToString().Contains(querry) || petName.Contains(querry))
+                serializableNicknames.Add(new SerializableNickname(petModel, petName));
+        }
+
+        return serializableNicknames;
     }
 
     public string GetRace(int r, byte gender)
@@ -85,7 +107,7 @@ internal class SheetUtils : UtilsRegistryType
 
     public string GetGender(byte gender)
     {
-        if(gender == 0) return "Male";
+        if (gender == 0) return "Male";
         if (gender == 1) return "Female";
 
         return "No Gender";
