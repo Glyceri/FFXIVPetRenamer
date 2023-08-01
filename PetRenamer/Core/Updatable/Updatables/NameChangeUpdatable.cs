@@ -45,6 +45,7 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe public override void Update(Framework frameWork)
     {
+        if (!playerUtils.PlayerDataAvailable()) return;
         PlayerData? playerData = playerUtils.GetPlayerData();
         int currentID = -1;
         string currentName;
@@ -52,7 +53,7 @@ internal class NameChangeUpdatable : Updatable
         if (playerData == null) return;
         if (playerData!.Value.companionData != null)
             currentID = playerData!.Value.companionData!.Value.currentModelID;
-        SerializableNickname serializableNickname = nicknameUtils.GetNickname(currentID);
+        SerializableNickname serializableNickname = nicknameUtils.GetLocalNickname(currentID);
         if (serializableNickname == null) currentName = sheetUtils.GetCurrentPetName();
         else currentName = serializableNickname.Name;
 
@@ -61,7 +62,7 @@ internal class NameChangeUpdatable : Updatable
             lastID = currentID;
             lastName = currentName;
 
-            SerializableNickname nickname = nicknameUtils.GetNickname(currentID);
+            SerializableNickname nickname = nicknameUtils.GetLocalNickname(currentID);
 
             onCompanionChange?.Invoke(playerData, nickname);
         }

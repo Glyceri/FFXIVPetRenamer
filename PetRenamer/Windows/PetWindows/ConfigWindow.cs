@@ -1,6 +1,5 @@
 using System.Numerics;
 using ImGuiNET;
-using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
 
@@ -28,7 +27,7 @@ public class ConfigWindow : PetWindow
         if(ImGui.Button("Clear All Nicknames")) 
             PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
                 "Are you sure you want to clear all Nicknames?",
-                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknames(); } }
+                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknamesForLocalUser(); } }
                 , this);
         
 
