@@ -15,6 +15,18 @@ internal class StringUtils : UtilsRegistryType
 {
     MathUtils mathUtils { get; set; } = null!;
 
+    public string GetLocalName(int ID)
+    {
+        if (PluginLink.Configuration.serializableUsers!.Length == 0) return string.Empty;
+
+        foreach (SerializableNickname nickname in PluginLink.Configuration.serializableUsers![0].nicknames)
+            if (nickname.ID == ID)
+                return nickname.Name;
+
+        return string.Empty;
+    }
+
+    [Obsolete]
     public string GetName(int ID)
     {
         foreach (SerializableNickname nickname in PluginLink.Configuration.users!)
@@ -44,8 +56,6 @@ internal class StringUtils : UtilsRegistryType
         return nameBytes;
     }
 
-
-    public byte[] GetBytes(int ID) => GetBytes(GetName(ID));
     public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
     public bool CharIsValidForName(char c) 

@@ -11,6 +11,8 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class PlayerUtils : UtilsRegistryType
 {
+    public bool PlayerDataAvailable() => PluginHandlers.ClientState.LocalPlayer != null;
+
     unsafe internal PlayerData? GetPlayerData()
     {
         GameObject* me = GameObjectManager.GetGameObjectByIndex(0);

@@ -45,8 +45,8 @@ public class MainWindow : InitializablePetWindow
     public override void OnOpen()
     {
         tempText = string.Empty;
-        if (nicknameUtils.Contains(gottenID))
-            tempText = stringUtils.GetName(gottenID);
+        if (nicknameUtils.ContainsLocal(gottenID))
+            tempText = stringUtils.GetLocalName(gottenID);
 
         tempName = tempText;
     }

@@ -19,6 +19,39 @@ public class Configuration : IPluginConfiguration
         if(users == null) users = new SerializableNickname[0];
     }
 
+    void CurrentInitialize()
+    {
+        if(serializableUsers == null) serializableUsers = new SerializableUser[0];
+    }
+
+    public void ClearAllUsers()
+    {
+        PluginLink.WindowHandler.CloseAllWindows();
+        serializableUsers = new SerializableUser[0];
+        Save();
+    }
+
+    public void ClearNicknamesForAllUsers()
+    {
+        PluginLink.WindowHandler.CloseAllWindows();
+        foreach (SerializableUser user in serializableUsers!)
+            ClearNicknamesForUser(user, false);
+        Save();
+    }
+
+    public void ClearNicknamesForLocalUser()
+    {
+        if (serializableUsers!.Length == 0) return;
+        ClearNicknamesForUser(serializableUsers![0]);
+    }
+
+    public void ClearNicknamesForUser(SerializableUser user, bool autosave = true)
+    {
+        user.nicknames = new SerializableNickname[0];
+        if(autosave) Save();
+    }
+
+    [Obsolete("Use ClearNicknamesForUser() instead")]
     public void ClearNicknames()
     {
         PluginLink.WindowHandler.CloseAllWindows();
