@@ -9,6 +9,7 @@ namespace PetRenamer.Core.AutoRegistry;
 internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistryElement where TT : Attribute
 {
     protected List<T> elements = new List<T>();
+    protected List<TT> attributes = new List<TT>();
 
     public RegistryBase()
     {
@@ -28,6 +29,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
             T createdElement = (T)Activator.CreateInstance(type)!;
             OnElementCreation(createdElement);
             elements.Add(createdElement);
+            attributes.Add(createdElement.GetType().GetCustomAttribute<TT>()!);
         }
 
         foreach (T element in elements)
@@ -52,6 +54,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
                 ((IDisposable)element)?.Dispose();
         }
         elements.Clear();
+        attributes.Clear();
     }
 
     protected virtual void OnTypeArrayCreation(Type[] types) { }
