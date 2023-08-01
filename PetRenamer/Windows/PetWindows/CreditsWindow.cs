@@ -15,7 +15,7 @@ public class CreditsWindow : PetWindow
         SizeCondition = ImGuiCond.Always;
     }
 
-    public override void Draw()
+    public override void OnDraw()
     {
         ImGui.TextColored(new Vector4(0.6f, 1, 1, 1), "Created by: Glyceri");
         ImGui.TextColored(new Vector4(0.6f, 1, 1, 1), "In loving memory of: Bruno");

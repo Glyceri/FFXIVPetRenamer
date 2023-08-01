@@ -17,7 +17,7 @@ public class ConfigWindow : PetWindow
         SizeCondition = ImGuiCond.Always;
     }
 
-    public override void Draw()
+    public override void OnDraw()
     {
         if (ImGui.Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames))
         {

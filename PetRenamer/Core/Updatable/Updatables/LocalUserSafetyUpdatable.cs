@@ -23,7 +23,7 @@ internal class LocalUserSafetyUpdatable : Updatable
 
 
         PlayerData playerData = playerUtils.GetPlayerData()!.Value;
-        PluginLink.Configuration.serializableUsers = new SerializableUser[1] { new SerializableUser(new SerializableNickname[0], playerData.playerName, playerData.gender, playerData.homeWorld) };
+        PluginLink.Configuration.serializableUsers = new SerializableUser[1] { new SerializableUser(new SerializableNickname[0], playerData.playerName, playerData.homeWorld) };
     }
 }
 

@@ -51,7 +51,7 @@ public class MainWindow : InitializablePetWindow
         tempName = tempText;
     }
 
-    public override void Draw()
+    public override void OnDraw()
     {
         if (gottenID <= -1) DrawNoMinionSpawned();
         else DrawPetNameField();
