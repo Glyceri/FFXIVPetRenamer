@@ -40,6 +40,12 @@ public class Configuration : IPluginConfiguration
         Save();
     }
 
+    public void ClearNicknamesForLocalUser()
+    {
+        if (serializableUsers!.Length == 0) return;
+        ClearNicknamesForUser(serializableUsers![0]);
+    }
+
     public void ClearNicknamesForUser(SerializableUser user, bool autosave = true)
     {
         user.nicknames = new SerializableNickname[0];

@@ -3,6 +3,7 @@ using Dalamud.IoC;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
+using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +11,8 @@ namespace PetRenamer.Core.Legacy;
 
 internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAttribute>
 {
+    PlayerUtils playerUtils { get; set; } = null!;
+
     int lastInternalVersion = -1;
     int currentInternalVersion = 0;
 
@@ -17,6 +20,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
 
     public LegacyCompatibilityHandler() : base()
     {
+        playerUtils = PluginLink.Utils.Get<PlayerUtils>();
         currentInternalVersion = PluginLink.Configuration.Version;
     }
 
@@ -51,7 +55,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
 
         if (hasFoundPlayer) return;
 
-        hasFoundPlayer = PluginHandlers.ClientState.LocalPlayer != null;
+        hasFoundPlayer = playerUtils.PlayerDataAvailable();
         if (hasFoundPlayer)
             foreach (LegacyElement legacyElement in correctElements)
                 legacyElement.OnPlayerAvailable(currentInternalVersion);

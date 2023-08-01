@@ -1,6 +1,5 @@
 using System.Numerics;
 using ImGuiNET;
-using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
 
