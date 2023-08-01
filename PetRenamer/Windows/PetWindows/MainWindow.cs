@@ -113,13 +113,13 @@ public class MainWindow : InitializablePetWindow
     {
         if (ImGui.Button("Save Nickname"))
         {
-            configurationUtils.SetNickname(gottenID, internalTempText);
+            configurationUtils.SetLocalNickname(gottenID, internalTempText);
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
         if (ImGui.Button("Remove Nickname"))
         {
-            configurationUtils.RemoveNickname(gottenID);
+            configurationUtils.RemoveLocalNickname(gottenID);
             OnOpen();
         }
         ImGui.TextColored(new Vector4(0.8f, 0.8f, 0.8f, 1.0f),"Resummon your minion or simply look away from it\nfor a moment to apply the nickname.");

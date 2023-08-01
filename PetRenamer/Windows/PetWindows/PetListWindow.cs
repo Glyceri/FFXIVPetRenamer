@@ -33,7 +33,8 @@ public class PetListWindow : PetWindow
 
     public unsafe override void Draw()
     {
-        int minionCount = PluginLink.Configuration.users!.Length;
+        if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
+        int minionCount = PluginLink.Configuration.serializableUsers![0].nicknames!.Length;
         float calcedSize = minionCount * Styling.ListButton.Y + 10;
         if (calcedSize < maxBoxHeight) calcedSize = maxBoxHeight;
         int counter = 1;
@@ -49,7 +50,7 @@ public class PetListWindow : PetWindow
         ImGui.EndListBox();
 
         ImGui.BeginListBox("##<2>", new System.Numerics.Vector2(780, calcedSize));
-        foreach (SerializableNickname nickname in PluginLink.Configuration.users!)
+        foreach (SerializableNickname nickname in PluginLink.Configuration.serializableUsers![0].nicknames)
         {
             string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
 
@@ -58,7 +59,7 @@ public class PetListWindow : PetWindow
             if (ImGui.Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton)) 
                 PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID);                    ImGui.SameLine();
             if (ImGui.Button("X" + $"##<{counter++}>", Styling.SmallButton))
-               PluginLink.Utils.Get<ConfigurationUtils>().RemoveNickname(nickname.ID);
+               PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNickname(nickname.ID);
         }
         ImGui.EndListBox();
     }
