@@ -1,6 +1,7 @@
 ﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class ConfigurationUtils : UtilsRegistryType
 {
+    [Obsolete]
     public void SetNickname(int forPet, string nickname)
     {
         if (!PluginLink.Utils.Get<NicknameUtils>().Contains(forPet))
@@ -25,6 +27,7 @@ internal class ConfigurationUtils : UtilsRegistryType
         PluginLink.Configuration.Save();
     }
 
+    [Obsolete]
     public void RemoveNickname(int forPet)
     {
         if (PluginLink.Utils.Get<NicknameUtils>().Contains(forPet))

@@ -1,6 +1,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
+using System;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -44,7 +45,7 @@ internal class NicknameUtils : UtilsRegistryType
 
         return false;
     }
-
+    [Obsolete]
     internal SerializableNickname GetNickname(int ID)
     {
         for (int i = 0; i < PluginLink.Configuration.users!.Length; i++)

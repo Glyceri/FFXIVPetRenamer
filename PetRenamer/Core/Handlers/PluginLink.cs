@@ -1,5 +1,6 @@
 using Dalamud.Plugin;
 using PetRenamer.Commands;
+using PetRenamer.Core.Legacy;
 using PetRenamer.Core.Updatable;
 using PetRenamer.Utilization;
 using PetRenamer.Windows.Handler;
@@ -15,6 +16,7 @@ internal class PluginLink
     internal static DalamudPluginInterface DalamudPlugin { get; set; } = null!;
     internal static CommandHandler CommandHandler { get; set; } = null!;
     internal static UpdatableHandler UpdatableHandler { get; set; } = null!;
+    internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
 
     internal static void Start(DalamudPluginInterface dalamud, PetRenamerPlugin petPlugin)
     {
@@ -27,5 +29,6 @@ internal class PluginLink
         CommandHandler = new CommandHandler();
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
+        LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
     }
 }
