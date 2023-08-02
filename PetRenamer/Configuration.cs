@@ -13,6 +13,7 @@ public class Configuration : IPluginConfiguration
     public SerializableUser[]? serializableUsers = null;
 
     public bool displayCustomNames = true;
+    public bool useCustomTheme = true;
 
     public void Initialize()
     {

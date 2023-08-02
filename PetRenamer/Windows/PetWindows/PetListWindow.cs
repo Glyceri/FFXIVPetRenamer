@@ -27,8 +27,6 @@ public class PetListWindow : PetWindow
         configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
 
-        IsOpen = true;
-
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 800),
@@ -50,7 +48,7 @@ public class PetListWindow : PetWindow
         PlayerData playerData = playerUtils.GetPlayerData()!.Value;
         byte playerGender = playerData.gender;
 
-        ImGui.BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
+        BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
         Button($"{playerData.playerName}", Styling.ListButton); ImGui.SameLine();
         Label($"{sheetUtils.GetWorldName(playerData.homeWorld)}", Styling.ListButton); ImGui.SameLine();
         Label($"{sheetUtils.GetRace(playerData.race, playerData.gender)}", Styling.ListButton); ImGui.SameLine();
@@ -61,7 +59,7 @@ public class PetListWindow : PetWindow
 
     void DrawExportHeader()
     {
-        ImGui.BeginListBox("##<clipboard>", new System.Numerics.Vector2(780, 32));
+        BeginListBox("##<clipboard>", new System.Numerics.Vector2(780, 32));
         Button($"Export to Clipboard",    Styling.ListButton); ImGui.SameLine();
         Button($"Import from Clipboard",  Styling.ListButton);
         ImGui.EndListBox();
@@ -70,7 +68,7 @@ public class PetListWindow : PetWindow
     void DrawList()
     {
         int counter = 10;
-        ImGui.BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
+        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
         DrawListHeader();
         if (openedAddPet) DrawOpenedNewPet();
         else 
