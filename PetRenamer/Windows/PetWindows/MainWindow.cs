@@ -82,17 +82,15 @@ public class MainWindow : InitializablePetWindow
 
         tempName = tempName.Trim();
 
-        if (!stringUtils.StringIsInvalidForName(tempName))
-        {
+        //if (!stringUtils.StringIsInvalidForName(tempName)) {
             lastValidName = tempName;
             DrawValidName(tempName);
-        }
-        else
+        /*} else
         {
             DrawInvalidName();
             tempName = lastValidName;
             tempName = tempName.Replace("�", "");
-        }
+        }*/
     }
 
     //What a dirty way of doing this :D I hate it :D

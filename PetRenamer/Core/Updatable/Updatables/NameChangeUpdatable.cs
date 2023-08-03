@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -90,7 +91,9 @@ internal class NameChangeUpdatable : Updatable
                 }
 
                 if (playerCompanion == null) break;
-                Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+                byte[] outcome = new byte[PluginConstants.ffxivNameSize];
+                Marshal.Copy((nint)Utf8String.FromString(currentName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
+                Marshal.Copy(outcome, 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
             }
         }
     }
