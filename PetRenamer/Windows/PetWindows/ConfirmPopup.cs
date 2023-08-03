@@ -21,18 +21,17 @@ public class ConfirmPopup : TemporaryPetWindow
         IsOpen = true;
     }
 
-    internal override void OnDraw()
+    public override void OnDraw()
     {
         if (blackenedWindow != null) blackenedWindow.IsOpen = false;
-        ImGui.TextColored(new Vector4(1, 0, 0, 1), message);
+        ImGui.TextColored(StylingColours.errorText, message);
 
         bool? outcome = null;
 
         
-        if (ImGui.Button("Yes")) outcome = true;
+        if (Button("Yes")) outcome = true;
         ImGui.SameLine();
-        if (ImGui.Button("No")) outcome = false;
-        //ImGui.NewLine();
+        if (Button("No")) outcome = false;
         if (outcome == null) return;
 
         IsOpen = false;

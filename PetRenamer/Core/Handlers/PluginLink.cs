@@ -17,8 +17,9 @@ internal class PluginLink
     internal static CommandHandler CommandHandler { get; set; } = null!;
     internal static UpdatableHandler UpdatableHandler { get; set; } = null!;
     internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
+    internal static QuitHandler QuitHandler { get; set; } = null!;
 
-    internal static void Start(DalamudPluginInterface dalamud, PetRenamerPlugin petPlugin)
+    internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
     {
         DalamudPlugin = dalamud;
         PetRenamerPlugin = petPlugin;
@@ -30,5 +31,6 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
+        QuitHandler = new QuitHandler();
     }
 }

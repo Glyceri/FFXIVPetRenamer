@@ -16,5 +16,5 @@ internal class PluginHandlers
     [PluginService] internal static SigScanner SigScanner { get; set; } = null!;
     [PluginService] internal static ClientState ClientState { get; private set; } = null!;
 
-    internal static void Start(DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
+    internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

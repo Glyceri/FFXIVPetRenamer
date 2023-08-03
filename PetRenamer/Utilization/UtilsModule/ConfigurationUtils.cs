@@ -10,6 +10,12 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class ConfigurationUtils : UtilsRegistryType
 {
+    public SerializableUser? GetLocalPlayer()
+    {
+        if (PluginLink.Configuration.serializableUsers!.Length == 0) return null;
+        return PluginLink.Configuration.serializableUsers[0];
+    }
+
     public void SetLocalNickname(int forPet, string nickname)
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
@@ -42,6 +48,37 @@ internal class ConfigurationUtils : UtilsRegistryType
             PluginLink.Configuration.serializableUsers[0]!.nicknames = nicknames.ToArray();
             PluginLink.Configuration.Save();
         }
+    }
+
+
+    public void AddNewUser(SerializableUser user)
+    {
+        if (UserExists(user)) return;
+
+        List<SerializableUser> users = PluginLink.Configuration.serializableUsers!.ToList();
+        users.Add(user);
+        PluginLink.Configuration.serializableUsers = users.ToArray();
+        PluginLink.Configuration.Save();
+    }
+
+    public bool UserExists(SerializableUser testForUser)
+    {
+        if (PluginLink.Configuration.serializableUsers!.Length == 0) return false;
+
+        foreach(SerializableUser user in PluginLink.Configuration.serializableUsers!)
+            if(user.username == testForUser.username && user.homeworld == testForUser.homeworld) 
+                return true;
+        
+        return false;
+    }
+
+    public SerializableUser GetUser(SerializableUser testForUser)
+    {
+        foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
+            if (user.username == testForUser.username && user.homeworld == testForUser.homeworld)
+                return user;
+
+        return null!;
     }
 
     [Obsolete]
