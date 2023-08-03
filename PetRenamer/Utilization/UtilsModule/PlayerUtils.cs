@@ -1,9 +1,7 @@
-﻿using Dalamud.Game.ClientState;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.Attributes;
-
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 
 namespace PetRenamer.Utilization.UtilsModule;

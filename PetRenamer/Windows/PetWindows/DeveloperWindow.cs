@@ -9,4 +9,3 @@ internal class DeveloperWindow : PetWindow
         IsOpen = true;
     }
 }
-

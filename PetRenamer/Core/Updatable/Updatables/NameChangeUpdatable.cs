@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
-using Lumina.Excel.GeneratedSheets;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -79,7 +78,7 @@ internal class NameChangeUpdatable : Updatable
                 string currentName;
                 SerializableNickname serializableNickname = nicknameUtils.GetNickname(user, currentID);
                 currentName = sheetUtils.GetPetName(currentID);
-                if (PluginLink.Configuration.displayCustomNames && currentName.Length != 0)
+                if (PluginLink.Configuration.displayCustomNames && currentName.Length != 0 && serializableNickname != null)
                     currentName = serializableNickname.Name;
 
                 if (i == 0 && (currentID != lastID || currentName != lastName))
