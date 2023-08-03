@@ -1,10 +1,9 @@
-using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using System;
 
 namespace PetRenamer.Windows;
 
-public abstract class TemporaryPetWindow : Window, IDisposable
+public abstract class TemporaryPetWindow : PetWindow, IDisposable
 {
     Action<object> callback { get; set; } = null!;
     public bool closed { get; private set; } = false;
@@ -19,10 +18,9 @@ public abstract class TemporaryPetWindow : Window, IDisposable
         callback?.Invoke(data);
         Close();
     }
-    public void Dispose() { closed = true; OnDispose(); }
+    public new void Dispose() { closed = true; OnDispose(); }
     public void Close() => Dispose();
-    protected virtual void OnDispose() { }
+    protected override void OnDispose() { }
 
-    public sealed override void Draw() => OnDraw();
-    internal virtual void OnDraw() { }
+    public unsafe override void OnDraw() { }
 }

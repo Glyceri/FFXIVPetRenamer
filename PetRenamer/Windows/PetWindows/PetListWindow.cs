@@ -17,10 +17,12 @@ public class PetListWindow : PetWindow
     ConfigurationUtils configurationUtils { get; set; } = null!;
     NicknameUtils nicknameUtils { get; set; } = null!;
 
-    int maxBoxHeight = 725;
+    int maxBoxHeight = 670;
 
-    public PetListWindow() : base("Minion List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public PetListWindow() : base("Minion List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
+        IsOpen = true;
+
         sheetUtils = PluginLink.Utils.Get<SheetUtils>();
         stringUtils = PluginLink.Utils.Get<StringUtils>();
         playerUtils = PluginLink.Utils.Get<PlayerUtils>();
@@ -30,15 +32,16 @@ public class PetListWindow : PetWindow
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 800),
-            MaximumSize = new Vector2(800, 10000000)
+            MaximumSize = new Vector2(800, 800)
         };
     }
 
-    public unsafe override void Draw()
+    public unsafe override void OnDraw()
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
         
         DrawUserHeader();
+        DrawExportHeader();
         DrawList();
     }
 
@@ -46,19 +49,28 @@ public class PetListWindow : PetWindow
     {
         PlayerData playerData = playerUtils.GetPlayerData()!.Value;
         byte playerGender = playerData.gender;
-        
-        ImGui.BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        ImGui.Button($"{playerData.playerName}", Styling.ListButton); ImGui.SameLine();
-        ImGui.Button($"{sheetUtils.GetWorldName(playerData.homeWorld)}", Styling.ListButton); ImGui.SameLine();
-        ImGui.Button($"{sheetUtils.GetRace(playerData.race, playerData.gender)}", Styling.ListButton); ImGui.SameLine();
-        ImGui.Button($"{sheetUtils.GetGender(playerGender)}", Styling.ListButton);
+
+        BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
+        Button($"{playerData.playerName}", Styling.ListButton); ImGui.SameLine();
+        Label($"{sheetUtils.GetWorldName(playerData.homeWorld)}", Styling.ListButton); ImGui.SameLine();
+        Label($"{sheetUtils.GetRace(playerData.race, playerData.gender)}", Styling.ListButton); ImGui.SameLine();
+        Label($"{sheetUtils.GetGender(playerGender)}", Styling.ListButton);
+        ImGui.EndListBox();
+        ImGui.NewLine();
+    }
+
+    void DrawExportHeader()
+    {
+        BeginListBox("##<clipboard>", new System.Numerics.Vector2(780, 32));
+        Button($"Export to Clipboard",    Styling.ListButton); ImGui.SameLine();
+        Button($"Import from Clipboard",  Styling.ListButton);
         ImGui.EndListBox();
     }
 
     void DrawList()
     {
         int counter = 10;
-        ImGui.BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
+        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
         DrawListHeader();
         if (openedAddPet) DrawOpenedNewPet();
         else 
@@ -66,11 +78,11 @@ public class PetListWindow : PetWindow
         {
             string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
 
-            ImGui.Button(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-            ImGui.Button(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-            if (ImGui.Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
+                Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
                 PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
-            if (ImGui.Button("X" + $"##<{counter++}>", Styling.SmallButton))
+            if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                 PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNickname(nickname.ID);
         }
         ImGui.EndListBox();
@@ -83,11 +95,11 @@ public class PetListWindow : PetWindow
     void DrawOpenedNewPet()
     {
         int counter = 0;
-        if(ImGui.InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackEdit))
+        if(InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackEdit))
             foundNicknames = sheetUtils.GetThoseThatContain(minionSearchField);
         
-        ImGui.SameLine();
-        if(ImGui.Button("X##ForOpenedPet", Styling.SmallButton))
+        ImGui.SameLine(0, 41);
+        if(XButton("X##ForOpenedPet", Styling.SmallButton))
         {
             openedAddPet = false;
             minionSearchField = string.Empty;
@@ -98,9 +110,9 @@ public class PetListWindow : PetWindow
 
         foreach(SerializableNickname nickname in foundNicknames)
         {
-            ImGui.Button(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-            ImGui.Button(stringUtils.MakeTitleCase(nickname.Name) + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-            if (ImGui.Button("+" + $"##<{counter++}>", Styling.SmallButton))
+            Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+            Label(stringUtils.MakeTitleCase(nickname.Name) + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
             {
                 openedAddPet = false;
                 if(!nicknameUtils.ContainsLocal(nickname.ID)) configurationUtils.SetLocalNickname(nickname.ID, string.Empty);
@@ -111,10 +123,10 @@ public class PetListWindow : PetWindow
 
     void DrawListHeader()
     {
-        ImGui.Button("Minion ID", Styling.ListIDField); ImGui.SameLine();
-        ImGui.Button("Minion Name", Styling.ListButton); ImGui.SameLine();
-        ImGui.Button("Custom Minion name", Styling.ListNameButton); ImGui.SameLine();
-        if (ImGui.Button("+", Styling.SmallButton)) openedAddPet = true;
+        Label("Minion ID", Styling.ListIDField); ImGui.SameLine();
+        Label("Minion Name", Styling.ListButton); ImGui.SameLine();
+        Label("Custom Minion name", Styling.ListNameButton); ImGui.SameLine();
+        if (XButton("+", Styling.SmallButton)) openedAddPet = true;
         if(!openedAddPet)
         ImGui.NewLine();
     }

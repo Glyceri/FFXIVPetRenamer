@@ -13,25 +13,22 @@ public class ConfigWindow : PetWindow
         "Global minionname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(232, 115);
+        Size = new Vector2(232, 135);
         SizeCondition = ImGuiCond.Always;
     }
 
-    public override void Draw()
+    public override void OnDraw()
     {
-        if (ImGui.Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames))
-        {
+        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
             PluginLink.Configuration.Save();
-        }
 
-        if(ImGui.Button("Clear All Nicknames")) 
+        if (Button("Clear All Nicknames")) 
             PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
                 "Are you sure you want to clear all Nicknames?",
                 (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknamesForLocalUser(); } }
                 , this);
-        
 
-        if (ImGui.Button("Credits"))
+        if (Button("Credits"))
             PluginLink.WindowHandler.OpenWindow<CreditsWindow>();
     }
 }
