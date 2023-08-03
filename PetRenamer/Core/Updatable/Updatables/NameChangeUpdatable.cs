@@ -59,7 +59,7 @@ internal class NameChangeUpdatable : Updatable
             FFCompanion* meCompanion = (FFCompanion*)me;
             if (meCompanion == null) continue;
             FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
-
+            
 
             string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
             ushort objectHomeworld = playerCharacter->HomeWorld;
@@ -89,7 +89,7 @@ internal class NameChangeUpdatable : Updatable
                     onCompanionChange?.Invoke(playerUtils.GetPlayerData(), serializableNickname);
                 }
 
-
+                if (playerCompanion == null) break;
                 Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
             }
         }
