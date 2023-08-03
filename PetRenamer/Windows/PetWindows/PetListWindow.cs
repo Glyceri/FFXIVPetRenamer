@@ -23,8 +23,6 @@ public class PetListWindow : PetWindow
 
     public PetListWindow() : base("Minion List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
-        IsOpen = true;
-
         sheetUtils = PluginLink.Utils.Get<SheetUtils>();
         stringUtils = PluginLink.Utils.Get<StringUtils>();
         playerUtils = PluginLink.Utils.Get<PlayerUtils>();
