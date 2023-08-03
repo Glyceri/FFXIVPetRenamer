@@ -4,6 +4,10 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
+using Lumina.Excel.GeneratedSheets;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -43,6 +47,7 @@ internal class NameChangeUpdatable : Updatable
     }
 #pragma warning restore CS8601 // Possible null reference assignment.
 
+    /*
     unsafe public override void Update(Framework frameWork)
     {
         if (!playerUtils.PlayerDataAvailable()) return;
@@ -71,5 +76,54 @@ internal class NameChangeUpdatable : Updatable
             currentName = sheetUtils.GetCurrentPetName();
 
         Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerData!.Value.companionData!.Value.namePtr, PluginConstants.ffxivNameSize);
+    }*/
+
+    public override unsafe void Update(Framework frameWork)
+    {
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+        for (int i = 0; i < 200; i++)
+        {
+            GameObject* me = GameObjectManager.GetGameObjectByIndex(i);
+            if (me == null) continue;
+            if (!me->IsCharacter()) continue;
+            Character* playerCharacter = (Character*)me;
+            if (playerCharacter == null) continue;
+            FFCompanion* meCompanion = (FFCompanion*)me;
+            if (meCompanion == null) continue;
+            FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
+
+
+            string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
+            ushort objectHomeworld = playerCharacter->HomeWorld;
+
+            int currentID = -1;
+            
+            if(playerCompanion != null)
+                currentID = playerCompanion->Character.CharacterData.ModelSkeletonId;
+
+            foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
+            {
+                if (user == null) continue;
+                if (objectName != user.username) continue;
+                if (objectHomeworld != user.homeworld) continue;
+
+                string currentName;
+                SerializableNickname serializableNickname = nicknameUtils.GetNickname(user, currentID);
+                currentName = sheetUtils.GetPetName(currentID);
+                if (PluginLink.Configuration.displayCustomNames && currentName.Length != 0)
+                    currentName = serializableNickname.Name;
+
+                if (i == 0 && (currentID != lastID || currentName != lastName))
+                {
+                    lastID = currentID;
+                    lastName = currentName;
+
+                    onCompanionChange?.Invoke(playerUtils.GetPlayerData(), serializableNickname);
+                }
+
+
+                Marshal.Copy(stringUtils.GetBytes(currentName), 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+            }
+        }
     }
 }

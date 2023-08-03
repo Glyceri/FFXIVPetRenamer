@@ -11,11 +11,16 @@ internal class NicknameUtils : UtilsRegistryType
     internal SerializableNickname GetLocalNickname(int ID)
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return null!;
-        SerializableUser localUser = PluginLink.Configuration.serializableUsers![0];
+        return GetNickname(PluginLink.Configuration.serializableUsers![0], ID);
+    }
 
-        for (int i = 0; i < localUser.nicknames!.Length; i++)
-            if (localUser.nicknames[i].ID == ID)
-                return localUser.nicknames[i];
+    internal SerializableNickname GetNickname(SerializableUser user, int ID)
+    {
+        if(user == null) return null!;
+
+        for (int i = 0; i < user.nicknames!.Length; i++)
+            if (user.nicknames[i].ID == ID)
+                return user.nicknames[i];
 
         return null!;
     }
