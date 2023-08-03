@@ -14,7 +14,7 @@ namespace PetRenamer.Core.Serialization
         public SerializableUser(SerializableNickname[] nicknames, string username, ushort homeworld)
         {
             this.nicknames = nicknames;
-            this.username = username;
+            this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
             this.homeworld = homeworld;
         }
 

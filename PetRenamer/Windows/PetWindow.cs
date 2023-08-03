@@ -94,13 +94,31 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
-    protected void Label(string text, Vector2 styling)
+    protected bool Label(string text, Vector2 styling)
     {
         PushStyleColor(ImGuiCol.ButtonHovered,    StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Button,           StylingColours.idleColor);
         PushStyleColor(ImGuiCol.ButtonActive,     StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);      
-        ImGui.Button(text, styling);
+        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        return ImGui.Button(text, styling);
+    }
+
+    protected bool NewLabel(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.button);
+        PushStyleColor(ImGuiCol.Button, StylingColours.button);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.button);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.Button(text, styling);
+    }
+
+    protected bool OverrideLabel(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.Button(text, styling);
     }
 
     protected bool Checkbox(string text, ref bool value)

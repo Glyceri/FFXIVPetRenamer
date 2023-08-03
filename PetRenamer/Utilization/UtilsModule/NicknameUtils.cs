@@ -34,6 +34,29 @@ internal class NicknameUtils : UtilsRegistryType
         return false;
     }
 
+    internal bool IsSame(SerializableUser user, int ID, string name)
+    {
+        if(user == null) return false;
+        foreach (SerializableNickname nickname in user.nicknames)
+        {
+            if (nickname == null) continue;
+            if (nickname.ID == ID && nickname.Name == name) return true;
+        }
+        return false;
+    }
+
+    internal bool HasID(SerializableUser user, int ID)
+    {
+        if(user == null) return false;
+
+        foreach (SerializableNickname nickname in user.nicknames)
+        {
+            if (nickname == null) continue;
+            if (nickname.ID == ID) return true;
+        }
+        return false;
+    }
+
     [Obsolete]
     internal bool Contains(int ID)
     {
