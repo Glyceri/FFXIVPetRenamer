@@ -21,6 +21,8 @@ public class PetListWindow : PetWindow
 
     public PetListWindow() : base("Minion List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
+        IsOpen = true;
+
         sheetUtils = PluginLink.Utils.Get<SheetUtils>();
         stringUtils = PluginLink.Utils.Get<StringUtils>();
         playerUtils = PluginLink.Utils.Get<PlayerUtils>();
@@ -93,10 +95,10 @@ public class PetListWindow : PetWindow
     void DrawOpenedNewPet()
     {
         int counter = 0;
-        if(ImGui.InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackEdit))
+        if(InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackEdit))
             foundNicknames = sheetUtils.GetThoseThatContain(minionSearchField);
         
-        ImGui.SameLine();
+        ImGui.SameLine(0, 41);
         if(XButton("X##ForOpenedPet", Styling.SmallButton))
         {
             openedAddPet = false;

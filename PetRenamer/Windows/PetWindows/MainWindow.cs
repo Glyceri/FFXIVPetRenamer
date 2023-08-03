@@ -19,7 +19,6 @@ public class MainWindow : InitializablePetWindow
     readonly SheetUtils sheetUtils;
     readonly NicknameUtils nicknameUtils;
     readonly ConfigurationUtils configurationUtils;
-    readonly MathUtils mathUtils;
 
     int gottenID = -1;
     string tempName = string.Empty;
@@ -28,18 +27,17 @@ public class MainWindow : InitializablePetWindow
 
     public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(300, 145);
+        Size = new Vector2(310, 165);
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(300, 145),
-            MaximumSize = new Vector2(300, 145),
+            MinimumSize = new Vector2(310, 165),
+            MaximumSize = new Vector2(310, 165),
         };
 
         stringUtils         = PluginLink.Utils.Get<StringUtils>();
         nicknameUtils       = PluginLink.Utils.Get<NicknameUtils>();
         sheetUtils          = PluginLink.Utils.Get<SheetUtils>();
         configurationUtils  = PluginLink.Utils.Get<ConfigurationUtils>();
-        mathUtils           = PluginLink.Utils.Get<MathUtils>();
     }
     
     public override void OnOpen()
@@ -59,16 +57,28 @@ public class MainWindow : InitializablePetWindow
 
     void DrawNoMinionSpawned()
     {
-        ImGui.Text("Please spawn a Minion!");
+        ImGui.TextColored(StylingColours.blueText, "Please spawn a Minion!");
     }
 
     void DrawPetNameField()
     {
         string basePetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(gottenID));
-
-        if (tempText.Length == 0) ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {basePetName} does not have a name!");
-        else ImGui.TextColored(new Vector4(1, 0, 1, 1), $"Your {basePetName} is named: {tempText}");
-        ImGui.InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
+        ImGui.TextColored(StylingColours.defaultText, $"Your");
+        SameLinePretendSpace();
+        ImGui.TextColored(StylingColours.blueText, $"{basePetName}");
+        SameLinePretendSpace();
+        if (tempText.Length == 0)
+        {
+            ImGui.TextColored(StylingColours.defaultText, $"does not have a name!");
+        }
+        else
+        {
+            ImGui.TextColored(StylingColours.defaultText, $"is named:");
+            if(tempText.Length < 10)
+                SameLinePretendSpace();
+            ImGui.TextColored(StylingColours.blueText, $"{tempText}");
+        }
+        InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
 
         tempName = tempName.Trim();
 
@@ -102,27 +112,27 @@ public class MainWindow : InitializablePetWindow
 
         foreach(BooledString booledString in booledStrings)
         {
-            ImGui.TextColored(booledString.boolean ? new Vector4(1, 1, 1, 1) : new Vector4(1, 0, 0, 1), booledString.str);
+            ImGui.TextColored(booledString.boolean ? StylingColours.defaultText : StylingColours.errorText, booledString.str);
             ImGui.SameLine(0, 0.00001f);
         }
         ImGui.NewLine();
-        ImGui.TextColored(new Vector4(1, 0, 0, 1), "Your name cannot contain invalid characters!");
+        ImGui.TextColored(StylingColours.errorText, "Your name cannot contain invalid characters!");
     }
 
     void DrawValidName(string internalTempText)
     {
-        if (ImGui.Button("Save Nickname"))
+        if (Button("Save Nickname"))
         {
             configurationUtils.SetLocalNickname(gottenID, internalTempText);
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
-        if (ImGui.Button("Remove Nickname"))
+        if (Button("Remove Nickname"))
         {
             configurationUtils.RemoveLocalNickname(gottenID);
             OnOpen();
         }
-        ImGui.TextColored(new Vector4(0.8f, 0.8f, 0.8f, 1.0f),"Resummon your minion or simply look away from it\nfor a moment to apply the nickname.");
+        ImGui.TextColored(StylingColours.defaultText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");
     }
 
     void OnChange(PlayerData? playerData, SerializableNickname nickname)
