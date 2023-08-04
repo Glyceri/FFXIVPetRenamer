@@ -11,6 +11,7 @@ namespace PetRenamer.Utilization.UtilsModule;
 internal class SheetUtils : UtilsRegistryType
 {
     ExcelSheet<Companion> petSheet { get; set; } = null!;
+    ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<Tribe> tribe { get; set; } = null!;
@@ -21,6 +22,15 @@ internal class SheetUtils : UtilsRegistryType
         worlds = PluginHandlers.DataManager.GetExcelSheet<World>()!;
         races = PluginHandlers.DataManager.GetExcelSheet<Race>()!;
         tribe = PluginHandlers.DataManager.GetExcelSheet<Tribe>()!;
+        battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
+    }
+
+    public void GetCurrentBattlePetName()
+    {
+        foreach(Pet pet in battlePetSheet) 
+        { 
+            Dalamud.Logging.PluginLog.Log(pet.Name + " : " + pet.RowId);
+        }
     }
 
     public string GetCurrentPetName()
