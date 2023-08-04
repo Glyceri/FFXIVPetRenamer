@@ -4,33 +4,42 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
 internal class SheetUtils : UtilsRegistryType
 {
-    ExcelSheet<Companion> petSheet { get; set; } = null!;
-    ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
+    ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<Tribe> tribe { get; set; } = null!;
+    ExcelSheet<ClassJob> classJob { get; set; } = null!;
 
     internal override void OnRegistered()
     {
-        petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
+        petSheet = PluginHandlers.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Companion>()!;
         worlds = PluginHandlers.DataManager.GetExcelSheet<World>()!;
         races = PluginHandlers.DataManager.GetExcelSheet<Race>()!;
         tribe = PluginHandlers.DataManager.GetExcelSheet<Tribe>()!;
-        battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
+        classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;   
     }
 
-    public void GetCurrentBattlePetName()
+    public unsafe string GetCurrentClassName()
     {
-        foreach(Pet pet in battlePetSheet) 
-        { 
-            Dalamud.Logging.PluginLog.Log(pet.Name + " : " + pet.RowId);
-        }
+        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        if (playerData == null) return string.Empty;
+
+        return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
+    }
+
+    public string GetClassName(int id)
+    {
+        foreach (ClassJob cls in classJob)
+            if(cls.RowId == id)
+                return cls.Name;
+        return string.Empty;
     }
 
     public string GetCurrentPetName()
@@ -44,7 +53,7 @@ internal class SheetUtils : UtilsRegistryType
 
     public string GetPetName(int id)
     {
-        foreach (Companion pet in petSheet)
+        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
         {
             if (pet == null) continue;
 
@@ -60,7 +69,7 @@ internal class SheetUtils : UtilsRegistryType
         List<SerializableNickname> serializableNicknames = new List<SerializableNickname>();
         if(querry.Length == 0) return serializableNicknames;
 
-        foreach (Companion pet in petSheet)
+        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
         {
             if (pet == null) continue;
             int petModel = pet.Model.Value!.Model;

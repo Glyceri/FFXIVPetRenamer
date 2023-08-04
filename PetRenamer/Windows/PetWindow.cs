@@ -3,15 +3,29 @@ using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Theming;
 
 namespace PetRenamer.Windows;
 
 public abstract class PetWindow : Window, IDisposableRegistryElement
-{ 
+{
+    static PetMode _petMode = PetMode.Normal;
+    private static PetMode petMode { get => _petMode; 
+        set 
+        { 
+            _petMode = value;
+            if (petMode == PetMode.Normal)  ThemeHandler.SetTheme(ThemeHandler.baseTheme);
+            else                            ThemeHandler.SetTheme(ThemeHandler.greenTheme);
+        } 
+    }
+
+
     protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     public void Dispose() => OnDispose();
     protected virtual void OnDispose() { }
+
+    protected readonly bool drawToggle = false;
 
     public sealed override unsafe void Draw()
     {
@@ -23,11 +37,18 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
         PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
+        if(drawToggle) DrawModeToggle();
         OnDraw();
+        if (petMode == PetMode.Normal) OnDrawNormal();
+        else OnDrawBattlePet();
+        OnLateDraw();
         PopAllStyleColours();
     }
 
     public unsafe virtual void OnDraw() { }
+    public unsafe virtual void OnDrawNormal() { }
+    public unsafe virtual void OnDrawBattlePet() { }
+    public unsafe virtual void OnLateDraw() { }
 
     public static class Styling
     {
@@ -36,36 +57,82 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         public static Vector2 ListIDField = new Vector2(75, 25);
         public static Vector2 SmallButton = new Vector2(25, 25);
 
+        public static Vector2 ToggleButton = new Vector2(30, 12);
     }
 
     public static class StylingColours
     {
-        public static Vector4 defaultBackground         = new Vector4(0.60f, 0.70f, 0.80f, 0.95f);
-        public static Vector4 titleBgActive             = new Vector4(0.30f, 0.50f, 1f, 1f);
-        public static Vector4 titleBg                   = new Vector4(0.20f, 0.30f, 0.6f, 1f);
-        public static Vector4 tileBgCollapsed           = new Vector4(0.1f, 0.1f, 0.1f, 1f);
+        public static Vector4 defaultBackground => ThemeHandler.ActiveTheme.defaultBackground;
+        public static Vector4 titleBgActive => ThemeHandler.ActiveTheme.titleBgActive;
+        public static Vector4 titleBg => ThemeHandler.ActiveTheme.titleBg;
+        public static Vector4 tileBgCollapsed => ThemeHandler.ActiveTheme.tileBgCollapsed;
 
-        public static Vector4 defaultText               = new Vector4(0.95f, 0.95f, 0.95f, 1f);
-        public static Vector4 errorText                 = new Vector4(1, 0, 0, 1.0f);
-        public static Vector4 blueText                  = new Vector4(0.6f, 0.6f, 1f, 1f);
-        public static Vector4 readableBlueText          = new Vector4(0.8f, 0.8f, 1f, 1f);
+        public static Vector4 defaultText => ThemeHandler.ActiveTheme.defaultText;
+        public static Vector4 errorText => ThemeHandler.ActiveTheme.errorText;
+        public static Vector4 blueText => ThemeHandler.ActiveTheme.blueText;
+        public static Vector4 readableBlueText => ThemeHandler.ActiveTheme.readableBlueText;
 
-        public static Vector4 idleColor                 = new Vector4(0.4f, 0.4f, 0.5f, 1f);
+        public static Vector4 idleColor => ThemeHandler.ActiveTheme.idleColor;
 
-        public static Vector4 buttonHovered             = new Vector4(0.5f, 0.5f, 1f, 1f);
-        public static Vector4 buttonPressed             = new Vector4(0.36f, 0.36f, 1f, 1f);
-        public static Vector4 button                    = new Vector4(0.3f, 0.3f, 1f, 1f);
+        public static Vector4 buttonHovered => ThemeHandler.ActiveTheme.buttonHovered;
+        public static Vector4 buttonPressed => ThemeHandler.ActiveTheme.buttonPressed;
+        public static Vector4 button => ThemeHandler.ActiveTheme.button;
 
-        public static Vector4 textFieldHovered          = new Vector4(0.5f, 0.5f, 1f, 1f);
-        public static Vector4 textFieldPressed          = new Vector4(0.36f, 0.36f, 1f, 1f);
-        public static Vector4 textField                 = new Vector4(0.3f, 0.3f, 0.8f, 1f);
+        public static Vector4 textFieldHovered => ThemeHandler.ActiveTheme.textFieldHovered;
+        public static Vector4 textFieldPressed => ThemeHandler.ActiveTheme.textFieldPressed;
+        public static Vector4 textField => ThemeHandler.ActiveTheme.textField;
 
-        public static Vector4 xButtonHovered            = new Vector4(0.5f, 0.5f, 0.8f, 1f);
-        public static Vector4 xButtonPressed            = new Vector4(0.36f, 0.36f, 0.8f, 1f);
-        public static Vector4 xButton                   = new Vector4(0.3f, 0.3f, 0.8f, 1f);
+        public static Vector4 xButtonHovered => ThemeHandler.ActiveTheme.xButtonHovered;
+        public static Vector4 xButtonPressed => ThemeHandler.ActiveTheme.xButtonPressed;
+        public static Vector4 xButton => ThemeHandler.ActiveTheme.xButton;
 
-        public static Vector4 listBox                   = new Vector4(0.26f, 0.26f, 0.36f, 1f);
-        public static Vector4 scrollBarBG               = new Vector4(0.29f, 0.29f, 0.36f, 1f);
+        public static Vector4 listBox => ThemeHandler.ActiveTheme.listBox;
+        public static Vector4 scrollBarBG => ThemeHandler.ActiveTheme.scrollBarBG;
+    }
+
+    private void DrawModeToggle()
+    {
+        bool battleMode = petMode == PetMode.BattlePet;
+
+        bool hasBeenPressed = false;
+
+        if (battleMode) 
+        { 
+            if (ToggleButtonBad()) 
+                hasBeenPressed = true; 
+            SameLineNoMargin(); 
+        }
+        
+        if (ToggleButton())                      
+            hasBeenPressed = true;
+
+        if (!battleMode)
+        {
+            SameLineNoMargin();
+            if (ToggleButtonBad()) 
+                hasBeenPressed = true;
+        }
+
+        if (!hasBeenPressed) return;
+
+        if  (battleMode)  petMode = PetMode.Normal;
+        else              petMode = PetMode.BattlePet;
+    }
+
+    protected bool ToggleButton()
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.button);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
+        return ImGui.Button("##toggleButton", Styling.ToggleButton);
+    }
+
+    protected bool ToggleButtonBad()
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        return ImGui.Button("##toggleButtonBad", Styling.ToggleButton);
     }
 
     protected bool Button(string text)
@@ -162,4 +229,10 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     protected void SameLine() => ImGui.SameLine();
     protected void SameLineNoMargin() => ImGui.SameLine(0, 0.0000001f);
     protected void SameLinePretendSpace() => ImGui.SameLine(0, 3f);
+}
+
+internal enum PetMode
+{
+    Normal,
+    BattlePet
 }

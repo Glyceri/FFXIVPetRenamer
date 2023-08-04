@@ -14,7 +14,6 @@ internal class OverrideNamesWindow : PetWindow
 {
     SheetUtils sheetUtils { get; set; } = null!;
     StringUtils stringUtils { get; set; } = null!;
-    PlayerUtils playerUtils { get; set; } = null!;
     ConfigurationUtils configurationUtils { get; set; } = null!;
     NicknameUtils nicknameUtils { get; set; } = null!;
 
@@ -27,7 +26,6 @@ internal class OverrideNamesWindow : PetWindow
     {
         sheetUtils = PluginLink.Utils.Get<SheetUtils>();
         stringUtils = PluginLink.Utils.Get<StringUtils>();
-        playerUtils = PluginLink.Utils.Get<PlayerUtils>();
         configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
 

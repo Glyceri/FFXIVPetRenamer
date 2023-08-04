@@ -8,5 +8,6 @@ namespace PetRenamer.Core.Updatable
         public void Dispose() => OnDispose();
         protected virtual void OnDispose() { }
         public abstract unsafe void Update(Framework frameWork);
+        public virtual unsafe void LateUpdate(Framework frameWork) { }
     }
 }

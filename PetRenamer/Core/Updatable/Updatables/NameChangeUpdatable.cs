@@ -7,12 +7,7 @@ using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
-using FFPet = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using static FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using System.Reflection;
-using System;
-using Lumina.Excel.GeneratedSheets;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -57,6 +52,9 @@ internal class NameChangeUpdatable : Updatable
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         GameObject* selfObject = GameObjectManager.GetGameObjectByIndex(0);
         if(selfObject == null) return;
+
+        //Dalamud.Logging.PluginLog.Log(((Character*)selfObject)->CharacterData.ClassJob.ToString());
+
         for (int i = 0; i < 2000; i++)
         {
             GameObject* me = GameObjectManager.GetGameObjectByIndex(i);
@@ -71,10 +69,6 @@ internal class NameChangeUpdatable : Updatable
             {
                 Utf8String newStr = new Utf8String();
                 newStr.SetString(me->Name);
-                sheetUtils.GetCurrentBattlePetName(); 
-                Dalamud.Logging.PluginLog.Log("-----------");
-                Dalamud.Logging.PluginLog.Log(newStr.ToString() + " : " + playerCharacter->CharacterData.ModelCharaId);
-                Dalamud.Logging.PluginLog.Log("-----------");
             }
 
             string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");

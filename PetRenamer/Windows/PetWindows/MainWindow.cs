@@ -6,13 +6,11 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Updatable.Updatables;
-using System.Collections.Generic;
-using PetRenamer.Utilization.Utils;
-using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 
 [PersistentPetWindow]
+[ModeTogglePetWindow]
 public class MainWindow : InitializablePetWindow
 {
     readonly StringUtils stringUtils;
@@ -26,12 +24,9 @@ public class MainWindow : InitializablePetWindow
 
     public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(310, 165);
-        SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(310, 165),
-            MaximumSize = new Vector2(310, 165),
-        };
+        Size = new Vector2(310, 195);
+
+        IsOpen = true;
 
         stringUtils         = PluginLink.Utils.Get<StringUtils>();
         nicknameUtils       = PluginLink.Utils.Get<NicknameUtils>();
@@ -48,7 +43,9 @@ public class MainWindow : InitializablePetWindow
         tempName = tempText;
     }
 
-    public override void OnDraw()
+    public override void OnDrawNormal() => DrawNormalMode();
+
+    void DrawNormalMode()
     {
         if (gottenID <= -1) DrawNoMinionSpawned();
         else DrawPetNameField();

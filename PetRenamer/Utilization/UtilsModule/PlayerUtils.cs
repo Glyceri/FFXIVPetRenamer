@@ -37,7 +37,7 @@ internal class PlayerUtils : UtilsRegistryType
 internal struct PlayerData
 {
     StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
-    unsafe GameObject* playerGameObject;
+    internal unsafe GameObject* playerGameObject;
     unsafe internal string playerName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
     unsafe internal byte* namePtr;
     internal ushort homeWorld;

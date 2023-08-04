@@ -27,13 +27,18 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     }
 
     public PetWindow GetWindow(Type windowType) => GetElement(windowType);
-    public T GetWindow<T>() where T : PetWindow => (T)GetWindow(typeof(T)); 
+    public T GetWindow<T>() where T : PetWindow => (T)GetWindow(typeof(T));
 
     protected override void OnElementCreation(PetWindow element)
     {
         windowSystem.AddWindow(element);
 
-        if (element.GetType().GetCustomAttribute<ConfigPetWindowAttribute>() != null)
+        Type t = element.GetType();
+
+        if (t.GetCustomAttribute<ModeTogglePetWindowAttribute>() != null)
+            t.GetField("drawToggle", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(element, true);
+
+        if (t.GetCustomAttribute<ConfigPetWindowAttribute>() != null)
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
     }
 

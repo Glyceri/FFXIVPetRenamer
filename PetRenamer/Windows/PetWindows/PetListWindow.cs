@@ -11,6 +11,7 @@ using System.Text;
 namespace PetRenamer.Windows.PetWindows;
 
 [PersistentPetWindow]
+[ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
     SheetUtils sheetUtils { get; set; } = null!;
@@ -31,8 +32,8 @@ public class PetListWindow : PetWindow
 
         SizeConstraints = new WindowSizeConstraints()
         {
-            MinimumSize = new Vector2(800, 800),
-            MaximumSize = new Vector2(800, 800)
+            MinimumSize = new Vector2(800, 815),
+            MaximumSize = new Vector2(800, 815)
         };
     }
 
@@ -41,11 +42,12 @@ public class PetListWindow : PetWindow
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         if (configurationUtils.GetLocalUser() == null) return;
-
+        
         DrawUserHeader();
         DrawExportHeader();
-        DrawList();
     }
+
+    public override unsafe void OnDrawNormal() => DrawList();
 
     void DrawUserHeader()
     {

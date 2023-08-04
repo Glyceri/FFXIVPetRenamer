@@ -27,6 +27,9 @@ namespace PetRenamer.Core.Updatable
         {
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);
+
+            foreach (Updatable updatable in updatables)
+                updatable.LateUpdate(framework);
         }
     }
 }

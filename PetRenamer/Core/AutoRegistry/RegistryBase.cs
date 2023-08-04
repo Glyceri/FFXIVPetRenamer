@@ -26,7 +26,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
 
         foreach (Type type in elementTypes)
         {
-            T createdElement = (T)Activator.CreateInstance(type)!;
+            T createdElement = CreateInstance(type)!;
             OnElementCreation(createdElement);
             elements.Add(createdElement);
             attributes.Add(createdElement.GetType().GetCustomAttribute<TT>()!);
@@ -61,4 +61,6 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
     protected virtual void OnElementCreation(T element) { }
     protected virtual void OnLateElementCreation(T element) { }
     protected virtual void OnElementDestroyed(T element) { }
+
+    protected virtual T CreateInstance(Type type) => (T)Activator.CreateInstance(type)!;
 }
