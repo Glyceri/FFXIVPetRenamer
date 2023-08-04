@@ -12,7 +12,7 @@ internal class PlayerUtils : UtilsRegistryType
 {
     public bool PlayerDataAvailable() => PluginHandlers.ClientState.LocalPlayer != null;
 
-    unsafe internal PlayerData? GetPlayerData()
+    unsafe internal PlayerData? GetPlayerData(bool hasPetOut = false)
     {
         GameObject* me = GameObjectManager.GetGameObjectByIndex(0);
         if (me == null) return null;
@@ -29,7 +29,14 @@ internal class PlayerUtils : UtilsRegistryType
         if(playerCompanion != null)
             data = new CompanionData(playerCompanion, playerCompanion->Character.CharacterData.ModelSkeletonId);
 
-        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, data);
+        int petType = -1;
+        if (hasPetOut)
+        {
+            if (playerCharacter->CharacterData.ClassJob == 28) petType = -3;
+            if (playerCharacter->CharacterData.ClassJob == 26 || playerCharacter->CharacterData.ClassJob == 27) petType = -2;
+        }
+
+        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType,  data);
     }
 }
 
@@ -44,16 +51,18 @@ internal struct PlayerData
     internal byte gender;
     internal int race;
     internal int tribe;
+    internal int battlePetID;
 
     internal CompanionData? companionData;
 
-    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, CompanionData? companionData)
+    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, int battlePetID, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
         this.namePtr = playerGameObject->Name;
         this.gender = gender;
         this.homeWorld = homeWorld;
         this.companionData = companionData;
+        this.battlePetID = battlePetID;
         this.race = race;
         this.tribe = tribe;
     }

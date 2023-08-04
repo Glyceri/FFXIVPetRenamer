@@ -15,6 +15,9 @@ namespace PetRenamer.Core.Updatable.Updatables;
 internal class NameChangeUpdatable : Updatable
 {
     int lastID = -1;
+    int lastJob = -1;
+    bool lastHasPetOut = false;
+    bool lastPetBeenTrue = false;
     string lastName = null!;
 
     StringUtils stringUtils;
@@ -53,7 +56,9 @@ internal class NameChangeUpdatable : Updatable
         GameObject* selfObject = GameObjectManager.GetGameObjectByIndex(0);
         if(selfObject == null) return;
 
-        //Dalamud.Logging.PluginLog.Log(((Character*)selfObject)->CharacterData.ClassJob.ToString());
+        bool hasPetOut = false;
+        bool petBeenTrue = false;
+        bool flickAtEnd = false;
 
         for (int i = 0; i < 2000; i++)
         {
@@ -65,16 +70,20 @@ internal class NameChangeUpdatable : Updatable
             FFCompanion* playerCompanion = playerCharacter->Companion.CompanionObject;
 
 
+            Dalamud.Logging.PluginLog.Log((playerCharacter->GameObject.OwnerID == selfObject->ObjectID).ToString());
+
             if (playerCharacter->GameObject.OwnerID == selfObject->ObjectID)
             {
-                Utf8String newStr = new Utf8String();
-                newStr.SetString(me->Name);
+                hasPetOut = true;
+                petBeenTrue = true;
             }
+
 
             string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
             ushort objectHomeworld = playerCharacter->HomeWorld;
 
             int currentID = -1;
+            int currentJob = playerCharacter->CharacterData.ClassJob;
 
             if (playerCompanion != null)
                 currentID = playerCompanion->Character.CharacterData.ModelSkeletonId;
@@ -91,12 +100,14 @@ internal class NameChangeUpdatable : Updatable
                 if (PluginLink.Configuration.displayCustomNames && currentName.Length != 0 && serializableNickname != null)
                     currentName = serializableNickname.Name;
 
-                if (i == 0 && (currentID != lastID || currentName != lastName))
+                if (i == 0 && (currentID != lastID || currentName != lastName || lastJob != currentJob || lastHasPetOut != hasPetOut))
                 {
                     lastID = currentID;
                     lastName = currentName;
+                    lastJob = currentJob;
+                    lastHasPetOut = hasPetOut;
 
-                    onCompanionChange?.Invoke(playerUtils.GetPlayerData(), serializableNickname);
+                    flickAtEnd = true;
                 }
 
                 if (playerCompanion != null)
@@ -106,6 +117,11 @@ internal class NameChangeUpdatable : Updatable
                     Marshal.Copy(outcome, 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
                 }
             }
+        }
+        if (flickAtEnd || lastPetBeenTrue != petBeenTrue)
+        {
+            lastPetBeenTrue = petBeenTrue;
+            onCompanionChange?.Invoke(playerUtils.GetPlayerData(petBeenTrue), null);
         }
     }
 }

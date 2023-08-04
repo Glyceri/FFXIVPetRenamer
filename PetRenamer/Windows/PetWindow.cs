@@ -69,7 +69,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
         public static Vector4 defaultText => ThemeHandler.ActiveTheme.defaultText;
         public static Vector4 errorText => ThemeHandler.ActiveTheme.errorText;
-        public static Vector4 blueText => ThemeHandler.ActiveTheme.blueText;
+        public static Vector4 highlightText => ThemeHandler.ActiveTheme.highlightedText;
         public static Vector4 readableBlueText => ThemeHandler.ActiveTheme.readableBlueText;
 
         public static Vector4 idleColor => ThemeHandler.ActiveTheme.idleColor;

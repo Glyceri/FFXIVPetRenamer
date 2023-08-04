@@ -11,7 +11,7 @@ internal abstract class Theme
 
     internal abstract Vector4 defaultText { get; set; }
     internal abstract Vector4 errorText { get; set; }
-    internal abstract Vector4 blueText { get; set; }
+    internal abstract Vector4 highlightedText { get; set; }
     internal abstract Vector4 readableBlueText { get; set; }
 
     internal abstract Vector4 idleColor { get; set; }
