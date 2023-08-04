@@ -10,20 +10,23 @@ namespace PetRenamer.Core.Updatable.Updatables;
 internal class LocalUserSafetyUpdatable : Updatable
 {
     PlayerUtils playerUtils { get; set; } = null!;
+    ConfigurationUtils configurationUtils { get; set; } = null!;
 
     public LocalUserSafetyUpdatable() : base()
     {
         playerUtils = PluginLink.Utils.Get<PlayerUtils>();
+        configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
     }
 
     public override void Update(Framework frameWork)
     {
-        if (PluginLink.Configuration.serializableUsers!.Length != 0) return;
+        if (configurationUtils.GetUser(configurationUtils.GetLocalUser()) != null) return;
         if (!playerUtils.PlayerDataAvailable()) return;
 
 
-        PlayerData playerData = playerUtils.GetPlayerData()!.Value;
-        PluginLink.Configuration.serializableUsers = new SerializableUser[1] { new SerializableUser(new SerializableNickname[0], playerData.playerName, playerData.homeWorld) };
+        PlayerData? playerData = playerUtils.GetPlayerData();
+        if(playerData == null) return;
+        configurationUtils.AddNewUser(new SerializableUser(new SerializableNickname[0], playerData.Value.playerName, playerData.Value.homeWorld));
     }
 }
 

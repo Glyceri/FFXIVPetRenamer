@@ -5,6 +5,7 @@ using PetRenamer.Utilization.Attributes;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -17,9 +18,10 @@ internal class StringUtils : UtilsRegistryType
 
     public string GetLocalName(int ID)
     {
-        if (PluginLink.Configuration.serializableUsers!.Length == 0) return string.Empty;
+        SerializableUser user;
+        if ((user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser()!) == null) return string.Empty;
 
-        foreach (SerializableNickname nickname in PluginLink.Configuration.serializableUsers![0].nicknames)
+        foreach (SerializableNickname nickname in user.nicknames)
             if (nickname.ID == ID)
                 return nickname.Name;
 
@@ -60,7 +62,7 @@ internal class StringUtils : UtilsRegistryType
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
     public bool CharIsValidForName(char c) 
     {
-        mathUtils = mathUtils != null ? mathUtils : mathUtils = PluginLink.Utils.Get<MathUtils>();
+        mathUtils = mathUtils ?? (mathUtils = PluginLink.Utils.Get<MathUtils>());
         bool isValid = false;
         if (mathUtils.IsInRange(c, 97, 122)) isValid = true;
         if (mathUtils.IsInRange(c, 65, 90)) isValid = true;

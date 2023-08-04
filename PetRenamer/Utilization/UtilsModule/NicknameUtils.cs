@@ -10,8 +10,9 @@ internal class NicknameUtils : UtilsRegistryType
 {
     internal SerializableNickname GetLocalNickname(int ID)
     {
-        if (PluginLink.Configuration.serializableUsers!.Length == 0) return null!;
-        return GetNickname(PluginLink.Configuration.serializableUsers![0], ID);
+        SerializableUser? user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser();
+        if (user == null) return null!;
+        return GetNickname(user, ID);
     }
 
     internal SerializableNickname GetNickname(SerializableUser user, int ID)
@@ -28,7 +29,8 @@ internal class NicknameUtils : UtilsRegistryType
     internal bool ContainsLocal(int ID)
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return false; 
-        SerializableUser localUser = PluginLink.Configuration.serializableUsers![0];
+        SerializableUser? localUser = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser();
+        if (localUser == null) return false;
 
         foreach (SerializableNickname nickname in localUser.nicknames)
         {

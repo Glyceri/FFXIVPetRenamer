@@ -15,8 +15,9 @@ internal class LegacyNamingVer2 : LegacyElement
         if (detectedVersion != 2) return;
         if (PluginLink.Configuration.users!.Length == 0) return;
 
-        PlayerData playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData()!.Value;
-        SerializableUser newSerializableUser = new SerializableUser((SerializableNickname[])PluginLink.Configuration.users.Clone(), playerData.playerName, playerData.homeWorld);
+        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        if(playerData == null) return;
+        SerializableUser newSerializableUser = new SerializableUser((SerializableNickname[])PluginLink.Configuration.users.Clone(), playerData.Value.playerName, playerData.Value.homeWorld);
         PluginLink.Configuration.users = new SerializableNickname[0];
         PluginLink.Configuration.Version = 3;
         PluginLink.Configuration.serializableUsers = new SerializableUser[1] { newSerializableUser };

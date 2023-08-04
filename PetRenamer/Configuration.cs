@@ -1,6 +1,7 @@
 using Dalamud.Configuration;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 
 namespace PetRenamer;
@@ -43,8 +44,9 @@ public class Configuration : IPluginConfiguration
 
     public void ClearNicknamesForLocalUser()
     {
-        if (serializableUsers!.Length == 0) return;
-        ClearNicknamesForUser(serializableUsers![0]);
+        SerializableUser? user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser();
+        if (user == null) return;
+        ClearNicknamesForUser(user);
     }
 
     public void ClearNicknamesForUser(SerializableUser user, bool autosave = true)

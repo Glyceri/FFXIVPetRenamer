@@ -22,7 +22,6 @@ public class MainWindow : InitializablePetWindow
 
     int gottenID = -1;
     string tempName = string.Empty;
-    string lastValidName = string.Empty;
     string tempText = string.Empty;
 
     public MainWindow() : base("Minion Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
@@ -81,40 +80,7 @@ public class MainWindow : InitializablePetWindow
         InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
 
         tempName = tempName.Trim();
-
-        //if (!stringUtils.StringIsInvalidForName(tempName)) {
-            lastValidName = tempName;
-            DrawValidName(tempName);
-        /*} else
-        {
-            DrawInvalidName();
-            tempName = lastValidName;
-            tempName = tempName.Replace("�", "");
-        }*/
-    }
-
-    //What a dirty way of doing this :D I hate it :D
-    void DrawInvalidName()
-    {
-        List<BooledString> booledStrings = new List<BooledString>();
-        for(int i = 0; i < tempName.Length; i++)
-        {
-            bool charIsValid = stringUtils.CharIsValidForName(tempName[i]);
-            if (booledStrings.Count == 0) booledStrings.Add(new BooledString(tempName[i].ToString(), charIsValid));
-            else
-            {
-                if (booledStrings.Last().boolean != charIsValid) booledStrings.Add(new BooledString(tempName[i].ToString(), charIsValid));
-                else booledStrings.Last().str += tempName[i];
-            }
-        }
-
-        foreach(BooledString booledString in booledStrings)
-        {
-            ImGui.TextColored(booledString.boolean ? StylingColours.defaultText : StylingColours.errorText, booledString.str);
-            ImGui.SameLine(0, 0.00001f);
-        }
-        ImGui.NewLine();
-        ImGui.TextColored(StylingColours.errorText, "Your name cannot contain invalid characters!");
+        DrawValidName(tempName);
     }
 
     void DrawValidName(string internalTempText)

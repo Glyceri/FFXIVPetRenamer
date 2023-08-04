@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
@@ -10,21 +11,15 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class ConfigurationUtils : UtilsRegistryType
 {
-    public SerializableUser? GetLocalPlayer()
-    {
-        if (PluginLink.Configuration.serializableUsers!.Length == 0) return null;
-        return PluginLink.Configuration.serializableUsers[0];
-    }
-
     public void SetLocalNickname(int forPet, string nickname)
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
 
         if (!PluginLink.Utils.Get<NicknameUtils>().ContainsLocal(forPet))
         {
-            List<SerializableNickname> nicknames = PluginLink.Configuration.serializableUsers[0]!.nicknames.ToList();
+            List<SerializableNickname> nicknames = GetLocalUser()!.nicknames.ToList();
             nicknames.Insert(0, (new SerializableNickname(forPet, nickname)));
-            PluginLink.Configuration.serializableUsers[0]!.nicknames = nicknames.ToArray();
+            GetLocalUser()!.nicknames = nicknames.ToArray();
         }
 
         SerializableNickname nick = PluginLink.Utils.Get<NicknameUtils>().GetLocalNickname(forPet);
@@ -40,12 +35,12 @@ internal class ConfigurationUtils : UtilsRegistryType
 
         if (PluginLink.Utils.Get<NicknameUtils>().ContainsLocal(forPet))
         {
-            List<SerializableNickname> nicknames = PluginLink.Configuration.serializableUsers[0]!.nicknames.ToList();
+            List<SerializableNickname> nicknames = GetLocalUser()!.nicknames.ToList();
             for (int i = nicknames.Count - 1; i >= 0; i--)
                 if (nicknames[i].ID == forPet)
                     nicknames.RemoveAt(i);
 
-            PluginLink.Configuration.serializableUsers[0]!.nicknames = nicknames.ToArray();
+            GetLocalUser()!.nicknames = nicknames.ToArray();
             PluginLink.Configuration.Save();
         }
     }
@@ -72,13 +67,21 @@ internal class ConfigurationUtils : UtilsRegistryType
         return false;
     }
 
-    public SerializableUser GetUser(SerializableUser testForUser)
+    public SerializableUser GetUser(SerializableUser? testForUser)
     {
+        if (testForUser == null) return null!;
         foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
             if (user.username == testForUser.username && user.homeworld == testForUser.homeworld)
                 return user;
 
         return null!;
+    }
+
+    public SerializableUser? GetLocalUser()
+    {
+        PlayerCharacter? chara =  PluginHandlers.ClientState.LocalPlayer;
+        if (chara == null) return null!;
+        return GetUser(new SerializableUser(new SerializableNickname[0], chara.Name.ToString(), (ushort)chara.HomeWorld.Id));
     }
 
     [Obsolete]

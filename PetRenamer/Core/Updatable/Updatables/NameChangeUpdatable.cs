@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
+using FFPet = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace PetRenamer.Core.Updatable.Updatables;
@@ -50,24 +51,22 @@ internal class NameChangeUpdatable : Updatable
     public override unsafe void Update(Framework frameWork)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < 2000; i++)
         {
             GameObject* me = GameObjectManager.GetGameObjectByIndex(i);
             if (me == null) continue;
             if (!me->IsCharacter()) continue;
             Character* playerCharacter = (Character*)me;
             if (playerCharacter == null) continue;
-            FFCompanion* meCompanion = (FFCompanion*)me;
-            if (meCompanion == null) continue;
-            FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
-            
+            FFCompanion* playerCompanion = playerCharacter->Companion.CompanionObject;
+
 
             string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
             ushort objectHomeworld = playerCharacter->HomeWorld;
 
             int currentID = -1;
-            
-            if(playerCompanion != null)
+
+            if (playerCompanion != null)
                 currentID = playerCompanion->Character.CharacterData.ModelSkeletonId;
 
             foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
@@ -90,10 +89,12 @@ internal class NameChangeUpdatable : Updatable
                     onCompanionChange?.Invoke(playerUtils.GetPlayerData(), serializableNickname);
                 }
 
-                if (playerCompanion == null) break;
-                byte[] outcome = new byte[PluginConstants.ffxivNameSize];
-                Marshal.Copy((nint)Utf8String.FromString(currentName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
-                Marshal.Copy(outcome, 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+                if (playerCompanion != null)
+                {
+                    byte[] outcome = new byte[PluginConstants.ffxivNameSize];
+                    Marshal.Copy((nint)Utf8String.FromString(currentName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
+                    Marshal.Copy(outcome, 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+                }
             }
         }
     }

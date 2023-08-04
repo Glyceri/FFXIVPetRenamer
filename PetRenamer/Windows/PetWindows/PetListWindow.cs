@@ -39,6 +39,8 @@ public class PetListWindow : PetWindow
     public unsafe override void OnDraw()
     {
         if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+        if (configurationUtils.GetLocalUser() == null) return;
 
         DrawUserHeader();
         DrawExportHeader();
@@ -47,13 +49,14 @@ public class PetListWindow : PetWindow
 
     void DrawUserHeader()
     {
-        PlayerData playerData = playerUtils.GetPlayerData()!.Value;
-        byte playerGender = playerData.gender;
+        PlayerData? playerData = playerUtils.GetPlayerData();
+        if (playerData == null) return;
+        byte playerGender = playerData.Value.gender;
 
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Button($"{playerData.playerName}", Styling.ListButton); ImGui.SameLine();
-        Label($"{sheetUtils.GetWorldName(playerData.homeWorld)}", Styling.ListButton); ImGui.SameLine();
-        Label($"{sheetUtils.GetRace(playerData.race, playerData.gender)}", Styling.ListButton); ImGui.SameLine();
+        Button($"{playerData.Value.playerName}", Styling.ListButton); ImGui.SameLine();
+        Label($"{sheetUtils.GetWorldName(playerData.Value.homeWorld)}", Styling.ListButton); ImGui.SameLine();
+        Label($"{sheetUtils.GetRace(playerData.Value.race, playerData.Value.gender)}", Styling.ListButton); ImGui.SameLine();
         Label($"{sheetUtils.GetGender(playerGender)}", Styling.ListButton);
         ImGui.EndListBox();
         ImGui.NewLine();
@@ -67,7 +70,7 @@ public class PetListWindow : PetWindow
         {
             try
             {
-                SerializableUser localPlayer = configurationUtils.GetLocalPlayer()!;
+                SerializableUser localPlayer = configurationUtils.GetLocalUser()!;
                 if (localPlayer != null)
                 {
                     string exportString = string.Concat("[PetExport]-", localPlayer.username.ToString(), "-", localPlayer.homeworld.ToString(), "-");
@@ -101,7 +104,7 @@ public class PetListWindow : PetWindow
         DrawListHeader();
         if (openedAddPet) DrawOpenedNewPet();
         else
-            foreach (SerializableNickname nickname in PluginLink.Configuration.serializableUsers![0].nicknames)
+            foreach (SerializableNickname nickname in configurationUtils.GetLocalUser()!.nicknames)
             {
                 string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
 
