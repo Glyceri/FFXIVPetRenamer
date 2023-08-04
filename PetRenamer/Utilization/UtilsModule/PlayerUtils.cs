@@ -24,18 +24,12 @@ internal class PlayerUtils : UtilsRegistryType
 
         FFCompanion* playerCompanion = meCompanion->Character.Companion.CompanionObject;
 
-        MountContainer mount = playerCharacter->Mount;
-
         CompanionData? data = null;
-        MountData? mountData = null;
 
         if(playerCompanion != null)
             data = new CompanionData(playerCompanion, playerCompanion->Character.CharacterData.ModelSkeletonId);
 
-        if (mount.MountObject != null)
-            mountData = new MountData(mount.MountObject, playerCharacter->Mount.MountId, playerCharacter->Mount.Flags);
-
-        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, data, mountData);
+        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, data);
     }
 }
 
@@ -52,16 +46,14 @@ internal struct PlayerData
     internal int tribe;
 
     internal CompanionData? companionData;
-    internal MountData? mountData;
 
-    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, CompanionData? companionData, MountData? mountData)
+    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
         this.namePtr = playerGameObject->Name;
         this.gender = gender;
         this.homeWorld = homeWorld;
         this.companionData = companionData;
-        this.mountData = mountData;
         this.race = race;
         this.tribe = tribe;
     }
@@ -80,19 +72,5 @@ internal struct CompanionData
         this.namePtr = companion->Character.GameObject.Name;
         this.companion = companion;
         this.currentModelID = currentModelID;
-    }
-}
-
-internal struct MountData
-{
-    unsafe internal Character* mount;
-    internal ushort mountID;
-    internal byte flags;
-
-    unsafe public MountData(Character* mount, ushort mountID, byte flags)
-    {
-        this.mount = mount;
-        this.mountID = mountID;
-        this.flags = flags;
     }
 }
