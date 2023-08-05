@@ -68,7 +68,7 @@ public class MainWindow : InitializablePetWindow
     void HandleBattlePetName()
     {
         string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "fairy";
+        if (gottenClass == 28) petType = "faerie";
 
         DrawPetNameField(petType, ref tempText2, ref tempName2, ref gottenBattlePetID);
     }
@@ -76,7 +76,7 @@ public class MainWindow : InitializablePetWindow
     void DrawGetPetOut()
     {
         string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "fairy";
+        if (gottenClass == 28) petType = "faerie";
 
         ImGui.TextColored(StylingColours.highlightText, $"Please summon your {petType}.");
     }

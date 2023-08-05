@@ -30,6 +30,8 @@ public class PetListWindow : PetWindow
         configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
 
+        IsOpen = true;
+
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 815),
@@ -48,18 +50,38 @@ public class PetListWindow : PetWindow
     }
 
     public override unsafe void OnDrawNormal() => DrawList();
+    public override unsafe void OnDrawBattlePet() => DrawBattlePetList();
+
+    void DrawBattlePetList()
+    {
+        int counter = 10;
+        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
+
+        if (openedAddPet) DrawOpenedNewPet();
+        else
+            foreach (SerializableNickname nickname in configurationUtils.GetLocalUser()!.nicknames)
+            {
+                if (nickname.ID >= -1) continue;
+                string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
+
+                Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+                Label(nickname.ID == -2 ? "Carbuncle" : "Faerie" + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+                if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
+                    PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
+                if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
+                    PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNickname(nickname.ID);
+            }
+        ImGui.EndListBox();
+    }
 
     void DrawUserHeader()
     {
         PlayerData? playerData = playerUtils.GetPlayerData();
         if (playerData == null) return;
-        byte playerGender = playerData.Value.gender;
 
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
         Button($"{playerData.Value.playerName}", Styling.ListButton); ImGui.SameLine();
         Label($"{sheetUtils.GetWorldName(playerData.Value.homeWorld)}", Styling.ListButton); ImGui.SameLine();
-        Label($"{sheetUtils.GetRace(playerData.Value.race, playerData.Value.gender)}", Styling.ListButton); ImGui.SameLine();
-        Label($"{sheetUtils.GetGender(playerGender)}", Styling.ListButton);
         ImGui.EndListBox();
         ImGui.NewLine();
     }
