@@ -75,26 +75,26 @@ public class PetListWindow : PetWindow
                 SerializableUser localPlayer = configurationUtils.GetLocalUser()!;
                 if (localPlayer != null)
                 {
-                    string exportString = string.Concat("[PetExport]-", localPlayer.username.ToString(), "-", localPlayer.homeworld.ToString(), "-");
+                    string exportString = string.Concat("[PetExport]\n", localPlayer.username.ToString(), "\n", localPlayer.homeworld.ToString(), "\n");
                     foreach (SerializableNickname nickname in localPlayer.nicknames)
-                        exportString = string.Concat(exportString, nickname.ToString(), "-");
-                    string convertedString = Convert.ToBase64String(Encoding.UTF8.GetBytes(exportString));
+                        exportString = string.Concat(exportString, nickname.ToString(), "\n");
+                    string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
                     ImGui.SetClipboardText(convertedString);
                 }
             }
-            catch { }
+            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Export Error occured: {e}"); }
         }
         ImGui.SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
             try
             {
-                string gottenText = Encoding.UTF8.GetString(Convert.FromBase64String(ImGui.GetClipboardText())).Replace("-", "\n");
+                string gottenText = Encoding.Unicode.GetString(Convert.FromBase64String(ImGui.GetClipboardText()));
                 OverrideNamesWindow window = PluginLink.WindowHandler.GetWindow<OverrideNamesWindow>();
                 if(window.SetImportString(gottenText))
                 window.IsOpen = true;
             }
-            catch { }
+            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured: {e}"); }
         }
         ImGui.EndListBox();
     }

@@ -43,6 +43,7 @@ internal class OverrideNamesWindow : PetWindow
         try
         {
             string[] splitLines = importString.Split('\n');
+            if (splitLines.Length <= 2) return false; 
             try
             {
                 string userName = splitLines[1];
@@ -54,18 +55,19 @@ internal class OverrideNamesWindow : PetWindow
                     for (int i = 3; i < splitLines.Length; i++)
                     {
                         string[] splitNickname = splitLines[i].Split(',');
-                        int ID = int.Parse(splitNickname[0].Replace("ID:", ""));
+                        if (splitNickname.Length < 1) continue;
+                        if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) continue;
                         string nickname = splitNickname[1].Replace("Name:", "");
                         nicknames.Add(new SerializableNickname(ID, nickname));
                     }
                 }
-                catch { }
+                catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableNickname]: {e}"); }
 
                 importedUser = new SerializableUser(nicknames.ToArray(), userName, homeWorld);
             }
-            catch { }
+            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableUser]: {e}"); }
         }
-        catch { return false; }
+        catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [Overall]: {e}"); return false; }
 
         return true;
     }

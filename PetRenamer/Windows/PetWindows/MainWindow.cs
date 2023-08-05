@@ -30,9 +30,7 @@ public class MainWindow : InitializablePetWindow
     public MainWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
         Size = new Vector2(310, 195);
-
-        IsOpen = true;
-
+        
         stringUtils         = PluginLink.Utils.Get<StringUtils>();
         nicknameUtils       = PluginLink.Utils.Get<NicknameUtils>();
         sheetUtils          = PluginLink.Utils.Get<SheetUtils>();

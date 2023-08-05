@@ -58,6 +58,8 @@ internal class StringUtils : UtilsRegistryType
         return nameBytes;
     }
 
+    public unsafe string GetCharacterName(byte*  bytePtr) => FromBytes(GetBytes(bytePtr)).Replace(((char)0).ToString(), "");
+
     public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
     public bool CharIsValidForName(char c) 

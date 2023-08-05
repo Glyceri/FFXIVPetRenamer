@@ -71,7 +71,7 @@ internal class ConfigurationUtils : UtilsRegistryType
     {
         if (testForUser == null) return null!;
         foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
-            if (user.username == testForUser.username && user.homeworld == testForUser.homeworld)
+            if (user.username.Trim().ToLower() == testForUser.username.Trim().ToLower() && user.homeworld == testForUser.homeworld)
                 return user;
 
         return null!;
