@@ -108,6 +108,7 @@ public class PetListWindow : PetWindow
         else
             foreach (SerializableNickname nickname in configurationUtils.GetLocalUser()!.nicknames)
             {
+                if (nickname.ID <= 0) continue;
                 string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
 
                 Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();

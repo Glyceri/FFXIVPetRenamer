@@ -9,6 +9,7 @@ internal abstract class Theme
     internal abstract Vector4 titleBg { get; set; }
     internal abstract Vector4 tileBgCollapsed { get; set; }
 
+    internal abstract Vector4 whiteText { get; set; }
     internal abstract Vector4 defaultText { get; set; }
     internal abstract Vector4 errorText { get; set; }
     internal abstract Vector4 highlightedText { get; set; }

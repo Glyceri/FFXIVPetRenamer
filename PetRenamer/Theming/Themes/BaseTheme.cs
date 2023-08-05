@@ -9,6 +9,7 @@ internal class BaseTheme : Theme
     internal override Vector4 titleBg { get; set; } = new Vector4(0.20f, 0.30f, 0.6f, 1f);
     internal override Vector4 tileBgCollapsed { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
 
+    internal override Vector4 whiteText { get; set; } = new Vector4(0.95f, 0.95f, 0.95f, 1f);
     internal override Vector4 defaultText { get; set; } = new Vector4(0.95f, 0.95f, 0.95f, 1f);
     internal override Vector4 errorText { get; set; } = new Vector4(1, 0, 0, 1.0f);
     internal override Vector4 highlightedText { get; set; } = new Vector4(0.6f, 0.6f, 1f, 1f);

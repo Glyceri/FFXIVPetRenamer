@@ -12,6 +12,7 @@ namespace PetRenamer.Utilization.UtilsModule;
 internal class SheetUtils : UtilsRegistryType
 {
     ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;
+    ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<Tribe> tribe { get; set; } = null!;
@@ -23,7 +24,8 @@ internal class SheetUtils : UtilsRegistryType
         worlds = PluginHandlers.DataManager.GetExcelSheet<World>()!;
         races = PluginHandlers.DataManager.GetExcelSheet<Race>()!;
         tribe = PluginHandlers.DataManager.GetExcelSheet<Tribe>()!;
-        classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;   
+        classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;
+        battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
     }
 
     public unsafe string GetCurrentClassName()
@@ -32,6 +34,19 @@ internal class SheetUtils : UtilsRegistryType
         if (playerData == null) return string.Empty;
 
         return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
+    }
+
+    public unsafe string GetBattlePetName(int id)
+    {
+        //Look how generous I am. If you send the wrong ID it auto remaps
+        if(id > 100) id = PluginLink.Utils.Get<RemapUtils>().BattlePetSkeletonToNameID(id);
+        if (id <= 0) return "[ERROR] Contact: Glyceri";
+
+        foreach(Pet pet in battlePetSheet)
+            if(pet.RowId == id)
+                return pet.Name;
+
+        return string.Empty;
     }
 
     public string GetClassName(int id)

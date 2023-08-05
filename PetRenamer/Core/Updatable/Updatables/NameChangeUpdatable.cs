@@ -59,9 +59,10 @@ internal class NameChangeUpdatable : Updatable
         bool hasPetOut = false;
         bool petBeenTrue = false;
         bool flickAtEnd = false;
-
+        
         for (int i = 0; i < 2000; i++)
         {
+            bool currentIsPet = false;
             GameObject* me = GameObjectManager.GetGameObjectByIndex(i);
             if (me == null) continue;
             if (!me->IsCharacter()) continue;
@@ -69,24 +70,39 @@ internal class NameChangeUpdatable : Updatable
             if (playerCharacter == null) continue;
             FFCompanion* playerCompanion = playerCharacter->Companion.CompanionObject;
 
-
-            Dalamud.Logging.PluginLog.Log((playerCharacter->GameObject.OwnerID == selfObject->ObjectID).ToString());
-
             if (playerCharacter->GameObject.OwnerID == selfObject->ObjectID)
             {
+                currentIsPet = true;
                 hasPetOut = true;
                 petBeenTrue = true;
+                Utf8String petString = new Utf8String();
+                petString.SetString(playerCharacter->GameObject.Name);
+            }
+            string objectName;
+            ushort objectHomeworld;
+            if (!currentIsPet) {
+                objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
+                objectHomeworld = playerCharacter->HomeWorld;
+            }
+            else
+            {
+                objectName = stringUtils.FromBytes(stringUtils.GetBytes(selfObject->Name)).Replace(((char)0).ToString(), "");
+                objectHomeworld = ((Character*)selfObject)->HomeWorld;
             }
 
-
-            string objectName = stringUtils.FromBytes(stringUtils.GetBytes(me->Name)).Replace(((char)0).ToString(), "");
-            ushort objectHomeworld = playerCharacter->HomeWorld;
-
             int currentID = -1;
-            int currentJob = playerCharacter->CharacterData.ClassJob;
+            int currentJob = ((Character*)selfObject)->CharacterData.ClassJob;
 
             if (playerCompanion != null)
                 currentID = playerCompanion->Character.CharacterData.ModelSkeletonId;
+
+            if (currentIsPet)
+            {
+                if (currentJob == 26 || currentJob == 27)
+                    currentID = -2;
+                else if(currentJob == 28)
+                    currentID = -3;
+            }
 
             foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
             {
@@ -96,7 +112,10 @@ internal class NameChangeUpdatable : Updatable
 
                 string currentName;
                 SerializableNickname serializableNickname = nicknameUtils.GetNickname(user, currentID);
-                currentName = sheetUtils.GetPetName(currentID);
+                if (currentIsPet)
+                    currentName = sheetUtils.GetBattlePetName(playerCharacter->CharacterData.ModelCharaId);
+                else
+                    currentName = sheetUtils.GetPetName(currentID);
                 if (PluginLink.Configuration.displayCustomNames && currentName.Length != 0 && serializableNickname != null)
                     currentName = serializableNickname.Name;
 
@@ -115,6 +134,13 @@ internal class NameChangeUpdatable : Updatable
                     byte[] outcome = new byte[PluginConstants.ffxivNameSize];
                     Marshal.Copy((nint)Utf8String.FromString(currentName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
                     Marshal.Copy(outcome, 0, (nint)playerCompanion->Character.GameObject.Name, PluginConstants.ffxivNameSize);
+                }
+
+                if(currentIsPet && playerCharacter != null)
+                {
+                    byte[] outcome = new byte[PluginConstants.ffxivNameSize];
+                    Marshal.Copy((nint)Utf8String.FromString(currentName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
+                    Marshal.Copy(outcome, 0, (nint)playerCharacter->GameObject.Name, PluginConstants.ffxivNameSize);
                 }
             }
         }

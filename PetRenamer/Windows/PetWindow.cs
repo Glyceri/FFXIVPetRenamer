@@ -67,6 +67,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         public static Vector4 titleBg => ThemeHandler.ActiveTheme.titleBg;
         public static Vector4 tileBgCollapsed => ThemeHandler.ActiveTheme.tileBgCollapsed;
 
+        public static Vector4 whiteText => ThemeHandler.ActiveTheme.whiteText; 
         public static Vector4 defaultText => ThemeHandler.ActiveTheme.defaultText;
         public static Vector4 errorText => ThemeHandler.ActiveTheme.errorText;
         public static Vector4 highlightText => ThemeHandler.ActiveTheme.highlightedText;
@@ -137,6 +138,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     protected bool Button(string text)
     {
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
@@ -190,7 +192,8 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     protected bool Checkbox(string text, ref bool value)
     {
-        PushStyleColor(ImGuiCol.CheckMark, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
+        PushStyleColor(ImGuiCol.CheckMark, StylingColours.whiteText);
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.xButtonHovered);
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);

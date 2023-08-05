@@ -23,7 +23,9 @@ public class MainWindow : InitializablePetWindow
     int gottenBattlePetID = -1;
     int gottenClass = -1;
     string tempName = string.Empty;
+    string tempName2 = string.Empty;
     string tempText = string.Empty;
+    string tempText2 = string.Empty;
 
     public MainWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
@@ -40,9 +42,13 @@ public class MainWindow : InitializablePetWindow
     public override void OnOpen()
     {
         tempText = string.Empty;
+        tempText2 = string.Empty;
         if (nicknameUtils.ContainsLocal(gottenID))
             tempText = stringUtils.GetLocalName(gottenID);
+        if (nicknameUtils.ContainsLocal(gottenBattlePetID))
+            tempText2 = stringUtils.GetLocalName(gottenBattlePetID);
 
+        tempName2 = tempText2;
         tempName = tempText;
     }
 
@@ -63,14 +69,18 @@ public class MainWindow : InitializablePetWindow
 
     void HandleBattlePetName()
     {
-        if(gottenBattlePetID == -3) ImGui.TextColored(StylingColours.highlightText, "FAIRY FOUND!");
-        if (gottenBattlePetID == -2) ImGui.TextColored(StylingColours.highlightText, "FAIRY CARBUNCLE!");
+        string petType = "Carbuncle";
+        if (gottenClass == 28) petType = "fairy";
+
+        DrawPetNameField(petType, ref tempText2, ref tempName2, ref gottenBattlePetID);
     }
 
     void DrawGetPetOut()
     {
-        if(gottenClass == 28)  ImGui.TextColored(StylingColours.highlightText, "Please summon your Fairy");
-        else ImGui.TextColored(StylingColours.highlightText, "Please summon your Carbuncle");
+        string petType = "Carbuncle";
+        if (gottenClass == 28) petType = "fairy";
+
+        ImGui.TextColored(StylingColours.highlightText, $"Please summon your {petType}.");
     }
 
     void DrawWrongClass()
@@ -84,52 +94,51 @@ public class MainWindow : InitializablePetWindow
     void DrawNormalMode()
     {
         if (gottenID <= -1) DrawNoMinionSpawned();
-        else DrawPetNameField();
+        else DrawPetNameField(stringUtils.MakeTitleCase(sheetUtils.GetPetName(gottenID)), ref tempText, ref tempName, ref gottenID);
     }
 
     void DrawNoMinionSpawned()
     {
-        ImGui.TextColored(StylingColours.highlightText, "Please spawn a Minion!");
+        ImGui.TextColored(StylingColours.highlightText, "Please summon a minion.");
     }
 
-    void DrawPetNameField()
+    void DrawPetNameField(string basePet, ref string theTempText, ref string theTempName, ref int theID)
     {
-        string basePetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(gottenID));
-        ImGui.TextColored(StylingColours.defaultText, $"Your");
+        ImGui.TextColored(StylingColours.whiteText, $"Your");
         SameLinePretendSpace();
-        ImGui.TextColored(StylingColours.highlightText, $"{basePetName}");
+        ImGui.TextColored(StylingColours.highlightText, $"{basePet}");
         SameLinePretendSpace();
-        if (tempText.Length == 0)
+        if (theTempText.Length == 0)
         {
-            ImGui.TextColored(StylingColours.defaultText, $"does not have a name!");
+            ImGui.TextColored(StylingColours.whiteText, $"does not have a name!");
         }
         else
         {
-            ImGui.TextColored(StylingColours.defaultText, $"is named:");
-            if(tempText.Length < 10)
+            ImGui.TextColored(StylingColours.whiteText, $"is named:");
+            if(theTempText.Length < 10)
                 SameLinePretendSpace();
-            ImGui.TextColored(StylingColours.highlightText, $"{tempText}");
+            ImGui.TextColored(StylingColours.highlightText, $"{theTempText}");
         }
-        InputText(string.Empty, ref tempName, PluginConstants.ffxivNameSize);
+        InputText(string.Empty, ref theTempName, PluginConstants.ffxivNameSize);
 
-        tempName = tempName.Trim();
-        DrawValidName(tempName);
+        theTempName = theTempName.Trim();
+        DrawValidName(theTempName, ref theID);
     }
 
-    void DrawValidName(string internalTempText)
+    void DrawValidName(string internalTempText, ref int theID)
     {
         if (Button("Save Nickname"))
         {
-            configurationUtils.SetLocalNickname(gottenID, internalTempText);
+            configurationUtils.SetLocalNickname(theID, internalTempText);
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            configurationUtils.RemoveLocalNickname(gottenID);
+            configurationUtils.RemoveLocalNickname(theID);
             OnOpen();
         }
-        ImGui.TextColored(StylingColours.defaultText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");
+        ImGui.TextColored(StylingColours.whiteText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");
     }
 
     unsafe void OnChange(PlayerData? playerData, SerializableNickname nickname)
@@ -140,9 +149,7 @@ public class MainWindow : InitializablePetWindow
         OnOpen();
         if (playerData == null) return;
         gottenBattlePetID = playerData!.Value.battlePetID;
-        Dalamud.Logging.PluginLog.Log(gottenBattlePetID.ToString());
         gottenClass = ((Character*)playerData!.Value.playerGameObject)->CharacterData.ClassJob;
-        OnOpen();
         if (playerData!.Value.companionData == null) return;
         gottenID = playerData!.Value.companionData!.Value.currentModelID;
         OnOpen();

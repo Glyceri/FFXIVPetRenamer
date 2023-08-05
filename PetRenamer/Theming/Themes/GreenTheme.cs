@@ -16,6 +16,6 @@ internal class GreenTheme : BaseTheme
     internal override Vector4 xButtonPressed { get; set; } = new Vector4(0.36f, 0.8f, 0.36f, 1f);
     internal override Vector4 xButton { get; set; } = new Vector4(0.3f, 0.8f, 0.3f, 1f);
 
-    internal override Vector4 defaultText { get; set; } = new Vector4(0.45f, 0.45f, 0.45f, 1f);
+    internal override Vector4 defaultText { get; set; } = new Vector4(0.25f, 0.25f, 0.25f, 1f);
     internal override Vector4 highlightedText { get; set; } = new Vector4(0.6f, 1f, 0.6f, 1f);
 }
