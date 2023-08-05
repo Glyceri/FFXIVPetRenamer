@@ -59,12 +59,17 @@ internal class NameChangeUpdatable : Updatable
         bool hasPetOut = false;
         bool petBeenTrue = false;
         bool flickAtEnd = false;
-        
+
+        int lastFound = -1;
+        int count = 0;
+
         for (int i = 0; i < 2000; i++)
         {
             bool currentIsPet = false;
             GameObject* me = GameObjectManager.GetGameObjectByIndex(i);
             if (me == null) continue;
+            lastFound = i;
+            count++;
             if (!me->IsCharacter()) continue;
             Character* playerCharacter = (Character*)me;
             if (playerCharacter == null) continue;
@@ -75,8 +80,6 @@ internal class NameChangeUpdatable : Updatable
                 currentIsPet = true;
                 hasPetOut = true;
                 petBeenTrue = true;
-                Utf8String petString = new Utf8String();
-                petString.SetString(playerCharacter->GameObject.Name);
             }
             string objectName;
             ushort objectHomeworld;
@@ -149,5 +152,6 @@ internal class NameChangeUpdatable : Updatable
             lastPetBeenTrue = petBeenTrue;
             onCompanionChange?.Invoke(playerUtils.GetPlayerData(petBeenTrue), null);
         }
+        Dalamud.Logging.PluginLog.Log($"LastFound: {lastFound} : Count:{count}");
     }
 }
