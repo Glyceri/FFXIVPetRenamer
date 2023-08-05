@@ -133,7 +133,7 @@ internal class NameChangeUpdatable : Updatable
                 ApplyName(character.GetCompanionName(), currentName);
             }
 
-            if(hasBattlePet) 
+            if(hasBattlePet && character.BattlePetNamingAllowed()) 
             {
                 battlePetBeenActive = true;
                 currentID = character.GetBattlePetID();
@@ -204,6 +204,7 @@ internal class NameChangeUpdatable : Updatable
         public string ownName = string.Empty;
         public uint ownHomeWorld = 0;
 
+        public bool BattlePetNamingAllowed() => GetPlayerJob() == 26 || GetPlayerJob() == 27 || GetPlayerJob() == 28;
         public bool HasBattlePet() => battlePetCharacter != null;
         public bool HasCompanion() => playerCompanion != null;
 
