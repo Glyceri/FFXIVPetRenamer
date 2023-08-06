@@ -187,8 +187,6 @@ internal class NameChangeUpdatable : Updatable
             if (localCurrentBattleName == remapUtils.PetIDToName(remapUtils.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
 
             IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, remapUtils.GetPetIDFromClass(currentJob), localCurrentBattleName));
-            Dalamud.Logging.PluginLog.Log(new NicknameData(currentID, localCurrentName, remapUtils.GetPetIDFromClass(currentJob), localCurrentBattleName)!.ToString());
-            Dalamud.Logging.PluginLog.Log(IpcProvider.GetLocalCharacterNicknameCallback());
             return true;
         }
         return false;

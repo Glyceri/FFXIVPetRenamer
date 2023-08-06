@@ -61,6 +61,8 @@ public static class IpcProvider
     internal static void NotifyDisposing() => Disposing?.SendMessage();
     internal static void ChangedPetNickname(NicknameData? data)
     {
+        PluginLog.Log(data?.ToNormalString() ?? string.Empty);
+
         if (PluginHandlers.ClientState.LocalPlayer is PlayerCharacter playerCharacter)
         {
             (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);

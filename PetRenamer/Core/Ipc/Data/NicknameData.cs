@@ -21,6 +21,7 @@ public class NicknameData
     }
 
     public new string ToString() => $"{ID}^{Nickname}^{BattleID}^{BattleNickname}";
+    public string ToNormalString() => ToString().Replace("^", ",");
 
     public bool Equals(NicknameData other) => ID == other.ID && Nickname == other.Nickname;
     public bool IDEquals(NicknameData other) => ID == other.ID;
