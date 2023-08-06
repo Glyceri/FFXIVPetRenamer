@@ -18,6 +18,6 @@ namespace PetRenamer.Core.Serialization
 
         public override string ToString() => $"ID:{ID},Name:{Name}";
 
-        public string ToSaveString() => $"{ID},{Name}";
+        public string ToSaveString() => $"{ID}^{Name}";
     }
 }

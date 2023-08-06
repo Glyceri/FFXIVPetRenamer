@@ -5,6 +5,8 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core;
+using System.Linq;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -71,6 +73,15 @@ internal class SheetUtils : UtilsRegistryType
             if(cls.RowId == id)
                 return cls.Name;
         return string.Empty;
+    }
+
+    public string GetCurrentBattlePetName()
+    {
+        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        if (playerData == null) return string.Empty;
+        if (!PluginConstants.allowedJobs.Contains(playerData.Value.job)) return string.Empty;
+
+        return GetBattlePetName(PluginLink.Utils.Get<RemapUtils>().GetPetIDFromClass(playerData.Value.job));
     }
 
     public string GetCurrentPetName()

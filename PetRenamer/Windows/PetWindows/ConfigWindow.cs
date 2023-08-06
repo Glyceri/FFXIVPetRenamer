@@ -25,7 +25,7 @@ public class ConfigWindow : PetWindow
         if (Button("Clear All Nicknames")) 
             PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
                 "Are you sure you want to clear all Nicknames\nfor every user?",
-                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknamesForAllUsers(); } }
+                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearNicknamesForAllUsersV2(); } }
                 , this);
 
         if (Button("Credits"))

@@ -35,7 +35,7 @@ internal class PlayerUtils : UtilsRegistryType
             if (playerCharacter->CharacterData.ClassJob == 26 || playerCharacter->CharacterData.ClassJob == 27) petType = -2;
         }
 
-        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType,  data);
+        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType, playerCharacter->CharacterData.ClassJob, data);
     }
 }
 
@@ -50,11 +50,12 @@ internal struct PlayerData
     internal byte gender;
     internal int race;
     internal int tribe;
+    internal int job;
     internal int battlePetID;
 
     internal CompanionData? companionData;
 
-    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, int battlePetID, CompanionData? companionData)
+    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, int battlePetID, int job, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
         this.namePtr = playerGameObject->Name;
@@ -64,6 +65,7 @@ internal struct PlayerData
         this.battlePetID = battlePetID;
         this.race = race;
         this.tribe = tribe;
+        this.job = job;
     }
 }
 

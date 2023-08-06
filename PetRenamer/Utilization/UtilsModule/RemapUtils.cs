@@ -1,5 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
-using PetRenamer.Utilization.Attributes;
+﻿using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;

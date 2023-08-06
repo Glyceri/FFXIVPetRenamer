@@ -21,7 +21,7 @@ internal class AutoBattlePetUpdatable : Updatable
     public override void LateUpdate(Framework frameWork)
     {
         if (hasFilled) return;
-        SerializableUser? localUser = configurationUtils.GetLocalUser();
+        SerializableUserV2? localUser = configurationUtils.GetLocalUserV2();
         if (localUser == null) return;
 
         List<int> missingIDs = new List<int>();
@@ -39,9 +39,8 @@ internal class AutoBattlePetUpdatable : Updatable
         }
 
         foreach (int id in missingIDs)
-        {
-            configurationUtils.SetLocalNickname(id, "");
-        }
+            configurationUtils.SetLocalNicknameV2(id, "");
+        
         hasFilled = true;
     }
 
