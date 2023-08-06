@@ -26,16 +26,17 @@ internal class IpcUtils : UtilsRegistryType
         
         foreach (var kvp in data)
         {
-            SerializableUserV2? user = ConfigurationUtils!.GetUserV2(new SerializableUserV2(kvp.Key.Item1, (ushort)kvp.Key.Item2));
+            SerializableUserV2? storedUser = new SerializableUserV2(kvp.Key.Item1, (ushort)kvp.Key.Item2);
+            SerializableUserV2? user = ConfigurationUtils!.GetUserV2(storedUser);
             if (user == null) 
             {
                 ConfigurationUtils!.AddNewUserV2(user!);
-                SerializableUserV2? user2 = ConfigurationUtils!.GetUserV2(new SerializableUserV2(kvp.Key.Item1, (ushort)kvp.Key.Item2));
-                user2!.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
+                SerializableUserV2? user2 = ConfigurationUtils!.GetUserV2(storedUser);
+                user2?.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
             }
             else
             {
-                user.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
+                user?.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
             }
         }
     }
