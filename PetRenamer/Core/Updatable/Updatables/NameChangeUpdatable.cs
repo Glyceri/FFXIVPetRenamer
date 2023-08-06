@@ -134,7 +134,7 @@ internal class NameChangeUpdatable : Updatable
                 ApplyName(character.GetCompanionName(), currentName);
             }
 
-            if(hasBattlePet) 
+            if(hasBattlePet && character.BattlePetNamingAllowed()) 
             {
                 battlePetBeenActive = true;
                 currentID = character.GetBattlePetID();

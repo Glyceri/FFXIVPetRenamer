@@ -32,8 +32,6 @@ public class PetListWindow : PetWindow
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
         remapUtils = PluginLink.Utils.Get<RemapUtils>();
 
-        IsOpen = true;
-
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 815),
