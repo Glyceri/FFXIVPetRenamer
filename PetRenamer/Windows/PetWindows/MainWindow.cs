@@ -109,6 +109,10 @@ public class MainWindow : InitializablePetWindow
     {
         if (Button("Save Nickname"))
         {
+            
+            SerializableNickname nName = nicknameUtils.GetLocalNickname(theID);
+            if(nName.Name != internalTempText)
+                IpcProvider.ChangedPetNickname(new NicknameData(theID, internalTempText));
             configurationUtils.SetLocalNickname(theID, internalTempText);
             OnOpen();
         }
