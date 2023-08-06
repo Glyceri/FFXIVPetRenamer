@@ -17,23 +17,25 @@ public static class IpcProvider
     public const uint MajorVersion = 1;
     public const uint MinorVersion = 0;
 
-    public static ICallGateProvider<(uint, uint)>? ApiVersion;
-
+    private static ICallGateProvider<(uint, uint)>? ApiVersion;
     private static ICallGateProvider<object>? Ready;
     private static ICallGateProvider<object>? Disposing;
-    private static ICallGateProvider<Character, string, object>? SetCharacterNickname;
-    private static ICallGateProvider<Character, int, string>? GetCharacterNickname;
+    private static ICallGateProvider<Character, string, object>? SetCharacterPetNickname;
+    private static ICallGateProvider<Character, int, string>? GetCharacterPetNickname;
     private static ICallGateProvider<int, string>? GetLocalCharacterPetNickname;
+    private static ICallGateProvider<string, object>? LocalCharacterChangedPetNickname;
     private static ICallGateProvider<Character, object>? ClearCharacter;
 
     public const string NameSpace = "PetRenamer.";
     public const string ApiVersionIdentifier = $"{NameSpace}{nameof(ApiVersion)}";
     public const string ReadyIdentifier = $"{NameSpace}{nameof(Ready)}";
     public const string DisposingIdentifier = $"{NameSpace}{nameof(Disposing)}";
-    public const string SetCharacterNicknameIdentifier = $"{NameSpace}{nameof(SetCharacterNickname)}";
-    public const string GetCharacterNicknameIdentifier = $"{NameSpace}{nameof(GetCharacterNickname)}";
+    public const string SetCharacterNicknameIdentifier = $"{NameSpace}{nameof(SetCharacterPetNickname)}";
+    public const string GetCharacterNicknameIdentifier = $"{NameSpace}{nameof(GetCharacterPetNickname)}";
     public const string GetLocalCharacterPetNicknameIdentifier = $"{NameSpace}{nameof(GetLocalCharacterPetNickname)}";
     public const string ClearCharacterIdentifier = $"{NameSpace}{nameof(ClearCharacter)}";
+    public const string LocalCharacterChangedPetNicknameIdentifier = $"{NameSpace}{nameof(LocalCharacterChangedPetNickname)}";
+    
 
     internal static void Init(ref DalamudPluginInterface dalamudPluginInterface)
     {
@@ -41,14 +43,15 @@ public static class IpcProvider
         Ready = dalamudPluginInterface.GetIpcProvider<object>(ReadyIdentifier);
         Disposing = dalamudPluginInterface.GetIpcProvider<object>(DisposingIdentifier);
 
-        SetCharacterNickname = dalamudPluginInterface.GetIpcProvider<Character, string, object>(SetCharacterNicknameIdentifier);
-        GetCharacterNickname = dalamudPluginInterface.GetIpcProvider<Character, int, string>(GetCharacterNicknameIdentifier);
+        SetCharacterPetNickname = dalamudPluginInterface.GetIpcProvider<Character, string, object>(SetCharacterNicknameIdentifier);
+        GetCharacterPetNickname = dalamudPluginInterface.GetIpcProvider<Character, int, string>(GetCharacterNicknameIdentifier);
         GetLocalCharacterPetNickname = dalamudPluginInterface.GetIpcProvider<int, string>(GetLocalCharacterPetNicknameIdentifier);
         ClearCharacter = dalamudPluginInterface.GetIpcProvider<Character, object>(ClearCharacterIdentifier);
+        LocalCharacterChangedPetNickname = dalamudPluginInterface.GetIpcProvider<string, object>(LocalCharacterChangedPetNicknameIdentifier);
 
         ApiVersion.RegisterFunc(VersionFunction);
-        SetCharacterNickname.RegisterAction(SetCharacterNicknameCallback);
-        GetCharacterNickname.RegisterFunc(GetCharacterNicknameCallback);
+        SetCharacterPetNickname.RegisterAction(SetCharacterNicknameCallback);
+        GetCharacterPetNickname.RegisterFunc(GetCharacterNicknameCallback);
         GetLocalCharacterPetNickname.RegisterFunc(GetLocalCharacterNicknameCallback);
         ClearCharacter.RegisterAction(ClearCharacterCallback);
     }
@@ -56,6 +59,12 @@ public static class IpcProvider
 
     internal static void NotifyReady() => Ready?.SendMessage();
     internal static void NotifyDisposing() => Disposing?.SendMessage();
+    internal static void ChangedPetNickname(NicknameData? data)
+    {
+        string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);
+        LocalCharacterChangedPetNickname?.SendMessage(jsonString);
+    }
+
 
     static (uint, uint) VersionFunction() => (MajorVersion, MinorVersion);
 
@@ -84,7 +93,7 @@ public static class IpcProvider
                 nicknameDataList.Remove(nicknameData);
             PluginLink.IpcStorage.IpcAssignedNicknames[player] = nicknameDataList;
         }
-        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(SetCharacterNickname)} IPC."); }
+        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(SetCharacterPetNickname)} IPC."); }
     }
 
     static string GetCharacterNicknameCallback(Character character, int pet)
@@ -98,7 +107,7 @@ public static class IpcProvider
                 if(d.ID == pet)
                     return JsonConvert.SerializeObject(d);
         }
-        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
+        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterPetNickname)} IPC."); }
 
         return string.Empty;
     }
@@ -119,11 +128,12 @@ public static class IpcProvider
     {
         ApiVersion?.UnregisterFunc();
 
-        SetCharacterNickname?.UnregisterAction();
-        GetCharacterNickname?.UnregisterFunc();
+        SetCharacterPetNickname?.UnregisterAction();
+        GetCharacterPetNickname?.UnregisterFunc();
         GetLocalCharacterPetNickname?.UnregisterFunc();
         ClearCharacter?.UnregisterAction();
 
+        LocalCharacterChangedPetNickname = null;
         Ready = null;
         Disposing = null;
     }
