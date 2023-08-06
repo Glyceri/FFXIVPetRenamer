@@ -3,12 +3,16 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Text.Json.Serialization;
 
 namespace PetRenamer;
 
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
+    [JsonIgnore]
+    public const int currentSaveFileVersion = 4;
+
     public int Version { get; set; } = 4;
 
     public SerializableUserV2[]? serializableUsersV2 = null;
