@@ -79,6 +79,14 @@ internal class ConfigurationUtils : UtilsRegistryType
         return null!;
     }
 
+    public SerializableUserV2 GetUserV2(string username, ushort homeworld)
+    {
+        foreach (SerializableUserV2 user in PluginLink.Configuration.serializableUsersV2!)
+            if (user.username.Trim().ToLower() == username.Trim().ToLower() && user.homeworld == homeworld)
+                return user;
+        return null!;
+    }
+
     public SerializableUserV2? GetLocalUserV2()
     {
         PlayerCharacter? chara = PluginHandlers.ClientState.LocalPlayer;

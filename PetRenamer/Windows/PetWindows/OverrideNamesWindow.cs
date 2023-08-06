@@ -17,8 +17,8 @@ internal class OverrideNamesWindow : PetWindow
     ConfigurationUtils configurationUtils { get; set; } = null!;
     NicknameUtils nicknameUtils { get; set; } = null!;
 
-    SerializableUser importedUser { get; set; } = null!;
-    SerializableUser alreadyExistingUser { get; set; } = null!;
+    SerializableUserV2 importedUser { get; set; } = null!;
+    SerializableUserV2 alreadyExistingUser { get; set; } = null!;
 
     int maxBoxHeight = 670;
 
@@ -63,7 +63,7 @@ internal class OverrideNamesWindow : PetWindow
                 }
                 catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableNickname]: {e}"); }
 
-                importedUser = new SerializableUser(nicknames.ToArray(), userName, homeWorld);
+                importedUser = new SerializableUserV2(nicknames.ToArray(), userName, homeWorld);
             }
             catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableUser]: {e}"); }
         }
@@ -75,7 +75,7 @@ internal class OverrideNamesWindow : PetWindow
     public unsafe override void OnDraw()
     {
         if (importedUser == null) return;
-        alreadyExistingUser = configurationUtils.GetUser(importedUser);
+        alreadyExistingUser = configurationUtils.GetUserV2(importedUser);
         DrawUserHeader();
         DrawList();
         DrawFooter();
@@ -89,7 +89,7 @@ internal class OverrideNamesWindow : PetWindow
         {
             if(alreadyExistingUser == null)
             {
-                configurationUtils.AddNewUser(importedUser);
+                configurationUtils.AddNewUserV2(importedUser);
             }
             else
             {
@@ -146,13 +146,13 @@ internal class OverrideNamesWindow : PetWindow
     bool IsExactSame(SerializableNickname nickname)
     {
         if (alreadyExistingUser == null) return false;
-        return nicknameUtils.IsSame(alreadyExistingUser, nickname.ID, nickname.Name);
+        return nicknameUtils.IsSameV2(alreadyExistingUser, nickname.ID, nickname.Name);
     }
 
     bool HasNickname(SerializableNickname nickname)
     {
         if (alreadyExistingUser == null) return false;
-        return nicknameUtils.HasID(alreadyExistingUser, nickname.ID);
+        return nicknameUtils.HasIDV2(alreadyExistingUser, nickname.ID);
     }
 }
 
