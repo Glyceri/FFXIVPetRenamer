@@ -9,6 +9,8 @@ public class NicknameData
     public int BattleID = -1;
     public string? BattleNickname = string.Empty;
 
+    public NicknameData() { }
+
     [JsonConstructor]
     public NicknameData(int ID, string? nickname, int BattleID, string? BattleNickname)
     {
