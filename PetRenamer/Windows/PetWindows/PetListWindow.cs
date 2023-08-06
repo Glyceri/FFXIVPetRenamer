@@ -19,6 +19,7 @@ public class PetListWindow : PetWindow
     PlayerUtils playerUtils { get; set; } = null!;
     ConfigurationUtils configurationUtils { get; set; } = null!;
     NicknameUtils nicknameUtils { get; set; } = null!;
+    RemapUtils remapUtils { get; set; } = null!;
 
     int maxBoxHeight = 670;
 
@@ -29,6 +30,7 @@ public class PetListWindow : PetWindow
         playerUtils = PluginLink.Utils.Get<PlayerUtils>();
         configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
         nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
+        remapUtils = PluginLink.Utils.Get<RemapUtils>();
 
         IsOpen = true;
 
@@ -54,6 +56,7 @@ public class PetListWindow : PetWindow
 
     void DrawBattlePetList()
     {
+        DrawBattlePetWarningHeader();
         int counter = 10;
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
 
@@ -65,12 +68,19 @@ public class PetListWindow : PetWindow
                 string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
 
                 Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-                Label(nickname.ID == -2 ? "Carbuncle" : "Faerie" + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+                Label(remapUtils.PetIDToName(nickname.ID).ToString() + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
                 if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
+                    PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForBattleID(nickname.ID); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                    PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNickname(nickname.ID);
+                    PluginLink.Utils.Get<ConfigurationUtils>().SetLocalNickname(nickname.ID, string.Empty);
             }
+        ImGui.EndListBox();
+    }
+
+    void DrawBattlePetWarningHeader()
+    {
+        BeginListBox("##WarningHeader", new System.Numerics.Vector2(780, 40));
+        ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change, for example, a summoners Carbuncle into a Faerie.\nIt will still use the Carbuncle's name.");
         ImGui.EndListBox();
     }
 
@@ -99,7 +109,7 @@ public class PetListWindow : PetWindow
                 {
                     string exportString = string.Concat("[PetExport]\n", localPlayer.username.ToString(), "\n", localPlayer.homeworld.ToString(), "\n");
                     foreach (SerializableNickname nickname in localPlayer.nicknames)
-                        exportString = string.Concat(exportString, nickname.ToString(), "\n");
+                        exportString = string.Concat(exportString, nickname.ToSaveString(), "\n");
                     string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
                     ImGui.SetClipboardText(convertedString);
                 }

@@ -6,7 +6,6 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Updatable.Updatables;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -18,10 +17,10 @@ public class MainWindow : InitializablePetWindow
     readonly SheetUtils sheetUtils;
     readonly NicknameUtils nicknameUtils;
     readonly ConfigurationUtils configurationUtils;
+    readonly RemapUtils remapUtils;
 
     int gottenID = -1;
     int gottenBattlePetID = -1;
-    int gottenClass = -1;
     string tempName = string.Empty;
     string tempName2 = string.Empty;
     string tempText = string.Empty;
@@ -35,6 +34,7 @@ public class MainWindow : InitializablePetWindow
         nicknameUtils       = PluginLink.Utils.Get<NicknameUtils>();
         sheetUtils          = PluginLink.Utils.Get<SheetUtils>();
         configurationUtils  = PluginLink.Utils.Get<ConfigurationUtils>();
+        remapUtils          = PluginLink.Utils.Get<RemapUtils>();
     }
     
     public override void OnOpen()
@@ -51,13 +51,7 @@ public class MainWindow : InitializablePetWindow
     }
 
     public override void OnDrawNormal() => DrawNormalMode();
-    public override void OnDrawBattlePet() => DrawBattlePetMode();
-
-    void DrawBattlePetMode()
-    {
-        if (gottenClass < 26 || gottenClass > 28) DrawWrongClass();
-        else HandleBattleMode(); 
-    }
+    public override void OnDrawBattlePet() => HandleBattleMode();
 
     void HandleBattleMode()
     {
@@ -67,26 +61,12 @@ public class MainWindow : InitializablePetWindow
 
     void HandleBattlePetName()
     {
-        string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "faerie";
-
-        DrawPetNameField(petType, ref tempText2, ref tempName2, ref gottenBattlePetID);
+        DrawPetNameField(remapUtils.PetIDToName(gottenBattlePetID), ref tempText2, ref tempName2, ref gottenBattlePetID);
     }
 
     void DrawGetPetOut()
     {
-        string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "faerie";
-
-        ImGui.TextColored(StylingColours.highlightText, $"Please summon your {petType}.");
-    }
-
-    void DrawWrongClass()
-    {
-        ImGui.TextColored(StylingColours.highlightText, "Please switch to: ");
-        ImGui.TextColored(StylingColours.highlightText, "- Arcanist");
-        ImGui.TextColored(StylingColours.highlightText, "- Summoner");
-        ImGui.TextColored(StylingColours.highlightText, "- Scholar");
+        ImGui.TextColored(StylingColours.highlightText, $"Please summon your {remapUtils.PetIDToName(gottenBattlePetID)}.");
     }
 
     void DrawNormalMode()
@@ -142,12 +122,12 @@ public class MainWindow : InitializablePetWindow
     unsafe void OnChange(PlayerData? playerData, SerializableNickname nickname)
     {
         gottenID = -1;
-        gottenClass = -1;
         gottenBattlePetID = -1;
         OnOpen();
         if (playerData == null) return;
+        Dalamud.Logging.PluginLog.Log("early: " + playerData!.Value.battlePetID.ToString());
         gottenBattlePetID = playerData!.Value.battlePetID;
-        gottenClass = ((Character*)playerData!.Value.playerGameObject)->CharacterData.ClassJob;
+        OnOpen();
         if (playerData!.Value.companionData == null) return;
         gottenID = playerData!.Value.companionData!.Value.currentModelID;
         OnOpen();
@@ -156,6 +136,13 @@ public class MainWindow : InitializablePetWindow
     public void OpenForId(int ID)
     {
         gottenID = ID;
+        IsOpen = true;
+        OnOpen();
+    }
+
+    public void OpenForBattleID(int id)
+    {
+        gottenBattlePetID = id;
         IsOpen = true;
         OnOpen();
     }

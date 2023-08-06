@@ -29,9 +29,6 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     public sealed override unsafe void Draw()
     {
-        PushStyleColor(ImGuiCol.TitleBgActive, StylingColours.titleBgActive);
-        PushStyleColor(ImGuiCol.TitleBg, StylingColours.titleBg);
-        PushStyleColor(ImGuiCol.TitleBgCollapsed, StylingColours.tileBgCollapsed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
         PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
@@ -230,7 +227,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     }
 
     protected void SameLine() => ImGui.SameLine();
-    protected void SameLineNoMargin() => ImGui.SameLine(0, 0.0000001f);
+    protected void SameLineNoMargin() => ImGui.SameLine(0, 0);
     protected void SameLinePretendSpace() => ImGui.SameLine(0, 3f);
 }
 

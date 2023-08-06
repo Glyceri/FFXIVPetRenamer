@@ -36,6 +36,22 @@ internal class SheetUtils : UtilsRegistryType
         return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
     }
 
+    public void DrawAllClasses()
+    {
+        foreach(ClassJob job in classJob)
+        {
+            Dalamud.Logging.PluginLog.Log(job.NameEnglish + " : " + job.RowId);
+        }
+    }
+
+    public void DrawAllPetnames()
+    {
+        foreach(Pet pet in battlePetSheet)
+        {
+            Dalamud.Logging.PluginLog.Log(pet.Name + " : " + pet.RowId);
+        }
+    }
+
     public unsafe string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps

@@ -1,4 +1,4 @@
-﻿using Dalamud.Game;
+using Dalamud.Game;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -204,6 +205,7 @@ internal class NameChangeUpdatable : Updatable
         public string ownName = string.Empty;
         public uint ownHomeWorld = 0;
 
+        public bool BattlePetNamingAllowed() => PluginConstants.allowedJobs.Contains(GetPlayerJob());
         public bool HasBattlePet() => battlePetCharacter != null;
         public bool HasCompanion() => playerCompanion != null;
 
@@ -211,13 +213,7 @@ internal class NameChangeUpdatable : Updatable
         public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
 
         public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
-        public int GetBattlePetID()
-        {
-            byte playerJob = GetPlayerJob();
-            if (playerJob == 28) return -3;
-            if (playerJob == 26 || playerJob == 27) return -2;
-            return -1;
-        }
+        public int GetBattlePetID() => PluginLink.Utils.Get<RemapUtils>().GetPetIDFromClass(GetPlayerJob());
 
         public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
 
