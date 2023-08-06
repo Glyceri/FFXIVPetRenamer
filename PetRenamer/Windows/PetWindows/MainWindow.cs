@@ -109,13 +109,8 @@ public class MainWindow : InitializablePetWindow
     {
         if (Button("Save Nickname"))
         {
-            SerializableNickname nName = nicknameUtils.GetLocalNicknameV2(theID);
-            configurationUtils.SetLocalNicknameV2(theID, internalTempText);
-            if (nName.Name != internalTempText)
-            {
-
-            }
-            
+            internalTempText = internalTempText.Replace("^", "");
+            configurationUtils.SetLocalNicknameV2(theID, internalTempText);           
             OnOpen();
         }
         ImGui.SameLine(0, 1f);

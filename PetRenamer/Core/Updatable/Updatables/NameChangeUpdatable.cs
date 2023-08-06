@@ -183,10 +183,8 @@ internal class NameChangeUpdatable : Updatable
 
             string localCurrentName = currentName;
             string localCurrentBattleName = currentBattleName;
-            if (localCurrentName == sheetUtils.GetBattlePetName(currentBattleSkeletonID)) localCurrentName = string.Empty;
-            Dalamud.Logging.PluginLog.Log(currentBattleName);
-            Dalamud.Logging.PluginLog.Log(sheetUtils.GetBattlePetName(currentBattleSkeletonID));
-            if (localCurrentBattleName == sheetUtils.GetCurrentBattlePetName()) localCurrentBattleName = string.Empty;
+            if (localCurrentName == sheetUtils.GetCurrentPetName()) localCurrentName = string.Empty;
+            if (localCurrentBattleName == remapUtils.PetIDToName(remapUtils.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
 
             IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, remapUtils.GetPetIDFromClass(currentJob), localCurrentBattleName));
             Dalamud.Logging.PluginLog.Log(new NicknameData(currentID, localCurrentName, remapUtils.GetPetIDFromClass(currentJob), localCurrentBattleName)!.ToString());
