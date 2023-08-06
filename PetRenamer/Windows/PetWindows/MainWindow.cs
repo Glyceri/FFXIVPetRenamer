@@ -66,7 +66,9 @@ public class MainWindow : InitializablePetWindow
 
     void DrawGetPetOut()
     {
-        ImGui.TextColored(StylingColours.highlightText, $"Please summon your {remapUtils.PetIDToName(gottenBattlePetID)}.");
+        string gottenString = remapUtils.PetIDToName(gottenBattlePetID);
+        if(gottenString ==  string.Empty) ImGui.TextColored(StylingColours.highlightText, $"Please summon a Battle Pet.");
+        else ImGui.TextColored(StylingColours.highlightText, $"Please summon your {gottenString}.");
     }
 
     void DrawNormalMode()
