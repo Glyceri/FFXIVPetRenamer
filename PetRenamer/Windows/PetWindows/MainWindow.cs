@@ -110,9 +110,12 @@ public class MainWindow : InitializablePetWindow
         if (Button("Save Nickname"))
         {
             SerializableNickname nName = nicknameUtils.GetLocalNicknameV2(theID);
-            if (nName.Name != internalTempText)
-                IpcProvider.ChangedPetNickname(new NicknameData(theID, internalTempText));
             configurationUtils.SetLocalNicknameV2(theID, internalTempText);
+            if (nName.Name != internalTempText)
+            {
+
+            }
+            
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
@@ -130,7 +133,6 @@ public class MainWindow : InitializablePetWindow
         gottenBattlePetID = -1;
         OnOpen();
         if (playerData == null) return;
-        Dalamud.Logging.PluginLog.Log("early: " + playerData!.Value.battlePetID.ToString());
         gottenBattlePetID = playerData!.Value.battlePetID;
         OnOpen();
         if (playerData!.Value.companionData == null) return;

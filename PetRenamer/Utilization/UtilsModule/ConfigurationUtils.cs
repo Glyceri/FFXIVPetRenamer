@@ -27,6 +27,8 @@ internal class ConfigurationUtils : UtilsRegistryType
         if (nick != null)
             nick.Name = nickname;
 
+        localUser.SaveNickname(nick!);
+
         PluginLink.Configuration.Save();
     }
 

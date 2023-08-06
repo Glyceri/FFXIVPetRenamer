@@ -14,7 +14,7 @@ public class SerializableUserV2
     public ushort homeworld { get; set; }
 
     [JsonIgnore]
-    public SerializableNickname[] nicknames 
+    public SerializableNickname[] nicknames
     {
         get => ToArray();
         set
@@ -31,14 +31,14 @@ public class SerializableUserV2
     }
 
     [JsonIgnore]
-    public SerializableNickname this[ int i]
+    public SerializableNickname this[int i]
     {
         get => new SerializableNickname(ids[i], names[i]);
         set
         {
             ids[i] = value.ID;
             names[i] = value.Name;
-        } 
+        }
     }
 
     [JsonIgnore]
@@ -47,9 +47,9 @@ public class SerializableUserV2
     public SerializableUserV2(string username, ushort homeworld) : this(new int[0], new string[0], username, homeworld) { }
     public SerializableUserV2(SerializableNickname[] nicknames, string username, ushort homeworld) : this(username, homeworld)
     {
-        ids= new int[nicknames.Length];
-        names= new string[nicknames.Length];
-        for(int i = 0; i < nicknames.Length; i++)
+        ids = new int[nicknames.Length];
+        names = new string[nicknames.Length];
+        for (int i = 0; i < nicknames.Length; i++)
         {
             ids[i] = nicknames[i].ID;
             names[i] = nicknames[i].Name;
@@ -75,7 +75,20 @@ public class SerializableUserV2
     public List<SerializableNickname> ToList() => ToArray().ToList();
 
 
+    public void SaveNickname(SerializableNickname nickname)
+    {
+        if (nickname == null) return;
+        for (int i = 0; i < length; i++)
+            if (this[i].ID == nickname.ID)
+            {
+                this[i] = nickname;
+                return;
+            }
 
+        var list = ToList();
+        list.Add(nickname);
+        nicknames = list.ToArray();
+    }
 
     public override string ToString() => $"username:{username},ids:{ids},names:{names},homeworld:{homeworld}";
 }

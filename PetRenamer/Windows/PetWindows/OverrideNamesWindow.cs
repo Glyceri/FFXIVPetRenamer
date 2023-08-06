@@ -54,7 +54,7 @@ internal class OverrideNamesWindow : PetWindow
                 {
                     for (int i = 3; i < splitLines.Length; i++)
                     {
-                        string[] splitNickname = splitLines[i].Split(',');
+                        string[] splitNickname = splitLines[i].Split('^');
                         if (splitNickname.Length < 1) continue;
                         if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) continue;
                         string nickname = splitNickname[1].Replace("Name:", "");

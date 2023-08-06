@@ -25,10 +25,6 @@ public static class IpcProvider
     private static ICallGateProvider<Character, string, object>? SetCharacterNickname;
     private static ICallGateProvider<Character, string>? GetCharacterMinionNickname;
     private static ICallGateProvider<string>? GetLocalCharacterMinionNickname;
-
-    private static ICallGateProvider<Character, string>? GetCharacterPetNickname;
-    private static ICallGateProvider<string>? GetLocalCharacterPetNickname;
-
     private static ICallGateProvider<string, object>? LocalCharacterChangedNickname;
     private static ICallGateProvider<Character, object>? ClearCharacter;
 
@@ -40,22 +36,11 @@ public static class IpcProvider
     public const string GetCharacterNicknameIdentifier = $"{NameSpace}{nameof(GetCharacterMinionNickname)}";
     public const string GetLocalCharacterPetNicknameIdentifier = $"{NameSpace}{nameof(GetLocalCharacterMinionNickname)}";
 
-    public const string GetCharacterPetNicknameIdentifier = $"{NameSpace}{nameof(GetCharacterPetNickname)}";
-    public const string GetLocalCharacterPetPetNicknameIdentifier = $"{NameSpace}{nameof(GetLocalCharacterPetNickname)}";
-
     public const string ClearCharacterIdentifier = $"{NameSpace}{nameof(ClearCharacter)}";
     public const string LocalCharacterChangedPetNicknameIdentifier = $"{NameSpace}{nameof(LocalCharacterChangedNickname)}";
 
-    static RemapUtils remapUtils = null!;
-    static NicknameUtils nicknameUtils = null!;
-    static ConfigurationUtils configurationUtils = null!;
-
     internal static void Init(ref DalamudPluginInterface dalamudPluginInterface)
     {
-        remapUtils = PluginLink.Utils.Get<RemapUtils>();
-        nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
-        configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
-
         ApiVersion = dalamudPluginInterface.GetIpcProvider<(uint, uint)>(ApiVersionIdentifier);
         Ready = dalamudPluginInterface.GetIpcProvider<object>(ReadyIdentifier);
         Disposing = dalamudPluginInterface.GetIpcProvider<object>(DisposingIdentifier);
@@ -63,10 +48,6 @@ public static class IpcProvider
         SetCharacterNickname = dalamudPluginInterface.GetIpcProvider<Character, string, object>(SetCharacterNicknameIdentifier);
         GetCharacterMinionNickname = dalamudPluginInterface.GetIpcProvider<Character, string>(GetCharacterNicknameIdentifier);
         GetLocalCharacterMinionNickname = dalamudPluginInterface.GetIpcProvider<string>(GetLocalCharacterPetNicknameIdentifier);
-
-        GetCharacterPetNickname = dalamudPluginInterface.GetIpcProvider<Character, string>(GetCharacterPetNicknameIdentifier);
-        GetLocalCharacterPetNickname = dalamudPluginInterface.GetIpcProvider<string>(GetLocalCharacterPetPetNicknameIdentifier);
-
         ClearCharacter = dalamudPluginInterface.GetIpcProvider<Character, object>(ClearCharacterIdentifier);
         LocalCharacterChangedNickname = dalamudPluginInterface.GetIpcProvider<string, object>(LocalCharacterChangedPetNicknameIdentifier);
 
@@ -74,8 +55,6 @@ public static class IpcProvider
         SetCharacterNickname.RegisterAction(SetCharacterNicknameCallback);
         GetCharacterMinionNickname.RegisterFunc(GetCharacterNicknameCallback);
         GetLocalCharacterMinionNickname.RegisterFunc(GetLocalCharacterNicknameCallback);
-        GetCharacterPetNickname.RegisterFunc(GetCharacterPetNicknameCallback);
-        GetLocalCharacterPetNickname.RegisterFunc(GetLocalCharacterPetNicknameCallback);
         ClearCharacter.RegisterAction(ClearCharacterCallback);
     }
 
@@ -105,12 +84,18 @@ public static class IpcProvider
             if (nicknameData == null) return;
             bool setName = false;
             foreach (NicknameData data in nicknameDataList)
+            {
                 if (data.IDEquals(nicknameData))
                 {
                     data.Nickname = nicknameData.Nickname;
                     setName = true;
-                    break;
                 }
+                if(data.BattleID == nicknameData.BattleID)
+                {
+                    data.BattleNickname = nicknameData.BattleNickname;
+                    setName = true;
+                }
+            }
             if(!setName) nicknameDataList.Add(nicknameData);
             if (nicknameData.Nickname == string.Empty)
                 nicknameDataList.Remove(nicknameData);
@@ -119,28 +104,7 @@ public static class IpcProvider
         catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(SetCharacterNickname)} IPC."); }
     }
 
-    static string GetCharacterPetNicknameCallback(Character character)
-    {
-        try
-        {
-            if (character is not PlayerCharacter playerCharacter) return string.Empty;
-            (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
-            if (!PluginLink.IpcStorage.IpcAssignedNicknames.TryGetValue(player, out List<NicknameData>? data) || data == null) return string.Empty;
-            PlayerData? pData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
-            if(pData == null ) return string.Empty;
-            if (pData.Value.companionData == null ) return string.Empty;
-            int id = remapUtils.GetPetIDFromClass(pData.Value.companionData.Value.currentModelID);
-            foreach (NicknameData d in data)
-                if (d.ID == id)
-                    return nicknameUtils.GetNicknameV2(configurationUtils.GetUserV2(playerCharacter.Name.TextValue, (ushort)playerCharacter.HomeWorld.Id), id)?.Name ?? string.Empty;
-            return string.Empty;
-        }
-        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterMinionNickname)} IPC."); }
-
-        return string.Empty;
-    }
-
-    static string GetLocalCharacterNicknameCallback()
+    public static string GetLocalCharacterNicknameCallback()
     {
         if(PluginHandlers.ClientState.LocalPlayer == null) return string.Empty;
         return GetCharacterNicknameCallback(PluginHandlers.ClientState.LocalPlayer);
@@ -157,19 +121,13 @@ public static class IpcProvider
             if (pData == null) return string.Empty;
             if (pData.Value.companionData == null) return string.Empty;
             foreach (NicknameData d in data)
-                if (d.ID == pData.Value.job)
+                if (d.ID == pData.Value.companionData.Value.currentModelID)
                     return pData.Value.companionData.Value.currentCompanionName;
             return string.Empty;
         }
         catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterMinionNickname)} IPC."); }
 
         return string.Empty;
-    }
-
-    static string GetLocalCharacterPetNicknameCallback()
-    {
-        if (PluginHandlers.ClientState.LocalPlayer == null) return string.Empty;
-        return GetCharacterPetNicknameCallback(PluginHandlers.ClientState.LocalPlayer);
     }
 
     static void ClearCharacterCallback(Character character)
@@ -185,9 +143,6 @@ public static class IpcProvider
         SetCharacterNickname?.UnregisterAction();
         GetCharacterMinionNickname?.UnregisterFunc();
         GetLocalCharacterMinionNickname?.UnregisterFunc();
-
-        GetCharacterPetNickname?.UnregisterFunc();
-        GetLocalCharacterPetNickname?.UnregisterFunc();
 
         ClearCharacter?.UnregisterAction();
 
