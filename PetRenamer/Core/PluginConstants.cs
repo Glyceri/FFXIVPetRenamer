@@ -13,7 +13,7 @@ public static class PluginConstants
         26,     //Arcanist
         27,     //Summoner
         28,     //Scholar
-        30,     //Ninja
+//        30,     //Ninja
         31,     //Machinist 
         32,     //Dark Knight
     };
@@ -23,6 +23,6 @@ public static class PluginConstants
         -3,     //Scholar
         -4,     //Machinist
         -5,     //Dark Knight
-        -6,     //Ninja
+//        -6,     //Ninja
     };
 }
