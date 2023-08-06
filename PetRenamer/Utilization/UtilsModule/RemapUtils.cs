@@ -47,11 +47,10 @@ internal class RemapUtils : UtilsRegistryType
 
         { 1027, 8  }, //Rook Autoturret MCHN
         { 2619, 21 }, //Seraph
-        { -2,   18 }, //Automaton Queen
-        { -3,   17 }, //Esteem DRK
+        { 2618, 18 }, //Automaton Queen
+        { 2621, 17 }, //Esteem DRK
         { -4,   35 }, //Bishop Autoturret
-        { -5,   34 }, //Amber Carbuncle
-        { -6,   19 }, //Bunshin Ninja
+        { -5,   19 }, //Bunshin Ninja
 
     };
 

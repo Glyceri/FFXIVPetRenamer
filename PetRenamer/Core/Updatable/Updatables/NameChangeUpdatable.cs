@@ -192,8 +192,6 @@ internal class NameChangeUpdatable : Updatable
         LoopUserList();
     }
 
-
-
     private unsafe class FoundPlayerCharacter
     {
         public GameObject* selfGameObject;

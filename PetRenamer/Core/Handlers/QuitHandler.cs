@@ -8,6 +8,9 @@ internal class QuitHandler
         PluginLink.WindowHandler.RemoveAllWindows();
         PluginLink.CommandHandler.ClearAllCommands();
         PluginLink.UpdatableHandler.ClearAllUpdatables();
+
+        IpcProvider.NotifyDisposing();
+        IpcProvider.DeInit();
     }
 }
 

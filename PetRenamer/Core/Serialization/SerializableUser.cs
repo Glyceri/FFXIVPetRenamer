@@ -18,6 +18,13 @@ namespace PetRenamer.Core.Serialization
             this.homeworld = homeworld;
         }
 
+        public SerializableUser(string username, ushort homeworld)
+        {
+            this.nicknames = new SerializableNickname[0];
+            this.username = username;
+            this.homeworld = homeworld;
+        }
+
         public override string ToString() => $"username:{username},nicknames:{nicknames},homeworld:{homeworld}";
     }
 }

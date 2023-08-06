@@ -18,11 +18,13 @@ internal class PluginLink
     internal static UpdatableHandler UpdatableHandler { get; set; } = null!;
     internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
     internal static QuitHandler QuitHandler { get; set; } = null!;
+    internal static IpcStorage IpcStorage { get; set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
     {
         DalamudPlugin = dalamud;
         PetRenamerPlugin = petPlugin;
+        IpcStorage = new IpcStorage();
         Utils = new UtilsHandler();
         Configuration = PluginHandlers.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize();

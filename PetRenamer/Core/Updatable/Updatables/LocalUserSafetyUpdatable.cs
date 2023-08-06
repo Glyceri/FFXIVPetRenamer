@@ -26,7 +26,7 @@ internal class LocalUserSafetyUpdatable : Updatable
 
         PlayerData? playerData = playerUtils.GetPlayerData();
         if(playerData == null) return;
-        SerializableUser localUser = new SerializableUser(new SerializableNickname[0], playerData.Value.playerName, playerData.Value.homeWorld);
+        SerializableUser localUser = new SerializableUser(playerData.Value.playerName, playerData.Value.homeWorld);
         configurationUtils.AddNewUser(localUser);
     }
 }

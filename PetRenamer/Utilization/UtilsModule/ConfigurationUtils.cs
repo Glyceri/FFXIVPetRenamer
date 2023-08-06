@@ -81,7 +81,7 @@ internal class ConfigurationUtils : UtilsRegistryType
     {
         PlayerCharacter? chara =  PluginHandlers.ClientState.LocalPlayer;
         if (chara == null) return null!;
-        return GetUser(new SerializableUser(new SerializableNickname[0], chara.Name.ToString(), (ushort)chara.HomeWorld.Id));
+        return GetUser(new SerializableUser(chara.Name.ToString(), (ushort)chara.HomeWorld.Id));
     }
 
     [Obsolete]
