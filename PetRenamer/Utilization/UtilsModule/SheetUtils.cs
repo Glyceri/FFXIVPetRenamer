@@ -58,7 +58,7 @@ internal class SheetUtils : UtilsRegistryType
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
         if(id > 100) id = PluginLink.Utils.Get<RemapUtils>().BattlePetSkeletonToNameID(id);
-        if (id <= 0) return "[ERROR] Contact: Glyceri";
+        if (id <= 0) return string.Empty;
 
         foreach(Pet pet in battlePetSheet)
             if(pet.RowId == id)
