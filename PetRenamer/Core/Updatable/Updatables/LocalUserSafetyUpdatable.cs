@@ -20,14 +20,14 @@ internal class LocalUserSafetyUpdatable : Updatable
 
     public override void Update(Framework frameWork)
     {
-        if (configurationUtils.GetLocalUser() != null) return;
+        if (configurationUtils.GetLocalUserV2() != null) return;
         if (!playerUtils.PlayerDataAvailable()) return;
 
 
         PlayerData? playerData = playerUtils.GetPlayerData();
         if(playerData == null) return;
-        SerializableUser localUser = new SerializableUser(new SerializableNickname[0], playerData.Value.playerName, playerData.Value.homeWorld);
-        configurationUtils.AddNewUser(localUser);
+        SerializableUserV2 localUser = new SerializableUserV2(playerData.Value.playerName, playerData.Value.homeWorld);
+        configurationUtils.AddNewUserV2(localUser);
     }
 }
 

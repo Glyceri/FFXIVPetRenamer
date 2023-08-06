@@ -18,8 +18,8 @@ internal class StringUtils : UtilsRegistryType
 
     public string GetLocalName(int ID)
     {
-        SerializableUser user;
-        if ((user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser()!) == null) return string.Empty;
+        SerializableUserV2 user;
+        if ((user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUserV2()!) == null) return string.Empty;
 
         foreach (SerializableNickname nickname in user.nicknames)
             if (nickname.ID == ID)

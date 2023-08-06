@@ -69,9 +69,9 @@ internal class NameChangeUpdatable : Updatable
             string name = stringUtils.GetCharacterName(currentObject->Name);
             ushort homeWorld = plCharacter->HomeWorld;
 
-            SerializableUser? correctUser = null;
+            SerializableUserV2? correctUser = null;
 
-            foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
+            foreach (SerializableUserV2 user in PluginLink.Configuration.serializableUsersV2!)
             {
                 if (user == null) continue;
                 if (user.username != name) continue;
@@ -179,7 +179,7 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe void SetName(FoundPlayerCharacter character, int id, ref string name)
     {
-        SerializableNickname serializableNickname = nicknameUtils.GetNickname(character.associatedUser!, id);
+        SerializableNickname serializableNickname = nicknameUtils.GetNicknameV2(character.associatedUser!, id);
         if (serializableNickname == null) return;
         if (serializableNickname.Name.Length == 0 || !PluginLink.Configuration.displayCustomNames || name.Length == 0) return;
         name = serializableNickname.Name;
@@ -200,7 +200,7 @@ internal class NameChangeUpdatable : Updatable
         public Character* playerCharacter;
         public Character* battlePetCharacter;
         public FFCompanion* playerCompanion;
-        public SerializableUser? associatedUser;
+        public SerializableUserV2? associatedUser;
 
         public string ownName = string.Empty;
         public uint ownHomeWorld = 0;

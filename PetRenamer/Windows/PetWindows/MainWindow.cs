@@ -41,9 +41,9 @@ public class MainWindow : InitializablePetWindow
     {
         tempText = string.Empty;
         tempText2 = string.Empty;
-        if (nicknameUtils.ContainsLocal(gottenID))
+        if (nicknameUtils.ContainsLocalV2(gottenID))
             tempText = stringUtils.GetLocalName(gottenID);
-        if (nicknameUtils.ContainsLocal(gottenBattlePetID))
+        if (nicknameUtils.ContainsLocalV2(gottenBattlePetID))
             tempText2 = stringUtils.GetLocalName(gottenBattlePetID);
 
         tempName2 = tempText2;
@@ -109,13 +109,13 @@ public class MainWindow : InitializablePetWindow
     {
         if (Button("Save Nickname"))
         {
-            configurationUtils.SetLocalNickname(theID, internalTempText);
+            configurationUtils.SetLocalNicknameV2(theID, internalTempText);
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            configurationUtils.RemoveLocalNickname(theID);
+            configurationUtils.RemoveLocalNicknameV2(theID);
             OnOpen();
         }
         ImGui.TextColored(StylingColours.whiteText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");

@@ -41,9 +41,9 @@ public class PetListWindow : PetWindow
 
     public unsafe override void OnDraw()
     {
-        if (PluginLink.Configuration.serializableUsers!.Length == 0) return;
+        if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        if (configurationUtils.GetLocalUser() == null) return;
+        if (configurationUtils.GetLocalUserV2() == null) return;
         
         DrawUserHeader();
         DrawExportHeader();
@@ -60,7 +60,7 @@ public class PetListWindow : PetWindow
 
         if (openedAddPet) DrawOpenedNewPet();
         else
-            foreach (SerializableNickname nickname in configurationUtils.GetLocalUser()!.nicknames)
+            foreach (SerializableNickname nickname in configurationUtils.GetLocalUserV2()!.nicknames)
             {
                 if (nickname.ID >= -1) continue;
                 string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
@@ -70,7 +70,7 @@ public class PetListWindow : PetWindow
                 if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
                     PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForBattleID(nickname.ID); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                    PluginLink.Utils.Get<ConfigurationUtils>().SetLocalNickname(nickname.ID, string.Empty);
+                    PluginLink.Utils.Get<ConfigurationUtils>().SetLocalNicknameV2(nickname.ID, string.Empty);
             }
         ImGui.EndListBox();
     }
@@ -102,7 +102,7 @@ public class PetListWindow : PetWindow
         {
             try
             {
-                SerializableUser localPlayer = configurationUtils.GetLocalUser()!;
+                SerializableUserV2 localPlayer = configurationUtils.GetLocalUserV2()!;
                 if (localPlayer != null)
                 {
                     string exportString = string.Concat("[PetExport]\n", localPlayer.username.ToString(), "\n", localPlayer.homeworld.ToString(), "\n");
@@ -136,7 +136,7 @@ public class PetListWindow : PetWindow
         DrawListHeader();
         if (openedAddPet) DrawOpenedNewPet();
         else
-            foreach (SerializableNickname nickname in configurationUtils.GetLocalUser()!.nicknames)
+            foreach (SerializableNickname nickname in configurationUtils.GetLocalUserV2()!.nicknames)
             {
                 if (nickname.ID <= 0) continue;
                 string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
@@ -146,7 +146,7 @@ public class PetListWindow : PetWindow
                 if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
                     PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                    PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNickname(nickname.ID);
+                    PluginLink.Utils.Get<ConfigurationUtils>().RemoveLocalNicknameV2(nickname.ID);
             }
         ImGui.EndListBox();
     }
@@ -177,7 +177,7 @@ public class PetListWindow : PetWindow
             if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
             {
                 openedAddPet = false;
-                if (!nicknameUtils.ContainsLocal(nickname.ID)) configurationUtils.SetLocalNickname(nickname.ID, string.Empty);
+                if (!nicknameUtils.ContainsLocalV2(nickname.ID)) configurationUtils.SetLocalNicknameV2(nickname.ID, string.Empty);
                 PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID);
             }
         }
