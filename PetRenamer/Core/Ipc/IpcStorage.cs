@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PetRenamer.Core.Updatable.Updatables;
+using System.Collections.Generic;
 
 namespace PetRenamer;
 
@@ -11,6 +12,8 @@ public class IpcStorage
     public event OnIpcChange IpcChange = null!;
 
     private Dictionary<(string, uint), NicknameData> _IpcAssignedNicknames = new Dictionary<(string, uint), NicknameData>();
+
+    public List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
 
     public Dictionary<(string, uint), NicknameData> IpcAssignedNicknames 
     {

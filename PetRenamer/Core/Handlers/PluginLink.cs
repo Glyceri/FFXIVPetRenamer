@@ -1,5 +1,6 @@
 using Dalamud.Plugin;
 using PetRenamer.Commands;
+using PetRenamer.Core.Hooking;
 using PetRenamer.Core.Legacy;
 using PetRenamer.Core.Updatable;
 using PetRenamer.Utilization;
@@ -19,6 +20,7 @@ internal class PluginLink
     internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
     internal static QuitHandler QuitHandler { get; set; } = null!;
     internal static IpcStorage IpcStorage { get; set; } = null!;
+    internal static HookHandler HookHandler { get; set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
     {
@@ -33,6 +35,7 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
+        HookHandler = new HookHandler();
         QuitHandler = new QuitHandler();
     }
 }

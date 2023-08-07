@@ -8,8 +8,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -42,10 +42,10 @@ internal class NameChangeUpdatable : Updatable
     }
 #pragma warning restore CS8601 // Possible null reference assignment.
 
-    List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
+
     unsafe void FillUserList()
     {
-        characters.Clear();
+        PluginLink.IpcStorage.characters.Clear();
         for (int i = 0; i < 500; i++)
         {
             GameObject* currentObject = GameObjectManager.GetGameObjectByIndex(i);
@@ -69,19 +69,22 @@ internal class NameChangeUpdatable : Updatable
             }
             if (correctUser == null)
             {
-                foreach (FoundPlayerCharacter character in characters)
+                foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
                 {
                     if (character.GetOwnID() == currentObject->OwnerID)
                     {
-                        character.battlePetCharacter = plCharacter;
-                        break;
+                        if (RemapUtils.instance.battlePetRemap.ContainsKey(plCharacter->CharacterData.ModelCharaId))
+                        {
+                            character.battlePetCharacter = plCharacter;
+                            break;
+                        }
                     }
                 }
                 continue;
             }
 
             FFCompanion* plCompanion = plCharacter->Companion.CompanionObject;
-            characters.Add(new FoundPlayerCharacter()
+            PluginLink.IpcStorage.characters.Add(new FoundPlayerCharacter()
             {
                 selfGameObject = currentObject,
                 playerCharacter = plCharacter,
@@ -100,9 +103,7 @@ internal class NameChangeUpdatable : Updatable
         bool flickAtEnd = false;
         bool battlePetBeenActive = false;
 
-       
-
-        foreach (FoundPlayerCharacter character in characters)
+        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             bool isLocalPlayer = character.ownName == playerChar.Name.ToString() && character.ownHomeWorld == playerChar.HomeWorld.Id;
 
@@ -149,6 +150,7 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe void ApplyName(byte* namePtr, string newName)
     {
+        if (PluginLink.Configuration.useNewNameSystem) return;
         byte[] outcome = new byte[PluginConstants.ffxivNameSize];
         Marshal.Copy((nint)Utf8String.FromString(newName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
         Marshal.Copy(outcome, 0, (nint)namePtr, PluginConstants.ffxivNameSize);
@@ -188,34 +190,38 @@ internal class NameChangeUpdatable : Updatable
     public override unsafe void Update(Framework frameWork)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        FillUserList();
-        LoopUserList();
-    }
+        lock (PluginLink.IpcStorage.characters)
+        {
+            FillUserList();
+            LoopUserList();
+        }
+    }    
+}
 
-    private unsafe class FoundPlayerCharacter
-    {
-        public GameObject* selfGameObject;
-        public Character* playerCharacter;
-        public Character* battlePetCharacter;
-        public FFCompanion* playerCompanion;
-        public SerializableUserV2? associatedUser;
+public unsafe class FoundPlayerCharacter
+{
+    public GameObject* selfGameObject;
+    public Character* playerCharacter;
+    public Character* battlePetCharacter;
+    public FFCompanion* playerCompanion;
+    public SerializableUserV2? associatedUser;
 
-        public string ownName = string.Empty;
-        public uint ownHomeWorld = 0;
+    public string ownName = string.Empty;
+    public uint ownHomeWorld = 0;
 
-        public bool BattlePetNamingAllowed() => PluginConstants.allowedJobs.Contains(GetPlayerJob());
-        public bool HasBattlePet() => battlePetCharacter != null;
-        public bool HasCompanion() => playerCompanion != null;
+    public bool BattlePetNamingAllowed() => PluginConstants.allowedJobs.Contains(GetPlayerJob());
+    public bool HasBattlePet() => battlePetCharacter != null;
+    public bool HasCompanion() => playerCompanion != null;
 
-        public byte* GetBattlePetName() => battlePetCharacter->GameObject.Name;
-        public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
+    public byte* GetBattlePetName() => battlePetCharacter->GameObject.Name;
+    public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
 
-        public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
-        public int GetBattlePetID() => RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
+    public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
+    public int GetBattlePetID() => RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
 
-        public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
+    public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
 
-        public uint GetOwnID() => selfGameObject->ObjectID;
-        public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
-    }
+    public uint GetOwnID() => selfGameObject->ObjectID;
+    public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID; 
+    public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
 }

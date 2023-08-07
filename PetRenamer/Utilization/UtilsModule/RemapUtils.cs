@@ -31,7 +31,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     //Monk              : 20
 
 
-    private readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
+    public readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
     {
         { 407,  6  }, //EOS
         { 408,  7  }, //Selene
