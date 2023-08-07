@@ -57,7 +57,7 @@ public class Configuration : IPluginConfiguration
 
     public void ClearNicknamesForLocalUserV2()
     {
-        SerializableUserV2? user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUserV2();
+        SerializableUserV2? user = ConfigurationUtils.instance.GetLocalUserV2();
         if (user == null) return;
         ClearNicknamesForUserV2(user);
     }

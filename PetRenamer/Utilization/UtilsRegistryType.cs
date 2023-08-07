@@ -7,6 +7,7 @@ namespace PetRenamer.Utilization;
 internal class UtilsRegistryType : IRegistryElement, IDisposable
 {
     protected UtilsHandler Utils => PluginLink.Utils;
+
     internal virtual void OnRegistered() { }
     internal virtual void OnLateRegistered() { }
 

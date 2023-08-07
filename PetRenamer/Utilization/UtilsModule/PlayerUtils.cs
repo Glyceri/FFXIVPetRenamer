@@ -1,14 +1,17 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class PlayerUtils : UtilsRegistryType
+internal class PlayerUtils : UtilsRegistryType, ISingletonBase<PlayerUtils>
 {
+    public static PlayerUtils instance { get; set; } = null!;
+
     public bool PlayerDataAvailable() => PluginHandlers.ClientState.LocalPlayer != null;
 
     unsafe internal PlayerData? GetPlayerData(bool hasPetOut = false)
@@ -42,9 +45,8 @@ internal class PlayerUtils : UtilsRegistryType
 
 internal struct PlayerData
 {
-    StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     internal unsafe GameObject* playerGameObject;
-    unsafe internal string playerName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal string playerName => StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(namePtr));
     unsafe internal byte* namePtr;
     internal ushort homeWorld;
     internal byte gender;
@@ -71,9 +73,8 @@ internal struct PlayerData
 
 internal struct CompanionData
 {
-    StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     unsafe internal FFCompanion* companion;
-    unsafe internal string currentCompanionName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal string currentCompanionName => StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(namePtr));
     unsafe internal byte* namePtr;
     internal int currentModelID;
 

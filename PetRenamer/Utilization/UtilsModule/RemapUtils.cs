@@ -1,10 +1,11 @@
-﻿using PetRenamer.Utilization.Attributes;
+﻿using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class RemapUtils : UtilsRegistryType
+internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 {
     //ClassJob ID's reminder
     //Adventurer        : 0                 Warrior         : 21
@@ -72,6 +73,8 @@ internal class RemapUtils : UtilsRegistryType
         { -6, "Bunshin" }
     };
 
+    public static RemapUtils instance { get; set; } = null!;
+
     internal string PetIDToName(int petID)
     {
         if (!petIDToPetName.ContainsKey(petID)) return string.Empty;
@@ -82,14 +85,6 @@ internal class RemapUtils : UtilsRegistryType
     {
         if (!classToPetID.ContainsKey(jobclass)) return -1;
         return classToPetID[jobclass];
-    }
-
-
-    internal ClassType FromClassID(int classID)
-    {
-        if (classID == 28) return ClassType.Healing;
-        if (classID == 26 || classID == 27) return ClassType.Summoning;
-        return ClassType.Invalid;
     }
 
     internal int BattlePetSkeletonToNameID(int skeletonID)

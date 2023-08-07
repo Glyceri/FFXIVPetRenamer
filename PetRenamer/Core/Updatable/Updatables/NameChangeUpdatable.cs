@@ -25,23 +25,8 @@ internal class NameChangeUpdatable : Updatable
     string lastName = null!;
     string lastBattleName = null!;
 
-    StringUtils stringUtils;
-    NicknameUtils nicknameUtils;
-    PlayerUtils playerUtils;
-    SheetUtils sheetUtils;
-    RemapUtils remapUtils;
-
     internal delegate void OnCompanionChange(PlayerData? playerData, SerializableNickname? serializableNickname);
     internal OnCompanionChange onCompanionChange = null!;
-
-    public NameChangeUpdatable()
-    {
-        stringUtils = PluginLink.Utils.Get<StringUtils>();
-        nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
-        playerUtils = PluginLink.Utils.Get<PlayerUtils>();
-        sheetUtils = PluginLink.Utils.Get<SheetUtils>();
-        remapUtils =    PluginLink.Utils.Get<RemapUtils>();
-    }
 
 #pragma warning disable CS8601 // Possible null reference assignment. (It's legit impossible for it to be null intelliSense 😤😤😤) 
     public void RegisterMethod(OnCompanionChange companionChange)
@@ -69,7 +54,7 @@ internal class NameChangeUpdatable : Updatable
             Character* plCharacter = (Character*)currentObject;
             if (plCharacter == null) continue;
 
-            string name = stringUtils.GetCharacterName(currentObject->Name);
+            string name = StringUtils.instance.GetCharacterName(currentObject->Name);
             ushort homeWorld = plCharacter->HomeWorld;
 
             SerializableUserV2? correctUser = null;
@@ -135,7 +120,7 @@ internal class NameChangeUpdatable : Updatable
             if (hasCompanion)
             {
                 currentID = character.GetCompanionID();
-                currentName = sheetUtils.GetPetName(currentID);
+                currentName = SheetUtils.instance.GetPetName(currentID);
                 SetName(character, currentID, ref currentName);
                 ApplyName(character.GetCompanionName(), currentName);
             }
@@ -145,7 +130,7 @@ internal class NameChangeUpdatable : Updatable
                 battlePetBeenActive = true;
                 currentbattID = character.GetBattlePetID();
                 currentIDBattlePet = character.GetBattlePetModelID();
-                currentNameBattlePet = sheetUtils.GetBattlePetName(currentIDBattlePet);
+                currentNameBattlePet = SheetUtils.instance.GetBattlePetName(currentIDBattlePet);
                 SetName(character, currentbattID, ref currentNameBattlePet);
                 ApplyName(character.GetBattlePetName(), currentNameBattlePet);
             }
@@ -157,7 +142,7 @@ internal class NameChangeUpdatable : Updatable
         if (!flickAtEnd && battlePetBeenActive == lastPetBeenTrue) return;
 
         lastPetBeenTrue = battlePetBeenActive;
-        onCompanionChange?.Invoke(playerUtils.GetPlayerData(battlePetBeenActive), null);
+        onCompanionChange?.Invoke(PlayerUtils.instance.GetPlayerData(battlePetBeenActive), null);
 
 
     }
@@ -183,10 +168,10 @@ internal class NameChangeUpdatable : Updatable
 
             string localCurrentName = currentName;
             string localCurrentBattleName = currentBattleName;
-            if (localCurrentName == sheetUtils.GetCurrentPetName()) localCurrentName = string.Empty;
-            if (localCurrentBattleName == remapUtils.PetIDToName(remapUtils.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
+            if (localCurrentName == SheetUtils.instance.GetCurrentPetName()) localCurrentName = string.Empty;
+            if (localCurrentBattleName == RemapUtils.instance.PetIDToName(RemapUtils.instance.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
 
-            IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, remapUtils.GetPetIDFromClass(currentJob), localCurrentBattleName));
+            IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, RemapUtils.instance.GetPetIDFromClass(currentJob), localCurrentBattleName));
             return true;
         }
         return false;
@@ -194,7 +179,7 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe void SetName(FoundPlayerCharacter character, int id, ref string name)
     {
-        SerializableNickname serializableNickname = nicknameUtils.GetNicknameV2(character.associatedUser!, id);
+        SerializableNickname serializableNickname = NicknameUtils.instance.GetNicknameV2(character.associatedUser!, id);
         if (serializableNickname == null) return;
         if (serializableNickname.Name.Length == 0 || !PluginLink.Configuration.displayCustomNames || name.Length == 0) return;
         name = serializableNickname.Name;
@@ -226,7 +211,7 @@ internal class NameChangeUpdatable : Updatable
         public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
 
         public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
-        public int GetBattlePetID() => PluginLink.Utils.Get<RemapUtils>().GetPetIDFromClass(GetPlayerJob());
+        public int GetBattlePetID() => RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
 
         public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
 

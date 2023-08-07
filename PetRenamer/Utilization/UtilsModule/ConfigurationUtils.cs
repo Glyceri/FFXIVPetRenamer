@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -9,21 +10,23 @@ using System.Linq;
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class ConfigurationUtils : UtilsRegistryType
+internal class ConfigurationUtils : UtilsRegistryType, ISingletonBase<ConfigurationUtils>
 {
+    public static ConfigurationUtils instance { get; set; } = null!;
+
     public void SetLocalNicknameV2(int forPet, string nickname)
     {
         if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return;
         SerializableUserV2 localUser = GetLocalUserV2()!;
         if(localUser == null) return;
-        if (!PluginLink.Utils.Get<NicknameUtils>().ContainsLocalV2(forPet))
+        if (!NicknameUtils.instance.ContainsLocalV2(forPet))
         {
             List<SerializableNickname> nicknames = localUser.nicknames.ToList();
             nicknames.Insert(0, (new SerializableNickname(forPet, nickname)));
             localUser.nicknames = nicknames.ToArray();
         }
 
-        SerializableNickname nick = PluginLink.Utils.Get<NicknameUtils>().GetLocalNicknameV2(forPet);
+        SerializableNickname nick = NicknameUtils.instance.GetLocalNicknameV2(forPet);
         if (nick != null)
             nick.Name = nickname;
 
@@ -38,7 +41,7 @@ internal class ConfigurationUtils : UtilsRegistryType
 
         SerializableUserV2 localUser = GetLocalUserV2()!;
         if (localUser == null) return;
-        if (PluginLink.Utils.Get<NicknameUtils>().ContainsLocalV2(forPet))
+        if (NicknameUtils.instance.ContainsLocalV2(forPet))
         {
             List<SerializableNickname> nicknames = localUser.ToList();
             for (int i = nicknames.Count - 1; i >= 0; i--)

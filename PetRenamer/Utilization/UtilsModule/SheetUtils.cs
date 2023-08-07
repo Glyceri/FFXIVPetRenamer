@@ -7,11 +7,12 @@ using System.Collections.Generic;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core;
 using System.Linq;
+using PetRenamer.Core.Singleton;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class SheetUtils : UtilsRegistryType
+internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
     ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;
     ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
@@ -19,6 +20,7 @@ internal class SheetUtils : UtilsRegistryType
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<Tribe> tribe { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
+    public static SheetUtils instance { get; set; } = null!;
 
     internal override void OnRegistered()
     {
@@ -32,32 +34,16 @@ internal class SheetUtils : UtilsRegistryType
 
     public unsafe string GetCurrentClassName()
     {
-        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
         if (playerData == null) return string.Empty;
 
         return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
     }
 
-    public void DrawAllClasses()
-    {
-        foreach(ClassJob job in classJob)
-        {
-            Dalamud.Logging.PluginLog.Log(job.NameEnglish + " : " + job.RowId);
-        }
-    }
-
-    public void DrawAllPetnames()
-    {
-        foreach(Pet pet in battlePetSheet)
-        {
-            Dalamud.Logging.PluginLog.Log(pet.Name + " : " + pet.RowId);
-        }
-    }
-
     public unsafe string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
-        if(id > 100) id = PluginLink.Utils.Get<RemapUtils>().BattlePetSkeletonToNameID(id);
+        if(id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
         if (id <= 0) return string.Empty;
 
         foreach(Pet pet in battlePetSheet)
@@ -77,16 +63,16 @@ internal class SheetUtils : UtilsRegistryType
 
     public string GetCurrentBattlePetName()
     {
-        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
         if (playerData == null) return string.Empty;
         if (!PluginConstants.allowedJobs.Contains(playerData.Value.job)) return string.Empty;
 
-        return GetBattlePetName(PluginLink.Utils.Get<RemapUtils>().GetPetIDFromClass(playerData.Value.job));
+        return GetBattlePetName(RemapUtils.instance.GetPetIDFromClass(playerData.Value.job));
     }
 
     public string GetCurrentPetName()
     {
-        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
         if (playerData == null) return string.Empty;
         if (playerData!.Value.companionData == null) return string.Empty;
 

@@ -12,11 +12,6 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 internal class OverrideNamesWindow : PetWindow
 {
-    SheetUtils sheetUtils { get; set; } = null!;
-    StringUtils stringUtils { get; set; } = null!;
-    ConfigurationUtils configurationUtils { get; set; } = null!;
-    NicknameUtils nicknameUtils { get; set; } = null!;
-
     SerializableUserV2 importedUser { get; set; } = null!;
     SerializableUserV2 alreadyExistingUser { get; set; } = null!;
 
@@ -24,11 +19,6 @@ internal class OverrideNamesWindow : PetWindow
 
     public OverrideNamesWindow() : base("Import Minion Names", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
-        sheetUtils = PluginLink.Utils.Get<SheetUtils>();
-        stringUtils = PluginLink.Utils.Get<StringUtils>();
-        configurationUtils = PluginLink.Utils.Get<ConfigurationUtils>();
-        nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
-
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 800),
@@ -75,7 +65,7 @@ internal class OverrideNamesWindow : PetWindow
     public unsafe override void OnDraw()
     {
         if (importedUser == null) return;
-        alreadyExistingUser = configurationUtils.GetUserV2(importedUser);
+        alreadyExistingUser = ConfigurationUtils.instance.GetUserV2(importedUser);
         DrawUserHeader();
         DrawList();
         DrawFooter();
@@ -89,7 +79,7 @@ internal class OverrideNamesWindow : PetWindow
         {
             if(alreadyExistingUser == null)
             {
-                configurationUtils.AddNewUserV2(importedUser);
+                ConfigurationUtils.instance.AddNewUserV2(importedUser);
             }
             else
             {
@@ -105,7 +95,7 @@ internal class OverrideNamesWindow : PetWindow
     {
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
         Label($"{importedUser.username}", Styling.ListButton); ImGui.SameLine();
-        Label($"{sheetUtils.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
+        Label($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
         if (alreadyExistingUser == null) NewLabel("New User", Styling.ListButton);
         else Label("User Status: " +  "Exists", Styling.ListButton);
         ImGui.EndListBox();
@@ -121,7 +111,7 @@ internal class OverrideNamesWindow : PetWindow
         foreach (SerializableNickname nickname in importedUser.nicknames)
         {
             
-            string currentPetName = stringUtils.MakeTitleCase(sheetUtils.GetPetName(nickname.ID));
+            string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
             if (IsExactSame(nickname)) Label("=", Styling.SmallButton);
             else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton); 
             else NewLabel("+", Styling.SmallButton);
@@ -146,13 +136,13 @@ internal class OverrideNamesWindow : PetWindow
     bool IsExactSame(SerializableNickname nickname)
     {
         if (alreadyExistingUser == null) return false;
-        return nicknameUtils.IsSameV2(alreadyExistingUser, nickname.ID, nickname.Name);
+        return NicknameUtils.instance.IsSameV2(alreadyExistingUser, nickname.ID, nickname.Name);
     }
 
     bool HasNickname(SerializableNickname nickname)
     {
         if (alreadyExistingUser == null) return false;
-        return nicknameUtils.HasIDV2(alreadyExistingUser, nickname.ID);
+        return NicknameUtils.instance.HasIDV2(alreadyExistingUser, nickname.ID);
     }
 }
 

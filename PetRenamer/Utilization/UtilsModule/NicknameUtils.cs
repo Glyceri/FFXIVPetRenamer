@@ -1,16 +1,19 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class NicknameUtils : UtilsRegistryType
+internal class NicknameUtils : UtilsRegistryType, ISingletonBase<NicknameUtils>
 {
+    public static NicknameUtils instance { get; set; } = null!;
+
     internal SerializableNickname GetLocalNicknameV2(int ID)
     {
-        SerializableUserV2? user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUserV2();
+        SerializableUserV2? user = ConfigurationUtils.instance.GetLocalUserV2();
         if (user == null) return null!;
         return GetNicknameV2(user, ID);
     }
@@ -29,7 +32,7 @@ internal class NicknameUtils : UtilsRegistryType
     internal bool ContainsLocalV2(int ID)
     {
         if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return false; 
-        SerializableUserV2? localUser = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUserV2();
+        SerializableUserV2? localUser = ConfigurationUtils.instance.GetLocalUserV2();
         if (localUser == null) return false;
 
         foreach (SerializableNickname nickname in localUser.nicknames)
@@ -148,6 +151,7 @@ internal class NicknameUtils : UtilsRegistryType
 
         return null!;
     }
+
 
     #endregion
 }

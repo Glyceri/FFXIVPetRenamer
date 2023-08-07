@@ -1,10 +1,13 @@
-﻿using PetRenamer.Utilization.Attributes;
+﻿using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.Attributes;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class MathUtils : UtilsRegistryType
+internal class MathUtils : UtilsRegistryType, ISingletonBase<MathUtils>
 {
+    public static MathUtils instance { get; set; } = null!;
+
     internal bool IsInRange(int value, int max, bool inclusive = true) => IsInRange(value, 0, max, inclusive);
     internal bool IsInRange(float value, float max, bool inclusive = true) => IsInRange(value, 0, max, inclusive);
     

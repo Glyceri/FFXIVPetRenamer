@@ -2,13 +2,14 @@
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class IpcUtils : UtilsRegistryType
+internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
 {
-    ConfigurationUtils ConfigurationUtils { get; set; } = null!;
+    public static IpcUtils instance { get; set; } = null!;
 
     internal override void OnRegistered()
     {
@@ -22,16 +23,15 @@ internal class IpcUtils : UtilsRegistryType
 
     public void OnIpcChange(Dictionary<(string, uint), NicknameData> data)
     {
-        if (ConfigurationUtils == null) PluginLink.Utils.Get<ConfigurationUtils>();
-        
+     
         foreach (var kvp in data)
         {
             SerializableUserV2? storedUser = new SerializableUserV2(kvp.Key.Item1, (ushort)kvp.Key.Item2);
-            SerializableUserV2? user = ConfigurationUtils!.GetUserV2(storedUser);
+            SerializableUserV2? user = ConfigurationUtils.instance.GetUserV2(storedUser);
             if (user == null) 
             {
-                ConfigurationUtils!.AddNewUserV2(user!);
-                SerializableUserV2? user2 = ConfigurationUtils!.GetUserV2(storedUser);
+                ConfigurationUtils.instance.AddNewUserV2(user!);
+                SerializableUserV2? user2 = ConfigurationUtils.instance.GetUserV2(storedUser);
                 user2?.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
             }
             else
