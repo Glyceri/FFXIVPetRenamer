@@ -32,11 +32,7 @@ internal class PlayerUtils : UtilsRegistryType, ISingletonBase<PlayerUtils>
             data = new CompanionData(playerCompanion, playerCompanion->Character.CharacterData.ModelSkeletonId);
 
         int petType = -1;
-        if (hasPetOut)
-        {
-            if (playerCharacter->CharacterData.ClassJob == 28) petType = -3;
-            if (playerCharacter->CharacterData.ClassJob == 26 || playerCharacter->CharacterData.ClassJob == 27) petType = -2;
-        }
+        if (hasPetOut) petType = RemapUtils.instance.GetPetIDFromClass(playerCharacter->CharacterData.ClassJob);
 
         return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType, playerCharacter->CharacterData.ClassJob, data);
     }
