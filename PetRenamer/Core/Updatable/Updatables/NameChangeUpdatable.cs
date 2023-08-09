@@ -46,7 +46,7 @@ internal class NameChangeUpdatable : Updatable
     unsafe void FillUserList()
     {
         PluginLink.IpcStorage.characters.Clear();
-        for (int i = 0; i < 500; i++)
+        for (int i = 0; i < 2000; i++)
         {
             GameObject* currentObject = GameObjectManager.GetGameObjectByIndex(i);
             if (currentObject == null) continue;
@@ -186,6 +186,7 @@ internal class NameChangeUpdatable : Updatable
         if (serializableNickname.Name.Length == 0 || !PluginLink.Configuration.displayCustomNames || name.Length == 0) return;
         name = serializableNickname.Name;
     }
+
 
     public override unsafe void Update(Framework frameWork)
     {

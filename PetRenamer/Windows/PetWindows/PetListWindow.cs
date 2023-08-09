@@ -7,6 +7,7 @@ using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using Dalamud.Logging;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -30,7 +31,7 @@ public class PetListWindow : PetWindow
         if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         if (ConfigurationUtils.instance.GetLocalUserV2() == null) return;
-        
+
         DrawUserHeader();
         DrawExportHeader();
     }
@@ -106,9 +107,10 @@ public class PetListWindow : PetWindow
             try
             {
                 string gottenText = Encoding.Unicode.GetString(Convert.FromBase64String(ImGui.GetClipboardText()));
+                PluginLog.Log(gottenText);
                 OverrideNamesWindow window = PluginLink.WindowHandler.GetWindow<OverrideNamesWindow>();
-                if(window.SetImportString(gottenText))
-                window.IsOpen = true;
+                if (window.SetImportString(gottenText))
+                    window.IsOpen = true;
             }
             catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured: {e}"); }
         }
@@ -122,18 +124,25 @@ public class PetListWindow : PetWindow
         DrawListHeader();
         if (openedAddPet) DrawOpenedNewPet();
         else
-            foreach (SerializableNickname nickname in ConfigurationUtils.instance.GetLocalUserV2()!.nicknames)
+        {
+            SerializableUserV2 user = ConfigurationUtils.instance.GetLocalUserV2()!;
+            if (user != null)
             {
-                if (nickname.ID <= 0) continue;
-                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
+                foreach (SerializableNickname nickname in user!.nicknames)
+                {
+                    if (nickname == null) continue;
+                    if (nickname.ID <= 0) continue;
+                    string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
 
-                Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-                if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
-                if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                    ConfigurationUtils.instance.RemoveLocalNicknameV2(nickname.ID);
+                    Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+                    Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+                    if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
+                        PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
+                    if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
+                        ConfigurationUtils.instance.RemoveLocalNicknameV2(nickname.ID);
+                }
             }
+        }
         ImGui.EndListBox();
     }
 
@@ -163,7 +172,7 @@ public class PetListWindow : PetWindow
             if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
             {
                 openedAddPet = false;
-                if (!NicknameUtils.instance.ContainsLocalV2(nickname.ID)) 
+                if (!NicknameUtils.instance.ContainsLocalV2(nickname.ID))
                     ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
                 PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID);
             }

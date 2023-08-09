@@ -28,6 +28,8 @@ namespace PetRenamer.Core.Updatable
 
         void MainUpdate(Framework framework)
         {
+            if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);
 
