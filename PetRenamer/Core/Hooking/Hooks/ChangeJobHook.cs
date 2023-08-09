@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Hooking.Attributes;
 using System;
 
@@ -19,6 +20,8 @@ internal class ChangeJobHook : HookableElement
     internal override void OnInit()
     {
         _changeJobHook?.Enable();
+
+        
     }
 
     private void ChangeJobDetour(IntPtr data, uint job)
