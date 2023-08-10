@@ -1,4 +1,5 @@
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Commands;
 using PetRenamer.Core.Hooking;
 using PetRenamer.Core.Legacy;
@@ -21,6 +22,7 @@ internal class PluginLink
     internal static QuitHandler QuitHandler { get; set; } = null!;
     internal static IpcStorage IpcStorage { get; set; } = null!;
     internal static HookHandler HookHandler { get; set; } = null!;
+    unsafe internal static CharacterManager* CharacterManager => FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager.Instance();
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
     {

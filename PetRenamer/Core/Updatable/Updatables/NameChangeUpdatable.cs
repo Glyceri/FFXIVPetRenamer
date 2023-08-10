@@ -10,6 +10,7 @@ using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using System.Linq;
 using System;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -46,6 +47,33 @@ internal class NameChangeUpdatable : Updatable
     unsafe void FillUserList()
     {
         PluginLink.IpcStorage.characters.Clear();
+        /*
+        foreach (SerializableUserV2 user in PluginLink.Configuration.serializableUsersV2!)
+        {
+            BattleChara* battleChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.username, true, (short)user.homeworld);
+            if (battleChara == null) continue;
+            FFCompanion* companion = battleChara->Character.Companion.CompanionObject;
+            BattleChara* pet =  PluginLink.CharacterManager->LookupPetByOwnerObject(battleChara);
+            PluginLog.Log("---------------------------------");
+            Utf8String str = new Utf8String();
+            if (battleChara != null)
+            {
+                str.SetString(battleChara->Character.GameObject.Name);
+                PluginLog.Log("Player Name: " + str.ToString());
+            }
+            if (pet != null)
+            {
+                str.SetString(pet->Character.GameObject.Name);
+                PluginLog.Log("Pet Name: " + str.ToString());
+            }
+            if (companion != null)
+            {
+                str.SetString(companion->Character.GameObject.Name);
+                PluginLog.Log("Minion Name: " + str.ToString());
+            }
+        }
+
+        return;*/
         for (int i = 0; i < 2000; i++)
         {
             GameObject* currentObject = GameObjectManager.GetGameObjectByIndex(i);
@@ -126,7 +154,7 @@ internal class NameChangeUpdatable : Updatable
                 ApplyName(character.GetCompanionName(), currentName);
             }
 
-            if(hasBattlePet && character.BattlePetNamingAllowed()) 
+            if (hasBattlePet && character.BattlePetNamingAllowed())
             {
                 battlePetBeenActive = true;
                 currentbattID = character.GetBattlePetID();
@@ -136,7 +164,7 @@ internal class NameChangeUpdatable : Updatable
                 ApplyName(character.GetBattlePetName(), currentNameBattlePet);
             }
 
-            if (isLocalPlayer) 
+            if (isLocalPlayer)
                 flickAtEnd = HasChanged(currentID, currentIDBattlePet, currentbattID, currentName, currentNameBattlePet, character.GetPlayerJob(), hasBattlePet);
         }
 
@@ -196,7 +224,7 @@ internal class NameChangeUpdatable : Updatable
             FillUserList();
             LoopUserList();
         }
-    }    
+    }
 }
 
 public unsafe class FoundPlayerCharacter
@@ -223,6 +251,6 @@ public unsafe class FoundPlayerCharacter
     public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
 
     public uint GetOwnID() => selfGameObject->ObjectID;
-    public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID; 
+    public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID;
     public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
 }
