@@ -13,13 +13,13 @@ public class ConfigWindow : PetWindow
         "Global minionname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
-        Size = new Vector2(232, 137);
+        Size = new Vector2(232, 165);
         SizeCondition = ImGuiCond.Always;
     }
 
     public override void OnDraw()
     {
-        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
+        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme) || Checkbox("Use Party List (FLICKERS)", ref PluginLink.Configuration.usePartyList))
             PluginLink.Configuration.Save();
 
 

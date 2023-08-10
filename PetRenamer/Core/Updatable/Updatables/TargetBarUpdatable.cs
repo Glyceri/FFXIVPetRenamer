@@ -23,6 +23,7 @@ internal unsafe class TargetBarUpdatable : Updatable
         HandleTargetBar();
         HandleTargetOfTargetBar();
         HandleFocusBar();
+        if (PluginLink.Configuration.usePartyList) HandlePartyList();
     }
 
     void HandlePartyList()
@@ -36,7 +37,6 @@ internal unsafe class TargetBarUpdatable : Updatable
             if (baseComponentNode == null) return;
             AtkTextNode* textNode = baseComponentNode.GetNode<AtkTextNode>(14);
             if (textNode == null) return;
-            textNode->AtkResNode.ToggleVisibility(false);
             GameObject* gObj = &PluginLink.CharacterManager->LookupPetByOwnerObject((BattleChara*)GameObjectManager.GetGameObjectByIndex(PluginHandlers.ClientState.LocalPlayer!.ObjectIndex))->Character.GameObject;
             SetNicknameForGameObject(ref textNode, ref gObj, targetObjectKind);
         }
