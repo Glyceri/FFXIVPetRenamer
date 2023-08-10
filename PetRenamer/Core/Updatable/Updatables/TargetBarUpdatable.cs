@@ -9,17 +9,19 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
+using ComponentNode = PetRenamer.Core.Hooking.ComponentNode;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
 [Updatable]
-internal unsafe class TargetBarUpdatable :Updatable
+internal unsafe class TargetBarUpdatable : Updatable
 {
     public override void Update(Framework frameWork)
     {
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
         HandleTargetBar();
+        HandleTargetOfTargetBar();
         HandleFocusBar();
     }
 
@@ -55,11 +57,24 @@ internal unsafe class TargetBarUpdatable :Updatable
             if (PluginHandlers.TargetManager.Target.Name.ToString() != textNode->NodeText.ToString()) return;
             GameObject* gObj = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.ObjectIndex);
             SetNicknameForGameObject(ref textNode, ref gObj, targetObjectKind);
+        }
+        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+    }
 
+    void HandleTargetOfTargetBar()
+    {
+        try
+        {
+            if(PluginHandlers.TargetManager.Target == null) return; 
+            if (PluginHandlers.TargetManager.Target.TargetObject == null) return;
+            Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
+            BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
+            if (resNode == null) return;
             AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
             if (textNode2 == null) return;
-            if (PluginHandlers.TargetManager.Target.Name.ToString() != textNode2->NodeText.ToString()) return;
-            GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.ObjectIndex);
+            if (!textNode2->NodeText.ToString().Contains(PluginHandlers.TargetManager.Target.TargetObject.Name.ToString())) return;
+            targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
+            GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex);
             SetNicknameForGameObject(ref textNode2, ref gObj2, targetObjectKind);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
