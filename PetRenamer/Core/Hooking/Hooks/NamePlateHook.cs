@@ -8,6 +8,7 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Utilization.UtilsModule;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -25,7 +26,7 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
-        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters) 
+        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             if (!character.HasBattlePet()) continue;
             if (!RemapUtils.instance.battlePetRemap.ContainsKey(battleChara->Character.CharacterData.ModelCharaId)) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
@@ -45,6 +46,8 @@ public unsafe sealed class NamePlateHook : HookableElement
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             if (!character.HasCompanion()) continue;
+            if (character.GetOwnID() != ((FFCharacter*)gameObject)->CompanionOwnerID) continue;
+            if (character.GetCompanionObjectID() != gameObject->ObjectID) continue;
             if (character.GetCompanionID() == ((FFCharacter*)gameObject)->CharacterData.ModelSkeletonId)
             {
                 SerializableNickname? nickname = NicknameUtils.instance.GetNicknameV2(character.associatedUser!, character.GetCompanionID());
@@ -58,7 +61,7 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     internal override void OnInit()
     {
-        nameplateHook?.Enable(); 
+        nameplateHook?.Enable();
         nameplateHookMinion?.Enable();
     }
 

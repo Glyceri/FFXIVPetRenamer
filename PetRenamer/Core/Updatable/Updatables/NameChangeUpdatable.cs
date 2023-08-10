@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using System.Linq;
 using System;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -189,5 +190,6 @@ public unsafe class FoundPlayerCharacter
 
     public uint GetOwnID() => selfGameObject->ObjectID;
     public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID;
+    public uint GetCompanionObjectID() => playerCompanion->Character.GameObject.ObjectID;
     public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
 }

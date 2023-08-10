@@ -107,6 +107,7 @@ internal unsafe class TargetBarUpdatable : Updatable
             {
                 if (!character.HasCompanion()) continue;
                 if (character.GetCompanionID() != ((FFCharacter*)gObj)->CharacterData.ModelSkeletonId) continue;
+                if (character.GetOwnID() != ((FFCharacter*)gObj)->CompanionOwnerID) continue;
                 curID = character.GetCompanionID();
             }
             else if (targetObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc)
