@@ -25,7 +25,6 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
-        if (!PluginLink.Configuration.useNewNameSystem) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters) 
         {
             if (!character.HasBattlePet()) continue;
@@ -43,7 +42,6 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
-        if (!PluginLink.Configuration.useNewNameSystem) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             if (!character.HasCompanion()) continue;

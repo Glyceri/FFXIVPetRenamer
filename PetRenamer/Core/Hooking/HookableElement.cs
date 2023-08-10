@@ -10,6 +10,4 @@ public unsafe class HookableElement : IDisposableRegistryElement
     internal virtual void OnDispose() { }
 
     internal virtual void OnInit() { }
-
-    internal virtual void OnUpdate(Framework framework) { }
 }

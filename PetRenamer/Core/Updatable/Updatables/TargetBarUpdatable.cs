@@ -4,27 +4,25 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Hooking.Attributes;
+using PetRenamer.Core.Hooking;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
 using System;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
-namespace PetRenamer.Core.Hooking.Hooks;
+namespace PetRenamer.Core.Updatable.Updatables;
 
-[Hook]
-internal unsafe class PartyListHook : HookableElement
+[Updatable]
+internal unsafe class TargetBarUpdatable :Updatable
 {
-    
-    internal override void OnUpdate(Framework framework)
+    public override void Update(Framework frameWork)
     {
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
         HandleTargetBar();
         HandleFocusBar();
-        //HandlePartyList();
     }
-    
+
     void HandlePartyList()
     {
         try
@@ -53,7 +51,7 @@ internal unsafe class PartyListHook : HookableElement
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
-            if(textNode == null) return;
+            if (textNode == null) return;
             if (PluginHandlers.TargetManager.Target.Name.ToString() != textNode->NodeText.ToString()) return;
             GameObject* gObj = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.ObjectIndex);
             SetNicknameForGameObject(ref textNode, ref gObj, targetObjectKind);

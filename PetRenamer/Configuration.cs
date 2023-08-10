@@ -19,7 +19,6 @@ public class Configuration : IPluginConfiguration
 
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
-    public bool useNewNameSystem = true;
 
     public void Initialize()
     {
