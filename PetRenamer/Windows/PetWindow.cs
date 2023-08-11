@@ -19,6 +19,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         } 
     }
 
+    internal static void SetPetMode(PetMode mode) => petMode = mode;
 
     protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 

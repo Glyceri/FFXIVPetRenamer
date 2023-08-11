@@ -1,6 +1,8 @@
+using Dalamud.ContextMenu;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Commands;
+using PetRenamer.Core.ContextMenu;
 using PetRenamer.Core.Hooking;
 using PetRenamer.Core.Legacy;
 using PetRenamer.Core.Updatable;
@@ -22,6 +24,8 @@ internal class PluginLink
     internal static QuitHandler QuitHandler { get; set; } = null!;
     internal static IpcStorage IpcStorage { get; set; } = null!;
     internal static HookHandler HookHandler { get; set; } = null!;
+    internal static ContextMenuHandler ContextMenuHandler { get; set; } = null!;
+    internal static DalamudContextMenu DalamudContextMenu { get; private set; } = null!;
     unsafe internal static CharacterManager* CharacterManager => FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager.Instance();
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
@@ -37,6 +41,8 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
+        DalamudContextMenu = new DalamudContextMenu();
+        ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         QuitHandler = new QuitHandler();
     }

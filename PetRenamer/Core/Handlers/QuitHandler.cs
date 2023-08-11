@@ -9,6 +9,7 @@ internal class QuitHandler
         PluginLink.UpdatableHandler.Dispose();
         PluginLink.HookHandler.Dispose();
         PluginLink.LegacyCompatibilityHandler.Dispose();
+        PluginLink.ContextMenuHandler.Dispose();
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();

@@ -4,8 +4,10 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
+using Dalamud.Game.Gui.Dtr;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.ContextMenu;
 
 namespace PetRenamer.Core.Handlers;
 

@@ -30,6 +30,7 @@
   </PropertyGroup>
   
    <ItemGroup>
+     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.3" />
      <PackageReference Include="DalamudPackager" Version="2.1.11" />
    </ItemGroup>
   
