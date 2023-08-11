@@ -20,6 +20,7 @@ public class Configuration : IPluginConfiguration
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
     public bool usePartyList = false;
+    public bool useContextMenus = true;
 
     public void Initialize()
     {
