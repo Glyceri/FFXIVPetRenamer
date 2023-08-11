@@ -66,16 +66,15 @@ internal unsafe class TargetBarUpdatable : Updatable
     {
         try
         {
-            if(PluginHandlers.TargetManager.Target == null) return; 
+            if (PluginHandlers.TargetManager.Target == null) return;
             if (PluginHandlers.TargetManager.Target.TargetObject == null) return;
             Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
             if (textNode2 == null) return;
-            PluginLog.Log(StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex)->Name)));
+            if (!textNode2->NodeText.ToString().Contains(PluginHandlers.TargetManager.Target.TargetObject.Name.ToString())) return;
             targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
-            PluginLog.Log(targetObjectKind.ToString());
             GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex);
             SetNicknameForGameObject(ref textNode2, ref gObj2, targetObjectKind);
         }

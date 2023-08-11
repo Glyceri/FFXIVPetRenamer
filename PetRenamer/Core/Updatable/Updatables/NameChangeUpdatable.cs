@@ -9,6 +9,7 @@ using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using System.Linq;
 using System;
 using Dalamud.Logging;
+using Dalamud.Game.ClientState.Objects.Enums;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -54,6 +55,14 @@ internal class NameChangeUpdatable : Updatable
             if (plCharacter == null) continue;
             FFCompanion* companion = battleChara->Character.Companion.CompanionObject;
             BattleChara* pet =  PluginLink.CharacterManager->LookupPetByOwnerObject(battleChara);
+            //MidoriKami told me that LookupPetByOwnerObject could return the same pets and what not...
+            //this could be a good fix:
+            //     bool HasPet()
+            //      => Service.ObjectTable
+            //      .Where(obj => obj.OwnerId == GetObjectId())
+            //      .Where(obj => obj.ObjectKind is ObjectKind.BattleNpc)
+            //      .Where(obj => (obj as BattleNpc)?.SubKind == (byte)BattleNpcSubKind.Pet)
+            //      .Any();
             Character* petCharacter = null!;
             if (pet != null) 
                 if (RemapUtils.instance.battlePetRemap.ContainsKey(pet->Character.CharacterData.ModelCharaId))
