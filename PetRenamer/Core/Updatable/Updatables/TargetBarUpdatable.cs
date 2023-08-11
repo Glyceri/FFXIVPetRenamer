@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -72,8 +73,9 @@ internal unsafe class TargetBarUpdatable : Updatable
             if (resNode == null) return;
             AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
             if (textNode2 == null) return;
-            if (!textNode2->NodeText.ToString().Contains(PluginHandlers.TargetManager.Target.TargetObject.Name.ToString())) return;
+            PluginLog.Log(StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex)->Name)));
             targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
+            PluginLog.Log(targetObjectKind.ToString());
             GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex);
             SetNicknameForGameObject(ref textNode2, ref gObj2, targetObjectKind);
         }
@@ -115,7 +117,7 @@ internal unsafe class TargetBarUpdatable : Updatable
                 if (!character.HasBattlePet()) continue;
                 if (!RemapUtils.instance.battlePetRemap.ContainsKey(((BattleChara*)gObj)->Character.CharacterData.ModelCharaId)) continue;
                 if (character.GetBattlePetObjectID() != ((BattleChara*)gObj)->Character.GameObject.ObjectID) continue;
-                curID = (int)character.GetBattlePetID();
+                curID = character.GetBattlePetID();
             }
             if (curID == -1) continue;
             SetNickname(curID, character, ref textNode);
