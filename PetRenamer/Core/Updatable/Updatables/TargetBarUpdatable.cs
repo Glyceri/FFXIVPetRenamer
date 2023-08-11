@@ -1,6 +1,6 @@
 ﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Objects;
 using Dalamud.Logging;
+using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -12,6 +12,8 @@ using PetRenamer.Windows.Attributes;
 using System;
 using ComponentNode = PetRenamer.Core.Hooking.ComponentNode;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
+using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -31,7 +33,7 @@ internal unsafe class TargetBarUpdatable : Updatable
     {
         try
         {
-            Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc;
+            TargetObjectKind targetObjectKind = TargetObjectKind.BattleNpc;
             BaseNode resNode = new BaseNode("_PartyList");
             if (resNode == null) return;
             ComponentNode baseComponentNode = resNode.GetComponentNode(19);
@@ -50,7 +52,7 @@ internal unsafe class TargetBarUpdatable : Updatable
         try
         {
             if (PluginHandlers.TargetManager.Target == null) return;
-            Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.ObjectKind;
+            TargetObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
@@ -68,14 +70,31 @@ internal unsafe class TargetBarUpdatable : Updatable
         {
             if (PluginHandlers.TargetManager.Target == null) return;
             if (PluginHandlers.TargetManager.Target.TargetObject == null) return;
-            Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
+            DGameObject? targetObject = PluginHandlers.TargetManager.Target;
+            DGameObject? targetOfTargetObject = PluginHandlers.TargetManager.Target.TargetObject;
+            TargetObjectKind targetObjectKind = targetOfTargetObject.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
             if (textNode2 == null) return;
-            if (!textNode2->NodeText.ToString().Contains(PluginHandlers.TargetManager.Target.TargetObject.Name.ToString())) return;
-            targetObjectKind = PluginHandlers.TargetManager.Target.TargetObject.ObjectKind;
-            GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.TargetObject.ObjectIndex);
+            string nameString = targetOfTargetObject.Name.ToString();
+            int index = targetOfTargetObject.ObjectIndex;
+
+            if (targetObjectKind == TargetObjectKind.Player)
+            {
+                ulong targetID2 = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetObject.ObjectId)->Character.GetTargetId();
+                if (!targetID2.ToString("X").StartsWith("4")) return;
+
+                targetObjectKind = TargetObjectKind.Companion;
+
+                FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetID2);
+                GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
+                nameString = MemoryHelper.ReadSeString((nint)gObj->Name, 64).ToString();
+                index = gObj->ObjectIndex;
+            }
+
+            if (!textNode2->NodeText.ToString().Contains(nameString)) return;
+            GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(index);
             SetNicknameForGameObject(ref textNode2, ref gObj2, targetObjectKind);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
