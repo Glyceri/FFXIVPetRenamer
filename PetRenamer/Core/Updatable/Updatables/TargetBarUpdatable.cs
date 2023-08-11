@@ -105,7 +105,7 @@ internal unsafe class TargetBarUpdatable : Updatable
         try
         {
             if (PluginHandlers.TargetManager.FocusTarget == null) return;
-            Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind = PluginHandlers.TargetManager.FocusTarget.ObjectKind;
+            TargetObjectKind targetObjectKind = PluginHandlers.TargetManager.FocusTarget.ObjectKind;
             BaseNode resNode = new BaseNode("_FocusTargetInfo");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
@@ -118,19 +118,19 @@ internal unsafe class TargetBarUpdatable : Updatable
     }
 
 
-    void SetNicknameForGameObject(ref AtkTextNode* textNode, ref GameObject* gObj, Dalamud.Game.ClientState.Objects.Enums.ObjectKind targetObjectKind)
+    void SetNicknameForGameObject(ref AtkTextNode* textNode, ref GameObject* gObj, TargetObjectKind targetObjectKind)
     {
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             int curID = -1;
-            if (targetObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Companion)
+            if (targetObjectKind == TargetObjectKind.Companion)
             {
                 if (!character.HasCompanion()) continue;
                 if (character.GetCompanionID() != ((FFCharacter*)gObj)->CharacterData.ModelSkeletonId) continue;
                 if (character.GetOwnID() != ((FFCharacter*)gObj)->CompanionOwnerID) continue;
                 curID = character.GetCompanionID();
             }
-            else if (targetObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc)
+            else if (targetObjectKind == TargetObjectKind.BattleNpc)
             {
                 if (!character.HasBattlePet()) continue;
                 if (!RemapUtils.instance.battlePetRemap.ContainsKey(((BattleChara*)gObj)->Character.CharacterData.ModelCharaId)) continue;

@@ -8,8 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using System.Linq;
 using System;
-using Dalamud.Logging;
-using Dalamud.Game.ClientState.Objects.Enums;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
