@@ -22,6 +22,7 @@ internal class PluginHandlers
     [PluginService] internal static GameGui GameGui { get; private set; } = null!;
     [PluginService] internal static TargetManager TargetManager { get; private set; } = null!;
     [PluginService] internal static ObjectTable ObjectTable { get; private set; } = null!;
+    [PluginService] internal static ChatGui ChatGui { get; private set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

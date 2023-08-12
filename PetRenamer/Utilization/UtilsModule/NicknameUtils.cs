@@ -1,8 +1,14 @@
+using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Utilization.Attributes;
+using PetRenamer.Utilization.Enum;
 using System;
+using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -10,6 +16,37 @@ namespace PetRenamer.Utilization.UtilsModule;
 internal class NicknameUtils : UtilsRegistryType, ISingletonBase<NicknameUtils>
 {
     public static NicknameUtils instance { get; set; } = null!;
+
+    internal unsafe SerializableNickname GetBattlePetFromOwnerPtr(GameObject* gObj)
+    {
+        return GetFromGameObjectPtr(&((BattleChara*)gObj)->Character.GameObject, PetType.BattlePet);
+    }
+
+    internal unsafe SerializableNickname GetFromGameObjectPtr(GameObject* gObj, PetType type)
+    {
+        if (gObj == null) return null!;
+        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
+        {
+            int curID = -1;
+            if (type == PetType.Companion)
+            {
+                if (!character.HasCompanion()) continue;
+                if (character.GetCompanionID() != ((FFCharacter*)gObj)->CharacterData.ModelSkeletonId) continue;
+                if (character.GetOwnID() != ((FFCharacter*)gObj)->CompanionOwnerID) continue;
+                curID = character.GetCompanionID();
+            }
+            else if (type == PetType.BattlePet)
+            {
+                if (!character.HasBattlePet()) continue;
+                if (!RemapUtils.instance.battlePetRemap.ContainsKey(((BattleChara*)gObj)->Character.CharacterData.ModelCharaId)) continue; 
+                if (character.GetBattlePetObjectID() != ((BattleChara*)gObj)->Character.GameObject.ObjectID) continue; 
+                curID = character.GetBattlePetID();
+            }
+            if (curID == -1) continue; 
+            return GetNicknameV2(character.associatedUser!, curID);
+        }
+        return null!;
+    }
 
     internal SerializableNickname GetLocalNicknameV2(int ID)
     {

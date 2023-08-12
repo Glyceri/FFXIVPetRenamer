@@ -19,7 +19,7 @@ public class ConfigWindow : PetWindow
 
     public override void OnDraw()
     {
-        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme) || Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenus) || Checkbox("Use Party List (FLICKERS)", ref PluginLink.Configuration.usePartyList))
+        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme) || Checkbox("Use Custom Names for emotes", ref PluginLink.Configuration.replaceEmotes) || Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenus))
             PluginLink.Configuration.Save();
 
 

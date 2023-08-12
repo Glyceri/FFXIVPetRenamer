@@ -1,13 +1,12 @@
-﻿using Dalamud.Game;
+﻿
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Hooking.Attributes;
 using System;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-//[Hook]
+// [Hook]
 internal class ChangeJobHook : HookableElement
 {
     private delegate void ChangeJobDelegate(IntPtr data, uint job);

@@ -19,7 +19,8 @@ public class Configuration : IPluginConfiguration
 
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
-    public bool usePartyList = false;
+    public bool replaceEmotes = true;
+
     public bool useContextMenus = true;
 
     public void Initialize()
@@ -115,6 +116,8 @@ public class Configuration : IPluginConfiguration
     public SerializableNickname[]? users = null;
     [Obsolete("Old User Save System. Very innefficient. Use SerializableUserV2 now")]
     public SerializableUser[]? serializableUsers = null;
+    [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
+    public bool usePartyList = false;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
