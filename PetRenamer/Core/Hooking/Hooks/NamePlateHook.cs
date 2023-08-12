@@ -33,7 +33,7 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
-        if (!PluginLink.Configuration.displayCustomNames) nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
+        if (!PluginLink.Configuration.displayCustomNames) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
         SerializableNickname nickname = NicknameUtils.instance.GetFromGameObjectPtr(gameObject, PetType.Companion);
         if(nickname?.Valid() ?? false)
             namePlateInfo->Name.SetString(nickname.Name);
