@@ -9,8 +9,8 @@ namespace PetRenamer.Windows;
 
 public abstract class PetWindow : Window, IDisposableRegistryElement
 {
-    static PetMode _petMode = PetMode.Normal;
-    private static PetMode petMode { get => _petMode; 
+    internal static PetMode _petMode = PetMode.Normal;
+    internal static PetMode petMode { get => _petMode; 
         set 
         { 
             _petMode = value;

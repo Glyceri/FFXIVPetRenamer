@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using Dalamud.Logging;
+using Dalamud.Configuration;
+using PetRenamer.Core;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -24,8 +26,6 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 815),
             MaximumSize = new Vector2(800, 815)
         };
-
-        IsOpen = true;
     }
 
     public unsafe override void OnDraw()
@@ -33,7 +33,8 @@ public class PetListWindow : PetWindow
         if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         if (ConfigurationUtils.instance.GetLocalUserV2() == null) return;
-
+        if (petMode == PetMode.BattlePet) openedAddPet = false;
+        
         DrawUserHeader();
         DrawExportHeader();
     }
@@ -155,7 +156,7 @@ public class PetListWindow : PetWindow
     {
         int counter = 0;
         string searchField;
-        if (InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackCompletion))
+        if (InputText("Search by minion name or ID", ref minionSearchField, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.CallbackCompletion))
         {
             searchField = minionSearchField;
             foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
