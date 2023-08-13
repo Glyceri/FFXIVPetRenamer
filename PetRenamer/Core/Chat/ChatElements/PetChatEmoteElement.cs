@@ -61,9 +61,9 @@ internal unsafe class PetChatEmoteElement : ChatElement
             {
                 if (message.Payloads[i] is TextPayload tPayload)
                 {
-                    tPayload.Text = Regex.Replace(tPayload.Text!, nameString, nickname.Name, RegexOptions.IgnoreCase); ;
+                    foreach(string str in PluginConstants.removeables)
+                        tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname.Name, RegexOptions.IgnoreCase);
                     message.Payloads[i] = tPayload;
-                    PluginLog.Log(message.Payloads[i].ToString() ?? "NULL");
                 }
             }
             break;
