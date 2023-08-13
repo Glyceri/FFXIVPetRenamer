@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using Dalamud.Logging;
-using Dalamud.Configuration;
 using PetRenamer.Core;
 
 namespace PetRenamer.Windows.PetWindows;
