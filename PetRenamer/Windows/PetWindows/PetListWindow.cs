@@ -24,6 +24,8 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 815),
             MaximumSize = new Vector2(800, 815)
         };
+
+        IsOpen = true;
     }
 
     public unsafe override void OnDraw()
@@ -152,14 +154,17 @@ public class PetListWindow : PetWindow
     void DrawOpenedNewPet()
     {
         int counter = 0;
-        if (InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackEdit))
-            foundNicknames = SheetUtils.instance.GetThoseThatContain(minionSearchField);
+        string searchField;
+        if (InputText("Search by minion name or ID", ref minionSearchField, 64, ImGuiInputTextFlags.CallbackCompletion))
+        {
+            searchField = minionSearchField;
+            foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
+        }
 
         ImGui.SameLine(0, 41);
         if (XButton("X##ForOpenedPet", Styling.SmallButton))
         {
             openedAddPet = false;
-            minionSearchField = string.Empty;
             foundNicknames = new List<SerializableNickname>();
         }
 

@@ -20,7 +20,7 @@ public class Configuration : IPluginConfiguration
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
     public bool replaceEmotes = true;
-
+    public bool allowTooltips = true;
     public bool useContextMenus = true;
 
     public void Initialize()

@@ -1,4 +1,5 @@
-﻿using Dalamud.Game;
+﻿using Dalamud.Configuration;
+using Dalamud.Game;
 using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;

@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core;
 using System.Linq;
 using PetRenamer.Core.Singleton;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -89,6 +90,18 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
                 return pet.Singular.ToString();
         }
         return string.Empty;
+    }
+
+    public int GetIDFromName(string name)
+    {
+        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
+        {
+            if(pet == null) continue;
+            if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
+                return pet.Model.Value!.Model;
+        }
+
+        return -1;
     }
 
     public List<SerializableNickname> GetThoseThatContain(string querry)
