@@ -67,7 +67,7 @@ public class PetListWindow : PetWindow
     void DrawBattlePetWarningHeader()
     {
         BeginListBox("##WarningHeader", new System.Numerics.Vector2(780, 40));
-        ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change, for example, a summoners Carbuncle into a Faerie.\nIt will still use the Carbuncle's name.");
+        ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
         ImGui.EndListBox();
     }
 

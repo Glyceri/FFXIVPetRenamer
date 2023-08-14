@@ -5,6 +5,9 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Updatable.Updatables;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 
 namespace PetRenamer;
@@ -93,7 +96,7 @@ public static class IpcProvider
 
     public static string GetLocalCharacterNicknameCallback()
     {
-        if(PluginHandlers.ClientState.LocalPlayer == null) return string.Empty;
+        if (PluginHandlers.ClientState.LocalPlayer == null) return string.Empty;
         return GetCharacterNicknameCallback(PluginHandlers.ClientState.LocalPlayer);
     }
 
@@ -102,15 +105,41 @@ public static class IpcProvider
         try
         {
             if (character is not PlayerCharacter playerCharacter) return string.Empty;
-            (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id); 
+            (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
             NicknameData? data = new NicknameData();
-            PluginLink.IpcStorage.IpcAssignedNicknames.TryGetValue(player, out data);
+            SerializableUserV2 userv2 = ConfigurationUtils.instance.GetUserV2(new SerializableUserV2(player.Item1, (ushort)player.Item2));
+            foreach (FoundPlayerCharacter chara in PluginLink.IpcStorage.characters)
+            {
+                if (chara.ownName != userv2.username || chara.ownHomeWorld != userv2.homeworld) continue;
+
+                (int, string) cStr = (-1, string.Empty);
+                (int, string) bStr = (-1, string.Empty);
+                if (chara.HasCompanion())
+                    cStr = FromIdAndUser(userv2, chara.GetCompanionID());
+                
+                if (chara.HasBattlePet())
+                    bStr = FromIdAndUser(userv2, chara.GetBattlePetID());
+
+                data.ID = cStr.Item1;
+                data.Nickname = cStr.Item2;
+                data.BattleID = bStr.Item1;
+                data.BattleNickname = bStr.Item2;
+                break;
+            }
             string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);
             return jsonString;
         }
         catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
 
         return string.Empty;
+    }
+
+    static (int, string) FromIdAndUser(SerializableUserV2 user, int id)
+    {
+        SerializableNickname? nName = NicknameUtils.instance.GetNicknameV2(user, id);
+        if (nName == null) return (-1, string.Empty);
+        if (!nName.Valid()) return (-1, string.Empty);
+        return (nName.ID, nName.Name);
     }
 
     static void ClearCharacterCallback(Character character)
