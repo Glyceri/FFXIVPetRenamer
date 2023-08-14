@@ -1,9 +1,13 @@
 using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
+using Dalamud.Game.Gui;
+using Dalamud.Game.Gui.Dtr;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.ContextMenu;
 
 namespace PetRenamer.Core.Handlers;
 
@@ -15,6 +19,10 @@ internal class PluginHandlers
     [PluginService] internal static DataManager DataManager { get; set; } = null!;
     [PluginService] internal static SigScanner SigScanner { get; set; } = null!;
     [PluginService] internal static ClientState ClientState { get; private set; } = null!;
+    [PluginService] internal static GameGui GameGui { get; private set; } = null!;
+    [PluginService] internal static TargetManager TargetManager { get; private set; } = null!;
+    [PluginService] internal static ObjectTable ObjectTable { get; private set; } = null!;
+    [PluginService] internal static ChatGui ChatGui { get; private set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

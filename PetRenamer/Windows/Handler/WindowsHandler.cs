@@ -1,4 +1,5 @@
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
@@ -75,6 +76,11 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
 
     public void Draw()
     {
+        if (PluginHandlers.ClientState.LocalPlayer! == null) 
+        {
+            CloseAllWindows();
+            return; 
+        }
         for (int i = temporaryPetWindows.Count - 1; i >= 0; i--)
             if (temporaryPetWindows[i].closed)
             {

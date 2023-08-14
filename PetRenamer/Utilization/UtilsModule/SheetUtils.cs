@@ -5,11 +5,15 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core;
+using System.Linq;
+using PetRenamer.Core.Singleton;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class SheetUtils : UtilsRegistryType
+internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
     ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;
     ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
@@ -17,6 +21,7 @@ internal class SheetUtils : UtilsRegistryType
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<Tribe> tribe { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
+    public static SheetUtils instance { get; set; } = null!;
 
     internal override void OnRegistered()
     {
@@ -30,7 +35,7 @@ internal class SheetUtils : UtilsRegistryType
 
     public unsafe string GetCurrentClassName()
     {
-        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
         if (playerData == null) return string.Empty;
 
         return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
@@ -39,8 +44,8 @@ internal class SheetUtils : UtilsRegistryType
     public unsafe string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
-        if(id > 100) id = PluginLink.Utils.Get<RemapUtils>().BattlePetSkeletonToNameID(id);
-        if (id <= 0) return "[ERROR] Contact: Glyceri";
+        if(id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
+        if (id <= 0) return string.Empty;
 
         foreach(Pet pet in battlePetSheet)
             if(pet.RowId == id)
@@ -57,9 +62,18 @@ internal class SheetUtils : UtilsRegistryType
         return string.Empty;
     }
 
+    public string GetCurrentBattlePetName()
+    {
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
+        if (playerData == null) return string.Empty;
+        if (!PluginConstants.allowedJobs.Contains(playerData.Value.job)) return string.Empty;
+
+        return GetBattlePetName(RemapUtils.instance.GetPetIDFromClass(playerData.Value.job));
+    }
+
     public string GetCurrentPetName()
     {
-        PlayerData? playerData = PluginLink.Utils.Get<PlayerUtils>().GetPlayerData();
+        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
         if (playerData == null) return string.Empty;
         if (playerData!.Value.companionData == null) return string.Empty;
 
@@ -76,6 +90,18 @@ internal class SheetUtils : UtilsRegistryType
                 return pet.Singular.ToString();
         }
         return string.Empty;
+    }
+
+    public int GetIDFromName(string name)
+    {
+        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
+        {
+            if(pet == null) continue;
+            if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
+                return pet.Model.Value!.Model;
+        }
+
+        return -1;
     }
 
     public List<SerializableNickname> GetThoseThatContain(string querry)

@@ -1,14 +1,17 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class PlayerUtils : UtilsRegistryType
+internal class PlayerUtils : UtilsRegistryType, ISingletonBase<PlayerUtils>
 {
+    public static PlayerUtils instance { get; set; } = null!;
+
     public bool PlayerDataAvailable() => PluginHandlers.ClientState.LocalPlayer != null;
 
     unsafe internal PlayerData? GetPlayerData(bool hasPetOut = false)
@@ -29,32 +32,28 @@ internal class PlayerUtils : UtilsRegistryType
             data = new CompanionData(playerCompanion, playerCompanion->Character.CharacterData.ModelSkeletonId);
 
         int petType = -1;
-        if (hasPetOut)
-        {
-            if (playerCharacter->CharacterData.ClassJob == 28) petType = -3;
-            if (playerCharacter->CharacterData.ClassJob == 26 || playerCharacter->CharacterData.ClassJob == 27) petType = -2;
-        }
+        if (hasPetOut) petType = RemapUtils.instance.GetPetIDFromClass(playerCharacter->CharacterData.ClassJob);
 
-        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType,  data);
+        return new PlayerData(me, me->Gender, playerCharacter->HomeWorld, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Race] ?? -1, PluginHandlers.ClientState.LocalPlayer?.Customize[(int)Dalamud.Game.ClientState.Objects.Enums.CustomizeIndex.Tribe] ?? -1, petType, playerCharacter->CharacterData.ClassJob, data);
     }
 }
 
 
 internal struct PlayerData
 {
-    StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     internal unsafe GameObject* playerGameObject;
-    unsafe internal string playerName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal string playerName => StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(namePtr));
     unsafe internal byte* namePtr;
     internal ushort homeWorld;
     internal byte gender;
     internal int race;
     internal int tribe;
+    internal int job;
     internal int battlePetID;
 
     internal CompanionData? companionData;
 
-    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, int battlePetID, CompanionData? companionData)
+    unsafe public PlayerData(GameObject* playerGameObject, byte gender, ushort homeWorld, int race, int tribe, int battlePetID, int job, CompanionData? companionData)
     {
         this.playerGameObject = playerGameObject;
         this.namePtr = playerGameObject->Name;
@@ -64,14 +63,14 @@ internal struct PlayerData
         this.battlePetID = battlePetID;
         this.race = race;
         this.tribe = tribe;
+        this.job = job;
     }
 }
 
 internal struct CompanionData
 {
-    StringUtils stringUtils => PluginLink.Utils.Get<StringUtils>();
     unsafe internal FFCompanion* companion;
-    unsafe internal string currentCompanionName => stringUtils.FromBytes(stringUtils.GetBytes(namePtr));
+    unsafe internal string currentCompanionName => StringUtils.instance.FromBytes(StringUtils.instance.GetBytes(namePtr));
     unsafe internal byte* namePtr;
     internal int currentModelID;
 

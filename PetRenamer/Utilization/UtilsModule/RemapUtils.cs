@@ -1,12 +1,37 @@
-﻿using PetRenamer.Utilization.Attributes;
+﻿using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class RemapUtils : UtilsRegistryType
+internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 {
-    private readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
+    //ClassJob ID's reminder
+    //Adventurer        : 0                 Warrior         : 21
+    //Gladiator         : 1                 Dragoon         : 22
+    //Pugilist          : 2                 Bard            : 23
+    //Marauder          : 3                 White Mage      : 24
+    //Lancer            : 4                 Black Mage      : 25
+    //Archer            : 5                 Arcanist        : 26
+    //Conjurer          : 6                 Summoner        : 27
+    //Thaumaturge       : 7                 Scholar         : 28
+    //Carpenter         : 8                 Rogue           : 29
+    //Blacksmith        : 9                 Ninja           : 30
+    //Armorer           : 10                Machinist       : 31
+    //Goldsmith         : 11                Dark Knight     : 32
+    //Leatherworker     : 12                Astrologian     : 33
+    //Weaver            : 13                Samurai         : 34
+    //Alchemist         : 14                Red Mage        : 35
+    //Culinarian        : 15                Blue Mage       : 36
+    //Miner             : 16                Gunbreaker      : 37
+    //Botanist          : 17                Dancer          : 38
+    //Fisher            : 18                Reaper          : 39
+    //Paladin           : 19                Sage            : 40
+    //Monk              : 20
+
+
+    public readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
     {
         { 407,  6  }, //EOS
         { 408,  7  }, //Selene
@@ -20,14 +45,46 @@ internal class RemapUtils : UtilsRegistryType
         { 416,  28 }, //Titan-Egi
         { 417,  29 }, //Garuda-Egi 
 
+        { 1027, 8  }, //Rook Autoturret MCHN
         { 2619, 21 }, //Seraph
+        { 2618, 18 }, //Automaton Queen
+        { 2621, 17 }, //Esteem DRK
+        { -4,   35 }, //Bishop Autoturret
+        { -5,   19 }, //Bunshin Ninja
+
     };
 
-    internal ClassType FromClassID(int classID)
+    private readonly Dictionary<int, int> classToPetID = new Dictionary<int, int>()
     {
-        if (classID == 28) return ClassType.Healing;
-        if (classID == 26 || classID == 27) return ClassType.Summoning;
-        return ClassType.Invalid;
+        { 26,   -2 }, //Arcanist to Carbuncle  
+        { 27,   -2 }, //Summoner to Carbuncle  
+        { 28,   -3 }, //Scholar to Faerie
+        { 31,   -4 }, //Machinist to Automaton Queen
+        { 32,   -5 }, //Dark Knight Esteem
+        { 30,   -6 }, //Ninja Bunshin
+    };
+
+    private readonly Dictionary<int, string> petIDToPetName = new Dictionary<int, string>()
+    {
+        { -2, "Carbuncle" },
+        { -3, "Faerie" },
+        { -4, "Automaton Queen" },
+        { -5, "Esteem" },
+        { -6, "Bunshin" }
+    };
+
+    public static RemapUtils instance { get; set; } = null!;
+
+    internal string PetIDToName(int petID)
+    {
+        if (!petIDToPetName.ContainsKey(petID)) return string.Empty;
+        return petIDToPetName[petID];
+    }
+
+    internal int GetPetIDFromClass(int jobclass)
+    {
+        if (!classToPetID.ContainsKey(jobclass)) return -1;
+        return classToPetID[jobclass];
     }
 
     internal int BattlePetSkeletonToNameID(int skeletonID)
@@ -41,5 +98,6 @@ internal enum ClassType
 {
     Invalid,
     Summoning,
-    Healing
+    Healing,
+    Machinist
 }

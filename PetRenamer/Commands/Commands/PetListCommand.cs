@@ -4,7 +4,7 @@ using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Commands.Commands;
 
-[PetCommand("/minionlist", "Opens a list with all your nicknamed minions", true, "/petlist")]
+[PetCommand("/minionnames", "Opens a list with all your nicknamed minions", true, "/petnames", "/petlist", "/minionlist")]
 internal class PetListCommand : PetCommand
 {
     internal override void OnCommand(string command, string args) => PluginLink.WindowHandler.ToggleWindow<PetListWindow>();

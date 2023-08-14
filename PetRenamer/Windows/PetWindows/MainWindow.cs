@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Serialization;
@@ -6,7 +6,6 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Updatable.Updatables;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -14,14 +13,8 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class MainWindow : InitializablePetWindow
 {
-    readonly StringUtils stringUtils;
-    readonly SheetUtils sheetUtils;
-    readonly NicknameUtils nicknameUtils;
-    readonly ConfigurationUtils configurationUtils;
-
     int gottenID = -1;
     int gottenBattlePetID = -1;
-    int gottenClass = -1;
     string tempName = string.Empty;
     string tempName2 = string.Empty;
     string tempText = string.Empty;
@@ -30,34 +23,23 @@ public class MainWindow : InitializablePetWindow
     public MainWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
     {
         Size = new Vector2(310, 195);
-        
-        stringUtils         = PluginLink.Utils.Get<StringUtils>();
-        nicknameUtils       = PluginLink.Utils.Get<NicknameUtils>();
-        sheetUtils          = PluginLink.Utils.Get<SheetUtils>();
-        configurationUtils  = PluginLink.Utils.Get<ConfigurationUtils>();
     }
     
     public override void OnOpen()
     {
         tempText = string.Empty;
         tempText2 = string.Empty;
-        if (nicknameUtils.ContainsLocal(gottenID))
-            tempText = stringUtils.GetLocalName(gottenID);
-        if (nicknameUtils.ContainsLocal(gottenBattlePetID))
-            tempText2 = stringUtils.GetLocalName(gottenBattlePetID);
+        if (NicknameUtils.instance.ContainsLocalV2(gottenID))
+            tempText = StringUtils.instance.GetLocalName(gottenID);
+        if (NicknameUtils.instance.ContainsLocalV2(gottenBattlePetID))
+            tempText2 = StringUtils.instance.GetLocalName(gottenBattlePetID);
 
         tempName2 = tempText2;
         tempName = tempText;
     }
 
     public override void OnDrawNormal() => DrawNormalMode();
-    public override void OnDrawBattlePet() => DrawBattlePetMode();
-
-    void DrawBattlePetMode()
-    {
-        if (gottenClass < 26 || gottenClass > 28) DrawWrongClass();
-        else HandleBattleMode(); 
-    }
+    public override void OnDrawBattlePet() => HandleBattleMode();
 
     void HandleBattleMode()
     {
@@ -67,32 +49,20 @@ public class MainWindow : InitializablePetWindow
 
     void HandleBattlePetName()
     {
-        string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "faerie";
-
-        DrawPetNameField(petType, ref tempText2, ref tempName2, ref gottenBattlePetID);
+        DrawPetNameField(RemapUtils.instance.PetIDToName(gottenBattlePetID), ref tempText2, ref tempName2, ref gottenBattlePetID);
     }
 
     void DrawGetPetOut()
     {
-        string petType = "Carbuncle";
-        if (gottenClass == 28) petType = "faerie";
-
-        ImGui.TextColored(StylingColours.highlightText, $"Please summon your {petType}.");
-    }
-
-    void DrawWrongClass()
-    {
-        ImGui.TextColored(StylingColours.highlightText, "Please switch to: ");
-        ImGui.TextColored(StylingColours.highlightText, "- Arcanist");
-        ImGui.TextColored(StylingColours.highlightText, "- Summoner");
-        ImGui.TextColored(StylingColours.highlightText, "- Scholar");
+        string gottenString = RemapUtils.instance.PetIDToName(gottenBattlePetID);
+        if(gottenString ==  string.Empty) ImGui.TextColored(StylingColours.highlightText, $"Please summon a Battle Pet.");
+        else ImGui.TextColored(StylingColours.highlightText, $"Please summon your {gottenString}.");
     }
 
     void DrawNormalMode()
     {
         if (gottenID <= -1) DrawNoMinionSpawned();
-        else DrawPetNameField(stringUtils.MakeTitleCase(sheetUtils.GetPetName(gottenID)), ref tempText, ref tempName, ref gottenID);
+        else DrawPetNameField(StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(gottenID)), ref tempText, ref tempName, ref gottenID);
     }
 
     void DrawNoMinionSpawned()
@@ -127,13 +97,14 @@ public class MainWindow : InitializablePetWindow
     {
         if (Button("Save Nickname"))
         {
-            configurationUtils.SetLocalNickname(theID, internalTempText);
+            internalTempText = internalTempText.Replace("^", "");
+            ConfigurationUtils.instance.SetLocalNicknameV2(theID, internalTempText);           
             OnOpen();
         }
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            configurationUtils.RemoveLocalNickname(theID);
+            ConfigurationUtils.instance.RemoveLocalNicknameV2(theID);
             OnOpen();
         }
         ImGui.TextColored(StylingColours.whiteText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");
@@ -142,12 +113,11 @@ public class MainWindow : InitializablePetWindow
     unsafe void OnChange(PlayerData? playerData, SerializableNickname nickname)
     {
         gottenID = -1;
-        gottenClass = -1;
         gottenBattlePetID = -1;
         OnOpen();
         if (playerData == null) return;
         gottenBattlePetID = playerData!.Value.battlePetID;
-        gottenClass = ((Character*)playerData!.Value.playerGameObject)->CharacterData.ClassJob;
+        OnOpen();
         if (playerData!.Value.companionData == null) return;
         gottenID = playerData!.Value.companionData!.Value.currentModelID;
         OnOpen();
@@ -156,6 +126,13 @@ public class MainWindow : InitializablePetWindow
     public void OpenForId(int ID)
     {
         gottenID = ID;
+        IsOpen = true;
+        OnOpen();
+    }
+
+    public void OpenForBattleID(int id)
+    {
+        gottenBattlePetID = id;
         IsOpen = true;
         OnOpen();
     }

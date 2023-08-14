@@ -36,6 +36,11 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
             OnLateElementCreation(element);
     }
 
+    public void Dispose()
+    {
+        ClearAllElements();
+    }
+
     public T GetElement(Type elementType)
     {
         foreach (T element in elements)
@@ -50,8 +55,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         foreach (T element in elements)
         {
             OnElementDestroyed(element);
-            if(element.GetType().IsSubclassOf(typeof(IDisposable)))
-                ((IDisposable)element)?.Dispose();
+            if(element is IDisposable disposable) disposable.Dispose();
         }
         elements.Clear();
         attributes.Clear();

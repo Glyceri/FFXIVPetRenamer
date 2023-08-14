@@ -10,7 +10,7 @@ namespace PetRenamer.Core.Updatable
     {
         List<Updatable> updatables => elements;
 
-        public UpdatableHandler() 
+        public unsafe UpdatableHandler() 
         {
             PluginHandlers.Framework.Update += MainUpdate;
         }
@@ -25,6 +25,8 @@ namespace PetRenamer.Core.Updatable
 
         void MainUpdate(Framework framework)
         {
+            if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);
 

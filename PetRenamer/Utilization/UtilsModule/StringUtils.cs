@@ -1,37 +1,26 @@
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Globalization;
-using System.IO;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
-internal class StringUtils : UtilsRegistryType
+internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
 {
-    MathUtils mathUtils { get; set; } = null!;
+    public static StringUtils instance { get; set; } = null!;
 
     public string GetLocalName(int ID)
     {
-        SerializableUser user;
-        if ((user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser()!) == null) return string.Empty;
+        SerializableUserV2 user;
+        if ((user = ConfigurationUtils.instance.GetLocalUserV2()!) == null) return string.Empty;
 
         foreach (SerializableNickname nickname in user.nicknames)
-            if (nickname.ID == ID)
-                return nickname.Name;
-
-        return string.Empty;
-    }
-
-    [Obsolete]
-    public string GetName(int ID)
-    {
-        foreach (SerializableNickname nickname in PluginLink.Configuration.users!)
             if (nickname.ID == ID)
                 return nickname.Name;
 
@@ -62,21 +51,16 @@ internal class StringUtils : UtilsRegistryType
 
     public string FromBytes(byte[] bytes) => Encoding.Default.GetString(bytes);
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
-    public bool CharIsValidForName(char c) 
+
+    #region OBSOLETE
+    [Obsolete]
+    public string GetName(int ID)
     {
-        mathUtils = mathUtils ?? (mathUtils = PluginLink.Utils.Get<MathUtils>());
-        bool isValid = false;
-        if (mathUtils.IsInRange(c, 97, 122)) isValid = true;
-        if (mathUtils.IsInRange(c, 65, 90)) isValid = true;
-        if (mathUtils.IsInRange(c, 48, 57)) isValid = true;
-        if (c == 32 || c == 39) isValid = true;
-        return isValid;
+        foreach (SerializableNickname nickname in PluginLink.Configuration.users!)
+            if (nickname.ID == ID)
+                return nickname.Name;
+
+        return string.Empty;
     }
-    public bool StringIsInvalidForName(string s)
-    {
-        foreach(char c in s)
-            if(!CharIsValidForName(c)) 
-                return true;
-        return false;
-    }
+    #endregion
 }

@@ -1,14 +1,13 @@
-﻿using Dalamud.Game;
+using Dalamud.Game;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
-using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
-using FFXIVClientStructs.FFXIV.Client.System.String;
-using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -18,26 +17,14 @@ internal class NameChangeUpdatable : Updatable
     int lastID = -1;
     int lastBattleID = -1;
     int lastJob = -1;
+    int lastBattleSkeletonID = -1;
     bool lastHasPetOut = false;
     bool lastPetBeenTrue = false;
     string lastName = null!;
     string lastBattleName = null!;
 
-    StringUtils stringUtils;
-    NicknameUtils nicknameUtils;
-    PlayerUtils playerUtils;
-    SheetUtils sheetUtils;
-
     internal delegate void OnCompanionChange(PlayerData? playerData, SerializableNickname? serializableNickname);
     internal OnCompanionChange onCompanionChange = null!;
-
-    public NameChangeUpdatable()
-    {
-        stringUtils = PluginLink.Utils.Get<StringUtils>();
-        nicknameUtils = PluginLink.Utils.Get<NicknameUtils>();
-        playerUtils = PluginLink.Utils.Get<PlayerUtils>();
-        sheetUtils = PluginLink.Utils.Get<SheetUtils>();
-    }
 
 #pragma warning disable CS8601 // Possible null reference assignment. (It's legit impossible for it to be null intelliSense 😤😤😤) 
     public void RegisterMethod(OnCompanionChange companionChange)
@@ -53,53 +40,41 @@ internal class NameChangeUpdatable : Updatable
     }
 #pragma warning restore CS8601 // Possible null reference assignment.
 
-    List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
+
     unsafe void FillUserList()
     {
-        characters.Clear();
-        for (int i = 0; i < 2000; i++)
+        PluginLink.IpcStorage.characters.Clear();
+        
+        foreach (SerializableUserV2 user in PluginLink.Configuration.serializableUsersV2!)
         {
-            GameObject* currentObject = GameObjectManager.GetGameObjectByIndex(i);
-            if (currentObject == null) continue;
-
-            Character* plCharacter = (Character*)currentObject;
+            BattleChara* battleChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.username, true, (short)user.homeworld);
+            if (battleChara == null) continue;
+            Character* plCharacter = (Character*)battleChara;
             if (plCharacter == null) continue;
+            FFCompanion* companion = battleChara->Character.Companion.CompanionObject;
+            BattleChara* pet =  PluginLink.CharacterManager->LookupPetByOwnerObject(battleChara);
+            //MidoriKami told me that LookupPetByOwnerObject could return the same pets and what not...
+            //this could be a good fix:
+            //     bool HasPet()
+            //      => Service.ObjectTable
+            //      .Where(obj => obj.OwnerId == GetObjectId())
+            //      .Where(obj => obj.ObjectKind is ObjectKind.BattleNpc)
+            //      .Where(obj => (obj as BattleNpc)?.SubKind == (byte)BattleNpcSubKind.Pet)
+            //      .Any();
+            Character* petCharacter = null!;
+            if (pet != null) 
+                if (RemapUtils.instance.battlePetRemap.ContainsKey(pet->Character.CharacterData.ModelCharaId))
+                    petCharacter = &pet->Character;
 
-            string name = stringUtils.GetCharacterName(currentObject->Name);
-            ushort homeWorld = plCharacter->HomeWorld;
-
-            SerializableUser? correctUser = null;
-
-            foreach (SerializableUser user in PluginLink.Configuration.serializableUsers!)
+            PluginLink.IpcStorage.characters.Add(new FoundPlayerCharacter()
             {
-                if (user == null) continue;
-                if (user.username != name) continue;
-                if (user.homeworld != homeWorld) continue;
-                correctUser = user;
-                break;
-            }
-            if (correctUser == null)
-            {
-                foreach (FoundPlayerCharacter character in characters)
-                {
-                    if (character.GetOwnID() == currentObject->OwnerID)
-                    {
-                        character.battlePetCharacter = plCharacter;
-                        break;
-                    }
-                }
-                continue;
-            }
-
-            FFCompanion* plCompanion = plCharacter->Companion.CompanionObject;
-            characters.Add(new FoundPlayerCharacter()
-            {
-                selfGameObject = currentObject,
+                selfGameObject = &battleChara->Character.GameObject,
                 playerCharacter = plCharacter,
-                playerCompanion = plCompanion,
-                associatedUser = correctUser,
-                ownName = name,
-                ownHomeWorld = homeWorld,
+                playerCompanion = companion,
+                battlePetCharacter = petCharacter,
+                associatedUser = user,
+                ownName = user.username,
+                ownHomeWorld = user.homeworld,
             });
         }
     }
@@ -107,62 +82,56 @@ internal class NameChangeUpdatable : Updatable
     unsafe void LoopUserList()
     {
         Dalamud.Game.ClientState.Objects.SubKinds.PlayerCharacter playerChar = PluginHandlers.ClientState.LocalPlayer!;
+        if (playerChar == null) return;
         bool flickAtEnd = false;
         bool battlePetBeenActive = false;
 
-        foreach (FoundPlayerCharacter character in characters)
+        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             bool isLocalPlayer = character.ownName == playerChar.Name.ToString() && character.ownHomeWorld == playerChar.HomeWorld.Id;
 
             bool hasCompanion = character.HasCompanion();
             bool hasBattlePet = character.HasBattlePet();
 
-            int currentID = -1;
-            string currentName = string.Empty;
-
-            int currentIDBattlePet = -1;
-            string currentNameBattlePet = string.Empty;
-
             int currentJob = character.GetPlayerJob();
+
+            int currentID = -1;
+            int currentIDBattlePet = -1;
+            int currentbattID = -1;
+            string currentName = string.Empty;
+            string currentNameBattlePet = string.Empty;
 
             if (hasCompanion)
             {
                 currentID = character.GetCompanionID();
-                currentName = sheetUtils.GetPetName(currentID);
+                currentName = SheetUtils.instance.GetPetName(currentID);
                 SetName(character, currentID, ref currentName);
-                ApplyName(character.GetCompanionName(), currentName);
             }
 
-            if(hasBattlePet && character.BattlePetNamingAllowed()) 
+            if (hasBattlePet && character.BattlePetNamingAllowed())
             {
                 battlePetBeenActive = true;
-                currentID = character.GetBattlePetID();
+                currentbattID = character.GetBattlePetID();
                 currentIDBattlePet = character.GetBattlePetModelID();
-                currentNameBattlePet = sheetUtils.GetBattlePetName(currentIDBattlePet);
-                SetName(character, currentID, ref currentNameBattlePet);
-                ApplyName(character.GetBattlePetName(), currentNameBattlePet);
+                currentNameBattlePet = SheetUtils.instance.GetBattlePetName(currentIDBattlePet);
+                SetName(character, currentbattID, ref currentNameBattlePet);
             }
 
-            if (isLocalPlayer) 
-                flickAtEnd = HasChanged(currentID, currentIDBattlePet, currentName, currentNameBattlePet, character.GetPlayerJob(), hasBattlePet);
+            if (isLocalPlayer)
+                flickAtEnd = HasChanged(currentID, currentIDBattlePet, currentbattID, currentName, currentNameBattlePet, character.GetPlayerJob(), hasBattlePet);
         }
 
         if (!flickAtEnd && battlePetBeenActive == lastPetBeenTrue) return;
 
         lastPetBeenTrue = battlePetBeenActive;
-        onCompanionChange?.Invoke(playerUtils.GetPlayerData(battlePetBeenActive), null);
+        onCompanionChange?.Invoke(PlayerUtils.instance.GetPlayerData(battlePetBeenActive), null);
+
+
     }
 
-    unsafe void ApplyName(byte* namePtr, string newName)
+    bool HasChanged(int currentID, int currentIDBattlePet, int currentBattleSkeletonID, string currentName, string currentBattleName, byte currentJob, bool hasBattlePet)
     {
-        byte[] outcome = new byte[PluginConstants.ffxivNameSize];
-        Marshal.Copy((nint)Utf8String.FromString(newName)->StringPtr, outcome, 0, PluginConstants.ffxivNameSize);
-        Marshal.Copy(outcome, 0, (nint)namePtr, PluginConstants.ffxivNameSize);
-    }
-
-    bool HasChanged(int currentID, int currentIDBattlePet, string currentName, string currentBattleName, byte currentJob, bool hasBattlePet)
-    {
-        if (currentID != lastID || lastBattleID != currentIDBattlePet || currentName != lastName || lastJob != currentJob || lastHasPetOut != hasBattlePet)
+        if (currentID != lastID || lastBattleID != currentIDBattlePet || currentName != lastName || currentBattleName != lastBattleName || lastJob != currentJob || lastHasPetOut != hasBattlePet)
         {
             lastID = currentID;
             lastBattleID = currentIDBattlePet;
@@ -170,7 +139,14 @@ internal class NameChangeUpdatable : Updatable
             lastBattleName = currentBattleName;
             lastJob = currentJob;
             lastHasPetOut = hasBattlePet;
+            lastBattleSkeletonID = currentBattleSkeletonID;
 
+            string localCurrentName = currentName;
+            string localCurrentBattleName = currentBattleName;
+            if (localCurrentName == SheetUtils.instance.GetCurrentPetName()) localCurrentName = string.Empty;
+            if (localCurrentBattleName == RemapUtils.instance.PetIDToName(RemapUtils.instance.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
+
+            IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, RemapUtils.instance.GetPetIDFromClass(currentJob), localCurrentBattleName));
             return true;
         }
         return false;
@@ -178,51 +154,49 @@ internal class NameChangeUpdatable : Updatable
 
     unsafe void SetName(FoundPlayerCharacter character, int id, ref string name)
     {
-        SerializableNickname serializableNickname = nicknameUtils.GetNickname(character.associatedUser!, id);
+        SerializableNickname serializableNickname = NicknameUtils.instance.GetNicknameV2(character.associatedUser!, id);
         if (serializableNickname == null) return;
         if (serializableNickname.Name.Length == 0 || !PluginLink.Configuration.displayCustomNames || name.Length == 0) return;
         name = serializableNickname.Name;
     }
 
+
     public override unsafe void Update(Framework frameWork)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        FillUserList();
-        LoopUserList();
-    }
-
-
-
-    private unsafe class FoundPlayerCharacter
-    {
-        public GameObject* selfGameObject;
-        public Character* playerCharacter;
-        public Character* battlePetCharacter;
-        public FFCompanion* playerCompanion;
-        public SerializableUser? associatedUser;
-
-        public string ownName = string.Empty;
-        public uint ownHomeWorld = 0;
-
-        public bool BattlePetNamingAllowed() => GetPlayerJob() == 26 || GetPlayerJob() == 27 || GetPlayerJob() == 28;
-        public bool HasBattlePet() => battlePetCharacter != null;
-        public bool HasCompanion() => playerCompanion != null;
-
-        public byte* GetBattlePetName() => battlePetCharacter->GameObject.Name;
-        public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
-
-        public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
-        public int GetBattlePetID()
+        lock (PluginLink.IpcStorage.characters)
         {
-            byte playerJob = GetPlayerJob();
-            if (playerJob == 28) return -3;
-            if (playerJob == 26 || playerJob == 27) return -2;
-            return -1;
+            FillUserList();
+            LoopUserList();
         }
-
-        public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
-
-        public uint GetOwnID() => selfGameObject->ObjectID;
-        public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
     }
+}
+
+public unsafe class FoundPlayerCharacter
+{
+    public GameObject* selfGameObject;
+    public Character* playerCharacter;
+    public Character* battlePetCharacter;
+    public FFCompanion* playerCompanion;
+    public SerializableUserV2? associatedUser;
+
+    public string ownName = string.Empty;
+    public uint ownHomeWorld = 0;
+
+    public bool BattlePetNamingAllowed() => PluginConstants.allowedJobs.Contains(GetPlayerJob());
+    public bool HasBattlePet() => battlePetCharacter != null;
+    public bool HasCompanion() => playerCompanion != null;
+
+    public byte* GetBattlePetName() => battlePetCharacter->GameObject.Name;
+    public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
+
+    public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
+    public int GetBattlePetID() => RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
+
+    public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
+
+    public uint GetOwnID() => selfGameObject->ObjectID;
+    public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID;
+    public uint GetCompanionObjectID() => playerCompanion->Character.GameObject.ObjectID;
+    public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
 }
