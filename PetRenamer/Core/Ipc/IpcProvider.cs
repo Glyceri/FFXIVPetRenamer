@@ -108,8 +108,10 @@ public static class IpcProvider
             (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
             NicknameData? data = new NicknameData();
             SerializableUserV2 userv2 = ConfigurationUtils.instance.GetUserV2(new SerializableUserV2(player.Item1, (ushort)player.Item2));
+            if(userv2 == null) return string.Empty;
             foreach (FoundPlayerCharacter chara in PluginLink.IpcStorage.characters)
             {
+                if (chara == null) continue;
                 if (chara.ownName != userv2.username || chara.ownHomeWorld != userv2.homeworld) continue;
 
                 (int, string) cStr = (-1, string.Empty);
