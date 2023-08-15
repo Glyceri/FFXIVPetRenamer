@@ -109,7 +109,6 @@ public class PetListWindow : PetWindow
             try
             {
                 string gottenText = Encoding.Unicode.GetString(Convert.FromBase64String(ImGui.GetClipboardText()));
-                PluginLog.Log(gottenText);
                 OverrideNamesWindow window = PluginLink.WindowHandler.GetWindow<OverrideNamesWindow>();
                 if (window.SetImportString(gottenText))
                     window.IsOpen = true;

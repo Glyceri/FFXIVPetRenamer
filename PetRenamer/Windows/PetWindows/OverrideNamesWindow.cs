@@ -46,7 +46,7 @@ internal class OverrideNamesWindow : PetWindow
                     {
                         string[] splitNickname = splitLines[i].Split('^');
                         if (splitNickname.Length < 1) continue;
-                        if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) { Dalamud.Logging.PluginLog.Log($"Int parse failed: {splitNickname[0].Replace("ID:", "")}"); continue; }
+                        if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) { continue; }
                         string nickname = splitNickname[1].Replace("Name:", "");
                         nicknames.Add(new SerializableNickname(ID, nickname));
                     }
