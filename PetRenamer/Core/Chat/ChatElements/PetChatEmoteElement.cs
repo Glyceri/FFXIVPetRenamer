@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Chat.Attributes;
@@ -13,6 +12,7 @@ using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Core.Serialization;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using System.Text.RegularExpressions;
+using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
@@ -25,7 +25,13 @@ internal unsafe class PetChatEmoteElement : ChatElement
         if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;
+        DBGameObject lastTarget = PluginHandlers.TargetManager.Target!;
+        DBGameObject lastSoftTarget = PluginHandlers.TargetManager.SoftTarget!;
+        if (lastSoftTarget != null)
+            PluginHandlers.TargetManager.Target = lastSoftTarget;
         ulong target = bChara->Character.GetTargetId();
+        PluginHandlers.TargetManager.SoftTarget = lastSoftTarget;
+        PluginHandlers.TargetManager.Target = lastTarget;
         string nameString = string.Empty;
         int id = -1;
         string ownerName = string.Empty;
