@@ -31,14 +31,17 @@ internal unsafe class TargetBarUpdatable : Updatable
     {
         try
         {
-            if (PluginHandlers.TargetManager.Target == null) return;
-            TargetObjectKind targetObjectKind = PluginHandlers.TargetManager.Target.ObjectKind;
+            DGameObject target = PluginHandlers.TargetManager.Target!;
+            if(PluginHandlers.TargetManager.SoftTarget != null)
+                target = PluginHandlers.TargetManager.SoftTarget;
+            if (target == null) return;
+            TargetObjectKind targetObjectKind = target.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
             if (textNode == null) return;
-            if (PluginHandlers.TargetManager.Target.Name.ToString() != textNode->NodeText.ToString()) return;
-            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.Target.ObjectIndex);
+            if (target.Name.ToString() != textNode->NodeText.ToString()) return;
+            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex);
             SerializableNickname name = NicknameUtils.instance.GetFromGameObjectPtr(gObj, EnumUtils.instance.FromTargetType(targetObjectKind));
             if (name?.Valid() ?? false)
                 textNode->NodeText.SetString(name.Name);

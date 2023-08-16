@@ -125,8 +125,6 @@ internal class NameChangeUpdatable : Updatable
 
         lastPetBeenTrue = battlePetBeenActive;
         onCompanionChange?.Invoke(PlayerUtils.instance.GetPlayerData(battlePetBeenActive), null);
-
-
     }
 
     bool HasChanged(int currentID, int currentIDBattlePet, int currentBattleSkeletonID, string currentName, string currentBattleName, byte currentJob, bool hasBattlePet)
@@ -135,18 +133,11 @@ internal class NameChangeUpdatable : Updatable
         {
             lastID = currentID;
             lastBattleID = currentIDBattlePet;
-            lastName = currentName;
-            lastBattleName = currentBattleName;
             lastJob = currentJob;
             lastHasPetOut = hasBattlePet;
             lastBattleSkeletonID = currentBattleSkeletonID;
-
-            string localCurrentName = currentName;
-            string localCurrentBattleName = currentBattleName;
-            if (localCurrentName == SheetUtils.instance.GetCurrentPetName()) localCurrentName = string.Empty;
-            if (localCurrentBattleName == RemapUtils.instance.PetIDToName(RemapUtils.instance.GetPetIDFromClass(currentJob))) localCurrentBattleName = string.Empty;
-
-            IpcProvider.ChangedPetNickname(new NicknameData(currentID, localCurrentName, RemapUtils.instance.GetPetIDFromClass(currentJob), localCurrentBattleName));
+            lastName = currentName;
+            lastBattleName = currentBattleName;
             return true;
         }
         return false;

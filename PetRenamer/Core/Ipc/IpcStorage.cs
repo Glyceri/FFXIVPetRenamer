@@ -1,9 +1,12 @@
-﻿using PetRenamer.Core.Updatable.Updatables;
+﻿using Dalamud.Game;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Updatable.Updatables;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer;
 
-public class IpcStorage
+public class IpcStorage : IDisposable
 {
     // (string, uint) is the Equivelant of PetRenamer.Core.Serialization.SerializableUser
     // Which is now Obsolete ;)
@@ -15,13 +18,28 @@ public class IpcStorage
 
     public List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
 
+    bool touched = false;
+
     public Dictionary<(string, uint), NicknameData> IpcAssignedNicknames 
     {
-        get => _IpcAssignedNicknames; 
+        get 
+        {
+            touched = true;
+            return _IpcAssignedNicknames;
+        }
         set
         {
+            touched = true;
             _IpcAssignedNicknames = value;
-            IpcChange?.Invoke(value);
+        }
+    }
+
+    public void OnUpdate(Framework framework)
+    {
+        if (touched)
+        {
+            touched = false;
+            IpcChange?.Invoke(_IpcAssignedNicknames);
         }
     }
 
@@ -34,5 +52,17 @@ public class IpcStorage
     public void Deregister(OnIpcChange IpcChange)
     {
         this.IpcChange -= IpcChange;
+    }
+
+    public void LateInitialize()
+    {
+        PluginHandlers.Framework.Update += OnUpdate;
+    }
+
+    public void Dispose()
+    {
+        PluginHandlers.Framework.Update -= OnUpdate;
+        _IpcAssignedNicknames.Clear();
+        characters.Clear();
     }
 }

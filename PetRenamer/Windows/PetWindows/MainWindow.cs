@@ -98,7 +98,7 @@ public class MainWindow : InitializablePetWindow
         if (Button("Save Nickname"))
         {
             internalTempText = internalTempText.Replace("^", "");
-            ConfigurationUtils.instance.SetLocalNicknameV2(theID, internalTempText);           
+            ConfigurationUtils.instance.SetLocalNicknameV2(theID, internalTempText);
             OnOpen();
         }
         ImGui.SameLine(0, 1f);

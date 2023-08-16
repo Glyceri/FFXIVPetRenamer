@@ -48,5 +48,6 @@ internal class PluginLink
         ChatHandler = new ChatHandler();
         HookHandler = new HookHandler();
         QuitHandler = new QuitHandler();
+        IpcStorage?.LateInitialize();
     }
 }

@@ -22,13 +22,18 @@ internal class ConfigurationUtils : UtilsRegistryType, ISingletonBase<Configurat
         if (!NicknameUtils.instance.ContainsLocalV2(forPet))
         {
             List<SerializableNickname> nicknames = localUser.nicknames.ToList();
-            nicknames.Insert(0, (new SerializableNickname(forPet, nickname)));
+            nicknames.Insert(0, new SerializableNickname(forPet, nickname));
+            IpcProvider.ChangedPetNickname(new NicknameData(forPet, nickname, forPet, nickname));
             localUser.nicknames = nicknames.ToArray();
         }
 
         SerializableNickname nick = NicknameUtils.instance.GetLocalNicknameV2(forPet);
         if (nick != null)
+        {
+            if(nick.Name != nickname)
+                IpcProvider.ChangedPetNickname(new NicknameData(forPet, nickname, forPet, nickname));
             nick.Name = nickname;
+        }
 
         localUser.SaveNickname(nick!);
 
@@ -46,7 +51,10 @@ internal class ConfigurationUtils : UtilsRegistryType, ISingletonBase<Configurat
             List<SerializableNickname> nicknames = localUser.ToList();
             for (int i = nicknames.Count - 1; i >= 0; i--)
                 if (nicknames[i].ID == forPet)
+                {
+                    IpcProvider.ChangedPetNickname(new NicknameData(forPet, string.Empty, forPet, string.Empty));
                     nicknames.RemoveAt(i);
+                }
 
             localUser.nicknames = nicknames.ToArray();
             PluginLink.Configuration.Save();
