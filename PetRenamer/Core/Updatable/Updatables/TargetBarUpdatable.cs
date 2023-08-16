@@ -18,23 +18,33 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable]
 internal unsafe class TargetBarUpdatable : Updatable
 {
+    DGameObject target = null!;
+    DGameObject targetOfTarget = null!;
+    DGameObject focusTarget = null!;
+
     public override void Update(Framework frameWork)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
+        HandleTargetElements();
         HandleTargetBar();
         HandleTargetOfTargetBar();
         HandleFocusBar();
     }
 
+    void HandleTargetElements()
+    {
+        target = PluginHandlers.TargetManager.Target!;
+        if (PluginHandlers.TargetManager.SoftTarget != null) target = PluginHandlers.TargetManager.SoftTarget;
+        if (target != null) targetOfTarget = target.TargetObject!;
+        focusTarget = PluginHandlers.TargetManager.FocusTarget!;
+    }
+
     void HandleTargetBar()
     {
+        if (target == null) return;
         try
         {
-            DGameObject target = PluginHandlers.TargetManager.Target!;
-            if(PluginHandlers.TargetManager.SoftTarget != null)
-                target = PluginHandlers.TargetManager.SoftTarget;
-            if (target == null) return;
             TargetObjectKind targetObjectKind = target.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
@@ -51,23 +61,21 @@ internal unsafe class TargetBarUpdatable : Updatable
 
     void HandleTargetOfTargetBar()
     {
+        if (target == null) return;
+        if (targetOfTarget == null) return;
         try
         {
-            if (PluginHandlers.TargetManager.Target == null) return;
-            if (PluginHandlers.TargetManager.Target.TargetObject == null) return;
-            DGameObject? targetObject = PluginHandlers.TargetManager.Target;
-            DGameObject? targetOfTargetObject = PluginHandlers.TargetManager.Target.TargetObject;
-            TargetObjectKind targetObjectKind = targetOfTargetObject.ObjectKind;
+            TargetObjectKind targetObjectKind = targetOfTarget.ObjectKind;
             BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
             if (resNode == null) return;
             AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
             if (textNode2 == null) return;
-            string nameString = targetOfTargetObject.Name.ToString();
-            int index = targetOfTargetObject.ObjectIndex;
+            string nameString = targetOfTarget.Name.ToString();
+            int index = targetOfTarget.ObjectIndex;
 
             if (targetObjectKind == TargetObjectKind.Player)
             {
-                ulong targetID2 = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetObject.ObjectId)->Character.GetTargetId();
+                ulong targetID2 = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target.ObjectId)->Character.GetTargetId();
                 if (!targetID2.ToString("X").StartsWith("4")) return;
 
                 targetObjectKind = TargetObjectKind.Companion;
@@ -89,16 +97,16 @@ internal unsafe class TargetBarUpdatable : Updatable
 
     void HandleFocusBar()
     {
+        if (focusTarget == null) return;
         try
         {
-            if (PluginHandlers.TargetManager.FocusTarget == null) return;
-            TargetObjectKind targetObjectKind = PluginHandlers.TargetManager.FocusTarget.ObjectKind;
+            TargetObjectKind targetObjectKind = focusTarget.ObjectKind;
             BaseNode resNode = new BaseNode("_FocusTargetInfo");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
             if (textNode == null) return;
-            if (!textNode->NodeText.ToString().Contains(PluginHandlers.TargetManager.FocusTarget.Name.ToString())) return;
-            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(PluginHandlers.TargetManager.FocusTarget.ObjectIndex);
+            if (!textNode->NodeText.ToString().Contains(focusTarget.Name.ToString())) return;
+            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
             SerializableNickname name = NicknameUtils.instance.GetFromGameObjectPtr(gObj, EnumUtils.instance.FromTargetType(targetObjectKind));
             if (name?.Valid() ?? false)
                 textNode->NodeText.SetString(name.Name);
