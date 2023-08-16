@@ -1,4 +1,4 @@
-﻿using Dalamud.ContextMenu;
+using Dalamud.ContextMenu;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.ContextMenu.Attributes;
 using PetRenamer.Core.Handlers;

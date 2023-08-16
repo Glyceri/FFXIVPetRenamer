@@ -3,6 +3,7 @@ using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace PetRenamer.Core.Updatable
 {
@@ -19,6 +20,16 @@ namespace PetRenamer.Core.Updatable
         {
             PluginHandlers.Framework.Update -= MainUpdate;
             ClearAllUpdatables();
+        }
+
+        protected override void OnAllRegistered() => updatables?.Sort(Compare);
+        
+
+        int Compare(Updatable a, Updatable b)
+        {
+            int aVal = a.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
+            int bVal = b.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
+            return aVal.CompareTo(bVal);
         }
 
         public void ClearAllUpdatables() => ClearAllElements();

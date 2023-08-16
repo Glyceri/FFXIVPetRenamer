@@ -1,4 +1,4 @@
-﻿using Dalamud.Game;
+using Dalamud.Game;
 using Dalamud.Logging;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -15,7 +15,7 @@ using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable]
+[Updatable(-1)]
 internal unsafe class TargetBarUpdatable : Updatable
 {
     DGameObject target = null!;

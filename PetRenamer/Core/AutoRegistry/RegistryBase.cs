@@ -34,6 +34,8 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
 
         foreach (T element in elements)
             OnLateElementCreation(element);
+
+        OnAllRegistered();
     }
 
     public void Dispose()
@@ -61,6 +63,8 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         attributes.Clear();
     }
 
+
+    protected virtual void OnAllRegistered() { }
     protected virtual void OnTypeArrayCreation(Type[] types) { }
     protected virtual void OnElementCreation(T element) { }
     protected virtual void OnLateElementCreation(T element) { }
