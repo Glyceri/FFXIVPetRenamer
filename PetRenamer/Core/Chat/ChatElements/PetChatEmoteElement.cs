@@ -12,7 +12,6 @@ using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Core.Serialization;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using System.Text.RegularExpressions;
-using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
@@ -25,33 +24,29 @@ internal unsafe class PetChatEmoteElement : ChatElement
         if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;
-        DBGameObject lastTarget = PluginHandlers.TargetManager.Target!;
-        DBGameObject lastSoftTarget = PluginHandlers.TargetManager.SoftTarget!;
-        if (lastSoftTarget != null)
-            PluginHandlers.TargetManager.Target = lastSoftTarget;
         ulong target = bChara->Character.GetTargetId();
-        PluginHandlers.TargetManager.SoftTarget = lastSoftTarget;
-        PluginHandlers.TargetManager.Target = lastTarget;
+        uint softTarget = bChara->Character.PlayerTargetObjectID;
+        if (softTarget != 0)
+            target = softTarget;
+
         string nameString = string.Empty;
         int id = -1;
         string ownerName = string.Empty;
-        if (target.ToString("X").StartsWith("4"))
+
+        FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
+        GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
+        if (gObj != null)
         {
-            FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
-            GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
-            if (gObj != null) 
-            { 
-                nameString = Marshal.PtrToStringUTF8((IntPtr)gObj->Name) ?? string.Empty;
-                id = lookedUpChar2->Companion.CompanionObject->Character.CharacterData.ModelSkeletonId;
-                ownerName = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name)!;
-            }
-            else
-            {
-                nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
-                BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
-                id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
-                ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
-            }
+            nameString = Marshal.PtrToStringUTF8((IntPtr)gObj->Name) ?? string.Empty;
+            id = lookedUpChar2->Companion.CompanionObject->Character.CharacterData.ModelSkeletonId;
+            ownerName = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name)!;
+        }
+        else
+        {
+            nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
+            BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
+            id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
+            ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
         }
 
         if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
@@ -59,7 +54,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
             if (character.ownName != ownerName) continue;
-            
+
             SerializableNickname nickname = NicknameUtils.instance.GetNicknameV2(character.associatedUser!, id);
             if (nickname == null) continue;
             if (!nickname.Valid()) continue;
@@ -67,7 +62,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
             {
                 if (message.Payloads[i] is TextPayload tPayload)
                 {
-                    foreach(string str in PluginConstants.removeables)
+                    foreach (string str in PluginConstants.removeables)
                         tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname.Name, RegexOptions.IgnoreCase);
                     message.Payloads[i] = tPayload;
                 }
