@@ -1,8 +1,8 @@
 {
   "Author": "Glyceri",
   "Name": "Pet Nicknames",
-  "Punchline": "Give your minions, Carbuncle and Fairy cute nicknames",
-  "Description": "Use /minionname to give your minion, Carbuncle or Fairy a nickname.",
+  "Punchline": "Give your minions, Carbuncle and Faery cute nicknames",
+  "Description": "Rightclick a pet or minion to give them a nickname.",
   "InternalName": "PetRenamer",
   "ApplicableVersion": "any",
   "Tags": [
@@ -10,7 +10,6 @@
     "plugin",
     "Rename",
     "Nickname",
-    "Text",
     "Name",
     "Minion"
   ],
