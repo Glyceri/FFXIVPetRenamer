@@ -58,6 +58,7 @@ internal unsafe class TooltipHook : HookableElement
         {
             if (nickname == null) continue;
             if (!nickname.Valid()) continue;
+            nickname.Setup();
             if (!nickname.BaseNameEquals(tNodeText)) continue;
             tNode->NodeText.SetString(nickname.Name);
             lastAnswer = nickname.Name;

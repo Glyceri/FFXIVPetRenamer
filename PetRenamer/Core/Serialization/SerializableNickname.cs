@@ -11,13 +11,21 @@ namespace PetRenamer.Core.Serialization
         public string Name { get; set; } = null!;
         [JsonIgnore]
         public string BaseName { get; set; } = null!;
+        [JsonIgnore]
+        bool done = false;
 
         [JsonConstructor]
         public SerializableNickname(int ID, string Nickname) 
-        { 
+        {
             this.ID = ID;
             this.Name = Nickname;
-            if(ID >= 0) BaseName = SheetUtils.instance.GetPetName(ID);
+        }
+
+        public void Setup()
+        {
+            if(done) return;
+            done = true;
+            if (ID >= 0) BaseName = SheetUtils.instance.GetPetName(ID);
         }
 
         public override string ToString() => $"ID:{ID},Name:{Name},BaseName:{BaseName}";
