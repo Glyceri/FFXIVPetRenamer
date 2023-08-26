@@ -34,6 +34,9 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
         if (t.GetCustomAttribute<ModeTogglePetWindowAttribute>() != null)
             t.GetField("drawToggle", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(element, true);
 
+        if (t.GetCustomAttribute<MainPetWindowAttribute>() != null)
+            PluginHandlers.PluginInterface.UiBuilder.OpenMainUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
+
         if (t.GetCustomAttribute<ConfigPetWindowAttribute>() != null)
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
     }

@@ -9,6 +9,7 @@ using PetRenamer.Core.Updatable.Updatables;
 
 namespace PetRenamer.Windows.PetWindows;
 
+[MainPetWindow]
 [PersistentPetWindow]
 [ModeTogglePetWindow]
 public class MainWindow : InitializablePetWindow
@@ -20,7 +21,7 @@ public class MainWindow : InitializablePetWindow
     string tempText = string.Empty;
     string tempText2 = string.Empty;
 
-    public MainWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
+    public MainWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
         Size = new Vector2(310, 195);
     }

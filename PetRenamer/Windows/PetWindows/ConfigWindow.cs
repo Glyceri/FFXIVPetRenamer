@@ -11,7 +11,7 @@ public class ConfigWindow : PetWindow
 {
     public ConfigWindow() : base(
         "Global minionname Settings",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
+        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
         Size = new Vector2(232, 223);
         SizeCondition = ImGuiCond.Always;
