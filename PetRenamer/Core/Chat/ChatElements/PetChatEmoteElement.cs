@@ -34,6 +34,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
         string ownerName = string.Empty;
 
         FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
+        if (lookedUpChar2 == null) return;
         GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
         if (gObj != null)
         {

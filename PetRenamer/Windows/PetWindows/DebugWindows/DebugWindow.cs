@@ -63,16 +63,22 @@ public class DebugWindow : PetWindow
                 if (gObj2 == null) continue;
                 CSCharacter* companion = (CSCharacter*)gObj2;
                 if (companion == null) continue;
+                List<SerializableNickname> list = new List<SerializableNickname>();
+                list.Add(new SerializableNickname(companion->Character.CharacterData.ModelSkeletonId, "Minion test [ALL]!"));
+                list.Add(new SerializableNickname(-2, "Test1"));
+                list.Add(new SerializableNickname(-3, "Test2"));
+                list.Add(new SerializableNickname(-4, "Test3"));
+                list.Add(new SerializableNickname(-5, "Test4"));
+
+                for(int f = 2; f < 1002; f++)
+                {
+                    list.Add(new SerializableNickname(f, "Name" + f.ToString()));
+                }
                 ConfigurationUtils.instance.AddNewUserV2(
-                   new SerializableUserV2(new SerializableNickname[5]
-                   {
-                    new SerializableNickname( companion->Character.CharacterData.ModelSkeletonId, "Minion test [ALL]!"),
-                    new SerializableNickname(-2, "Test1"),
-                    new SerializableNickname(-3, "Test2"),
-                    new SerializableNickname(-4, "Test3"),
-                    new SerializableNickname(-5, "Test4") },
+                   new SerializableUserV2(
+                       list.ToArray(),
                        Marshal.PtrToStringUTF8((IntPtr)gObj->Name) ?? string.Empty,
-                   (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), true);
+                   (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), true); ;
             }
         }
 
