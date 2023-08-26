@@ -21,11 +21,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     {
         PluginHandlers.PluginInterface.UiBuilder.Draw += Draw;
     }
-    ~WindowsHandler()
-    {
-        PluginHandlers.PluginInterface.UiBuilder.Draw -= Draw;
-        RemoveAllWindows();
-    }
 
     public PetWindow GetWindow(Type windowType) => GetElement(windowType);
     public T GetWindow<T>() where T : PetWindow => (T)GetWindow(typeof(T));
@@ -43,8 +38,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
     }
 
-
-
     public T AddTemporaryWindow<T>(string message, Action<object> callback, Window blackenedWindow = null!) where T : TemporaryPetWindow
     {
         TemporaryPetWindow petWindow = (Activator.CreateInstance(typeof(T), new object[3] { message, callback, blackenedWindow }) as TemporaryPetWindow)!;
@@ -61,11 +54,10 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     public void CloseWindow(Type windowType) => GetWindow(windowType).IsOpen = false;
     public void OpenWindow(Type windowType) => GetWindow(windowType).IsOpen = true;
 
-    public void RemoveAllWindows()
+    protected override void OnDispose()
     {
         windowSystem.RemoveAllWindows();
-
-        ClearAllElements();
+        PluginHandlers.PluginInterface.UiBuilder.Draw -= Draw;
     }
 
     public void CloseAllWindows()

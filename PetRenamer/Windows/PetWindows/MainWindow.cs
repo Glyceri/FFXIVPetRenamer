@@ -110,16 +110,14 @@ public class MainWindow : InitializablePetWindow
         ImGui.TextColored(StylingColours.whiteText, "Resummon your minion or simply look away \nfor a moment to apply the nickname.");
     }
 
-    unsafe void OnChange(PlayerData? playerData, SerializableNickname nickname)
+    unsafe void OnChange((int, int) petData, SerializableNickname nickname)
     {
         gottenID = -1;
         gottenBattlePetID = -1;
         OnOpen();
-        if (playerData == null) return;
-        gottenBattlePetID = playerData!.Value.battlePetID;
+        gottenBattlePetID = petData.Item2;
         OnOpen();
-        if (playerData!.Value.companionData == null) return;
-        gottenID = playerData!.Value.companionData!.Value.currentModelID;
+        gottenID = petData.Item1;
         OnOpen();
     }
 
@@ -140,6 +138,6 @@ public class MainWindow : InitializablePetWindow
     public override void OnInitialized()
     {
         NameChangeUpdatable dataGatherer = (NameChangeUpdatable)PluginLink.UpdatableHandler.GetElement(typeof(NameChangeUpdatable));
-        dataGatherer.RegisterMethod(OnChange!);
+        dataGatherer?.RegisterMethod(OnChange!);
     }
 }

@@ -8,10 +8,12 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using System.Linq;
 using System;
+using System.Runtime.InteropServices;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable]
+[Updatable(-1)]
 internal class NameChangeUpdatable : Updatable
 {
     int lastID = -1;
@@ -23,7 +25,7 @@ internal class NameChangeUpdatable : Updatable
     string lastName = null!;
     string lastBattleName = null!;
 
-    internal delegate void OnCompanionChange(PlayerData? playerData, SerializableNickname? serializableNickname);
+    internal delegate void OnCompanionChange((int, int) petData, SerializableNickname? serializableNickname);
     internal OnCompanionChange onCompanionChange = null!;
 
 #pragma warning disable CS8601 // Possible null reference assignment. (It's legit impossible for it to be null intelliSense 😤😤😤) 
@@ -40,6 +42,12 @@ internal class NameChangeUpdatable : Updatable
     }
 #pragma warning restore CS8601 // Possible null reference assignment.
 
+    public override unsafe void Update(Framework frameWork)
+    {
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+        FillUserList();
+        LoopUserList();
+    }
 
     unsafe void FillUserList()
     {
@@ -52,7 +60,7 @@ internal class NameChangeUpdatable : Updatable
             Character* plCharacter = (Character*)battleChara;
             if (plCharacter == null) continue;
             FFCompanion* companion = battleChara->Character.Companion.CompanionObject;
-            BattleChara* pet =  PluginLink.CharacterManager->LookupPetByOwnerObject(battleChara);
+            BattleChara* pet = PluginLink.CharacterManager->LookupPetByOwnerObject(battleChara);
             //MidoriKami told me that LookupPetByOwnerObject could return the same pets and what not...
             //this could be a good fix:
             //     bool HasPet()
@@ -62,7 +70,7 @@ internal class NameChangeUpdatable : Updatable
             //      .Where(obj => (obj as BattleNpc)?.SubKind == (byte)BattleNpcSubKind.Pet)
             //      .Any();
             Character* petCharacter = null!;
-            if (pet != null) 
+            if (pet != null)
                 if (RemapUtils.instance.battlePetRemap.ContainsKey(pet->Character.CharacterData.ModelCharaId))
                     petCharacter = &pet->Character;
 
@@ -88,6 +96,7 @@ internal class NameChangeUpdatable : Updatable
 
         foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
         {
+            character.Solve();
             bool isLocalPlayer = character.ownName == playerChar.Name.ToString() && character.ownHomeWorld == playerChar.HomeWorld.Id;
 
             bool hasCompanion = character.HasCompanion();
@@ -107,7 +116,7 @@ internal class NameChangeUpdatable : Updatable
                 currentName = SheetUtils.instance.GetPetName(currentID);
                 SetName(character, currentID, ref currentName);
             }
-
+            
             if (hasBattlePet && character.BattlePetNamingAllowed())
             {
                 battlePetBeenActive = true;
@@ -124,7 +133,7 @@ internal class NameChangeUpdatable : Updatable
         if (!flickAtEnd && battlePetBeenActive == lastPetBeenTrue) return;
 
         lastPetBeenTrue = battlePetBeenActive;
-        onCompanionChange?.Invoke(PlayerUtils.instance.GetPlayerData(battlePetBeenActive), null);
+        onCompanionChange?.Invoke((lastID, lastBattleID), null);
     }
 
     bool HasChanged(int currentID, int currentIDBattlePet, int currentBattleSkeletonID, string currentName, string currentBattleName, byte currentJob, bool hasBattlePet)
@@ -150,17 +159,6 @@ internal class NameChangeUpdatable : Updatable
         if (serializableNickname.Name.Length == 0 || !PluginLink.Configuration.displayCustomNames || name.Length == 0) return;
         name = serializableNickname.Name;
     }
-
-
-    public override unsafe void Update(Framework frameWork)
-    {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        lock (PluginLink.IpcStorage.characters)
-        {
-            FillUserList();
-            LoopUserList();
-        }
-    }
 }
 
 public unsafe class FoundPlayerCharacter
@@ -174,20 +172,58 @@ public unsafe class FoundPlayerCharacter
     public string ownName = string.Empty;
     public uint ownHomeWorld = 0;
 
-    public bool BattlePetNamingAllowed() => PluginConstants.allowedJobs.Contains(GetPlayerJob());
-    public bool HasBattlePet() => battlePetCharacter != null;
-    public bool HasCompanion() => playerCompanion != null;
+    // This is mainly a mess now because I didnt want to go into all the places and replace all of the old code
+    public void Solve()
+    {
+        playerJob = playerCharacter->CharacterData.ClassJob;
+        ownID = selfGameObject->ObjectID;
 
-    public byte* GetBattlePetName() => battlePetCharacter->GameObject.Name;
-    public byte* GetCompanionName() => playerCompanion->Character.GameObject.Name;
+        hasCompanion = playerCompanion != null;
+        if (hasCompanion)
+        {
+            modelSkeletonID = playerCompanion->Character.CharacterData.ModelSkeletonId;
+            companionName = playerCompanion->Character.GameObject.Name;
+            companionObjectID = playerCompanion->Character.GameObject.ObjectID;
+        }
 
-    public int GetCompanionID() => playerCompanion->Character.CharacterData.ModelSkeletonId;
-    public int GetBattlePetID() => RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
+        hasBattlePet = battlePetCharacter != null;
+        if (hasBattlePet)
+        {
+            battlePetNamingAllowed = PluginConstants.allowedJobs.Contains(GetPlayerJob());
+            battlePetName = battlePetCharacter->GameObject.Name;
+            battlePetID = RemapUtils.instance.GetPetIDFromClass(GetPlayerJob());
+            battlePetModelID = battlePetCharacter->CharacterData.ModelCharaId;
+            battlePetObjectID = battlePetCharacter->GameObject.ObjectID;
+        }
+    }
 
-    public int GetBattlePetModelID() => battlePetCharacter->CharacterData.ModelCharaId;
+    byte playerJob;
+    bool battlePetNamingAllowed;
+    bool hasBattlePet;
+    bool hasCompanion;
+    byte* battlePetName;
+    byte* companionName;
+    int modelSkeletonID;
+    int battlePetID;
+    int battlePetModelID;
+    uint ownID;
+    uint battlePetObjectID;
+    uint companionObjectID;
 
-    public uint GetOwnID() => selfGameObject->ObjectID;
-    public uint GetBattlePetObjectID() => battlePetCharacter->GameObject.ObjectID;
-    public uint GetCompanionObjectID() => playerCompanion->Character.GameObject.ObjectID;
-    public byte GetPlayerJob() => playerCharacter->CharacterData.ClassJob;
+    public bool BattlePetNamingAllowed() => battlePetNamingAllowed;
+    public bool HasBattlePet() => hasBattlePet;
+    public bool HasCompanion() => hasCompanion;
+
+    public byte* GetBattlePetName() => battlePetName;
+    public byte* GetCompanionName() => companionName;
+
+    public int GetCompanionID() => modelSkeletonID;
+    public int GetBattlePetID() => battlePetID;
+
+    public int GetBattlePetModelID() => battlePetModelID;
+
+    public uint GetOwnID() => ownID;
+    public uint GetBattlePetObjectID() => battlePetObjectID;
+    public uint GetCompanionObjectID() => companionObjectID;
+    public byte GetPlayerJob() => playerJob;
 }

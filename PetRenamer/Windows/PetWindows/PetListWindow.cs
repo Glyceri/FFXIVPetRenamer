@@ -73,12 +73,11 @@ public class PetListWindow : PetWindow
 
     void DrawUserHeader()
     {
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if (playerData == null) return;
+        if (PluginHandlers.ClientState.LocalPlayer == null) return;
 
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Button($"{playerData.Value.playerName}", Styling.ListButton); ImGui.SameLine();
-        Label($"{SheetUtils.instance.GetWorldName(playerData.Value.homeWorld)}", Styling.ListButton); ImGui.SameLine();
+        Button($"{PluginHandlers.ClientState.LocalPlayer.Name}", Styling.ListButton); ImGui.SameLine();
+        Label($"{PluginHandlers.ClientState.LocalPlayer.HomeWorld.GameData?.Name}", Styling.ListButton); ImGui.SameLine();
         ImGui.EndListBox();
         ImGui.NewLine();
     }

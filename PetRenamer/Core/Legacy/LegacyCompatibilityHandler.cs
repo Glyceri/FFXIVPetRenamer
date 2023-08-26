@@ -9,7 +9,7 @@ using System.Linq;
 namespace PetRenamer.Core.Legacy;
 
 internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAttribute>
-{ 
+{
     int lastInternalVersion = -1;
     int currentInternalVersion = 0;
 
@@ -26,21 +26,21 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
     {
         hasFoundPlayer = false;
         correctElements.Clear();
-        for(int i = 0; i < elements.Count; i++)
+        for (int i = 0; i < elements.Count; i++)
         {
             LegacyElement element = elements[i];
             LegacyAttribute attribute = attributes[i];
-            if(attribute.forVersions.Contains(currentInternalVersion))
+            if (attribute.forVersions.Contains(currentInternalVersion))
                 correctElements.Add(element);
         }
 
-        foreach(LegacyElement legacyElement in correctElements)
+        foreach (LegacyElement legacyElement in correctElements)
             legacyElement.OnStartup(currentInternalVersion);
     }
 
     internal void OnUpdate(Framework frameWork)
     {
-        if(lastInternalVersion != currentInternalVersion)
+        if (lastInternalVersion != currentInternalVersion)
         {
             Reset();
             lastInternalVersion = currentInternalVersion;
@@ -52,9 +52,9 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
         if (hasFoundPlayer) return;
 
         hasFoundPlayer = PlayerUtils.instance.PlayerDataAvailable();
-        if (hasFoundPlayer)
-            foreach (LegacyElement legacyElement in correctElements)
-                legacyElement.OnPlayerAvailable(currentInternalVersion);
-        
+        if (!hasFoundPlayer) return;
+
+        foreach (LegacyElement legacyElement in correctElements)
+            legacyElement.OnPlayerAvailable(PlayerUtils.instance.PlayerCharacter!, currentInternalVersion);
     }
 }

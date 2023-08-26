@@ -19,14 +19,14 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
         PluginHandlers.Framework.Update += OnUpdate;
     }
 
-    ~HookHandler()
+    protected override void OnDispose()
     {
         PluginHandlers.Framework.Update -= OnUpdate;
     }
 
     protected void OnUpdate(Framework framework)
     {
-        foreach(HookableElement el in elements)
+        foreach (HookableElement el in elements)
             el?.OnUpdate(framework);
     }
 }

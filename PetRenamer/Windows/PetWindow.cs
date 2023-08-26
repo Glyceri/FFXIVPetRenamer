@@ -30,17 +30,22 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     public sealed override unsafe void Draw()
     {
+        try { HandleDraw();         } catch { }
+        try { OnLateDraw();         } catch { }
+        try { PopAllStyleColours(); } catch { }
+    }
+
+    void HandleDraw()
+    {
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
         PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
         PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
-        if(drawToggle) DrawModeToggle();
+        if (drawToggle) DrawModeToggle();
         OnDraw();
         if (petMode == PetMode.Normal) OnDrawNormal();
         else OnDrawBattlePet();
-        OnLateDraw();
-        PopAllStyleColours();
     }
 
     public unsafe virtual void OnDraw() { }
@@ -197,7 +202,6 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
         return ImGui.Checkbox(text, ref value);
     }
-
 
     int popCount = 0;
     protected void PushStyleColor(ImGuiCol imGuiCol, Vector4 colour)

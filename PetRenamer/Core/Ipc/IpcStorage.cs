@@ -8,9 +8,6 @@ namespace PetRenamer;
 
 public class IpcStorage : IDisposable
 {
-    // (string, uint) is the Equivelant of PetRenamer.Core.Serialization.SerializableUser
-    // Which is now Obsolete ;)
-
     public delegate void OnIpcChange(Dictionary<(string, uint), NicknameData> change);
     public event OnIpcChange IpcChange = null!;
 
@@ -36,11 +33,10 @@ public class IpcStorage : IDisposable
 
     public void OnUpdate(Framework framework)
     {
-        if (touched)
-        {
-            touched = false;
-            IpcChange?.Invoke(_IpcAssignedNicknames);
-        }
+        if (!touched) return;
+
+        touched = false;
+        IpcChange?.Invoke(_IpcAssignedNicknames);
     }
 
     public void Register(OnIpcChange IpcChange)

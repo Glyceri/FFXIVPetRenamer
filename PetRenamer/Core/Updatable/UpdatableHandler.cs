@@ -1,48 +1,55 @@
 ﻿using Dalamud.Game;
+using Dalamud.Logging;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
-namespace PetRenamer.Core.Updatable
+namespace PetRenamer.Core.Updatable;
+
+internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
 {
-    internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
+    List<Updatable> updatables => elements;
+
+    public UpdatableHandler() 
     {
-        List<Updatable> updatables => elements;
+        PluginHandlers.Framework.Update += MainUpdate;
+    }
 
-        public unsafe UpdatableHandler() 
+    protected override void OnDispose()
+    {
+        PluginHandlers.Framework.Update -= MainUpdate;
+    }
+
+    protected override void OnAllRegistered() => updatables?.Sort(Compare);
+    
+
+    int Compare(Updatable a, Updatable b)
+    {
+        int aVal = a.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
+        int bVal = b.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
+        return aVal.CompareTo(bVal);
+    }
+
+    public void ClearAllUpdatables() => ClearAllElements();
+
+    //Stopwatch sw = new Stopwatch();
+    //Stopwatch sw2 = new Stopwatch();
+    void MainUpdate(Framework framework)
+    {
+        //sw2.Start();
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+
+        foreach (Updatable updatable in elements)
         {
-            PluginHandlers.Framework.Update += MainUpdate;
+            //sw.Start();
+            updatable.Update(framework);
+            //PluginLog.Log(updatable.GetType().Name.ToString() + ": " + sw.Elapsed.Microseconds.ToString());
+            //sw.Reset();
         }
-
-        ~UpdatableHandler()
-        {
-            PluginHandlers.Framework.Update -= MainUpdate;
-            ClearAllUpdatables();
-        }
-
-        protected override void OnAllRegistered() => updatables?.Sort(Compare);
-        
-
-        int Compare(Updatable a, Updatable b)
-        {
-            int aVal = a.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
-            int bVal = b.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
-            return aVal.CompareTo(bVal);
-        }
-
-        public void ClearAllUpdatables() => ClearAllElements();
-
-        void MainUpdate(Framework framework)
-        {
-            if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-
-            foreach (Updatable updatable in updatables)
-                updatable.Update(framework);
-
-            foreach (Updatable updatable in updatables)
-                updatable.LateUpdate(framework);
-        }
+        //PluginLog.Log(GetType().Name.ToString() + ": " + sw2.Elapsed.Microseconds.ToString());
+        //sw.Reset();
     }
 }
