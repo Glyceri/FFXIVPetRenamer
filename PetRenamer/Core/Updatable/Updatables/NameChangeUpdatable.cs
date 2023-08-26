@@ -8,12 +8,10 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using System.Linq;
 using System;
-using System.Runtime.InteropServices;
-using Dalamud.Logging;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable(-1)]
+[Updatable(0)]
 internal class NameChangeUpdatable : Updatable
 {
     int lastID = -1;
