@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.Serialization;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -31,42 +32,40 @@ internal unsafe class TooltipHook : HookableElement
         addonupdatehook2?.Enable();
     }
 
-    byte Update(AtkUnitBase* baseD)
-    {
-        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) return addonupdatehook!.Original(baseD);
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name is not "ActionDetail")
-            return addonupdatehook!.Original(baseD);
-        BaseNode bNode = new BaseNode(name);
-        if(bNode == null) return addonupdatehook!.Original(baseD);
-        AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(5);
-        if(tNode == null) return addonupdatehook!.Original(baseD);
-        int id = SheetUtils.instance.GetIDFromName(tNode->NodeText.ToString());
-        if(id == -1) return addonupdatehook!.Original(baseD);
-        SerializableNickname nName = NicknameUtils.instance.GetLocalNicknameV2(id);
-        if (nName == null) return addonupdatehook!.Original(baseD);
-        if (!nName.Valid()) return addonupdatehook!.Original(baseD);
-        tNode->NodeText.SetString(nName.Name);
-        return addonupdatehook!.Original(baseD);
-    }
+    byte Update(AtkUnitBase* baseD) => HandleFor(baseD, ref addonupdatehook!, "ActionDetail", 5);
+    byte Update2(AtkUnitBase* baseD) => HandleFor(baseD, ref addonupdatehook2!, "Tooltip", 2);
 
-    byte Update2(AtkUnitBase* baseD)
+    string lastAnswer = string.Empty;
+
+    byte HandleFor(AtkUnitBase* baseD, ref Hook<Delegates.AddonUpdate> addonUpdateHook, string addonName, uint pos)
     {
-        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) return addonupdatehook2!.Original(baseD);
+        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) return addonUpdateHook!.Original(baseD);
+
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name is not "Tooltip")
-            return addonupdatehook2!.Original(baseD);
+        if (!baseD->IsVisible || name != addonName)
+            return addonUpdateHook!.Original(baseD);
+
         BaseNode bNode = new BaseNode(name);
-        if (bNode == null) return addonupdatehook2!.Original(baseD);
-        AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(2);
-        if (tNode == null) return addonupdatehook2!.Original(baseD);
-        int id = SheetUtils.instance.GetIDFromName(tNode->NodeText.ToString());
-        if (id == -1) return addonupdatehook2!.Original(baseD);
-        SerializableNickname nName = NicknameUtils.instance.GetLocalNicknameV2(id);
-        if (nName == null) return addonupdatehook2!.Original(baseD);
-        if (!nName.Valid()) return addonupdatehook2!.Original(baseD);
-        tNode->NodeText.SetString(nName.Name);
-        return addonupdatehook2!.Original(baseD);
+        if (bNode == null) return addonUpdateHook!.Original(baseD);
+        AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(pos);
+        if (tNode == null) return addonUpdateHook!.Original(baseD);
+
+        string tNodeText = tNode->NodeText.ToString();
+        if (tNodeText == lastAnswer) return addonUpdateHook!.Original(baseD);
+
+        SerializableNickname[] nicknames = NicknameUtils.instance.GetLocalNicknamesV2();
+        foreach (SerializableNickname nickname in nicknames)
+        {
+            if (nickname == null) continue;
+            if (!nickname.Valid()) continue;
+            nickname.Setup();
+            if (!nickname.BaseNameEquals(tNodeText)) continue;
+            tNode->NodeText.SetString(nickname.Name);
+            lastAnswer = nickname.Name;
+            break;
+        }
+
+        return addonUpdateHook!.Original(baseD);
     }
 
     internal override void OnDispose()

@@ -152,6 +152,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
+    protected bool XButtonError(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButtonHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
+        PushStyleColor(ImGuiCol.Text, StylingColours.errorText);
+        return ImGui.Button(text, styling);
+    }
+
     protected bool XButton(string text, Vector2 styling)
     {
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButtonHovered);

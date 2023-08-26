@@ -33,7 +33,7 @@ internal class OverrideNamesWindow : PetWindow
         try
         {
             string[] splitLines = importString.Split('\n');
-            if (splitLines.Length <= 2) return false; 
+            if (splitLines.Length <= 2) return false;
             try
             {
                 string userName = splitLines[1];
@@ -75,9 +75,9 @@ internal class OverrideNamesWindow : PetWindow
     {
         ImGui.NewLine();
         ImGui.SameLine(638);
-        if(Button($"Save Imported List##importListSave", Styling.ListButton))
+        if (Button($"Save Imported List##importListSave", Styling.ListButton))
         {
-            if(alreadyExistingUser == null)
+            if (alreadyExistingUser == null)
             {
                 ConfigurationUtils.instance.AddNewUserV2(importedUser);
             }
@@ -97,7 +97,7 @@ internal class OverrideNamesWindow : PetWindow
         Label($"{importedUser.username}", Styling.ListButton); ImGui.SameLine();
         Label($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
         if (alreadyExistingUser == null) NewLabel("New User", Styling.ListButton);
-        else Label("User Status: " +  "Exists", Styling.ListButton);
+        else Label("User Status: " + "Exists", Styling.ListButton);
         ImGui.EndListBox();
         ImGui.NewLine();
     }
@@ -108,14 +108,25 @@ internal class OverrideNamesWindow : PetWindow
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
         DrawListHeader();
 
+        SerializableNickname[] deletedNicknames = DeletesNicknames(importedUser);
+
+        foreach (SerializableNickname nickname in deletedNicknames)
+        {
+            string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
+            XButtonError("X", Styling.SmallButton);
+            ImGui.SameLine();
+            Label(nickname.ID.ToString() + $"##internal<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            Label($"{nickname.Name} ##internal<{counter++}>", Styling.ListButton);
+        }
+
         foreach (SerializableNickname nickname in importedUser.nicknames)
         {
-            
             string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
             if (IsExactSame(nickname)) Label("=", Styling.SmallButton);
-            else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton); 
+            else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton);
             else NewLabel("+", Styling.SmallButton);
-            
+
             ImGui.SameLine();
             Label(nickname.ID.ToString() + $"##internal<{counter++}>", Styling.ListIDField); ImGui.SameLine();
             Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); ImGui.SameLine();
@@ -143,6 +154,42 @@ internal class OverrideNamesWindow : PetWindow
     {
         if (alreadyExistingUser == null) return false;
         return NicknameUtils.instance.HasIDV2(alreadyExistingUser, nickname.ID);
+    }
+
+    bool IsDeleted(SerializableNickname[] nicknames, SerializableNickname nickname)
+    {
+        foreach (SerializableNickname nick in nicknames)
+            if (nick.ID == nickname.ID)
+                return true;
+
+        return false;
+    }
+
+    SerializableNickname[] DeletesNicknames(SerializableUserV2 importedUser)
+    {
+        SerializableUserV2? existingUser = ConfigurationUtils.instance.GetUserV2(importedUser);
+
+        List<SerializableNickname> nicknames = new List<SerializableNickname>();
+
+        if (existingUser == null) return nicknames.ToArray();
+
+
+        foreach (SerializableNickname nickname in existingUser.nicknames)
+        {
+            bool exists = false;
+            foreach (SerializableNickname nickname2 in importedUser.nicknames)
+            {
+                if (nickname2.ID == nickname.ID)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) continue;
+            nicknames.Add(nickname);
+        }
+
+        return nicknames.ToArray();
     }
 }
 
