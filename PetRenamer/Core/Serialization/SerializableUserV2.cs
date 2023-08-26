@@ -54,6 +54,12 @@ public class SerializableUserV2
             ids[i] = nicknames[i].ID;
             names[i] = nicknames[i].Name;
         }
+
+        foreach (int id in PluginConstants.allowedNegativePetIDS)
+        {
+            if (ids.Contains(id)) continue;
+            SaveNickname(new SerializableNickname(id, string.Empty));
+        }
     }
 
     [JsonConstructor]

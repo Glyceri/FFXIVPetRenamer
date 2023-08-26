@@ -48,6 +48,13 @@ internal class NicknameUtils : UtilsRegistryType, ISingletonBase<NicknameUtils>
         return null!;
     }
 
+    internal SerializableNickname[] GetLocalNicknamesV2()
+    {
+        SerializableUserV2? user = ConfigurationUtils.instance.GetLocalUserV2();
+        if (user == null) return new SerializableNickname[0];
+        return user.nicknames;
+    }
+
     internal SerializableNickname GetLocalNicknameV2(int ID)
     {
         SerializableUserV2? user = ConfigurationUtils.instance.GetLocalUserV2();
