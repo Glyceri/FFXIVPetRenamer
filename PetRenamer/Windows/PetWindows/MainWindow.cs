@@ -112,11 +112,7 @@ public class MainWindow : InitializablePetWindow
 
     unsafe void OnChange((int, int) petData, SerializableNickname nickname)
     {
-        gottenID = -1;
-        gottenBattlePetID = -1;
-        OnOpen();
         gottenBattlePetID = petData.Item2;
-        OnOpen();
         gottenID = petData.Item1;
         OnOpen();
     }

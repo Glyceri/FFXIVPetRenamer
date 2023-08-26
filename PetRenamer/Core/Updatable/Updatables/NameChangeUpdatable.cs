@@ -131,7 +131,7 @@ internal class NameChangeUpdatable : Updatable
         if (!flickAtEnd && battlePetBeenActive == lastPetBeenTrue) return;
 
         lastPetBeenTrue = battlePetBeenActive;
-        onCompanionChange?.Invoke((lastID, lastBattleID), null);
+        onCompanionChange?.Invoke((lastID, lastBattleSkeletonID), null);
     }
 
     bool HasChanged(int currentID, int currentIDBattlePet, int currentBattleSkeletonID, string currentName, string currentBattleName, byte currentJob, bool hasBattlePet)
