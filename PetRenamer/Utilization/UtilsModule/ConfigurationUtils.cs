@@ -61,9 +61,9 @@ internal class ConfigurationUtils : UtilsRegistryType, ISingletonBase<Configurat
         }
     }
 
-    public void AddNewUserV2(SerializableUserV2 user)
+    public void AddNewUserV2(SerializableUserV2 user, bool overwrite = false)
     {
-        if (UserExistsV2(user)) return;
+        if (UserExistsV2(user) && !overwrite) return;
 
         List<SerializableUserV2> users = PluginLink.Configuration.serializableUsersV2!.ToList();
         users.Add(user);

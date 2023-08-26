@@ -169,6 +169,7 @@ public unsafe class FoundPlayerCharacter
     public FFCompanion* playerCompanion;
     public SerializableUserV2? associatedUser;
 
+    public bool isLocalUser = false;
     public string ownName = string.Empty;
     public uint ownHomeWorld = 0;
 
@@ -177,6 +178,7 @@ public unsafe class FoundPlayerCharacter
     {
         playerJob = playerCharacter->CharacterData.ClassJob;
         ownID = selfGameObject->ObjectID;
+        isLocalUser = selfGameObject->ObjectIndex == 0;
 
         hasCompanion = playerCompanion != null;
         if (hasCompanion)
