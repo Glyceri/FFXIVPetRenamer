@@ -108,12 +108,23 @@ internal class OverrideNamesWindow : PetWindow
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
         DrawListHeader();
 
+        SerializableNickname[] deletedNicknames = DeletesNicknames(importedUser);
+
+        foreach(SerializableNickname nickname in deletedNicknames)
+        {
+            string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
+            XButtonError("X", Styling.SmallButton);
+            ImGui.SameLine();
+            Label(nickname.ID.ToString() + $"##internal<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            Label($"{nickname.Name} ##internal<{counter++}>", Styling.ListButton);
+        }
+
         foreach (SerializableNickname nickname in importedUser.nicknames)
         {
-            
             string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
             if (IsExactSame(nickname)) Label("=", Styling.SmallButton);
-            else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton); 
+            else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton);
             else NewLabel("+", Styling.SmallButton);
             
             ImGui.SameLine();
@@ -143,6 +154,42 @@ internal class OverrideNamesWindow : PetWindow
     {
         if (alreadyExistingUser == null) return false;
         return NicknameUtils.instance.HasIDV2(alreadyExistingUser, nickname.ID);
+    }
+    
+    bool IsDeleted(SerializableNickname[] nicknames, SerializableNickname nickname)
+    {
+        foreach(SerializableNickname nick in nicknames)
+            if(nick.ID == nickname.ID)
+                return true;
+        
+        return false;
+    }
+
+    SerializableNickname[] DeletesNicknames(SerializableUserV2 importedUser)
+    {
+        SerializableUserV2? existingUser = ConfigurationUtils.instance.GetUserV2(importedUser);
+
+        List<SerializableNickname> nicknames = new List<SerializableNickname>();
+
+        if(existingUser == null) return nicknames.ToArray();
+
+       
+        foreach( SerializableNickname nickname in existingUser.nicknames )
+        {
+            bool exists = false;
+            foreach(SerializableNickname nickname2 in importedUser.nicknames)
+            {
+                if (nickname2.ID == nickname.ID)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) continue;
+            nicknames.Add(nickname);
+        }
+
+        return nicknames.ToArray();
     }
 }
 
