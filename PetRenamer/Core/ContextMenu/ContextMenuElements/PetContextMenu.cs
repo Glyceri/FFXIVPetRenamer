@@ -2,7 +2,6 @@ using Dalamud.ContextMenu;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.ContextMenu.Attributes;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Windows;
 using PetRenamer.Windows.PetWindows;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;

@@ -13,7 +13,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace PetRenamer.Windows.PetWindows;
 
-[PersistentPetWindow]
+//[PersistentPetWindow]
 internal class DeveloperWindow : PetWindow
 {
     readonly Vector2 baseSize = new Vector2(700, 500);

@@ -55,13 +55,13 @@ internal class OverrideNamesWindow : PetWindow
                         names.Add(nickname);
                     }
                 }
-                catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableNickname]: {e}"); }
+                catch (Exception e) { PluginLog.Log($"Import Error occured [SerializableNickname]: {e}"); }
 
                 importedUser = new SerializableUserV3(ids.ToArray(), names.ToArray(), userName, homeWorld);
             }
-            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [SerializableUser]: {e}"); }
+            catch (Exception e) { PluginLog.Log($"Import Error occured [SerializableUser]: {e}"); }
         }
-        catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured [Overall]: {e}"); return false; }
+        catch (Exception e) { PluginLog.Log($"Import Error occured [Overall]: {e}"); return false; }
 
         return true;
     }

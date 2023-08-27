@@ -10,7 +10,6 @@ using System.Text;
 using Dalamud.Logging;
 using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
-using System.Xml.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 

@@ -2,7 +2,6 @@ using Dalamud.Configuration;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;

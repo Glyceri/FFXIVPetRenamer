@@ -3,7 +3,6 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Legacy.LegacyElements;
 
