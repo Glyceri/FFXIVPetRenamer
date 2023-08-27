@@ -27,7 +27,7 @@ internal class UserFindUpdatable : Updatable
 
         if (!user.SerializableUser.hasAny) return;
 
-        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName), true, (short)user.Homeworld);
+        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName.ToLowerInvariant()), true, (short)user.Homeworld);
         if (bChara == null) return;
         user.SetUser(bChara);
         if (user.SerializableUser.hasCompanion)

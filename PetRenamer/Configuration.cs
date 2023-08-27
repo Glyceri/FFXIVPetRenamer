@@ -1,5 +1,6 @@
 using Dalamud.Configuration;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
@@ -33,19 +34,25 @@ public class Configuration : IPluginConfiguration
 
     void CurrentInitialize()
     {
-        if (serializableUsersV2 == null) serializableUsersV2 = new SerializableUserV2[0];
         if (serializableUsersV3 == null) serializableUsersV3 = new SerializableUserV3[0];
 
         // TODO: this is temporary
-        List<SerializableUserV3> serializableUserV3 = new List<SerializableUserV3>();
+       // List<SerializableUserV3> serializableUserV3 = new List<SerializableUserV3>();
         foreach(SerializableUserV2 serializableUserV2 in serializableUsersV2)
         {
-            serializableUserV3.Add(new SerializableUserV3(serializableUserV2.ids, serializableUserV2.names, serializableUserV2.username, serializableUserV2.homeworld));
+            //serializableUserV3.Add(new SerializableUserV3(serializableUserV2.ids, serializableUserV2.names, serializableUserV2.username, serializableUserV2.homeworld));
         }
-        serializableUsersV3 = serializableUserV3.ToArray();
+        //serializableUsersV3 = serializableUserV3.ToArray();
     }
 
-    public void Save() => PluginLink.DalamudPlugin.SavePluginConfig(this);
+    public void Save() 
+    {
+        List<SerializableUserV3> users = new List<SerializableUserV3>();
+        foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
+            users.Add(user.SerializableUser);
+        serializableUsersV3 = users.ToArray();
+        PluginLink.DalamudPlugin.SavePluginConfig(this); 
+    }
 
     public void ClearAllUsersV2()
     {
@@ -136,6 +143,7 @@ public class Configuration : IPluginConfiguration
     {
         if (users == null) users = new SerializableNickname[0];
         if (serializableUsers == null) serializableUsers = new SerializableUser[0];
+        if (serializableUsersV2 == null) serializableUsersV2 = new SerializableUserV2[0];
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

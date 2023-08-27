@@ -81,7 +81,7 @@ public class PetListWindow : PetWindow
     void DrawUserHeader()
     {
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Button($"{PluginHandlers.ClientState.LocalPlayer!.Name}", Styling.ListButton); ImGui.SameLine();
+        Button($"{StringUtils.instance.MakeTitleCase(PluginHandlers.ClientState.LocalPlayer!.Name.ToString())}", Styling.ListButton); ImGui.SameLine();
         Label($"{SheetUtils.instance.GetWorldName((ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id)}", Styling.ListButton); ImGui.SameLine();
         ImGui.EndListBox();
         ImGui.NewLine();
@@ -96,10 +96,11 @@ public class PetListWindow : PetWindow
             try
             {
                 string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
-                user.SerializableUser.LoopThrough(nickname =>
+                PluginLog.Log(user.SerializableUser.length.ToString());
+                for(int i = 0; i < user.SerializableUser.length; i++)
                 {
-                    exportString += $"{nickname.Item1}^{nickname.Item2}";
-                });
+                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
+                }
                 string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
                 ImGui.SetClipboardText(convertedString);
             }

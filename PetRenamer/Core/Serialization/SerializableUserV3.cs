@@ -19,12 +19,15 @@ public class SerializableUserV3
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
     [JsonIgnore] public int length => ids.Length;
 
-    [JsonConstructor]
-    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld)
+    public SerializableUserV3(string username, ushort homeworld)
     {
-        this.username = username.Replace(((char)0).ToString(), "").ToLowerInvariant(); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
+        this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
         this.homeworld = homeworld;
+    }
 
+    [JsonConstructor]
+    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld) : this(username, homeworld)
+    {
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
@@ -126,7 +129,7 @@ public class SerializableUserV3
     }
 
     public bool HasID(int id) => ids.Contains(id);
-    public bool Equals(string username, ushort homeworld) => this.username == username && this.homeworld == homeworld;
+    public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim().Normalize() == username.ToLowerInvariant().Trim().Normalize() && this.homeworld == homeworld;
     public bool Equals((string, ushort) user) => Equals(user.Item1, user.Item2);
 
     public void Reset()

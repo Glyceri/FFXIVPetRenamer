@@ -91,7 +91,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     bool Contains(SerializableUserV3 user)
     {
         for(int i = 0; i < _users.Count; i++)
-            if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld) 
+            if (_users[i].UserName.ToLowerInvariant().Trim().Normalize() == user.username.ToLowerInvariant().Trim().Normalize() && _users[i].Homeworld == user.homeworld) 
                 return true;
         return false;
     } 

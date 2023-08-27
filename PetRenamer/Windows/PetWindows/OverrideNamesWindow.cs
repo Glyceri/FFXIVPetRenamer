@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Common.Math;
+﻿using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -74,7 +75,7 @@ internal class OverrideNamesWindow : PetWindow
             if (user.SerializableUser.username.Trim().ToLower() == importedUser.username.Trim().ToLower() &&
                 user.SerializableUser.homeworld == importedUser.homeworld)
             {
-                alreadyExistingUser = importedUser;
+                alreadyExistingUser = user.SerializableUser;
                 break;
             }
         }
@@ -99,6 +100,11 @@ internal class OverrideNamesWindow : PetWindow
                 {
                     alreadyExistingUser.SaveNickname(nickname.Item1, nickname.Item2, true, false);
                 });
+
+                foreach((int, string) nickname in DeletesNicknames(importedUser))
+                {
+                    alreadyExistingUser.RemoveNickname(nickname.Item1, false);
+                }
                 PluginLink.Configuration.Save();
             }
             IsOpen = false;
@@ -108,7 +114,7 @@ internal class OverrideNamesWindow : PetWindow
     void DrawUserHeader()
     {
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Label($"{importedUser.username}", Styling.ListButton); ImGui.SameLine();
+        Label($"{StringUtils.instance.MakeTitleCase(importedUser.username)}", Styling.ListButton); ImGui.SameLine();
         Label($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
         if (alreadyExistingUser == null) NewLabel("New User", Styling.ListButton);
         else Label("User Status: " + "Exists", Styling.ListButton);
