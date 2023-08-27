@@ -13,6 +13,7 @@ public class SerializableUserV3
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
 
+    [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
     [JsonIgnore] public bool hasCompanion { get; private set; } = false;
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
@@ -29,6 +30,14 @@ public class SerializableUserV3
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
     }
 
+    public void LoopThroughBreakable(Func<(int, string), bool> callback)
+    {
+        if (callback == null) return;
+        for (int i = 0; i < ids.Length; ++i)
+            if (callback.Invoke((ids[i], names[i])))
+                break;
+    }
+
     public void LoopThrough(Action<(int, string)> callback)
     {
         if (callback == null) return;
@@ -41,6 +50,16 @@ public class SerializableUserV3
         int index = IndexOf(id);
         if (index == -1) return null;
         return names[index].Substring(0, PluginConstants.ffxivNameSize);
+    }
+
+    public bool ToggleBackChanged()
+    {
+        if (changed)
+        {
+            changed = false;
+            return true;
+        }
+        return false;
     }
 
     public void SaveNickname(int id, string name, bool doCheck = true)

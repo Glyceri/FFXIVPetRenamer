@@ -4,7 +4,7 @@ using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
+[PersistentPetWindow]
 public class CreditsWindow : PetWindow
 {
     public CreditsWindow() : base("Credits",

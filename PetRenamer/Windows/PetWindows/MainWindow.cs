@@ -11,7 +11,6 @@ namespace PetRenamer.Windows.PetWindows;
 
 //[MainPetWindow]
 //[PersistentPetWindow]
-//[ModeTogglePetWindow]
 public class MainWindow : InitializablePetWindow
 {
     int gottenID = -1;

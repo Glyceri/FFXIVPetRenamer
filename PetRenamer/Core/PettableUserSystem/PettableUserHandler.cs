@@ -1,5 +1,4 @@
 ﻿using Dalamud.Logging;
-using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Enums;
@@ -12,6 +11,13 @@ namespace PetRenamer.Core.PettableUserSystem;
 internal class PettableUserHandler : IDisposable, IInitializable
 {
     List<PettableUser> _users = new List<PettableUser>();
+
+    public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
+    {
+        if (action == null) return;
+        for(int i = _users.Count - 1; i >= 0; i--)
+            action.Invoke(_users[i]);
+    }
 
     public void LoopThroughUsers(Action<PettableUser> action)
     {
@@ -56,6 +62,28 @@ internal class PettableUserHandler : IDisposable, IInitializable
                 if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld)
                     _users.RemoveAt(i);
         }
+    }
+
+    public bool LocalPetChanged()
+    {
+        PettableUser user = LocalUser()!;
+        if (user == null) return false;
+        return user.AnyPetChanged;
+    }
+
+    public PettableUser? LocalUser()
+    {
+        PettableUser? returnThis = null;
+        LoopThroughBreakable((user) =>
+        {
+            if (user.LocalUser)
+            {
+                returnThis = user;
+                return true;
+            }
+            return false;
+        });
+        return returnThis;
     }
 
     bool Contains(SerializableUserV3 user)

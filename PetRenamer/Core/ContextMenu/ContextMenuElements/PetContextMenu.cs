@@ -38,8 +38,8 @@ internal unsafe class PetContextMenu : ContextMenuElement
             foreach(FoundPlayerCharacter chara in PluginLink.IpcStorage.characters)
             {
                 if (chara.ownName != PluginHandlers.ClientState.LocalPlayer.Name.ToString() || chara.ownHomeWorld != PluginHandlers.ClientState.LocalPlayer.HomeWorld.Id) continue;
-                if (targetObjectKind == TargetObjectKind.Companion) PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(chara.GetCompanionID());
-                else PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(chara.GetBattlePetID());
+                if (targetObjectKind == TargetObjectKind.Companion) PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(chara.GetCompanionID());
+                else PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(chara.GetBattlePetID());
                 break;
             }
         }

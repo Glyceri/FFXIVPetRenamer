@@ -5,7 +5,7 @@ using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Commands.Commands;
 
-//[PetCommand(PluginConstants.petConfigCommand, "Opens the Minion Nickname configuration Window.", true, PluginConstants.petConfigCommandAlt)]
+[PetCommand(PluginConstants.petConfigCommand, "Opens the Minion Nickname configuration Window.", true, PluginConstants.petConfigCommandAlt)]
 internal class PetConfigCommand : PetCommand
 {
     internal override void OnCommand(string command, string args) => PluginLink.WindowHandler.ToggleWindow<ConfigWindow>();

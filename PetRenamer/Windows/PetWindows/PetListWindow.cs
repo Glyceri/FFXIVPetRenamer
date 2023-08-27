@@ -57,7 +57,7 @@ public class PetListWindow : PetWindow
                 Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
                 Label(RemapUtils.instance.PetIDToName(nickname.ID).ToString() + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
                 if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForBattleID(nickname.ID); ImGui.SameLine();
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.ID, -1); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                     ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
             }
@@ -138,7 +138,7 @@ public class PetListWindow : PetWindow
                     Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
                     Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
                     if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                        PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID); ImGui.SameLine();
+                        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID); ImGui.SameLine();
                     if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                         ConfigurationUtils.instance.RemoveLocalNicknameV2(nickname.ID);
                 }
@@ -178,7 +178,7 @@ public class PetListWindow : PetWindow
                 openedAddPet = false;
                 if (!NicknameUtils.instance.ContainsLocalV2(nickname.ID))
                     ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
-                PluginLink.WindowHandler.GetWindow<MainWindow>().OpenForId(nickname.ID);
+                PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID);
             }
         }
     }

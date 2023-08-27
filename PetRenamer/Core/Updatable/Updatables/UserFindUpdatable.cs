@@ -6,6 +6,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
+using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -21,13 +22,13 @@ internal class UserFindUpdatable : Updatable
     {
         if(user == null) return;
         user.Reset();
+        if(!PluginLink.Configuration.displayCustomNames) return;
 
         if (!user.SerializableUser.hasAny) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName), true, (short)user.Homeworld);
-
-        user.SetUser(bChara);
         if (bChara == null) return;
+        user.SetUser(bChara);
         if (user.SerializableUser.hasCompanion)
         {
             int companionIndex = bChara->Character.GameObject.ObjectIndex + 1;
@@ -39,5 +40,11 @@ internal class UserFindUpdatable : Updatable
             BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
             user.SetBattlePet(battlePet);
         }
+        if (!user.LocalUser) return;
+        if (!user.AnyPetChanged) return;
+        if (user.BattlePetChanged)
+            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForBattleID(user.BattlePetID, user.BattlePetSkeletonID);
+        if (user.CompanionChanged)
+            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(user.CompanionID);
     }
 }
