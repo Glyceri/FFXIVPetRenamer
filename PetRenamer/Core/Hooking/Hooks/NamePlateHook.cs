@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -36,12 +37,11 @@ public unsafe sealed class NamePlateHook : HookableElement
     {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (!user.UserExists) continue;
+            if (!user.UserExists) { PluginLog.Log("User doesnt exist"); continue; }
             string nameToUse = string.Empty;
             if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName;
             if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
-            if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameToUse);
-            break;
+            if (nameToUse != string.Empty) { namePlateInfo->Name.SetString(nameToUse); break; }
         }
     }
 

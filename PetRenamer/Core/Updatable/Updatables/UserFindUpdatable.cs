@@ -35,6 +35,7 @@ internal class UserFindUpdatable : Updatable
             Companion* companion = (Companion*)GameObjectManager.GetGameObjectByIndex(companionIndex);
             user.SetCompanion(companion);
         }
+
         if (user.SerializableUser.hasBattlePet || user.LocalUser)
         {
             BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
