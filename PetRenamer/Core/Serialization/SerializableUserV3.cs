@@ -68,8 +68,8 @@ public class SerializableUserV3
     public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false)
     {
         if (id == -1) return;
-        if (name == string.Empty) RemoveNickname(id, notifyICP);
-        else if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
+        //if (name == string.Empty && id >= 0) RemoveNickname(id, notifyICP);
+        if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
         else GenerateNewNickname(id, name, notifyICP);
 
         if (!doCheck) return;

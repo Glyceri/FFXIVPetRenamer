@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
@@ -7,31 +8,32 @@ using System.Collections.Generic;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-//[Updatable(1)]
+[Updatable(1)]
 internal class AutoBattlePetUpdatable : Updatable
 {
     public override void Update(Framework frameWork)
     {
-        SerializableUserV2? localUser = ConfigurationUtils.instance.GetLocalUserV2();
-        if (localUser == null) return;
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return;
 
         List<int> missingIDs = new List<int>();
 
         foreach(int id in PluginConstants.allowedNegativePetIDS)
         {
             bool found = false;
-            foreach(SerializableNickname nickname in localUser.nicknames)
-            {
-                if(nickname.ID == id) found = true;
-                if (found) break;
-            }
+            user.SerializableUser.LoopThroughBreakable(nickname => {
+                if (nickname.Item1 == id) 
+                { 
+                    found = true; 
+                    return true; 
+                }
+                return false; 
+            });
             if(!found)
             missingIDs.Add(id);
         }
 
         foreach (int id in missingIDs)
-            ConfigurationUtils.instance.SetLocalNicknameV2(id, "");
+            user.SerializableUser.SaveNickname(id, "", true, false);
     }
-
-    
 }

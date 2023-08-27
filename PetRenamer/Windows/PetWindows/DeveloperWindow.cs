@@ -5,7 +5,6 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.PettableUserSystem.Enums;
-using CSGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
 using System.Collections.Generic;
@@ -119,37 +118,19 @@ internal class DeveloperWindow : PetWindow
                         (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add);
             }
 
+        if (Button("Add ALL Users EMPTY"))
+        {
+            AddUser(false, 0);
+        }
+
         if (Button("Add ALL Users"))
         {
-            for(int i = 2; i < 200; i += 2)
-            {
-                GameObject? gObj = PluginHandlers.ObjectTable[i];
-                if (gObj == null) continue;
-                int minionTarget = i + 1;
-                CSCompanion* companion = (CSCompanion*)CSGameObjectManager.GetGameObjectByIndex(minionTarget);
-                int minID = -1;
-                string minName = string.Empty;
-                if (companion != null)
-                {
-                    minName = "[TESTNAME]";
-                    minID = companion->Character.CharacterData.ModelSkeletonId;
-                }
-                List<int> ids = new List<int>() { -2, minID };
-                List<string> names = new List<string>() { "[TESTNAME]", minName };
+            AddUser(true, 1000);
+        }
 
-                for(int f = 0; f < 1000; f++)
-                {
-                    ids.Add(f);
-                    names.Add("[TESTNAME]");
-                }
-
-                PluginLink.PettableUserHandler.DeclareUser(
-                    new SerializableUserV3(
-                        ids.ToArray(),
-                        names.ToArray(),
-                        gObj.Name.ToString(),
-                        (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add);
-            }
+        if (Button("Add ALL Users Small"))
+        {
+            AddUser(true, 0);
         }
 
         if (Button("Remove all custom users"))
@@ -166,6 +147,45 @@ internal class DeveloperWindow : PetWindow
                     return false;
                 });
             });
+        }
+    }
+
+    unsafe void AddUser(bool addStuff, int count)
+    {
+        for (int i = 2; i < 200; i += 2)
+        {
+            GameObject? gObj = PluginHandlers.ObjectTable[i];
+            if (gObj == null) continue;
+            int minionTarget = i + 1;
+            CSCompanion* companion = (CSCompanion*)CSGameObjectManager.GetGameObjectByIndex(minionTarget);
+            int minID = -1;
+            string minName = string.Empty;
+            if (companion != null)
+            {
+                minName = "[TESTNAME]";
+                minID = companion->Character.CharacterData.ModelSkeletonId;
+            }
+            List<int> ids = new List<int>() { -2, minID };
+            List<string> names = new List<string>() { "[TESTNAME]", minName };
+
+            for(int f = 0; f < count; f++)
+            {
+                ids.Add(f);
+                names.Add("[TESTNAME]");
+            }
+
+            if (!addStuff)
+            {
+                ids.Clear();
+                names.Clear();
+            }
+
+            PluginLink.PettableUserHandler.DeclareUser(
+                new SerializableUserV3(
+                    ids.ToArray(),
+                    names.ToArray(),
+                    gObj.Name.ToString(),
+                    (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add);
         }
     }
 

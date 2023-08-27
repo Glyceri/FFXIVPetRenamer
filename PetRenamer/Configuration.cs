@@ -13,9 +13,9 @@ namespace PetRenamer;
 public class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 4;
+    public const int currentSaveFileVersion = 5;
 
-    public int Version { get; set; } = 4;
+    public int Version { get; set; } = 5;
 
     public SerializableUserV2[]? serializableUsersV2 = null;
     public SerializableUserV3[]? serializableUsersV3 = null;
@@ -34,15 +34,7 @@ public class Configuration : IPluginConfiguration
 
     void CurrentInitialize()
     {
-        if (serializableUsersV3 == null) serializableUsersV3 = new SerializableUserV3[0];
-
-        // TODO: this is temporary
-       // List<SerializableUserV3> serializableUserV3 = new List<SerializableUserV3>();
-        foreach(SerializableUserV2 serializableUserV2 in serializableUsersV2)
-        {
-            //serializableUserV3.Add(new SerializableUserV3(serializableUserV2.ids, serializableUserV2.names, serializableUserV2.username, serializableUserV2.homeworld));
-        }
-        //serializableUsersV3 = serializableUserV3.ToArray();
+        serializableUsersV3 ??= new SerializableUserV3[0];
     }
 
     public void Save() 

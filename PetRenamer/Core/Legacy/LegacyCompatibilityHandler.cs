@@ -51,7 +51,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
 
         if (hasFoundPlayer) return;
 
-        hasFoundPlayer = PlayerUtils.instance.PlayerDataAvailable();
+        hasFoundPlayer = PluginHandlers.ClientState.LocalPlayer != null;
         if (hasFoundPlayer)
             foreach (LegacyElement legacyElement in correctElements)
                 legacyElement.OnPlayerAvailable(currentInternalVersion);

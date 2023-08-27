@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-//[Updatable]
+[Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
     public override void Update(Framework frameWork)
@@ -19,10 +19,8 @@ internal class LocalUserSafetyUpdatable : Updatable
             if (user.Equals(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id))
                 return;
        
-        List<int> ids = new List<int>();
-        foreach(int id in PluginConstants.allowedNegativePetIDS) 
-            ids.Add(id);
-        SerializableUserV3 newUser = new SerializableUserV3(ids.ToArray(), new string[ids.Count], PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id);
+       
+        SerializableUserV3 newUser = new SerializableUserV3(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id);
         PluginLink.PettableUserHandler.DeclareUser(newUser, PettableUserSystem.Enums.UserDeclareType.Add);
         PluginLink.Configuration.Save();
     }

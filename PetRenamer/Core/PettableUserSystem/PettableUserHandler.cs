@@ -51,10 +51,14 @@ internal class PettableUserHandler : IDisposable, IInitializable
         }
     }
 
-    public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType)
+    public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
     {
         if(userDeclareType == UserDeclareType.Add)
         {
+            if (force)
+                for (int i = _users.Count - 1; i >= 0; i--)
+                    if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld)
+                        _users.RemoveAt(i);
             if (!Contains(user))
                 _users.Add(new PettableUser(user.username, user.homeworld, user));
         }
