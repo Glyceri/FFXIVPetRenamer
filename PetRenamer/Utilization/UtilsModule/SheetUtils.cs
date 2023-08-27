@@ -33,14 +33,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
     }
 
-    public unsafe string GetCurrentClassName()
-    {
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if (playerData == null) return string.Empty;
-
-        return GetClassName(((Character*)playerData.Value.playerGameObject)->CharacterData.ClassJob);
-    }
-
     public unsafe string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
@@ -60,24 +52,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             if(cls.RowId == id)
                 return cls.Name;
         return string.Empty;
-    }
-
-    public string GetCurrentBattlePetName()
-    {
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if (playerData == null) return string.Empty;
-        if (!PluginConstants.allowedJobs.Contains(playerData.Value.job)) return string.Empty;
-
-        return GetBattlePetName(RemapUtils.instance.GetPetIDFromClass(playerData.Value.job));
-    }
-
-    public string GetCurrentPetName()
-    {
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if (playerData == null) return string.Empty;
-        if (playerData!.Value.companionData == null) return string.Empty;
-
-        return GetPetName(playerData!.Value.companionData!.Value.currentModelID);
     }
 
     public string GetPetName(int id)

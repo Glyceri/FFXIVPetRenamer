@@ -8,5 +8,5 @@ namespace PetRenamer.Commands.Commands;
 [PetCommand(PluginConstants.mainCommand, "Opens the Minion Nickname window.", true, PluginConstants.mainCommandAlt)]
 internal class PetNameCommand : PetCommand
 {
-    internal override void OnCommand(string command, string args) => PluginLink.WindowHandler.ToggleWindow<MainWindow>();
+    internal override void OnCommand(string command, string args) => PluginLink.WindowHandler.ToggleWindow<PetRenameWindow>();
 }

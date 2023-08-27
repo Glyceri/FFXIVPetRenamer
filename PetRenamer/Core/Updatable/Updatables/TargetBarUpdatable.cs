@@ -5,8 +5,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
@@ -52,9 +50,7 @@ internal unsafe class TargetBarUpdatable : Updatable
             if (textNode == null) return;
             if (target.Name.ToString() != textNode->NodeText.ToString()) return;
             GameObject* gObj = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex);
-            SerializableNickname name = NicknameUtils.instance.GetFromGameObjectPtr(gObj, EnumUtils.instance.FromTargetType(targetObjectKind));
-            if (name?.Valid() ?? false)
-                textNode->NodeText.SetString(name.Name);
+            SetFor(textNode, gObj);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
     }
@@ -88,9 +84,7 @@ internal unsafe class TargetBarUpdatable : Updatable
 
             if (!textNode2->NodeText.ToString().Contains(nameString)) return;
             GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(index);
-            SerializableNickname name = NicknameUtils.instance.GetFromGameObjectPtr(gObj2, EnumUtils.instance.FromTargetType(targetObjectKind));
-            if (name?.Valid() ?? false)
-                textNode2->NodeText.SetString(name.Name);
+            SetFor(textNode2, gObj2);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
     }
@@ -107,10 +101,28 @@ internal unsafe class TargetBarUpdatable : Updatable
             if (textNode == null) return;
             if (!textNode->NodeText.ToString().Contains(focusTarget.Name.ToString())) return;
             GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
-            SerializableNickname name = NicknameUtils.instance.GetFromGameObjectPtr(gObj, EnumUtils.instance.FromTargetType(targetObjectKind));
-            if (name?.Valid() ?? false)
-                textNode->NodeText.SetString(name.Name);
+            SetFor(textNode, gObj);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+    }
+
+    void SetFor(AtkTextNode* textNode, GameObject* gObj)
+    {
+        PluginLink.PettableUserHandler.LoopThroughBreakable(user =>
+        {
+            if (user.nintCompanion == (nint)gObj)
+            {
+                if (user.CustomCompanionName != string.Empty)
+                    textNode->NodeText.SetString(user.CustomCompanionName);
+                return true;
+            }
+            if (user.nintBattlePet == (nint)gObj)
+            {
+                if (user.BattlePetCustomName != string.Empty)
+                    textNode->NodeText.SetString(user.BattlePetCustomName);
+                return true;
+            }
+            return false;
+        });
     }
 }

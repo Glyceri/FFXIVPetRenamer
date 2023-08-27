@@ -54,6 +54,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         public static Vector2 ListNameButton = new Vector2(480, 25);
         public static Vector2 ListIDField = new Vector2(75, 25);
         public static Vector2 SmallButton = new Vector2(25, 25);
+        public static Vector2 ListSmallNameField = new Vector2(200, 25);
 
         public static Vector2 ToggleButton = new Vector2(30, 12);
     }
@@ -118,20 +119,20 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         else              petMode = PetMode.BattlePet;
     }
 
-    protected bool ToggleButton()
+    protected bool ToggleButton(int count = 0)
     {
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
-        return ImGui.Button("##toggleButton", Styling.ToggleButton);
+        return ImGui.Button($"##{count}toggleButton", Styling.ToggleButton);
     }
 
-    protected bool ToggleButtonBad()
+    protected bool ToggleButtonBad(int count = 0)
     {
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
-        return ImGui.Button("##toggleButtonBad", Styling.ToggleButton);
+        return ImGui.Button($"##{count}toggleButtonBad", Styling.ToggleButton);
     }
 
     protected bool Button(string text)
@@ -149,6 +150,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.Button(text, styling);
+    }
+
+    protected bool XButtonError(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButtonHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
+        PushStyleColor(ImGuiCol.Text, StylingColours.errorText);
         return ImGui.Button(text, styling);
     }
 

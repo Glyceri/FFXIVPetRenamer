@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Singleton;
 using Dalamud.Logging;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -26,16 +27,14 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
     {
         foreach (var kvp in data)
         {
-            SerializableUserV2? storedUser = new SerializableUserV2(kvp.Key.Item1, (ushort)kvp.Key.Item2);
-            SerializableUserV2? user = ConfigurationUtils.instance.GetUserV2(storedUser);
-            if (user == null)
+            PluginLink.PettableUserHandler.DeclareUser(new SerializableUserV3(kvp.Key.Item1, (ushort)kvp.Key.Item2), Core.PettableUserSystem.Enums.UserDeclareType.Add);
+            foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
             {
-                ConfigurationUtils.instance.AddNewUserV2(user!);
-                user = ConfigurationUtils.instance.GetUserV2(storedUser);
+                if (!user.SerializableUser.Equals(kvp.Key.Item1, (ushort)kvp.Key.Item2)) continue;
+                user.SerializableUser.SaveNickname(kvp.Value.ID, kvp.Value.Nickname!);
+                if (kvp.Value.ID != kvp.Value.BattleID)
+                    user.SerializableUser.SaveNickname(kvp.Value.BattleID, kvp.Value.BattleNickname!);
             }
-            user?.SaveNickname(new SerializableNickname(kvp.Value.ID, kvp.Value.Nickname!));
-            if(kvp.Value.ID != kvp.Value.BattleID)
-                user?.SaveNickname(new SerializableNickname(kvp.Value.BattleID, kvp.Value.BattleNickname!));
         }
         PluginLink.Configuration.Save();
     }

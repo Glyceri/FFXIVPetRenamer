@@ -1,7 +1,7 @@
 using Dalamud.Game;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Handlers;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
@@ -10,14 +10,16 @@ internal class LocalUserSafetyUpdatable : Updatable
 {
     public override void Update(Framework frameWork)
     {
-        if (ConfigurationUtils.instance.GetLocalUserV2() != null) return;
-        if (!PlayerUtils.instance.PlayerDataAvailable()) return;
-
-
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if(playerData == null) return;
-        SerializableUserV2 localUser = new SerializableUserV2(playerData.Value.playerName, playerData.Value.homeWorld);
-        ConfigurationUtils.instance.AddNewUserV2(localUser);
+        if (PluginLink.Configuration.serializableUsersV3! == null) return;
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+        foreach (SerializableUserV3 user in PluginLink.Configuration.serializableUsersV3!)
+            if (user.Equals(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id))
+                return;
+       
+       
+        SerializableUserV3 newUser = new SerializableUserV3(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id);
+        PluginLink.PettableUserHandler.DeclareUser(newUser, PettableUserSystem.Enums.UserDeclareType.Add);
+        PluginLink.Configuration.Save();
     }
 }
 

@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Updatable.Updatables;
 using System;
 using System.Collections.Generic;
 
@@ -15,8 +14,6 @@ public class IpcStorage : IDisposable
     public event OnIpcChange IpcChange = null!;
 
     private Dictionary<(string, uint), NicknameData> _IpcAssignedNicknames = new Dictionary<(string, uint), NicknameData>();
-
-    public List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
 
     bool touched = false;
 
@@ -63,6 +60,5 @@ public class IpcStorage : IDisposable
     {
         PluginHandlers.Framework.Update -= OnUpdate;
         _IpcAssignedNicknames.Clear();
-        characters.Clear();
     }
 }

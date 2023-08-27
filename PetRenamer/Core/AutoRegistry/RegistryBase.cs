@@ -40,6 +40,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
 
     public void Dispose()
     {
+        OnDipose();
         ClearAllElements();
     }
 
@@ -63,7 +64,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         attributes.Clear();
     }
 
-
+    protected virtual void OnDipose() { }
     protected virtual void OnAllRegistered() { }
     protected virtual void OnTypeArrayCreation(Type[] types) { }
     protected virtual void OnElementCreation(T element) { }

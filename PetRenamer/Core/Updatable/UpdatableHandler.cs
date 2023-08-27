@@ -16,10 +16,9 @@ namespace PetRenamer.Core.Updatable
             PluginHandlers.Framework.Update += MainUpdate;
         }
 
-        ~UpdatableHandler()
+        protected override void OnDipose()
         {
             PluginHandlers.Framework.Update -= MainUpdate;
-            ClearAllUpdatables();
         }
 
         protected override void OnAllRegistered() => updatables?.Sort(Compare);
@@ -36,13 +35,10 @@ namespace PetRenamer.Core.Updatable
 
         void MainUpdate(Framework framework)
         {
-            if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+            if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
 
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);
-
-            foreach (Updatable updatable in updatables)
-                updatable.LateUpdate(framework);
         }
     }
 }

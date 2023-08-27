@@ -3,4 +3,4 @@
 namespace PetRenamer.Windows.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ConfigPetWindowAttribute : Attribute { }
+public class MainPetWindowAttribute : Attribute { }

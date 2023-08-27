@@ -2,7 +2,6 @@ using Dalamud.Game;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
-using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -51,7 +50,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
 
         if (hasFoundPlayer) return;
 
-        hasFoundPlayer = PlayerUtils.instance.PlayerDataAvailable();
+        hasFoundPlayer = PluginHandlers.ClientState.LocalPlayer != null;
         if (hasFoundPlayer)
             foreach (LegacyElement legacyElement in correctElements)
                 legacyElement.OnPlayerAvailable(currentInternalVersion);

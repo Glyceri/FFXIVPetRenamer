@@ -1,5 +1,4 @@
 using Dalamud.Interface.Windowing;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
@@ -21,10 +20,11 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     {
         PluginHandlers.PluginInterface.UiBuilder.Draw += Draw;
     }
-    ~WindowsHandler()
+
+    protected override void OnDipose()
     {
+        windowSystem.RemoveAllWindows();
         PluginHandlers.PluginInterface.UiBuilder.Draw -= Draw;
-        RemoveAllWindows();
     }
 
     public PetWindow GetWindow(Type windowType) => GetElement(windowType);
@@ -39,11 +39,12 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
         if (t.GetCustomAttribute<ModeTogglePetWindowAttribute>() != null)
             t.GetField("drawToggle", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(element, true);
 
+        if (t.GetCustomAttribute<MainPetWindowAttribute>() != null)
+            PluginHandlers.PluginInterface.UiBuilder.OpenMainUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
+
         if (t.GetCustomAttribute<ConfigPetWindowAttribute>() != null)
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
     }
-
-
 
     public T AddTemporaryWindow<T>(string message, Action<object> callback, Window blackenedWindow = null!) where T : TemporaryPetWindow
     {
@@ -61,13 +62,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     public void CloseWindow(Type windowType) => GetWindow(windowType).IsOpen = false;
     public void OpenWindow(Type windowType) => GetWindow(windowType).IsOpen = true;
 
-    public void RemoveAllWindows()
-    {
-        windowSystem.RemoveAllWindows();
-
-        ClearAllElements();
-    }
-
     public void CloseAllWindows()
     {
         foreach (PetWindow window in petWindows)
@@ -76,10 +70,11 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
 
     public void Draw()
     {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) 
+        windowSystem.Draw();
+        if (PluginHandlers.ClientState.LocalPlayer! == null)
         {
             CloseAllWindows();
-            return; 
+            return;
         }
         for (int i = temporaryPetWindows.Count - 1; i >= 0; i--)
             if (temporaryPetWindows[i].closed)
@@ -88,7 +83,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
                 temporaryPetWindows.RemoveAt(i);
             }
 
-        windowSystem.Draw();
+        
     }
 
     bool initialized = false;
@@ -99,7 +94,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
         initialized = true;
 
         foreach (PetWindow element in elements)
-            if(element is InitializablePetWindow initWindow)
+            if (element is InitializablePetWindow initWindow)
                 initWindow.OnInitialized();
     }
 }
