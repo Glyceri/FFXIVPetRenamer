@@ -2,15 +2,16 @@
 using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Hooking.Attributes;
 using System.Runtime.InteropServices;
 using System;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Hooking.Attributes;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-//[Hook]
+[Hook]
 internal unsafe class TooltipHook : HookableElement
 {
     private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
@@ -52,17 +53,25 @@ internal unsafe class TooltipHook : HookableElement
         string tNodeText = tNode->NodeText.ToString();
         if (tNodeText == lastAnswer) return addonUpdateHook!.Original(baseD);
 
-        SerializableNickname[] nicknames = NicknameUtils.instance.GetLocalNicknamesV2();
-        foreach (SerializableNickname nickname in nicknames)
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return addonUpdateHook!.Original(baseD);
+
+        int id = SheetUtils.instance.GetIDFromName(tNodeText);
+        if (id == -1) 
         {
-            if (nickname == null) continue;
-            if (!nickname.Valid()) continue;
-            nickname.Setup();
-            if (!nickname.BaseNameEquals(tNodeText)) continue;
-            tNode->NodeText.SetString(nickname.Name);
-            lastAnswer = nickname.Name;
-            break;
+            lastAnswer = tNodeText;
+            return addonUpdateHook!.Original(baseD); 
         }
+        user.SerializableUser.LoopThroughBreakable(nickname =>
+        {
+            if(nickname.Item1 == id)
+            {
+                tNode->NodeText.SetString(nickname.Item2);
+                lastAnswer = nickname.Item2;
+                return true;
+            }
+            return false;
+        });
 
         return addonUpdateHook!.Original(baseD);
     }

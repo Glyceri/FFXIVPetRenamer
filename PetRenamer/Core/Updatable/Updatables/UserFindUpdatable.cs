@@ -43,7 +43,7 @@ internal class UserFindUpdatable : Updatable
         if (!user.LocalUser) return;
         if (!user.AnyPetChanged) return;
         if (user.BattlePetChanged)
-            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForBattleID(user.BattlePetID, user.BattlePetSkeletonID);
+            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForBattleID(user.BattlePetID);
         if (user.CompanionChanged)
             PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(user.CompanionID);
     }

@@ -62,12 +62,12 @@ public class SerializableUserV3
         return false;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true)
+    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false)
     {
         if (id == -1) return;
-        if (name == string.Empty) RemoveNickname(id);
-        else if (ids.Contains(id)) OverwriteNickname(id, name);
-        else GenerateNewNickname(id, name);
+        if (name == string.Empty) RemoveNickname(id, notifyICP);
+        else if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
+        else GenerateNewNickname(id, name, notifyICP);
 
         if (!doCheck) return;
         hasCompanion = false;
@@ -81,7 +81,7 @@ public class SerializableUserV3
         }
     }
 
-    void GenerateNewNickname(int id, string name)
+    void GenerateNewNickname(int id, string name, bool notifyICP = false)
     {
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
@@ -89,25 +89,32 @@ public class SerializableUserV3
         namesList.Add(name);
         ids = idList.ToArray();
         names = namesList.ToArray();
+        changed = true;
+        if(notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
-    public void OverwriteNickname(int id, string name)
+    public void OverwriteNickname(int id, string name, bool notifyICP = false)
     {
         int index = IndexOf(id);
         if (index == -1) return;
+        if (names[index] == name) return;
         names[index] = name;
+        changed = true;
+        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
-    public void RemoveNickname(int id)
+    public void RemoveNickname(int id, bool notifyICP = false)
     {
         int index = IndexOf(id);
         if (index == -1) return;
+        changed = true;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.RemoveAt(index);
         namesList.RemoveAt(index);
         ids = idList.ToArray();
         names = namesList.ToArray();
+        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, string.Empty, id, string.Empty));
     }
 
     int IndexOf(int id)

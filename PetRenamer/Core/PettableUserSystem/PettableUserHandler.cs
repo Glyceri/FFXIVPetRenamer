@@ -12,6 +12,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
 {
     List<PettableUser> _users = new List<PettableUser>();
 
+    public List<PettableUser> Users { get => _users; set => _users = value; }
+
     public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
     {
         if (action == null) return;

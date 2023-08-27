@@ -3,14 +3,12 @@ using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Hooking.Attributes;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
-using PetRenamer.Utilization.Enum;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-//[Hook]
+[Hook]
 public unsafe sealed class NamePlateHook : HookableElement
 {
     [Signature("40 55 56 57 41 56 48 81 EC ?? ?? ?? ?? 48 8B 84 24", DetourName = nameof(UpdateNameplateDetour))]
@@ -25,18 +23,32 @@ public unsafe sealed class NamePlateHook : HookableElement
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
         if (!PluginLink.Configuration.displayCustomNames) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
-        SerializableNickname nickname = NicknameUtils.instance.GetFromGameObjectPtr(&battleChara->Character.GameObject, PetType.BattlePet);
-        if (nickname?.Valid() ?? false)
-            namePlateInfo->Name.SetString(nickname.Name);
+        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+        {
+            if (!user.UserExists) continue;
+            if (user.nintBattlePet == (nint)battleChara)
+            {
+                if (user.BattlePetCustomName != string.Empty)
+                    namePlateInfo->Name.SetString(user.BattlePetCustomName);
+                break;
+            }
+        }
         return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
     }
 
     public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
         if (!PluginLink.Configuration.displayCustomNames) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
-        SerializableNickname nickname = NicknameUtils.instance.GetFromGameObjectPtr(gameObject, PetType.Companion);
-        if(nickname?.Valid() ?? false)
-            namePlateInfo->Name.SetString(nickname.Name);
+        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+        {
+            if (!user.UserExists) continue;
+            if (user.nintCompanion == (nint)gameObject)
+            {
+                if (user.CustomCompanionName != string.Empty)
+                    namePlateInfo->Name.SetString(user.CustomCompanionName);
+                break;
+            }
+        }
         return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 

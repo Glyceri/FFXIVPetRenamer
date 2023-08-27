@@ -1,21 +1,16 @@
-﻿using Dalamud.Configuration;
-using Dalamud.Game;
+﻿using Dalamud.Game;
 using Dalamud.Hooking;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.Enum;
-using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Core.PettableUserSystem;
 using System;
 using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-//[Hook]
+[Hook]
 internal unsafe class PartyListHook : HookableElement
 {
     // VVVVVV ACTUAL BYTE CODE GENEROUSLY PROVIDED BY: Nuko
@@ -25,12 +20,10 @@ internal unsafe class PartyListHook : HookableElement
 
     AddonPartyList* partyList;
 
-    GameObject* pet;
 
     internal override void OnUpdate(Framework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        pet = &PluginLink.CharacterManager->LookupPetByOwnerObject((BattleChara*)GameObjectManager.GetGameObjectByIndex(0))->Character.GameObject;
         partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
         addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[42]), Update);
         addonupdatehook?.Enable();
@@ -43,9 +36,12 @@ internal unsafe class PartyListHook : HookableElement
         if (!baseD->IsVisible || name is not "_PartyList")
             return addonupdatehook!.Original(baseD);
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
-        SerializableNickname nickname = NicknameUtils.instance.GetFromGameObjectPtr(pet, PetType.BattlePet);
-        if(nickname?.Valid() ?? false)
-            partyNode->Pet.Name->SetText(nickname.Name);
+
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return addonupdatehook!.Original(baseD);
+        if (!user.HasBattlePet) return addonupdatehook!.Original(baseD);
+        if (user.BattlePetCustomName != string.Empty)
+            partyNode->Pet.Name->SetText(user.BattlePetCustomName);
         return addonupdatehook!.Original(baseD);
     }
 

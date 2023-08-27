@@ -7,10 +7,11 @@ using PetRenamer.Windows;
 using PetRenamer.Windows.PetWindows;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 
-//[ContextMenu]
+[ContextMenu]
 internal unsafe class PetContextMenu : ContextMenuElement
 {
     internal override void OnOpenMenu(GameObjectContextMenuOpenArgs args)
@@ -30,18 +31,16 @@ internal unsafe class PetContextMenu : ContextMenuElement
             ownerID = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex)->GetObjectID().ObjectID;
         if (ownerID != PluginHandlers.ClientState.LocalPlayer.ObjectId) return;
 
-        args.AddCustomItem(new GameObjectContextMenuItem("[PetRenamer] Give Nickname", (a) => 
+        args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => 
         {
             if(targetObjectKind == TargetObjectKind.Companion) PetWindow.SetPetMode(PetMode.Normal);
             else PetWindow.SetPetMode(PetMode.BattlePet);
 
-            foreach(FoundPlayerCharacter chara in PluginLink.IpcStorage.characters)
-            {
-                if (chara.ownName != PluginHandlers.ClientState.LocalPlayer.Name.ToString() || chara.ownHomeWorld != PluginHandlers.ClientState.LocalPlayer.HomeWorld.Id) continue;
-                if (targetObjectKind == TargetObjectKind.Companion) PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(chara.GetCompanionID());
-                else PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(chara.GetBattlePetID());
-                break;
-            }
+            PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+            if (user == null) return;
+            PetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
+            if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.CompanionID, true);
+            else petWindow?.OpenForBattleID(user.BattlePetID, true);
         }
         ));
     }

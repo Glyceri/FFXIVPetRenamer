@@ -35,6 +35,10 @@ internal unsafe class PettableUser
 
     SerializableUserV3 _serializableUser;
 
+    public nint nintUser => _user;
+    public nint nintBattlePet => _BattlePet;
+    public nint nintCompanion => _companion;
+
     public BattleChara* User => (BattleChara*)_user;
     public BattleChara* BattlePet => (BattleChara*)_BattlePet;
     public Companion* Companion => (Companion*)_companion;
@@ -84,7 +88,13 @@ internal unsafe class PettableUser
     {
         _user = (nint)user;
 
-        
+        if (_serializableUser?.ToggleBackChanged() ?? false)
+        {
+            _CustomCompanionName = string.Empty;
+            _CustomBattlePetName = string.Empty;
+            _LastBattlePetID = -1;
+            _LastCompanionID = -1;
+        }
     }
 
     public void SetBattlePet(BattleChara* battlePet)
@@ -146,13 +156,6 @@ internal unsafe class PettableUser
         _companion = nint.Zero;
         _userChangedCompanion = false;
         _userChangedBattlePet = false;
-
-        if (_serializableUser?.ToggleBackChanged() ?? false)
-        {
-            _LastBattlePetID = -1;
-            _LastBattlePetSkeletonID = -1;
-            _LastCompanionID = -1;
-        }
 
         ResetBattlePet();
         ResetCompanion();

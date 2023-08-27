@@ -57,7 +57,7 @@ public class PetListWindow : PetWindow
                 Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
                 Label(RemapUtils.instance.PetIDToName(nickname.ID).ToString() + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
                 if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.ID, -1); ImGui.SameLine();
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.ID); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                     ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
             }

@@ -25,7 +25,6 @@ public class PetRenameWindow : InitializablePetWindow
 
     int companionID = -1;
     int battlePetID = -1;
-    int battlePetSkeletonID = -1;
 
     public PetRenameWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
@@ -44,6 +43,7 @@ public class PetRenameWindow : InitializablePetWindow
             companionID = user.CompanionID;
             companionName = user.CustomCompanionName;
             companionBaseName = user.CompanionBaseName;
+            temporaryCompanionName = companionName;
         }
 
         if (battlePetID == -1 && user.HasBattlePet)
@@ -51,7 +51,7 @@ public class PetRenameWindow : InitializablePetWindow
             battlePetID = user.BattlePetID;
             battlePetBaseName = user.BaseBattelPetName;
             battlePetName = user.BattlePetCustomName;
-            battlePetSkeletonID = user.BattlePetSkeletonID;
+            temporaryBattlePetName = battlePetName;
         }
     }
 
@@ -95,35 +95,33 @@ public class PetRenameWindow : InitializablePetWindow
         if (Button("Save Nickname"))
         {
             internalTempText = internalTempText.Replace("^", "");
-            PluginLog.Log("wants to save: " + theID.ToString() + " : " + internalTempText);
-            user.SerializableUser.SaveNickname(theID, internalTempText);
+            user.SerializableUser.SaveNickname(theID, internalTempText, notifyICP: true); 
         }
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            user.SerializableUser.RemoveNickname(theID);
+            user.SerializableUser.RemoveNickname(theID, notifyICP: true);
         }
     }
 
-    public void OpenForId(int id)
+    public void OpenForId(int id, bool forceOpen = false)
     {
         if (user == null) return;
         companionID = id;
         companionBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(companionID));
         companionName = user.GetCustomName(companionID);
         temporaryCompanionName = companionName;
-        IsOpen = true;
+        if(forceOpen) IsOpen = true;
     }
 
-    public void OpenForBattleID(int id, int battleSkeletonID)
+    public void OpenForBattleID(int id, bool forceOpen = false)
     {
         if (user == null) return;
         battlePetID = id;
-        battlePetSkeletonID = battleSkeletonID;
         battlePetBaseName = RemapUtils.instance.PetIDToName(id);
         battlePetName = user.GetCustomName(battlePetID);
         temporaryBattlePetName = battlePetName;
-        IsOpen = true;
+        if (forceOpen) IsOpen = true;
     }
 
     public override void OnInitialized()
