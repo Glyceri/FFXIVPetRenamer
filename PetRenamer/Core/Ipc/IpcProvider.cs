@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Updatable.Updatables;
 using PetRenamer.Utilization.UtilsModule;
@@ -107,20 +108,14 @@ public static class IpcProvider
             if (character is not PlayerCharacter playerCharacter) return string.Empty;
             (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
             NicknameData? data = new NicknameData();
-            SerializableUserV2 userv2 = ConfigurationUtils.instance.GetUserV2(new SerializableUserV2(player.Item1, (ushort)player.Item2));
-            if(userv2 == null) return string.Empty;
-            foreach (FoundPlayerCharacter chara in PluginLink.IpcStorage.characters)
-            {
-                if (chara == null) continue;
-                if (chara.ownName != userv2.username || chara.ownHomeWorld != userv2.homeworld) continue;
 
+            foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
+            {
+                if (!user.SerializableUser.Equals(player.Item1, (ushort)player.Item2)) continue;
                 (int, string) cStr = (-1, string.Empty);
                 (int, string) bStr = (-1, string.Empty);
-                if (chara.HasCompanion())
-                    cStr = FromIdAndUser(userv2, chara.GetCompanionID());
-                
-                if (chara.HasBattlePet())
-                    bStr = FromIdAndUser(userv2, chara.GetBattlePetID());
+                if (user.HasCompanion) cStr = (user.CompanionID, user.CustomCompanionName);
+                if (user.HasBattlePet) bStr = (user.BattlePetID, user.BattlePetCustomName);
 
                 data.ID = cStr.Item1;
                 data.Nickname = cStr.Item2;
@@ -134,14 +129,6 @@ public static class IpcProvider
         catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
 
         return string.Empty;
-    }
-
-    static (int, string) FromIdAndUser(SerializableUserV2 user, int id)
-    {
-        SerializableNickname? nName = NicknameUtils.instance.GetNicknameV2(user, id);
-        if (nName == null) return (-1, string.Empty);
-        if (!nName.Valid()) return (-1, string.Empty);
-        return (nName.ID, nName.Name);
     }
 
     static void ClearCharacterCallback(Character character)

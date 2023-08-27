@@ -37,11 +37,15 @@ public unsafe sealed class NamePlateHook : HookableElement
     {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (!user.UserExists) { PluginLog.Log("User doesnt exist"); continue; }
+            if (!user.UserExists) continue;
             string nameToUse = string.Empty;
             if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName;
             if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
-            if (nameToUse != string.Empty) { namePlateInfo->Name.SetString(nameToUse); break; }
+            if (nameToUse != string.Empty) 
+            { 
+                namePlateInfo->Name.SetString(nameToUse); 
+                break; 
+            }
         }
     }
 

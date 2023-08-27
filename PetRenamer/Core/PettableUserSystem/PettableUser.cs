@@ -111,6 +111,7 @@ internal unsafe class PettableUser
                 _LastBattlePetSkeletonID = _BattlePetSkeletonID;
                 _LastBattlePetID = _BattlePetID;
                 _BattlePetBaseName = Marshal.PtrToStringUTF8((IntPtr)battlePet->Character.GameObject.Name)!;
+                _CustomBattlePetName = string.Empty;
                 SerializableUser.LoopThroughBreakable((nickname) => 
                 {
                     if (_BattlePetID == nickname.Item1)
@@ -135,7 +136,8 @@ internal unsafe class PettableUser
             {
                 _userChangedCompanion = true;
                 _LastCompanionID = _CompanionID;
-                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
+                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!; 
+                _CustomCompanionName = string.Empty;
                 SerializableUser.LoopThroughBreakable((nickname) =>
                 {
                     if (_CompanionID == nickname.Item1)
