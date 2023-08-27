@@ -4,7 +4,7 @@ using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
+[PersistentPetWindow]
 internal class SaveFileMismatchWindow : PetWindow
 {
     public SaveFileMismatchWindow() : base("Save File Mismatch", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse , true)
@@ -17,6 +17,6 @@ internal class SaveFileMismatchWindow : PetWindow
 
     public override void OnDraw()
     {
-        ImGui.TextColored(StylingColours.errorText, $"Your save file version is NEWER than currently supported. [{PluginLink.Configuration.Version}:{Configuration.currentSaveFileVersion}]\nPlease disable the plugin and update or risk corrupting your savefile!");
+        ImGui.TextColored(StylingColours.errorText, $"Your save file version is NEWER than currently supported. [{PluginLink.Configuration.Version}:{Configuration.currentSaveFileVersion}]\nPlease disable the Pet Nicknames plugin and update or risk corrupting your savefile!");
     }
 }

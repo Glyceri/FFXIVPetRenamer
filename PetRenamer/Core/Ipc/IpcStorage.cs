@@ -16,8 +16,6 @@ public class IpcStorage : IDisposable
 
     private Dictionary<(string, uint), NicknameData> _IpcAssignedNicknames = new Dictionary<(string, uint), NicknameData>();
 
-    public List<FoundPlayerCharacter> characters = new List<FoundPlayerCharacter>();
-
     bool touched = false;
 
     public Dictionary<(string, uint), NicknameData> IpcAssignedNicknames 
@@ -63,6 +61,5 @@ public class IpcStorage : IDisposable
     {
         PluginHandlers.Framework.Update -= OnUpdate;
         _IpcAssignedNicknames.Clear();
-        characters.Clear();
     }
 }

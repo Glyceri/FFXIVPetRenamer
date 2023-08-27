@@ -46,78 +46,13 @@ public class Configuration : IPluginConfiguration
         PluginLink.DalamudPlugin.SavePluginConfig(this); 
     }
 
-    public void ClearAllUsersV2()
+    public void ClearAllNicknames()
     {
-        PluginLink.WindowHandler.CloseAllWindows();
-        serializableUsersV2 = new SerializableUserV2[0];
+        PluginLink.PettableUserHandler.Users.Clear();
         Save();
-    }
-
-    public void ClearNicknamesForAllUsersV2()
-    {
-        PluginLink.WindowHandler.CloseAllWindows();
-        foreach (SerializableUserV2 user in serializableUsersV2!)
-            ClearNicknamesForUserV2(user, false);
-        Save();
-    }
-
-    public void ClearNicknamesForUserV2(SerializableUserV2 user, bool autosave = true)
-    {
-        user.ids = new int[0];
-        user.names = new string[0];
-        if (autosave) Save();
-    }
-
-    public void ClearNicknamesForLocalUserV2()
-    {
-        SerializableUserV2? user = ConfigurationUtils.instance.GetLocalUserV2();
-        if (user == null) return;
-        ClearNicknamesForUserV2(user);
     }
 
     #region OBSOLETE
-
-    [Obsolete("Use ClearAllUsersV2() Instead")]
-    public void ClearAllUsers()
-    {
-        PluginLink.WindowHandler.CloseAllWindows();
-        serializableUsers = new SerializableUser[0];
-        Save();
-    }
-
-    [Obsolete("Use ClearNicknamesForAllUsersV2() Instead")]
-    public void ClearNicknamesForAllUsers()
-    {
-        PluginLink.WindowHandler.CloseAllWindows();
-        foreach (SerializableUser user in serializableUsers!)
-            ClearNicknamesForUser(user, false);
-        Save();
-    }
-
-    [Obsolete("Use ClearNicknamesForLocalUserV2() Instead")]
-    public void ClearNicknamesForLocalUser()
-    {
-        SerializableUser? user = PluginLink.Utils.Get<ConfigurationUtils>().GetLocalUser();
-        if (user == null) return;
-        ClearNicknamesForUser(user);
-    }
-
-    [Obsolete("Use ClearNicknamesForUserV2() instead")]
-    public void ClearNicknamesForUser(SerializableUser user, bool autosave = true)
-    {
-        user.nicknames = new SerializableNickname[0];
-        if(autosave) Save();
-    }
-
-    [Obsolete("Use ClearNicknamesForUser() instead")]
-    public void ClearNicknames()
-    {
-        PluginLink.WindowHandler.CloseAllWindows();
-        users = new SerializableNickname[0];
-        Save();
-    }
-
-
 
     //---------------------------Legacy Variables---------------------------
     // Will be kept for backwards compatibility

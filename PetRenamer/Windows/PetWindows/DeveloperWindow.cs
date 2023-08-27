@@ -9,6 +9,7 @@ using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -115,7 +116,7 @@ internal class DeveloperWindow : PetWindow
                         new int[2] { -2, minID },
                         new string[2] { "[TESTNAME]", minName },
                         target.Name.ToString(),
-                        (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add);
+                        (ushort)((PlayerCharacter)target).HomeWorld.Id), UserDeclareType.Add);
             }
 
         if (Button("Add ALL Users EMPTY"))
