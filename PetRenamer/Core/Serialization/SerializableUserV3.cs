@@ -33,7 +33,7 @@ public class SerializableUserV3
     public void LoopThroughBreakable(Func<(int, string), bool> callback)
     {
         if (callback == null) return;
-        for (int i = 0; i < ids.Length; ++i)
+        for (int i = 0; i < ids.Length; i++)
             if (callback.Invoke((ids[i], names[i])))
                 break;
     }
@@ -41,7 +41,7 @@ public class SerializableUserV3
     public void LoopThrough(Action<(int, string)> callback)
     {
         if (callback == null) return;
-        for (int i = 0; i < ids.Length; ++i)
+        for (int i = 0; i < ids.Length; i++)
             callback.Invoke((ids[i], names[i]));
     }
 

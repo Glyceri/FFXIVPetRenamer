@@ -98,7 +98,7 @@ public class PetListWindow : PetWindow
                 string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
                 user.SerializableUser.LoopThrough(nickname =>
                 {
-                    exportString = string.Concat(exportString, $"{nickname.Item1}^{nickname.Item2}");
+                    exportString += $"{nickname.Item1}^{nickname.Item2}";
                 });
                 string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
                 ImGui.SetClipboardText(convertedString);
