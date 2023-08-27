@@ -74,7 +74,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
 
         for (int i = 0; i < message.Payloads.Count; i++)
         {
-            if (message.Payloads[i] is not TextPayload tPayload) return;
+            if (message.Payloads[i] is not TextPayload tPayload) continue;
 
             foreach (string str in PluginConstants.removeables)
                 tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname, RegexOptions.IgnoreCase);
