@@ -8,14 +8,13 @@ using System.Runtime.InteropServices;
 using System;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using PetRenamer.Utilization.UtilsModule;
-using PetRenamer.Core.Updatable.Updatables;
-using PetRenamer.Core.Serialization;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using System.Text.RegularExpressions;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
-//[Chat]
+[Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
@@ -52,23 +51,33 @@ internal unsafe class PetChatEmoteElement : ChatElement
 
         if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
 
-        foreach (FoundPlayerCharacter character in PluginLink.IpcStorage.characters)
+        string nickname = string.Empty;
+        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (character.ownName != ownerName) continue;
+            if (!user.UserExists) continue;
+            if (user.UserName.ToLower().Normalize() != ownerName.ToLower().Normalize()) continue;
 
-            SerializableNickname nickname = NicknameUtils.instance.GetNicknameV2(character.associatedUser!, id);
-            if (nickname == null) continue;
-            if (!nickname.Valid()) continue;
-            for (int i = 0; i < message.Payloads.Count; i++)
+            user.SerializableUser.LoopThroughBreakable(n =>
             {
-                if (message.Payloads[i] is TextPayload tPayload)
+                if (n.Item1 == id)
                 {
-                    foreach (string str in PluginConstants.removeables)
-                        tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname.Name, RegexOptions.IgnoreCase);
-                    message.Payloads[i] = tPayload;
+                    nickname = n.Item2;
+                    return true;
                 }
-            }
+                return false;
+            });
             break;
+        }
+
+        if (nickname == string.Empty) return;
+
+        for (int i = 0; i < message.Payloads.Count; i++)
+        {
+            if (message.Payloads[i] is not TextPayload tPayload) return;
+
+            foreach (string str in PluginConstants.removeables)
+                tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname, RegexOptions.IgnoreCase);
+            message.Payloads[i] = tPayload;
         }
     }
 }

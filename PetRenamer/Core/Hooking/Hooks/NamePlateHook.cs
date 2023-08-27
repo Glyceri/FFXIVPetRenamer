@@ -22,34 +22,27 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-        {
-            if (!user.UserExists) continue;
-            if (user.nintBattlePet == (nint)battleChara)
-            {
-                if (user.BattlePetCustomName != string.Empty)
-                    namePlateInfo->Name.SetString(user.BattlePetCustomName);
-                break;
-            }
-        }
+        if (PluginLink.Configuration.displayCustomNames) SetNameplate(namePlateInfo, (nint)battleChara);
         return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
     }
 
     public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
+        if (PluginLink.Configuration.displayCustomNames) SetNameplate(namePlateInfo, (nint)gameObject);
+        return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
+    }
+
+    void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
+    {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (!user.UserExists) continue;
-            if (user.nintCompanion == (nint)gameObject)
-            {
-                if (user.CustomCompanionName != string.Empty)
-                    namePlateInfo->Name.SetString(user.CustomCompanionName);
-                break;
-            }
+            string nameToUse = string.Empty;
+            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName;
+            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
+            if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameToUse);
+            break;
         }
-        return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 
     internal override void OnInit()

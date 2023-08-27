@@ -5,15 +5,11 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
-using Lumina.Excel.GeneratedSheets;
-using static Lumina.Data.Parsing.Uld.NodeData;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 

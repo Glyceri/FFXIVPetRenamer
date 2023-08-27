@@ -13,6 +13,7 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable(-10)]
 internal class UserFindUpdatable : Updatable
 {
+
     public override void Update(Framework frameWork)
     {
         PluginLink.PettableUserHandler.LoopThroughUsers(OnUser);
@@ -42,9 +43,9 @@ internal class UserFindUpdatable : Updatable
         }
         if (!user.LocalUser) return;
         if (!user.AnyPetChanged) return;
-        if (user.BattlePetChanged)
-            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForBattleID(user.BattlePetID);
-        if (user.CompanionChanged)
-            PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(user.CompanionID);
+        PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
+        if (window == null) return;
+        if (user.BattlePetChanged) window.OpenForBattleID   (user.BattlePetID);
+        if (user.CompanionChanged) window.OpenForId         (user.CompanionID);
     }
 }

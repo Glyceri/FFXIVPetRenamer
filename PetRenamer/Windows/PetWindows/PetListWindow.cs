@@ -9,11 +9,13 @@ using System;
 using System.Text;
 using Dalamud.Logging;
 using PetRenamer.Core;
+using PetRenamer.Core.PettableUserSystem;
+using System.Xml.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
-//[ModeTogglePetWindow]
+[PersistentPetWindow]
+[ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
     int maxBoxHeight = 670;
@@ -27,13 +29,15 @@ public class PetListWindow : PetWindow
         };
     }
 
+    PettableUser user = null!;
+
     public unsafe override void OnDraw()
     {
-        if (PluginLink.Configuration.serializableUsersV2!.Length == 0) return;
+        if (PluginLink.Configuration.serializableUsersV3!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        if (ConfigurationUtils.instance.GetLocalUserV2() == null) return;
+        if ((user = PluginLink.PettableUserHandler.LocalUser()!) == null) return;
         if (petMode == PetMode.BattlePet) openedAddPet = false;
-        
+
         DrawUserHeader();
         DrawExportHeader();
     }
@@ -73,12 +77,9 @@ public class PetListWindow : PetWindow
 
     void DrawUserHeader()
     {
-        PlayerData? playerData = PlayerUtils.instance.GetPlayerData();
-        if (playerData == null) return;
-
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Button($"{playerData.Value.playerName}", Styling.ListButton); ImGui.SameLine();
-        Label($"{SheetUtils.instance.GetWorldName(playerData.Value.homeWorld)}", Styling.ListButton); ImGui.SameLine();
+        Button($"{PluginHandlers.ClientState.LocalPlayer!.Name}", Styling.ListButton); ImGui.SameLine();
+        Label($"{SheetUtils.instance.GetWorldName((ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id)}", Styling.ListButton); ImGui.SameLine();
         ImGui.EndListBox();
         ImGui.NewLine();
     }
@@ -91,17 +92,15 @@ public class PetListWindow : PetWindow
         {
             try
             {
-                SerializableUserV2 localPlayer = ConfigurationUtils.instance.GetLocalUserV2()!;
-                if (localPlayer != null)
+                string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
+                user.SerializableUser.LoopThrough(nickname =>
                 {
-                    string exportString = string.Concat("[PetExport]\n", localPlayer.username.ToString(), "\n", localPlayer.homeworld.ToString(), "\n");
-                    foreach (SerializableNickname nickname in localPlayer.nicknames)
-                        exportString = string.Concat(exportString, nickname.ToSaveString(), "\n");
-                    string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
-                    ImGui.SetClipboardText(convertedString);
-                }
+                    exportString = string.Concat(exportString, $"{nickname.Item1}^{nickname.Item2}");
+                });
+                string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
+                ImGui.SetClipboardText(convertedString);
             }
-            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Export Error occured: {e}"); }
+            catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); }
         }
         ImGui.SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
@@ -113,7 +112,7 @@ public class PetListWindow : PetWindow
                 if (window.SetImportString(gottenText))
                     window.IsOpen = true;
             }
-            catch (Exception e) { Dalamud.Logging.PluginLog.Log($"Import Error occured: {e}"); }
+            catch (Exception e) { PluginLog.Log($"Import Error occured: {e}"); }
         }
         ImGui.EndListBox();
     }
