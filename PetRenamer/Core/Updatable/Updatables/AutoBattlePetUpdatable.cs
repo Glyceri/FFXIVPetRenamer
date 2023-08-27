@@ -1,8 +1,6 @@
 ﻿using Dalamud.Game;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
 

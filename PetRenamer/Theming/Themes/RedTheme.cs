@@ -1,5 +1,4 @@
-﻿
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace PetRenamer.Theming.Themes;
 

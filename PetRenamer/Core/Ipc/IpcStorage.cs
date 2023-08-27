@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Updatable.Updatables;
 using System;
 using System.Collections.Generic;
 

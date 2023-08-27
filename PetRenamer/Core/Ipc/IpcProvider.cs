@@ -6,9 +6,6 @@ using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Core.Updatable.Updatables;
-using PetRenamer.Utilization.UtilsModule;
 using System;
 
 namespace PetRenamer;

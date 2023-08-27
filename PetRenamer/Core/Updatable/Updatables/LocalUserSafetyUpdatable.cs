@@ -1,10 +1,7 @@
 using Dalamud.Game;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Handlers;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 

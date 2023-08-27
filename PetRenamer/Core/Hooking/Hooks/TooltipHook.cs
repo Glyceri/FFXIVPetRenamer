@@ -5,7 +5,6 @@ using PetRenamer.Core.Handlers;
 using System.Runtime.InteropServices;
 using System;
 using PetRenamer.Utilization.UtilsModule;
-using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 

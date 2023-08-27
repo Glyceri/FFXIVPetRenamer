@@ -2,7 +2,6 @@ using Dalamud.Game;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
-using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Linq;
 
