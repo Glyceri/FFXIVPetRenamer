@@ -22,7 +22,7 @@ internal class DeveloperWindow : PetWindow
 
     public DeveloperWindow() : base("Dev Window Pet Renamer")
     {
-        IsOpen = true;
+        
         Size = baseSize;
     }
 

@@ -71,6 +71,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
 
     public void Draw()
     {
+        windowSystem.Draw();
         if (PluginHandlers.ClientState.LocalPlayer! == null)
         {
             CloseAllWindows();
@@ -83,7 +84,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
                 temporaryPetWindows.RemoveAt(i);
             }
 
-        windowSystem.Draw();
+        
     }
 
     bool initialized = false;

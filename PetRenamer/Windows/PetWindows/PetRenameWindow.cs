@@ -1,5 +1,4 @@
-﻿using Dalamud.Logging;
-using ImGuiNET;
+﻿using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -26,7 +25,7 @@ public class PetRenameWindow : InitializablePetWindow
     int companionID = -1;
     int battlePetID = -1;
 
-    public PetRenameWindow() : base("Give Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
+    public PetRenameWindow() : base("Pet Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
         Size = new Vector2(310, 195);
     }
@@ -35,9 +34,9 @@ public class PetRenameWindow : InitializablePetWindow
 
     public override void OnDraw()
     {
-        user = PluginLink.PettableUserHandler.LocalUser()!;
-
+        user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
+
         if (companionID == -1 && user.HasCompanion)
         {
             companionID = user.CompanionID;
@@ -92,36 +91,40 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawValidName(string internalTempText, ref int theID)
     {
-        if (Button("Save Nickname"))
-        {
-            internalTempText = internalTempText.Replace("^", "");
-            user.SerializableUser.SaveNickname(theID, internalTempText, notifyICP: true); 
+        if (Button("Save Nickname")) 
+        { 
+            user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true); 
+            PluginLink.Configuration.Save(); 
         }
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            user.SerializableUser.RemoveNickname(theID, notifyICP: true);
+            user.SerializableUser.RemoveNickname(theID, notifyICP: true); 
+            PluginLink.Configuration.Save();
         }
-    }
+}
 
     public void OpenForId(int id, bool forceOpen = false)
     {
+        if (forceOpen) IsOpen = true;
+        user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         companionID = id;
         companionBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(companionID));
         companionName = user.GetCustomName(companionID);
         temporaryCompanionName = companionName;
-        if(forceOpen) IsOpen = true;
+        
     }
 
     public void OpenForBattleID(int id, bool forceOpen = false)
     {
+        if (forceOpen) IsOpen = true;
+        user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         battlePetID = id;
         battlePetBaseName = RemapUtils.instance.PetIDToName(id);
         battlePetName = user.GetCustomName(battlePetID);
         temporaryBattlePetName = battlePetName;
-        if (forceOpen) IsOpen = true;
     }
 
     public override void OnInitialized()

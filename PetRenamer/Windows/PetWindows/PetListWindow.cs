@@ -53,18 +53,21 @@ public class PetListWindow : PetWindow
 
         if (openedAddPet) DrawOpenedNewPet();
         else
-            foreach (SerializableNickname nickname in ConfigurationUtils.instance.GetLocalUserV2()!.nicknames)
+            user.SerializableUser.LoopThrough(nickname =>
             {
-                if (nickname.ID >= -1) continue;
-                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
+                if (nickname.Item1 >= -1) return;
+                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
 
-                Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-                Label(RemapUtils.instance.PetIDToName(nickname.ID).ToString() + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-                if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.ID); ImGui.SameLine();
+                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+                if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true); ImGui.SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                    ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
-            }
+                {
+                    user.SerializableUser.RemoveNickname(nickname.Item1, true);
+                    PluginLink.Configuration.Save();
+                }
+            });
         ImGui.EndListBox();
     }
 
@@ -125,24 +128,23 @@ public class PetListWindow : PetWindow
         if (openedAddPet) DrawOpenedNewPet();
         else
         {
-            SerializableUserV2 user = ConfigurationUtils.instance.GetLocalUserV2()!;
-            if (user != null)
+            user.SerializableUser.LoopThrough(nickname =>
             {
-                foreach (SerializableNickname nickname in user!.nicknames)
-                {
-                    if (nickname == null) continue;
-                    if (nickname.ID <= 0) continue;
-                    string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
+                if (nickname.Item1 <= 0) return;
+                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
 
-                    Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-                    Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-                    if (Button($"{nickname.Name} ##<{counter++}>", Styling.ListNameButton))
-                        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID); ImGui.SameLine();
-                    if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
-                        ConfigurationUtils.instance.RemoveLocalNicknameV2(nickname.ID);
+                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
+                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+                if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true); ImGui.SameLine();
+                if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
+                {
+                    user.SerializableUser.RemoveNickname(nickname.Item1, true);
+                    PluginLink.Configuration.Save();
                 }
+            });
             }
-        }
+        
         ImGui.EndListBox();
     }
 
@@ -175,9 +177,7 @@ public class PetListWindow : PetWindow
             if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
             {
                 openedAddPet = false;
-                if (!NicknameUtils.instance.ContainsLocalV2(nickname.ID))
-                    ConfigurationUtils.instance.SetLocalNicknameV2(nickname.ID, string.Empty);
-                PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID);
+                PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
             }
         }
     }
