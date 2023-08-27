@@ -16,10 +16,9 @@ namespace PetRenamer.Core.Updatable
             PluginHandlers.Framework.Update += MainUpdate;
         }
 
-        ~UpdatableHandler()
+        protected override void OnDipose()
         {
             PluginHandlers.Framework.Update -= MainUpdate;
-            ClearAllUpdatables();
         }
 
         protected override void OnAllRegistered() => updatables?.Sort(Compare);

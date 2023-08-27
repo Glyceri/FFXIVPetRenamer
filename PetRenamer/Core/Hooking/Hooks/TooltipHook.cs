@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 using System;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.Serialization;
-using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 

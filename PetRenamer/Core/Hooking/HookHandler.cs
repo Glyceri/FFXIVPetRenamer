@@ -19,7 +19,7 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
         PluginHandlers.Framework.Update += OnUpdate;
     }
 
-    ~HookHandler()
+    protected override void OnDipose()
     {
         PluginHandlers.Framework.Update -= OnUpdate;
     }

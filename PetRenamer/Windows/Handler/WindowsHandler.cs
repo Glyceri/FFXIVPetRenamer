@@ -22,7 +22,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
         PluginHandlers.PluginInterface.UiBuilder.Draw += Draw;
     }
 
-    ~WindowsHandler() 
+    protected override void OnDipose()
     {
         windowSystem.RemoveAllWindows();
         PluginHandlers.PluginInterface.UiBuilder.Draw -= Draw;
