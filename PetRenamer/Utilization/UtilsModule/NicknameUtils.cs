@@ -12,7 +12,7 @@ using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class NicknameUtils : UtilsRegistryType, ISingletonBase<NicknameUtils>
 {
     public static NicknameUtils instance { get; set; } = null!;

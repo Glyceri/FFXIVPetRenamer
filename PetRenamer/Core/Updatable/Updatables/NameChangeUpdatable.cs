@@ -11,7 +11,7 @@ using System;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable]
+//[Updatable]
 internal class NameChangeUpdatable : Updatable
 {
     int lastID = -1;

@@ -10,7 +10,7 @@ using PetRenamer.Core.Handlers;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-[Hook]
+//[Hook]
 public unsafe sealed class NamePlateHook : HookableElement
 {
     [Signature("40 55 56 57 41 56 48 81 EC ?? ?? ?? ?? 48 8B 84 24", DetourName = nameof(UpdateNameplateDetour))]

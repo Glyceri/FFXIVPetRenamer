@@ -5,7 +5,7 @@ using PetRenamer.Core.Serialization;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable]
+//[Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
     public override void Update(Framework frameWork)

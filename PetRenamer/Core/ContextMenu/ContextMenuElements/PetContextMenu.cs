@@ -10,7 +10,7 @@ using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 
-[ContextMenu]
+//[ContextMenu]
 internal unsafe class PetContextMenu : ContextMenuElement
 {
     internal override void OnOpenMenu(GameObjectContextMenuOpenArgs args)

@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-[Hook]
+//[Hook]
 internal unsafe class PartyListHook : HookableElement
 {
     // VVVVVV ACTUAL BYTE CODE GENEROUSLY PROVIDED BY: Nuko

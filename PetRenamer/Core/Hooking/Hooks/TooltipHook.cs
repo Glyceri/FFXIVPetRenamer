@@ -10,7 +10,7 @@ using PetRenamer.Core.Serialization;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-[Hook]
+//[Hook]
 internal unsafe class TooltipHook : HookableElement
 {
     private Hook<Delegates.AddonUpdate>? addonupdatehook = null;

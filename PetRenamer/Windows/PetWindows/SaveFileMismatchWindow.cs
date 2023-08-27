@@ -4,7 +4,7 @@ using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
-[PersistentPetWindow]
+//[PersistentPetWindow]
 internal class SaveFileMismatchWindow : PetWindow
 {
     public SaveFileMismatchWindow() : base("Save File Mismatch", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse , true)

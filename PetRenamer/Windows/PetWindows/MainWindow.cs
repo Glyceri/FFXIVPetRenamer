@@ -9,9 +9,9 @@ using PetRenamer.Core.Updatable.Updatables;
 
 namespace PetRenamer.Windows.PetWindows;
 
-[MainPetWindow]
-[PersistentPetWindow]
-[ModeTogglePetWindow]
+//[MainPetWindow]
+//[PersistentPetWindow]
+//[ModeTogglePetWindow]
 public class MainWindow : InitializablePetWindow
 {
     int gottenID = -1;

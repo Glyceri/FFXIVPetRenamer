@@ -7,7 +7,7 @@ using Dalamud.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
 {
     public static IpcUtils instance { get; set; } = null!;

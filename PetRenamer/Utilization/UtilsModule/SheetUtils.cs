@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
     ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;

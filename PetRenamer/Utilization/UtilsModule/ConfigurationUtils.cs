@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class ConfigurationUtils : UtilsRegistryType, ISingletonBase<ConfigurationUtils>
 {
     public static ConfigurationUtils instance { get; set; } = null!;

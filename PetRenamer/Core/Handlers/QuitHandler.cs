@@ -4,14 +4,15 @@ internal class QuitHandler
 {
     public void Quit() 
     {
-        PluginLink.WindowHandler.Dispose();
-        PluginLink.CommandHandler.Dispose();
-        PluginLink.UpdatableHandler.Dispose();
-        PluginLink.HookHandler.Dispose();
-        PluginLink.LegacyCompatibilityHandler.Dispose();
-        PluginLink.ContextMenuHandler.Dispose();
-        PluginLink.ChatHandler.Dispose();
-        PluginLink.IpcStorage.Dispose();
+        PluginLink.WindowHandler?.Dispose();
+        PluginLink.CommandHandler?.Dispose();
+        PluginLink.UpdatableHandler?.Dispose();
+        PluginLink.HookHandler?.Dispose();
+        PluginLink.LegacyCompatibilityHandler?.Dispose();
+        PluginLink.ContextMenuHandler?.Dispose();
+        PluginLink.ChatHandler?.Dispose();
+        PluginLink.IpcStorage?.Dispose();
+        PluginLink.PettableUserHandler?.Dispose();
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();

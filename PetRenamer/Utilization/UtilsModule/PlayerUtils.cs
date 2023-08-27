@@ -7,7 +7,7 @@ using FFCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class PlayerUtils : UtilsRegistryType, ISingletonBase<PlayerUtils>
 {
     public static PlayerUtils instance { get; set; } = null!;

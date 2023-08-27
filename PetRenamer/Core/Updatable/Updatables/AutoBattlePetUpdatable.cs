@@ -7,10 +7,10 @@ using System.Collections.Generic;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable]
+//[Updatable(1)]
 internal class AutoBattlePetUpdatable : Updatable
 {
-    public override void LateUpdate(Framework frameWork)
+    public override void Update(Framework frameWork)
     {
         SerializableUserV2? localUser = ConfigurationUtils.instance.GetLocalUserV2();
         if (localUser == null) return;
@@ -33,5 +33,5 @@ internal class AutoBattlePetUpdatable : Updatable
             ConfigurationUtils.instance.SetLocalNicknameV2(id, "");
     }
 
-    public override void Update(Framework frameWork) { }
+    
 }

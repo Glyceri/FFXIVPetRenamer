@@ -3,6 +3,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace PetRenamer;
@@ -16,6 +17,7 @@ public class Configuration : IPluginConfiguration
     public int Version { get; set; } = 4;
 
     public SerializableUserV2[]? serializableUsersV2 = null;
+    public SerializableUserV3[]? serializableUsersV3 = null;
 
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
@@ -32,6 +34,15 @@ public class Configuration : IPluginConfiguration
     void CurrentInitialize()
     {
         if (serializableUsersV2 == null) serializableUsersV2 = new SerializableUserV2[0];
+        if (serializableUsersV3 == null) serializableUsersV3 = new SerializableUserV3[0];
+
+        // TODO: this is temporary
+        List<SerializableUserV3> serializableUserV3 = new List<SerializableUserV3>();
+        foreach(SerializableUserV2 serializableUserV2 in serializableUsersV2)
+        {
+            serializableUserV3.Add(new SerializableUserV3(serializableUserV2.ids, serializableUserV2.names, serializableUserV2.username, serializableUserV2.homeworld));
+        }
+        serializableUsersV3 = serializableUserV3.ToArray();
     }
 
     public void Save() => PluginLink.DalamudPlugin.SavePluginConfig(this);

@@ -12,8 +12,8 @@ using PetRenamer.Core;
 
 namespace PetRenamer.Windows.PetWindows;
 
-[PersistentPetWindow]
-[ModeTogglePetWindow]
+//[PersistentPetWindow]
+//[ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
     int maxBoxHeight = 670;

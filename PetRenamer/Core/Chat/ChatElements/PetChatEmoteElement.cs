@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
-[Chat]
+//[Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)

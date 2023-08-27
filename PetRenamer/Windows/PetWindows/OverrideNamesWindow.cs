@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace PetRenamer.Windows.PetWindows;
 
-[PersistentPetWindow]
+//[PersistentPetWindow]
 internal class OverrideNamesWindow : PetWindow
 {
     SerializableUserV2 importedUser { get; set; } = null!;

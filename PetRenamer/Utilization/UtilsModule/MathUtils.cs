@@ -3,7 +3,7 @@ using PetRenamer.Utilization.Attributes;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class MathUtils : UtilsRegistryType, ISingletonBase<MathUtils>
 {
     public static MathUtils instance { get; set; } = null!;

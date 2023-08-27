@@ -5,7 +5,7 @@ using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
-[UtilsDeclarable]
+//[UtilsDeclarable]
 internal class EnumUtils : UtilsRegistryType, ISingletonBase<EnumUtils>
 {
     public static EnumUtils instance { get; set; } = null!;

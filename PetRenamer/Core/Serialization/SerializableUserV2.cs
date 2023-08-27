@@ -85,7 +85,7 @@ public class SerializableUserV2
                 return;
             }
 
-        var list = ToList();
+        List<SerializableNickname> list = ToList();
         list.Add(nickname);
         nicknames = list.ToArray();
     }

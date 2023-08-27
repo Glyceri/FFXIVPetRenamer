@@ -15,7 +15,7 @@ using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
-[Updatable(-1)]
+//[Updatable(-1)]
 internal unsafe class TargetBarUpdatable : Updatable
 {
     DGameObject target = null!;
