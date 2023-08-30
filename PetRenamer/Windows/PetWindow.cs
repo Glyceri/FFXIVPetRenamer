@@ -1,9 +1,11 @@
+using Dalamud.Game.Text;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Theming;
+using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Windows;
 
@@ -15,7 +17,8 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         { 
             _petMode = value;
             if (petMode == PetMode.Normal)  ThemeHandler.SetTheme(ThemeHandler.baseTheme);
-            else                            ThemeHandler.SetTheme(ThemeHandler.greenTheme);
+            else if (petMode == PetMode.BattlePet) ThemeHandler.SetTheme(ThemeHandler.greenTheme);
+            else if (petMode == PetMode.ShareMode) ThemeHandler.SetTheme(ThemeHandler.redTheme);
         } 
     }
 
@@ -38,7 +41,8 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         if(drawToggle) DrawModeToggle();
         OnDraw();
         if (petMode == PetMode.Normal) OnDrawNormal();
-        else OnDrawBattlePet();
+        else if (petMode == PetMode.BattlePet) OnDrawBattlePet();
+        else OnDrawSharing();
         OnLateDraw();
         PopAllStyleColours();
     }
@@ -46,6 +50,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     public unsafe virtual void OnDraw() { }
     public unsafe virtual void OnDrawNormal() { }
     public unsafe virtual void OnDrawBattlePet() { }
+    public unsafe virtual void OnDrawSharing() { }
     public unsafe virtual void OnLateDraw() { }
 
     public static class Styling
@@ -55,8 +60,13 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         public static Vector2 ListIDField = new Vector2(75, 25);
         public static Vector2 SmallButton = new Vector2(25, 25);
         public static Vector2 ListSmallNameField = new Vector2(200, 25);
+        public static Vector2 FillSize = new Vector2(755, 25);
+        public static Vector2 FillSizeSmall = new Vector2(746, 25);
+        public static Vector2 FillSizeFull = new Vector2(782, 25);
+        public static Vector2 FillSizeFullSmall = new Vector2(774, 25);
 
         public static Vector2 ToggleButton = new Vector2(30, 12);
+        public static Vector2 helpButtonSize = new Vector2(25, 25);
     }
 
     public static class StylingColours
@@ -90,33 +100,68 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         public static Vector4 scrollBarBG => ThemeHandler.ActiveTheme.scrollBarBG;
     }
 
+    int ButtonCount = 3;
+
     private void DrawModeToggle()
     {
-        bool battleMode = petMode == PetMode.BattlePet;
+        int pressed = -1;
 
-        bool hasBeenPressed = false;
-
-        if (battleMode) 
-        { 
-            if (ToggleButtonBad()) 
-                hasBeenPressed = true; 
-            SameLineNoMargin(); 
-        }
-        
-        if (ToggleButton())                      
-            hasBeenPressed = true;
-
-        if (!battleMode)
+        for(int i = 0; i < (int)PetMode.COUNT; i++)
         {
+            if ((int)petMode == i)
+            {
+                if (ToggleButton(60 + i))
+                    pressed = i;
+            }
+            else
+            {
+                if (ToggleButtonBad(60 + i))
+                    pressed = i;
+            }
+
+            if (i == (int)PetMode.Normal) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Minion Mode]");
+            if (i == (int)PetMode.BattlePet) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Battle Pet Mode]");
+            if (i == (int)PetMode.ShareMode) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Sharing Mode]");
+
             SameLineNoMargin();
-            if (ToggleButtonBad()) 
-                hasBeenPressed = true;
         }
 
-        if (!hasBeenPressed) return;
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.button);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
 
-        if  (battleMode)  petMode = PetMode.Normal;
-        else              petMode = PetMode.BattlePet;
+        float widthLeft = (int)PetMode.COUNT * Styling.ToggleButton.X;
+        float widthRight = ButtonCount * (Styling.helpButtonSize.X + (5 * 2));
+
+        float setWidth = ImGui.GetWindowSize()!.X - widthLeft - widthRight;
+
+        ImGui.SameLine(0, setWidth);
+
+        for (int i = 0; i < ButtonCount; i++)
+        {
+            if (i == 0) {
+                if(ImGui.Button(SeIconChar.BoxedQuestionMark.ToIconString(), Styling.helpButtonSize))
+                    PluginLink.WindowHandler.OpenWindow<PetHelpWindow>();
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Help]");
+            }
+            if (i == 1)
+            {
+                if (ImGui.Button(SeIconChar.MouseWheel.ToIconString(), Styling.helpButtonSize))
+                    PluginLink.WindowHandler.OpenWindow<ConfigWindow>();
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Settings]");
+            }
+            if (i == 2)
+            {
+                if(ImGui.Button(SeIconChar.Square.ToIconString(), Styling.helpButtonSize))
+                    PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Pet/Minion List]");
+            }
+            
+            if (i != ButtonCount - 1) ImGui.SameLine(0, 5f);
+        }
+
+        if (pressed == -1) return;
+        petMode = (PetMode)pressed;
     }
 
     protected bool ToggleButton(int count = 0)
@@ -245,5 +290,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 internal enum PetMode
 {
     Normal,
-    BattlePet
+    BattlePet,
+    ShareMode,
+    COUNT
 }
