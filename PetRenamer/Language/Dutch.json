@@ -1,0 +1,56 @@
+﻿{
+  "Help": "Hulp",
+  "Settings": "Instellingen",
+  "List": "Huisdier lijst",
+
+  "Minion_Mode": "Minion Modus",
+  "Battle_Pet_Mode": "Battle Pet Modus",
+  "Sharing_Mode": "Sharing Modus",
+
+  "Minion_ID": "Minion ID",
+  "Minion_Name": "Minion Naam",
+  "Custom_Minion_Name": "Aangepaste Minion Naam",
+
+  "Pet_ID": "Pet ID",
+  "Pet_Name": "Pet Naam",
+  "Custom_Pet_Name": "Aangepaste Pet Naam",
+  "Pet_Type": "Pet Type",
+
+  "Export_to_Clipboard": "Exporteren naar Klembord",
+  "Import_from_Clipboard": "Importeren van Klembord",
+  "Export_Import_Header": "Een vriend kan jouw code importeren.",
+  "Save_Imported_list": "Sla Geïmporteerde lijst op.",
+  "Export_Tooltip": "Exporteert ALLE bijnamen naar een lijst.\nDeze kan je vervolgens naar iedereen sturen.\nBijvoorbeeld: Plak de text in Discord en zorgt dat je vriend deze kopieerd.",
+  "Import_Tooltip": "Nadat je alle namen van je vriend hebt gekopieerd,\nen op deze knop hebt gedrukt, worden allen namen geïmporteerd\nwaardoor jij ze nu ook ziet.",
+
+  "Display_Custom_Names": "Geef aangepaste namen weer",
+  "Use_Custom_Theme": "Gebruik aangepaste weergave",
+  "Allow_Tooltips": "Sta tooltips toe",
+  "Use_Custom_Names_For_Emotes": "Gebruik aangepaste namen voor emotes",
+  "Allow_Context_Menus": "Gebruik contextmenu's",
+  "Clear_All_Nicknames": "Verwijder alle aangepaste namen",
+  "Credits": "Credits",
+  "Clear_Nicknames_Confirm": "Weet je zeker dat je iedere bijnaam wil verwijderen\nvoor elke gebruiker?",
+
+  "Yes": "Ja",
+  "No": "Nee",
+
+  "Global_Minionname_Settings": "Globale Minionnaam Instellingen",
+  "Created_By": "Gemaakt door:",
+  "In_Memory_Of": "Met liefde gemaakt voor:",
+
+  "English": "Engels",
+  "German": "Duits",
+  "French": "Frans",
+  "Japanese": "Japans",
+  "Dutch": "Nederlands",
+
+  "Minion_List": "Minion Lijst",
+  "Search_by_minion_name_or_id": "Zoek op minion naam of ID",
+  "Add_{minionname}_{minionid}_to_the_list": "Voeg {minionname} [{minionid}] toe aan de lijst?",
+  "Stop_looking": "Stop met zoeken",
+  "Add_new_pet": "Voeg een nieuwe Pet toe",
+  "Rename": "Hernoem",
+  "Deletes_the_nickname": "Verwijderd de bijnaam!",
+  "Clears_the_nickname": "Leegt de bijnaam!"
+}

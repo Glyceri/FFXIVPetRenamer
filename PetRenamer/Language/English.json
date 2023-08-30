@@ -1,0 +1,56 @@
+﻿{
+  "Help": "Help",
+  "Settings": "Settings",
+  "List": "Pet/Minion List",
+
+  "Minion_Mode": "Minion Mode",
+  "Battle_Pet_Mode": "Battle Pet Mode",
+  "Sharing_Mode": "Sharing Mode",
+
+  "Minion_ID": "Minion ID",
+  "Minion_Name": "Minion Name",
+  "Custom_Minion_Name": "Custom Minion Name",
+
+  "Pet_ID": "Pet ID",
+  "Pet_Name": "Pet Name",
+  "Custom_Pet_Name": "Custom Pet Name",
+  "Pet_Type": "Pet Type",
+
+  "Export_to_Clipboard": "Export to Clipboard",
+  "Import_from_Clipboard": "Import from Clipboard",
+  "Export_Import_Header": "A friend can import your code to see your names.",
+  "Save_Imported_list": "Save Imported List",
+  "Export_Tooltip": "Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.",
+  "Import_Tooltip": "After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.",
+
+  "Display_Custom_Names": "Display Custom Names",
+  "Use_Custom_Theme": "Use Custom Theme",
+  "Allow_Tooltips": "Allow Tooltips",
+  "Use_Custom_Names_For_Emotes": "Use Custom Names for Emotes",
+  "Allow_Context_Menus": "Allow Context Menus",
+  "Clear_All_Nicknames": "Clear All Nicknames",
+  "Credits": "Credits",
+  "Clear_Nicknames_Confirm": "Are you sure you want to clear all Nicknames\nfor every user?",
+
+  "Yes": "Yes",
+  "No": "No",
+
+  "Global_Minionname_Settings": "Global Minionname Settings",
+  "Created_By": "Created by:",
+  "In_Memory_Of": "In loving memory of:",
+
+  "English": "English",
+  "German": "German",
+  "French": "French",
+  "Japanese": "Japanese",
+  "Dutch": "Dutch",
+
+  "Minion_List": "Minion List",
+  "Search_by_minion_name_or_id": "Search by minion name or ID",
+  "Add_{minionname}_{minionid}_to_the_list": "Add {minionname} [{minionid}] to the list?",
+  "Stop_looking": "Stop looking for a pet",
+  "Add_new_pet": "Add a new pet",
+  "Rename": "Rename",
+  "Deletes_the_nickname": "Deletes the nickname!",
+  "Clears_the_nickname": "Clears the nickname!"
+}

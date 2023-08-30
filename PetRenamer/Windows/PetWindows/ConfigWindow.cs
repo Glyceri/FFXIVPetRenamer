@@ -1,6 +1,7 @@
 using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Translations;
 using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -10,7 +11,7 @@ namespace PetRenamer.Windows.PetWindows;
 public class ConfigWindow : PetWindow
 {
     public ConfigWindow() : base(
-        "Global minionname Settings",
+        Translate.GetValue("Global_Minionname_Settings"),
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
         Size = new Vector2(232, 225);
@@ -19,17 +20,17 @@ public class ConfigWindow : PetWindow
 
     public override void OnDraw()
     {
-        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || 
-            Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme) || 
-            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltips) || 
-            Checkbox("Use Custom Names for emotes", ref PluginLink.Configuration.replaceEmotes) || 
-            Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenus))
+        if (Checkbox("Display_Custom_Names", ref PluginLink.Configuration.displayCustomNames) || 
+            Checkbox("Use_Custom_Theme", ref PluginLink.Configuration.useCustomTheme) || 
+            Checkbox("Allow_Tooltips", ref PluginLink.Configuration.allowTooltips) || 
+            Checkbox("Use_Custom_Names_For_Emotes", ref PluginLink.Configuration.replaceEmotes) || 
+            Checkbox("Allow_Context_Menus", ref PluginLink.Configuration.useContextMenus))
             PluginLink.Configuration.Save();
 
 
-        if (Button("Clear All Nicknames")) 
+        if (Button("Clear_All_Nicknames")) 
             PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
-                "Are you sure you want to clear all Nicknames\nfor every user?",
+                "Clear_Nicknames_Confirm",
                 (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearAllNicknames(); } }
                 , this);
 

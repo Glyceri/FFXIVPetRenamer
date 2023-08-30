@@ -30,7 +30,34 @@
   </PropertyGroup>
   
    <ItemGroup>
+     <None Remove="Language\Dutch.json" />
+     <None Remove="Language\English.json" />
+     <None Remove="Language\French.json" />
+     <None Remove="Language\German.json" />
+     <None Remove="Language\Japanese.json" />
+   </ItemGroup>
+  
+   <ItemGroup>
+     <Content Include="Language\Dutch.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </Content>
+     <Content Include="Language\Japanese.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </Content>
+     <Content Include="Language\German.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </Content>
+     <Content Include="Language\French.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </Content>
+     <Content Include="Language\English.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </Content>
+   </ItemGroup>
+  
+   <ItemGroup>
      <PackageReference Include="Dalamud.ContextMenu" Version="1.2.3" />
+     <PackageReference Include="Dalamud.Loc" Version="1.0.3" />
      <PackageReference Include="DalamudPackager" Version="2.1.11" />
    </ItemGroup>
   

@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Translations;
 using PetRenamer.Theming;
 using PetRenamer.Windows.PetWindows;
 
@@ -119,9 +120,9 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
                     pressed = i;
             }
 
-            if (i == (int)PetMode.Normal) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Minion Mode]");
-            if (i == (int)PetMode.BattlePet) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Battle Pet Mode]");
-            if (i == (int)PetMode.ShareMode) if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Sharing Mode]");
+            if (i == (int)PetMode.Normal) if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("Minion_Mode")}]");
+            if (i == (int)PetMode.BattlePet) if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("Battle_Pet_Mode")}]");
+            if (i == (int)PetMode.ShareMode) if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("Sharing_Mode")}]");
 
             SameLineNoMargin();
         }
@@ -142,19 +143,19 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
             if (i == 0) {
                 if(ImGui.Button(SeIconChar.BoxedQuestionMark.ToIconString(), Styling.helpButtonSize))
                     PluginLink.WindowHandler.OpenWindow<PetHelpWindow>();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Help]");
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("Help")}]");
             }
             if (i == 1)
             {
                 if (ImGui.Button(SeIconChar.MouseWheel.ToIconString(), Styling.helpButtonSize))
                     PluginLink.WindowHandler.OpenWindow<ConfigWindow>();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Settings]");
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("Settings")}]");
             }
             if (i == 2)
             {
                 if(ImGui.Button(SeIconChar.Square.ToIconString(), Styling.helpButtonSize))
                     PluginLink.WindowHandler.OpenWindow<PetListWindow>();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Pet/Minion List]");
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"[{Translate.GetValue("List")}]");
             }
             
             if (i != ButtonCount - 1) ImGui.SameLine(0, 5f);
@@ -186,7 +187,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
-        return ImGui.Button(text);
+        return ImGui.Button(TranslateString(text));
     }
 
     protected bool Button(string text, Vector2 styling)
@@ -195,7 +196,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool XButtonError(string text, Vector2 styling)
@@ -204,7 +205,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.errorText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool XButton(string text, Vector2 styling)
@@ -213,7 +214,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool Label(string text, Vector2 styling)
@@ -222,7 +223,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button,           StylingColours.idleColor);
         PushStyleColor(ImGuiCol.ButtonActive,     StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool NewLabel(string text, Vector2 styling)
@@ -231,7 +232,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.button);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool OverrideLabel(string text, Vector2 styling)
@@ -240,7 +241,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text, styling);
+        return ImGui.Button(TranslateString(text), styling);
     }
 
     protected bool Checkbox(string text, ref bool value)
@@ -250,7 +251,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.xButtonHovered);
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
-        return ImGui.Checkbox(text, ref value);
+        return ImGui.Checkbox(TranslateString(text), ref value);
     }
 
 
@@ -271,7 +272,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     protected bool BeginListBox(string text, Vector2 styling)
     {
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.listBox);
-        return ImGui.BeginListBox(text, styling);
+        return ImGui.BeginListBox(TranslateString(text), styling);
     }
 
     protected bool InputText(string label, ref string input, uint maxLength, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
@@ -279,7 +280,18 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.textFieldPressed);
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
-        return ImGui.InputText(label, ref input, maxLength, flags);
+        return ImGui.InputText(TranslateString(label), ref input, maxLength, flags);
+    }
+
+    string TranslateString(string inputString)
+    {
+        if (!inputString.Contains("##")) return Translate.GetValue(inputString);
+        else
+        {
+            string[] splitString = inputString.Split("##");
+            if(splitString.Length != 2) return Translate.GetValue(splitString[0]);
+            return Translate.GetValue(splitString[0]) + "##" + splitString[1];
+        }
     }
 
     protected void SameLine() => ImGui.SameLine();

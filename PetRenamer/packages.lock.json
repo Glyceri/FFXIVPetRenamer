@@ -8,6 +8,12 @@
         "resolved": "1.2.3",
         "contentHash": "ydemplF7DNcA/LLeongDVzWUD/JV0Fw3EwA2+P0jYq3Le2ZYSt4U8qyJq4FyoChqt0lFG8BxYCAzfeWp4Jmnqw=="
       },
+      "Dalamud.Loc": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "EOuF/6fCmcGpslKeW7gPgt1yOMv9JdC+W+7SEVWwLsyZo/W13RqsPiSYpMXmZbV2byjdavweZVxF3dNziRZOdA=="
+      },
       "DalamudPackager": {
         "type": "Direct",
         "requested": "[2.1.11, )",

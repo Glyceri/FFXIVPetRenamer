@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
+using PetRenamer.Core.Translations;
 using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -7,7 +8,7 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 public class CreditsWindow : PetWindow
 {
-    public CreditsWindow() : base("Credits",
+    public CreditsWindow() : base(Translate.GetValue("Credits"),
    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
    ImGuiWindowFlags.NoScrollWithMouse)
     {
@@ -17,7 +18,7 @@ public class CreditsWindow : PetWindow
 
     public override void OnDraw()
     {
-        Label("Created by: Glyceri", Styling.ListNameButton);
-        Label("In loving memory of: Bruno", Styling.ListNameButton);
+        Label($"{Translate.GetValue("Created_By")} Glyceri", Styling.ListNameButton);
+        Label($"{Translate.GetValue("In_Memory_Of")} Bruno", Styling.ListNameButton);
     }
 }

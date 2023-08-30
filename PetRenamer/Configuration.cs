@@ -24,6 +24,13 @@ public class Configuration : IPluginConfiguration
     public bool replaceEmotes = true;
     public bool allowTooltips = true;
     public bool useContextMenus = true;
+    //-1 = Client Language
+    // 0 = English
+    // 1 = German
+    // 2 = French
+    // 3 = Japanese
+    // 4 = Dutch
+    public int language = -1;
 
     public void Initialize()
     {

@@ -1,6 +1,7 @@
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
+using PetRenamer.Core.Translations;
 using System;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -10,13 +11,13 @@ public class ConfirmPopup : TemporaryPetWindow
     string message;
     Window blackenedWindow;
 
-    public ConfirmPopup(string message, Action<object> callback, Window blackenedWindow = null!) : base(message, callback, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar)
+    public ConfirmPopup(string message, Action<object> callback, Window blackenedWindow = null!) : base(Translate.GetValue(message), callback, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar)
     {
         Size = new Vector2(290, 140);
         SizeCondition = ImGuiCond.Always;
         if (blackenedWindow != null)
             Position = blackenedWindow.Position;
-        this.message = message;
+        this.message = Translate.GetValue(message);
         this.blackenedWindow = blackenedWindow!;
         IsOpen = true;
     }
