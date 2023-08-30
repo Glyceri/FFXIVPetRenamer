@@ -15,4 +15,6 @@ internal class RedTheme : BaseTheme
     internal override Vector4 xButtonHovered { get; set; } = new Vector4(0.8f, 0.5f,  0.5f, 1f);
     internal override Vector4 xButtonPressed { get; set; } = new Vector4(0.8f, 0.36f,  0.36f, 1f);
     internal override Vector4 xButton { get; set; } = new Vector4(0.8f, 0.3f, 0.3f, 1f);
+
+    internal override Vector4 highlightedText { get; set; } = new Vector4(1f, 0.6f, 0.6f, 1f);
 }

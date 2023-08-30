@@ -25,9 +25,12 @@ public class PetRenameWindow : InitializablePetWindow
     int companionID = -1;
     int battlePetID = -1;
 
+    Vector2 baseSize = new Vector2(310, 158);
+    Vector2 wideSize = new Vector2(335, 127);
+
     public PetRenameWindow() : base("Pet Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
-        Size = new Vector2(310, 195);
+        Size = baseSize;
     }
 
     PettableUser user = null!;
@@ -56,6 +59,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     public override void OnDrawNormal()
     {
+        Size = baseSize;
         if (user == null) return;
         if (!user.HasCompanion) ImGui.TextColored(StylingColours.highlightText, "Please summon a minion.");
         else DrawPetNameField(companionBaseName, ref companionName, ref temporaryCompanionName, ref companionID);
@@ -63,6 +67,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     public override void OnDrawBattlePet()
     {
+        Size = baseSize;
         if (user == null) return;
         if (!user.HasBattlePet)
         {
@@ -72,19 +77,27 @@ public class PetRenameWindow : InitializablePetWindow
         else DrawPetNameField(battlePetBaseName, ref battlePetName, ref temporaryBattlePetName, ref battlePetID);
     }
 
+    public override void OnDrawSharing()
+    {
+        Size = wideSize;
+        PluginLink.WindowHandler.GetWindow<PetListWindow>()?.DrawExportHeader();
+    }
+
     void DrawPetNameField(string basePet, ref string temporaryName, ref string temporaryCustomName, ref int theID)
     {
         ImGui.TextColored(StylingColours.whiteText, $"Your");               SameLinePretendSpace();
         ImGui.TextColored(StylingColours.highlightText, $"{basePet}");      SameLinePretendSpace();
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{basePet}");
         if (temporaryName.Length == 0) ImGui.TextColored(StylingColours.whiteText, $"does not have a name!");
         else
         {
             ImGui.TextColored(StylingColours.whiteText, $"is named:");
             if (temporaryName.Length < 10) SameLinePretendSpace();
             ImGui.TextColored(StylingColours.highlightText, $"{temporaryName}");
+            if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{temporaryName}");
         }
         InputText(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize);
-
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Put in a nickname here.");
         temporaryCustomName = temporaryCustomName.Trim();
         DrawValidName(temporaryCustomName, ref theID);
     }
@@ -96,13 +109,15 @@ public class PetRenameWindow : InitializablePetWindow
             user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true); 
             PluginLink.Configuration.Save(); 
         }
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
             user.SerializableUser.RemoveNickname(theID, notifyICP: true); 
             PluginLink.Configuration.Save();
         }
-}
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Removes the nickname from your list.");
+    }
 
     public void OpenForId(int id, bool forceOpen = false)
     {
