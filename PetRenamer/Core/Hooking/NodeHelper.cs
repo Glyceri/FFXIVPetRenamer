@@ -1,7 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 
-//Code from daily duteis
+//Code from daily duties
 namespace PetRenamer.Core.Hooking;
 
 internal unsafe class BaseNode
