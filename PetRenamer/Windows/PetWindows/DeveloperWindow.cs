@@ -197,9 +197,9 @@ internal class DeveloperWindow : PetWindow
     {
         SetSize(baseSize);
         NewLabel("Totalcount: " + totalCount.ToString(), Styling.ListSmallNameField);
-        ImGui.SameLine();
+        SameLine();
         NewLabel("Active player count: " + playerCount.ToString(), Styling.ListSmallNameField);
-        ImGui.NewLine();
+        NewLine();
         totalCount = 0;
         playerCount = 0;
         PluginLink.PettableUserHandler.LoopThroughUsers(DrawUser);
@@ -208,37 +208,37 @@ internal class DeveloperWindow : PetWindow
     void DrawUser(PettableUser user)
     {
         NewLabel(user.UserName, Styling.ListSmallNameField);
-        ImGui.SameLine();
+        SameLine();
         NewLabel(user.Homeworld.ToString(), Styling.ListIDField);
-        ImGui.SameLine();
+        SameLine();
         if (user.UserExists) { NewLabel("O", Styling.SmallButton); playerCount++; }
         else NewLabel("X", Styling.SmallButton);
 
-        ImGui.SameLine();
+        SameLine();
         NewLabel(user.SerializableUser.length.ToString(), Styling.ListIDField);
         totalCount += user.SerializableUser.length;
         if (user.HasBattlePet)
         {
             NewLabel(user.BattlePetID.ToString(), Styling.ListIDField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.BattlePetSkeletonID.ToString(), Styling.ListIDField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.BattlePetCustomName.ToString(), Styling.ListSmallNameField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.BaseBattelPetName.ToString(), Styling.ListSmallNameField);
         }
 
         if (user.HasCompanion)
         {
             NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.CustomCompanionName.ToString(), Styling.ListSmallNameField);
-            ImGui.SameLine();
+            SameLine();
             NewLabel(user.CompanionBaseName.ToString(), Styling.ListSmallNameField);
         }
 
-        ImGui.NewLine();
+        NewLine();
     }
 }

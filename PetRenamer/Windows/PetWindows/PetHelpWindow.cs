@@ -62,9 +62,9 @@ internal class PetHelpWindow : PetWindow
 
     public override void OnLateDraw()
     {
-        ImGui.NewLine();
-        ImGui.NewLine();
-        ImGui.BeginListBox("##HelpBoxBase", new Vector2(790, 735));
+        NewLine();
+        NewLine();
+        BeginListBox("##HelpBoxBase", new Vector2(790, 735));
         DrawHelpHeader();
         if (curMode == HelpMode.Naming)  DrawNamingHelp();
         if (curMode == HelpMode.Modes)   DrawModesHelp();
@@ -77,23 +77,23 @@ internal class PetHelpWindow : PetWindow
     {
         if (Button("Naming a pet", Styling.ListSmallNameField)) curMode = HelpMode.Naming; ImGui.SameLine(0, 91);
 
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Help with naming a pet.");
+        if (ImGui.IsItemHovered()) SetTooltip("Help with naming a pet.");
 
         if (Button("Modes", Styling.ListSmallNameField)) curMode = HelpMode.Modes; ImGui.SameLine(0, 91);
 
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Help with switching modes and it's implications.");
+        if (ImGui.IsItemHovered()) SetTooltip("Help with switching modes and it's implications.");
 
         if (Button("Sharing", Styling.ListSmallNameField)) curMode = HelpMode.Sharing;
 
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Help with sharing nicknames.");
+        if (ImGui.IsItemHovered()) SetTooltip("Help with sharing nicknames.");
     }
 
     void DrawNamingHelp()
     {
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace(); 
         Label("Help with naming a pet.", Styling.FillSize);
-        ImGui.NewLine();
-        ImGui.BeginListBox("##Naming Help", new Vector2(782, 648));
+        NewLine();
+        BeginListBox("##Naming Help", new Vector2(782, 648));
 
         NewLabel("1.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("You can open the naming window by right-clicking on your minion or pet and choosing the [Give Nickname] option.", Styling.FillSizeSmall);
@@ -105,19 +105,19 @@ internal class PetHelpWindow : PetWindow
         Label("Depending on if you are naming a minion or battle pet you need to switch modes.", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("See the section [Modes] for help with that.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
         NewLabel("2.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("Fill a name into the Text Box and click [Save Nickname].", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Not clicking [Save Nickname] will result in the nickname NOT applying.", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("ALL your nicknames will automatically save.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
         NewLabel("3.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("If your pet has a nickname and you don't want it to have one anymore? Please click [Remove Nickname].", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("ALL your nicknames will automatically save.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
 
         NewLabel("4.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("There is another way to name a Minion or Battle Pet.", Styling.FillSizeSmall);
@@ -145,8 +145,8 @@ internal class PetHelpWindow : PetWindow
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Help about switching modes and it's implications.", Styling.FillSize);
 
-        ImGui.NewLine();
-        ImGui.BeginListBox("##Modes Help Box", new Vector2(782, 648));
+        NewLine();
+        BeginListBox("##Modes Help Box", new Vector2(782, 648));
 
         NewLabel("1.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("In the top left of some windows small buttons will be located.", Styling.FillSizeSmall);
@@ -154,7 +154,7 @@ internal class PetHelpWindow : PetWindow
         Label("Clicking these will switch modes.", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Switching modes is required for naming minions or battle pets.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
         NewLabel("2.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("There are 3 modes:", Styling.FillSizeSmall);
 
@@ -167,13 +167,13 @@ internal class PetHelpWindow : PetWindow
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("[Sharing Mode]", Styling.FillSizeSmall);
 
-        ImGui.NewLine();
+        NewLine();
         NewLabel("3.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("[Minion Mode]", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Enable minion mode to give a nickname to minions.", Styling.FillSizeSmall);
 
-        ImGui.NewLine();
+        NewLine();
         NewLabel("4.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("[Battle Pet Mode]", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
@@ -185,7 +185,7 @@ internal class PetHelpWindow : PetWindow
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Battle Pet names are tied to the players current job not their current Battle Pet", Styling.FillSizeSmall);
 
-        ImGui.NewLine();
+        NewLine();
         NewLabel("5.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("[Sharing Mode]", Styling.FillSizeSmall);
         NewLabel("?", Styling.helpButtonSize); SameLinePretendSpace();
@@ -198,8 +198,8 @@ internal class PetHelpWindow : PetWindow
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Help about sharing your pets with your friends.", Styling.FillSize);
 
-        ImGui.NewLine();
-        ImGui.BeginListBox("##Sharing Help Box", new Vector2(782, 648));
+        NewLine();
+        BeginListBox("##Sharing Help Box", new Vector2(782, 648));
 
         NewLabel("1.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("Sharing Mode is by far the most interesting mode. You can access the full Sharing Mode window via: ", Styling.FillSizeSmall);
@@ -207,7 +207,7 @@ internal class PetHelpWindow : PetWindow
         Label("[/minionnames] [/petnames] [/minionlist] [/petlist]", Styling.FillSizeSmall);
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Or the button in the top right corner of most windows.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
 
         NewLabel("2.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("Exporting", Styling.FillSizeSmall);
@@ -215,7 +215,7 @@ internal class PetHelpWindow : PetWindow
         Label("By clicking [Export to Clipboard] you will copy all your petnames to your clipboard.", Styling.FillSizeSmall);
         NewLabel("!", Styling.helpButtonSize); SameLinePretendSpace();
         Label("Send this list to your friends (For example: pasting it into Discord) so they can copy it.", Styling.FillSizeSmall);
-        ImGui.NewLine();
+        NewLine();
 
         NewLabel("3.", Styling.helpButtonSize); SameLinePretendSpace();
         NewLabel("Importing", Styling.FillSizeSmall);
