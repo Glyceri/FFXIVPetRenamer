@@ -1,34 +1,47 @@
-using Dalamud.Game;
-using Dalamud.Logging;
-using Dalamud.Memory;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
+﻿using Dalamud.Game;
+using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Hooking;
-using PetRenamer.Windows.Attributes;
-using System;
+using PetRenamer.Core.Hooking.Attributes;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using Dalamud.Logging;
+using Dalamud.Memory;
+using System;
 
-namespace PetRenamer.Core.Updatable.Updatables;
+namespace PetRenamer.Core.Hooking.Hooks;
 
-[Updatable(-1)]
-internal unsafe class TargetBarUpdatable : Updatable
+[Hook]
+internal unsafe class TargetBarHooking : HookableElement
 {
-    DGameObject target = null!;
-    DGameObject targetOfTarget = null!;
-    DGameObject focusTarget = null!;
+    private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
+    private Hook<Delegates.AddonUpdate>? addonupdatehook2 = null;
 
-    public override void Update(Framework frameWork)
+    AtkUnitBase* baseElement;
+    AtkUnitBase* baseElement2;
+
+    internal override void OnUpdate(Framework framework)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
         HandleTargetElements();
-        HandleTargetBar();
-        HandleTargetOfTargetBar();
-        HandleFocusBar();
+
+        baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_TargetInfoMainTarget");
+
+        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[42]), Update);
+        addonupdatehook?.Enable();
+
+        baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_FocusTargetInfo");
+
+        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[42]), Update2);
+        addonupdatehook2?.Enable();
     }
+
+    DGameObject target = null!;
+    DGameObject targetOfTarget = null!;
+    DGameObject focusTarget = null!;
 
     void HandleTargetElements()
     {
@@ -38,18 +51,31 @@ internal unsafe class TargetBarUpdatable : Updatable
         focusTarget = PluginHandlers.TargetManager.FocusTarget!;
     }
 
-    void HandleTargetBar()
+    byte Update(AtkUnitBase* baseD)
     {
-        if (target == null) return;
+        HandleTargetBar();
+        HandleTargetOfTargetBar();
+        return addonupdatehook!.Original(baseD);
+    }
+
+    byte Update2(AtkUnitBase* baseD)
+    {
+        HandleFocusBar();
+        return addonupdatehook2!.Original(baseD);
+    }
+
+    void HandleFocusBar()
+    {
+        if (focusTarget == null) return;
         try
         {
-            TargetObjectKind targetObjectKind = target.ObjectKind;
-            BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
+            TargetObjectKind targetObjectKind = focusTarget.ObjectKind;
+            BaseNode resNode = new BaseNode("_FocusTargetInfo");
             if (resNode == null) return;
             AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
             if (textNode == null) return;
-            if (target.Name.ToString() != textNode->NodeText.ToString()) return;
-            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex);
+            if (!textNode->NodeText.ToString().Contains(focusTarget.Name.ToString())) return;
+            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
             SetFor(textNode, gObj);
         }
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
@@ -57,8 +83,7 @@ internal unsafe class TargetBarUpdatable : Updatable
 
     void HandleTargetOfTargetBar()
     {
-        if (target == null) return;
-        if (targetOfTarget == null) return;
+        if (target == null || targetOfTarget == null) return;
         try
         {
             TargetObjectKind targetObjectKind = targetOfTarget.ObjectKind;
@@ -89,21 +114,17 @@ internal unsafe class TargetBarUpdatable : Updatable
         catch (Exception ex) { PluginLog.Log(ex.ToString()); }
     }
 
-    void HandleFocusBar()
+    void HandleTargetBar()
     {
-        if (focusTarget == null) return;
-        try
-        {
-            TargetObjectKind targetObjectKind = focusTarget.ObjectKind;
-            BaseNode resNode = new BaseNode("_FocusTargetInfo");
-            if (resNode == null) return;
-            AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
-            if (textNode == null) return;
-            if (!textNode->NodeText.ToString().Contains(focusTarget.Name.ToString())) return;
-            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
-            SetFor(textNode, gObj);
-        }
-        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+        if (target == null) return;
+        TargetObjectKind targetObjectKind = target.ObjectKind;
+        BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
+        if (resNode == null) return;
+        AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
+        if (textNode == null) return;
+        if (target.Name.ToString() != textNode->NodeText.ToString()) return;
+        GameObject* gObj = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex);
+        SetFor(textNode, gObj);
     }
 
     void SetFor(AtkTextNode* textNode, GameObject* gObj)
@@ -124,5 +145,14 @@ internal unsafe class TargetBarUpdatable : Updatable
             }
             return false;
         });
+    }
+
+    internal override void OnDispose()
+    {
+        addonupdatehook?.Disable();
+        addonupdatehook?.Dispose();
+
+        addonupdatehook2?.Disable();
+        addonupdatehook2?.Dispose();
     }
 }
