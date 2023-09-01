@@ -93,8 +93,8 @@ public class PetListWindow : PetWindow
                 }
                 alreadyExistingUser = null!;
                 importedUser = null!;
-                PluginLink.Configuration.Save();
             }
+            PluginLink.Configuration.Save();
         }
     }
 
