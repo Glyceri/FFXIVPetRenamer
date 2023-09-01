@@ -3,6 +3,7 @@ using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
+using FFBattleCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
@@ -96,7 +97,9 @@ internal unsafe class TargetBarHooking : HookableElement
 
             if (targetObjectKind == TargetObjectKind.Player)
             {
-                ulong targetID2 = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target.ObjectId)->Character.GetTargetId();
+                FFBattleCharacter* bChara = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target.ObjectId);
+                if (bChara == null) return;
+                ulong targetID2 = bChara->Character.GetTargetId();
                 if (!targetID2.ToString("X").StartsWith("4")) return;
 
                 targetObjectKind = TargetObjectKind.Companion;

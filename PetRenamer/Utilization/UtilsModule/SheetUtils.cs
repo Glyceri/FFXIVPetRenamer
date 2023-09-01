@@ -33,8 +33,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     public void PrintAllPets()
     {
         foreach (Pet pet in battlePetSheet)
-            
-                PluginLog.Log(pet.Name + " : " + pet.RowId.ToString());
+            PluginLog.Log(pet.Name + " : " + pet.RowId.ToString());
     }
 
     public string GetBattlePetName(int id)
