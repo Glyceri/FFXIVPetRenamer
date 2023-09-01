@@ -4,18 +4,15 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using PetRenamer.Core;
-using System.Linq;
 using PetRenamer.Core.Singleton;
-using System.Text.RegularExpressions;
+using Dalamud.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
 [UtilsDeclarable]
 internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
-    ExcelSheet<Lumina.Excel.GeneratedSheets.Companion> petSheet { get; set; } = null!;
+    ExcelSheet<Companion> petSheet { get; set; } = null!;
     ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
@@ -25,7 +22,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     internal override void OnRegistered()
     {
-        petSheet = PluginHandlers.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Companion>()!;
+        petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
         worlds = PluginHandlers.DataManager.GetExcelSheet<World>()!;
         races = PluginHandlers.DataManager.GetExcelSheet<Race>()!;
         tribe = PluginHandlers.DataManager.GetExcelSheet<Tribe>()!;
@@ -33,7 +30,14 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
     }
 
-    public unsafe string GetBattlePetName(int id)
+    public void PrintAllPets()
+    {
+        foreach (Pet pet in battlePetSheet)
+            
+                PluginLog.Log(pet.Name + " : " + pet.RowId.ToString());
+    }
+
+    public string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
         if(id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
@@ -56,7 +60,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public string GetPetName(int id)
     {
-        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
+        foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
 
@@ -68,7 +72,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public int GetIDFromName(string name)
     {
-        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
+        foreach (Companion pet in petSheet)
         {
             if(pet == null) continue;
             if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
@@ -84,7 +88,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         List<SerializableNickname> serializableNicknames = new List<SerializableNickname>();
         if(querry.Length == 0) return serializableNicknames;
 
-        foreach (Lumina.Excel.GeneratedSheets.Companion pet in petSheet)
+        foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
             int petModel = pet.Model.Value!.Model;

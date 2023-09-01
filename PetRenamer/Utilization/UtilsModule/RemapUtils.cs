@@ -52,6 +52,11 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { -4,   35 }, //Bishop Autoturret
         { -5,   19 }, //Bunshin Ninja
 
+        { 2620, 14 }, //Demi-Phoenix
+        { 1930, 10 }, //Demi-Bahamut
+        { 3124, 31 }, //Topaz-Titan
+        { 3123, 32 }, //Emerald-Garuda
+        { 3122, 30 }, //Ruby-Iffrit
     };
 
     private readonly Dictionary<int, int> classToPetID = new Dictionary<int, int>()

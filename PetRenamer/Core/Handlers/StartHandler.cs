@@ -1,4 +1,5 @@
 ﻿using Dalamud.Plugin;
+using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Handlers;
 
@@ -8,6 +9,8 @@ internal class StartHandler
     {
         PluginHandlers.Start(ref dalamudPluginInterface);
         PluginLink.Start(ref dalamudPluginInterface, ref plugin);
+
+        SheetUtils.instance.PrintAllPets();
 
         IpcProvider.Init(ref dalamudPluginInterface);
         IpcProvider.NotifyReady();
