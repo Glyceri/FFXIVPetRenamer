@@ -11,6 +11,7 @@ using PetRenamer.Utilization.UtilsModule;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using System.Text.RegularExpressions;
 using PetRenamer.Core.PettableUserSystem;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
@@ -34,6 +35,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
 
         FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
         if (lookedUpChar2 == null) return;
+        PluginLog.Log(lookedUpChar2->CharacterData.ModelCharaId.ToString());
         GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
         if (gObj != null)
         {
@@ -43,6 +45,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
         }
         else
         {
+            if (!RemapUtils.instance.skeletonToClass.ContainsKey(lookedUpChar2->CharacterData.ModelCharaId)) return;
             nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
             BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
             if (chara == null) return;
