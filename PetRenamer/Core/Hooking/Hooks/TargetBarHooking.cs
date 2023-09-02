@@ -105,7 +105,9 @@ internal unsafe class TargetBarHooking : HookableElement
                 targetObjectKind = TargetObjectKind.Companion;
 
                 FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetID2);
+                if (lookedUpChar2 == null) return;
                 GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
+                if(gObj == null) return;
                 nameString = MemoryHelper.ReadSeString((nint)gObj->Name, 64).ToString();
                 index = gObj->ObjectIndex;
             }
