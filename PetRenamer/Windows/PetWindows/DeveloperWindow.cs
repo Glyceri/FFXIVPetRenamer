@@ -225,7 +225,7 @@ internal class DeveloperWindow : PetWindow
             SameLine();
             NewLabel(user.BattlePetCustomName.ToString(), Styling.ListSmallNameField);
             SameLine();
-            NewLabel(user.BaseBattelPetName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.BaseBattlePetName.ToString(), Styling.ListSmallNameField);
         }
 
         if (user.HasCompanion)

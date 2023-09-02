@@ -51,7 +51,7 @@ public class PetRenameWindow : InitializablePetWindow
         if (battlePetID == -1 && user.HasBattlePet)
         {
             battlePetID = user.BattlePetID;
-            battlePetBaseName = user.BaseBattelPetName;
+            battlePetBaseName = user.BaseBattlePetName;
             battlePetName = user.BattlePetCustomName;
             temporaryBattlePetName = battlePetName;
         }
@@ -61,7 +61,12 @@ public class PetRenameWindow : InitializablePetWindow
     {
         Size = baseSize;
         if (user == null) return;
-        if (!user.HasCompanion) ImGui.TextColored(StylingColours.highlightText, "Please summon a minion.");
+        if (!user.HasCompanion) 
+        { 
+            TextColoured(StylingColours.highlightText, $"Please summon a minion.\nOr open the naming list: ");
+            if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+            SetTooltipHovered("Opens the Minion List");
+        }
         else DrawPetNameField(companionBaseName, ref companionName, ref temporaryCompanionName, ref companionID);
     }
 
@@ -69,9 +74,14 @@ public class PetRenameWindow : InitializablePetWindow
     {
         Size = baseSize;
         if (user == null) return;
-        if (!user.HasBattlePet)
+        if (battlePetID == -1)
         {
-            if (battlePetBaseName == string.Empty) TextColoured(StylingColours.highlightText, $"Please summon a Battle Pet.");
+            if (battlePetBaseName == string.Empty) 
+            { 
+                TextColoured(StylingColours.highlightText, $"Please summon a Battle Pet.\nOr open the naming list: ");
+                if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+                SetTooltipHovered("Opens the Battle Pet List");
+            }
             else TextColoured(StylingColours.highlightText, $"Please summon your {battlePetBaseName}.");
         }
         else DrawPetNameField(battlePetBaseName, ref battlePetName, ref temporaryBattlePetName, ref battlePetID);
@@ -87,17 +97,17 @@ public class PetRenameWindow : InitializablePetWindow
     {
         TextColoured(StylingColours.whiteText, $"Your");               SameLinePretendSpace();
         TextColoured(StylingColours.highlightText, $"{basePet}");      SameLinePretendSpace();
-        if (ImGui.IsItemHovered()) SetTooltip($"{basePet}");
+        SetTooltipHovered($"{basePet}");
         if (temporaryName.Length == 0) TextColoured(StylingColours.whiteText, $"does not have a name!");
         else
         {
             TextColoured(StylingColours.whiteText, $"is named:");
             if (temporaryName.Length < 10) SameLinePretendSpace();
             TextColoured(StylingColours.highlightText, $"{temporaryName}");
-            if (ImGui.IsItemHovered()) SetTooltip($"{temporaryName}");
+            SetTooltipHovered($"{temporaryName}");
         }
         InputText(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize);
-        if (ImGui.IsItemHovered()) SetTooltip("Put in a nickname here.");
+        SetTooltipHovered("Put in a nickname here.");
         temporaryCustomName = temporaryCustomName.Trim();
         DrawValidName(temporaryCustomName, ref theID);
     }
@@ -109,14 +119,14 @@ public class PetRenameWindow : InitializablePetWindow
             user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true); 
             PluginLink.Configuration.Save(); 
         }
-        if (ImGui.IsItemHovered()) SetTooltip("[Required to see a nickname]");
+        SetTooltipHovered("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
             user.SerializableUser.RemoveNickname(theID, notifyICP: true); 
             PluginLink.Configuration.Save();
         }
-        if (ImGui.IsItemHovered()) SetTooltip("Removes the nickname from your list.");
+        SetTooltipHovered("Removes the nickname from your list.");
     }
 
     public void OpenForId(int id, bool forceOpen = false)

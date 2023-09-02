@@ -77,15 +77,15 @@ internal class PetHelpWindow : PetWindow
     {
         if (Button("Naming a pet", Styling.ListSmallNameField)) curMode = HelpMode.Naming; ImGui.SameLine(0, 91);
 
-        if (ImGui.IsItemHovered()) SetTooltip("Help with naming a pet.");
+        SetTooltipHovered("Help with naming a pet.");
 
         if (Button("Modes", Styling.ListSmallNameField)) curMode = HelpMode.Modes; ImGui.SameLine(0, 91);
 
-        if (ImGui.IsItemHovered()) SetTooltip("Help with switching modes and it's implications.");
+        SetTooltipHovered("Help with switching modes and it's implications.");
 
         if (Button("Sharing", Styling.ListSmallNameField)) curMode = HelpMode.Sharing;
 
-        if (ImGui.IsItemHovered()) SetTooltip("Help with sharing nicknames.");
+        SetTooltipHovered("Help with sharing nicknames.");
     }
 
     void DrawNamingHelp()

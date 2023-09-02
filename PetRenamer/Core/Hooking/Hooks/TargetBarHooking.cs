@@ -31,12 +31,12 @@ internal unsafe class TargetBarHooking : HookableElement
 
         baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_TargetInfoMainTarget");
 
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[42]), Update);
+        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
 
         baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_FocusTargetInfo");
 
-        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[42]), Update2);
+        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
         addonupdatehook2?.Enable();
     }
 

@@ -259,19 +259,19 @@ public class PetListWindow : PetWindow
                 string currentPetName = StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
 
                 Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); SameLine();
-                if (ImGui.IsItemHovered()) SetTooltip($"Pet ID: {nickname.Item1}");
+                SetTooltipHovered($"Pet ID: {nickname.Item1}");
                 Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
-                if (ImGui.IsItemHovered()) SetTooltip($"Pet Type: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                SetTooltipHovered($"Pet Type: {StringUtils.instance.MakeTitleCase(currentPetName)}");
                 if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
                     PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true);
-                if (ImGui.IsItemHovered()) SetTooltip($"Rename: {nickname.Item2}");
+                SetTooltipHovered($"Rename: {nickname.Item2}");
                 SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                 {
                     user.SerializableUser.RemoveNickname(nickname.Item1, true);
                     PluginLink.Configuration.Save();
                 }
-                if (ImGui.IsItemHovered()) SetTooltip($"Clears the nickname!");
+                SetTooltipHovered($"Clears the nickname!");
             });
         ImGui.EndListBox();
     }
@@ -312,7 +312,7 @@ public class PetListWindow : PetWindow
             }
             catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); }
         }
-        if (ImGui.IsItemHovered()) SetTooltip("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.");
+        SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.");
         SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
@@ -326,7 +326,7 @@ public class PetListWindow : PetWindow
             }
             catch (Exception e) { PluginLog.Log($"Import Error occured: {e}"); }
         }
-        if (ImGui.IsItemHovered()) SetTooltip("After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.");
+        SetTooltipHovered("After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.");
         ImGui.EndListBox();
         ImGui.NewLine();
     }
@@ -345,19 +345,19 @@ public class PetListWindow : PetWindow
                 string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
 
                 Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField);
-                if (ImGui.IsItemHovered()) SetTooltip($"Minion ID: {nickname.Item1}");
+                SetTooltipHovered($"Minion ID: {nickname.Item1}");
                 SameLine();
                 Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
-                if (ImGui.IsItemHovered()) SetTooltip($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                SetTooltipHovered($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
                 if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
                     PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true); SameLine();
-                if (ImGui.IsItemHovered()) SetTooltip($"Rename: {nickname.Item2}");
+                SetTooltipHovered($"Rename: {nickname.Item2}");
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                 {
                     user.SerializableUser.RemoveNickname(nickname.Item1, true);
                     PluginLink.Configuration.Save();
                 }
-                if (ImGui.IsItemHovered()) SetTooltip($"Deletes the nickname!");
+                SetTooltipHovered($"Deletes the nickname!");
             });
             }
         
@@ -376,7 +376,7 @@ public class PetListWindow : PetWindow
             searchField = minionSearchField;
             foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
         }
-        if (ImGui.IsItemHovered()) SetTooltip($"Filter on Minion ID or Name.");
+        SetTooltipHovered($"Filter on Minion ID or Name.");
 
         ImGui.SameLine(0, 41);
         if (XButton("X##ForOpenedPet", Styling.SmallButton))
@@ -384,7 +384,7 @@ public class PetListWindow : PetWindow
             openedAddPet = false;
             foundNicknames = new List<SerializableNickname>();
         }
-        if (ImGui.IsItemHovered()) SetTooltip($"Stop looking for a new pet?");
+        SetTooltipHovered($"Stop looking for a new pet?");
         NewLine();
 
         foreach (SerializableNickname nickname in foundNicknames)
@@ -396,7 +396,7 @@ public class PetListWindow : PetWindow
                 openedAddPet = false;
                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
             }
-            if (ImGui.IsItemHovered()) SetTooltip($"Add {StringUtils.instance.MakeTitleCase(nickname.Name)} [{nickname.ID}] to the list?");
+            SetTooltipHovered($"Add {StringUtils.instance.MakeTitleCase(nickname.Name)} [{nickname.ID}] to the list?");
         }
     }
 
@@ -407,7 +407,7 @@ public class PetListWindow : PetWindow
         Label("Custom Minion name", Styling.ListNameButton); SameLine();
         if (XButton("+", Styling.SmallButton)) openedAddPet = true;
 
-        if (ImGui.IsItemHovered()) SetTooltip($"Add a new pet.");
+        SetTooltipHovered($"Add a new pet.");
 
         if (!openedAddPet)
             NewLine();

@@ -8,9 +8,6 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System.Collections.Generic;
-using FFXIVClientStructs.FFXIV.Client.UI;
-using ImGuiNET;
-using Dalamud.Game.Text.SeStringHandling;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -28,10 +25,10 @@ internal unsafe class TooltipHook : HookableElement
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionDetail");
         baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("Tooltip");
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[42]), Update);
+        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
 
-        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[42]), Update2);
+        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
         addonupdatehook2?.Enable();
     }
 
@@ -90,6 +87,8 @@ internal unsafe class TooltipHook : HookableElement
             }
         }
 
+        if (replaceName == string.Empty) return addonUpdateHook!.Original(baseD);
+
         if (id == -1) 
         {
             lastAnswer = tNodeText;
@@ -99,6 +98,7 @@ internal unsafe class TooltipHook : HookableElement
         {
             if(nickname.Item1 == id)
             {
+                if (nickname.Item2 == string.Empty) return false;
                 tNode->NodeText.SetString(tNode->NodeText.ToString().Replace(replaceName, nickname.Item2));
                 if(nineGridNode != null)
                 {

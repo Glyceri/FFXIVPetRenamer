@@ -61,7 +61,7 @@ internal unsafe class PettableUser
     public int BattlePetSkeletonID => _BattlePetSkeletonID;
     public int BattlePetID => _BattlePetID;
     public string BattlePetCustomName => _CustomBattlePetName;
-    public string BaseBattelPetName => _BattlePetBaseName;
+    public string BaseBattlePetName => _BattlePetBaseName;
 
     public int CompanionID => _CompanionID;
     public string CustomCompanionName => _CustomCompanionName;

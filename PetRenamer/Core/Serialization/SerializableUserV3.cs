@@ -52,7 +52,9 @@ public class SerializableUserV3
     {
         int index = IndexOf(id);
         if (index == -1) return null;
-        return names[index].Substring(0, PluginConstants.ffxivNameSize);
+        if (names[index].Length > PluginConstants.ffxivNameSize)
+            return names[index].Substring(0, PluginConstants.ffxivNameSize);
+        return names[index];
     }
 
     public bool ToggleBackChanged()

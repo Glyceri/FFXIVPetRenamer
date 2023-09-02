@@ -35,7 +35,6 @@ internal unsafe class PetChatEmoteElement : ChatElement
 
         FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
         if (lookedUpChar2 == null) return;
-        PluginLog.Log(lookedUpChar2->CharacterData.ModelCharaId.ToString());
         GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
         if (gObj != null)
         {

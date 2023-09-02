@@ -25,7 +25,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[42]), Update);
+        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
     }
 
@@ -36,7 +36,7 @@ internal unsafe class PartyListHook : HookableElement
         if (!baseD->IsVisible || name is not "_PartyList")
             return addonupdatehook!.Original(baseD);
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
-
+        if (partyNode == null) return addonupdatehook!.Original(baseD);
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return addonupdatehook!.Original(baseD);
         if (!user.HasBattlePet) return addonupdatehook!.Original(baseD);

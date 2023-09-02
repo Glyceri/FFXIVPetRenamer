@@ -136,8 +136,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
             if (((int)petMode == i) ? ToggleButton(identifier) : ToggleButtonBad(identifier))
                 pressed = i;
 
-            if (ImGui.IsItemHovered())
-                SetTooltip(tooltipStrings[(PetMode)i]);
+            SetTooltipHovered(tooltipStrings[(PetMode)i]);
 
             SameLineNoMargin();
         }
@@ -152,7 +151,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         for(int i = 0; i < helpButtons.Count; i++)
         {
             if(Button(helpButtons[i].Item1, Styling.helpButtonSize)) PluginLink.WindowHandler.OpenWindow(helpButtons[i].Item2);
-            if (ImGui.IsItemHovered()) SetTooltip(helpButtons[i].Item3);
+            SetTooltipHovered(helpButtons[i].Item3);
             if (i != helpButtons.Count - 1) SameLinePretendSpace();
         }
 
@@ -249,6 +248,12 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
         return ImGui.Checkbox(text, ref value);
+    }
+
+    protected void SetTooltipHovered(string text)
+    {
+        if (!ImGui.IsItemHovered()) return;
+        SetTooltip(text);
     }
 
     protected void SetTooltip(string text)
