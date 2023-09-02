@@ -59,6 +59,32 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 3122, 30 }, //Ruby-Iffrit
     };
 
+    public readonly Dictionary<int, int> skeletonToClass = new Dictionary<int, int>()
+    {
+        { 407,  -3  }, //EOS
+        { 408,  -3  }, //Selene
+
+        { 409,  -2  }, //Emerald Carbuncle
+        { 410,  -2 }, //Ruby Carbuncle
+        { 411,  -2 }, //Carbuncle
+        { 412,  -2  }, //Topaz Carbuncle
+
+        { 415,  -2 }, //Ifrit-Egi
+        { 416,  -2 }, //Titan-Egi
+        { 417,  -2 }, //Garuda-Egi 
+
+        { 1027, -4  }, //Rook Autoturret MCHN
+        { 2619, -3 }, //Seraph
+        { 2618, -4 }, //Automaton Queen
+        { 2621, -5 }, //Esteem DRK
+
+        { 2620, -2 }, //Demi-Phoenix
+        { 1930, -2 }, //Demi-Bahamut
+        { 3124, -2 }, //Topaz-Titan
+        { 3123, -2 }, //Emerald-Garuda
+        { 3122, -2 }, //Ruby-Iffrit
+    };
+
     private readonly Dictionary<int, int> classToPetID = new Dictionary<int, int>()
     {
         { 26,   -2 }, //Arcanist to Carbuncle  
