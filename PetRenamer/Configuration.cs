@@ -25,6 +25,7 @@ public class Configuration : IPluginConfiguration
     public bool allowTooltips = true;
     public bool useContextMenus = true;
     public bool useCustomNamesInChat = false;
+    public bool useCustomFlyoutInChat = false;
 
     public void Initialize()
     {

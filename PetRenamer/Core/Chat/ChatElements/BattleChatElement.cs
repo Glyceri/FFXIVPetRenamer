@@ -2,7 +2,6 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -18,32 +17,20 @@ internal unsafe class BattleChatElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        PluginLog.Log($"On Chat: {type} : {senderId} : {sender} : {isHandled} : {message.ToString()}");
         if (!PluginLink.Configuration.useCustomNamesInChat) return;
         if (Enum.IsDefined(typeof(XivChatType), type) && type != XivChatType.SystemMessage) return;
-
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         if (!user.UserExists) return;
         LastActionUsed lastActionUsed = PluginLink.PettableUserHandler.LastCast;
 
-        //if (type != (XivChatType)2219 && type != (XivChatType)2105 && type != (XivChatType)2106 && type != XivChatType.SystemMessage)
+        foreach (PettableUser user1 in PluginLink.PettableUserHandler.Users)
         {
-            if (PluginLink.PettableUserHandler.lastActionType == LastActionType.ActionUsed)
-                lastActionUsed = PluginLink.PettableUserHandler.LastUsedAction;
-            //else lastActionUsed = PluginLink.PettableUserHandler.LastCast;
-
-            if (!message.ToString().Contains(lastActionUsed.actionName ?? string.Empty)) return;
-
-            foreach (PettableUser user1 in PluginLink.PettableUserHandler.Users)
-            {
-                if (!user1.UserExists) continue;
-                if (user1.User->Character.GameObject.ObjectID != lastActionUsed.userID) continue;
-
-                user = user1;
-                break;
-            }
+            if (!user1.UserExists) continue;
+            if (user1.nintUser != lastActionUsed.castDealer) continue;
+            user = user1;
+            break;
         }
 
         if (user == null) return;

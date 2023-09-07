@@ -40,22 +40,16 @@ public static unsafe class Delegates
     public delegate void ReceiveAbilityDelegate(int sourceId, IntPtr sourceCharacter, IntPtr pos, ActionEffectHeader* effectHeader, ActionEffect* effectArray, ulong* effectTrail);
     public delegate void ActionIntegrityDelegate(uint targetId, IntPtr actionIntegrityData, bool isReplay);
 
-    public delegate void EffectResultDelegate(uint targetId, IntPtr ptr, byte a3);
+    public delegate void EffectResultDelegate(uint sourceId, IntPtr* sourceCharacter, IntPtr pos, IntPtr* effectHeader, IntPtr* effectArray, ulong* effectTail);
     public delegate void TestDelegate(IntPtr a, UInt32 targetId, IntPtr dataPtr);
     public delegate void CreateVFX(Int64 a1);
 
     public delegate char sub_140341720(Int64 a1, Int64 a2, int a3, char a4, int a5);
 
-    public delegate void ThisCouldBeIt(IntPtr* target,
-        IntPtr* source,
-        FlyTextKind logKind,
-        int option,
-        int actionKind,
-        int actionId,
-        int val1,
-        int val2,
-        int serverAttackType,
-        int val4);
+    public delegate void AddLogMessage(int a1, IntPtr a2, int a4, int a5, float a6);
+    public delegate void AddActionLogMessage(int a1, IntPtr a2, IntPtr a3, uint a4, uint a5, uint a6, uint a7, uint a8, uint a9, float a10);
+    public delegate void AddToScreenLogWithLogMessageId(IntPtr a1, IntPtr a2, int a3, char a4, int a5, int a6, int a7, int a8);
+    public delegate void AddToScreenLogWithScreenLogKind(IntPtr a1, IntPtr a2, int a3, char a4, char a9, int a5, int a6, int a7, int a8);
 
     public delegate void AddScreenLogDelegate(
         IntPtr target,

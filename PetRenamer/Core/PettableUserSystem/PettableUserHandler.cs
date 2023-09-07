@@ -14,22 +14,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public List<PettableUser> Users { get => _users; set => _users = value; }
 
-    LastActionUsed _lastUsedAction;
-    public LastActionUsed LastUsedAction { get => _lastUsedAction; private set => _lastUsedAction = value; }
-
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
-
-    public LastActionType lastActionType = LastActionType.Cast;
-
-    public List<LastActionUsed> actionsInUse = new List<LastActionUsed>();
-
-    public LastActionUsed GetLatest()
-    {
-        if (lastActionType == LastActionType.Cast)
-            return LastCast;
-        return LastUsedAction;
-    }
 
     public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
     {
@@ -117,41 +103,21 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return false;
     }
 
-    public void SetLastCast(uint userID, uint actionID, string actionName) 
+    public void SetLastCast(IntPtr castUser, IntPtr castDealer) 
     {
-        PluginLog.Log("Set last cast!");
-        LastCast = new LastActionUsed(userID, actionID, actionName); 
-        lastActionType = LastActionType.Cast; 
-    }
-
-    public void SetLastUsedAction(uint userID, uint actionID, string actionName)
-    {
-        PluginLog.Log("Set last used action!");
-        LastUsedAction = new LastActionUsed(userID, actionID, actionName); 
-        lastActionType = LastActionType.ActionUsed; 
+        _lastCast = new LastActionUsed(castUser, castDealer); 
     }
 }
 
 public struct LastActionUsed
 {
-    public uint userID;
-    public uint actionID;
-    public string actionName;
-    public IntPtr target;
+    public IntPtr castUser;
+    public IntPtr castDealer;
 
-    public LastActionUsed(uint userID, uint actionID, string actionName)
+    public LastActionUsed(IntPtr castUser, IntPtr castDealer)
     {
-        this.userID = userID;
-        this.actionID = actionID;
-        this.actionName = actionName;
-    }
-
-    public LastActionUsed(uint userID, uint actionID, string actionName, IntPtr target)
-    {
-        this.userID = userID;
-        this.actionID = actionID;
-        this.actionName = actionName;
-        this.target = target;
+        this.castUser = castUser;
+        this.castDealer = castDealer;
     }
 }
 
