@@ -1,12 +1,17 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Buffers.Text;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -37,12 +42,48 @@ internal unsafe class PartyListHook : HookableElement
             return addonupdatehook!.Original(baseD);
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
         if (partyNode == null) return addonupdatehook!.Original(baseD);
+        SetPetname(baseD, partyNode);
+        if(PluginLink.Configuration.allowCastBar) SetCastlist(baseD, partyNode);
+        return addonupdatehook!.Original(baseD);
+    }
+
+    void SetPetname(AtkUnitBase* baseD, AddonPartyList* partyNode)
+    {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-        if (user == null) return addonupdatehook!.Original(baseD);
-        if (!user.HasBattlePet) return addonupdatehook!.Original(baseD);
+        if (user == null) return;
+        if (!user.HasBattlePet) return;
         if (user.BattlePetCustomName != string.Empty)
             partyNode->Pet.Name->SetText(user.BattlePetCustomName);
-        return addonupdatehook!.Original(baseD);
+    }
+
+    void SetCastlist(AtkUnitBase * baseD, AddonPartyList * partyNode)
+    {
+        List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
+            partyNode->PartyMember.PartyMember0,
+            partyNode->PartyMember.PartyMember1,
+            partyNode->PartyMember.PartyMember2,
+            partyNode->PartyMember.PartyMember3,
+            partyNode->PartyMember.PartyMember4,
+            partyNode->PartyMember.PartyMember5,
+            partyNode->PartyMember.PartyMember6,
+            partyNode->PartyMember.PartyMember7
+        };
+
+        foreach(PartyListMemberStruct member in partyMemberNames)
+        {
+            string memberName = member.Name->NodeText.ToString()!;
+            if (memberName == null) continue;
+            if (memberName == string.Empty) continue;
+
+            string castString = member.CastingActionName->NodeText.ToString();
+            if (castString == string.Empty) continue;
+            
+            PettableUser? user = PluginLink.PettableUserHandler.GetUser(memberName);
+            if (user == null) continue;
+
+            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, castString);
+            StringUtils.instance.ReplaceAtkString(member.CastingActionName, validNames);
+        }
     }
 
     internal override void OnDispose()

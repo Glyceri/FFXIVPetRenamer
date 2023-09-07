@@ -11,7 +11,6 @@ using PetRenamer.Utilization.UtilsModule;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using System.Text.RegularExpressions;
 using PetRenamer.Core.PettableUserSystem;
-using Dalamud.Logging;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 

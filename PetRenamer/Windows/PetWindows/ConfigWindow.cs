@@ -13,7 +13,7 @@ public class ConfigWindow : PetWindow
         "Global minionname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
-        Size = new Vector2(300, 251);
+        Size = new Vector2(300, 302);
         SizeCondition = ImGuiCond.Always;
     }
 
@@ -24,7 +24,9 @@ public class ConfigWindow : PetWindow
             Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltips) || 
             Checkbox("Use Custom Names for emotes", ref PluginLink.Configuration.replaceEmotes) || 
             Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenus)||
-            Checkbox("Use Custom Names in Chat [Buggy]", ref PluginLink.Configuration.useCustomNamesInChat))
+            Checkbox("Use Custom Names in Chat", ref PluginLink.Configuration.useCustomNamesInChat) ||
+            Checkbox("Use Custom Names in Flyout text", ref PluginLink.Configuration.useCustomFlyoutInChat) ||
+            Checkbox("Allow custom Castbars", ref PluginLink.Configuration.allowCastBar))
             PluginLink.Configuration.Save();
 
 
