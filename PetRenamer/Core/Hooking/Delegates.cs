@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game;
+﻿using Dalamud.Game.Gui.FlyText;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -34,7 +35,38 @@ public static unsafe class Delegates
     //public delegate nint SetCooldown(IntPtr ptr, ActionType t, uint id);
     public delegate bool ActionOffCooldown(IntPtr ptr, ActionType t, uint id);
 
+    public delegate void ReceiveActorControlSelfDelegate(uint entityId, uint type, uint a3, uint amount, uint a5, uint source, uint a7, uint a8, ulong a9, byte flag);
+
     public delegate void ReceiveAbilityDelegate(int sourceId, IntPtr sourceCharacter, IntPtr pos, ActionEffectHeader* effectHeader, ActionEffect* effectArray, ulong* effectTrail);
     public delegate void ActionIntegrityDelegate(uint targetId, IntPtr actionIntegrityData, bool isReplay);
+
+    public delegate void EffectResultDelegate(uint targetId, IntPtr ptr, byte a3);
+    public delegate void TestDelegate(IntPtr a, UInt32 targetId, IntPtr dataPtr);
+    public delegate void CreateVFX(Int64 a1);
+
+    public delegate char sub_140341720(Int64 a1, Int64 a2, int a3, char a4, int a5);
+
+    public delegate void ThisCouldBeIt(IntPtr* target,
+        IntPtr* source,
+        FlyTextKind logKind,
+        int option,
+        int actionKind,
+        int actionId,
+        int val1,
+        int val2,
+        int serverAttackType,
+        int val4);
+
+    public delegate void AddScreenLogDelegate(
+        IntPtr target,
+        IntPtr source,
+        FlyTextKind logKind,
+        int option,
+        int actionKind,
+        int actionId,
+        int val1,
+        int val2,
+        int val3,
+        int val4);
 }
 

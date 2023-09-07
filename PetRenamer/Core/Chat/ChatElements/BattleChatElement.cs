@@ -2,6 +2,7 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -17,7 +18,7 @@ internal unsafe class BattleChatElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        //PluginLog.Log($"On Chat: {type} : {senderId} : {sender} : {isHandled} : {message.ToString()}");
+        PluginLog.Log($"On Chat: {type} : {senderId} : {sender} : {isHandled} : {message.ToString()}");
         if (!PluginLink.Configuration.useCustomNamesInChat) return;
         if (Enum.IsDefined(typeof(XivChatType), type) && type != XivChatType.SystemMessage) return;
 

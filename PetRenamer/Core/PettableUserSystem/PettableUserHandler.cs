@@ -24,6 +24,13 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public List<LastActionUsed> actionsInUse = new List<LastActionUsed>();
 
+    public LastActionUsed GetLatest()
+    {
+        if (lastActionType == LastActionType.Cast)
+            return LastCast;
+        return LastUsedAction;
+    }
+
     public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
     {
         if (action == null) return;
@@ -130,12 +137,21 @@ public struct LastActionUsed
     public uint userID;
     public uint actionID;
     public string actionName;
+    public IntPtr target;
 
     public LastActionUsed(uint userID, uint actionID, string actionName)
     {
         this.userID = userID;
         this.actionID = actionID;
         this.actionName = actionName;
+    }
+
+    public LastActionUsed(uint userID, uint actionID, string actionName, IntPtr target)
+    {
+        this.userID = userID;
+        this.actionID = actionID;
+        this.actionName = actionName;
+        this.target = target;
     }
 }
 

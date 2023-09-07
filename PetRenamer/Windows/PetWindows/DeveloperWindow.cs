@@ -3,7 +3,6 @@ using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
