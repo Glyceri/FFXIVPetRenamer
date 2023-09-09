@@ -49,9 +49,38 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 2619, 21 }, //Seraph
         { 2618, 18 }, //Automaton Queen
         { 2621, 17 }, //Esteem DRK
-        { -4,   35 }, //Bishop Autoturret
-        { -5,   19 }, //Bunshin Ninja
 
+        { 2620, 14 }, //Demi-Phoenix
+        { 1930, 10 }, //Demi-Bahamut
+        { 3124, 31 }, //Topaz-Titan
+        { 3123, 32 }, //Emerald-Garuda
+        { 3122, 30 }, //Ruby-Iffrit
+    };
+
+    public readonly Dictionary<int, int> skeletonToClass = new Dictionary<int, int>()
+    {
+        { 407,  -3  }, //EOS
+        { 408,  -3  }, //Selene
+
+        { 409,  -2  }, //Emerald Carbuncle
+        { 410,  -2 }, //Ruby Carbuncle
+        { 411,  -2 }, //Carbuncle
+        { 412,  -2  }, //Topaz Carbuncle
+
+        { 415,  -2 }, //Ifrit-Egi
+        { 416,  -2 }, //Titan-Egi
+        { 417,  -2 }, //Garuda-Egi 
+
+        { 1027, -4  }, //Rook Autoturret MCHN
+        { 2619, -3 }, //Seraph
+        { 2618, -4 }, //Automaton Queen
+        { 2621, -5 }, //Esteem DRK
+
+        { 2620, -2 }, //Demi-Phoenix
+        { 1930, -2 }, //Demi-Bahamut
+        { 3124, -2 }, //Topaz-Titan
+        { 3123, -2 }, //Emerald-Garuda
+        { 3122, -2 }, //Ruby-Iffrit
     };
 
     private readonly Dictionary<int, int> classToPetID = new Dictionary<int, int>()
@@ -61,7 +90,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 28,   -3 }, //Scholar to Faerie
         { 31,   -4 }, //Machinist to Automaton Queen
         { 32,   -5 }, //Dark Knight Esteem
-        { 30,   -6 }, //Ninja Bunshin
     };
 
     private readonly Dictionary<int, string> petIDToPetName = new Dictionary<int, string>()
@@ -70,7 +98,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { -3, "Faerie" },
         { -4, "Automaton Queen" },
         { -5, "Esteem" },
-        { -6, "Bunshin" }
     };
 
     public static RemapUtils instance { get; set; } = null!;

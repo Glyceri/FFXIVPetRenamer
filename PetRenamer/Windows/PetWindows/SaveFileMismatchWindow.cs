@@ -17,6 +17,6 @@ internal class SaveFileMismatchWindow : PetWindow
 
     public override void OnDraw()
     {
-        ImGui.TextColored(StylingColours.errorText, $"Your save file version is NEWER than currently supported. [{PluginLink.Configuration.Version}:{Configuration.currentSaveFileVersion}]\nPlease disable the Pet Nicknames plugin and update or risk corrupting your savefile!");
+        TextColoured(StylingColours.errorText, $"Your save file version is NEWER than currently supported. [{PluginLink.Configuration.Version}:{Configuration.currentSaveFileVersion}]\nPlease disable the Pet Nicknames plugin and update or risk corrupting your savefile!");
     }
 }

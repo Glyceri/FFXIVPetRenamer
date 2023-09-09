@@ -26,7 +26,8 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
 
     protected void OnUpdate(Framework framework)
     {
-        foreach(HookableElement el in elements)
+        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+        foreach (HookableElement el in elements)
             el?.OnUpdate(framework);
     }
 }

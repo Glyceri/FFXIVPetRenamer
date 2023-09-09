@@ -24,6 +24,9 @@ public class Configuration : IPluginConfiguration
     public bool replaceEmotes = true;
     public bool allowTooltips = true;
     public bool useContextMenus = true;
+    public bool useCustomNamesInChat = true;
+    public bool useCustomFlyoutInChat = true;
+    public bool allowCastBar = true;
 
     public void Initialize()
     {

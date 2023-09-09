@@ -8,6 +8,7 @@ public static class PluginConstants
     public const string mainCommand = "/minionname";
     public const string petConfigCommand = "/minionconfig";
     public const int ffxivNameSize = 64;
+    public const int AtkUnitBaseUpdateIndex = 42;
 
     public static readonly int[] allowedJobs = new int[]
     {

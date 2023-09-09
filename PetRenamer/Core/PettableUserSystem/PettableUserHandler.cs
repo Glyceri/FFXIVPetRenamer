@@ -1,7 +1,9 @@
-﻿using PetRenamer.Core.Attributes;
+﻿using Dalamud.Logging;
+using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +14,9 @@ internal class PettableUserHandler : IDisposable, IInitializable
     List<PettableUser> _users = new List<PettableUser>();
 
     public List<PettableUser> Users { get => _users; set => _users = value; }
+
+    LastActionUsed _lastCast;
+    public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
 
     public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
     {
@@ -76,6 +81,21 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return user.AnyPetChanged;
     }
 
+    public PettableUser? GetUser(string name)
+    {
+        PettableUser? returnThis = null;
+        LoopThroughBreakable((user) =>
+        {
+            if (name.Contains(user.UserName))
+            {
+                returnThis = user;
+                return true;
+            }
+            return false;
+        });
+        return returnThis;
+    }
+
     public PettableUser? LocalUser()
     {
         PettableUser? returnThis = null;
@@ -91,11 +111,70 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return returnThis;
     }
 
+    public PettableUser? LastCastedUser()
+    {
+        PettableUser user = null!;
+        foreach (PettableUser user1 in PluginLink.PettableUserHandler.Users)
+        {
+            if (user1 == null) continue;
+            if (!user1.UserExists) continue;
+            if (user1.nintUser != _lastCast.castDealer && user1.nintUser != _lastCast.castUser) continue;
+            user = user1;
+            break;
+        }
+
+        return user;
+    }
+
+    public (string, string)[] GetValidNames(PettableUser user, string beContainedIn)
+    {
+        List<(string, string)> validNames = new List<(string, string)>();
+        if (beContainedIn == null) return validNames.ToArray();
+        if (user == null) return validNames.ToArray();
+        if (!user.UserExists) return validNames.ToArray();
+        foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
+        {
+            string bPetname = SheetUtils.instance.GetBattlePetName(skelID) ?? string.Empty;
+            if (bPetname == string.Empty) continue;
+            if (!beContainedIn.ToString().Contains(bPetname)) continue;
+            if (!RemapUtils.instance.skeletonToClass.ContainsKey(skelID)) continue;
+            int jobID = RemapUtils.instance.skeletonToClass[skelID];
+            string cName = user.SerializableUser.GetNameFor(jobID) ?? string.Empty;
+            if (cName == string.Empty || cName == null) continue;
+            validNames.Add((bPetname, cName));
+        }
+        validNames.Sort((el1, el2) => el1.Item1.Length.CompareTo(el2.Item1.Length));
+        return validNames.ToArray();
+    }
+
     bool Contains(SerializableUserV3 user)
     {
         for(int i = 0; i < _users.Count; i++)
             if (_users[i].UserName.ToLowerInvariant().Trim().Normalize() == user.username.ToLowerInvariant().Trim().Normalize() && _users[i].Homeworld == user.homeworld) 
                 return true;
         return false;
-    } 
+    }
+
+    public void SetLastCast(IntPtr castUser, IntPtr castDealer) 
+    {
+        _lastCast = new LastActionUsed(castUser, castDealer); 
+    }
+}
+
+public struct LastActionUsed
+{
+    public IntPtr castUser;
+    public IntPtr castDealer;
+
+    public LastActionUsed(IntPtr castUser, IntPtr castDealer)
+    {
+        this.castUser = castUser;
+        this.castDealer = castDealer;
+    }
+}
+
+public enum LastActionType
+{
+    Cast,
+    ActionUsed
 }

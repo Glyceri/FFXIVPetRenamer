@@ -1,86 +1,72 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Logging;
+using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
-using System.Runtime.InteropServices;
-using System;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
+using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
-internal unsafe class TooltipHook : HookableElement
+internal class TooltipHook : QuickTextHookableElement
 {
-    private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-    private Hook<Delegates.AddonUpdate>? addonupdatehook2 = null;
 
-    AtkUnitBase* baseElement;
-    AtkUnitBase* baseElement2;
+    [Signature("66 44 89 44 24 ?? 53 55", DetourName = nameof(ShowTooltipDetour))]
+    readonly Hook<Delegates.AccurateShowTooltip> showTooltip = null!;
 
-    internal override void OnUpdate(Framework framework)
+    internal override void OnQuickInit()
     {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionDetail");
-        baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("Tooltip");
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[42]), Update);
-        addonupdatehook?.Enable();
+        RegisterHook("ActionDetail", 5, -1);
+        RegisterHook("Tooltip", 2, 3);
 
-        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[42]), Update2);
-        addonupdatehook2?.Enable();
+        showTooltip?.Enable();
     }
 
-    byte Update(AtkUnitBase* baseD) => HandleFor(baseD, ref addonupdatehook!, "ActionDetail", 5);
-    byte Update2(AtkUnitBase* baseD) => HandleFor(baseD, ref addonupdatehook2!, "Tooltip", 2);
-
-    string lastAnswer = string.Empty;
-
-    byte HandleFor(AtkUnitBase* baseD, ref Hook<Delegates.AddonUpdate> addonUpdateHook, string addonName, uint pos)
+    internal override void OnQuickDispose()
     {
-        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) return addonUpdateHook!.Original(baseD);
-
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name != addonName)
-            return addonUpdateHook!.Original(baseD);
-
-        BaseNode bNode = new BaseNode(name);
-        if (bNode == null) return addonUpdateHook!.Original(baseD);
-        AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(pos);
-        if (tNode == null) return addonUpdateHook!.Original(baseD);
-
-        string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == lastAnswer) return addonUpdateHook!.Original(baseD);
-
-        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-        if (user == null) return addonUpdateHook!.Original(baseD);
-
-        int id = SheetUtils.instance.GetIDFromName(tNodeText);
-        if (id == -1) 
-        {
-            lastAnswer = tNodeText;
-            return addonUpdateHook!.Original(baseD); 
-        }
-        user.SerializableUser.LoopThroughBreakable(nickname =>
-        {
-            if(nickname.Item1 == id)
-            {
-                tNode->NodeText.SetString(nickname.Item2);
-                lastAnswer = nickname.Item2;
-                return true;
-            }
-            return false;
-        });
-
-        return addonUpdateHook!.Original(baseD);
+        showTooltip?.Dispose();
     }
 
-    internal override void OnDispose()
-    {
-        addonupdatehook?.Disable();
-        addonupdatehook?.Dispose();
+    internal override void OnUpdate(Framework framework) =>
+        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowTooltips);
 
-        addonupdatehook2?.Disable();
-        addonupdatehook2?.Dispose();
+    unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
+    {
+        if (!TooltipHelper.lastTooltipWasMap) TooltipHelper.nextUser = null!;
+        TooltipHelper.lastTooltipWasMap = false;
+        
+        return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
     }
+}
+
+public unsafe static class TooltipHelper
+{
+    public static PettableUser nextUser = null!;
+
+    public static bool lastTooltipWasMap = false;
+    public static void SetNextUp(PettableUser user) => nextUser = user;
+
+    public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
+}
+
+public class PartyListInfo
+{
+    public string UserName = string.Empty;
+    public bool hasPet;
+    public bool hasChocobo;
+
+    public PartyListInfo(string userName, bool hasPet, bool hasChocobo)
+    {
+        UserName = userName;
+        this.hasPet = hasPet;
+        this.hasChocobo = hasChocobo;
+    }
+
+    public new string ToString() => $"UserName: {UserName}, Has Pet: {hasPet}, Has Chocobo: {hasChocobo}";
 }

@@ -43,6 +43,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
         }
         else
         {
+            if (!RemapUtils.instance.skeletonToClass.ContainsKey(lookedUpChar2->CharacterData.ModelCharaId)) return;
             nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
             BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
             if (chara == null) return;

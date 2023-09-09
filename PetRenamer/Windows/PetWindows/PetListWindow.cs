@@ -72,7 +72,7 @@ public class PetListWindow : PetWindow
 
     void DrawFooterSharing()
     {
-        ImGui.NewLine();
+        NewLine();
         ImGui.SameLine(638);
         if (Button($"Save Imported List##importListSave", Styling.ListButton))
         {
@@ -93,20 +93,20 @@ public class PetListWindow : PetWindow
                 }
                 alreadyExistingUser = null!;
                 importedUser = null!;
-                PluginLink.Configuration.Save();
             }
+            PluginLink.Configuration.Save();
         }
     }
 
     void DrawUserHeaderSharing()
     {
         BeginListBox("##<list header>", new System.Numerics.Vector2(780, 32));
-        Label($"{StringUtils.instance.MakeTitleCase(importedUser.username)}", Styling.ListButton); ImGui.SameLine();
+        Label($"{StringUtils.instance.MakeTitleCase(importedUser.username)}", Styling.ListButton); SameLine();
         Label($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
         if (alreadyExistingUser == null) NewLabel("New User", Styling.ListButton);
         else Label("User Status: " + "Exists", Styling.ListButton);
         ImGui.EndListBox();
-        ImGui.NewLine();
+        NewLine();
     }
 
     void DrawListSharing()
@@ -121,9 +121,9 @@ public class PetListWindow : PetWindow
         {
             string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
             XButtonError("X", Styling.SmallButton);
-            ImGui.SameLine();
-            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            SameLine();
+            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
+            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
             Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
         }
 
@@ -134,9 +134,9 @@ public class PetListWindow : PetWindow
             else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton);
             else NewLabel("+", Styling.SmallButton);
 
-            ImGui.SameLine();
-            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            SameLine();
+            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
+            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
             Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
         });
         ImGui.EndListBox();
@@ -144,11 +144,11 @@ public class PetListWindow : PetWindow
 
     void DrawListHeaderSharing()
     {
-        Label("", Styling.SmallButton); ImGui.SameLine();
-        Label("Minion ID", Styling.ListIDField); ImGui.SameLine();
-        Label("Minion Name", Styling.ListButton); ImGui.SameLine();
-        Label("Custom Minion name", Styling.ListButton); ImGui.SameLine();
-        ImGui.NewLine();
+        Label("", Styling.SmallButton); SameLine();
+        Label("Minion ID", Styling.ListIDField); SameLine();
+        Label("Minion Name", Styling.ListButton); SameLine();
+        Label("Custom Minion name", Styling.ListButton); SameLine();
+        NewLine();
     }
 
     bool IsExactSame((int, string) nickname)
@@ -258,20 +258,20 @@ public class PetListWindow : PetWindow
                 if (nickname.Item1 >= -1) return;
                 string currentPetName = StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
 
-                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Pet ID: {nickname.Item1}");
-                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Pet Type: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); SameLine();
+                SetTooltipHovered($"Pet ID: {nickname.Item1}");
+                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
+                SetTooltipHovered($"Pet Type: {StringUtils.instance.MakeTitleCase(currentPetName)}");
                 if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
                     PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Rename: {nickname.Item2}");
-                ImGui.SameLine();
+                SetTooltipHovered($"Rename: {nickname.Item2}");
+                SameLine();
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                 {
                     user.SerializableUser.RemoveNickname(nickname.Item1, true);
                     PluginLink.Configuration.Save();
                 }
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Clears the nickname!");
+                SetTooltipHovered($"Clears the nickname!");
             });
         ImGui.EndListBox();
     }
@@ -286,10 +286,10 @@ public class PetListWindow : PetWindow
     void DrawUserHeader()
     {
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        Button($"{StringUtils.instance.MakeTitleCase(PluginHandlers.ClientState.LocalPlayer!.Name.ToString())}", Styling.ListButton); ImGui.SameLine();
-        Label($"{SheetUtils.instance.GetWorldName((ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id)}", Styling.ListButton); ImGui.SameLine();
+        Button($"{StringUtils.instance.MakeTitleCase(PluginHandlers.ClientState.LocalPlayer!.Name.ToString())}", Styling.ListButton); SameLine();
+        Label($"{SheetUtils.instance.GetWorldName((ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id)}", Styling.ListButton); SameLine();
         ImGui.EndListBox();
-        ImGui.NewLine();
+        NewLine();
     }
 
     public void DrawExportHeader()
@@ -312,8 +312,8 @@ public class PetListWindow : PetWindow
             }
             catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); }
         }
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.");
-        ImGui.SameLine();
+        SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.");
+        SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
             try
@@ -326,7 +326,7 @@ public class PetListWindow : PetWindow
             }
             catch (Exception e) { PluginLog.Log($"Import Error occured: {e}"); }
         }
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip("After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.");
+        SetTooltipHovered("After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.");
         ImGui.EndListBox();
         ImGui.NewLine();
     }
@@ -345,19 +345,19 @@ public class PetListWindow : PetWindow
                 string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
 
                 Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Minion ID: {nickname.Item1}");
-                ImGui.SameLine();
-                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                SetTooltipHovered($"Minion ID: {nickname.Item1}");
+                SameLine();
+                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
+                SetTooltipHovered($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
                 if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
-                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true); ImGui.SameLine();
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Rename: {nickname.Item2}");
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true); SameLine();
+                SetTooltipHovered($"Rename: {nickname.Item2}");
                 if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
                 {
                     user.SerializableUser.RemoveNickname(nickname.Item1, true);
                     PluginLink.Configuration.Save();
                 }
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Deletes the nickname!");
+                SetTooltipHovered($"Deletes the nickname!");
             });
             }
         
@@ -376,7 +376,7 @@ public class PetListWindow : PetWindow
             searchField = minionSearchField;
             foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
         }
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Filter on Minion ID or Name.");
+        SetTooltipHovered($"Filter on Minion ID or Name.");
 
         ImGui.SameLine(0, 41);
         if (XButton("X##ForOpenedPet", Styling.SmallButton))
@@ -384,32 +384,32 @@ public class PetListWindow : PetWindow
             openedAddPet = false;
             foundNicknames = new List<SerializableNickname>();
         }
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Stop looking for a new pet?");
-        ImGui.NewLine();
+        SetTooltipHovered($"Stop looking for a new pet?");
+        NewLine();
 
         foreach (SerializableNickname nickname in foundNicknames)
         {
-            Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); ImGui.SameLine();
-            Label(StringUtils.instance.MakeTitleCase(nickname.Name) + $"##<{counter++}>", Styling.ListButton); ImGui.SameLine();
+            Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); SameLine();
+            Label(StringUtils.instance.MakeTitleCase(nickname.Name) + $"##<{counter++}>", Styling.ListButton); SameLine();
             if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
             {
                 openedAddPet = false;
                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
             }
-            if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Add {StringUtils.instance.MakeTitleCase(nickname.Name)} [{nickname.ID}] to the list?");
+            SetTooltipHovered($"Add {StringUtils.instance.MakeTitleCase(nickname.Name)} [{nickname.ID}] to the list?");
         }
     }
 
     void DrawListHeader()
     {
-        Label("Minion ID", Styling.ListIDField); ImGui.SameLine();
-        Label("Minion Name", Styling.ListButton); ImGui.SameLine();
-        Label("Custom Minion name", Styling.ListNameButton); ImGui.SameLine();
+        Label("Minion ID", Styling.ListIDField); SameLine();
+        Label("Minion Name", Styling.ListButton); SameLine();
+        Label("Custom Minion name", Styling.ListNameButton); SameLine();
         if (XButton("+", Styling.SmallButton)) openedAddPet = true;
 
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"Add a new pet.");
+        SetTooltipHovered($"Add a new pet.");
 
         if (!openedAddPet)
-            ImGui.NewLine();
+            NewLine();
     }
 }

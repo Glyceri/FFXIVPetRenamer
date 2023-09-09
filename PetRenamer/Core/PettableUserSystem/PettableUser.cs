@@ -6,7 +6,7 @@ using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
-internal unsafe class PettableUser
+public unsafe class PettableUser
 {
     readonly string _username;
     readonly ushort _homeworld;
@@ -61,7 +61,7 @@ internal unsafe class PettableUser
     public int BattlePetSkeletonID => _BattlePetSkeletonID;
     public int BattlePetID => _BattlePetID;
     public string BattlePetCustomName => _CustomBattlePetName;
-    public string BaseBattelPetName => _BattlePetBaseName;
+    public string BaseBattlePetName => _BattlePetBaseName;
 
     public int CompanionID => _CompanionID;
     public string CustomCompanionName => _CustomCompanionName;

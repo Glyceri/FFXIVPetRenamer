@@ -24,13 +24,13 @@ public class ConfirmPopup : TemporaryPetWindow
     public override void OnDraw()
     {
         if (blackenedWindow != null) blackenedWindow.IsOpen = false;
-        ImGui.TextColored(StylingColours.errorText, message);
+        TextColoured(StylingColours.errorText, message);
 
         bool? outcome = null;
 
         
         if (Button("Yes")) outcome = true;
-        ImGui.SameLine();
+        SameLine();
         if (Button("No")) outcome = false;
         if (outcome == null) return;
 
