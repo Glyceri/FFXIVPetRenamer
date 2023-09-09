@@ -38,6 +38,9 @@ public static unsafe class Delegates
 
     public delegate int AccurateShowTooltip(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8);
 
+
+    public delegate char NaviMapTooltip(AtkUnitBase* tooltip, int a2);
+
     public delegate char AreaMapTooltipDelegate(AtkUnitBase* a1, uint a2, char a3);
     public delegate IntPtr AreaMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2);
     public delegate IntPtr NaviMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2, IntPtr unk3);

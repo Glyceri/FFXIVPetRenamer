@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
+using System;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -13,13 +14,102 @@ namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
 internal unsafe class MapHook : HookableElement
-{ 
+{
+    [Signature("40 57 48 83 EC 60 48 8B F9 83 FA 64", DetourName = nameof(NaviTooltip))]
+    readonly Hook<Delegates.NaviMapTooltip> naviTooltip = null!;
+
     [Signature("48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8 ", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<Delegates.AreaMapTooltipDelegate> showTooltipThing = null!;
 
     internal override void OnInit()
     {
         showTooltipThing?.Enable();
+        naviTooltip?.Enable();
+    }
+
+    char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
+    {
+        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) 
+            return naviTooltip!.Original(unitBase, elementIndex);
+        TooltipHelper.lastTooltipWasMap = true;
+
+        if (elementIndex == last) return naviTooltip!.Original(unitBase, elementIndex);
+        last = (uint)elementIndex;
+
+        if (TooltipHelper.partyListInfos.Count == 0) return naviTooltip!.Original(unitBase, elementIndex);
+
+        BaseNode node = new BaseNode(unitBase);
+        if (node == null) return naviTooltip!.Original(unitBase, elementIndex);
+        ComponentNode mapComponentNode = node.GetComponentNode(18);
+        if (mapComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkComponentNode* atkComponentNode = mapComponentNode.GetPointer();
+        if (atkComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkComponentBase* atkComponentBase = atkComponentNode->Component;
+        if (atkComponentBase == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkUldManager manager = atkComponentBase->UldManager;
+
+        elementIndex += manager.PartsListCount;
+        int startIndex = -1;
+
+
+        for (int i = 0; i < manager.NodeListCount; i++)
+        {
+            AtkResNode* curNode = manager.NodeList[i];
+            if (curNode == null) continue;
+            if (!curNode->IsVisible) continue;
+            AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
+            if (cNode == null) continue;
+            AtkComponentBase* cBase = cNode->Component;
+            if (cBase == null) continue;
+            AtkResNode* resNode = cBase->GetImageNodeById(3);
+            if (resNode == null) continue;
+            AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
+            if (imgNode == null) continue;
+            AtkUldPartsList* partsList = imgNode->PartsList;
+            if (partsList == null) continue;
+            AtkUldPart* parts = partsList->Parts;
+            if (parts == null) continue;
+            AtkUldAsset* asset = parts->UldAsset;
+            if (asset == null) continue;
+            AtkTexture texture = asset->AtkTexture;
+            AtkTextureResource* textureResource = texture.Resource;
+            if (textureResource == null) continue;
+            if (textureResource->IconID == playerIconID)
+            {
+                startIndex = i;
+                break;
+            }            
+        }
+
+        if (startIndex == -1) return naviTooltip!.Original(unitBase, elementIndex);
+        TooltipHelper.nextUser = null!;
+
+        int actualCurrent = 0;
+
+        for (int i = 0; i < TooltipHelper.partyListInfos.Count; i++)
+        {
+            if (TooltipHelper.partyListInfos[i].hasPet)
+            {
+                actualCurrent++;
+                if (startIndex + i + actualCurrent == elementIndex)
+                {
+                    PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
+                    if (user == null) break;
+                    if (!user.HasBattlePet) break;
+                    TooltipHelper.SetNextUp(user);
+                    break;
+                }
+            }
+
+            if (TooltipHelper.partyListInfos[i].hasChocobo)
+            {
+                actualCurrent++;
+                if (startIndex + i + actualCurrent == elementIndex) break;
+            }
+            if (i == 0) actualCurrent--;
+        }
+
+        return naviTooltip!.Original(unitBase, elementIndex);
     }
 
     uint last = 0;
@@ -30,6 +120,9 @@ internal unsafe class MapHook : HookableElement
 
     char ShowTooltipDetour(AtkUnitBase* areaMap, uint elementIndex, char a3)
     {
+        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips)
+            return showTooltipThing!.Original(areaMap, elementIndex, a3);
+
         TooltipHelper.lastTooltipWasMap = true;
         if (elementIndex == last) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         last = elementIndex;
@@ -90,7 +183,7 @@ internal unsafe class MapHook : HookableElement
                 if (startIndex + i + actualCurrent == elementIndex)
                 {
                     PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
-                    if (user == null) { PluginLog.Log("User null!"); break; }
+                    if (user == null) break;
                     if (!user.HasBattlePet) break;
                     TooltipHelper.SetNextUp(user);
                     break;
@@ -110,6 +203,7 @@ internal unsafe class MapHook : HookableElement
 
     internal override void OnDispose()
     {
-        showTooltipThing?.Dispose();
+        showTooltipThing?.Dispose(); 
+        naviTooltip?.Dispose();
     }
 }
