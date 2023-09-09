@@ -90,7 +90,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 28,   -3 }, //Scholar to Faerie
         { 31,   -4 }, //Machinist to Automaton Queen
         { 32,   -5 }, //Dark Knight Esteem
-        { 30,   -6 }, //Ninja Bunshin
     };
 
     private readonly Dictionary<int, string> petIDToPetName = new Dictionary<int, string>()
@@ -99,7 +98,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { -3, "Faerie" },
         { -4, "Automaton Queen" },
         { -5, "Esteem" },
-        { -6, "Bunshin" }
     };
 
     public static RemapUtils instance { get; set; } = null!;

@@ -36,18 +36,10 @@ public static unsafe class Delegates
     public delegate void ShowTooltip(AtkTooltipManager* atkTooltipManager, AtkTooltipType tooltipType, ushort parentID, AtkResNode* atkResNode, AtkTooltipArgs* atkTooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, void*> whatTheFock, bool bool1, bool bool2);
     public delegate AtkTooltipArgs* TooltipArgs(AtkTooltipArgs* atkTooltipArgs);
 
-    public delegate void WonderWhatThisIs(IntPtr a1, IntPtr a2, int a3);
-    public delegate void WonderWhatThisIs2(IntPtr a1, IntPtr a2, IntPtr a3, IntPtr a4, IntPtr a5);
+    public delegate int AccurateShowTooltip(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8);
 
-    public delegate char WhatsThis(IntPtr a1, uint a2, char a3);
-    public delegate IntPtr WhatsThis2(IntPtr a1, int a2);
-
-    public delegate IntPtr PositionDelegate(IntPtr a1, int a2, int a3);
-
-    public delegate byte CheckAtkCollisionNodeIntersectDelegate(AtkNineGridNode* node, IntPtr a2, IntPtr a3, IntPtr a4);
+    public delegate char AreaMapTooltipDelegate(AtkUnitBase* a1, uint a2, char a3);
     public delegate IntPtr AreaMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2);
     public delegate IntPtr NaviMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2, IntPtr unk3);
-    public delegate IntPtr AddonNaviMapOnUpdateDelegate(AtkUnitBase* addonNaviMap, IntPtr unk2, IntPtr unk3);
-    public delegate IntPtr AddonAreaMapOnUpdateDelegate(AtkUnitBase* addonAreaMap, IntPtr unk2, IntPtr unk3);
 }
 

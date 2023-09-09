@@ -6,7 +6,7 @@ using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
-internal unsafe class PettableUser
+public unsafe class PettableUser
 {
     readonly string _username;
     readonly ushort _homeworld;
