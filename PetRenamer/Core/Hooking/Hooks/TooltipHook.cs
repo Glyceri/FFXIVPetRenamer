@@ -8,8 +8,6 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
