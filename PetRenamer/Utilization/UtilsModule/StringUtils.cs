@@ -18,6 +18,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public void ReplaceSeString(ref SeString message, (string, string)[] validNames)
     {
         if (validNames.Length == 0) return;
+        if (message == null) return;
         for (int i = 0; i < message.Payloads.Count; i++)
         {
             if (message.Payloads[i] is not TextPayload tPayload) continue;

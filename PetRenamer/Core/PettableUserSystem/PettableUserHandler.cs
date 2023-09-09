@@ -116,6 +116,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
         PettableUser user = null!;
         foreach (PettableUser user1 in PluginLink.PettableUserHandler.Users)
         {
+            if (user1 == null) continue;
             if (!user1.UserExists) continue;
             if (user1.nintUser != _lastCast.castDealer && user1.nintUser != _lastCast.castUser) continue;
             user = user1;
@@ -128,6 +129,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public (string, string)[] GetValidNames(PettableUser user, string beContainedIn)
     {
         List<(string, string)> validNames = new List<(string, string)>();
+        if (beContainedIn == null) return validNames.ToArray();
         if (user == null) return validNames.ToArray();
         if (!user.UserExists) return validNames.ToArray();
         foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
@@ -138,7 +140,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             if (!RemapUtils.instance.skeletonToClass.ContainsKey(skelID)) continue;
             int jobID = RemapUtils.instance.skeletonToClass[skelID];
             string cName = user.SerializableUser.GetNameFor(jobID) ?? string.Empty;
-            if (cName == string.Empty) continue;
+            if (cName == string.Empty || cName == null) continue;
             validNames.Add((bPetname, cName));
         }
         validNames.Sort((el1, el2) => el1.Item1.Length.CompareTo(el2.Item1.Length));

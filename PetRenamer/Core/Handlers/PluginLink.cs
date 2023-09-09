@@ -1,6 +1,7 @@
 using Dalamud.ContextMenu;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Commands;
 using PetRenamer.Core.Chat;
 using PetRenamer.Core.ContextMenu;

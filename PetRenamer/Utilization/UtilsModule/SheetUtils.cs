@@ -19,6 +19,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<Tribe> tribe { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
     ExcelSheet<Action> actions { get; set; } = null!;
+    ExcelSheet<Map> maps { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 
     internal override void OnRegistered()
@@ -30,12 +31,18 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
+        maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
     }
 
     public void PrintAllPets()
     {
         foreach (Pet pet in battlePetSheet)
             PluginLog.Log(pet.Name + " : " + pet.RowId.ToString());
+    }
+
+    public Map GetMap(uint id)
+    {
+        return maps.GetRow(id)!;
     }
 
     public Action GetAction(uint actionID) => actions?.GetRow(actionID)!;

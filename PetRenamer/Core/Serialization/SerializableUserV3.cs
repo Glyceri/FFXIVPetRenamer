@@ -52,6 +52,7 @@ public class SerializableUserV3
     {
         int index = IndexOf(id);
         if (index == -1) return null;
+        if (names.Length < index) return null;
         if (names[index].Length > PluginConstants.ffxivNameSize)
             return names[index].Substring(0, PluginConstants.ffxivNameSize);
         return names[index];

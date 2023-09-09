@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -42,8 +44,8 @@ internal unsafe class PartyListHook : HookableElement
             return addonupdatehook!.Original(baseD);
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
         if (partyNode == null) return addonupdatehook!.Original(baseD);
-        SetPetname(baseD, partyNode);
-        if(PluginLink.Configuration.allowCastBar) SetCastlist(baseD, partyNode);
+         SetPetname(baseD, partyNode);
+        SetCastlist(baseD, partyNode);
         return addonupdatehook!.Original(baseD);
     }
 
@@ -69,20 +71,31 @@ internal unsafe class PartyListHook : HookableElement
             partyNode->PartyMember.PartyMember7
         };
 
+        TooltipHelper.partyListInfos.Clear();
+
         foreach(PartyListMemberStruct member in partyMemberNames)
         {
             string memberName = member.Name->NodeText.ToString()!;
             if (memberName == null) continue;
             if (memberName == string.Empty) continue;
+            string[] splitName = memberName.Split(' ');
+            if(splitName.Length != 3) continue;
+            memberName = $"{splitName[1]} {splitName[2]}";
+
+            BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
+            if (bChara == null) continue;
+            BattleChara* bChara2 = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
+            //TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, bChara2 != null,  ));
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
-            
+
             PettableUser? user = PluginLink.PettableUserHandler.GetUser(memberName);
             if (user == null) continue;
 
             (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, castString);
-            StringUtils.instance.ReplaceAtkString(member.CastingActionName, validNames);
+            if (PluginLink.Configuration.allowCastBar)
+                StringUtils.instance.ReplaceAtkString(member.CastingActionName, validNames);
         }
     }
 

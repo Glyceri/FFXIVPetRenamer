@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -31,6 +32,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
         baseElement = null;
         addonupdatehook?.Dispose();
     }
+
     bool allow = true;
 
     public void OnUpdate(Framework framework, bool allow)
@@ -45,6 +47,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
     byte Handle(AtkUnitBase* baseElement)
     {
         if(!allow) return addonupdatehook!.Original(baseElement);
+
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
         if (!baseElement->IsVisible || name != AddonName)
             return addonupdatehook!.Original(baseElement);
@@ -61,6 +64,8 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (AddonName == "Tooltip") TooltipDetour(ref user);
+
         if (user == null) return addonupdatehook!.Original(baseElement);
 
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
@@ -71,6 +76,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
             List<(string, int)> correctNames = new List<(string, int)>();
             foreach (int nameID in RemapUtils.instance.battlePetRemap.Keys)
             {
+                if (!RemapUtils.instance.battlePetRemap.ContainsKey(nameID)) continue;
                 string bPetName = SheetUtils.instance.GetBattlePetName(RemapUtils.instance.battlePetRemap[nameID]);
                 if (tNodeText.Contains(bPetName))
                     correctNames.Add((bPetName, nameID));
@@ -115,5 +121,29 @@ public unsafe class QuickTextReplaceHook : IDisposable
         });
 
         return addonupdatehook!.Original(baseElement);
+    }
+
+    unsafe void TooltipDetour(ref PettableUser user)
+    {
+        BattleChara* bChara;
+        if ((bChara = TooltipHelper.GetNext()) == null) return;
+        PettableUser usr = user;
+
+        PluginLink.PettableUserHandler.LoopThroughBreakable((u) => 
+        {
+            if (u == null) return false;
+            if (u.User == null) return false;
+            if (u.UserExists == false) return false;
+            if (u.HasBattlePet == false) return false;
+            if (u.BattlePet != bChara) return false;
+
+            usr = u;
+
+            return true;
+        });
+
+        user = usr;
+
+        TooltipHelper.ClearupNext();
     }
 }

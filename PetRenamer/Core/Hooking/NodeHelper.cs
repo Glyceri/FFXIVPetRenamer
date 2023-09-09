@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
 
 //Code from daily duties
@@ -7,6 +8,11 @@ namespace PetRenamer.Core.Hooking;
 internal unsafe class BaseNode
 {
     private readonly AtkUnitBase* node;
+
+    public BaseNode(AtkUnitBase* node)
+    {
+        this.node = node;
+    }
 
     public BaseNode(string addon)
     {

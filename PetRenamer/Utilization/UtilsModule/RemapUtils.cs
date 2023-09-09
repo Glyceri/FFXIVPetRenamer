@@ -49,8 +49,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 2619, 21 }, //Seraph
         { 2618, 18 }, //Automaton Queen
         { 2621, 17 }, //Esteem DRK
-        { -4,   35 }, //Bishop Autoturret
-        { -5,   19 }, //Bunshin Ninja
 
         { 2620, 14 }, //Demi-Phoenix
         { 1930, 10 }, //Demi-Bahamut
