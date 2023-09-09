@@ -84,8 +84,9 @@ internal unsafe class PartyListHook : HookableElement
 
             BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
             if (bChara == null) continue;
-            BattleChara* bChara2 = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-            //TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, bChara2 != null,  ));
+            BattleChara* carbuncle = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
+            BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(bChara);
+            TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, carbuncle != null, chocobo != null));
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
