@@ -95,7 +95,6 @@ internal unsafe class MapHook : HookableElement
                 {
                     PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
                     if (user == null) break;
-                    if (!user.HasBattlePet) break;
                     TooltipHelper.SetNextUp(user);
                     break;
                 }
@@ -108,7 +107,6 @@ internal unsafe class MapHook : HookableElement
             }
             if (i == 0) actualCurrent--;
         }
-
         return naviTooltip!.Original(unitBase, elementIndex);
     }
 
@@ -126,7 +124,7 @@ internal unsafe class MapHook : HookableElement
         TooltipHelper.lastTooltipWasMap = true;
         if (elementIndex == last) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         last = elementIndex;
-        
+
         if (TooltipHelper.partyListInfos.Count == 0) return showTooltipThing!.Original(areaMap, elementIndex, a3);
 
         BaseNode node = new BaseNode(areaMap);
@@ -138,10 +136,10 @@ internal unsafe class MapHook : HookableElement
         AtkComponentBase* atkComponentBase = atkComponentNode->Component;
         if (atkComponentBase == null) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         AtkUldManager manager = atkComponentBase->UldManager;
-        
+
         int startIndex = -1;
 
-        for (int i = manager.NodeListCount - 1 ; i >= 0; i--)
+        for (int i = manager.NodeListCount - 1; i >= 0; i--)
         {
             AtkResNode* curNode = manager.NodeList[i];
             if (curNode == null) continue;
@@ -175,7 +173,7 @@ internal unsafe class MapHook : HookableElement
 
         int actualCurrent = 0;
 
-        for(int i = 0; i < TooltipHelper.partyListInfos.Count; i++)
+        for (int i = 0; i < TooltipHelper.partyListInfos.Count; i++)
         {
             if (TooltipHelper.partyListInfos[i].hasPet)
             {
@@ -184,7 +182,6 @@ internal unsafe class MapHook : HookableElement
                 {
                     PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
                     if (user == null) break;
-                    if (!user.HasBattlePet) break;
                     TooltipHelper.SetNextUp(user);
                     break;
                 }

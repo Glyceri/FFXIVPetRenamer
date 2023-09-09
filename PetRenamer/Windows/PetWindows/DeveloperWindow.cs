@@ -9,6 +9,7 @@ using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObje
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
