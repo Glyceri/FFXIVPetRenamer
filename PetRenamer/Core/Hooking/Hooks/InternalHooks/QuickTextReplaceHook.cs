@@ -89,7 +89,9 @@ public unsafe class QuickTextReplaceHook : IDisposable
                     if (correctNames[i].Item1.Length < correctNames[shortestEl].Item1.Length)
                         shortestEl = i;
                 }
-                id = RemapUtils.instance.skeletonToClass[correctNames[shortestEl].Item2];
+                int item2 = correctNames[shortestEl].Item2;
+                if (RemapUtils.instance.skeletonToClass.ContainsKey(item2))
+                id = RemapUtils.instance.skeletonToClass[item2];
                 replaceName = correctNames[shortestEl].Item1;
             }
         }

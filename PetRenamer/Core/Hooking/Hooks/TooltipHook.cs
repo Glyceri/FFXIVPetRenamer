@@ -41,4 +41,6 @@ public class PartyListInfo
         this.hasPet = hasPet;
         this.hasChocobo = hasChocobo;
     }
+
+    public new string ToString() => $"UserName: {UserName}, Has Pet: {hasPet}, Has Chocobo: {hasChocobo}";
 }
