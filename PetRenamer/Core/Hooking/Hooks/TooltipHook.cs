@@ -1,30 +1,56 @@
 ﻿using Dalamud.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using Dalamud.Hooking;
+using Dalamud.Logging;
+using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
+using PetRenamer.Core.PettableUserSystem;
+using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
 internal class TooltipHook : QuickTextHookableElement
 {
+
+    [Signature("66 44 89 44 24 ?? 53 55", DetourName = nameof(ShowTooltipDetour))]
+    readonly Hook<Delegates.AccurateShowTooltip> showTooltip = null!;
+
     internal override void OnQuickInit()
     {
         RegisterHook("ActionDetail", 5, -1);
         RegisterHook("Tooltip", 2, 3);
+
+        showTooltip?.Enable();
+    }
+
+    internal override void OnQuickDispose()
+    {
+        showTooltip?.Dispose();
     }
 
     internal override void OnUpdate(Framework framework) =>
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowTooltips);
+
+    unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
+    {
+        if (!TooltipHelper.lastTooltipWasMap) TooltipHelper.nextUser = null!;
+        TooltipHelper.lastTooltipWasMap = false;
+        
+        return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
+    }
 }
 
 public unsafe static class TooltipHelper
 {
-    static BattleChara* nextTooltipIs = null!;
+    public static PettableUser nextUser = null!;
 
-    public static BattleChara* GetNext() => nextTooltipIs;
-    public static void ClearupNext() => nextTooltipIs = null!;
+    public static bool lastTooltipWasMap = false;
+    public static void SetNextUp(PettableUser user) => nextUser = user;
 
     public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
 }

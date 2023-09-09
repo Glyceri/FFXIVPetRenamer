@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -44,9 +45,10 @@ public unsafe class QuickTextReplaceHook : IDisposable
     }
 
     string lastAnswer = string.Empty;
+
     byte Handle(AtkUnitBase* baseElement)
     {
-        if(!allow) return addonupdatehook!.Original(baseElement);
+        if (!allow) return addonupdatehook!.Original(baseElement);
 
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
         if (!baseElement->IsVisible || name != AddonName)
@@ -57,7 +59,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
         AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(TextPos);
         if (tNode == null) return addonupdatehook!.Original(baseElement);
         string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == lastAnswer) return addonupdatehook!.Original(baseElement);
+        if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
 
         AtkNineGridNode* nineGridNode = null;
         if (AtkPos != -1) nineGridNode = bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
@@ -91,7 +93,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
                 }
                 int item2 = correctNames[shortestEl].Item2;
                 if (RemapUtils.instance.skeletonToClass.ContainsKey(item2))
-                id = RemapUtils.instance.skeletonToClass[item2];
+                    id = RemapUtils.instance.skeletonToClass[item2];
                 replaceName = correctNames[shortestEl].Item1;
             }
         }
@@ -125,27 +127,10 @@ public unsafe class QuickTextReplaceHook : IDisposable
         return addonupdatehook!.Original(baseElement);
     }
 
+
+
     unsafe void TooltipDetour(ref PettableUser user)
     {
-        BattleChara* bChara;
-        if ((bChara = TooltipHelper.GetNext()) == null) return;
-        PettableUser usr = user;
-
-        PluginLink.PettableUserHandler.LoopThroughBreakable((u) => 
-        {
-            if (u == null) return false;
-            if (u.User == null) return false;
-            if (u.UserExists == false) return false;
-            if (u.HasBattlePet == false) return false;
-            if (u.BattlePet != bChara) return false;
-
-            usr = u;
-
-            return true;
-        });
-
-        user = usr;
-
-        TooltipHelper.ClearupNext();
+        if (TooltipHelper.nextUser != null) user = TooltipHelper.nextUser;
     }
 }
