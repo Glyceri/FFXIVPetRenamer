@@ -84,14 +84,19 @@ internal unsafe class MapHook : HookableElement
         if (startIndex == -1) return naviTooltip!.Original(unitBase, elementIndex);
         TooltipHelper.nextUser = null!;
 
+
+
         int actualCurrent = 0;
+        int minusMe = 0;
 
         for (int i = 0; i < TooltipHelper.partyListInfos.Count; i++)
         {
             if (TooltipHelper.partyListInfos[i].hasPet)
             {
                 actualCurrent++;
-                if (startIndex + i + actualCurrent == elementIndex)
+                int calculation = startIndex + i + actualCurrent + minusMe;
+                if (calculation < 0) calculation = 0;
+                if (calculation == elementIndex)
                 {
                     PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
                     if (user == null) break;
@@ -102,10 +107,12 @@ internal unsafe class MapHook : HookableElement
 
             if (TooltipHelper.partyListInfos[i].hasChocobo)
             {
-                actualCurrent++;
-                if (startIndex + i + actualCurrent == elementIndex) break;
+                actualCurrent++; 
+                int calculation = startIndex + i + actualCurrent + minusMe;
+                if (calculation < 0) calculation = 0;
+                if (calculation == elementIndex) break;
             }
-            if (i == 0) actualCurrent--;
+            if (i == 0) minusMe--;
         }
         return naviTooltip!.Original(unitBase, elementIndex);
     }
@@ -168,17 +175,22 @@ internal unsafe class MapHook : HookableElement
             }
         }
 
+        PluginLog.Log(elementIndex.ToString());
+
         if (startIndex == -1) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         TooltipHelper.nextUser = null!;
 
         int actualCurrent = 0;
+        int minusMe = 0;
 
         for (int i = 0; i < TooltipHelper.partyListInfos.Count; i++)
         {
             if (TooltipHelper.partyListInfos[i].hasPet)
             {
                 actualCurrent++;
-                if (startIndex + i + actualCurrent == elementIndex)
+                int calculation = startIndex + i + actualCurrent + minusMe;
+                if (calculation < 0) calculation = 0;
+                if (calculation == elementIndex)
                 {
                     PettableUser user = PluginLink.PettableUserHandler.GetUser(TooltipHelper.partyListInfos[i].UserName)!;
                     if (user == null) break;
@@ -190,9 +202,12 @@ internal unsafe class MapHook : HookableElement
             if (TooltipHelper.partyListInfos[i].hasChocobo)
             {
                 actualCurrent++;
-                if (startIndex + i + actualCurrent == elementIndex) break;
+                int calculation = startIndex + i + actualCurrent + minusMe;
+                if (calculation < 0) calculation = 0;
+                if (calculation == elementIndex) break;
             }
-            if (i == 0) actualCurrent--;
+
+            if (i == 0) { minusMe--; }
         }
 
         return showTooltipThing!.Original(areaMap, elementIndex, a3);
