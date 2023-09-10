@@ -8,8 +8,6 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -23,10 +21,12 @@ internal class TooltipHook : QuickTextHookableElement
     internal override void OnQuickInit()
     {
         RegisterHook("ActionDetail", 5, -1);
-        RegisterHook("Tooltip", 2, 3);
+        RegisterHook("Tooltip", 2, 3, TooltipDetour);
 
         showTooltip?.Enable();
     }
+
+    PettableUser TooltipDetour() => TooltipHelper.nextUser;
 
     internal override void OnQuickDispose()
     {

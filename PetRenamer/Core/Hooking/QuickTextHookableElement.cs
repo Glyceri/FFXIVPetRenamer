@@ -1,5 +1,7 @@
 ﻿using Dalamud.Game;
 using PetRenamer.Core.Hooking.Hooks.InternalHooks;
+using PetRenamer.Core.PettableUserSystem;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.Core.Hooking;
@@ -32,7 +34,7 @@ public class QuickTextHookableElement : HookableElement
 
     List<QuickTextReplaceHook> quickTextReplaceHooks = new List<QuickTextReplaceHook>();
 
-    protected void RegisterHook(string addonName, uint atkTextID, int atkBackgroundID) 
-        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, atkBackgroundID));
+    protected void RegisterHook(string addonName, uint atkTextID, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!) 
+        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, atkBackgroundID, pettableUserFunc));
     
 }

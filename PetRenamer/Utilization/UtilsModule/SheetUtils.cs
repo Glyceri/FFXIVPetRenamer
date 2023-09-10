@@ -40,6 +40,19 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             PluginLog.Log(pet.Name + " : " + pet.RowId.ToString());
     }
 
+    public bool PetExistsInANY(string petname)
+    {
+        foreach (Pet pet in battlePetSheet)
+            if (pet.Name.ToString().Contains(petname))
+                return true;
+
+        foreach (Companion pet in petSheet)
+            if (pet.Singular.ToString().Contains(petname))
+                return true;
+
+        return false;
+    }
+
     public Map GetMap(uint id)
     {
         return maps.GetRow(id)!;
