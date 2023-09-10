@@ -21,10 +21,12 @@ internal class TooltipHook : QuickTextHookableElement
     internal override void OnQuickInit()
     {
         RegisterHook("ActionDetail", 5, -1);
-        RegisterHook("Tooltip", 2, 3);
+        RegisterHook("Tooltip", 2, 3, TooltipDetour);
 
         showTooltip?.Enable();
     }
+
+    PettableUser TooltipDetour() => TooltipHelper.nextUser;
 
     internal override void OnQuickDispose()
     {

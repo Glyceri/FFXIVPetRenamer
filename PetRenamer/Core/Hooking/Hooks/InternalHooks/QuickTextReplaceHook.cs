@@ -1,7 +1,5 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
-using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -20,12 +18,14 @@ public unsafe class QuickTextReplaceHook : IDisposable
     string AddonName;
     uint TextPos;
     int AtkPos;
+    Func<PettableUser> recallAction;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, int atkPos)
+    public QuickTextReplaceHook(string addonName, uint textPos, int atkPos = -1, Func<PettableUser> recallAction = null!)
     {
         AddonName = addonName;
         TextPos = textPos;
         AtkPos = atkPos;
+        this.recallAction = recallAction;
     }
 
     public void Dispose()
@@ -66,7 +66,12 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-        if (AddonName == "Tooltip") TooltipDetour(ref user);
+
+        if (recallAction != null) 
+        { 
+            PettableUser tempUser = recallAction.Invoke();
+            if (tempUser != null) user = tempUser;
+        }
 
         if (user == null) return addonupdatehook!.Original(baseElement);
 
@@ -125,12 +130,5 @@ public unsafe class QuickTextReplaceHook : IDisposable
         });
 
         return addonupdatehook!.Original(baseElement);
-    }
-
-
-
-    unsafe void TooltipDetour(ref PettableUser user)
-    {
-        if (TooltipHelper.nextUser != null) user = TooltipHelper.nextUser;
     }
 }
