@@ -7,6 +7,9 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 using PetRenamer.Utilization.UtilsModule;
+using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -32,10 +35,26 @@ internal class FlyTextHook : HookableElement
         StringUtils.instance.ReplaceSeString(ref text2, validNames);
     }
 
-    unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr castBoss, IntPtr castDealer, int a3, char a4, int a5, int a6, int a7, int a8)
+    unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int a3, char a4, int a5, int a6, int a7, int a8)
     {
-        addToScreenLogWithLogMessageId?.Original(castBoss, castDealer, a3, a4, a5, a6, a7, a8);
-        PluginLink.PettableUserHandler.SetLastCast(castBoss, castDealer);
+        Character* targetChara = (Character*)target;
+        string targetName = string.Empty;
+
+        if (targetChara != null)
+        {
+            targetName = Marshal.PtrToStringUTF8((IntPtr)targetChara->GameObject.Name)!;
+        }
+
+        Character* castDealerChara = (Character*)castDealer;
+        string targetName2 = string.Empty;
+
+        if (castDealerChara != null)
+        {
+            targetName2 = Marshal.PtrToStringUTF8((IntPtr)castDealerChara->GameObject.Name)!;
+        }
+
+        addToScreenLogWithLogMessageId?.Original(target, castDealer, a3, a4, a5, a6, a7, a8);
+        PluginLink.PettableUserHandler.SetLastCast(target, castDealer);
     }
 
     internal override void OnDispose()
