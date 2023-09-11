@@ -12,21 +12,26 @@ namespace PetRenamer;
 public class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 5;
+    public const int currentSaveFileVersion = 6;
 
-    public int Version { get; set; } = 5;
+    public int Version { get; set; } = 6;
 
     public SerializableUserV2[]? serializableUsersV2 = null;
     public SerializableUserV3[]? serializableUsersV3 = null;
 
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
-    public bool replaceEmotes = true;
-    public bool allowTooltips = true;
-    public bool useContextMenus = true;
-    public bool useCustomNamesInChat = true;
-    public bool useCustomFlyoutInChat = true;
-    public bool allowCastBar = true;
+
+    public bool allowCastBarPet = true;
+    public bool useCustomFlyoutPet = true;
+    public bool useCustomPetNamesInBattleChat = true;
+    public bool useContextMenuOnBattlePets = true;
+    public bool allowTooltipsBattlePets = true;
+    public bool replaceEmotesBattlePets = true;
+
+    public bool useContextMenuOnMinions = true;
+    public bool allowTooltipsOnMinions = true;
+    public bool replaceEmotesOnMinions = true;
 
     public void Initialize()
     {
@@ -65,6 +70,13 @@ public class Configuration : IPluginConfiguration
     public SerializableUser[]? serializableUsers = null;
     [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
     public bool usePartyList = false;
+
+    [Obsolete] public bool replaceEmotes = true;
+    [Obsolete] public bool allowTooltips = true;
+    [Obsolete] public bool useContextMenus = true;
+    [Obsolete] public bool useCustomNamesInChat = true;
+    [Obsolete] public bool useCustomFlyoutInChat = true;
+    [Obsolete] public bool allowCastBar = true;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete

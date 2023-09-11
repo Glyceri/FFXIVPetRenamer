@@ -20,21 +20,30 @@ internal class TooltipHook : QuickTextHookableElement
 
     internal override void OnQuickInit()
     {
-        RegisterHook("ActionDetail", 5, -1);
-        RegisterHook("Tooltip", 2, 3, TooltipDetour);
+        RegisterHook("ActionDetail", 5, Allowed, -1);
+        RegisterHook("Tooltip", 2, Allowed, 3, TooltipDetour);
 
         showTooltip?.Enable();
     }
 
-    PettableUser TooltipDetour() => TooltipHelper.nextUser;
+    bool Allowed(int id)
+    {
+        if (id >= 0 && !PluginLink.Configuration.allowTooltipsOnMinions) return false;
+        if (id <= -2 && !PluginLink.Configuration.allowTooltipsBattlePets) return false;
+        return true;
+    }
 
+    PettableUser TooltipDetour()
+    {
+        return TooltipHelper.nextUser;
+    }
     internal override void OnQuickDispose()
     {
         showTooltip?.Dispose();
     }
 
     internal override void OnUpdate(Framework framework) =>
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowTooltips);
+        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
 
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
     {

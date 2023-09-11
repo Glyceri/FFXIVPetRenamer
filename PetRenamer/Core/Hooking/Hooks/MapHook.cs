@@ -29,7 +29,7 @@ internal unsafe class MapHook : HookableElement
 
     char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
-        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips) 
+        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltipsBattlePets) 
             return naviTooltip!.Original(unitBase, elementIndex);
         TooltipHelper.lastTooltipWasMap = true;
 
@@ -125,7 +125,7 @@ internal unsafe class MapHook : HookableElement
 
     char ShowTooltipDetour(AtkUnitBase* areaMap, uint elementIndex, char a3)
     {
-        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltips)
+        if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltipsBattlePets)
             return showTooltipThing!.Original(areaMap, elementIndex, a3);
 
         TooltipHelper.lastTooltipWasMap = true;

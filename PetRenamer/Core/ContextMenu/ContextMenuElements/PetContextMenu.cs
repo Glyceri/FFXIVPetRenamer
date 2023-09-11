@@ -7,9 +7,6 @@ using PetRenamer.Windows.PetWindows;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using PetRenamer.Core.PettableUserSystem;
-using Dalamud.Plugin;
-using Dalamud.Logging;
-using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 
@@ -20,7 +17,6 @@ internal unsafe class PetContextMenu : ContextMenuElement
     {
         if (args.ParentAddonName != null) return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
-        if (!PluginLink.Configuration.useContextMenus) return;
         if (args.ObjectId == 0xE000000) return;
         DBGameObject target = PluginHandlers.TargetManager.Target!;
         if (PluginHandlers.TargetManager.SoftTarget != null)
@@ -37,6 +33,9 @@ internal unsafe class PetContextMenu : ContextMenuElement
         // This is commented out, because so far I havent seen a reason that it needs to be active, but this is and end all fix (its just costly)
         // If there are still exceptions out there, or its laggy, or you know... w/e I'll turn it on
         // if (!SheetUtils.instance.PetExistsInANY(name)) return;
+
+        if (targetObjectKind == TargetObjectKind.Companion && !PluginLink.Configuration.useContextMenuOnMinions) return;
+        if (targetObjectKind == TargetObjectKind.BattleNpc && !PluginLink.Configuration.useContextMenuOnBattlePets) return;
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => 
         {

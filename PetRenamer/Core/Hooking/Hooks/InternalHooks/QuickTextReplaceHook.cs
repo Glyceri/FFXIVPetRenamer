@@ -19,13 +19,15 @@ public unsafe class QuickTextReplaceHook : IDisposable
     uint TextPos;
     int AtkPos;
     Func<PettableUser> recallAction;
+    Func<int, bool> allowedToFunction;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, int atkPos = -1, Func<PettableUser> recallAction = null!)
+    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!)
     {
         AddonName = addonName;
         TextPos = textPos;
         AtkPos = atkPos;
         this.recallAction = recallAction;
+        this.allowedToFunction = allowedToFunction;
     }
 
     public void Dispose()
@@ -110,6 +112,8 @@ public unsafe class QuickTextReplaceHook : IDisposable
             lastAnswer = tNodeText;
             return addonupdatehook!.Original(baseElement);
         }
+        if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
+
         user.SerializableUser.LoopThroughBreakable(nickname =>
         {
             if (nickname.Item1 == id)

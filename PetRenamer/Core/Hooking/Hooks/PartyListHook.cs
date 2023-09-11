@@ -96,7 +96,7 @@ internal unsafe class PartyListHook : HookableElement
             if (user == null) continue;
 
             (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, castString);
-            if (PluginLink.Configuration.allowCastBar)
+            if (PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames)
                 StringUtils.instance.ReplaceAtkString(member.CastingActionName, validNames);
         }
     }

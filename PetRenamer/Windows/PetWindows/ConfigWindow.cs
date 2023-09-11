@@ -7,30 +7,65 @@ namespace PetRenamer.Windows.PetWindows;
 
 [ConfigPetWindow]
 [PersistentPetWindow]
+[ModeTogglePetWindow]
 public class ConfigWindow : PetWindow
 {
     public ConfigWindow() : base(
         "Global minionname Settings",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
-        Size = new Vector2(300, 302);
+        Size = new Vector2(300, 382);
         SizeCondition = ImGuiCond.Always;
     }
 
     public override void OnDraw()
     {
-        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) || 
-            Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme) || 
-            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltips) || 
-            Checkbox("Use Custom Names for emotes", ref PluginLink.Configuration.replaceEmotes) || 
-            Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenus)||
-            Checkbox("Use Custom Names in Chat", ref PluginLink.Configuration.useCustomNamesInChat) ||
-            Checkbox("Use Custom Names in Flyout text", ref PluginLink.Configuration.useCustomFlyoutInChat) ||
-            Checkbox("Allow custom Castbars", ref PluginLink.Configuration.allowCastBar))
+        if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) ||
+            Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
             PluginLink.Configuration.Save();
 
+        NewLine();
+    }
 
-        if (Button("Clear All Nicknames")) 
+    public override void OnDrawNormal()
+    {
+        BeginListBox("##MinionConfig", new Vector2(286, 166));
+        OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
+        if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnMinions) ||
+            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsOnMinions) ||
+            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesOnMinions))
+            PluginLink.Configuration.Save();
+
+        ImGui.EndListBox();
+    }
+
+    public override void OnDrawBattlePet()
+    {
+        BeginListBox("##BattleConfig", new Vector2(286, 166));
+        OverrideLabel("Battle Pet Specific Settings", new Vector2(278, 25));
+
+        if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnBattlePets) ||
+            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsBattlePets) ||
+            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesBattlePets) ||
+            Checkbox("Battle Chat", ref PluginLink.Configuration.useCustomPetNamesInBattleChat) ||
+            Checkbox("Replace Flyout Text", ref PluginLink.Configuration.useCustomFlyoutPet))
+            PluginLink.Configuration.Save();
+
+        ImGui.EndListBox();
+    }
+
+    public override void OnDrawSharing()
+    {
+        BeginListBox("##SharingConfig", new Vector2(286, 166));
+        OverrideLabel("Sharing Mode Specific Settings", new Vector2(278, 25));
+
+        ImGui.EndListBox();
+    }
+
+    public override void OnLateDraw()
+    {
+        NewLine();
+        if (Button("Clear All Nicknames"))
             PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
                 "Are you sure you want to clear all Nicknames\nfor every user?",
                 (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearAllNicknames(); } }

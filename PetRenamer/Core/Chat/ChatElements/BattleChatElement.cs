@@ -13,7 +13,8 @@ internal unsafe class BattleChatElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!PluginLink.Configuration.useCustomNamesInChat) return;
+        if (!PluginLink.Configuration.displayCustomNames) return;
+        if (!PluginLink.Configuration.useCustomPetNamesInBattleChat) return;
         if (Enum.IsDefined(typeof(XivChatType), type)) return;
 
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;

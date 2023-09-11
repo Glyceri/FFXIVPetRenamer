@@ -138,7 +138,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     int ButtonCount = 3;
 
-    private void DrawModeToggle()
+    protected void DrawModeToggle()
     {
         int pressed = -1;
 

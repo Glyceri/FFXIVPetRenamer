@@ -34,7 +34,7 @@ public class QuickTextHookableElement : HookableElement
 
     List<QuickTextReplaceHook> quickTextReplaceHooks = new List<QuickTextReplaceHook>();
 
-    protected void RegisterHook(string addonName, uint atkTextID, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!) 
-        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, atkBackgroundID, pettableUserFunc));
+    protected void RegisterHook(string addonName, uint atkTextID, Func<int, bool> allowedToFunction, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!) 
+        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, allowedToFunction, atkBackgroundID, pettableUserFunc));
     
 }

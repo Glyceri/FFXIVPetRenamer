@@ -11,9 +11,15 @@ internal class CastBarHook : QuickTextHookableElement
 {
     internal override void OnQuickInit() 
     { 
-        RegisterHook("_CastBar", 4, -1); 
-        RegisterHook("_TargetInfoCastBar", 4, -1, GetThisInstead);
-        RegisterHook("_FocusTargetInfo", 5, -1, GetThisInsteadFocus);
+        RegisterHook("_CastBar", 4, Allowed, -1); 
+        RegisterHook("_TargetInfoCastBar", 4, Allowed, -1, GetThisInstead);
+        RegisterHook("_FocusTargetInfo", 5, Allowed, -1, GetThisInsteadFocus);
+    }
+
+    bool Allowed(int id)
+    {
+        if (id <= -2 && !PluginLink.Configuration.allowCastBarPet) return false;
+        return true;
     }
 
     PettableUser GetThisInsteadFocus() => GetFromTarget(PluginHandlers.TargetManager.FocusTarget);
@@ -37,5 +43,5 @@ internal class CastBarHook : QuickTextHookableElement
     }
 
     internal override void OnUpdate(Framework framework) => 
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowCastBar);
+        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowCastBarPet);
 }

@@ -28,7 +28,8 @@ internal class FlyTextHook : HookableElement
 
     void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
-        if (!PluginLink.Configuration.useCustomFlyoutInChat) return;
+        if (!PluginLink.Configuration.displayCustomNames) return;
+        if (!PluginLink.Configuration.useCustomFlyoutPet) return;
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;
         (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, text1.ToString() + text2.ToString());
         StringUtils.instance.ReplaceSeString(ref text1, validNames);
