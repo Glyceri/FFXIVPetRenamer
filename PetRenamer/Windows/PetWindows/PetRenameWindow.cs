@@ -29,7 +29,7 @@ public class PetRenameWindow : InitializablePetWindow
     Vector2 baseSize = new Vector2(310, 158);
     Vector2 wideSize = new Vector2(335, 127);
 
-    public PetRenameWindow() : base("Pet Nickname", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
+    public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
         Size = baseSize;
     }

@@ -32,7 +32,7 @@ public unsafe class PettableUser
     bool _userChangedCompanion = false;
     bool _userChangedBattlePet = false;
 
-    SerializableUserV3 _serializableUser;
+    readonly SerializableUserV3 _serializableUser;
 
     public nint nintUser => _user;
     public nint nintBattlePet => _BattlePet;

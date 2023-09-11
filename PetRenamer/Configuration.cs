@@ -82,9 +82,9 @@ public class Configuration : IPluginConfiguration
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialize()
     {
-        if (users == null) users = new SerializableNickname[0];
-        if (serializableUsers == null) serializableUsers = new SerializableUser[0];
-        if (serializableUsersV2 == null) serializableUsersV2 = new SerializableUserV2[0];
+        users ??= new SerializableNickname[0];
+        serializableUsers ??= new SerializableUser[0];
+        serializableUsersV2 ??= new SerializableUserV2[0];
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

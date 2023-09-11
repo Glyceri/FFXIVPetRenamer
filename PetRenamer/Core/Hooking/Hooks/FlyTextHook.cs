@@ -17,7 +17,7 @@ namespace PetRenamer.Core.Hooking.Hooks;
 internal class FlyTextHook : HookableElement
 {
     [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
-    Hook<Delegates.AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
+    readonly Hook<Delegates.AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 
     unsafe internal override void OnInit()
     {

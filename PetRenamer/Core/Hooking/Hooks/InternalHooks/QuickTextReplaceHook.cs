@@ -15,11 +15,11 @@ public unsafe class QuickTextReplaceHook : IDisposable
     Hook<Delegates.AddonUpdate>? addonupdatehook = null;
     AtkUnitBase* baseElement;
 
-    string AddonName;
-    uint TextPos;
-    int AtkPos;
-    Func<PettableUser> recallAction;
-    Func<int, bool> allowedToFunction;
+    readonly string AddonName;
+    readonly uint TextPos;
+    readonly int AtkPos;
+    readonly Func<PettableUser> recallAction;
+    readonly Func<int, bool> allowedToFunction;
 
     public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!)
     {

@@ -7,7 +7,7 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 public class CreditsWindow : PetWindow
 {
-    public CreditsWindow() : base("Credits",
+    public CreditsWindow() : base("Pet Nicknames Credits",
    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
    ImGuiWindowFlags.NoScrollWithMouse)
     {
