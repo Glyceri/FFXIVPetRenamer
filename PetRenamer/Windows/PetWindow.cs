@@ -42,9 +42,9 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     readonly List<(string, Type, string)> helpButtons = new List<(string, Type, string)>()
     {
-        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),  "[Help]"),
-        (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),   "[Settings]"),
-        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),  "[Pet/Minion List]")
+        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]"),
+        (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]"),
+        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]")
     };
 
     public sealed override void PreDraw()
@@ -71,6 +71,18 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PopAllStyleColours();
     }
 
+    public sealed override void OnOpen()
+    {
+        OnWindowOpen();
+    }
+
+    public sealed override void OnClose()
+    {
+        OnWindowClose();
+    }
+
+    public unsafe virtual void OnWindowOpen() { }
+    public unsafe virtual void OnWindowClose() { }
     public unsafe virtual void OnDraw() { }
     public unsafe virtual void OnDrawNormal() { }
     public unsafe virtual void OnDrawBattlePet() { }
@@ -141,8 +153,8 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
             SameLineNoMargin();
         }
 
-        float widthLeft = (int)PetMode.COUNT * Styling.ToggleButton.X;
-        float widthRight = ButtonCount * (Styling.helpButtonSize.X + (5 * 2));
+        float widthLeft = (int)helpButtons.Count * Styling.ToggleButton.X;
+        float widthRight = ButtonCount * (Styling.helpButtonSize.X + 9);
 
         float setWidth = ImGui.GetWindowSize()!.X - widthLeft - widthRight;
 

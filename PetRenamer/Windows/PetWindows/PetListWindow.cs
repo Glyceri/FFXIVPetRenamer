@@ -545,14 +545,14 @@ public class PetListWindow : PetWindow
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
         if (petMode != PetMode.ShareMode)
         {
-            if (Button($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton))
+            if (Button($"{StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}", Styling.ListButton))
                 SetUserMode(!userMode);
         }
         else
         {
-            Label($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton);
+            Label($"{StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}", Styling.ListButton);
         }
-        SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user.UserName)}");
+        SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}");
         SameLine();
         Label($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
         SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
