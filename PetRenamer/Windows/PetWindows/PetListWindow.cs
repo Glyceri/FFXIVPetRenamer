@@ -28,8 +28,6 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 883),
             MaximumSize = new Vector2(800, 883)
         };
-
-        IsOpen = true;
     }
 
     PettableUser user = null!;
@@ -41,14 +39,16 @@ public class PetListWindow : PetWindow
     PettableUser youSureUser = null!;
     string minionSearchField = string.Empty;
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
+    bool advancedMode = false;
 
-    public unsafe override void OnDraw()
+    public override void OnDraw()
     {
         if (PluginLink.Configuration.serializableUsersV3!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if ((user ??= localUser!) == null) return;
         if (petMode != PetMode.Normal) openedAddPet = false;
+        if (petMode != PetMode.ShareMode) SetAdvancedMode(false);
         if (petMode == PetMode.ShareMode)
         {
             SetUserMode(false);
@@ -168,13 +168,16 @@ public class PetListWindow : PetWindow
     SerializableUserV3 importedUser { get; set; } = null!;
     SerializableUserV3 alreadyExistingUser { get; set; } = null!;
 
-    readonly SerializableUserV3 testUser = new SerializableUserV3("Please import a user", 9999);
-
     unsafe void DrawSharing()
     {
-        if (importedUser == null)
-            importedUser = testUser;
+        if (user == null) return;
+        if (advancedMode)
+        {
+            DrawAdvancedSharing();
+            return;
+        }
 
+        if (importedUser == null) return;
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (user.SerializableUser == null) continue;
@@ -185,20 +188,111 @@ public class PetListWindow : PetWindow
                 break;
             }
         }
+
         DrawUserHeaderSharing();
         DrawListSharing();
         DrawFooterSharing();
+    }
+
+    void DrawAdvancedSharing()
+    {
+        DrawAdvancedHeader();
+        DrawAdvancedList();
+    }
+
+    List<bool> contains = new List<bool>();
+    bool current = true;
+    void DrawAdvancedList()
+    {
+        if (contains.Count == 0 && user.SerializableUser.length != 0)
+        {
+            FillList();
+            current = true;
+        }
+
+        int counter = 10000;
+        BeginListBox("##<6>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
+
+
+        if (Checkbox($"##{counter++}", ref current))
+            for (int i = 0; i < contains.Count; i++)
+                contains[i] = current;
+        SetTooltipHovered("Toggle all");
+
+        SameLine();
+        Label("ID", Styling.ListIDField); SameLine();
+        Label("Name", Styling.ListButton); SameLine();
+        Label("Custom Name", Styling.ListButton); SameLine();
+        NewLine();
+        NewLine();
+
+        for (int i = 0; i < user.SerializableUser.length; i++)
+        {
+            current = contains[i];
+            Checkbox($"##{counter++}", ref current);
+            SetTooltipHovered("Include pet in export");
+            contains[i] = current;
+            SameLine();
+            Label($"{user.SerializableUser.ids[i]}##{counter++}", Styling.ListIDField); SameLine();
+            string basePetName;
+            if (user.SerializableUser.ids[i] < -1) basePetName = RemapUtils.instance.PetIDToName(user.SerializableUser.ids[i]);
+            else basePetName = SheetUtils.instance.GetPetName(user.SerializableUser.ids[i]);
+            Label($"{basePetName}##{counter++}", Styling.ListButton); SameLine();
+            Label($"{user.SerializableUser.names[i]}##{counter++}", Styling.ListButton); SameLine();
+            NewLine();
+        }
+
+        ImGui.EndListBox();
+
+        NewLine();
+        ImGui.SameLine(638);
+
+        if (Button($"Export Nicknames List##EmportListSave", Styling.ListButton))
+        {
+            Export();
+            SetAdvancedMode(false);
+        }
+    }
+
+    void FillList()
+    {
+        contains.Clear();
+        for (int i = 0; i < user.SerializableUser.length; i++)
+            contains.Add(true);
+    }
+
+    void Export()
+    {
+        try
+        {
+            string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
+            for (int i = 0; i < user.SerializableUser.length; i++)
+            {
+                if (user.SerializableUser.names[i] != string.Empty && contains[i])
+                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
+            }
+            string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
+            ImGui.SetClipboardText(convertedString);
+            exportTimer = 2;
+        }
+        catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); errorTimer = 2; }
+    }
+
+    void DrawAdvancedHeader()
+    {
+        BeginListBox("##<list header>", new System.Numerics.Vector2(780, 32));
+        Label($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton); SameLine();
+        SetTooltipHovered($"{StringUtils.instance.MakeTitleCase(user.UserName)}");
+        Label($"{SheetUtils.instance.GetWorldName(user.Homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
+        SetTooltipHovered($"{SheetUtils.instance.GetWorldName(user.Homeworld)}");
+        ImGui.EndListBox();
+        NewLine();
     }
 
     void DrawFooterSharing()
     {
         NewLine();
         ImGui.SameLine(638);
-        if (testUser == importedUser)
-        {
-            Label($"Save Imported List##importListSaveLabel", Styling.ListButton);
-            return;
-        }
 
         if (Button($"Save Imported List##importListSave", Styling.ListButton))
         {
@@ -423,10 +517,19 @@ public class PetListWindow : PetWindow
     void DrawUserHeader()
     {
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
-        if (Button($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton))
-            SetUserMode(!userMode);
+        if (petMode != PetMode.ShareMode)
+        {
+            if (Button($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton))
+                SetUserMode(!userMode);
+        }
+        else
+        {
+            Label($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton);
+        }
+        SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user.UserName)}");
         SameLine();
         Label($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
+        SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
         ImGui.EndListBox();
         NewLine();
     }
@@ -442,6 +545,22 @@ public class PetListWindow : PetWindow
         }
     }
 
+    void SetAdvancedMode(bool advanced)
+    {
+        advancedMode = advanced;
+        contains.Clear();
+
+        if (!advancedMode) return;
+
+        user = PluginLink.PettableUserHandler.LocalUser()!;
+        importedUser = null!;
+        IsOpen = true;
+        SetPetMode(PetMode.ShareMode);
+    }
+
+    double exportTimer = 0;
+    double errorTimer = 0;
+
     public void DrawExportHeader()
     {
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
@@ -450,22 +569,32 @@ public class PetListWindow : PetWindow
         Label("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {
-            try
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) SetAdvancedMode(true);
+            else
             {
-                string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
-                for (int i = 0; i < user.SerializableUser.length; i++)
-                {
-                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
-                }
-                string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
-                ImGui.SetClipboardText(convertedString);
+                SetAdvancedMode(false);
+                FillList();
+                Export();
             }
-            catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); }
         }
-        SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.");
+        if (errorTimer > 0)
+        {
+            errorTimer -= PluginHandlers.Framework.UpdateDelta.Milliseconds * 0.001;
+            SetTooltip("...[ERROR] [Couldn't export Nicknames]...");
+        }
+        else if (exportTimer > 0)
+        {
+            exportTimer -= PluginHandlers.Framework.UpdateDelta.Milliseconds * 0.001;
+            SetTooltip("...[Exported Names]...");
+        }
+        else
+        {
+            SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.\n\n[Hold L-Shift for advanced options.]");
+        }
         SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
+            SetAdvancedMode(false);
             try
             {
                 string gottenText = Encoding.Unicode.GetString(Convert.FromBase64String(ImGui.GetClipboardText()));
