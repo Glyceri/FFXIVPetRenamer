@@ -99,7 +99,7 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         _BattlePet = (nint)battlePet;
-        if (_BattlePet == nint.Zero) ResetBattlePet();
+        if (_BattlePet == nint.Zero) { ResetBattlePet(); _LastBattlePetID = -1; }
         else
         {
             _BattlePetSkeletonID = battlePet->Character.CharacterData.ModelCharaId;
@@ -127,15 +127,15 @@ public unsafe class PettableUser
     public void SetCompanion(Companion* companion)
     {
         _companion = (nint)companion;
-        if (_companion == nint.Zero) ResetCompanion();
+        if (_companion == nint.Zero) { ResetCompanion(); _LastCompanionID = -1; }
         else
         {
             _CompanionID = companion->Character.CharacterData.ModelSkeletonId;
-            if(_LastCompanionID != _CompanionID)
+            if (_LastCompanionID != _CompanionID)
             {
                 _userChangedCompanion = true;
                 _LastCompanionID = _CompanionID;
-                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!; 
+                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
                 _CustomCompanionName = string.Empty;
                 SerializableUser.LoopThroughBreakable((nickname) =>
                 {

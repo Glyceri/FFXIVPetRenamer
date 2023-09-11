@@ -62,8 +62,8 @@ public class PetRenameWindow : InitializablePetWindow
     {
         Size = baseSize;
         if (user == null) return;
-        if (!user.HasCompanion) 
-        { 
+        if (companionID == -1)
+        {
             TextColoured(StylingColours.highlightText, $"Please summon a minion.\nOr open the naming list: ");
             if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
             SetTooltipHovered("Opens the Minion List");
@@ -77,8 +77,8 @@ public class PetRenameWindow : InitializablePetWindow
         if (user == null) return;
         if (battlePetID == -1)
         {
-            if (battlePetBaseName == string.Empty) 
-            { 
+            if (battlePetBaseName == string.Empty)
+            {
                 TextColoured(StylingColours.highlightText, $"Please summon a Battle Pet.\nOr open the naming list: ");
                 if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
                 SetTooltipHovered("Opens the Battle Pet List");
@@ -96,8 +96,8 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawPetNameField(string basePet, ref string temporaryName, ref string temporaryCustomName, ref int theID)
     {
-        TextColoured(StylingColours.whiteText, $"Your");               SameLinePretendSpace();
-        TextColoured(StylingColours.highlightText, $"{basePet}");      SameLinePretendSpace();
+        TextColoured(StylingColours.whiteText, $"Your"); SameLinePretendSpace();
+        TextColoured(StylingColours.highlightText, $"{basePet}"); SameLinePretendSpace();
         SetTooltipHovered($"{basePet}");
         if (temporaryName.Length == 0) TextColoured(StylingColours.whiteText, $"does not have a name!");
         else
@@ -115,17 +115,25 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawValidName(string internalTempText, ref int theID)
     {
-        if (Button("Save Nickname")) 
-        { 
-            user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true); 
-            PluginLink.Configuration.Save(); 
+        if (Button("Save Nickname"))
+        {
+            user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
+            PluginLink.Configuration.Save();
+            if (companionID == theID)
+                companionName = internalTempText;
+            if (battlePetID == theID)
+                battlePetName = internalTempText;
         }
         SetTooltipHovered("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
         if (Button("Remove Nickname"))
         {
-            user.SerializableUser.RemoveNickname(theID, notifyICP: true); 
+            user.SerializableUser.RemoveNickname(theID, notifyICP: true);
             PluginLink.Configuration.Save();
+            if (companionID == theID)
+                companionID = -1;
+            if (battlePetID == theID)
+                battlePetID = -1;
         }
         SetTooltipHovered("Removes the nickname from your list.");
     }
@@ -139,7 +147,7 @@ public class PetRenameWindow : InitializablePetWindow
         companionBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(companionID));
         companionName = user.GetCustomName(companionID);
         temporaryCompanionName = companionName;
-        
+
     }
 
     public void OpenForBattleID(int id, bool forceOpen = false)

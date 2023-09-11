@@ -213,6 +213,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
+    protected bool TransparentLabel(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0,0,0,0));
+        PushStyleColor(ImGuiCol.Button, new Vector4(0, 0, 0, 0));
+        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0, 0, 0, 0));
+        PushStyleColor(ImGuiCol.Text, new Vector4(0, 0, 0, 0));
+        return ImGui.Button(text, styling);
+    }
+
     protected bool Label(string text, Vector2 styling)
     {
         PushStyleColor(ImGuiCol.ButtonHovered,    StylingColours.idleColor);

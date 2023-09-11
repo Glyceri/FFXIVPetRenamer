@@ -89,6 +89,7 @@ public class SerializableUserV3
 
     void GenerateNewNickname(int id, string name, bool notifyICP = false)
     {
+        if (id == -1 || name == string.Empty) return;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.Add(id);
@@ -134,6 +135,41 @@ public class SerializableUserV3
     public bool HasID(int id) => ids.Contains(id);
     public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim().Normalize() == username.ToLowerInvariant().Trim().Normalize() && this.homeworld == homeworld;
     public bool Equals((string, ushort) user) => Equals(user.Item1, user.Item2);
+
+    public int AccurateTotalPetCount()
+    {
+        int counter = 0;
+        foreach (string str in names)
+        {
+            if (str != string.Empty && str != null)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int AccurateMinionCount()
+    {
+        int counter = 0;
+        for (int i = 0; i < names.Length!; i++)
+        {
+            if (ids[i] <= -1) continue;
+            if (names[i] != string.Empty && names[i] != null)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int AccurateBattlePetCount()
+    {
+        int counter = 0;
+        for(int i = 0; i < names.Length!; i++)
+        {
+            if (ids[i] >= -1) continue;
+            if (names[i] != string.Empty && names[i] != null)
+                counter++;
+        }
+        return counter;
+    }
 
     public void Reset()
     {
