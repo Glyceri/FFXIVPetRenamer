@@ -14,7 +14,7 @@ public class ConfigWindow : PetWindow
         "Pet Nicknames Configuration",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
-        Size = new Vector2(300, 382);
+        Size = new Vector2(300, 408);
         SizeCondition = ImGuiCond.Always;
     }
 
@@ -29,7 +29,7 @@ public class ConfigWindow : PetWindow
 
     public override void OnDrawNormal()
     {
-        BeginListBox("##MinionConfig", new Vector2(286, 166));
+        BeginListBox("##MinionConfig", new Vector2(286, 194));
         OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
         if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnMinions) ||
             Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsOnMinions) ||
@@ -41,14 +41,15 @@ public class ConfigWindow : PetWindow
 
     public override void OnDrawBattlePet()
     {
-        BeginListBox("##BattleConfig", new Vector2(286, 166));
+        BeginListBox("##BattleConfig", new Vector2(286, 194));
         OverrideLabel("Battle Pet Specific Settings", new Vector2(278, 25));
 
         if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnBattlePets) ||
             Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsBattlePets) ||
             Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesBattlePets) ||
             Checkbox("Battle Chat", ref PluginLink.Configuration.useCustomPetNamesInBattleChat) ||
-            Checkbox("Replace Flyout Text", ref PluginLink.Configuration.useCustomFlyoutPet))
+            Checkbox("Replace Flyout Text", ref PluginLink.Configuration.useCustomFlyoutPet) ||
+            Checkbox("Allow Cast Bar", ref PluginLink.Configuration.allowCastBarPet))
             PluginLink.Configuration.Save();
 
         ImGui.EndListBox();
@@ -56,7 +57,7 @@ public class ConfigWindow : PetWindow
 
     public override void OnDrawSharing()
     {
-        BeginListBox("##SharingConfig", new Vector2(286, 166));
+        BeginListBox("##SharingConfig", new Vector2(286, 194));
         OverrideLabel("Sharing Mode Specific Settings", new Vector2(278, 25));
 
         ImGui.EndListBox();
