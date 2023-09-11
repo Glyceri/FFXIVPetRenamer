@@ -42,6 +42,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     readonly List<(string, Type, string)> helpButtons = new List<(string, Type, string)>()
     {
+        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]"),
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]"),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]"),
         (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]")
@@ -154,7 +155,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         }
 
         float widthLeft = (int)helpButtons.Count * Styling.ToggleButton.X;
-        float widthRight = ButtonCount * (Styling.helpButtonSize.X + 9);
+        float widthRight = ButtonCount * (Styling.helpButtonSize.X + 8);
 
         float setWidth = ImGui.GetWindowSize()!.X - widthLeft - widthRight;
 
