@@ -301,6 +301,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.textFieldPressed);
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.InputText(label, ref input, maxLength, flags);
     }
 

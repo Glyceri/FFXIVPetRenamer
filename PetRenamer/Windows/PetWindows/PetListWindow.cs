@@ -342,25 +342,51 @@ public class PetListWindow : PetWindow
 
         foreach ((int, string) nickname in deletedNicknames)
         {
-            string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
+            string currentPetName =
+            nickname.Item1 >= 0 ?
+            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)) :
+            StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
+
             XButtonError("X", Styling.SmallButton);
+            SetTooltipHovered("Pet name gets removed");
             SameLine();
             Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
+            SetTooltipHovered(nickname.Item1.ToString());
             Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
+            SetTooltipHovered(currentPetName);
             Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
+            SetTooltipHovered(nickname.Item2);
         }
 
         importedUser.LoopThrough(nickname =>
         {
-            string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
-            if (IsExactSame(nickname)) Label("=", Styling.SmallButton);
-            else if (HasNickname(nickname)) OverrideLabel("O", Styling.SmallButton);
-            else NewLabel("+", Styling.SmallButton);
+            string currentPetName = 
+            nickname.Item1 >= 0 ? 
+            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)) :
+            StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
+            if (IsExactSame(nickname))
+            {
+                Label("=", Styling.SmallButton);
+                SetTooltipHovered("Pet name stays the exact same");
+            }
+            else if (HasNickname(nickname))
+            {
+                OverrideLabel("O", Styling.SmallButton);
+                SetTooltipHovered("Pet name gets changed");
+            }
+            else
+            {
+                NewLabel("+", Styling.SmallButton);
+                SetTooltipHovered("Pet name is new");
+            }
 
             SameLine();
             Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
+            SetTooltipHovered(nickname.Item1.ToString());
             Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
+            SetTooltipHovered(currentPetName);
             Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
+            SetTooltipHovered(nickname.Item2);
         });
         ImGui.EndListBox();
     }
