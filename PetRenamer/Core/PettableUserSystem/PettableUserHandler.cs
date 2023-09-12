@@ -57,7 +57,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
     {
-        if(userDeclareType == UserDeclareType.Add)
+        if (userDeclareType == UserDeclareType.Add)
         {
             if (force)
                 for (int i = _users.Count - 1; i >= 0; i--)
@@ -87,6 +87,21 @@ internal class PettableUserHandler : IDisposable, IInitializable
         LoopThroughBreakable((user) =>
         {
             if (name.Contains(user.UserName))
+            {
+                returnThis = user;
+                return true;
+            }
+            return false;
+        });
+        return returnThis;
+    }
+
+    public PettableUser? GetUser(string name, ushort homeworld)
+    {
+        PettableUser? returnThis = null;
+        LoopThroughBreakable((user) =>
+        {
+            if (name.Contains(user.UserName) && homeworld == user.Homeworld)
             {
                 returnThis = user;
                 return true;

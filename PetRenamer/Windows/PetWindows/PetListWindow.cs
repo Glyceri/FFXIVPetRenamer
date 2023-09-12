@@ -10,6 +10,7 @@ using System.Text;
 using Dalamud.Logging;
 using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -311,9 +312,25 @@ public class PetListWindow : PetWindow
                 {
                     alreadyExistingUser.RemoveNickname(nickname.Item1, false);
                 }
-                alreadyExistingUser = null!;
-                importedUser = null!;
             }
+
+            PettableUser curUser = null!;
+            foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+                if (user.SerializableUser.Equals(importedUser.username, importedUser.homeworld))
+                {
+                    curUser = user;
+                    break;
+                }
+
+            if (curUser != null)
+            {
+                PenumbraIPCProvider.RedrawBattlePetByIndex(curUser.BattlePetIndex);
+                PenumbraIPCProvider.RedrawMinionByIndex(curUser.MinionIndex);
+            }
+
+            alreadyExistingUser = null!;
+            importedUser = null!;
+
             PluginLink.Configuration.Save();
         }
     }
@@ -360,8 +377,8 @@ public class PetListWindow : PetWindow
 
         importedUser.LoopThrough(nickname =>
         {
-            string currentPetName = 
-            nickname.Item1 >= 0 ? 
+            string currentPetName =
+            nickname.Item1 >= 0 ?
             StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)) :
             StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
             if (IsExactSame(nickname))
@@ -460,6 +477,7 @@ public class PetListWindow : PetWindow
     {
         importedUser = null!;
         if (!importString.StartsWith("[PetExport]")) return false;
+
         try
         {
             string[] splitLines = importString.Split('\n');
@@ -595,7 +613,7 @@ public class PetListWindow : PetWindow
         Label("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {
-            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode) 
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode)
                 SetAdvancedMode(true);
             else
             {

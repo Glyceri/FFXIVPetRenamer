@@ -26,8 +26,10 @@ public unsafe class PettableUser
     int _LastCompanionID = -1;
 
     nint _LastBattlePetPointer = nint.Zero;
+    nint _LastMinionPointer = nint.Zero;
 
     int _BattlePetIndex = -1;
+    int _MinionIndex = -1;
 
     string _CustomBattlePetName = string.Empty; // [Sally]
     string _CustomCompanionName = string.Empty; // [George]
@@ -70,6 +72,7 @@ public unsafe class PettableUser
     public string BaseBattlePetName => _BattlePetBaseName;
 
     public int BattlePetIndex => _BattlePetIndex;
+    public int MinionIndex => _MinionIndex;
 
     public int CompanionID => _CompanionID;
     public string CustomCompanionName => _CustomCompanionName;
@@ -139,12 +142,17 @@ public unsafe class PettableUser
     public void SetCompanion(Companion* companion)
     {
         _companion = (nint)companion;
+
+        if (companion == null) _MinionIndex = -1;
+        else _MinionIndex = companion->Character.GameObject.ObjectIndex;
+
         if (_companion == nint.Zero) { ResetCompanion(); _LastCompanionID = -1; }
         else
         {
             _CompanionID = companion->Character.CharacterData.ModelSkeletonId;
-            if (_LastCompanionID != _CompanionID)
+            if (_LastCompanionID != _CompanionID || _LastMinionPointer != _companion)
             {
+                _LastMinionPointer = _companion;
                 _userChangedCompanion = true;
                 _LastCompanionID = _CompanionID;
                 _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
@@ -177,12 +185,14 @@ public unsafe class PettableUser
     void ResetCompanion()
     {
         _CompanionID = -1;
+        _MinionIndex = -1;
     }
 
     void ResetBattlePet()
     {
         _BattlePetID = -1;
         _BattlePetSkeletonID = -1;
+        _BattlePetIndex = -1;
     }
 
     public string GetCustomName(int skeletonID)

@@ -57,6 +57,8 @@ public class ConfigWindow : PetWindow
             if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
             BeginListBox("##MinionConfig", new Vector2(286, 194));
             OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
+            if (Checkbox("Redraw On Change [Penumbra]", ref PluginLink.Configuration.redrawMinionOnSpawn))
+                PluginLink.Configuration.Save();
             ImGui.EndListBox();
             return;
         }

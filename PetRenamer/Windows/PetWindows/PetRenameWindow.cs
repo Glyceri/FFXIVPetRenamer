@@ -2,6 +2,7 @@
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
@@ -120,9 +121,15 @@ public class PetRenameWindow : InitializablePetWindow
             user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
             PluginLink.Configuration.Save();
             if (companionID == theID)
+            {
                 companionName = internalTempText;
+                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
+            }
             if (battlePetID == theID)
+            {
                 battlePetName = internalTempText;
+                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
+            }
         }
         SetTooltipHovered("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
@@ -131,9 +138,15 @@ public class PetRenameWindow : InitializablePetWindow
             user.SerializableUser.RemoveNickname(theID, notifyICP: true);
             PluginLink.Configuration.Save();
             if (companionID == theID)
+            {
                 companionID = -1;
+                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
+            }
             if (battlePetID == theID)
+            {
                 battlePetID = -1;
+                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
+            }
         }
         SetTooltipHovered("Removes the nickname from your list.");
     }

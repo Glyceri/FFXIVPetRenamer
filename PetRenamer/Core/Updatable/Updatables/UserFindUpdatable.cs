@@ -53,11 +53,7 @@ internal class UserFindUpdatable : Updatable
         PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
         if (window == null) return;
         if (user.CompanionChanged) window.OpenForId(user.CompanionID);
-        if (user.BattlePetChanged) 
-        { 
-            window.OpenForBattleID(user.BattlePetID); 
-            PenumbraIPCProvider.RedrawObjectByIndex(user.BattlePetIndex);
-        }
+        if (user.BattlePetChanged) window.OpenForBattleID(user.BattlePetID);
     }
 
     unsafe BattleChara* AlterantiveFindForBChara(BattleChara* bChara, BattleChara* basePet)
