@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 
@@ -22,6 +24,10 @@ public unsafe class PettableUser
     int _LastBattlePetID = -1;
     int _CompanionID = -1; // [0, 1, 2, 3.....]
     int _LastCompanionID = -1;
+
+    nint _LastBattlePetPointer = nint.Zero;
+
+    int _BattlePetIndex = -1;
 
     string _CustomBattlePetName = string.Empty; // [Sally]
     string _CustomCompanionName = string.Empty; // [George]
@@ -63,6 +69,8 @@ public unsafe class PettableUser
     public string BattlePetCustomName => _CustomBattlePetName;
     public string BaseBattlePetName => _BattlePetBaseName;
 
+    public int BattlePetIndex => _BattlePetIndex;
+
     public int CompanionID => _CompanionID;
     public string CustomCompanionName => _CustomCompanionName;
     public string CompanionBaseName => _CompanionBaseName;
@@ -99,14 +107,18 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         _BattlePet = (nint)battlePet;
+        if (battlePet == null) _BattlePetIndex = -1;
+        else _BattlePetIndex = battlePet->Character.GameObject.ObjectIndex;
+
         if (_BattlePet == nint.Zero) { ResetBattlePet(); _LastBattlePetID = -1; }
         else
         {
             _BattlePetSkeletonID = battlePet->Character.CharacterData.ModelCharaId;
             _BattlePetID = RemapUtils.instance.GetPetIDFromClass(User->Character.CharacterData.ClassJob);
-            if (_LastBattlePetID != _BattlePetID || _LastBattlePetSkeletonID != _BattlePetSkeletonID)
+            if (_LastBattlePetID != _BattlePetID || _LastBattlePetSkeletonID != _BattlePetSkeletonID || _LastBattlePetPointer != _BattlePet)
             {
                 _userChangedBattlePet = true;
+                _LastBattlePetPointer = _BattlePet;
                 _LastBattlePetSkeletonID = _BattlePetSkeletonID;
                 _LastBattlePetID = _BattlePetID;
                 _BattlePetBaseName = Marshal.PtrToStringUTF8((IntPtr)battlePet->Character.GameObject.Name)!;

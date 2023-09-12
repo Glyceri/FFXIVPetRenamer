@@ -595,7 +595,8 @@ public class PetListWindow : PetWindow
         Label("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {
-            if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) SetAdvancedMode(true);
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode) 
+                SetAdvancedMode(true);
             else
             {
                 SetAdvancedMode(false);

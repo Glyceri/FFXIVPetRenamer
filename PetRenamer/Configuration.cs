@@ -4,6 +4,7 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PetRenamer;
@@ -16,23 +17,27 @@ public class Configuration : IPluginConfiguration
 
     public int Version { get; set; } = 6;
 
-    public SerializableUserV2[]? serializableUsersV2 = null;
-    public SerializableUserV3[]? serializableUsersV3 = null;
-
+    // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
-
+    // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;
     public bool useCustomPetNamesInBattleChat = true;
     public bool useContextMenuOnBattlePets = true;
     public bool allowTooltipsBattlePets = true;
     public bool replaceEmotesBattlePets = true;
-
+    // ---- Penumbra REQUIRED ----
+    public bool redrawBattlePetOnSpawn = false;       
+    // ------------------------- Minion Settings -------------------------
     public bool useContextMenuOnMinions = true;
     public bool allowTooltipsOnMinions = true;
     public bool replaceEmotesOnMinions = true;
+    // ---------------------- Sharing Mode Settings ----------------------
+    public bool alwaysOpenAdvancedMode = false;
 
+    public SerializableUserV3[]? serializableUsersV3 = null;
+    
     public void Initialize()
     {
         LegacyInitialize();
@@ -65,18 +70,20 @@ public class Configuration : IPluginConfiguration
     // Will be kept for backwards compatibility
     //---------------------------Legacy Variables---------------------------
     [Obsolete("Old nickname Save System. Nowadays nicknames get saved per User")] 
-    public SerializableNickname[]? users = null;
+    public SerializableNickname[]? users { get; set; } = null;
     [Obsolete("Old User Save System. Very innefficient. Use SerializableUserV2 now")]
-    public SerializableUser[]? serializableUsers = null;
+    public SerializableUser[]? serializableUsers { get; set; } = null;
+    [Obsolete("Old User Save System. Very innefficient. Use SerializableUserV3 now")]
+    public SerializableUserV2[]? serializableUsersV2 { get; set; } = null;
     [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
-    public bool usePartyList = false;
+    public bool usePartyList { get; set; } = false;
 
-    [Obsolete] public bool replaceEmotes = true;
-    [Obsolete] public bool allowTooltips = true;
-    [Obsolete] public bool useContextMenus = true;
-    [Obsolete] public bool useCustomNamesInChat = true;
-    [Obsolete] public bool useCustomFlyoutInChat = true;
-    [Obsolete] public bool allowCastBar = true;
+    [Obsolete] public bool replaceEmotes { get; set; } = true;
+    [Obsolete] public bool allowTooltips { get; set; } = true;
+    [Obsolete] public bool useContextMenus { get; set; } = true;
+    [Obsolete] public bool useCustomNamesInChat { get; set; } = true;
+    [Obsolete] public bool useCustomFlyoutInChat { get; set; } = true;
+    [Obsolete] public bool allowCastBar { get; set; } = true;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
