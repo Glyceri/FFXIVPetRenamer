@@ -5,8 +5,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 

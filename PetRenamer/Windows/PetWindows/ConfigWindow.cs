@@ -1,7 +1,6 @@
 using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -52,13 +51,6 @@ public class ConfigWindow : PetWindow
             Checkbox("Replace Flyout Text", ref PluginLink.Configuration.useCustomFlyoutPet) ||
             Checkbox("Allow Cast Bar", ref PluginLink.Configuration.allowCastBarPet))
             PluginLink.Configuration.Save();
-
-        if (PenumbraIPCProvider.PenumbraEnabled())
-        {
-            if(Checkbox("Redraw On Change", ref PluginLink.Configuration.redrawBattlePetOnSpawn))
-                PluginLink.Configuration.Save();
-            SetTooltipHovered("Redraws the Battle Pet upon changing or spawning");
-        }
 
         ImGui.EndListBox();
     }

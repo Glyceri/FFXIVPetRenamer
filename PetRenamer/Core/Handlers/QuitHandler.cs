@@ -1,6 +1,4 @@
-﻿using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-
-namespace PetRenamer.Core.Handlers;
+﻿namespace PetRenamer.Core.Handlers;
 
 internal class QuitHandler
 {
@@ -18,8 +16,6 @@ internal class QuitHandler
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();
-
-        PenumbraIPCProvider.DeInit();
     }
 }
 
