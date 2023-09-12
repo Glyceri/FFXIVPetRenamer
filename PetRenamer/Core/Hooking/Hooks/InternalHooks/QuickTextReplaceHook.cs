@@ -22,14 +22,16 @@ public unsafe class QuickTextReplaceHook : IDisposable
     readonly int AtkPos;
     readonly Func<PettableUser> recallAction;
     readonly Func<int, bool> allowedToFunction;
+    readonly Action<string> latestOutcome;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!)
+    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
     {
         AddonName = addonName;
         TextPos = textPos;
         AtkPos = atkPos;
         this.recallAction = recallAction;
         this.allowedToFunction = allowedToFunction;
+        this.latestOutcome = latestOutcome;
     }
 
     public void Dispose()
@@ -65,6 +67,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
         string tNodeText = tNode->NodeText.ToString();
         if (tNodeText == null) return addonupdatehook!.Original(baseElement);
+        if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
         if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
 
 
@@ -125,7 +128,6 @@ public unsafe class QuickTextReplaceHook : IDisposable
             {
                 if (nickname.Item2 == string.Empty) return false;
                 tNode->NodeText.SetString(tNode->NodeText.ToString().Replace(replaceName, nickname.Item2));
-
                 if (nineGridNode != null)
                 {
                     tNode->ResizeNodeForCurrentText();

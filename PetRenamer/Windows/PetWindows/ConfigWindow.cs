@@ -30,6 +30,7 @@ public class ConfigWindow : PetWindow
         }
         if (unsupportedMode)
         {
+            OverrideLabel("Only INSTALLED plugins will show up!", new Vector2(286, 24));
             BeginListBox("##SharingConfig", new Vector2(286, 102));
             TextColoured(new Vector4(1, 0.6f, 0.6f, 1), "Do NOT send feedback or issues for these\nsettings on discord or via the official \n[Send Feedback] button!\nONLY Github Issues are ALLOWED!");
             if (Checkbox("Understood!", ref PluginLink.Configuration.understoodWarningThirdPartySettings))
@@ -59,6 +60,7 @@ public class ConfigWindow : PetWindow
             OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
             if (Checkbox("Redraw On Change [Penumbra]", ref PluginLink.Configuration.redrawMinionOnSpawn))
                 PluginLink.Configuration.Save();
+            SetTooltipHovered("Redraws your Minion upon changing or spawning\nThis fixes bugs like names lingering on, or appearing too late.");
             ImGui.EndListBox();
             return;
         }
@@ -157,7 +159,7 @@ public class ConfigWindow : PetWindow
             if (AnyIllegalsGoingOn())
             {
                 NewLine();
-                if (XButtonError("Unsupported Settings", new Vector2(286, 24)))
+                if (XButton("Other Plugin Settings", new Vector2(286, 24)))
                     unsupportedMode = true;
             }
         }

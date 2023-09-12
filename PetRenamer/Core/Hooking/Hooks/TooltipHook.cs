@@ -21,9 +21,11 @@ internal class TooltipHook : QuickTextHookableElement
     [Signature("48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20", DetourName = nameof(ItemDetailOnUpdateDetour))]
     private Hook<Delegates.AddonOnUpdate>? ItemDetailOnUpdateHook { get; init; }
 
+    public static string latestOutcome = string.Empty;
+
     internal override void OnQuickInit()
     {
-        RegisterHook("ActionDetail", 5, Allowed, -1);
+        RegisterHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
         RegisterHook("Tooltip", 2, Allowed, 3, TooltipDetour);
 
         showTooltip?.Enable();

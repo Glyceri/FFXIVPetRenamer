@@ -12,7 +12,7 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
-    ExcelSheet<Companion> petSheet { get; set; } = null!;
+    public ExcelSheet<Companion> petSheet { get; set; } = null!;
     ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
