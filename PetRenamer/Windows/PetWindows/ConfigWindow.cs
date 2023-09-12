@@ -1,6 +1,7 @@
 using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -52,6 +53,13 @@ public class ConfigWindow : PetWindow
             Checkbox("Allow Cast Bar", ref PluginLink.Configuration.allowCastBarPet))
             PluginLink.Configuration.Save();
 
+        if (PenumbraIPCProvider.PenumbraEnabled())
+        {
+            if(Checkbox("Redraw On Change", ref PluginLink.Configuration.redrawBattlePetOnSpawn))
+                PluginLink.Configuration.Save();
+            SetTooltipHovered("Redraws the Battle Pet upon changing or spawning");
+        }
+
         ImGui.EndListBox();
     }
 
@@ -59,6 +67,9 @@ public class ConfigWindow : PetWindow
     {
         BeginListBox("##SharingConfig", new Vector2(286, 194));
         OverrideLabel("Sharing Mode Specific Settings", new Vector2(278, 25));
+
+        if (Checkbox("Always open Advanced Mode [Export]", ref PluginLink.Configuration.alwaysOpenAdvancedMode))
+            PluginLink.Configuration.Save();
 
         ImGui.EndListBox();
     }

@@ -5,6 +5,8 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+using Dalamud.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -32,6 +34,8 @@ public unsafe sealed class NamePlateHook : HookableElement
         return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 
+    string lastBattlePetNameToUse = string.Empty;
+
     void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
@@ -42,7 +46,7 @@ public unsafe sealed class NamePlateHook : HookableElement
             if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
             if (nameToUse != string.Empty) 
             { 
-                namePlateInfo->Name.SetString(nameToUse); 
+                namePlateInfo->Name.SetString(nameToUse);
                 break; 
             }
         }
