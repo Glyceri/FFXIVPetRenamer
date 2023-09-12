@@ -105,8 +105,8 @@ public class ConfigWindow : PetWindow
 
     public bool AnyIllegalsGoingOn()
     {
-        if (PenumbraIPCProvider.PenumbraEnabled())
-            return true;
+        // Comment out this line to unsupport all the Third Party support
+        if (PenumbraIPCProvider.PenumbraEnabled()) return true;
 
         unsupportedMode = false;
         return false;
