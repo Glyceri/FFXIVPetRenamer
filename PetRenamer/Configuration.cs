@@ -69,6 +69,8 @@ public class Configuration : IPluginConfiguration
     //---------------------------Legacy Variables---------------------------
     // Will be kept for backwards compatibility
     //---------------------------Legacy Variables---------------------------
+    [Obsolete("NEVER USE THIS VALUE!")]
+    public string __Obsolete_Values__ { get; set; } = "\nThe values from here onwards are obsolete, editing these will result in NOTHING";
     [Obsolete("Old nickname Save System. Nowadays nicknames get saved per User")] 
     public SerializableNickname[]? users { get; set; } = null;
     [Obsolete("Old User Save System. Very innefficient. Use SerializableUserV2 now")]

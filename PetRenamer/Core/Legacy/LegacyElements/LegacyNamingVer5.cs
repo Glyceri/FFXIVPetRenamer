@@ -5,7 +5,7 @@ using PetRenamer.Core.Legacy.Attributes;
 
 namespace PetRenamer.Core.Legacy.LegacyElements;
 
-[Legacy(new int[1] { 4 })]
+[Legacy(new int[1] { 5 })]
 internal class LegacyNamingVer5 : LegacyElement
 {
     internal override void OnPlayerAvailable(int detectedVersion)
