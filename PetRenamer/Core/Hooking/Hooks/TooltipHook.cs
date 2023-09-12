@@ -57,11 +57,17 @@ internal class TooltipHook : QuickTextHookableElement
     internal override void OnUpdate(Framework framework) =>
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
 
+    IntPtr lastTooltip;
+
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
     {
         if (!TooltipHelper.lastTooltipWasMap) TooltipHelper.nextUser = null!;
         TooltipHelper.lastTooltipWasMap = false;
-        TooltipHelper.handleAsItem = false;
+        if (lastTooltip != a4)
+        {
+            lastTooltip = a4;
+            TooltipHelper.handleAsItem = false;
+        }
         return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
     }
 }
