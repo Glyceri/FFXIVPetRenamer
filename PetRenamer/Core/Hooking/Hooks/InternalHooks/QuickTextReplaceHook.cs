@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -7,6 +8,7 @@ using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
@@ -60,8 +62,11 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (bNode == null) return addonupdatehook!.Original(baseElement);
         AtkTextNode* tNode = bNode.GetNode<AtkTextNode>(TextPos);
         if (tNode == null) return addonupdatehook!.Original(baseElement);
+        if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
         string tNodeText = tNode->NodeText.ToString();
+        if (tNodeText == null) return addonupdatehook!.Original(baseElement);
         if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
+
 
         AtkNineGridNode* nineGridNode = null;
         if (AtkPos != -1) nineGridNode = bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
@@ -69,8 +74,8 @@ public unsafe class QuickTextReplaceHook : IDisposable
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
 
-        if (recallAction != null) 
-        { 
+        if (recallAction != null)
+        {
             PettableUser tempUser = recallAction.Invoke();
             if (tempUser != null) user = tempUser;
         }

@@ -16,6 +16,8 @@ public static unsafe class Delegates
     public delegate void AddonFinalize(AtkUnitBase* addon);
     public delegate byte AddonUpdate(AtkUnitBase* addon);
 
+    public unsafe delegate void* AddonOnUpdate(AtkUnitBase* atkUnitBase, NumberArrayData* nums, StringArrayData* strings);
+
     public delegate void AgentShow(AgentInterface* agent);
     public delegate nint AgentReceiveEvent(AgentInterface* agent, nint rawData, AtkValue* args, uint argCount, ulong sender);
 

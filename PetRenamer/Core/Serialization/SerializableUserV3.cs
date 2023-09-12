@@ -68,12 +68,12 @@ public class SerializableUserV3
         return false;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false)
+    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
     {
         if (id == -1) return;
         //if (name == string.Empty && id >= 0) RemoveNickname(id, notifyICP);
         if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
-        else GenerateNewNickname(id, name, notifyICP);
+        else GenerateNewNickname(id, name, notifyICP, force);
 
         if (!doCheck) return;
         hasCompanion = false;
@@ -87,9 +87,11 @@ public class SerializableUserV3
         }
     }
 
-    void GenerateNewNickname(int id, string name, bool notifyICP = false)
+    void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
     {
-        if (id == -1 || name == string.Empty) return;
+        if(!force)
+            if (id == -1 || name == string.Empty) 
+                return;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.Add(id);
