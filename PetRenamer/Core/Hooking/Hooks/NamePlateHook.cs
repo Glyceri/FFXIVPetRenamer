@@ -42,12 +42,12 @@ public unsafe sealed class NamePlateHook : HookableElement
         {
             if (!user.UserExists) continue;
             string nameToUse = string.Empty;
-            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName;
-            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
+            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName == string.Empty ? user.CompanionBaseName : user.CustomCompanionName;
+            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName == string.Empty ? user.BaseBattlePetName : user.BattlePetCustomName;
             if (nameToUse != string.Empty) 
             { 
                 namePlateInfo->Name.SetString(nameToUse);
-                break; 
+                break;
             }
         }
     }

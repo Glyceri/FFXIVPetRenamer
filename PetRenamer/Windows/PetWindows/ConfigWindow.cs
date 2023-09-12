@@ -35,19 +35,19 @@ public class ConfigWindow : PetWindow
             if (Checkbox("Understood!", ref PluginLink.Configuration.understoodWarningThirdPartySettings))
                 PluginLink.Configuration.Save();
             ImGui.EndListBox();
-            NewLine();
-
-            if (Button("Normal Settings", new Vector2(286, 24)))
+            if (Button("Back to Normal Settings", new Vector2(286, 24)))
                 unsupportedMode = false;
+
+            NewLine();
         }
         else
         {
             if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) ||
                 Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
                 PluginLink.Configuration.Save();
-        }
 
-        NewLine();
+            NewLine();
+        }
     }
 
     public override void OnDrawNormal()
@@ -82,7 +82,7 @@ public class ConfigWindow : PetWindow
                 OverrideLabel("Battle Pet Specific Settings", new Vector2(278, 25));
                 if (Checkbox("Redraw On Change [Penumbra]", ref PluginLink.Configuration.redrawBattlePetOnSpawn))
                     PluginLink.Configuration.Save();
-                SetTooltipHovered("Redraws the Battle Pet upon changing or spawning");
+                SetTooltipHovered("Redraws the Battle Pet upon changing or spawning\nThis fixes bugs like names lingering on, or appearing too late.");
                 ImGui.EndListBox();
             }
             return;
