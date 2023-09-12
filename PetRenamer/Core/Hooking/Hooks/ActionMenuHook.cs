@@ -1,15 +1,11 @@
 ﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Hooking;
-using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Utilization.UtilsModule;
 using System.Runtime.InteropServices;
 using System;
-using System.Xml.Linq;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 
 namespace PetRenamer.Core.Hooking.Hooks;
