@@ -4,7 +4,6 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PetRenamer;
@@ -17,6 +16,7 @@ public class Configuration : IPluginConfiguration
 
     public int Version { get; set; } = 6;
 
+    public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
