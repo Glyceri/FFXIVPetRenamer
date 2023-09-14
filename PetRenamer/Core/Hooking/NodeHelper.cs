@@ -81,7 +81,11 @@ internal unsafe class ComponentNode
         return new ComponentNode(targetNode);
     }
 
-    public T* GetNode<T>(uint id) where T : unmanaged
+    public T* GetNode
+        
+        
+        
+        <T>(uint id) where T : unmanaged
     {
         if (componentBase == null) return null;
 

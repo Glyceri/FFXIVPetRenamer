@@ -30,6 +30,14 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     //Paladin           : 19                Sage            : 40
     //Monk              : 20
 
+    internal override void OnLateRegistered()
+    {
+        foreach (int skeletonID in battlePetRemap.Keys)
+            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));
+    }
+    
+    // [Populated]
+    public readonly Dictionary<int, string> bakedBattlePetSkeletonToName = new Dictionary<int, string>();
 
     public readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
     {
@@ -56,6 +64,8 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 3123, 32 }, //Emerald-Garuda
         { 3122, 30 }, //Ruby-Iffrit
     };
+
+    
 
     public readonly Dictionary<int, int> skeletonToClass = new Dictionary<int, int>()
     {

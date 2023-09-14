@@ -51,7 +51,6 @@ internal unsafe class MapHook : HookableElement
         elementIndex += manager.PartsListCount;
         int startIndex = -1;
 
-
         for (int i = 0; i < manager.NodeListCount; i++)
         {
             AtkResNode* curNode = manager.NodeList[i];
@@ -83,8 +82,6 @@ internal unsafe class MapHook : HookableElement
 
         if (startIndex == -1) return naviTooltip!.Original(unitBase, elementIndex);
         TooltipHelper.nextUser = null!;
-
-
 
         int actualCurrent = 0;
         int minusMe = 0;
@@ -174,8 +171,6 @@ internal unsafe class MapHook : HookableElement
                 break;
             }
         }
-
-        PluginLog.Log(elementIndex.ToString());
 
         if (startIndex == -1) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         TooltipHelper.nextUser = null!;

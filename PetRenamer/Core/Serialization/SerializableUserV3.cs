@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,7 @@ public class SerializableUserV3
             callback.Invoke((ids[i], names[i]));
     }
 
+    public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
     public string? GetNameFor(int id)
     {
         int index = IndexOf(id);
