@@ -34,6 +34,7 @@ public class Configuration : IPluginConfiguration
     public bool useContextMenuOnMinions = true;
     public bool allowTooltipsOnMinions = true;
     public bool replaceEmotesOnMinions = true;
+    public bool showNamesInMinionBook = true;
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
 

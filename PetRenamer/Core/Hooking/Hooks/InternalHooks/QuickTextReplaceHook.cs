@@ -64,26 +64,25 @@ public unsafe class QuickTextReplaceHook : IDisposable
 
     byte Handle(AtkUnitBase* baseElement)
     {
-        byte original = addonupdatehook!.Original(baseElement);
-        if (TextPos.Length == 0) return original;
-        if (!allow) return original;
+        if (TextPos.Length == 0) return addonupdatehook!.Original(baseElement);
+        if (!allow) return addonupdatehook!.Original(baseElement);
 
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
         if (!baseElement->IsVisible || name != AddonName)
-            return original;
+            return addonupdatehook!.Original(baseElement);
 
         BaseNode bNode = new BaseNode(name);
-        if (bNode == null) return original;
+        if (bNode == null) return addonupdatehook!.Original(baseElement);
         AtkTextNode* tNode = null!;
         if (TextPos.Length > 1)
         {
             ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
             for (int i = 1; i < TextPos.Count() - 1; i++)
             {
-                if (cNode == null) return original;
+                if (cNode == null) return addonupdatehook!.Original(baseElement);
                 cNode = cNode.GetComponentNode(TextPos[i]);
             }
-            if (cNode == null) return original;
+            if (cNode == null) return addonupdatehook!.Original(baseElement);
             tNode = cNode.GetNode<AtkTextNode>(TextPos[TextPos.Length - 1]);
         }
         else
@@ -91,17 +90,17 @@ public unsafe class QuickTextReplaceHook : IDisposable
             tNode = bNode.GetNode<AtkTextNode>(TextPos[0]);
         }
 
-        if (tNode == null) return original;
-        if (TooltipHelper.handleAsItem) return original;
+        if (tNode == null) return addonupdatehook!.Original(baseElement);
+        if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
         string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == null) return original;
+        if (tNodeText == null) return addonupdatehook!.Original(baseElement);
         if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
-        if (tNodeText == lastAnswer && AddonName != "Tooltip") return original;
+        if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
 
 
         AtkNineGridNode* nineGridNode = null;
         if (AtkPos != -1) nineGridNode = bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
-        if (AtkPos != -1 && nineGridNode == null) return original;
+        if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
 
@@ -111,7 +110,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
             if (tempUser != null) user = tempUser;
         }
 
-        if (user == null) return original;
+        if (user == null) return addonupdatehook!.Original(baseElement);
 
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
         string replaceName = tNodeText;
@@ -141,14 +140,14 @@ public unsafe class QuickTextReplaceHook : IDisposable
             }
         }
 
-        if (replaceName == string.Empty) return original;
+        if (replaceName == string.Empty) return addonupdatehook!.Original(baseElement);
 
         if (id == -1)
         {
             lastAnswer = tNodeText;
-            return original;
+            return addonupdatehook!.Original(baseElement);
         }
-        if (!allowedToFunction?.Invoke(id) ?? false) return original;
+        if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
         user.SerializableUser.LoopThroughBreakable(nickname =>
         {
@@ -168,6 +167,6 @@ public unsafe class QuickTextReplaceHook : IDisposable
             return false;
         });
 
-        return original;
+        return addonupdatehook!.Original(baseElement);
     }
 }
