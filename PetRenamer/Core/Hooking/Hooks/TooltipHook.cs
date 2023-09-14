@@ -18,8 +18,9 @@ internal class TooltipHook : QuickTextHookableElement
     readonly Hook<Delegates.AccurateShowTooltip> showTooltip = null!;
 
     // Hook from: https://github.com/Kouzukii/ffxiv-whichpatchwasthat/blob/main/WhichPatchWasThat/Hooks.cs
-    [Signature("48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20", DetourName = nameof(ItemDetailOnUpdateDetour))]
-    private Hook<Delegates.AddonOnUpdate>? ItemDetailOnUpdateHook { get; init; }
+    // Actually its now from: https://github.com/Caraxi/SimpleTweaksPlugin/blob/b390e0686c1f8b30e163306dcc3420390b67f340/Tweaks/Tooltips/AdditionalItemInfo.cs#L21
+    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 4C 8B AA ?? ?? ?? ??", DetourName = nameof(ItemDetailOnUpdateDetour))]
+    private Hook<Delegates.AddonOnRequestedUpdate>? ItemDetailOnUpdateHook { get; init; }
 
     public static string latestOutcome = string.Empty;
 
@@ -32,12 +33,11 @@ internal class TooltipHook : QuickTextHookableElement
         ItemDetailOnUpdateHook?.Enable();
     }
 
-    private unsafe void* ItemDetailOnUpdateDetour(AtkUnitBase* atkUnitBase, NumberArrayData* numberArrayData, StringArrayData* stringArrayData)
+    private unsafe IntPtr ItemDetailOnUpdateDetour(IntPtr a1, IntPtr a2, IntPtr a3)
     {
         TooltipHelper.handleAsItem = true;
-        return ItemDetailOnUpdateHook!.Original(atkUnitBase, numberArrayData, stringArrayData);
+        return ItemDetailOnUpdateHook!.Original(a1, a2, a3);
     }
-
 
     bool Allowed(int id)
     {

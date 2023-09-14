@@ -15,6 +15,7 @@ public static unsafe class Delegates
     public delegate byte AddonOnRefresh(AtkUnitBase* addon, int valueCount, AtkValue* values);
     public delegate void AddonFinalize(AtkUnitBase* addon);
     public delegate byte AddonUpdate(AtkUnitBase* addon);
+    public delegate IntPtr AddonOnRequestedUpdate(IntPtr a1, IntPtr a2, IntPtr a3);
 
     public unsafe delegate void* AddonOnUpdate(AtkUnitBase* atkUnitBase, NumberArrayData* nums, StringArrayData* strings);
 
