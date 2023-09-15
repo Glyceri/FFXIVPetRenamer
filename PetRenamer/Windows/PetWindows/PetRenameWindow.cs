@@ -74,7 +74,7 @@ public class PetRenameWindow : InitializablePetWindow
         }
 
         if (petMode != PetMode.ShareMode)
-        BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119));
+        BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119), StylingColours.titleBg);
     }
 
     public override void OnLateDraw()
@@ -86,8 +86,17 @@ public class PetRenameWindow : InitializablePetWindow
             if (petMode == PetMode.Normal && textureWrap == null) return;
             if (petMode == PetMode.BattlePet && textureWrapPet == null) return;
             SameLinePretendSpace();
-            BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119));
+            BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119), StylingColours.titleBg);
+            if(PluginLink.Configuration.displayImages)
             ImGui.Image(petMode == PetMode.Normal ? textureWrap.ImGuiHandle : textureWrapPet.ImGuiHandle, new Vector2(111, 112));
+            else
+            {
+                PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
+                PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
+                PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
+                ImGui.Button("", new Vector2(111, 112));
+            } 
+                
             ImGui.EndListBox();
         }
     }

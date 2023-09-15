@@ -14,6 +14,7 @@ using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Dalamud.Game.Text;
 using System.Threading.Tasks;
+using static PetRenamer.Windows.PetWindow;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -814,7 +815,7 @@ public class PetListWindow : PetWindow
     void DrawRightHeading(int column)
     {
         SetColumn(column);
-        TransparentLabel(new Vector2(5, 0));
+        TransparentLabel(new Vector2(25, 0));
     }
 
     void DrawTexture(ref int textureIndex)
@@ -830,7 +831,17 @@ public class PetListWindow : PetWindow
     {
         TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
         nint texturePointer = thenint;
-        if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
+        if (!PluginLink.Configuration.displayImages)
+        {
+            PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
+            PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
+            PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
+            ImGui.Button("", new System.Numerics.Vector2(83, 83));
+        }
+        else
+        {
+            if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
+        }
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 

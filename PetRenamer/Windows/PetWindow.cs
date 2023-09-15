@@ -367,7 +367,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
 
     static int popCount = 0;
 
-    private void PushStyleColor(ImGuiCol imGuiCol, Vector4 colour)
+    protected void PushStyleColor(ImGuiCol imGuiCol, Vector4 colour)
     {
         if (!PluginLink.Configuration.useCustomTheme) return;
         popCount++;

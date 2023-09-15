@@ -12,7 +12,7 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class ConfigWindow : PetWindow
 {
-    Vector2 baseSize = new Vector2(300, 435);
+    Vector2 baseSize = new Vector2(300, 442);
     bool unsupportedMode = false;
 
     public ConfigWindow() : base(
@@ -62,7 +62,8 @@ public class ConfigWindow : PetWindow
                         PluginLink.PettableUserHandler.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
             }
 
-            NewLine();
+            if (Checkbox("Display Images", ref PluginLink.Configuration.displayImages))
+                PluginLink.Configuration.Save();
         }
     }
 
