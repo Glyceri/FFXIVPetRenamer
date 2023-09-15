@@ -123,6 +123,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             }
             return false;
         });
+
         return returnThis;
     }
 
