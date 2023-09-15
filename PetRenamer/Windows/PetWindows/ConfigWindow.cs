@@ -69,7 +69,8 @@ public class ConfigWindow : PetWindow
         OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
         if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnMinions) ||
             Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsOnMinions) ||
-            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesOnMinions))
+            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesOnMinions) ||
+            Checkbox("Show names in Minion Notebook", ref PluginLink.Configuration.showNamesInMinionBook))
             PluginLink.Configuration.Save();
 
         ImGui.EndListBox();

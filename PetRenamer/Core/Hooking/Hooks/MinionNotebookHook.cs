@@ -21,6 +21,6 @@ public unsafe class MinionNotebookHook : QuickTextHookableElement
     internal override void OnUpdate(Framework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
+        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.showNamesInMinionBook);
     }
 }
