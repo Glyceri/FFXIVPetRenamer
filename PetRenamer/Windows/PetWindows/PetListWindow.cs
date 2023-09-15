@@ -12,6 +12,8 @@ using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics.Metrics;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -108,74 +110,79 @@ public class PetListWindow : PetWindow
 
     void DrawUserSelect()
     {
-        //DrawUserHeaderSelect();
         BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+        bool buttonPressed = false;
+        int counter = 1000;
+        texturePointer = 0;
 
+        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
+        ImGui.BeginTable("##Image Table 4", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+        DrawFillerBar(2);
 
-
-        /*
-
-        int ctr = 1000;
         foreach (PettableUser u in PluginLink.PettableUserHandler.Users)
         {
-            ctr++;
             if (u == null) continue;
-            bool buttonPressed = false;
-            if (Button($"{u.UserName}##Homeworld:{u.Homeworld}", Styling.ListButton))
+            SetColumn(0);
+            DrawTexture(PluginLink.PettableUserHandler.GetTexture(u));
+            SetColumn(1);
+
+            if (u.LocalUser)
             {
-                SetUserMode(false);
-                user = u;
-                buttonPressed = true;
+                DrawAdvancedBarWithQuit("Username", u.UserName, ref counter, () =>
+                {
+                    SetUserMode(false);
+                    user = u;
+                    buttonPressed = true;
+                });
             }
-            SameLine();
+            else
+            {
+                DrawAdvancedBarWithQuit("Username", u.UserName, ref counter, () =>
+                {
+                    SetUserMode(false);
+                    user = u;
+                }, 
+                "X", "Remove User", () => 
+                {
+                    youSureMode = !youSureMode;
+                    youSureUser = youSureMode ? u : null!;
+                    buttonPressed = true;
+                });
+            }
             SetTooltipHovered($"Show names from: {u.UserName}");
-            Label($"{SheetUtils.instance.GetWorldName(u.Homeworld)}", Styling.ListButton);
-            SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(u.Homeworld)}");
-            SameLine();
-            Label($"{u.SerializableUser.AccurateTotalPetCount()}", Styling.ListButton);
-            SetTooltipHovered($"Total Nickname Count: {u.SerializableUser.AccurateTotalPetCount()}\nMinions: {u.SerializableUser.AccurateMinionCount()}\nBattle Pets: {u.SerializableUser.AccurateBattlePetCount()}");
-            
-            nint texturePointer = PluginLink.PettableUserHandler.GetTexture(u);
-            if (texturePointer != nint.Zero)
-            {
-                SameLine();
-                ImGui.Image(texturePointer, new System.Numerics.Vector2(50, 50));
-            }
-
-            if (u == PluginLink.PettableUserHandler.LocalUser()!) continue;
-            ImGui.SameLine(0, 170);
-
-            if (XButton($"X##{ctr}", Styling.SmallButton))
-            {
-                youSureMode = true;
-                youSureUser = u;
-                buttonPressed = true;
-            }
-            SetTooltipHovered($"Remove: {u.UserName}");
             if (youSureMode && youSureUser == u)
             {
-                BeginListBox("##WarningHeader2", new System.Numerics.Vector2(780, 50));
-                TextColoured(StylingColours.highlightText, $"Are you sure you want to remove: {youSureUser.UserName} {SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}");
-                if (Button("Yes##YesRemoveUser"))
-                {
-                    youSureMode = false;
-                    youSureUser = null!;
-                    buttonPressed = true;
-                    PluginLink.PettableUserHandler.DeclareUser(u.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove);
-                    PluginLink.Configuration.Save();
-                }
-                SameLine();
-                if (Button("No##NoRemoveUser"))
-                {
-                    youSureMode = false;
-                    youSureUser = null!;
-                    buttonPressed = true;
-                }
-                ImGui.EndListBox();
+                TransparentLabel("", new Vector2(1,25));
+                DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}", 
+                    ref counter, 
+                    () => 
+                    {
+                        youSureMode = false;
+                        youSureUser = null!;
+                        buttonPressed = true;
+                        PluginLink.PettableUserHandler.DeclareUser(u.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove);
+                        PluginLink.Configuration.Save();
+                    }, () =>
+                    {
+                        youSureMode = false;
+                        youSureUser = null!;
+                        buttonPressed = true;
+                    });
             }
+            else
+            {
+                DrawBasicBar("Homeworld", $"{SheetUtils.instance.GetWorldName(u.Homeworld)}", ref counter);
+                DrawBasicBar("Petcount", $"Total: {u.SerializableUser.AccurateTotalPetCount()}, Minions: {u.SerializableUser.AccurateMinionCount()}, Battle Pets: {u.SerializableUser.AccurateBattlePetCount()}", ref counter);
+            }
+            DrawRightHeading(2);
+            DrawFillerBar(2);
+
             if (buttonPressed) break;
         }
-        */
+
+        ImGui.EndTable();
+        ImGui.PopStyleVar();
 
         ImGui.EndListBox();
 
@@ -785,22 +792,43 @@ public class PetListWindow : PetWindow
 
     void DrawTexture(ref int textureIndex)
     {
-        TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
         nint texturePointer = nint.Zero;
         if (textureIndex < TextureWraps.Count)
             texturePointer = TextureWraps[textureIndex].ImGuiHandle;
+
+        DrawTexture(texturePointer);
+    }
+
+    void DrawTexture(nint thenint)
+    {
+        TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
+        nint texturePointer = thenint;
         if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 
-    void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText, string quitTooltip, Action callback2)
+    void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null)
     {
         DrawBasicLabel(label);
         if (Button($"          {value} ##<{counter++}>", new Vector2(480, 25))) callback?.Invoke();
         SetTooltipHovered($"{label}: {value.Trim()}");
+        if (callback2 == null) return;
         SameLinePretendSpace();
         if (XButton(quitText + $"##<Close{counter++}>", Styling.SmallButton)) callback2?.Invoke();
         SetTooltipHovered(quitTooltip);
+    }
+
+    void DrawYesNoBar(string label, ref int counter, Action yesCallback, Action noCallback)
+    {
+        Label(label + $"##<{counter++}>", new Vector2(508, 25));
+        SameLinePretendSpace(); SameLinePretendSpace();
+        if (Button("Yes", Styling.ListIDField))
+            yesCallback?.Invoke();
+        SetTooltipHovered("Will delete this user and all their nicknames from your savefile!");
+        SameLinePretendSpace();
+        if (Button("No", Styling.ListIDField))
+            noCallback?.Invoke();
+        SetTooltipHovered("Will keep this user and all their nicknames saved to your savefile!");
     }
 
     void DrawBasicBar(string label, string value, ref int counter)
