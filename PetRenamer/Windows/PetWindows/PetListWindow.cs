@@ -12,8 +12,6 @@ using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
-using Newtonsoft.Json.Linq;
-using System.Diagnostics.Metrics;
 using Dalamud.Game.Text;
 using System.Threading.Tasks;
 
@@ -31,8 +29,8 @@ public class PetListWindow : PetWindow
     {
         SizeConstraints = new WindowSizeConstraints()
         {
-            MinimumSize = new Vector2(800, 883),
-            MaximumSize = new Vector2(800, 883)
+            MinimumSize = new Vector2(800, 783 + 64),
+            MaximumSize = new Vector2(800, 783 + 64)
         };
 
         IsOpen = true;
@@ -50,7 +48,6 @@ public class PetListWindow : PetWindow
     string minionSearchField = string.Empty;
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
     bool advancedMode = false;
-    bool inDownload = false;
 
     int texturePointer = 0;
     string searchField = string.Empty;
@@ -73,9 +70,12 @@ public class PetListWindow : PetWindow
         if (!currentIsLocalUser) SetOpenedAddPet(false);
 
         DrawUserHeader();
-        ImGui.Indent(220);
+        //ImGui.Indent(220);
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(- 350, 77));
         DrawExportHeader();
-        ImGui.Unindent(220);
+        //ImGui.Unindent(220);
+
+        
 
         if (user.CompanionChanged || user != lastUser)
             FillTextureList();
@@ -606,7 +606,13 @@ public class PetListWindow : PetWindow
 
     void DrawUserHeader()
     {
-        BeginListBox("##<1>", new System.Numerics.Vector2(780, 32));
+        if (user == null) return;
+        BeginListBox("##<1>", new System.Numerics.Vector2(780, 90));
+        
+        DrawTexture(PluginLink.PettableUserHandler.GetTexture(user));
+
+        SameLinePretendSpace();
+
         if (petMode != PetMode.ShareMode)
         {
             if (Button($"{StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}", Styling.ListButton))
@@ -618,10 +624,17 @@ public class PetListWindow : PetWindow
         }
         SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}\nClick to change user.");
         SameLine();
+        ImGui.SetCursorPos(ImGui.GetCursorPos()  - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y - 4));
         Label($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
         SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
+
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y * 2 - 8));
+
+        Label($"[{user!.SerializableUser.AccurateTotalPetCount()}, {user!.SerializableUser.AccurateMinionCount()}, {user!.SerializableUser.AccurateBattlePetCount()}]", Styling.ListButton); 
+        SetTooltipHovered($"Total Pet Count: {user!.SerializableUser.AccurateTotalPetCount()}, Minion Count: {user!.SerializableUser.AccurateMinionCount()}, Battle Pet Count: {user!.SerializableUser.AccurateBattlePetCount()}");
+
         ImGui.EndListBox();
-        NewLine();
+        //SameLine();
     }
 
     void SetUserMode(bool userMode)
@@ -655,7 +668,7 @@ public class PetListWindow : PetWindow
     {
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         int counter = 30;
-        BeginListBox("##<clipboard>", new System.Numerics.Vector2(318, 60));
+        BeginListBox("##<clipboard>", new System.Numerics.Vector2(318, 60), StylingColours.titleBg);
         Label("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {

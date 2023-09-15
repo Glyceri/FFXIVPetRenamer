@@ -60,7 +60,6 @@ public class ConfigWindow : PetWindow
                 if (PluginLink.Configuration.downloadProfilePictures)
                     for(int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
                         PluginLink.PettableUserHandler.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
-                
             }
 
             NewLine();
