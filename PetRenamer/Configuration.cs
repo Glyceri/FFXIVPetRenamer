@@ -20,6 +20,7 @@ public class Configuration : IPluginConfiguration
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
     public bool useCustomTheme = true;
+    public bool downloadProfilePictures = false;
     // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;

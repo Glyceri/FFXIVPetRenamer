@@ -14,6 +14,8 @@ using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics.Metrics;
+using Dalamud.Game.Text;
+using System.Threading.Tasks;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -48,6 +50,7 @@ public class PetListWindow : PetWindow
     string minionSearchField = string.Empty;
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
     bool advancedMode = false;
+    bool inDownload = false;
 
     int texturePointer = 0;
     string searchField = string.Empty;
@@ -110,12 +113,16 @@ public class PetListWindow : PetWindow
 
     void DrawUserSelect()
     {
+        OverrideLabel("Help! I cannot see any profile pictures. Please enable: [Allow Automatic Profile Pictures] in the Settings menu.", Styling.FillSize);
+        SameLinePretendSpace();
+        if (XButton(SeIconChar.MouseWheel.ToIconString() + "##<SafetySettings>", Styling.SmallButton))
+            PluginLink.WindowHandler.OpenWindow<ConfigWindow>();
+        SetTooltipHovered("Open Settings Menu");
         BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
         bool buttonPressed = false;
         int counter = 1000;
         texturePointer = 0;
 
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 4", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
         DrawFillerBar(2);
@@ -125,8 +132,21 @@ public class PetListWindow : PetWindow
             if (u == null) continue;
             SetColumn(0);
             DrawTexture(PluginLink.PettableUserHandler.GetTexture(u));
-            SetColumn(1);
 
+            ImGui.SetItemAllowOverlap();
+            ImGui.SameLine();
+            ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(35, -60));
+
+            if (RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{counter++}", Styling.SmallButton))
+            {
+                Task.Run(() =>
+                {
+                    PluginLink.PettableUserHandler.DownloadPagination((u.UserName, u.Homeworld));
+                });
+            }
+            SetTooltipHovered($"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}");
+
+            SetColumn(1);
             if (u.LocalUser)
             {
                 DrawAdvancedBarWithQuit("Username", u.UserName, ref counter, () =>
@@ -143,14 +163,13 @@ public class PetListWindow : PetWindow
                     SetUserMode(false);
                     user = u;
                 }, 
-                "X", "Remove User", () => 
+                "X", $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}", () => 
                 {
                     youSureMode = !youSureMode;
                     youSureUser = youSureMode ? u : null!;
-                    buttonPressed = true;
                 });
             }
-            SetTooltipHovered($"Show names from: {u.UserName}");
+
             if (youSureMode && youSureUser == u)
             {
                 TransparentLabel("", new Vector2(1,25));
@@ -167,7 +186,6 @@ public class PetListWindow : PetWindow
                     {
                         youSureMode = false;
                         youSureUser = null!;
-                        buttonPressed = true;
                     });
             }
             else

@@ -186,8 +186,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        
-        if (forceOpen) IsOpen = true;
+        if (forceOpen) { IsOpen = true; ImGui.SetWindowFocus(); }
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         companionID = id;
@@ -203,7 +202,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     public void OpenForBattleID(int id, bool forceOpen = false)
     {
-        if (forceOpen) IsOpen = true;
+        if (forceOpen) { IsOpen = true; ImGui.SetWindowFocus(); }
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         battlePetID = id;

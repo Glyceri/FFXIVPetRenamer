@@ -83,7 +83,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
                 _users.Add(u);
                 try
                 {
-                    OnDeclare(u, UserDeclareType.Add);
+                    OnDeclare(u, UserDeclareType.Add, false);
                 }
                 catch { }
             }
@@ -93,10 +93,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
             for (int i = _users.Count - 1; i >= 0; i--)
             {
                 if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
-                
+
                 try
                 {
-                    OnDeclare(_users[i], UserDeclareType.Remove);
+                    OnDeclare(_users[i], UserDeclareType.Remove, false);
                 }
                 catch { }
                 _users.RemoveAt(i);
@@ -120,7 +120,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     Dictionary<(string, uint), TextureWrap> fileInfos = new Dictionary<(string, uint), TextureWrap>();
 
-    public void OnDeclare(PettableUser user, UserDeclareType type)
+    public void OnDeclare(PettableUser user, UserDeclareType type, bool force)
     {
         (string, uint) currentUser = (user.UserName, user.Homeworld);
         if (type == UserDeclareType.Remove)
@@ -130,7 +130,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             fileInfos.Remove(currentUser);
             PluginLog.LogVerbose($"User Removed: {currentUser}");
         }
-        else if(type == UserDeclareType.Add)
+        else if (type == UserDeclareType.Add)
         {
             if (fileInfos.ContainsKey(currentUser)) return;
             string path = MakePath(currentUser);
@@ -141,7 +141,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
                     PluginLog.LogVerbose("File already exists! Grabbing from cache!");
                     DeclareDownload((user.UserName, user.Homeworld));
                 }
-                else
+                else if (PluginLink.Configuration.downloadProfilePictures || force)
                 {
                     PluginLog.LogVerbose("File doesn't exists! Downloading file!");
                     DownloadPagination((user.UserName, user.Homeworld));
@@ -151,8 +151,13 @@ internal class PettableUserHandler : IDisposable, IInitializable
         }
     }
 
-    async void DownloadPagination((string, uint) characterData)
+    public async void DownloadPagination((string, uint) characterData)
     {
+        if (fileInfos.ContainsKey(characterData))
+        {
+            fileInfos[characterData]?.Dispose();
+            fileInfos?.Remove(characterData);
+        }
         try
         {
             HttpClient client = new HttpClient();
@@ -167,7 +172,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             {
                 List<Result> pStruct = paginatedStruct.Results;
                 if (pStruct != null && pStruct.Count != 0 && pStruct[0].Avatar != null)
-                    _ = Task.Run(() => AsyncDownload(pStruct[0].Avatar.ToString(), characterData));
+                    await Task.Run(() => AsyncDownload(pStruct[0].Avatar.ToString(), characterData));
             }
 
             reader?.Dispose();

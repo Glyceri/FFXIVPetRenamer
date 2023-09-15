@@ -13,7 +13,7 @@ using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
+[PersistentPetWindow]
 internal class DeveloperWindow : PetWindow
 {
     readonly Vector2 baseSize = new Vector2(700, 500);

@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -11,7 +12,7 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class ConfigWindow : PetWindow
 {
-    Vector2 baseSize = new Vector2(300, 410);
+    Vector2 baseSize = new Vector2(300, 435);
     bool unsupportedMode = false;
 
     public ConfigWindow() : base(
@@ -21,6 +22,8 @@ public class ConfigWindow : PetWindow
         Size = baseSize;
         SizeCondition = ImGuiCond.Always;
     }
+
+    bool lastDownloadAll = false;
 
     public override void OnDraw()
     {
@@ -46,6 +49,19 @@ public class ConfigWindow : PetWindow
             if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) ||
                 Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
                 PluginLink.Configuration.Save();
+
+            if(Checkbox("Allow Automatic Profile Pictures", ref PluginLink.Configuration.downloadProfilePictures))
+                PluginLink.Configuration.Save();
+            SetTooltipHovered("This will automatically download profile pictures from Lodestone");
+
+            if (lastDownloadAll != PluginLink.Configuration.downloadProfilePictures)
+            {
+                lastDownloadAll = PluginLink.Configuration.downloadProfilePictures;
+                if (PluginLink.Configuration.downloadProfilePictures)
+                    for(int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
+                        PluginLink.PettableUserHandler.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
+                
+            }
 
             NewLine();
         }

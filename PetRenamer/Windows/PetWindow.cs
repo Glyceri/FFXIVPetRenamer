@@ -235,6 +235,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
+    protected bool RedownloadButton(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.titleBg);
+        PushStyleColor(ImGuiCol.Button, StylingColours.listBox);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
+        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        return ImGui.Button(text, styling);
+    }
+
     protected bool TransparentLabel(Vector2 styling)
     {
         PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0, 0, 0, 0));
