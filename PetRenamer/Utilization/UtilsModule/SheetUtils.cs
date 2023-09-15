@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
 using Dalamud.Logging;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -160,17 +161,23 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         List<SerializableNickname> serializableNicknames = new List<SerializableNickname>();
         if (querry.Length == 0) return lastList = serializableNicknames;
 
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
             int petModel = pet.Model.Value!.Model;
             string petName = pet.Singular.ToString();
+            string customPetName = string.Empty;
 
-            if (petModel <= 0) continue;
             if (petName.Length == 0) continue;
+            if (petModel <= 0) continue;
 
-            if (petModel.ToString().Contains(querry) || petName.Contains(querry))
-                serializableNicknames.Add(new SerializableNickname(petModel, petName));
+            if (user != null)
+                customPetName = user.SerializableUser.GetNameFor(petName) ?? string.Empty;
+
+            if (petModel.ToString().Contains(querry) || petName.Contains(querry) || (customPetName.Contains(querry) && customPetName.Length != 0))
+                serializableNicknames.Add(new SerializableNickname(petModel, customPetName));
         }
 
         return lastList = serializableNicknames;
@@ -190,5 +197,5 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return string.Empty;
     }
 
-    public string GetWorldName(ushort worldID) => worlds.GetRow(worldID)?.Name ?? string.Empty;
+    public string GetWorldName(ushort worldID) => worlds.GetRow(worldID)?.InternalName ?? string.Empty;
 }

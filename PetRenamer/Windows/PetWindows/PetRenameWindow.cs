@@ -141,7 +141,7 @@ public class PetRenameWindow : InitializablePetWindow
             SetTooltipHovered($"{temporaryName}");
         }
         
-        InputTextMultiLine(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize, new Vector2(290, 25));
+        InputTextMultiLine(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize, new Vector2(290, 25), ImGuiInputTextFlags.CtrlEnterForNewLine);
         SetTooltipHovered("Put in a nickname here.");
         temporaryCustomName = temporaryCustomName.Trim();
         DrawValidName(temporaryCustomName, ref theID);

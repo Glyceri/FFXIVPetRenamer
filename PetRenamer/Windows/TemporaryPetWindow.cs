@@ -1,6 +1,8 @@
 using ImGuiNET;
 using System;
 
+
+
 namespace PetRenamer.Windows;
 
 public abstract class TemporaryPetWindow : PetWindow, IDisposable

@@ -12,8 +12,6 @@ using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Diagnostics.Metrics;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -34,6 +32,7 @@ public class PetListWindow : PetWindow
         };
 
         IsOpen = true;
+        SetUserMode(true);
     }
 
     PettableUser user = null!;
@@ -41,12 +40,15 @@ public class PetListWindow : PetWindow
     bool userMode = false;
     bool currentIsLocalUser = false;
 
-    bool openedAddPet = false;
+    bool _openedAddPet = false;
     bool youSureMode = false;
     PettableUser youSureUser = null!;
     string minionSearchField = string.Empty;
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
     bool advancedMode = false;
+
+    int texturePointer = 0;
+    string searchField = string.Empty;
 
     public override void OnDraw()
     {
@@ -54,7 +56,7 @@ public class PetListWindow : PetWindow
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if ((user ??= localUser!) == null) return;
-        if (petMode != PetMode.Normal) openedAddPet = false;
+        if (petMode != PetMode.Normal) SetOpenedAddPet(false);
         if (petMode != PetMode.ShareMode) SetAdvancedMode(false);
         if (petMode == PetMode.ShareMode)
         {
@@ -63,7 +65,7 @@ public class PetListWindow : PetWindow
         }
         if (user == null) return;
         currentIsLocalUser = user == localUser;
-        if (!currentIsLocalUser) openedAddPet = false;
+        if (!currentIsLocalUser) SetOpenedAddPet(false);
 
         DrawUserHeader();
         ImGui.Indent(220);
@@ -106,8 +108,13 @@ public class PetListWindow : PetWindow
 
     void DrawUserSelect()
     {
-        DrawUserHeaderSelect();
+        //DrawUserHeaderSelect();
         BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+
+
+
+        /*
+
         int ctr = 1000;
         foreach (PettableUser u in PluginLink.PettableUserHandler.Users)
         {
@@ -127,9 +134,16 @@ public class PetListWindow : PetWindow
             SameLine();
             Label($"{u.SerializableUser.AccurateTotalPetCount()}", Styling.ListButton);
             SetTooltipHovered($"Total Nickname Count: {u.SerializableUser.AccurateTotalPetCount()}\nMinions: {u.SerializableUser.AccurateMinionCount()}\nBattle Pets: {u.SerializableUser.AccurateBattlePetCount()}");
+            
+            nint texturePointer = PluginLink.PettableUserHandler.GetTexture(u);
+            if (texturePointer != nint.Zero)
+            {
+                SameLine();
+                ImGui.Image(texturePointer, new System.Numerics.Vector2(50, 50));
+            }
 
             if (u == PluginLink.PettableUserHandler.LocalUser()!) continue;
-            ImGui.SameLine(0, 270);
+            ImGui.SameLine(0, 170);
 
             if (XButton($"X##{ctr}", Styling.SmallButton))
             {
@@ -147,7 +161,7 @@ public class PetListWindow : PetWindow
                     youSureMode = false;
                     youSureUser = null!;
                     buttonPressed = true;
-                    PluginLink.PettableUserHandler.Users.Remove(u);
+                    PluginLink.PettableUserHandler.DeclareUser(u.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove);
                     PluginLink.Configuration.Save();
                 }
                 SameLine();
@@ -161,26 +175,10 @@ public class PetListWindow : PetWindow
             }
             if (buttonPressed) break;
         }
+        */
 
         ImGui.EndListBox();
 
-    }
-
-    void DrawUserHeaderSelect()
-    {
-        BeginListBox("##<list header>", new System.Numerics.Vector2(780, 32));
-        Label($"Username", Styling.ListButton); SameLine();
-        SetTooltipHovered($"Username");
-        Label($"Homeworld", Styling.ListButton);
-        SetTooltipHovered($"Homeworld");
-        SameLine();
-        Label($"Nickname Count", Styling.ListButton);
-        SetTooltipHovered($"Nickname Count");
-        ImGui.SameLine(0, 270);
-
-        Label("X", Styling.SmallButton);
-        SetTooltipHovered($"Remove the user");
-        ImGui.EndListBox();
     }
 
     SerializableUserV3 importedUser { get; set; } = null!;
@@ -533,38 +531,44 @@ public class PetListWindow : PetWindow
     {
         DrawBattlePetWarningHeader();
         int counter = 10;
+        texturePointer = 0;
+
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
-        DrawListHeaderBattlePet();
-        if (openedAddPet) DrawOpenedNewPet();
-        else
-            user.SerializableUser.LoopThrough(nickname =>
+        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
+        ImGui.BeginTable("##Image Table 2", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+        DrawFillerBar(2);
+
+        user.SerializableUser.LoopThrough(nickname =>
+        {
+            if (nickname.Item1 >= -1) return;
+
+            SetColumn(0);
+            texturePointer++;
+            DrawTexture(ref texturePointer);
+            SetColumn(1);
+
+            if (currentIsLocalUser)
             {
-                if (nickname.Item1 >= -1) return;
-                string currentPetName = StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
-
-                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField); SameLine();
-                SetTooltipHovered($"Pet ID: {nickname.Item1}");
-                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
-                SetTooltipHovered($"Pet Type: {StringUtils.instance.MakeTitleCase(currentPetName)}");
-                if (currentIsLocalUser)
-                {
-                    if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
-                        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true);
-                    SetTooltipHovered($"Rename: {nickname.Item2}");
-                    SameLine();
-                }
-                else Label($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton);
-
-                if (currentIsLocalUser)
-                {
-                    if (XButton("X" + $"##<{counter++}>", Styling.SmallButton))
+                DrawAdvancedBarWithQuit("Nickname", nickname.Item2, ref counter,
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    "X", "Clears the nickname!",
+                    () =>
                     {
                         user.SerializableUser.RemoveNickname(nickname.Item1, true);
                         PluginLink.Configuration.Save();
-                    }
-                    SetTooltipHovered($"Clears the nickname!");
-                }
-            });
+                    });
+            }
+            else DrawBasicBar("Nickname", nickname.Item2, ref counter);
+
+            string currentPetName = StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
+            DrawBasicBar("Pet Name", currentPetName, ref counter);
+            DrawBasicBar("Pet ID", nickname.Item1.ToString(), ref counter);
+            DrawRightHeading(2);
+            DrawFillerBar(2);
+        });
+        ImGui.EndTable();
+        ImGui.PopStyleVar();
+
         ImGui.EndListBox();
     }
 
@@ -677,20 +681,21 @@ public class PetListWindow : PetWindow
     void DrawList()
     {
         int counter = 10;
-        int counter3 = 0;
+        texturePointer = 0;
+
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight), StylingColours.titleBg);
         NewLine();
-        if (!openedAddPet)
+        if (!_openedAddPet)
         {
             ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
-            ImGui.BeginTable("##Image Table 1", 2, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+            ImGui.BeginTable("##Image Table 1", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
             DrawFillerBar(2);
 
-
-            if (!openedAddPet && currentIsLocalUser)
+            if (!_openedAddPet && currentIsLocalUser)
             {
                 SetColumn(0);
-                DrawTexture(TextureWraps![counter3++]?.ImGuiHandle ?? nint.Zero);
+                DrawTexture(ref texturePointer);
+                texturePointer++;
                 SetColumn(1);
                 TransparentLabel(Styling.ListButton);
                 SameLinePretendSpace(); SameLinePretendSpace();
@@ -700,24 +705,25 @@ public class PetListWindow : PetWindow
                 if (currentIsLocalUser)
                 {
                     if (XButton("+" + $"##<Close{counter++}>", Styling.SmallButton))
-                        openedAddPet = true;
+                        SetOpenedAddPet(true);
                     SetTooltipHovered($"Search for a new pet.");
                     SameLine();
                     NewLine();
                 }
-
+                DrawRightHeading(2);
                 DrawFillerBar(2);
             }
-            else counter3++;
+            else texturePointer++;
 
-            if (!currentIsLocalUser) openedAddPet = false;
+            if (!currentIsLocalUser) SetOpenedAddPet(false);
 
-            user.SerializableUser.LoopThrough(nickname =>
+            user?.SerializableUser?.LoopThrough(nickname =>
             {
                 if (nickname.Item1 < 0) return;
 
                 SetColumn(0);
-                DrawTexture(TextureWraps![counter3++]?.ImGuiHandle ?? nint.Zero);
+                DrawTexture(ref texturePointer);
+                texturePointer ++;
                 SetColumn(1);
 
                 if (currentIsLocalUser)
@@ -736,8 +742,9 @@ public class PetListWindow : PetWindow
                 string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
                 DrawBasicBar("Minion Name", currentPetName, ref counter);
                 DrawBasicBar("Minion ID", nickname.Item1.ToString(), ref counter);
-
+                DrawRightHeading(2);
                 DrawFillerBar(2);
+
             });
             ImGui.EndTable();
             ImGui.PopStyleVar();
@@ -770,11 +777,18 @@ public class PetListWindow : PetWindow
         TextureWraps!.Add(textureWrap);
     }
 
+    void DrawRightHeading(int column)
+    {
+        SetColumn(column);
+        TransparentLabel(new Vector2(5, 0));
+    }
 
-    void DrawTexture(nint imGuiHandle)
+    void DrawTexture(ref int textureIndex)
     {
         TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
-        nint texturePointer = imGuiHandle;
+        nint texturePointer = nint.Zero;
+        if (textureIndex < TextureWraps.Count)
+            texturePointer = TextureWraps[textureIndex].ImGuiHandle;
         if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
@@ -782,8 +796,8 @@ public class PetListWindow : PetWindow
     void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText, string quitTooltip, Action callback2)
     {
         DrawBasicLabel(label);
-        if (Button($"{value} ##<{counter++}>", new Vector2(480, 25))) callback?.Invoke();
-        SetTooltipHovered($"{label}: {value}");
+        if (Button($"          {value} ##<{counter++}>", new Vector2(480, 25))) callback?.Invoke();
+        SetTooltipHovered($"{label}: {value.Trim()}");
         SameLinePretendSpace();
         if (XButton(quitText + $"##<Close{counter++}>", Styling.SmallButton)) callback2?.Invoke();
         SetTooltipHovered(quitTooltip);
@@ -821,48 +835,85 @@ public class PetListWindow : PetWindow
 
     void DrawOpenedNewPet()
     {
+        texturePointer = 0;
+
+        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
+        ImGui.BeginTable("##Image Table 3", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+        DrawFillerBar(2);
+        SetColumn(0);
+        DrawTexture(ref texturePointer);
+        SetColumn(1);
+        
+
         int counter = 0;
-        string searchField;
-        if (InputText("Search by minion name or ID", ref minionSearchField, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.CallbackCompletion))
+
+        DrawBasicLabel("Search by name or ID");
+
+        if (InputTextMultiLine(string.Empty, ref minionSearchField, PluginConstants.ffxivNameSize, new Vector2(480, 25), ImGuiInputTextFlags.CallbackCompletion | ImGuiInputTextFlags.CtrlEnterForNewLine))
         {
             searchField = minionSearchField;
             foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
+            FillTextureListFound();
+            foreach (SerializableNickname nickname in foundNicknames)
+                nickname.Setup();
         }
         SetTooltipHovered($"Filter on Minion ID or Name.");
 
-        ImGui.SameLine(0, 58);
+        SameLinePretendSpace();
         if (XButton("X##ForOpenedPet", Styling.SmallButton))
         {
-            openedAddPet = false;
+            SetOpenedAddPet(false);
             foundNicknames = new List<SerializableNickname>();
         }
         SetTooltipHovered($"Stop looking for a new pet?");
-        NewLine();
+
+        DrawRightHeading(2);
+        DrawFillerBar(2);
 
         foreach (SerializableNickname nickname in foundNicknames)
         {
-            Label(nickname.ID.ToString() + $"##<{counter++}>", Styling.ListIDField); SameLine();
-            Label(StringUtils.instance.MakeTitleCase(nickname.Name) + $"##<{counter++}>", Styling.ListButton); SameLine();
-            if (Button("+" + $"##<{counter++}>", Styling.SmallButton))
-            {
-                openedAddPet = false;
-                PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
-            }
-            SetTooltipHovered($"Add {StringUtils.instance.MakeTitleCase(nickname.Name)} [{nickname.ID}] to the list?");
+            SetColumn(0);
+            texturePointer++;
+            DrawTexture(ref texturePointer);
+            SetColumn(1);
+
+            string currentPetName = StringUtils.instance.MakeTitleCase(nickname.BaseName);
+
+            DrawAdvancedBarWithQuit("Nickname", nickname.Name, ref counter,
+                () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true),
+                "+", $"Add: {currentPetName}",
+                () =>
+                {
+                    SetOpenedAddPet(false);
+                    PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
+                });
+
+            
+            DrawBasicBar("Minion Name", currentPetName, ref counter);
+            DrawBasicBar("Minion ID", nickname.ID.ToString(), ref counter);
+            DrawRightHeading(2);
+            DrawFillerBar(2);
         }
+
+        ImGui.EndTable();
+        ImGui.PopStyleVar();
     }
 
-    void DrawListHeaderBattlePet()
+    public void SetOpenedAddPet(bool value)
     {
-        Label("Pet ID", Styling.ListIDField); SameLine();
-        SetTooltipHovered($"ID of the Pet");
-        Label("Pet Name", Styling.ListButton); SameLine();
-        SetTooltipHovered($"In Game name of the Pet");
-        Label("Custom Minion name", Styling.ListNameButton); SameLine();
-        SetTooltipHovered($"Custom nickname given to the Pet");
-        Label("X", Styling.SmallButton);
-        SetTooltipHovered($"Removes the Nickname");
-        NewLine();
+        searchField = string.Empty;
+        if (value == false && _openedAddPet != false)
+            FillTextureList();
+        _openedAddPet = value;
+
+    }
+
+    void FillTextureListFound()
+    {
+        DisposeTextures();
+        AddTexture(-1);
+        foreach (SerializableNickname nName in foundNicknames)
+            AddTexture(nName.ID);
     }
 
     protected override void OnDispose()
