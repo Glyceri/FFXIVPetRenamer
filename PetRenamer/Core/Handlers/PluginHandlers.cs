@@ -8,6 +8,7 @@ using Dalamud.Game.Gui.FlyText;
 using Dalamud.Game.Network;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 
 namespace PetRenamer.Core.Handlers;
 
@@ -24,6 +25,7 @@ internal class PluginHandlers
     [PluginService] internal static ChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static GameNetwork GameNetwork { get; private set; } = null!;
     [PluginService] internal static FlyTextGui FlyTextGui { get; private set; } = null!;
+    [PluginService] internal static ITextureProvider TextureProvider { get; set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

@@ -11,6 +11,7 @@ using Dalamud.Logging;
 using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+using ImGuiScene;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -29,9 +30,12 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 883),
             MaximumSize = new Vector2(800, 883)
         };
+
+        IsOpen = true;
     }
 
     PettableUser user = null!;
+    PettableUser lastUser = null!;
     bool userMode = false;
     bool currentIsLocalUser = false;
 
@@ -655,11 +659,13 @@ public class PetListWindow : PetWindow
         ImGui.NewLine();
     }
 
+    List<TextureWrap> TextureWraps = new List<TextureWrap>();
+
     void DrawList()
     {
         int counter = 10;
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight));
-        DrawListHeader();
+        //DrawListHeader();
 
         if (!openedAddPet)
         {
@@ -677,23 +683,50 @@ public class PetListWindow : PetWindow
             }
             else openedAddPet = false;
 
+            if (user.CompanionChanged || user != lastUser)
+            {
+                DisposeTextures();
+
+                user.SerializableUser.LoopThrough(nickname =>
+                {
+                    if (nickname.Item1 < 0) return;
+                    uint textureID = RemapUtils.instance.GetTextureID(nickname.Item1);
+                    if (textureID == 0) return;
+                    string iconPath = PluginHandlers.TextureProvider.GetIconPath(textureID)!;
+                    if (iconPath == null) return;
+                    TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+                    TextureWraps!.Add(textureWrap);
+                });
+            }
+
+            int counter3 = 0;
             user.SerializableUser.LoopThrough(nickname =>
             {
+               
                 if (nickname.Item1 <= 0) return;
-                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
+                BeginListBox($"##<FullBGBoxMinion{counter3}>", new Vector2(755, 96), StylingColours.titleBgActive);
+                #region Pet Image
+                BeginListBox($"##<TextureBoxMinion{counter3}>", new Vector2(89, 90), StylingColours.titleBg);
+                nint texturePointer = TextureWraps![counter3]?.ImGuiHandle ?? nint.Zero; counter3++;
+                if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
+                ImGui.EndListBox();
+                #endregion
+                SameLineNoMargin();
+                #region PetData
+                BeginListBox($"##<DataBoxMinion{counter3}>", new Vector2(658, 90), StylingColours.titleBg);
 
-                Label(nickname.Item1.ToString() + $"##<{counter++}>", Styling.ListIDField);
-                SetTooltipHovered($"Minion ID: {nickname.Item1}");
-                SameLine();
-                Label(currentPetName + $"##<{counter++}>", Styling.ListButton); SameLine();
-                SetTooltipHovered($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                #region bar1
+                Label("Nickname", Styling.ListButton);
+                SameLinePretendSpace(); SameLinePretendSpace();
                 if (currentIsLocalUser)
                 {
-                    if (Button($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton))
+                    if (Button($"{nickname.Item2} ##<{counter++}>", new Vector2(470, 25)))
                         PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true); SameLine();
                     SetTooltipHovered($"Rename: {nickname.Item2}");
                 }
-                else Label($"{nickname.Item2} ##<{counter++}>", Styling.ListNameButton);
+                else Label($"{nickname.Item2} ##<{counter++}>", new Vector2(470, 25));
+
+                SameLinePretendSpace();
                 if (currentIsLocalUser)
                 {
                     if (XButton("X" + $"##<Close{counter++}>", Styling.SmallButton))
@@ -703,6 +736,26 @@ public class PetListWindow : PetWindow
                     }
                     SetTooltipHovered($"Deletes the nickname!");
                 }
+                #endregion
+
+                #region bar2
+                Label("Minion Name", Styling.ListButton);
+                SameLinePretendSpace(); SameLinePretendSpace();
+                string currentPetName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1));
+                Label(currentPetName + $"##<{counter++}>", new Vector2(498, 25));
+                SetTooltipHovered($"Minion Name: {StringUtils.instance.MakeTitleCase(currentPetName)}");
+                #endregion
+
+                #region Bar3
+                Label("Minion ID", Styling.ListButton);
+                SameLinePretendSpace(); SameLinePretendSpace();
+                Label(nickname.Item1.ToString() + $"##<{counter++}>", new Vector2(498, 25));
+                SetTooltipHovered($"Minion ID: {nickname.Item1}");
+                #endregion
+
+                ImGui.EndListBox();
+                #endregion
+                ImGui.EndListBox();
             });
         }
         else DrawOpenedNewPet();
@@ -766,5 +819,18 @@ public class PetListWindow : PetWindow
         Label("X", Styling.SmallButton);
         SetTooltipHovered($"Removes the Nickname");
         NewLine();
+    }
+
+    protected override void OnDispose()
+    {
+        DisposeTextures();
+    }
+
+    void DisposeTextures()
+    {
+        lastUser = user;
+        foreach (TextureWrap tWrap in TextureWraps)
+            tWrap?.Dispose();
+        TextureWraps?.Clear();
     }
 }

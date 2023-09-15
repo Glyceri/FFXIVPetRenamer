@@ -1,4 +1,5 @@
-﻿using Dalamud.Logging;
+﻿using Dalamud.Interface.Internal;
+using Dalamud.Logging;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
@@ -27,8 +28,12 @@ public class PetRenameWindow : InitializablePetWindow
     int companionID = -1;
     int battlePetID = -1;
 
-    Vector2 baseSize = new Vector2(310, 158);
+    Vector2 baseSize = new Vector2(437, 188);
+    Vector2 bPetSize = new Vector2(437, 188);
     Vector2 wideSize = new Vector2(335, 127);
+
+    IDalamudTextureWrap textureWrap = null!;
+    IDalamudTextureWrap textureWrapPet = null!;
 
     public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
     {
@@ -49,6 +54,11 @@ public class PetRenameWindow : InitializablePetWindow
             companionBaseName = user.CompanionBaseName;
             temporaryCompanionName = companionName;
         }
+        else if (companionID == -1)
+        {
+            textureWrap?.Dispose();
+            textureWrap = null!;
+        }
 
         if (battlePetID == -1 && user.HasBattlePet)
         {
@@ -56,6 +66,29 @@ public class PetRenameWindow : InitializablePetWindow
             battlePetBaseName = user.BaseBattlePetName;
             battlePetName = user.BattlePetCustomName;
             temporaryBattlePetName = battlePetName;
+        }
+        else if (battlePetID == -1)
+        {
+            textureWrapPet?.Dispose();
+            textureWrapPet = null!;
+        }
+
+        if (petMode != PetMode.ShareMode)
+        BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119));
+    }
+
+    public override void OnLateDraw()
+    {
+        if (petMode != PetMode.ShareMode) 
+        { 
+            ImGui.EndListBox();
+
+            if (petMode == PetMode.Normal && textureWrap == null) return;
+            if (petMode == PetMode.BattlePet && textureWrapPet == null) return;
+            SameLinePretendSpace();
+            BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119));
+            ImGui.Image(petMode == PetMode.Normal ? textureWrap.ImGuiHandle : textureWrapPet.ImGuiHandle, new Vector2(111, 112));
+            ImGui.EndListBox();
         }
     }
 
@@ -74,7 +107,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     public override void OnDrawBattlePet()
     {
-        Size = baseSize;
+        Size = bPetSize;
         if (user == null) return;
         if (battlePetID == -1)
         {
@@ -97,18 +130,18 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawPetNameField(string basePet, ref string temporaryName, ref string temporaryCustomName, ref int theID)
     {
-        TextColoured(StylingColours.whiteText, $"Your"); SameLinePretendSpace();
-        TextColoured(StylingColours.highlightText, $"{basePet}"); SameLinePretendSpace();
-        SetTooltipHovered($"{basePet}");
-        if (temporaryName.Length == 0) TextColoured(StylingColours.whiteText, $"does not have a name!");
-        else
+        
+        string tempText = $"does not have a name!";
+        if (temporaryName.Length != 0) tempText = $"is named:";
+        Label($"Your {basePet} {tempText}", new Vector2(290, 25),StylingColours.whiteText);
+        if (basePet != string.Empty) SetTooltipHovered($"{basePet}");
+        if (temporaryName.Length != 0)
         {
-            TextColoured(StylingColours.whiteText, $"is named:");
-            if (temporaryName.Length < 10) SameLinePretendSpace();
-            TextColoured(StylingColours.highlightText, $"{temporaryName}");
+            Label($"{temporaryName}", new Vector2(290, 25), StylingColours.whiteText);
             SetTooltipHovered($"{temporaryName}");
         }
-        InputText(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize);
+        
+        InputTextMultiLine(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize, new Vector2(290, 25));
         SetTooltipHovered("Put in a nickname here.");
         temporaryCustomName = temporaryCustomName.Trim();
         DrawValidName(temporaryCustomName, ref theID);
@@ -116,7 +149,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawValidName(string internalTempText, ref int theID)
     {
-        if (Button("Save Nickname"))
+        if (Button("Save Nickname", new Vector2(144, 25)))
         {
             user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
             PluginLink.Configuration.Save();
@@ -133,7 +166,7 @@ public class PetRenameWindow : InitializablePetWindow
         }
         SetTooltipHovered("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
-        if (Button("Remove Nickname"))
+        if (Button("Clear Nickname", new Vector2(144, 25)))
         {
             user.SerializableUser.RemoveNickname(theID, notifyICP: true);
             PluginLink.Configuration.Save();
@@ -148,11 +181,12 @@ public class PetRenameWindow : InitializablePetWindow
                 PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
             }
         }
-        SetTooltipHovered("Removes the nickname from your list.");
+        SetTooltipHovered("Clears the nickname from your list.");
     }
 
     public void OpenForId(int id, bool forceOpen = false)
     {
+        
         if (forceOpen) IsOpen = true;
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
@@ -161,6 +195,10 @@ public class PetRenameWindow : InitializablePetWindow
         companionName = user.GetCustomName(companionID);
         temporaryCompanionName = companionName;
 
+        if (companionID == -1) return;
+        string iconPath = PluginHandlers.TextureProvider.GetIconPath(RemapUtils.instance.GetTextureID(companionID))!;
+        if (iconPath == null) return;
+        textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
     }
 
     public void OpenForBattleID(int id, bool forceOpen = false)
@@ -172,10 +210,21 @@ public class PetRenameWindow : InitializablePetWindow
         battlePetBaseName = RemapUtils.instance.PetIDToName(id);
         battlePetName = user.GetCustomName(battlePetID);
         temporaryBattlePetName = battlePetName;
+
+        if (battlePetID == -1) return;
+        string iconPath = PluginHandlers.TextureProvider.GetIconPath(RemapUtils.instance.GetTextureID(battlePetID))!;
+        if (iconPath == null) return;
+        textureWrapPet = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
     }
 
     public override void OnInitialized()
     {
 
+    }
+
+    protected override void OnDispose()
+    {
+        textureWrap?.Dispose();
+        textureWrapPet?.Dispose();
     }
 }

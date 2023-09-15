@@ -1,4 +1,5 @@
-﻿using PetRenamer.Core.Singleton;
+﻿using Lumina.Excel.GeneratedSheets;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 
@@ -35,7 +36,15 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         foreach (int skeletonID in battlePetRemap.Keys)
             bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));
     }
-    
+
+    public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
+    {
+        { -2, 25798 },
+        { -3, 17215 },
+        { -4, 16501 },
+        { -5, 16472 }
+    };
+
     // [Populated]
     public readonly Dictionary<int, string> bakedBattlePetSkeletonToName = new Dictionary<int, string>();
 
@@ -128,6 +137,25 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     {
         if (!battlePetRemap.ContainsKey(skeletonID)) return -1;
         return battlePetRemap[skeletonID];
+    }
+
+    internal uint GetTextureID(int companionID)
+    {
+        if (companionID >= 0)
+        {
+            foreach (Companion companion in SheetUtils.instance.petSheet)
+            {
+                if (companion == null) continue;
+                if (companion.Model!.Value!.Model! == companionID)
+                    return companion.Icon;
+            }
+        }else if (companionID <= -2)
+        {
+            if (!petIDToAction.ContainsKey(companionID)) return 786;
+            return SheetUtils.instance.actions.GetRow(petIDToAction[companionID])?.Icon ?? 786;
+        }
+
+        return 786;
     }
 }
 

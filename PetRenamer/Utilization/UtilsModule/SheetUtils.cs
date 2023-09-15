@@ -6,6 +6,7 @@ using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
+using Dalamud.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -17,7 +18,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
-    ExcelSheet<Action> actions { get; set; } = null!;
+    public ExcelSheet<Action> actions { get; set; } = null!;
     ExcelSheet<Map> maps { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 

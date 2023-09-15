@@ -235,12 +235,39 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
+    protected bool Label(string text)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        return ImGui.Button(text);
+    }
+
     protected bool Label(string text, Vector2 styling)
     {
         PushStyleColor(ImGuiCol.ButtonHovered,    StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Button,           StylingColours.idleColor);
         PushStyleColor(ImGuiCol.ButtonActive,     StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        return ImGui.Button(text, styling);
+    }
+
+    protected bool Label(string text, Vector4 textColour)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Text, textColour);
+        return ImGui.Button(text);
+    }
+
+    protected bool Label(string text, Vector2 styling, Vector4 textColour)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text, styling);
     }
 
@@ -259,6 +286,33 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.Button(text, styling);
+    }
+
+    protected bool OverrideLabel(string text)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.Button(text);
+    }
+
+    protected bool OverrideLabel(string text, Vector4 textColour)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Text, textColour);
+        return ImGui.Button(text);
+    }
+
+    protected bool OverrideLabel(string text, Vector2 styling, Vector4 textColour)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text, styling);
     }
 
@@ -309,6 +363,17 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.BeginListBox(text, styling);
     }
 
+    protected bool BeginListBox(string text, Vector2 styling, Vector4 bgColour)
+    {
+        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
+        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
+        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
+        PushStyleColor(ImGuiCol.FrameBg, bgColour);
+        return ImGui.BeginListBox(text, styling);
+    }
+
+
     protected bool InputText(string label, ref string input, uint maxLength, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
     {
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
@@ -316,6 +381,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.InputText(label, ref input, maxLength, flags);
+    }
+
+    protected bool InputTextMultiLine(string label, ref string input, uint maxLength, Vector2 size,ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
+    {
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
+        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.textFieldPressed);
+        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        return ImGui.InputTextMultiline(label, ref input, maxLength, size, flags);
     }
 
     protected void SameLine() => ImGui.SameLine();
