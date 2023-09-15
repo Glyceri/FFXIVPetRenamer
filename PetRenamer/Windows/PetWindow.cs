@@ -13,9 +13,10 @@ namespace PetRenamer.Windows;
 
 public abstract class PetWindow : Window, IDisposableRegistryElement
 {
+    internal PetMode _lastMode = PetMode.ShareMode;
     internal static PetMode _petMode = PetMode.Normal;
     internal static PetMode petMode { get => _petMode; 
-        set 
+        private set 
         { 
             _petMode = value;
             if (petMode == PetMode.Normal)  ThemeHandler.SetTheme(ThemeHandler.baseTheme);
@@ -25,6 +26,7 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     }
 
     internal static void SetPetMode(PetMode mode) => petMode = mode;
+    internal virtual void OnPetModeChange(PetMode mode) { }
 
     protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
@@ -59,6 +61,13 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
     public sealed override unsafe void Draw()
     {
         if (drawToggle) DrawModeToggle();
+
+        if (_lastMode != petMode)
+        {
+            _lastMode = petMode;
+            OnPetModeChange(petMode);
+        }
+
         OnDraw();
         if (petMode == PetMode.Normal) OnDrawNormal();
         else if (petMode == PetMode.BattlePet) OnDrawBattlePet();
@@ -224,6 +233,15 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.Button(text, styling);
+    }
+
+    protected bool TransparentLabel(Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0, 0, 0, 0));
+        PushStyleColor(ImGuiCol.Button, new Vector4(0, 0, 0, 0));
+        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0, 0, 0, 0));
+        PushStyleColor(ImGuiCol.Text, new Vector4(0, 0, 0, 0));
+        return ImGui.Button(string.Empty, styling);
     }
 
     protected bool TransparentLabel(string text, Vector2 styling)
