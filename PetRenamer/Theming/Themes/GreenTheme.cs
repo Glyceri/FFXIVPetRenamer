@@ -5,7 +5,7 @@ namespace PetRenamer.Theming.Themes;
 internal class GreenTheme : BaseTheme
 {
     internal override Vector4 titleBgActive { get; set; } = new Vector4(0.30f, 1f, 0.50f, 1f);
-    internal override Vector4 titleBg { get; set; } = new Vector4(0.20f, 0.60f, 0.3f, 1f);
+    internal override Vector4 titleBg { get; set; } = new Vector4(0.20f, 0.40f, 0.3f, 1f);
     internal override Vector4 tileBgCollapsed { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
 
     internal override Vector4 buttonHovered { get; set; } = new Vector4(0.5f, 1f, 0.5f, 1f);

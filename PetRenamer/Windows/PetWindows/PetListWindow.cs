@@ -70,12 +70,8 @@ public class PetListWindow : PetWindow
         if (!currentIsLocalUser) SetOpenedAddPet(false);
 
         DrawUserHeader();
-        //ImGui.Indent(220);
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(- 350, 77));
-        DrawExportHeader();
-        //ImGui.Unindent(220);
-
-        
+        DrawExportHeader();        
 
         if (user.CompanionChanged || user != lastUser)
             FillTextureList();
@@ -118,14 +114,14 @@ public class PetListWindow : PetWindow
         if (XButton(SeIconChar.MouseWheel.ToIconString() + "##<SafetySettings>", Styling.SmallButton))
             PluginLink.WindowHandler.OpenWindow<ConfigWindow>();
         SetTooltipHovered("Open Settings Menu");
-        BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+        BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg);
         bool buttonPressed = false;
         int counter = 1000;
         texturePointer = 0;
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 4", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
-        DrawFillerBar(2);
+        DrawFillerBar(3);
 
         foreach (PettableUser u in PluginLink.PettableUserHandler.Users)
         {
@@ -194,7 +190,7 @@ public class PetListWindow : PetWindow
                 DrawBasicBar("Petcount", $"Total: {u.SerializableUser.AccurateTotalPetCount()}, Minions: {u.SerializableUser.AccurateMinionCount()}, Battle Pets: {u.SerializableUser.AccurateBattlePetCount()}", ref counter);
             }
             DrawRightHeading(2);
-            DrawFillerBar(2);
+            DrawFillerBar(3);
 
             if (buttonPressed) break;
         }
@@ -561,7 +557,7 @@ public class PetListWindow : PetWindow
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 2", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
-        DrawFillerBar(2);
+        DrawFillerBar(3);
 
         user.SerializableUser.LoopThrough(nickname =>
         {
@@ -589,7 +585,7 @@ public class PetListWindow : PetWindow
             DrawBasicBar("Pet Name", currentPetName, ref counter);
             DrawBasicBar("Pet ID", nickname.Item1.ToString(), ref counter);
             DrawRightHeading(2);
-            DrawFillerBar(2);
+            DrawFillerBar(3);
         });
         ImGui.EndTable();
         ImGui.PopStyleVar();
@@ -607,7 +603,7 @@ public class PetListWindow : PetWindow
     void DrawUserHeader()
     {
         if (user == null) return;
-        BeginListBox("##<1>", new System.Numerics.Vector2(780, 90));
+        BeginListBox("##<1>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
         
         DrawTexture(PluginLink.PettableUserHandler.GetTexture(user));
 
@@ -625,12 +621,12 @@ public class PetListWindow : PetWindow
         SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}\nClick to change user.");
         SameLine();
         ImGui.SetCursorPos(ImGui.GetCursorPos()  - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y - 4));
-        Label($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
+        OverrideLabel($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
         SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y * 2 - 8));
 
-        Label($"[{user!.SerializableUser.AccurateTotalPetCount()}, {user!.SerializableUser.AccurateMinionCount()}, {user!.SerializableUser.AccurateBattlePetCount()}]", Styling.ListButton); 
+        OverrideLabel($"[{user!.SerializableUser.AccurateTotalPetCount()}, {user!.SerializableUser.AccurateMinionCount()}, {user!.SerializableUser.AccurateBattlePetCount()}]", Styling.ListButton); 
         SetTooltipHovered($"Total Pet Count: {user!.SerializableUser.AccurateTotalPetCount()}, Minion Count: {user!.SerializableUser.AccurateMinionCount()}, Battle Pet Count: {user!.SerializableUser.AccurateBattlePetCount()}");
 
         ImGui.EndListBox();
@@ -668,8 +664,8 @@ public class PetListWindow : PetWindow
     {
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         int counter = 30;
-        BeginListBox("##<clipboard>", new System.Numerics.Vector2(318, 60), StylingColours.titleBg);
-        Label("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
+        BeginListBox("##<clipboard>", new System.Numerics.Vector2(318, 60));
+        OverrideLabel("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {
             if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode)
@@ -727,7 +723,7 @@ public class PetListWindow : PetWindow
         {
             ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
             ImGui.BeginTable("##Image Table 1", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
-            DrawFillerBar(2);
+            DrawFillerBar(3);
 
             if (!_openedAddPet && currentIsLocalUser)
             {
@@ -749,7 +745,7 @@ public class PetListWindow : PetWindow
                     NewLine();
                 }
                 DrawRightHeading(2);
-                DrawFillerBar(2);
+                DrawFillerBar(3);
             }
             else texturePointer++;
 
@@ -781,7 +777,7 @@ public class PetListWindow : PetWindow
                 DrawBasicBar("Minion Name", currentPetName, ref counter);
                 DrawBasicBar("Minion ID", nickname.Item1.ToString(), ref counter);
                 DrawRightHeading(2);
-                DrawFillerBar(2);
+                DrawFillerBar(3);
 
             });
             ImGui.EndTable();
@@ -879,7 +875,7 @@ public class PetListWindow : PetWindow
     {
         if (column == 0) ImGui.TableNextRow();
         ImGui.TableSetColumnIndex(column);
-        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, ImGui.ColorConvertFloat4ToU32(StylingColours.titleBg));
+        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, ImGui.ColorConvertFloat4ToU32(StylingColours.listBox));
     }
 
     void DrawFillerBar(int columns)
@@ -898,7 +894,7 @@ public class PetListWindow : PetWindow
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 3", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
-        DrawFillerBar(2);
+        DrawFillerBar(3);
         SetColumn(0);
         DrawTexture(ref texturePointer);
         SetColumn(1);
@@ -927,7 +923,7 @@ public class PetListWindow : PetWindow
         SetTooltipHovered($"Stop looking for a new pet?");
 
         DrawRightHeading(2);
-        DrawFillerBar(2);
+        DrawFillerBar(3);
 
         foreach (SerializableNickname nickname in foundNicknames)
         {
@@ -951,7 +947,7 @@ public class PetListWindow : PetWindow
             DrawBasicBar("Minion Name", currentPetName, ref counter);
             DrawBasicBar("Minion ID", nickname.ID.ToString(), ref counter);
             DrawRightHeading(2);
-            DrawFillerBar(2);
+            DrawFillerBar(3);
         }
 
         ImGui.EndTable();
