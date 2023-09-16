@@ -14,6 +14,14 @@ using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Dalamud.Game.Text;
 using System.Threading.Tasks;
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+using PetRenamer.Core.Networking.NetworkingElements;
+=======
+using static PetRenamer.Windows.PetWindow;
+>>>>>>> parent of 4a072f2... Fixes
+>>>>>>> Stashed changes
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -630,6 +638,7 @@ public class PetListWindow : PetWindow
         SetTooltipHovered($"Total Pet Count: {user!.SerializableUser.AccurateTotalPetCount()}, Minion Count: {user!.SerializableUser.AccurateMinionCount()}, Battle Pet Count: {user!.SerializableUser.AccurateBattlePetCount()}");
 
         ImGui.EndListBox();
+        //SameLine();
     }
 
     void SetUserMode(bool userMode)
