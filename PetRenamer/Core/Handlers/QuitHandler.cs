@@ -15,6 +15,7 @@ internal class QuitHandler
         PluginLink.ChatHandler?.Dispose();
         PluginLink.IpcStorage?.Dispose();
         PluginLink.PettableUserHandler?.Dispose();
+        PluginLink.NetworkingHandler?.Dispose();
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();

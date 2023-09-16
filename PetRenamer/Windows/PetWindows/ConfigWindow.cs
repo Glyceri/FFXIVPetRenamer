@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Windows.Attributes;
 
@@ -59,7 +60,7 @@ public class ConfigWindow : PetWindow
                 lastDownloadAll = PluginLink.Configuration.downloadProfilePictures;
                 if (PluginLink.Configuration.downloadProfilePictures)
                     for(int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
-                        PluginLink.PettableUserHandler.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
+                        ProfilePictureNetworked.instance.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
             }
 
             if (Checkbox("Display Images", ref PluginLink.Configuration.displayImages))

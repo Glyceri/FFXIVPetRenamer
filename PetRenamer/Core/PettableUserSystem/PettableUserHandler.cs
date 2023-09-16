@@ -2,6 +2,7 @@
 using ImGuiScene;
 using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.Networking.Structs;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Serialization;
@@ -11,8 +12,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -53,10 +52,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public void Dispose()
     {
         _users?.Clear();
-
-        foreach (TextureWrap textureWrap in fileInfos.Values)
-            textureWrap?.Dispose();
-        fileInfos?.Clear();
     }
 
     public void Initialize()
@@ -83,9 +78,9 @@ internal class PettableUserHandler : IDisposable, IInitializable
                 _users.Add(u);
                 try
                 {
-                    OnDeclare(u, UserDeclareType.Add, false);
+                    ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
                 }
-                catch { }
+                catch (Exception e) { PluginLog.Log(e.Message); }
             }
         }
         else if (userDeclareType == UserDeclareType.Remove)
@@ -96,160 +91,15 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
                 try
                 {
-                    OnDeclare(_users[i], UserDeclareType.Remove, false);
+                    ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
                 }
-                catch { }
+                catch (Exception e) { PluginLog.Log(e.Message); }
                 _users.RemoveAt(i);
             }
         }
     }
 
-    public nint GetTexture(PettableUser user)
-    {
-        if (user == null) return nint.Zero;
-        if (!fileInfos.ContainsKey((user.UserName, user.Homeworld)))
-        {
-            string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
-            if (iconPath == null) return nint.Zero;
-            TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
-            if (textureWrap == null) return nint.Zero;
-            return textureWrap.ImGuiHandle;
-        }
-        return fileInfos[(user.UserName, user.Homeworld)].ImGuiHandle;
-    }
-
-    Dictionary<(string, uint), TextureWrap> fileInfos = new Dictionary<(string, uint), TextureWrap>();
-
-    public void OnDeclare(PettableUser user, UserDeclareType type, bool force)
-    {
-        (string, uint) currentUser = (user.UserName, user.Homeworld);
-        if (type == UserDeclareType.Remove)
-        {
-            if (!fileInfos.ContainsKey(currentUser)) return;
-            fileInfos[currentUser]?.Dispose();
-            fileInfos.Remove(currentUser);
-            PluginLog.LogVerbose($"User Removed: {currentUser}");
-        }
-        else if (type == UserDeclareType.Add)
-        {
-            if (fileInfos.ContainsKey(currentUser)) return;
-            string path = MakePath(currentUser);
-            try
-            {
-                if (Path.Exists(path))
-                {
-                    PluginLog.LogVerbose("File already exists! Grabbing from cache!");
-                    DeclareDownload((user.UserName, user.Homeworld));
-                }
-                else if (PluginLink.Configuration.downloadProfilePictures || force)
-                {
-                    PluginLog.LogVerbose("File doesn't exists! Downloading file!");
-                    DownloadPagination((user.UserName, user.Homeworld));
-                }
-            }
-            catch { }
-        }
-    }
-
-    public async void DownloadPagination((string, uint) characterData)
-    {
-        if (fileInfos.ContainsKey(characterData))
-        {
-            fileInfos[characterData]?.Dispose();
-            fileInfos?.Remove(characterData);
-        }
-        try
-        {
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync($"https://xivapi.com/character/search?name={characterData.Item1}&server={SheetUtils.instance.GetWorldName((ushort)characterData.Item2)}");
-            response.EnsureSuccessStatusCode();
-            Stream str = response.Content.ReadAsStream();
-            StreamReader reader = new StreamReader(str);
-            string lines = reader.ReadToEnd();
-
-            PaginationRoot? paginatedStruct = JsonSerializer.Deserialize<PaginationRoot>(lines);
-            if (paginatedStruct != null)
-            {
-                List<Result> pStruct = paginatedStruct.Results;
-                if (pStruct != null && pStruct.Count != 0 && pStruct[0].Avatar != null)
-                    await Task.Run(() => AsyncDownload(pStruct[0].Avatar.ToString(), characterData));
-            }
-
-            reader?.Dispose();
-            str?.Dispose();
-            response?.Dispose();
-            client?.Dispose();
-        }
-        catch { }
-    }
-
-    async void AsyncDownload(string URL, (string, uint) charaData)
-    {
-        try
-        {
-            HttpClient httpClient = new HttpClient();
-            HttpResponseMessage response = await httpClient.GetAsync(URL);
-            response.EnsureSuccessStatusCode();
-            Stream str = response.Content.ReadAsStream();
-
-            ImageCodecInfo myImageCodecInfo;
-            Encoder myEncoder;
-            EncoderParameter myEncoderParameter;
-            EncoderParameters myEncoderParameters;
-
-            Image bMap = Image.FromStream(str);
-            myImageCodecInfo = GetEncoderInfo("image/jpeg");
-            myEncoder = Encoder.Quality;
-
-            myEncoderParameters = new EncoderParameters(1);
-            myEncoderParameter = new EncoderParameter(myEncoder, 100L);
-            myEncoderParameters.Param[0] = myEncoderParameter;
-            bMap.Save(MakePath(charaData), myImageCodecInfo, myEncoderParameters);
-            DeclareDownload(charaData);
-            str?.Dispose();
-            response?.Dispose();
-            httpClient?.Dispose();
-        }
-        catch { }
-    }
-
-    public void DeclareDownload((string, uint) characterData)
-    {
-        try
-        {
-            lock (fileInfos)
-            {
-                if (fileInfos.ContainsKey(characterData))
-                    fileInfos[characterData]?.Dispose();
-                fileInfos.Remove(characterData);
-
-                string path = MakePath(characterData);
-                FileInfo info = new FileInfo(path);
-                if (!info.Exists) return;
-
-                TextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, false)!;
-                if (wrap == null) return;
-                fileInfos.Add(characterData, wrap);
-            }
-        }
-        catch { }
-    }
-
-    ImageCodecInfo GetEncoderInfo(string mimeType)
-    {
-        int j;
-        ImageCodecInfo[] encoders;
-        encoders = ImageCodecInfo.GetImageEncoders();
-        for (j = 0; j < encoders.Length; ++j)
-        {
-            if (encoders[j].MimeType == mimeType)
-                return encoders[j];
-        }
-        return null!;
-    }
-
-    string MakePath((string, uint) characterData) => Path.Combine(Path.GetTempPath(), $"PetNicknames_{characterData.Item1.Replace(" ", "_")}_{SheetUtils.instance.GetWorldName((ushort)characterData.Item2)}.jpg");
-
+    
 
     public bool LocalPetChanged()
     {
