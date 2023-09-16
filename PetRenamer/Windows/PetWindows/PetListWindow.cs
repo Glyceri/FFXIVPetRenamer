@@ -15,6 +15,8 @@ using ImGuiScene;
 using Dalamud.Game.Text;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.Sharing;
+using PetRenamer.Core.Sharing.Importing;
+using PetRenamer.Core.Sharing.Importing.Data;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -33,9 +35,6 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 783 + 64),
             MaximumSize = new Vector2(800, 783 + 64)
         };
-
-        IsOpen = true;
-        SetUserMode(true);
     }
 
     int internalCounter = 0;
@@ -54,6 +53,7 @@ public class PetListWindow : PetWindow
 
     int texturePointer = 0;
     string searchField = string.Empty;
+    bool existed = false;
 
     public override void OnDraw()
     {
@@ -63,7 +63,11 @@ public class PetListWindow : PetWindow
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if ((user ??= localUser!) == null) return;
         if (petMode != PetMode.Normal) SetOpenedAddPet(false);
-        if (petMode != PetMode.ShareMode) SetAdvancedMode(false);
+        if (petMode != PetMode.ShareMode) 
+        { 
+            SetAdvancedMode(false);
+            CleanupImport();
+        }
         if (petMode == PetMode.ShareMode)
         {
             SetUserMode(false);
@@ -72,13 +76,6 @@ public class PetListWindow : PetWindow
         if (user == null) return;
         currentIsLocalUser = user == localUser;
         if (!currentIsLocalUser) SetOpenedAddPet(false);
-
-        if (!(petMode == PetMode.ShareMode && advancedMode))
-        {
-            DrawUserHeader(user);
-            ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(-350, 77));
-            DrawExportHeader();
-        }
 
         if (user.CompanionChanged || user != lastUser)
             FillTextureList();
@@ -96,6 +93,7 @@ public class PetListWindow : PetWindow
     void HandleOnDrawNormal()
     {
         if (user == null) return;
+        DrawBasicUserHeader();
         if (userMode) DrawUserSelect();
         else DrawList();
     }
@@ -103,6 +101,7 @@ public class PetListWindow : PetWindow
     void HandleOnDrawBattlePetList()
     {
         if (user == null) return;
+        DrawBasicUserHeader();
         if (userMode) DrawUserSelect();
         else DrawBattlePetList();
     }
@@ -110,8 +109,18 @@ public class PetListWindow : PetWindow
     void HandleOnDrawSharing()
     {
         if (user == null) return;
+        
+        if (advancedMode) DrawUserHeader(user, 0, 32, () => OverrideLabel("Advanced Exporting"));
+        else if (importedData != null && existingUser != null) DrawUserHeader(existingUser, 0, 32, () => OverrideLabel("Importing"));
+        else DrawBasicUserHeader();
+
         if (userMode) DrawUserSelect();
         else DrawSharing();
+    }
+
+    void DrawBasicUserHeader()
+    {
+        DrawUserHeader(user, 75, 15, DrawExportHeader);
     }
 
     void DrawUserSelect()
@@ -193,45 +202,35 @@ public class PetListWindow : PetWindow
         ImGui.PopStyleVar();
 
         ImGui.EndListBox();
-
     }
 
-    SerializableUserV3 importedUser { get; set; } = null!;
-    SerializableUserV3 alreadyExistingUser { get; set; } = null!;
+    SucceededImportData importedData = null!;
+    PettableUser existingUser = null!;
+    PettableUser removeMeUser = null!;
 
     unsafe void DrawSharing()
     {
         if (user == null) return;
+
         if (advancedMode)
         {
             DrawAdvancedSharing();
             return;
         }
 
-        if (importedUser == null) return;
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+        if (importedData == null) return;
+        if (existingUser == null)
         {
-            if (user.SerializableUser == null) continue;
-            if (user.SerializableUser.username.Trim().ToLower() == importedUser.username.Trim().ToLower() &&
-                user.SerializableUser.homeworld == importedUser.homeworld)
-            {
-                alreadyExistingUser = user.SerializableUser;
-                break;
-            }
+            existingUser = PluginLink.PettableUserHandler.GetUser(importedData.UserName, importedData.HomeWorld)!;
+            removeMeUser = PluginLink.PettableUserHandler.GetUser(importedData.UserName, importedData.HomeWorld)!;
+            FillTextureList(new PettableUser("_temp_", 0, new SerializableUserV3(importedData.ids, importedData.names, "_temp_", 0)));
         }
-
-        DrawUserHeaderSharing();
         DrawListSharing();
         DrawFooterSharing();
     }
 
     void DrawAdvancedSharing()
     {
-        DrawUserHeader(user);
-        SameLine();
-        ImGui.SetItemAllowOverlap();
-        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(350, -32));
-        OverrideLabel("Advanced Exporting");
         DrawAdvancedList();
     }
 
@@ -246,7 +245,7 @@ public class PetListWindow : PetWindow
 
         BeginListBox("##<6>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
 
-        int texturePointer = 0; 
+        int texturePointer = 0;
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 6", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
         DrawFillerBar(3);
@@ -255,7 +254,7 @@ public class PetListWindow : PetWindow
         SetColumn(0);
         DrawTexture(TextureWraps[texturePointer++].ImGuiHandle, () =>
         {
-            if (Checkbox($"##{internalCounter++}", "Toggle all", ref current)) 
+            if (Checkbox($"##{internalCounter++}", "Toggle all", ref current))
                 SharingHandler.ToggleAll(current);
         });
 
@@ -288,7 +287,7 @@ public class PetListWindow : PetWindow
                 SheetUtils.instance.GetPetName(user.SerializableUser.ids[i]);
             DrawBasicBar("Type", $"{basePetName}", ref internalCounter);
             DrawBasicBar("ID", $"{user.SerializableUser.ids[i]}", ref internalCounter);
-           
+
             DrawRightHeading(2);
             DrawFillerBar(3);
         }
@@ -310,224 +309,72 @@ public class PetListWindow : PetWindow
 
     void DrawFooterSharing()
     {
+        if (existingUser == null) return;
         NewLine();
         ImGui.SameLine(638);
 
         if (Button($"Save Imported List##importListSave", Styling.ListButton))
         {
-            if (alreadyExistingUser == null)
+            for (int i = 0; i < importedData.ids.Length; i++)
             {
-                PluginLink.PettableUserHandler.DeclareUser(importedUser, Core.PettableUserSystem.Enums.UserDeclareType.Add);
+                if (importedData.importTypes[i] == ImportType.Remove) existingUser.SerializableUser.RemoveNickname(importedData.ids[i]);
+                else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
-            else
-            {
-                importedUser.LoopThrough(nickname =>
-                {
-                    alreadyExistingUser.SaveNickname(nickname.Item1, nickname.Item2, true, false);
-                });
+            
+            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePetIndex);
+            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.MinionIndex);
 
-                foreach ((int, string) nickname in DeletesNicknames(importedUser))
-                {
-                    alreadyExistingUser.RemoveNickname(nickname.Item1, false);
-                }
-            }
-
-            PettableUser curUser = null!;
-            foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-                if (user.SerializableUser.Equals(importedUser.username, importedUser.homeworld))
-                {
-                    curUser = user;
-                    break;
-                }
-
-            if (curUser != null)
-            {
-                PenumbraIPCProvider.RedrawBattlePetByIndex(curUser.BattlePetIndex);
-                PenumbraIPCProvider.RedrawMinionByIndex(curUser.MinionIndex);
-            }
-
-            alreadyExistingUser = null!;
-            importedUser = null!;
+            removeMeUser = null!;
+            existingUser = null!;
+            importedData = null!;
 
             PluginLink.Configuration.Save();
         }
     }
 
-    void DrawUserHeaderSharing()
-    {
-        BeginListBox("##<list header>", new System.Numerics.Vector2(780, 32));
-        Label($"{StringUtils.instance.MakeTitleCase(importedUser.username)}", Styling.ListButton); SameLine();
-        SetTooltipHovered($"{StringUtils.instance.MakeTitleCase(importedUser.username)}");
-        Label($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
-        SetTooltipHovered($"{SheetUtils.instance.GetWorldName(importedUser.homeworld)}");
-        if (alreadyExistingUser == null) NewLabel("New User", Styling.ListButton);
-        else Label("User Status: " + "Exists", Styling.ListButton);
-        SetTooltipHovered($"Status of the user");
-        ImGui.EndListBox();
-        NewLine();
-    }
-
     void DrawListSharing()
     {
-        int counter = 10;
+        texturePointer = 0;
         BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
-        DrawListHeaderSharing();
 
-        (int, string)[] deletedNicknames = DeletesNicknames(importedUser);
+        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
+        ImGui.BeginTable("##Image Table 7", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+        DrawFillerBar(3);
 
-        foreach ((int, string) nickname in deletedNicknames)
+        for (int i = 0; i < importedData.ids.Length; i++)
         {
-            string currentPetName =
-            nickname.Item1 >= 0 ?
-            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)) :
-            StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
+            if (importedData.names[i] == string.Empty) continue;
+            ImGui.TableNextRow();
+            SetColumn(0);
+            if (texturePointer < TextureWraps.Count -1)
+            {
+                DrawTexture(TextureWraps[++texturePointer].ImGuiHandle, () => DrawImportType(importedData.importTypes[i]));
+            }
+            SetColumn(1);
 
-            XButtonError("X", Styling.SmallButton);
-            SetTooltipHovered("Pet name gets removed");
-            SameLine();
-            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
-            SetTooltipHovered(nickname.Item1.ToString());
-            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
-            SetTooltipHovered(currentPetName);
-            Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
-            SetTooltipHovered(nickname.Item2);
+            string name = importedData.names[i];
+            DrawBasicBar("Nickname", $"{name}", ref internalCounter);
+            int id = importedData.ids[i];
+            string basePetName = id < -1 ? RemapUtils.instance.PetIDToName(id) : SheetUtils.instance.GetPetName(id);
+            DrawBasicBar("Type", $"{basePetName}", ref internalCounter);
+            DrawBasicBar("ID", $"{id}", ref internalCounter);
+
+            DrawRightHeading(2);
+            DrawFillerBar(3);
         }
 
-        importedUser.LoopThrough(nickname =>
-        {
-            string currentPetName =
-            nickname.Item1 >= 0 ?
-            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)) :
-            StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1));
-            if (IsExactSame(nickname))
-            {
-                Label("=", Styling.SmallButton);
-                SetTooltipHovered("Pet name stays the exact same");
-            }
-            else if (HasNickname(nickname))
-            {
-                OverrideLabel("O", Styling.SmallButton);
-                SetTooltipHovered("Pet name gets changed");
-            }
-            else
-            {
-                NewLabel("+", Styling.SmallButton);
-                SetTooltipHovered("Pet name is new");
-            }
+        ImGui.EndTable();
+        ImGui.PopStyleVar();
 
-            SameLine();
-            Label(nickname.Item1.ToString() + $"##internal<{counter++}>", Styling.ListIDField); SameLine();
-            SetTooltipHovered(nickname.Item1.ToString());
-            Label(currentPetName + $"##internal<{counter++}>", Styling.ListButton); SameLine();
-            SetTooltipHovered(currentPetName);
-            Label($"{nickname.Item2} ##internal<{counter++}>", Styling.ListButton);
-            SetTooltipHovered(nickname.Item2);
-        });
         ImGui.EndListBox();
     }
 
-    void DrawListHeaderSharing()
+    void DrawImportType(ImportType importType)
     {
-        Label("", Styling.SmallButton); SameLine();
-        Label("Minion ID", Styling.ListIDField); SameLine();
-        Label("Minion Name", Styling.ListButton); SameLine();
-        Label("Custom Minion name", Styling.ListButton); SameLine();
-        NewLine();
-    }
-
-    bool IsExactSame((int, string) nickname)
-    {
-        if (alreadyExistingUser == null) return false;
-        bool exists = false;
-        alreadyExistingUser.LoopThroughBreakable(nName =>
-        {
-            if (nName.Item1 == nickname.Item1 && nName.Item2 == nickname.Item2)
-            {
-                exists = true;
-                return true;
-            }
-            return false;
-        });
-        return exists;
-    }
-
-    bool HasNickname((int, string) nickname)
-    {
-        if (alreadyExistingUser == null) return false;
-        bool exists = false;
-        alreadyExistingUser.LoopThroughBreakable(nName =>
-        {
-            if (nName.Item1 == nickname.Item1)
-            {
-                exists = true;
-                return true;
-            }
-            return false;
-        });
-        return exists;
-    }
-
-    (int, string)[] DeletesNicknames(SerializableUserV3 importedUser)
-    {
-        List<(int, string)> nicknames = new List<(int, string)>();
-        if (alreadyExistingUser == null) return nicknames.ToArray();
-
-        alreadyExistingUser.LoopThrough(nickname =>
-        {
-            bool exists = false;
-            importedUser.LoopThroughBreakable(nickname2 =>
-            {
-                if (nickname2.Item1 == nickname.Item1)
-                {
-                    exists = true;
-                    return true;
-                }
-                return false;
-            });
-            if (exists) return;
-            nicknames.Add(nickname);
-        });
-
-        return nicknames.ToArray();
-    }
-
-    public bool SetImportString(string importString)
-    {
-        importedUser = null!;
-        if (!importString.StartsWith("[PetExport]")) return false;
-
-        try
-        {
-            string[] splitLines = importString.Split('\n');
-            if (splitLines.Length <= 2) return false;
-            try
-            {
-                string userName = splitLines[1];
-                ushort homeWorld = ushort.Parse(splitLines[2]);
-
-                List<int> ids = new List<int>();
-                List<string> names = new List<string>();
-                try
-                {
-                    for (int i = 3; i < splitLines.Length; i++)
-                    {
-                        string[] splitNickname = splitLines[i].Split('^');
-                        if (splitNickname.Length < 1) continue;
-                        if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) { continue; }
-                        string nickname = splitNickname[1].Replace("Name:", "");
-                        ids.Add(ID);
-                        names.Add(nickname);
-                    }
-                }
-                catch (Exception e) { PluginLog.Log($"Import Error occured [SerializableNickname]: {e}"); }
-
-                importedUser = new SerializableUserV3(ids.ToArray(), names.ToArray(), userName, homeWorld);
-            }
-            catch (Exception e) { PluginLog.Log($"Import Error occured [SerializableUser]: {e}"); }
-        }
-        catch (Exception e) { PluginLog.Log($"Import Error occured [Overall]: {e}"); return false; }
-
-        return true;
+        if (importType == ImportType.None) Label("=", Styling.SmallButton);
+        if (importType == ImportType.New) NewLabel("+", Styling.SmallButton);
+        if (importType == ImportType.Rename) NewLabel("O", Styling.SmallButton);
+        if (importType == ImportType.Remove) XButtonError("X", Styling.SmallButton);
     }
 
     void DrawBattlePetList()
@@ -582,7 +429,7 @@ public class PetListWindow : PetWindow
         ImGui.EndListBox();
     }
 
-    void DrawUserHeader(PettableUser user)
+    void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
         BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
@@ -612,6 +459,14 @@ public class PetListWindow : PetWindow
         SetTooltipHovered($"Total Pet Count: {user?.SerializableUser?.AccurateTotalPetCount()}, Minion Count: {user?.SerializableUser?.AccurateMinionCount()}, Battle Pet Count: {user?.SerializableUser?.AccurateBattlePetCount()}");
 
         ImGui.EndListBox();
+
+        if (drawMidElement != null)
+        {
+            SameLine();
+            ImGui.SetItemAllowOverlap();
+            ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(350 + xOffset, -yOffset));
+            drawMidElement?.Invoke();
+        }
     }
 
     void SetUserMode(bool userMode)
@@ -633,21 +488,32 @@ public class PetListWindow : PetWindow
         if (!advancedMode) return;
 
         user = PluginLink.PettableUserHandler.LocalUser()!;
-        importedUser = null!;
+        CleanupImport();
         IsOpen = true;
         SetPetMode(PetMode.ShareMode);
+    }
+    
+    void CleanupImport()
+    {
+        importedData = null!;
+        existingUser = null!;
+        if (removeMeUser != null)
+        {
+            if(!existed) PluginLink.PettableUserHandler.DeclareUser(removeMeUser.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove);
+            existed = false;
+            removeMeUser = null!;
+        }
     }
 
     public void DrawExportHeader()
     {
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         int counter = 30;
-        BeginListBox("##<clipboard>", new System.Numerics.Vector2(318, 60));
+        BeginListBox($"##<clipboard>{internalCounter++}", new System.Numerics.Vector2(318, 60));
         OverrideLabel("A friend can import your code to see your names.", new System.Numerics.Vector2(310, 24));
         if (Button($"Export to Clipboard##clipboardExport{counter++}", Styling.ListButton))
         {
-            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode)
-                SetAdvancedMode(true);
+            if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode) SetAdvancedMode(true);
             else
             {
                 SetAdvancedMode(false);
@@ -656,24 +522,26 @@ public class PetListWindow : PetWindow
             }
         }
         SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.\n\n[Hold L-Shift for advanced options.]");
-        
+
         SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
             SetAdvancedMode(false);
-            try
+            ImportData data = ImportHandler.SetImportString(ImGui.GetClipboardText());
+            if (data is FailedImportData failedImportData) PluginLog.Log($"Import Error occured: {failedImportData.ErrorMessage}");
+            if (data is SucceededImportData succeededImportData)
             {
-                string gottenText = Encoding.Unicode.GetString(Convert.FromBase64String(ImGui.GetClipboardText()));
+                importedData = succeededImportData;
                 SetPetMode(PetMode.ShareMode);
                 PetListWindow window = PluginLink.WindowHandler.GetWindow<PetListWindow>();
-                if (window.SetImportString(gottenText))
-                    window.IsOpen = true;
+                window.IsOpen = true;
+
+                existed = PluginLink.PettableUserHandler.GetUser(importedData.UserName, importedData.HomeWorld) != null;
+                PluginLink.PettableUserHandler.DeclareUser(new SerializableUserV3(importedData.UserName, importedData.HomeWorld), Core.PettableUserSystem.Enums.UserDeclareType.Add);
             }
-            catch (Exception e) { PluginLog.Log($"Import Error occured: {e}"); }
         }
         SetTooltipHovered("After having copied a list of names from a friend.\nClicking this button will result into importing all their nicknames \nallowing you to see them for yourself.");
         ImGui.EndListBox();
-        ImGui.NewLine();
     }
 
     List<TextureWrap> TextureWraps = new List<TextureWrap>();
@@ -698,7 +566,7 @@ public class PetListWindow : PetWindow
                 texturePointer++;
                 SetColumn(1);
                 DrawEmptyBar("+", "Search for a new pet.", () => SetOpenedAddPet(true), currentIsLocalUser);
-               
+
                 DrawRightHeading(2);
                 DrawFillerBar(3);
             }
@@ -743,9 +611,10 @@ public class PetListWindow : PetWindow
         ImGui.EndListBox();
     }
 
-    void FillTextureList()
+    void FillTextureList(PettableUser user = null!)
     {
         DisposeTextures();
+        if (user == null) user = this.user;
         if (user == null) return;
         AddTexture(-1);
         user.SerializableUser.LoopThrough(nickname =>
@@ -818,6 +687,7 @@ public class PetListWindow : PetWindow
 
     void DrawRedownloadButton(Action drawMe)
     {
+        if (drawMe == null) return;
         ImGui.SetItemAllowOverlap();
         ImGui.SameLine();
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(35, -59));

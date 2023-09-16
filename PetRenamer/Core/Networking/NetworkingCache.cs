@@ -17,12 +17,11 @@ public class NetworkingCache : IDisposable, IInitializable
 
     public void Dispose()
     {
-        ClearTextureCache();
+        DisposeTextureCache();
     }
 
     public void ClearTextureCache()
     {
-        DisposeTextureCache();
         textureCache?.Clear();
     }
 
@@ -30,12 +29,16 @@ public class NetworkingCache : IDisposable, IInitializable
     {
         foreach (TextureWrap texture in textureCache.Values)
             texture?.Dispose();
+        ClearTextureCache();
     }
 
     public void RemoveTexture((string, uint) character)
     {
-        if (!textureCache.ContainsKey(character)) return;
-        textureCache[character]?.Dispose();
-        textureCache?.Remove(character);
+        lock (textureCache)
+        {
+            if (!textureCache.ContainsKey(character)) return;
+            textureCache[character]?.Dispose();
+            textureCache?.Remove(character);
+        }
     }
 }

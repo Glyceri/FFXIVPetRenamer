@@ -35,16 +35,28 @@ public class SucceededImportData : ImportData
         List<int> listIds = new List<int>();
         List<string> listStrings = new List<string>();
         List<ImportType> importTypes = new List<ImportType>();
+        
         for(int i = 0; i < me.ids.Length; i++)
         {
             int id = me.ids[i];
             string name = me.names[i];
             listIds.Add(id);
-            listStrings.Add(names[i]);
-            if (ids.Contains(id)) importTypes.Add(names.Contains(name) ? ImportType.None : ImportType.Rename);
-            else importTypes.Add(ImportType.Remove);
-        }
 
+            if (ids.Contains(id))
+            {
+                int index = ids.ToList().IndexOf(id);
+                string n = names[index];
+                listStrings.Add(n);
+                if (n == name) importTypes.Add(ImportType.None);
+                else importTypes.Add(ImportType.Rename);
+            }
+            else 
+            {
+                listStrings.Add(me.names[i]);
+                importTypes.Add(ImportType.Remove); 
+            }
+        }
+        
         for (int i = 0; i < ids.Length; i++)
         {
             int id = ids[i];

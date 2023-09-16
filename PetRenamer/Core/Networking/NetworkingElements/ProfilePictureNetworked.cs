@@ -26,17 +26,25 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     public nint GetTexture(PettableUser user)
     {
-        if (user == null) return nint.Zero;
-        (string, uint) currentUser = (user.UserName, user.Homeworld);
-        if (!Cache.textureCache.ContainsKey(currentUser))
+        try
         {
-            string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
-            if (iconPath == null) return nint.Zero;
-            TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
-            if (textureWrap == null) return nint.Zero;
-            return textureWrap.ImGuiHandle;
+            if (user == null) return nint.Zero;
+            (string, uint) currentUser = (user.UserName, user.Homeworld);
+            if (!Cache.textureCache.ContainsKey(currentUser)) return GetSearchingTexture();
+            nint returner = Cache.textureCache[currentUser]?.ImGuiHandle ?? nint.Zero;
+            if (returner == nint.Zero) returner = GetSearchingTexture();
+            return returner;
         }
-        return Cache.textureCache[currentUser].ImGuiHandle;
+        catch { return GetSearchingTexture(); }
+    }
+
+    nint GetSearchingTexture()
+    {
+        string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
+        if (iconPath == null) return nint.Zero;
+        TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        if (textureWrap == null) return nint.Zero;
+        return textureWrap.ImGuiHandle;
     }
 
     public void OnDeclare(PettableUser user, UserDeclareType type, bool force)
@@ -53,7 +61,6 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         if (!Cache.textureCache.ContainsKey(currentUser)) return;
         Cache.textureCache[currentUser]?.Dispose();
         Cache.textureCache.Remove(currentUser);
-        PluginLog.LogVerbose($"User Removed: {currentUser}");
     }
 
     void HandleAsAdd(ref (string, uint) currentUser, bool force)
@@ -64,53 +71,60 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             if (Path.Exists(path))
             {
-                PluginLog.LogVerbose("File already exists! Grabbing from cache!");
                 DeclareDownload(currentUser);
             }
             else if (PluginLink.Configuration.downloadProfilePictures || force)
             {
-                PluginLog.LogVerbose("File doesn't exists! Downloading file!");
-                DownloadPagination(currentUser);
+                Cache.RemoveTexture(currentUser);
+                (string, uint) cUser = currentUser;
+                Task.Run(() => DownloadPagination(cUser));
             }
         }
-        catch(Exception e) { PluginLog.Log(e.Message); }
+        catch { }
     }
 
     void DeclareDownload((string, uint) characterData)
     {
-        try
+        lock (Cache.textureCache)
         {
-            lock (Cache.textureCache)
+            try
             {
+
                 if (Cache.textureCache.ContainsKey(characterData))
                     Cache.textureCache[characterData]?.Dispose();
                 Cache.textureCache.Remove(characterData);
-
+            }
+            catch { }
+            FileInfo info = null!;
+            try
+            {
                 string path = MakeTexturePath(RemapCharacterData(ref characterData));
-                FileInfo info = new FileInfo(path);
+                if (!Path.Exists(path)) return;
+                info = new FileInfo(path);
+                if (info == null) return;
                 if (!info.Exists) return;
-
-                TextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, false)!;
+            }
+            catch { }
+            try
+            {
+                TextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
                 if (wrap == null) return;
                 Cache.textureCache.Add(characterData, wrap);
             }
+            catch { }
         }
-        catch (Exception e) { PluginLog.Log(e.Message); }
     }
 
     async void DownloadPagination((string, uint) characterData)
     {
-        if (Cache.textureCache.ContainsKey(characterData))
-        {
-            Cache.textureCache[characterData]?.Dispose();
-            Cache.textureCache?.Remove(characterData);
-        }
+        Cache.RemoveTexture(characterData);
         try
         {
             using HttpResponseMessage response = await client?.GetAsync(GetUrl(RemapCharacterData(ref characterData)))!;
             if (response == null) return;
             response.EnsureSuccessStatusCode();
             using Stream str = await response.Content.ReadAsStreamAsync();
+            if (str == null) return;
             PaginationRoot? paginatedStruct = await JsonSerializer.DeserializeAsync<PaginationRoot>(str);
             if (paginatedStruct == null) return;
 
@@ -121,7 +135,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
             await Task.Run(() => AsyncDownload(pStruct[0].Avatar.ToString(), characterData));
         }
-        catch (Exception e) { PluginLog.Log(e.Message); }
+        catch { }
     }
 
     async void AsyncDownload(string URL, (string, uint) charaData)
@@ -130,11 +144,13 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             CancellationToken cancellationToken = CancellationToken.None;
             using HttpResponseMessage response = await client.GetAsync(URL);
+            if (response == null) return;
             response.EnsureSuccessStatusCode();
 
             // Thank DarkArchon for this code :D
 
-            using FileStream fileStream = File.Create(MakeTexturePath(RemapCharacterData(ref charaData)));
+            string path = MakeTexturePath(RemapCharacterData(ref charaData));
+            FileStream fileStream = File.Create(path);
             await using (fileStream.ConfigureAwait(false))
             {
                 int bufferSize = response.Content.Headers.ContentLength > 1024 * 1024 ? 4096 : 1024;
@@ -147,7 +163,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
                 }
             }
         }
-        catch (Exception e) { PluginLog.Log(e.Message); return; }
+        catch { return; }
 
         DeclareDownload(charaData);
     }
