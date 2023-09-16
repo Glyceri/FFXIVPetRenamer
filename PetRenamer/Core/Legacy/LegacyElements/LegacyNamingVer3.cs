@@ -20,7 +20,7 @@ internal class LegacyNamingVer3 : LegacyElement
             newSerializableUsers.Add(new SerializableUserV2((SerializableNickname[])userOld.nicknames.Clone(), userOld.username, userOld.homeworld));
 
         PluginLink.Configuration.serializableUsersV2 = newSerializableUsers.ToArray();
-        PluginLink.Configuration.serializableUsers = new SerializableUser[0];
+        PluginLink.Configuration.serializableUsers = null;
         PluginLink.Configuration.Version = 4;
         PluginLink.Configuration.Save();
     }

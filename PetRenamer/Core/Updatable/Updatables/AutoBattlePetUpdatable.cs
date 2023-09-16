@@ -32,6 +32,6 @@ internal class AutoBattlePetUpdatable : Updatable
         }
 
         foreach (int id in missingIDs)
-            user.SerializableUser.SaveNickname(id, "", true, false);
+            user.SerializableUser.SaveNickname(id, "", true, false, true);
     }
 }

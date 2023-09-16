@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
 
 //Code from daily duties

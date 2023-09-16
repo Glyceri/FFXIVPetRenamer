@@ -32,18 +32,20 @@ public unsafe sealed class NamePlateHook : HookableElement
         return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 
+    string lastBattlePetNameToUse = string.Empty;
+
     void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (!user.UserExists) continue;
             string nameToUse = string.Empty;
-            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName;
-            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName;
+            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName == string.Empty ? user.CompanionBaseName : user.CustomCompanionName;
+            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName == string.Empty ? user.BaseBattlePetName : user.BattlePetCustomName;
             if (nameToUse != string.Empty) 
             { 
-                namePlateInfo->Name.SetString(nameToUse); 
-                break; 
+                namePlateInfo->Name.SetString(nameToUse);
+                break;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,8 @@ namespace PetRenamer.Core.Serialization;
 [Serializable]
 public class SerializableUserV3
 {
-    public int[] ids { get; private set; } = new int[0];
-    public string[] names { get; private set; } = new string[0];
+    public int[] ids { get; private set; } = Array.Empty<int>();
+    public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
 
@@ -48,13 +49,14 @@ public class SerializableUserV3
             callback.Invoke((ids[i], names[i]));
     }
 
+    public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
     public string? GetNameFor(int id)
     {
         int index = IndexOf(id);
         if (index == -1) return null;
         if (names.Length < index) return null;
         if (names[index].Length > PluginConstants.ffxivNameSize)
-            return names[index].Substring(0, PluginConstants.ffxivNameSize);
+            return names[index][..PluginConstants.ffxivNameSize];
         return names[index];
     }
 
@@ -68,12 +70,12 @@ public class SerializableUserV3
         return false;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false)
+    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
     {
         if (id == -1) return;
         //if (name == string.Empty && id >= 0) RemoveNickname(id, notifyICP);
         if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
-        else GenerateNewNickname(id, name, notifyICP);
+        else GenerateNewNickname(id, name, notifyICP, force);
 
         if (!doCheck) return;
         hasCompanion = false;
@@ -87,8 +89,11 @@ public class SerializableUserV3
         }
     }
 
-    void GenerateNewNickname(int id, string name, bool notifyICP = false)
+    void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
     {
+        if(!force)
+            if (id == -1 || name == string.Empty) 
+                return;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.Add(id);
@@ -135,9 +140,44 @@ public class SerializableUserV3
     public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim().Normalize() == username.ToLowerInvariant().Trim().Normalize() && this.homeworld == homeworld;
     public bool Equals((string, ushort) user) => Equals(user.Item1, user.Item2);
 
+    public int AccurateTotalPetCount()
+    {
+        int counter = 0;
+        foreach (string str in names)
+        {
+            if (str != string.Empty && str != null)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int AccurateMinionCount()
+    {
+        int counter = 0;
+        for (int i = 0; i < names.Length!; i++)
+        {
+            if (ids[i] <= -1) continue;
+            if (names[i] != string.Empty && names[i] != null)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int AccurateBattlePetCount()
+    {
+        int counter = 0;
+        for(int i = 0; i < names.Length!; i++)
+        {
+            if (ids[i] >= -1) continue;
+            if (names[i] != string.Empty && names[i] != null)
+                counter++;
+        }
+        return counter;
+    }
+
     public void Reset()
     {
-        ids = new int[0];
-        names = new string[0];
+        ids = Array.Empty<int>();
+        names = Array.Empty<string>();
     }
 }

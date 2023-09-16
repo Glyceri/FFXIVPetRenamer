@@ -23,6 +23,12 @@ public unsafe class PettableUser
     int _CompanionID = -1; // [0, 1, 2, 3.....]
     int _LastCompanionID = -1;
 
+    nint _LastBattlePetPointer = nint.Zero;
+    nint _LastMinionPointer = nint.Zero;
+
+    int _BattlePetIndex = -1;
+    int _MinionIndex = -1;
+
     string _CustomBattlePetName = string.Empty; // [Sally]
     string _CustomCompanionName = string.Empty; // [George]
 
@@ -32,7 +38,7 @@ public unsafe class PettableUser
     bool _userChangedCompanion = false;
     bool _userChangedBattlePet = false;
 
-    SerializableUserV3 _serializableUser;
+    readonly SerializableUserV3 _serializableUser;
 
     public nint nintUser => _user;
     public nint nintBattlePet => _BattlePet;
@@ -62,6 +68,9 @@ public unsafe class PettableUser
     public int BattlePetID => _BattlePetID;
     public string BattlePetCustomName => _CustomBattlePetName;
     public string BaseBattlePetName => _BattlePetBaseName;
+
+    public int BattlePetIndex => _BattlePetIndex;
+    public int MinionIndex => _MinionIndex;
 
     public int CompanionID => _CompanionID;
     public string CustomCompanionName => _CustomCompanionName;
@@ -99,14 +108,18 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         _BattlePet = (nint)battlePet;
-        if (_BattlePet == nint.Zero) ResetBattlePet();
+        if (battlePet == null) _BattlePetIndex = -1;
+        else _BattlePetIndex = battlePet->Character.GameObject.ObjectIndex;
+
+        if (_BattlePet == nint.Zero) { ResetBattlePet(); _LastBattlePetID = -1; }
         else
         {
             _BattlePetSkeletonID = battlePet->Character.CharacterData.ModelCharaId;
             _BattlePetID = RemapUtils.instance.GetPetIDFromClass(User->Character.CharacterData.ClassJob);
-            if (_LastBattlePetID != _BattlePetID || _LastBattlePetSkeletonID != _BattlePetSkeletonID)
+            if (_LastBattlePetID != _BattlePetID || _LastBattlePetSkeletonID != _BattlePetSkeletonID || _LastBattlePetPointer != _BattlePet)
             {
                 _userChangedBattlePet = true;
+                _LastBattlePetPointer = _BattlePet;
                 _LastBattlePetSkeletonID = _BattlePetSkeletonID;
                 _LastBattlePetID = _BattlePetID;
                 _BattlePetBaseName = Marshal.PtrToStringUTF8((IntPtr)battlePet->Character.GameObject.Name)!;
@@ -127,15 +140,20 @@ public unsafe class PettableUser
     public void SetCompanion(Companion* companion)
     {
         _companion = (nint)companion;
-        if (_companion == nint.Zero) ResetCompanion();
+
+        if (companion == null) _MinionIndex = -1;
+        else _MinionIndex = companion->Character.GameObject.ObjectIndex;
+
+        if (_companion == nint.Zero) { ResetCompanion(); _LastCompanionID = -1; }
         else
         {
             _CompanionID = companion->Character.CharacterData.ModelSkeletonId;
-            if(_LastCompanionID != _CompanionID)
+            if (_LastCompanionID != _CompanionID || _LastMinionPointer != _companion)
             {
+                _LastMinionPointer = _companion;
                 _userChangedCompanion = true;
                 _LastCompanionID = _CompanionID;
-                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!; 
+                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
                 _CustomCompanionName = string.Empty;
                 SerializableUser.LoopThroughBreakable((nickname) =>
                 {
@@ -165,12 +183,14 @@ public unsafe class PettableUser
     void ResetCompanion()
     {
         _CompanionID = -1;
+        _MinionIndex = -1;
     }
 
     void ResetBattlePet()
     {
         _BattlePetID = -1;
         _BattlePetSkeletonID = -1;
+        _BattlePetIndex = -1;
     }
 
     public string GetCustomName(int skeletonID)

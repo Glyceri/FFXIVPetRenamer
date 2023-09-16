@@ -13,6 +13,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
 
     public RegistryBase()
     {
+        OnSelfInitialize();
         Type elementType = typeof(T);
         Assembly elementAssembly = Assembly.GetAssembly(elementType)!;
         Type[] elementTypes = elementAssembly.GetTypes().Where(t =>
@@ -64,6 +65,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         attributes.Clear();
     }
 
+    protected virtual void OnSelfInitialize() { }
     protected virtual void OnDipose() { }
     protected virtual void OnAllRegistered() { }
     protected virtual void OnTypeArrayCreation(Type[] types) { }

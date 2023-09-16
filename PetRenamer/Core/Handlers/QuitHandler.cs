@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.Core.Handlers;
+﻿using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+
+namespace PetRenamer.Core.Handlers;
 
 internal class QuitHandler
 {
@@ -13,9 +15,12 @@ internal class QuitHandler
         PluginLink.ChatHandler?.Dispose();
         PluginLink.IpcStorage?.Dispose();
         PluginLink.PettableUserHandler?.Dispose();
+        PluginLink.NetworkingHandler?.Dispose();
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();
+
+        PenumbraIPCProvider.DeInit();
     }
 }
 

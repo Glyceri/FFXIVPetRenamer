@@ -19,7 +19,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
 {
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!PluginLink.Configuration.replaceEmotes || !PluginLink.Configuration.displayCustomNames) return;
+        if (!PluginLink.Configuration.displayCustomNames) return;
         if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;
@@ -50,7 +50,8 @@ internal unsafe class PetChatEmoteElement : ChatElement
             id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
             ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
         }
-
+        if (id >= 0 && !PluginLink.Configuration.replaceEmotesOnMinions) return;
+        if (id <= -2 && !PluginLink.Configuration.replaceEmotesBattlePets) return;
         if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
 
         string nickname = string.Empty;

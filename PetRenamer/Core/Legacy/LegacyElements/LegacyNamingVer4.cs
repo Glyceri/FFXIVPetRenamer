@@ -20,7 +20,7 @@ internal class LegacyNamingVer4 : LegacyElement
             PluginLink.PettableUserHandler.DeclareUser(new SerializableUserV3(userOld.ids, userOld.names, userOld.username, userOld.homeworld), PettableUserSystem.Enums.UserDeclareType.Add, true);
 
         PluginLink.Configuration.serializableUsersV3 = newSerializableUsers.ToArray();
-        PluginLink.Configuration.serializableUsersV2 = new SerializableUserV2[0];
+        PluginLink.Configuration.serializableUsersV2 = null;
         PluginLink.Configuration.Version = 5;
         PluginLink.Configuration.Save();
     }

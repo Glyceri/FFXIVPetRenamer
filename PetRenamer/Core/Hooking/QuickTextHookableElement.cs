@@ -32,9 +32,11 @@ public class QuickTextHookableElement : HookableElement
 
     internal virtual void OnQuickInit() { }
 
-    List<QuickTextReplaceHook> quickTextReplaceHooks = new List<QuickTextReplaceHook>();
+    readonly List<QuickTextReplaceHook> quickTextReplaceHooks = new List<QuickTextReplaceHook>();
 
-    protected void RegisterHook(string addonName, uint atkTextID, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!) 
-        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, atkBackgroundID, pettableUserFunc));
-    
+    protected void RegisterHook(string addonName, uint atkTextID, Func<int, bool> allowedToFunction = null!, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!, Action<string> latestOutcome = null!) 
+        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextID, allowedToFunction, atkBackgroundID, pettableUserFunc, latestOutcome));
+
+    protected void RegisterHook(string addonName, uint[] atkTextIDs, Func<int, bool> allowedToFunction = null!, int atkBackgroundID = -1, Func<PettableUser> pettableUserFunc = null!, Action<string> latestOutcome = null!)
+        => quickTextReplaceHooks.Add(new QuickTextReplaceHook(addonName, atkTextIDs, allowedToFunction, atkBackgroundID, pettableUserFunc, latestOutcome));
 }

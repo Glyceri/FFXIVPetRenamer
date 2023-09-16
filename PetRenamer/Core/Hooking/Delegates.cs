@@ -15,6 +15,9 @@ public static unsafe class Delegates
     public delegate byte AddonOnRefresh(AtkUnitBase* addon, int valueCount, AtkValue* values);
     public delegate void AddonFinalize(AtkUnitBase* addon);
     public delegate byte AddonUpdate(AtkUnitBase* addon);
+    public delegate IntPtr AddonOnRequestedUpdate(IntPtr a1, IntPtr a2, IntPtr a3);
+
+    public unsafe delegate void* AddonOnUpdate(AtkUnitBase* atkUnitBase, NumberArrayData* nums, StringArrayData* strings);
 
     public delegate void AgentShow(AgentInterface* agent);
     public delegate nint AgentReceiveEvent(AgentInterface* agent, nint rawData, AtkValue* args, uint argCount, ulong sender);
@@ -37,7 +40,6 @@ public static unsafe class Delegates
     public delegate AtkTooltipArgs* TooltipArgs(AtkTooltipArgs* atkTooltipArgs);
 
     public delegate int AccurateShowTooltip(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8);
-
 
     public delegate char NaviMapTooltip(AtkUnitBase* tooltip, int a2);
 

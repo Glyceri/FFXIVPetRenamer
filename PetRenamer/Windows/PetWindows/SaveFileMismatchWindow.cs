@@ -7,7 +7,7 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 internal class SaveFileMismatchWindow : PetWindow
 {
-    public SaveFileMismatchWindow() : base("Save File Mismatch", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse , true)
+    public SaveFileMismatchWindow() : base("Pet Nicknames Save File Mismatch", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse , true)
     {
         Size = new System.Numerics.Vector2(450, 75);
 

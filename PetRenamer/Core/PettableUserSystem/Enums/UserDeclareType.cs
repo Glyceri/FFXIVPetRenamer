@@ -1,6 +1,6 @@
 ﻿namespace PetRenamer.Core.PettableUserSystem.Enums;
 
-internal enum UserDeclareType
+public enum UserDeclareType
 {
     Add,
     Remove

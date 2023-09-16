@@ -1,6 +1,7 @@
 ﻿using Dalamud.Logging;
 using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
@@ -21,7 +22,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
     {
         if (action == null) return;
-        for(int i = _users.Count - 1; i >= 0; i--)
+        for (int i = _users.Count - 1; i >= 0; i--)
             action.Invoke(_users[i]);
     }
 
@@ -34,7 +35,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public void LoopThroughBreakable(Func<PettableUser, bool> func)
     {
-        if(func == null) return;
+        if (func == null) return;
         foreach (PettableUser user in _users)
             if (func.Invoke(user))
                 break;
@@ -57,20 +58,36 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
     {
-        if(userDeclareType == UserDeclareType.Add)
+        if (userDeclareType == UserDeclareType.Add)
         {
             if (force)
                 for (int i = _users.Count - 1; i >= 0; i--)
                     if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld)
                         _users.RemoveAt(i);
             if (!Contains(user))
-                _users.Add(new PettableUser(user.username, user.homeworld, user));
+            {
+                PettableUser u = new PettableUser(user.username, user.homeworld, user);
+                _users.Add(u);
+                try
+                {
+                    ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
+                }
+                catch (Exception e) { PluginLog.Log(e.Message); }
+            }
         }
         else if (userDeclareType == UserDeclareType.Remove)
         {
             for (int i = _users.Count - 1; i >= 0; i--)
-                if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld)
-                    _users.RemoveAt(i);
+            {
+                if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
+
+                try
+                {
+                    ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
+                }
+                catch (Exception e) { PluginLog.Log(e.Message); }
+                _users.RemoveAt(i);
+            }
         }
     }
 
@@ -96,6 +113,21 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return returnThis;
     }
 
+    public PettableUser? GetUser(string name, ushort homeworld)
+    {
+        PettableUser? returnThis = null;
+        LoopThroughBreakable((user) =>
+        {
+            if (name.Contains(user.UserName) && homeworld == user.Homeworld)
+            {
+                returnThis = user;
+                return true;
+            }
+            return false;
+        });
+        return returnThis;
+    }
+
     public PettableUser? LocalUser()
     {
         PettableUser? returnThis = null;
@@ -108,6 +140,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             }
             return false;
         });
+
         return returnThis;
     }
 
@@ -118,7 +151,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
         {
             if (user1 == null) continue;
             if (!user1.UserExists) continue;
-            if (user1.nintUser != _lastCast.castUser && user1.nintBattlePet != _lastCast.castDealer) continue;
+            if (user1.nintUser != _lastCast.castDealer && user1.nintBattlePet != _lastCast.castDealer) continue;
             user = user1;
             break;
         }
@@ -149,15 +182,15 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     bool Contains(SerializableUserV3 user)
     {
-        for(int i = 0; i < _users.Count; i++)
-            if (_users[i].UserName.ToLowerInvariant().Trim().Normalize() == user.username.ToLowerInvariant().Trim().Normalize() && _users[i].Homeworld == user.homeworld) 
+        for (int i = 0; i < _users.Count; i++)
+            if (_users[i].UserName.ToLowerInvariant().Trim().Normalize() == user.username.ToLowerInvariant().Trim().Normalize() && _users[i].Homeworld == user.homeworld)
                 return true;
         return false;
     }
 
-    public void SetLastCast(IntPtr castUser, IntPtr castDealer) 
+    public void SetLastCast(IntPtr castUser, IntPtr castDealer)
     {
-        _lastCast = new LastActionUsed(castUser, castDealer); 
+        _lastCast = new LastActionUsed(castUser, castDealer);
     }
 }
 
