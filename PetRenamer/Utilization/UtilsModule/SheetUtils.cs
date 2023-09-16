@@ -6,7 +6,6 @@ using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
-using Dalamud.Logging;
 using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -25,11 +24,10 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     const int cacheSizes = 25;
 
-    Dictionary<string, bool> lastPets = new Dictionary<string, bool>(cacheSizes + 1);
-    Dictionary<int, string> lastBattleIds = new Dictionary<int, string>(cacheSizes + 1);
-    Dictionary<int, string> lastIds = new Dictionary<int, string>(cacheSizes + 1);
-    Dictionary<string, int> lastNames = new Dictionary<string, int>(cacheSizes + 1);
-
+    readonly Dictionary<string, bool> lastPets = new Dictionary<string, bool>(cacheSizes + 1);
+    readonly Dictionary<int, string> lastBattleIds = new Dictionary<int, string>(cacheSizes + 1);
+    readonly Dictionary<int, string> lastIds = new Dictionary<int, string>(cacheSizes + 1);
+    readonly Dictionary<string, int> lastNames = new Dictionary<string, int>(cacheSizes + 1);
     List<SerializableNickname> lastList = new List<SerializableNickname>();
     string lastQuerry = string.Empty;
 

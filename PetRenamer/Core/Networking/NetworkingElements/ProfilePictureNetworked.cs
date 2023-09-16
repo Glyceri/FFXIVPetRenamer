@@ -2,7 +2,6 @@
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
-using Dalamud.Logging;
 using PetRenamer.Core.Handlers;
 using System.IO;
 using PetRenamer.Utilization.UtilsModule;
@@ -22,7 +21,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 {
     public static ProfilePictureNetworked instance { get; set; } = null!;
 
-    HttpClient client = new HttpClient();
+    readonly HttpClient client = new HttpClient();
 
     public nint GetTexture(PettableUser user)
     {

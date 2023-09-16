@@ -79,7 +79,4 @@ public class SucceededImportData : ImportData
                 return false;
         return true;
     }
-
-
-
 }

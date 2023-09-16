@@ -9,8 +9,8 @@ namespace PetRenamer.Core.Serialization;
 [Serializable]
 public class SerializableUserV3
 {
-    public int[] ids { get; private set; } = new int[0];
-    public string[] names { get; private set; } = new string[0];
+    public int[] ids { get; private set; } = Array.Empty<int>();
+    public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
 
@@ -56,7 +56,7 @@ public class SerializableUserV3
         if (index == -1) return null;
         if (names.Length < index) return null;
         if (names[index].Length > PluginConstants.ffxivNameSize)
-            return names[index].Substring(0, PluginConstants.ffxivNameSize);
+            return names[index][..PluginConstants.ffxivNameSize];
         return names[index];
     }
 
@@ -177,7 +177,7 @@ public class SerializableUserV3
 
     public void Reset()
     {
-        ids = new int[0];
-        names = new string[0];
+        ids = Array.Empty<int>();
+        names = Array.Empty<string>();
     }
 }

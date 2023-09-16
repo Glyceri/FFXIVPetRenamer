@@ -1,20 +1,12 @@
 ﻿using Dalamud.Logging;
-using ImGuiScene;
 using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
-using PetRenamer.Core.Networking.Structs;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
