@@ -1,6 +1,5 @@
 ﻿using Dalamud.Plugin;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Handlers;
 

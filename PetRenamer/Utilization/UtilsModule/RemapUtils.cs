@@ -74,8 +74,6 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { 3122, 30 }, //Ruby-Iffrit
     };
 
-    
-
     public readonly Dictionary<int, int> skeletonToClass = new Dictionary<int, int>()
     {
         { 407,  -3  }, //EOS

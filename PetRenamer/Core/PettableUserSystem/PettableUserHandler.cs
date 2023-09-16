@@ -91,8 +91,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
         }
     }
 
-    
-
     public bool LocalPetChanged()
     {
         PettableUser user = LocalUser()!;

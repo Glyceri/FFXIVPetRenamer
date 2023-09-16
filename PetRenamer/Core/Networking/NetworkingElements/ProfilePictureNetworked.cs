@@ -57,9 +57,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     void HandleAsRemove(ref (string, uint) currentUser)
     {
-        if (!Cache.textureCache.ContainsKey(currentUser)) return;
-        Cache.textureCache[currentUser]?.Dispose();
-        Cache.textureCache.Remove(currentUser);
+        Cache.RemoveTexture(currentUser);
     }
 
     void HandleAsAdd(ref (string, uint) currentUser, bool force)
@@ -88,10 +86,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             try
             {
-
-                if (Cache.textureCache.ContainsKey(characterData))
-                    Cache.textureCache[characterData]?.Dispose();
-                Cache.textureCache.Remove(characterData);
+                Cache.RemoveTexture(characterData);
             }
             catch { }
             FileInfo info = null!;

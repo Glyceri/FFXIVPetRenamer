@@ -7,9 +7,6 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 using PetRenamer.Utilization.UtilsModule;
-using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 

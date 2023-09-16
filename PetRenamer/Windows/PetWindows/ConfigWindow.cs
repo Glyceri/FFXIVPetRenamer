@@ -154,10 +154,8 @@ public class ConfigWindow : PetWindow
         ImGui.EndListBox();
     }
 
-
     public override void OnWindowOpen() =>  unsupportedMode = false;
     public override void OnWindowClose() => unsupportedMode = false;
-    
 
     public override void OnLateDraw()
     {

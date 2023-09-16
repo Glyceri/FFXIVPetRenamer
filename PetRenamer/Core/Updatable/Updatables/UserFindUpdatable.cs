@@ -1,6 +1,4 @@
 ﻿using Dalamud.Game;
-using Dalamud.Logging;
-using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
@@ -8,7 +6,6 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Windows.PetWindows;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Core.Updatable.Updatables;
