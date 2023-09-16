@@ -110,11 +110,8 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             using HttpResponseMessage response = await client?.GetAsync(GetUrl(RemapCharacterData(ref characterData)))!;
             if (response == null) return;
             response.EnsureSuccessStatusCode();
-            using Stream str = response.Content.ReadAsStream();
-            using StreamReader reader = new StreamReader(str);
-            string lines = reader.ReadToEnd();
-
-            PaginationRoot? paginatedStruct = JsonSerializer.Deserialize<PaginationRoot>(lines);
+            using Stream str = await response.Content.ReadAsStreamAsync();
+            PaginationRoot? paginatedStruct = await JsonSerializer.DeserializeAsync<PaginationRoot>(str);
             if (paginatedStruct == null) return;
 
             List<Result> pStruct = paginatedStruct.Results;
