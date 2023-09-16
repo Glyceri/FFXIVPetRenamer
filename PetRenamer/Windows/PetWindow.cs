@@ -343,14 +343,18 @@ public abstract class PetWindow : Window, IDisposableRegistryElement
         return ImGui.Button(text, styling);
     }
 
-    protected bool Checkbox(string text, ref bool value)
+    protected bool Checkbox(string text, ref bool value) => Checkbox(text, string.Empty, ref value);
+
+    protected bool Checkbox(string text, string tooltip, ref bool value)
     {
         PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
         PushStyleColor(ImGuiCol.CheckMark, StylingColours.whiteText);
         PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.xButtonHovered);
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
         PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
-        return ImGui.Checkbox(text, ref value);
+        bool checkbox = ImGui.Checkbox(text, ref value);
+        if (tooltip != string.Empty) SetTooltipHovered(tooltip);
+        return checkbox;
     }
 
     protected void SetTooltipHovered(string text)

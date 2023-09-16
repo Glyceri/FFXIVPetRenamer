@@ -13,8 +13,8 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Dalamud.Game.Text;
-using System.Threading.Tasks;
 using PetRenamer.Core.Networking.NetworkingElements;
+using PetRenamer.Core.Sharing;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -24,7 +24,7 @@ public class PetListWindow : PetWindow
 {
     int maxBoxHeight = 675;
     int maxBoxHeightBattle = 631;
-    int maxBoxHeightSharing = 590;
+    int maxBoxHeightSharing = 655;
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
@@ -37,6 +37,8 @@ public class PetListWindow : PetWindow
         IsOpen = true;
         SetUserMode(true);
     }
+
+    int internalCounter = 0;
 
     PettableUser user = null!;
     PettableUser lastUser = null!;
@@ -55,6 +57,7 @@ public class PetListWindow : PetWindow
 
     public override void OnDraw()
     {
+        internalCounter = 0;
         if (PluginLink.Configuration.serializableUsersV3!.Length == 0) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
@@ -70,9 +73,12 @@ public class PetListWindow : PetWindow
         currentIsLocalUser = user == localUser;
         if (!currentIsLocalUser) SetOpenedAddPet(false);
 
-        DrawUserHeader();
-        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(- 350, 77));
-        DrawExportHeader();        
+        if (!(petMode == PetMode.ShareMode && advancedMode))
+        {
+            DrawUserHeader(user);
+            ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(-350, 77));
+            DrawExportHeader();
+        }
 
         if (user.CompanionChanged || user != lastUser)
             FillTextureList();
@@ -128,16 +134,7 @@ public class PetListWindow : PetWindow
         {
             if (u == null) continue;
             SetColumn(0);
-            DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-
-            ImGui.SetItemAllowOverlap();
-            ImGui.SameLine();
-            ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(35, -60));
-
-            if (RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{counter++}", Styling.SmallButton))
-                ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld));
-            
-            SetTooltipHovered($"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}");
+            DrawUserTexture(u);
 
             SetColumn(1);
             if (u.LocalUser)
@@ -155,8 +152,8 @@ public class PetListWindow : PetWindow
                 {
                     SetUserMode(false);
                     user = u;
-                }, 
-                "X", $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}", () => 
+                },
+                "X", $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}", () =>
                 {
                     youSureMode = !youSureMode;
                     youSureUser = youSureMode ? u : null!;
@@ -165,10 +162,10 @@ public class PetListWindow : PetWindow
 
             if (youSureMode && youSureUser == u)
             {
-                TransparentLabel("", new Vector2(1,25));
-                DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}", 
-                    ref counter, 
-                    () => 
+                TransparentLabel("", new Vector2(1, 25));
+                DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}",
+                    ref counter,
+                    () =>
                     {
                         youSureMode = false;
                         youSureUser = null!;
@@ -230,51 +227,74 @@ public class PetListWindow : PetWindow
 
     void DrawAdvancedSharing()
     {
-        DrawAdvancedHeader();
+        DrawUserHeader(user);
+        SameLine();
+        ImGui.SetItemAllowOverlap();
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(350, -32));
+        OverrideLabel("Advanced Exporting");
         DrawAdvancedList();
     }
 
-    List<bool> contains = new List<bool>();
     bool current = true;
     void DrawAdvancedList()
     {
-        if (contains.Count == 0 && user.SerializableUser.length != 0)
+        if (!SharingHandler.HasSetup(user) && user.SerializableUser.length != 0)
         {
-            FillList();
+            SharingHandler.SetupList(user);
             current = true;
         }
 
-        int counter = 10000;
         BeginListBox("##<6>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
 
+        int texturePointer = 0; 
+        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
+        ImGui.BeginTable("##Image Table 6", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
+        DrawFillerBar(3);
+        ImGui.TableNextRow();
 
-        if (Checkbox($"##{counter++}", ref current))
-            for (int i = 0; i < contains.Count; i++)
-                contains[i] = current;
-        SetTooltipHovered("Toggle all");
+        SetColumn(0);
+        DrawTexture(TextureWraps[texturePointer++].ImGuiHandle, () =>
+        {
+            if (Checkbox($"##{internalCounter++}", "Toggle all", ref current)) 
+                SharingHandler.ToggleAll(current);
+        });
 
-        SameLine();
-        Label("ID", Styling.ListIDField); SameLine();
-        Label("Name", Styling.ListButton); SameLine();
-        Label("Custom Name", Styling.ListButton); SameLine();
-        NewLine();
-        NewLine();
+        SetColumn(1);
+        DrawEmptyBar("X", "Stop Sharing", () => advancedMode = false);
+
+        DrawRightHeading(2);
+        DrawFillerBar(3);
 
         for (int i = 0; i < user.SerializableUser.length; i++)
         {
-            current = contains[i];
-            Checkbox($"##{counter++}", ref current);
-            SetTooltipHovered("Include pet in export");
-            contains[i] = current;
-            SameLine();
-            Label($"{user.SerializableUser.ids[i]}##{counter++}", Styling.ListIDField); SameLine();
-            string basePetName;
-            if (user.SerializableUser.ids[i] < -1) basePetName = RemapUtils.instance.PetIDToName(user.SerializableUser.ids[i]);
-            else basePetName = SheetUtils.instance.GetPetName(user.SerializableUser.ids[i]);
-            Label($"{basePetName}##{counter++}", Styling.ListButton); SameLine();
-            Label($"{user.SerializableUser.names[i]}##{counter++}", Styling.ListButton); SameLine();
-            NewLine();
+            ImGui.TableNextRow();
+            SetColumn(0);
+            if (texturePointer < TextureWraps.Count)
+            {
+                DrawTexture(TextureWraps[texturePointer++].ImGuiHandle, () =>
+                {
+                    current = SharingHandler.GetContainsList(i);
+                    Checkbox($"##{internalCounter++}", ref current);
+                    SetTooltipHovered("Include pet in export");
+                    SharingHandler.SetContainsList(i, current);
+                });
+            }
+            SetColumn(1);
+
+            DrawBasicBar("Nickname", $"{user.SerializableUser.names[i]}", ref internalCounter);
+            string basePetName =
+                user.SerializableUser.ids[i] < -1 ?
+                RemapUtils.instance.PetIDToName(user.SerializableUser.ids[i]) :
+                SheetUtils.instance.GetPetName(user.SerializableUser.ids[i]);
+            DrawBasicBar("Type", $"{basePetName}", ref internalCounter);
+            DrawBasicBar("ID", $"{user.SerializableUser.ids[i]}", ref internalCounter);
+           
+            DrawRightHeading(2);
+            DrawFillerBar(3);
         }
+
+        ImGui.EndTable();
+        ImGui.PopStyleVar();
 
         ImGui.EndListBox();
 
@@ -283,44 +303,9 @@ public class PetListWindow : PetWindow
 
         if (Button($"Export Nicknames List##EmportListSave", Styling.ListButton))
         {
-            Export();
+            SharingHandler.Export(user);
             SetAdvancedMode(false);
         }
-    }
-
-    void FillList()
-    {
-        contains.Clear();
-        for (int i = 0; i < user.SerializableUser.length; i++)
-            contains.Add(true);
-    }
-
-    void Export()
-    {
-        try
-        {
-            string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
-            for (int i = 0; i < user.SerializableUser.length; i++)
-            {
-                if (user.SerializableUser.names[i] != string.Empty && contains[i])
-                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
-            }
-            string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
-            ImGui.SetClipboardText(convertedString);
-            exportTimer = 2;
-        }
-        catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); errorTimer = 2; }
-    }
-
-    void DrawAdvancedHeader()
-    {
-        BeginListBox("##<list header>", new System.Numerics.Vector2(780, 32));
-        Label($"{StringUtils.instance.MakeTitleCase(user.UserName)}", Styling.ListButton); SameLine();
-        SetTooltipHovered($"{StringUtils.instance.MakeTitleCase(user.UserName)}");
-        Label($"{SheetUtils.instance.GetWorldName(user.Homeworld)}", Styling.ListButton); ImGui.SameLine(0, 315);
-        SetTooltipHovered($"{SheetUtils.instance.GetWorldName(user.Homeworld)}");
-        ImGui.EndListBox();
-        NewLine();
     }
 
     void DrawFooterSharing()
@@ -597,12 +582,12 @@ public class PetListWindow : PetWindow
         ImGui.EndListBox();
     }
 
-    void DrawUserHeader()
+    void DrawUserHeader(PettableUser user)
     {
         if (user == null) return;
-        BeginListBox("##<1>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
-        
-        DrawTexture(ProfilePictureNetworked.instance.GetTexture(user));
+        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
+
+        DrawUserTexture(user);
 
         SameLinePretendSpace();
 
@@ -617,17 +602,16 @@ public class PetListWindow : PetWindow
         }
         SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}\nClick to change user.");
         SameLine();
-        ImGui.SetCursorPos(ImGui.GetCursorPos()  - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y - 4));
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y - 4));
         OverrideLabel($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
         SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y * 2 - 8));
 
-        OverrideLabel($"[{user!.SerializableUser.AccurateTotalPetCount()}, {user!.SerializableUser.AccurateMinionCount()}, {user!.SerializableUser.AccurateBattlePetCount()}]", Styling.ListButton); 
-        SetTooltipHovered($"Total Pet Count: {user!.SerializableUser.AccurateTotalPetCount()}, Minion Count: {user!.SerializableUser.AccurateMinionCount()}, Battle Pet Count: {user!.SerializableUser.AccurateBattlePetCount()}");
+        OverrideLabel($"[{user?.SerializableUser?.AccurateTotalPetCount()}, {user?.SerializableUser?.AccurateMinionCount()}, {user?.SerializableUser?.AccurateBattlePetCount()}]", Styling.ListButton);
+        SetTooltipHovered($"Total Pet Count: {user?.SerializableUser?.AccurateTotalPetCount()}, Minion Count: {user?.SerializableUser?.AccurateMinionCount()}, Battle Pet Count: {user?.SerializableUser?.AccurateBattlePetCount()}");
 
         ImGui.EndListBox();
-        //SameLine();
     }
 
     void SetUserMode(bool userMode)
@@ -644,7 +628,7 @@ public class PetListWindow : PetWindow
     void SetAdvancedMode(bool advanced)
     {
         advancedMode = advanced;
-        contains.Clear();
+        SharingHandler.ClearList();
 
         if (!advancedMode) return;
 
@@ -653,9 +637,6 @@ public class PetListWindow : PetWindow
         IsOpen = true;
         SetPetMode(PetMode.ShareMode);
     }
-
-    double exportTimer = 0;
-    double errorTimer = 0;
 
     public void DrawExportHeader()
     {
@@ -670,24 +651,12 @@ public class PetListWindow : PetWindow
             else
             {
                 SetAdvancedMode(false);
-                FillList();
-                Export();
+                SharingHandler.SetupList(user);
+                SharingHandler.Export(user);
             }
         }
-        if (errorTimer > 0)
-        {
-            errorTimer -= PluginHandlers.Framework.UpdateDelta.Milliseconds * 0.001;
-            SetTooltip("...[ERROR] [Couldn't export Nicknames]...");
-        }
-        else if (exportTimer > 0)
-        {
-            exportTimer -= PluginHandlers.Framework.UpdateDelta.Milliseconds * 0.001;
-            SetTooltip("...[Exported Names]...");
-        }
-        else
-        {
-            SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.\n\n[Hold L-Shift for advanced options.]");
-        }
+        SetTooltipHovered("Exports ALL your nicknames to a list.\nYou can send this list to anyone.\nFor example: Paste this text into Discord and let a friend copy it.\n\n[Hold L-Shift for advanced options.]");
+        
         SameLine();
         if (Button($"Import from Clipboard##clipboardImport{counter++}", Styling.ListButton))
         {
@@ -728,19 +697,8 @@ public class PetListWindow : PetWindow
                 DrawTexture(ref texturePointer);
                 texturePointer++;
                 SetColumn(1);
-                TransparentLabel(Styling.ListButton);
-                SameLinePretendSpace(); SameLinePretendSpace();
-                TransparentLabel($"##<{counter++}>", new Vector2(480, 25));
-                SameLinePretendSpace();
-
-                if (currentIsLocalUser)
-                {
-                    if (XButton("+" + $"##<Close{counter++}>", Styling.SmallButton))
-                        SetOpenedAddPet(true);
-                    SetTooltipHovered($"Search for a new pet.");
-                    SameLine();
-                    NewLine();
-                }
+                DrawEmptyBar("+", "Search for a new pet.", () => SetOpenedAddPet(true), currentIsLocalUser);
+               
                 DrawRightHeading(2);
                 DrawFillerBar(3);
             }
@@ -754,7 +712,7 @@ public class PetListWindow : PetWindow
 
                 SetColumn(0);
                 DrawTexture(ref texturePointer);
-                texturePointer ++;
+                texturePointer++;
                 SetColumn(1);
 
                 if (currentIsLocalUser)
@@ -823,6 +781,23 @@ public class PetListWindow : PetWindow
         DrawTexture(texturePointer);
     }
 
+    void DrawTexture(nint theint, Action drawExtraButton)
+    {
+        DrawTexture(theint);
+        DrawRedownloadButton(drawExtraButton);
+    }
+
+    void DrawUserTexture(PettableUser u)
+    {
+        DrawTexture(u, () => DrawRedownloadButton(u));
+    }
+
+    void DrawTexture(PettableUser u, Action drawExtraButton)
+    {
+        DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
+        DrawRedownloadButton(drawExtraButton);
+    }
+
     void DrawTexture(nint thenint)
     {
         TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
@@ -839,6 +814,21 @@ public class PetListWindow : PetWindow
             if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
         }
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
+    }
+
+    void DrawRedownloadButton(Action drawMe)
+    {
+        ImGui.SetItemAllowOverlap();
+        ImGui.SameLine();
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(35, -59));
+        drawMe?.Invoke();
+    }
+
+    void DrawRedownloadButton(PettableUser u)
+    {
+        if (RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}", Styling.SmallButton))
+            ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld));
+        SetTooltipHovered($"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}");
     }
 
     void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!)
@@ -895,6 +885,23 @@ public class PetListWindow : PetWindow
         }
     }
 
+    void DrawEmptyBar(string buttonString, string tooltipString, Action callback, bool check = true)
+    {
+        TransparentLabel(Styling.ListButton);
+        SameLinePretendSpace(); SameLinePretendSpace();
+        TransparentLabel($"##<Transparent{internalCounter++}>", new Vector2(480, 25));
+        SameLinePretendSpace();
+
+        if (!check) return;
+
+        if (XButton(buttonString + $"##<Close{internalCounter++}>", Styling.SmallButton))
+            callback?.Invoke();
+        SetTooltipHovered(tooltipString);
+        SameLine();
+        NewLine();
+
+    }
+
     void DrawOpenedNewPet()
     {
         texturePointer = 0;
@@ -905,7 +912,7 @@ public class PetListWindow : PetWindow
         SetColumn(0);
         DrawTexture(ref texturePointer);
         SetColumn(1);
-        
+
 
         int counter = 0;
 
@@ -950,7 +957,7 @@ public class PetListWindow : PetWindow
                     PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true);
                 });
 
-            
+
             DrawBasicBar("Minion Name", currentPetName, ref counter);
             DrawBasicBar("Minion ID", nickname.ID.ToString(), ref counter);
             DrawRightHeading(2);
