@@ -43,6 +43,7 @@ internal class PluginLink
         Utils = new UtilsHandler();
         Configuration = PluginHandlers.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize();
+        NetworkingHandler = new NetworkingHandler();
         PettableUserHandler = new PettableUserHandler();
         PettableUserHandler.Initialize();
         WindowHandler = new WindowsHandler();
@@ -54,7 +55,6 @@ internal class PluginLink
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();
-        NetworkingHandler = new NetworkingHandler();
         QuitHandler = new QuitHandler();
         IpcStorage?.LateInitialize();
     }
