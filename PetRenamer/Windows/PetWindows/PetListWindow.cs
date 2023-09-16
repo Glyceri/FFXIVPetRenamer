@@ -629,13 +629,13 @@ public class PetListWindow : PetWindow
     {
         searchField = string.Empty;
         foundNicknames.Clear();
-        temporaryUser.Reset();
+        temporaryUser?.Reset();
         if (value == false && _openedAddPet != false)
         {
             user = PluginLink.PettableUserHandler.LocalUser()!;
             FillTextureList();
         }
-        else if (value && !_openedAddPet)
+        else if (value && !_openedAddPet && temporaryUser != null)
         {
             user = temporaryUser;
             FillTextureList();
