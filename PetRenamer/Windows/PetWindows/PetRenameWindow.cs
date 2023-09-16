@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface.Internal;
-using Dalamud.Logging;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
@@ -139,7 +138,6 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawPetNameField(string basePet, ref string temporaryName, ref string temporaryCustomName, ref int theID)
     {
-        
         string tempText = $"does not have a name!";
         if (temporaryName.Length != 0) tempText = $"is named:";
         Label($"Your {basePet} {tempText}", new Vector2(290, 25),StylingColours.whiteText);
@@ -158,7 +156,7 @@ public class PetRenameWindow : InitializablePetWindow
 
     void DrawValidName(string internalTempText, ref int theID)
     {
-        if (Button("Save Nickname", new Vector2(144, 25)))
+        if (Button("Save Nickname", new Vector2(144, 25), "[Required to see a nickname]"))
         {
             user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
             PluginLink.Configuration.Save();
@@ -173,9 +171,8 @@ public class PetRenameWindow : InitializablePetWindow
                 PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
             }
         }
-        SetTooltipHovered("[Required to see a nickname]");
         ImGui.SameLine(0, 1f);
-        if (Button("Clear Nickname", new Vector2(144, 25)))
+        if (Button("Clear Nickname", new Vector2(144, 25), "Clears the nickname from your list."))
         {
             user.SerializableUser.RemoveNickname(theID, notifyICP: true);
             PluginLink.Configuration.Save();
@@ -190,7 +187,6 @@ public class PetRenameWindow : InitializablePetWindow
                 PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
             }
         }
-        SetTooltipHovered("Clears the nickname from your list.");
     }
 
     public void OpenForId(int id, bool forceOpen = false)

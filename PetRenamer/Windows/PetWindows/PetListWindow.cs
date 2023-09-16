@@ -35,9 +35,6 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 783 + 64),
             MaximumSize = new Vector2(800, 783 + 64)
         };
-
-        IsOpen = true;
-        SetUserMode(true);
     }
 
     int texturePointer = 0;
