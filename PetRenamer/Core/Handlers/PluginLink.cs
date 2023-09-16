@@ -7,6 +7,7 @@ using PetRenamer.Core.Chat;
 using PetRenamer.Core.ContextMenu;
 using PetRenamer.Core.Hooking;
 using PetRenamer.Core.Legacy;
+using PetRenamer.Core.Networking;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Updatable;
 using PetRenamer.Utilization;
@@ -31,6 +32,7 @@ internal class PluginLink
     internal static DalamudContextMenu DalamudContextMenu { get; private set; } = null!;
     internal static ChatHandler ChatHandler { get; private set; } = null!;
     internal static PettableUserHandler PettableUserHandler { get; private set; } = null!;
+    internal static NetworkingHandler NetworkingHandler { get; private set; } = null!;
     unsafe internal static CharacterManager* CharacterManager => FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager.Instance();
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
@@ -52,6 +54,7 @@ internal class PluginLink
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();
+        NetworkingHandler = new NetworkingHandler();
         QuitHandler = new QuitHandler();
         IpcStorage?.LateInitialize();
     }

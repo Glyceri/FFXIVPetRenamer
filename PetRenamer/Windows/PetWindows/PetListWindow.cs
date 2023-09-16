@@ -1,4 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Common.Math;
+using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
@@ -14,14 +14,7 @@ using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Dalamud.Game.Text;
 using System.Threading.Tasks;
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
 using PetRenamer.Core.Networking.NetworkingElements;
-=======
-using static PetRenamer.Windows.PetWindow;
->>>>>>> parent of 4a072f2... Fixes
->>>>>>> Stashed changes
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -135,19 +128,15 @@ public class PetListWindow : PetWindow
         {
             if (u == null) continue;
             SetColumn(0);
-            DrawTexture(PluginLink.PettableUserHandler.GetTexture(u));
+            DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
 
             ImGui.SetItemAllowOverlap();
             ImGui.SameLine();
             ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(35, -60));
 
             if (RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{counter++}", Styling.SmallButton))
-            {
-                Task.Run(() =>
-                {
-                    PluginLink.PettableUserHandler.DownloadPagination((u.UserName, u.Homeworld));
-                });
-            }
+                ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld));
+            
             SetTooltipHovered($"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}");
 
             SetColumn(1);
@@ -613,7 +602,7 @@ public class PetListWindow : PetWindow
         if (user == null) return;
         BeginListBox("##<1>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
         
-        DrawTexture(PluginLink.PettableUserHandler.GetTexture(user));
+        DrawTexture(ProfilePictureNetworked.instance.GetTexture(user));
 
         SameLinePretendSpace();
 
@@ -852,7 +841,7 @@ public class PetListWindow : PetWindow
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 
-    void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null)
+    void DrawAdvancedBarWithQuit(string label, string value, ref int counter, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!)
     {
         DrawBasicLabel(label);
         if (Button($"          {value} ##<{counter++}>", new Vector2(480, 25))) callback?.Invoke();
