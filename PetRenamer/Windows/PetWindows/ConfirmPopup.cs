@@ -26,8 +26,7 @@ public class ConfirmPopup : TemporaryPetWindow
         if (blackenedWindow != null) blackenedWindow.IsOpen = false;
         TextColoured(StylingColours.errorText, message);
 
-        bool? outcome = null;
-
+        bool? outcome = null!;
         
         if (Button("Yes")) outcome = true;
         SameLine();

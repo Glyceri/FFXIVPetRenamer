@@ -25,7 +25,6 @@ public abstract class PetWindow : PetWindowHelpers
 
     public sealed override unsafe void Draw()
     {
-        internalCounter = 0;
         if (drawToggle) DrawModeToggle();
 
         if (_lastMode != petMode)

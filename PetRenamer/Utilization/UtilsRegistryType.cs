@@ -14,5 +14,4 @@ internal class UtilsRegistryType : IRegistryElement, IDisposable
     internal virtual void Dispose() { }
 
     void IDisposable.Dispose() => Dispose();
-    
 }

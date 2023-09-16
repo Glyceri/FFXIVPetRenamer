@@ -17,6 +17,7 @@ using PetRenamer.Core.Sharing;
 using PetRenamer.Core.Sharing.Importing;
 using PetRenamer.Core.Sharing.Importing.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.Windows.PetWindows;
 

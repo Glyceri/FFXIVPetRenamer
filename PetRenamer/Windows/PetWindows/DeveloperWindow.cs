@@ -36,17 +36,12 @@ internal class DeveloperWindow : PetWindow
         {
             if (currentTab == i)
             {
-                if (ToggleButton(i + 100))
-                {
-                    currentTab = i;
-                }
+                if (ToggleButton()) currentTab = i;
             }
             else
             {
-                if (ToggleButtonBad(i + 100))
-                {
-                    currentTab = i;
-                }
+                if (ToggleButtonBad()) currentTab = i;
+
             }
             SameLineNoMargin();
         }

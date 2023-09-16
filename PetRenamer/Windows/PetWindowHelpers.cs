@@ -20,7 +20,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     public PetWindowHelpers(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     protected readonly bool drawToggle = false;
-    protected int internalCounter = 0;
+    internal static int internalCounter = 0;
 
     readonly Dictionary<PetMode, string> tooltipStrings = new Dictionary<PetMode, string>()
     {
@@ -52,8 +52,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
         for (int i = 0; i < (int)PetMode.COUNT; i++)
         {
-            int identifier = 60 + i;
-            if (((int)PetWindow.petMode == i) ? ToggleButton(identifier) : ToggleButtonBad(identifier))
+            if (((int)PetWindow.petMode == i) ? ToggleButton() : ToggleButtonBad())
                 pressed = i;
 
             SetTooltipHovered(tooltipStrings[(PetMode)i]);
@@ -81,20 +80,20 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void TextColoured(Vector4 colour, string text) => ImGui.TextColored(colour, text);
 
-    protected bool ToggleButton(int count = 0)
+    protected bool ToggleButton()
     {
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
-        return ImGui.Button($"##{count}toggleButton", Styling.ToggleButton);
+        return ImGui.Button($"##{internalCounter++}toggleButton", Styling.ToggleButton);
     }
 
-    protected bool ToggleButtonBad(int count = 0)
+    protected bool ToggleButtonBad()
     {
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
         PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
-        return ImGui.Button($"##{count}toggleButtonBad", Styling.ToggleButton);
+        return ImGui.Button($"##{internalCounter++}toggleButtonBad", Styling.ToggleButton);
     }
 
     protected bool Button(string text, string tooltipText = "", Action callback = null!)

@@ -62,11 +62,12 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) =>
         {
+            PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+            if (user == null) return;
+
             if (targetObjectKind == TargetObjectKind.Companion) PetWindow.SetPetMode(PetMode.Normal);
             else PetWindow.SetPetMode(PetMode.BattlePet);
 
-            PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-            if (user == null) return;
             PetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
             if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.CompanionID, true);
             else petWindow?.OpenForBattleID(user.BattlePetID, true);

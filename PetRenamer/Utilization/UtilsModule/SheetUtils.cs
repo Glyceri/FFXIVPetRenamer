@@ -100,7 +100,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return string.Empty;
     }
 
-
     public string GetPetName(int id)
     {
         if (lastIds.ContainsKey(id))
@@ -123,8 +122,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         }
         return string.Empty;
     }
-
-
 
     public int GetIDFromName(string name)
     {
