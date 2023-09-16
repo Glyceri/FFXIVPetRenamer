@@ -14,7 +14,6 @@ using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using ImGuiScene;
 using Dalamud.Game.Text;
 using System.Threading.Tasks;
-using static PetRenamer.Windows.PetWindow;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -631,7 +630,6 @@ public class PetListWindow : PetWindow
         SetTooltipHovered($"Total Pet Count: {user!.SerializableUser.AccurateTotalPetCount()}, Minion Count: {user!.SerializableUser.AccurateMinionCount()}, Battle Pet Count: {user!.SerializableUser.AccurateBattlePetCount()}");
 
         ImGui.EndListBox();
-        //SameLine();
     }
 
     void SetUserMode(bool userMode)
