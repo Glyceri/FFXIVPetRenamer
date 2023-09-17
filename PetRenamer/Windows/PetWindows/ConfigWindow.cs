@@ -15,16 +15,9 @@ public class ConfigWindow : PetWindow
 {
     Vector2 baseSize = new Vector2(300, 442);
     bool unsupportedMode = false;
-
-    public ConfigWindow() : base(
-        "Pet Nicknames Configuration",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
-    {
-        Size = baseSize;
-        SizeCondition = ImGuiCond.Always;
-    }
-
     bool lastDownloadAll = false;
+
+    public ConfigWindow() : base("Pet Nicknames Configuration") => Size = baseSize;
 
     public override void OnDraw()
     {
@@ -51,7 +44,7 @@ public class ConfigWindow : PetWindow
                 Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
                 PluginLink.Configuration.Save();
 
-            if(Checkbox("Allow Automatic Profile Pictures", ref PluginLink.Configuration.downloadProfilePictures))
+            if (Checkbox("Allow Automatic Profile Pictures", ref PluginLink.Configuration.downloadProfilePictures))
                 PluginLink.Configuration.Save();
             SetTooltipHovered("This will automatically download profile pictures from Lodestone");
 
@@ -59,7 +52,7 @@ public class ConfigWindow : PetWindow
             {
                 lastDownloadAll = PluginLink.Configuration.downloadProfilePictures;
                 if (PluginLink.Configuration.downloadProfilePictures)
-                    for(int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
+                    for (int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
                         ProfilePictureNetworked.instance.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
             }
 
@@ -81,7 +74,7 @@ public class ConfigWindow : PetWindow
             ImGui.EndListBox();
             return;
         }
-        
+
         BeginListBox("##MinionConfig", new Vector2(286, 194));
         OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
         if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnMinions) ||
@@ -95,7 +88,7 @@ public class ConfigWindow : PetWindow
 
     public override void OnDrawBattlePet()
     {
-        if (unsupportedMode )
+        if (unsupportedMode)
         {
             if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
             if (PenumbraIPCProvider.PenumbraEnabled())
@@ -154,30 +147,28 @@ public class ConfigWindow : PetWindow
         ImGui.EndListBox();
     }
 
-    public override void OnWindowOpen() =>  unsupportedMode = false;
+    public override void OnWindowOpen() => unsupportedMode = false;
     public override void OnWindowClose() => unsupportedMode = false;
 
     public override void OnLateDraw()
     {
         NewLine();
 
-        if (!unsupportedMode)
-        {
-            if (Button("Clear All Nicknames", new Vector2(286, 24)))
-                PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
-                    "Are you sure you want to clear all Nicknames\nfor every user?",
-                    (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearAllNicknames(); } }
-                    , this);
+        if (unsupportedMode) return;
 
-            if (Button("Credits", new Vector2(286, 24)))
-                PluginLink.WindowHandler.OpenWindow<CreditsWindow>();
+        if (Button("Clear All Nicknames", new Vector2(286, 24)))
+            PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
+                "Are you sure you want to clear all Nicknames\nfor every user?",
+                (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearAllNicknames(); } }
+                , this);
 
-            if (AnyIllegalsGoingOn())
-            {
-                NewLine();
-                if (XButton("Other Plugin Settings", new Vector2(286, 24)))
-                    unsupportedMode = true;
-            }
-        }
+        if (Button("Credits", new Vector2(286, 24)))
+            PluginLink.WindowHandler.OpenWindow<CreditsWindow>();
+
+        if (!AnyIllegalsGoingOn()) return;
+
+        NewLine();
+        if (XButton("Other Plugin Settings", new Vector2(286, 24)))
+            unsupportedMode = true;
     }
 }

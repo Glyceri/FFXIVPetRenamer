@@ -155,12 +155,12 @@ public class PetListWindow : PetWindow
         {
             SetUserMode(false);
             user = u;
-        }, "X", $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}", callback);
+        }, "X", $"Remove User: {u.UserName}@{u.HomeWorldName}", callback);
 
-        if (youSureMode && youSureUser == u) DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}", () => DeleteUser(u), DisableYouSureMode);
+        if (youSureMode && youSureUser == u) DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{youSureUser.HomeWorldName}", () => DeleteUser(u), DisableYouSureMode);
         else
         {
-            DrawBasicBar("Homeworld", $"{SheetUtils.instance.GetWorldName(u.Homeworld)}");
+            DrawBasicBar("Homeworld", $"{u.HomeWorldName}");
             DrawBasicBar("Petcount", $"Total: {u.SerializableUser.AccurateTotalPetCount()}, Minions: {u.SerializableUser.AccurateMinionCount()}, Battle Pets: {u.SerializableUser.AccurateBattlePetCount()}");
         }
     }
@@ -258,8 +258,8 @@ public class PetListWindow : PetWindow
                 else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
 
-            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePetIndex);
-            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.MinionIndex);
+            PenumbraIPCProvider.RedrawByIndex(existingUser.BattlePetIndex);
+            PenumbraIPCProvider.RedrawByIndex(existingUser.MinionIndex);
 
             removeMeUser = null!;
             existingUser = null!;
@@ -328,7 +328,7 @@ public class PetListWindow : PetWindow
             if (currentIsLocalUser)
             {
                 DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
@@ -376,8 +376,8 @@ public class PetListWindow : PetWindow
         }
         SetTooltipHovered($"Username: {StringUtils.instance.MakeTitleCase(user?.UserName ?? string.Empty)}\nClick to change user."); SameLine();
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y - 4));
-        OverrideLabel($"{SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}", Styling.ListButton); SameLine();
-        SetTooltipHovered($"Homeworld: {SheetUtils.instance.GetWorldName(user?.Homeworld ?? 9999)}");
+        OverrideLabel($"{user?.HomeWorldName}", Styling.ListButton); SameLine();
+        SetTooltipHovered($"Homeworld: {user?.HomeWorldName}");
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y * 2 - 8));
 
@@ -611,17 +611,11 @@ public class PetListWindow : PetWindow
 
     void DrawTexture(nint thenint)
     {
-        TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
-        nint texturePointer = thenint;
-        if (!PluginLink.Configuration.displayImages)
-        {
-            PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
-            ImGui.Button("", new System.Numerics.Vector2(83, 83));
-        }
-        else if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
-        SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
+        TransparentLabel("", new Vector2(4, 0)); 
+        SameLineNoMargin();
+        Image(thenint, new Vector2(83, 83));
+        SameLineNoMargin(); 
+        TransparentLabel("", new Vector2(4, 0));
     }
 
     public void SetOpenedAddPet(bool value)

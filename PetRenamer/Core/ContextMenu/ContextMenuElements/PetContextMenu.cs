@@ -34,10 +34,10 @@ internal unsafe class PetContextMenu : ContextMenuElement
             if (c.Singular.ToString() == string.Empty) continue;
             if (petname.ToLower().Normalize() == string.Empty) continue;
             if (c.Singular.ToString().ToLower().Normalize().Trim() != petname.ToLower().Normalize().Trim()) continue;
-            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(c.Model.Value!.Model, true)));
+            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => OpenForID(c.Model.Value!.Model)));
             break;
         }
-    }
+    }    
 
     void HandleNonNotebook(GameObjectContextMenuOpenArgs args)
     {
@@ -65,13 +65,11 @@ internal unsafe class PetContextMenu : ContextMenuElement
             PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
             if (user == null) return;
 
-            if (targetObjectKind == TargetObjectKind.Companion) PetWindow.SetPetMode(PetMode.Normal);
-            else PetWindow.SetPetMode(PetMode.BattlePet);
-
-            PetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
-            if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.CompanionID, true);
-            else petWindow?.OpenForBattleID(user.BattlePetID, true);
+            if (targetObjectKind == TargetObjectKind.Companion) OpenForID(user.CompanionID);
+            else OpenForID(user.BattlePetID);
         }
         ));
     }
+
+    void OpenForID(int id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(id, true);
 }

@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Text;
+using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -8,8 +8,6 @@ using System.Runtime.InteropServices;
 using System;
 using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using PetRenamer.Utilization.UtilsModule;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using System.Text.RegularExpressions;
 using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Chat.ChatElements;
@@ -55,32 +53,12 @@ internal unsafe class PetChatEmoteElement : ChatElement
         if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
 
         string nickname = string.Empty;
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-        {
-            if (!user.UserExists) continue;
-            if (user.UserName.ToLower().Normalize() != ownerName.ToLower().Normalize()) continue;
 
-            user.SerializableUser.LoopThroughBreakable(n =>
-            {
-                if (n.Item1 == id)
-                {
-                    nickname = n.Item2;
-                    return true;
-                }
-                return false;
-            });
-            break;
-        }
+        PettableUser user = PluginLink.PettableUserHandler.GetUser(ownerName)!;
+        if (user == null) return;
+        nickname = user.GetCustomName(id);
+        if (nickname == null || nickname == string.Empty) return;
 
-        if (nickname == string.Empty) return;
-
-        for (int i = 0; i < message.Payloads.Count; i++)
-        {
-            if (message.Payloads[i] is not TextPayload tPayload) continue;
-
-            foreach (string str in PluginConstants.removeables)
-                tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname, RegexOptions.IgnoreCase);
-            message.Payloads[i] = tPayload;
-        }
+        StringUtils.instance.ReplaceSeString(ref message, StringUtils.instance.GetEmoteStrings(nameString, nickname));
     }
 }

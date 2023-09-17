@@ -362,7 +362,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     {
         RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}",
             Styling.SmallButton,
-            $"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}",
+            $"Redownload profile picture for: {u.UserName}@{u.HomeWorldName}",
             () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
     }
 
@@ -440,9 +440,26 @@ public abstract class PetWindowHelpers : PetWindowStyling
         ImGui.SameLine(638);
     }
 
+    protected void Image(nint handle, Vector2 size)
+    {
+        if (!PluginLink.Configuration.displayImages || handle == nint.Zero)
+        {
+            PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
+            PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
+            PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
+            ImGui.Button(string.Empty, size);
+        }
+        else ImGui.Image(handle, size);
+    }
+
     protected void SameLine() => ImGui.SameLine();
     protected void SameLineNoMargin() => ImGui.SameLine(0, 0);
     protected void SameLinePretendSpace() => ImGui.SameLine(0, 3f);
     protected void SameLinePretendSpace2() { SameLinePretendSpace(); SameLinePretendSpace(); }
     protected void NewLine() => ImGui.NewLine();
+    protected void NewLine(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+            NewLine();
+    }
 }

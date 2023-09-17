@@ -159,27 +159,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return user;
     }
 
-    public (string, string)[] GetValidNames(PettableUser user, string beContainedIn)
-    {
-        List<(string, string)> validNames = new List<(string, string)>();
-        if (beContainedIn == null) return validNames.ToArray();
-        if (user == null) return validNames.ToArray();
-        if (!user.UserExists) return validNames.ToArray();
-        foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
-        {
-            string bPetname = SheetUtils.instance.GetBattlePetName(skelID) ?? string.Empty;
-            if (bPetname == string.Empty) continue;
-            if (!beContainedIn.ToString().Contains(bPetname)) continue;
-            if (!RemapUtils.instance.skeletonToClass.ContainsKey(skelID)) continue;
-            int jobID = RemapUtils.instance.skeletonToClass[skelID];
-            string cName = user.SerializableUser.GetNameFor(jobID) ?? string.Empty;
-            if (cName == string.Empty || cName == null) continue;
-            validNames.Add((bPetname, cName));
-        }
-        validNames.Sort((el1, el2) => el1.Item1.Length.CompareTo(el2.Item1.Length));
-        return validNames.ToArray();
-    }
-
     bool Contains(SerializableUserV3 user)
     {
         for (int i = 0; i < _users.Count; i++)

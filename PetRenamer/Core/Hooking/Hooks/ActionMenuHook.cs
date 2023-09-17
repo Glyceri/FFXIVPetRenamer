@@ -58,7 +58,7 @@ public unsafe class ActionMenuHook : HookableElement
             AtkComponentBase cBase = button.AtkComponentBase;
             AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
             if (tNode == null) continue;
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
+            (string, string)[] validNames = StringUtils.instance.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
             StringUtils.instance.ReplaceAtkString(tNode, validNames);
         }
         return addonupdatehookreplacelist!.Original(baseD);
@@ -80,7 +80,7 @@ public unsafe class ActionMenuHook : HookableElement
             if (node->Component->UldManager.NodeListCount != 9) continue;
             AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(8);
             if (tNode == null) continue;
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
+            (string, string)[] validNames = StringUtils.instance.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
             StringUtils.instance.ReplaceAtkString(tNode, validNames);
         }
 

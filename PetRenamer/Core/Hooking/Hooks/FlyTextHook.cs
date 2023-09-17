@@ -28,7 +28,7 @@ internal class FlyTextHook : HookableElement
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (!PluginLink.Configuration.useCustomFlyoutPet) return;
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;
-        (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, text1.ToString() + text2.ToString());
+        (string, string)[] validNames = StringUtils.instance.GetValidNames(user, text1.ToString() + text2.ToString());
         StringUtils.instance.ReplaceSeString(ref text1, validNames);
         StringUtils.instance.ReplaceSeString(ref text2, validNames);
     }

@@ -49,6 +49,7 @@ public class SerializableUserV3
             callback.Invoke((ids[i], names[i]));
     }
 
+    public bool HasId(int id) => ids.Contains(id);
     public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
     public string? GetNameFor(int id)
     {

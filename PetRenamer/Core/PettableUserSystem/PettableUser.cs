@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 
@@ -97,6 +96,8 @@ public unsafe class PettableUser
         _user = user;
     }
 
+    public PettableUser(string username, ushort homeworld) : this (username, homeworld, new SerializableUserV3(username, homeworld)) { }
+
     public void SetUser(BattleChara* user)
     {
         _user = (nint)user;
@@ -128,16 +129,7 @@ public unsafe class PettableUser
                 _LastBattlePetSkeletonID = _BattlePetSkeletonID;
                 _LastBattlePetID = _BattlePetID;
                 _BattlePetBaseName = Marshal.PtrToStringUTF8((IntPtr)battlePet->Character.GameObject.Name)!;
-                _CustomBattlePetName = string.Empty;
-                SerializableUser.LoopThroughBreakable((nickname) => 
-                {
-                    if (_BattlePetID == nickname.Item1)
-                    {
-                        _CustomBattlePetName = nickname.Item2;
-                        return true;
-                    }
-                    return false;
-                });
+                _CustomBattlePetName = SerializableUser.GetNameFor(_BattlePetID) ?? string.Empty;
             }
         }
     }
@@ -159,16 +151,7 @@ public unsafe class PettableUser
                 _userChangedCompanion = true;
                 _LastCompanionID = _CompanionID;
                 _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
-                _CustomCompanionName = string.Empty;
-                SerializableUser.LoopThroughBreakable((nickname) =>
-                {
-                    if (_CompanionID == nickname.Item1)
-                    {
-                        _CustomCompanionName = nickname.Item2;
-                        return true;
-                    }
-                    return false;
-                });
+                _CustomCompanionName = SerializableUser.GetNameFor(_CompanionID) ?? string.Empty;
             }
         }
     }
@@ -198,19 +181,5 @@ public unsafe class PettableUser
         _BattlePetIndex = -1;
     }
 
-    public string GetCustomName(int skeletonID)
-    {
-        string str = string.Empty;
-        _serializableUser?.LoopThroughBreakable((nickname) =>
-        {
-            if(nickname.Item1 == skeletonID)
-            {
-                str = nickname.Item2;
-                return true;
-            }
-            return false;
-        });
-
-        return str;
-    }
+    public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID)!;
 }

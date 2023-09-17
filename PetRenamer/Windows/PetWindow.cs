@@ -21,7 +21,7 @@ public abstract class PetWindow : PetWindowHelpers
 
     internal static void SetPetMode(PetMode mode) => petMode = mode;
     internal virtual void OnPetModeChange(PetMode mode) { }
-    protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
+    protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     public sealed override unsafe void Draw()
     {
