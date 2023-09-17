@@ -17,7 +17,6 @@ using PetRenamer.Core.Sharing;
 using PetRenamer.Core.Sharing.Importing;
 using PetRenamer.Core.Sharing.Importing.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -25,9 +24,9 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
-    int maxBoxHeight = 675;
-    int maxBoxHeightBattle = 631;
-    int maxBoxHeightSharing = 655;
+    readonly int maxBoxHeight = 675;
+    readonly int maxBoxHeightBattle = 631;
+    readonly int maxBoxHeightSharing = 655;
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
@@ -91,8 +90,7 @@ public class PetListWindow : PetWindow
 
         if (user == null) return;
 
-        if (temporaryUser == null)
-            temporaryUser = new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
+        temporaryUser ??= new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
 
         currentIsLocalUser = user.UserName == localUser.UserName && user.Homeworld == localUser.Homeworld;
         if (!currentIsLocalUser) SetOpenedAddPet(false);

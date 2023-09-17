@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 
@@ -10,6 +11,7 @@ public unsafe class PettableUser
 {
     readonly string _username;
     readonly ushort _homeworld;
+    readonly string _homeworldName;
 
     IntPtr _user;
     IntPtr _companion;
@@ -50,6 +52,8 @@ public unsafe class PettableUser
     public SerializableUserV3 SerializableUser => _serializableUser; 
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
+    public string HomeWorldName => _homeworldName;
+    public NicknameData NicknameData => new NicknameData(CompanionID, CustomCompanionName, BattlePetID, BattlePetCustomName);
 
     public bool LocalUser
     {
@@ -84,6 +88,7 @@ public unsafe class PettableUser
     {
         _username = username;
         _homeworld = homeworld;
+        _homeworldName = SheetUtils.instance.GetWorldName(homeworld);
         _serializableUser = serializableUser;
     }
 

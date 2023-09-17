@@ -21,8 +21,8 @@ namespace PetRenamer.Core.Updatable
             PluginHandlers.Framework.Update -= MainUpdate;
         }
 
+        protected override void OnElementCreation(Updatable element) => element?.Initialize();
         protected override void OnAllRegistered() => updatables?.Sort(Compare);
-        
 
         int Compare(Updatable a, Updatable b)
         {
@@ -35,7 +35,7 @@ namespace PetRenamer.Core.Updatable
 
         void MainUpdate(Framework framework)
         {
-            if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
+            if (!(PluginHandlers.ClientState is { LocalPlayer: { } })) return;
 
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);

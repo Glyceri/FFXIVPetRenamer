@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Command;
+using Dalamud.Game.Command;
 using PetRenamer.Commands.Attributes;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;

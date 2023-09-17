@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Objects.Types;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;

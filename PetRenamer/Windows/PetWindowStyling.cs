@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using PetRenamer.Core.Attributes;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Theming;
 using System.Numerics;

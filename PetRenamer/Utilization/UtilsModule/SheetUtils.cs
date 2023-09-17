@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
 using PetRenamer.Core.PettableUserSystem;
+using Dalamud.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 

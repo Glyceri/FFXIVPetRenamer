@@ -84,12 +84,12 @@ public class Configuration : IPluginConfiguration
     [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
     public bool usePartyList { get; set; } = false;
 
-    [Obsolete] public bool replaceEmotes { get; set; } = true;
-    [Obsolete] public bool allowTooltips { get; set; } = true;
-    [Obsolete] public bool useContextMenus { get; set; } = true;
-    [Obsolete] public bool useCustomNamesInChat { get; set; } = true;
-    [Obsolete] public bool useCustomFlyoutInChat { get; set; } = true;
-    [Obsolete] public bool allowCastBar { get; set; } = true;
+    [Obsolete("Old Settings")] public bool replaceEmotes { get; set; } = true;
+    [Obsolete("Old Settings")] public bool allowTooltips { get; set; } = true;
+    [Obsolete("Old Settings")] public bool useContextMenus { get; set; } = true;
+    [Obsolete("Old Settings")] public bool useCustomNamesInChat { get; set; } = true;
+    [Obsolete("Old Settings")] public bool useCustomFlyoutInChat { get; set; } = true;
+    [Obsolete("Old Settings")] public bool allowCastBar { get; set; } = true;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
