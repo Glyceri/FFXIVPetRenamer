@@ -15,8 +15,7 @@ internal class LocalUserSafetyUpdatable : Updatable
         foreach (SerializableUserV3 user in PluginLink.Configuration.serializableUsersV3!)
             if (user.Equals(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id))
                 return;
-       
-       
+        
         SerializableUserV3 newUser = new SerializableUserV3(PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id);
         PluginLink.PettableUserHandler.DeclareUser(newUser, PettableUserSystem.Enums.UserDeclareType.Add);
         PluginLink.Configuration.Save();

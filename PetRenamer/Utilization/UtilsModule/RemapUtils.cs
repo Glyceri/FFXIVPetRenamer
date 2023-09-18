@@ -1,5 +1,6 @@
 ﻿using Dalamud.Logging;
 using Lumina.Excel.GeneratedSheets;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System;
@@ -100,8 +101,9 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     public int[] SharesGroupWith(int id)
     {
         foreach (int[] group in groupers)
-            if(group.Contains(id)) 
+            if (group.Contains(id))
                 return group;
+
         return new int[] { id };
     }
 
@@ -109,9 +111,9 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
     internal string PetIDToName(int petID, bool grouped = true)
     {
-        if(grouped) petID = SharesGroupWith(petID).First();
+        if (grouped) petID = SharesGroupWith(petID).First();
         if (!bakedBattlePetSkeletonToName.ContainsKey(petID)) return string.Empty;
-            return bakedBattlePetSkeletonToName[petID];
+        return bakedBattlePetSkeletonToName[petID];
     }
 
     internal uint GetTextureID(int companionID)
@@ -124,7 +126,8 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
                 if (companion.Model!.Value!.Model! == companionID)
                     return companion.Icon;
             }
-        }else if (companionID < 8000)
+        }
+        else if (companionID < 8000)
         {
             if (!petIDToAction.ContainsKey(companionID)) return 786;
             return SheetUtils.instance.actions.GetRow(petIDToAction[companionID])?.Icon ?? 786;

@@ -481,6 +481,7 @@ public class PetListWindow : PetWindow
 
     void SetSearch()
     {
+        if (temporaryUser == null) return;
         searchField = minionSearchField;
         foundNicknames = SheetUtils.instance.GetThoseThatContain(searchField);
         FillTextureListFound();
