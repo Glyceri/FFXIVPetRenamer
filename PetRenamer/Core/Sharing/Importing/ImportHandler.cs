@@ -39,7 +39,7 @@ public static class ImportHandler
                 {
                     for (int i = 3; i < splitLines.Length; i++)
                     {
-                        string[] splitNickname = splitLines[i].Split('^');
+                        string[] splitNickname = splitLines[i].Split(PluginConstants.forbiddenCharacter);
                         if (splitNickname.Length < 1) continue;
                         if (!int.TryParse(splitNickname[0].Replace("ID:", ""), out int ID)) { continue; }
                         string nickname = splitNickname[1].Replace("Name:", "");

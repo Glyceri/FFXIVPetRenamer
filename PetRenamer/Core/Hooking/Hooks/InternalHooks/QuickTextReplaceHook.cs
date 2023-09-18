@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
@@ -77,7 +80,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (TextPos.Length > 1)
         {
             ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
-            for (int i = 1; i < TextPos.Count() - 1; i++)
+            for (int i = 1; i < TextPos.Length - 1; i++)
             {
                 if (cNode == null) return addonupdatehook!.Original(baseElement);
                 cNode = cNode.GetComponentNode(TextPos[i]);
@@ -94,8 +97,9 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
         string tNodeText = tNode->NodeText.ToString();
         if (tNodeText == null) return addonupdatehook!.Original(baseElement);
+        if (tNodeText == string.Empty) return addonupdatehook!.Original(baseElement);
         if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
-        if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
+        if (tNodeText == lastAnswer) return addonupdatehook!.Original(baseElement);
 
 
         AtkNineGridNode* nineGridNode = null;
@@ -113,34 +117,36 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (user == null) return addonupdatehook!.Original(baseElement);
 
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
-        string replaceName = tNodeText;
+        List<string> replaceNames = new List<string>() { tNodeText };
 
         if (id == -1)
         {
+            replaceNames.Clear();
             List<(string, int)> correctNames = new List<(string, int)>();
-            foreach (int nameID in RemapUtils.instance.battlePetRemap.Keys)
+            foreach (int nameID in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
             {
-                if (!RemapUtils.instance.bakedBattlePetSkeletonToName.ContainsKey(nameID)) continue;
-                string bPetName = RemapUtils.instance.bakedBattlePetSkeletonToName[nameID];
-                if (tNodeText.Contains(bPetName))
-                    correctNames.Add((bPetName, nameID));
+                foreach (int sharedPetID in RemapUtils.instance.SharesGroupWith(nameID))
+                {
+                    string bPetName = RemapUtils.instance.PetIDToName(sharedPetID, false);
+                    if (bPetName == string.Empty) continue;
+                    if (tNodeText.Contains(bPetName, StringComparison.InvariantCultureIgnoreCase))
+                        correctNames.Add((bPetName, sharedPetID));
+                }
             }
             if (correctNames.Count != 0)
             {
-                int shortestEl = 0;
-                for (int i = 1; i < correctNames.Count; i++)
+                int smallestEl = 0;
+                for (int i = 0; i < correctNames.Count; i++)
                 {
-                    if (correctNames[i].Item1.Length < correctNames[shortestEl].Item1.Length)
-                        shortestEl = i;
+                    replaceNames.Add(correctNames[i].Item1);
+                    if (correctNames[i].Item1.Length < correctNames[smallestEl].Item1.Length)
+                        smallestEl = i;
                 }
-                int item2 = correctNames[shortestEl].Item2;
-                if (RemapUtils.instance.skeletonToClass.ContainsKey(item2))
-                    id = RemapUtils.instance.skeletonToClass[item2];
-                replaceName = correctNames[shortestEl].Item1;
+                id = correctNames[smallestEl].Item2;
             }
         }
 
-        if (replaceName == string.Empty) return addonupdatehook!.Original(baseElement);
+        if (replaceNames.Count == 0) return addonupdatehook!.Original(baseElement);
 
         if (id == -1)
         {
@@ -149,23 +155,33 @@ public unsafe class QuickTextReplaceHook : IDisposable
         }
         if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
-        user.SerializableUser.LoopThroughBreakable(nickname =>
-        {
-            if (nickname.Item1 == id)
-            {
-                if (nickname.Item2 == string.Empty) return false;
-                tNode->NodeText.SetString(tNode->NodeText.ToString().Replace(replaceName, nickname.Item2));
-                if (nineGridNode != null)
-                {
-                    tNode->ResizeNodeForCurrentText();
-                    nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
-                }
+        replaceNames.Sort((i1, i2) => i1.Length.CompareTo(i2.Length));
+        replaceNames.Reverse();
 
-                lastAnswer = nickname.Item2;
-                return true;
+        for (int i = 0; i < user.SerializableUser.length; i++)
+        {
+            int curID = user.SerializableUser.ids[i];
+            string curNickname = user.SerializableUser.names[i];
+            if (curID != id) continue;
+            if (curNickname == string.Empty) continue;
+
+            string tNodeString = tNode->NodeText.ToString();
+            foreach (string replaceName in replaceNames)
+            {
+                if (curNickname.Contains(replaceName)) tNodeString = Regex.Replace(tNodeString, curNickname, PluginConstants.forbiddenCharacter, RegexOptions.IgnoreCase);
+                tNodeString = Regex.Replace(tNodeString, replaceName, curNickname, RegexOptions.IgnoreCase);
             }
-            return false;
-        });
+            tNodeString = tNodeString.Replace(PluginConstants.forbiddenCharacter, curNickname);
+            tNode->NodeText.SetString(tNodeString);
+            if (nineGridNode != null)
+            {
+                tNode->ResizeNodeForCurrentText();
+                nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
+            }
+
+            lastAnswer = curNickname;
+            break;
+        }
 
         return addonupdatehook!.Original(baseElement);
     }

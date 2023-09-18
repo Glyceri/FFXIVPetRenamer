@@ -1,3 +1,3 @@
 ﻿namespace PetRenamer.Core.AutoRegistry.Interfaces;
 
-internal interface IRegistryElement { }
+public interface IRegistryElement { }

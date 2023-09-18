@@ -11,6 +11,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Logging;
 using Dalamud.Memory;
 using System;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Helpers;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -134,22 +136,19 @@ internal unsafe class TargetBarHooking : HookableElement
 
     void SetFor(AtkTextNode* textNode, GameObject* gObj)
     {
-        PluginLink.PettableUserHandler.LoopThroughBreakable(user =>
+        foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (user.nintCompanion == (nint)gObj)
-            {
-                if (user.CustomCompanionName != string.Empty)
-                    textNode->NodeText.SetString(user.CustomCompanionName);
-                return true;
-            }
-            if (user.nintBattlePet == (nint)gObj)
-            {
-                if (user.BattlePetCustomName != string.Empty)
-                    textNode->NodeText.SetString(user.BattlePetCustomName);
-                return true;
-            }
-            return false;
-        });
+            if (SetText(textNode, user.Minion, (nint)gObj)) return;
+            if (SetText(textNode, user.BattlePet, (nint)gObj)) return;
+        }
+    }
+
+    bool SetText(AtkTextNode* tNode, GeneralPetData petData, nint gObj)
+    {
+        if (petData.Pet != gObj) return false;
+        if (petData.CustomName == string.Empty) return false;
+        tNode->NodeText.SetString(petData.CustomName);
+        return true;
     }
 
     internal override void OnDispose()

@@ -8,7 +8,6 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -39,9 +38,8 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public PlayerPayload GetPlayerPayload(ref SeString SeString)
     {
         foreach (Payload payload in SeString.Payloads)
-            PluginLog.Log(payload.GetType().Name + " : " + payload.ToString());
-        //if (payload is PlayerPayload pPayload)
-        //return pPayload;
+            if (payload is PlayerPayload pPayload)
+                return pPayload;
         return null!;
     }
 
@@ -75,11 +73,11 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
         {
             string bPetname = SheetUtils.instance.GetBattlePetName(skelID) ?? string.Empty;
-            if (bPetname == string.Empty) continue;
+            if (bPetname == string.Empty || bPetname == null!) continue;
             if (!beContainedIn.ToString().Contains(bPetname)) continue;
-            if (!RemapUtils.instance.skeletonToClass.ContainsKey(skelID)) continue;
-            int jobID = RemapUtils.instance.skeletonToClass[skelID];
-            string cName = user.SerializableUser.GetNameFor(jobID) ?? string.Empty;
+            int petID = -skelID;
+            if (petID == -1) continue;
+            string cName = user.SerializableUser.GetNameFor(petID) ?? string.Empty;
             if (cName == string.Empty || cName == null) continue;
             validNames.Add((bPetname, cName));
         }

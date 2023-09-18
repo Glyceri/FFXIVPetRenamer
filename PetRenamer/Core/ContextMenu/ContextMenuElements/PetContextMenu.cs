@@ -65,8 +65,8 @@ internal unsafe class PetContextMenu : ContextMenuElement
             PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
             if (user == null) return;
 
-            if (targetObjectKind == TargetObjectKind.Companion) OpenForID(user.CompanionID);
-            else OpenForID(user.BattlePetID);
+            if (targetObjectKind == TargetObjectKind.Companion) OpenForID(user.Minion.ID);
+            else OpenForID(user.BattlePet.ID);
         }
         ));
     }

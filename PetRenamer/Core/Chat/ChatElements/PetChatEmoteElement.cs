@@ -41,11 +41,11 @@ internal unsafe class PetChatEmoteElement : ChatElement
         }
         else
         {
-            if (!RemapUtils.instance.skeletonToClass.ContainsKey(lookedUpChar2->CharacterData.ModelCharaId)) return;
+            id = -lookedUpChar2->CharacterData.ModelSkeletonId;
+            if (id == -1) return;
             nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
             BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
             if (chara == null) return;
-            id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
             ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
         }
         if (id >= 0 && !PluginLink.Configuration.replaceEmotesOnMinions) return;

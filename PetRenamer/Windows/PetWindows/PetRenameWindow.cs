@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Internal;
+using Dalamud.Logging;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
@@ -35,10 +36,10 @@ public class PetRenameWindow : PetWindow
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
 
-        if (companionData.id == -1 && user.HasCompanion) SetCompanion(user.CompanionID);
+        if (companionData.id == -1 && user.Minion.Has) Set(ref companionData, user.Minion.ID);
         else if (companionData.id == -1) companionData?.Dispose();
 
-        if (battlePetData.id == -1 && user.HasBattlePet) SetBattlePet(user.BattlePetID);
+        if (battlePetData.id == -1 && user.BattlePet.Has) Set(ref battlePetData, user.Minion.ID);
         else if (battlePetData.id == -1) battlePetData?.Dispose();
 
         activeData = companionData!;
@@ -106,15 +107,15 @@ public class PetRenameWindow : PetWindow
     {
         if (Button("Save Nickname", new Vector2(144, 25), "[Required to see a nickname]"))
         {
-            user.SerializableUser.SaveNickname(activeData.id, activeData.temporaryName.Replace("^", ""), notifyICP: true);
-            PenumbraIPCProvider.RedrawByIndex(activeData.id);
+            user.SerializableUser.SaveNickname(activeData.id, activeData.temporaryName.Replace(PluginConstants.forbiddenCharacter, ""), notifyICP: true);
+            PenumbraIPCProvider.RedrawByID(activeData.id);
             PluginLink.Configuration.Save();
         }
         ImGui.SameLine(0, 1f);
         if (Button("Clear Nickname", new Vector2(144, 25), "Clears the nickname from your list."))
         {
             user.SerializableUser.RemoveNickname(activeData.id, notifyICP: true);
-            PenumbraIPCProvider.RedrawByIndex(activeData.id);
+            PenumbraIPCProvider.RedrawByID(activeData.id);
             PluginLink.Configuration.Save();
             activeData.id = -1;
         }
@@ -122,31 +123,28 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        if (forceOpen) { IsOpen = true; ImGui.SetNextWindowFocus(); }
+        if (forceOpen) 
+        { 
+            IsOpen = true; 
+            ImGui.SetNextWindowFocus();
+            if (id < 8000) SetPetMode(PetMode.BattlePet);
+            else SetPetMode(PetMode.Normal);
+        }
 
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
-
-        if (id < -1) SetBattlePet(id);
-        if (id > -1) SetCompanion(id);
+        if (id == -1) return;
+        if (id < 8000) Set(ref battlePetData, id);
+        if (id > 8000) Set(ref companionData, id);
     }
 
-    void SetCompanion(int id)
+    void Set(ref PetData pData, int id) 
     {
-        companionData.id = id;
-        companionData.baseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(id));
-        companionData.customName = user.GetCustomName(id);
-        companionData.temporaryName = companionData.customName;
-        SetTextureWrap(id, ref companionData.textureWrap);
-    }
-
-    void SetBattlePet(int id)
-    {
-        battlePetData.id = id;
-        battlePetData.baseName = RemapUtils.instance.PetIDToName(id);
-        battlePetData.customName = user.GetCustomName(id);
-        battlePetData.temporaryName = battlePetData.customName;
-        SetTextureWrap(id, ref battlePetData.textureWrap);
+        pData.id = id;
+        pData.baseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(id));
+        pData.customName = user.GetCustomName(id);
+        pData.temporaryName = pData.customName;
+        SetTextureWrap(id, ref pData.textureWrap);
     }
 
     void SetTextureWrap(int id, ref IDalamudTextureWrap textureWrap)

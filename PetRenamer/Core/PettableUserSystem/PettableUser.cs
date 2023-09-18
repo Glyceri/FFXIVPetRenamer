@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Helpers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 
@@ -13,75 +15,41 @@ public unsafe class PettableUser
     readonly string _homeworldName;
 
     IntPtr _user;
-    IntPtr _companion;
-    IntPtr _BattlePet;
 
-    int _BattlePetSkeletonID = -1; // [407 = EOS, 408 = SELENE.....]
-    int _LastBattlePetSkeletonID = -1;
+    readonly GeneralPetData _minion;
+    readonly GeneralPetData _battlePet;
 
-    int _BattlePetID = -1; // [-2, -3, -4.....]
-    int _LastBattlePetID = -1;
-    int _CompanionID = -1; // [0, 1, 2, 3.....]
-    int _LastCompanionID = -1;
+    public GeneralPetData Minion => _minion;
+    public GeneralPetData BattlePet => _battlePet;
 
-    nint _LastBattlePetPointer = nint.Zero;
-    nint _LastMinionPointer = nint.Zero;
-
-    int _BattlePetIndex = -1;
-    int _MinionIndex = -1;
-
-    string _CustomBattlePetName = string.Empty; // [Sally]
-    string _CustomCompanionName = string.Empty; // [George]
-
-    string _BattlePetBaseName = string.Empty; // [Eos]
-    string _CompanionBaseName = string.Empty; // [Hedgehoglet]
-
-    bool _userChangedCompanion = false;
-    bool _userChangedBattlePet = false;
+    public GeneralPetData[] PetDatas => new GeneralPetData[2] { _minion, _battlePet };
 
     readonly SerializableUserV3 _serializableUser;
 
     public nint nintUser => _user;
-    public nint nintBattlePet => _BattlePet;
-    public nint nintCompanion => _companion;
+    public nint nintBattlePet => _battlePet.Pet;
+    public nint nintCompanion => _minion.Pet;
 
-    public BattleChara* User => (BattleChara*)_user;
-    public BattleChara* BattlePet => (BattleChara*)_BattlePet;
-    public Companion* Companion => (Companion*)_companion;
     public SerializableUserV3 SerializableUser => _serializableUser; 
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
-    public NicknameData NicknameData => new NicknameData(CompanionID, CustomCompanionName, BattlePetID, BattlePetCustomName);
+    public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
     public bool LocalUser
     {
         get
         {
             if (!UserExists) return false;
-            if (User->Character.GameObject.ObjectIndex == 0) return true;
+            if (((BattleChara*)_user)->Character.GameObject.ObjectIndex == 0) return true;
             return false;
         }
     }
     public bool UserExists => _user != nint.Zero;
-    public bool HasCompanion => _companion != nint.Zero;
-    public bool HasBattlePet => _BattlePet != nint.Zero;
 
-    public int BattlePetSkeletonID => _BattlePetSkeletonID;
-    public int BattlePetID => _BattlePetID;
-    public string BattlePetCustomName => _CustomBattlePetName;
-    public string BaseBattlePetName => _BattlePetBaseName;
-
-    public int BattlePetIndex => _BattlePetIndex;
-    public int MinionIndex => _MinionIndex;
-
-    public int CompanionID => _CompanionID;
-    public string CustomCompanionName => _CustomCompanionName;
-    public string CompanionBaseName => _CompanionBaseName;
-
-    public bool BattlePetChanged => _userChangedBattlePet;
-    public bool CompanionChanged => _userChangedCompanion;
-    public bool AnyPetChanged => _userChangedBattlePet || _userChangedCompanion;
+    public bool BattlePetChanged => _battlePet.PetChanged;
+    public bool MinionChanged => _minion.PetChanged;
+    public bool AnyPetChanged => _battlePet.PetChanged || _minion.PetChanged;
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser)
     {
@@ -89,6 +57,8 @@ public unsafe class PettableUser
         _homeworld = homeworld;
         _homeworldName = SheetUtils.instance.GetWorldName(homeworld);
         _serializableUser = serializableUser;
+        _battlePet = new GeneralPetData("Battle Pet", (id) => id < -1);
+        _minion = new GeneralPetData("Minion", (id) => id > -1);
     }
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser, nint user) : this(username, homeworld, serializableUser)
@@ -104,81 +74,31 @@ public unsafe class PettableUser
 
         if (_serializableUser?.ToggleBackChanged() ?? false)
         {
-            _CustomCompanionName = string.Empty;
-            _CustomBattlePetName = string.Empty;
-            _LastBattlePetID = -1;
-            _LastCompanionID = -1;
+            _minion.Clear();
+            _battlePet.Clear();
         }
     }
 
+
     public void SetBattlePet(BattleChara* battlePet)
     {
-        _BattlePet = (nint)battlePet;
-        if (battlePet == null) _BattlePetIndex = -1;
-        else _BattlePetIndex = battlePet->Character.GameObject.ObjectIndex;
-
-        if (_BattlePet == nint.Zero) { ResetBattlePet(); _LastBattlePetID = -1; }
-        else
-        {
-            _BattlePetSkeletonID = battlePet->Character.CharacterData.ModelCharaId;
-            _BattlePetID = RemapUtils.instance.GetPetIDFromClass(User->Character.CharacterData.ClassJob);
-            if (_LastBattlePetID != _BattlePetID || _LastBattlePetSkeletonID != _BattlePetSkeletonID || _LastBattlePetPointer != _BattlePet)
-            {
-                _userChangedBattlePet = true;
-                _LastBattlePetPointer = _BattlePet;
-                _LastBattlePetSkeletonID = _BattlePetSkeletonID;
-                _LastBattlePetID = _BattlePetID;
-                _BattlePetBaseName = Marshal.PtrToStringUTF8((IntPtr)battlePet->Character.GameObject.Name)!;
-                _CustomBattlePetName = SerializableUser.GetNameFor(_BattlePetID) ?? string.Empty;
-            }
-        }
+        int id = -1;
+        if (battlePet != null) id = battlePet->Character.CharacterData.ModelCharaId;
+        _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 
     public void SetCompanion(Companion* companion)
     {
-        _companion = (nint)companion;
-
-        if (companion == null) _MinionIndex = -1;
-        else _MinionIndex = companion->Character.GameObject.ObjectIndex;
-
-        if (_companion == nint.Zero) { ResetCompanion(); _LastCompanionID = -1; }
-        else
-        {
-            _CompanionID = companion->Character.CharacterData.ModelSkeletonId;
-            if (_LastCompanionID != _CompanionID || _LastMinionPointer != _companion)
-            {
-                _LastMinionPointer = _companion;
-                _userChangedCompanion = true;
-                _LastCompanionID = _CompanionID;
-                _CompanionBaseName = Marshal.PtrToStringUTF8((IntPtr)companion->Character.GameObject.Name)!;
-                _CustomCompanionName = SerializableUser.GetNameFor(_CompanionID) ?? string.Empty;
-            }
-        }
+        int minionID = -1;
+        if (companion != null) minionID = companion->Character.CharacterData.ModelSkeletonId;
+        _minion.Set((nint)companion, minionID, _serializableUser);
     }
 
     public void Reset()
     {
         _user = nint.Zero;
-        _BattlePet = nint.Zero;
-        _companion = nint.Zero;
-        _userChangedCompanion = false;
-        _userChangedBattlePet = false;
-
-        ResetBattlePet();
-        ResetCompanion();
-    }
-
-    void ResetCompanion()
-    {
-        _CompanionID = -1;
-        _MinionIndex = -1;
-    }
-
-    void ResetBattlePet()
-    {
-        _BattlePetID = -1;
-        _BattlePetSkeletonID = -1;
-        _BattlePetIndex = -1;
+        _battlePet.FullReset();
+        _minion.FullReset();
     }
 
     public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID)!;

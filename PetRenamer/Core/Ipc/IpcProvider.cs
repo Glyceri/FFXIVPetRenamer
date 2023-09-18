@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Helpers;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 
@@ -104,20 +105,12 @@ public static class IpcProvider
         {
             if (character is not PlayerCharacter playerCharacter) return string.Empty;
             (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
-            NicknameData? data = new NicknameData();
+            NicknameData? data = null!;
 
             foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
             {
                 if (!user.SerializableUser.Equals(player.Item1, (ushort)player.Item2)) continue;
-                (int, string) cStr = (-1, string.Empty);
-                (int, string) bStr = (-1, string.Empty);
-                if (user.HasCompanion) cStr = (user.CompanionID, user.CustomCompanionName);
-                if (user.HasBattlePet) bStr = (user.BattlePetID, user.BattlePetCustomName);
-
-                data.ID = cStr.Item1;
-                data.Nickname = cStr.Item2;
-                data.BattleID = bStr.Item1;
-                data.BattleNickname = bStr.Item2;
+                data = user.NicknameData;
                 break;
             }
             string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);

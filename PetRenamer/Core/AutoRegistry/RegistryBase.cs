@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace PetRenamer.Core.AutoRegistry;
 
-internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistryElement where TT : Attribute
+public class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistryElement where TT : Attribute
 {
     protected List<T> elements = new List<T>();
     protected List<TT> attributes = new List<TT>();

@@ -1,3 +1,3 @@
 ﻿namespace PetRenamer.Core.AutoRegistry;
 
-internal class IdentifyableRegistryBase { }
+public class IdentifyableRegistryBase { }

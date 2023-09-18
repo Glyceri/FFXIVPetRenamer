@@ -50,12 +50,12 @@ public class SerializableUserV3
     }
 
     public bool HasId(int id) => ids.Contains(id);
-    public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
-    public string? GetNameFor(int id)
+    public string GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
+    public string GetNameFor(int id)
     {
         int index = IndexOf(id);
-        if (index == -1) return null;
-        if (names.Length < index) return null;
+        if (index == -1) return string.Empty;
+        if (names.Length < index) return string.Empty;
         if (names[index].Length > PluginConstants.ffxivNameSize)
             return names[index][..PluginConstants.ffxivNameSize];
         return names[index];
@@ -84,8 +84,8 @@ public class SerializableUserV3
         for (int i = 0; i < ids.Length; i++)
         {
             int curID = ids[i];
-            if (curID >= 0) hasCompanion = true;
-            if (curID <= -1) hasBattlePet = true;
+            if (curID > 8000) hasCompanion = true;
+            if (curID < 8000) hasBattlePet = true;
             if (hasCompanion && hasBattlePet) break;
         }
     }

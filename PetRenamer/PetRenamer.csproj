@@ -64,4 +64,8 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Core\EventSystem\EventElements\" />
+  </ItemGroup>
 </Project>

@@ -73,7 +73,12 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     public string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
-        if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
+        if (id > 100)
+        {
+            if (RemapUtils.instance.battlePetRemap.ContainsKey(id))
+                id = RemapUtils.instance.battlePetRemap[id];
+            else id = -1;
+        }
         if (id <= 0) return string.Empty;
 
         if (lastBattleIds.ContainsKey(id))
@@ -110,13 +115,26 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (lastIds.Count > cacheSizes)
             lastIds.Remove(lastIds.Keys.ToArray().First());
 
-        foreach (Companion pet in petSheet)
+        if (id > 8000)
         {
-            if (pet == null) continue;
-
-            if (pet.Model.Value!.Model == id)
+            foreach (Companion pet in petSheet)
             {
-                string endName = pet.Singular.ToString();
+                if (pet == null) continue;
+
+                if (pet.Model.Value!.Model == id)
+                {
+                    string endName = pet.Singular.ToString();
+                    lastIds[id] = endName;
+                    return endName;
+                }
+            }
+        }
+        if (id < 8000)
+        {
+            string petName = RemapUtils.instance.PetIDToName(id);
+            if (petName != string.Empty)
+            {
+                string endName = petName;
                 lastIds[id] = endName;
                 return endName;
             }
@@ -133,10 +151,12 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (lastNames.Count > cacheSizes)
             lastNames.Remove(lastNames.Keys.ToArray().First());
 
+        string readyName = name.ToLower().Normalize();
+
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
-            if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
+            if (pet.Singular.ToString().ToLower().Normalize() == readyName)
             {
                 int val = pet.Model.Value!.Model;
                 lastNames[name] = val;

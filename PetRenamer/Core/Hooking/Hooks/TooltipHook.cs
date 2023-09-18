@@ -41,8 +41,9 @@ internal class TooltipHook : QuickTextHookableElement
 
     bool Allowed(int id)
     {
-        if (id >= 0 && !PluginLink.Configuration.allowTooltipsOnMinions) return false;
-        if (id <= -2 && !PluginLink.Configuration.allowTooltipsBattlePets) return false;
+        if (id == -1) return false;
+        if (id > 8000 && !PluginLink.Configuration.allowTooltipsOnMinions) return false;
+        if (id < 8000 && !PluginLink.Configuration.allowTooltipsBattlePets) return false;
         return true;
     }
 

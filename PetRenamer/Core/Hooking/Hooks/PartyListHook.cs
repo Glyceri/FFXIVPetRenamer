@@ -31,6 +31,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
+        if (partyList == null) return;
         addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
     }
@@ -43,7 +44,7 @@ internal unsafe class PartyListHook : HookableElement
             return addonupdatehook!.Original(baseD);
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
         if (partyNode == null) return addonupdatehook!.Original(baseD);
-         SetPetname(baseD, partyNode);
+        SetPetname(baseD, partyNode);
         SetCastlist(baseD, partyNode);
         return addonupdatehook!.Original(baseD);
     }
@@ -52,9 +53,9 @@ internal unsafe class PartyListHook : HookableElement
     {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
-        if (!user.HasBattlePet) return;
-        if (user.BattlePetCustomName != string.Empty)
-            partyNode->Pet.Name->SetText(user.BattlePetCustomName);
+        if (!user.BattlePet.Has) return;
+        if (user.BattlePet.CustomName != string.Empty)
+            partyNode->Pet.Name->SetText(user.BattlePet.CustomName);
     }
 
     void SetCastlist(AtkUnitBase * baseD, AddonPartyList * partyNode)

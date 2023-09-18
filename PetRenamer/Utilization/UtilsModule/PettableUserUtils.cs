@@ -46,8 +46,8 @@ internal unsafe class PettableUserUtils : UtilsRegistryType, ISingletonBase<Pett
         if (!user.AnyPetChanged) return;
         PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
         if (window == null) return;
-        if (user.CompanionChanged) window.OpenForId(user.CompanionID);
-        if (user.BattlePetChanged) window.OpenForId(user.BattlePetID);
+        if (user.MinionChanged) window.OpenForId(user.Minion.ID);
+        if (user.BattlePetChanged) window.OpenForId(user.BattlePet.ID);
     }
 
     public BattleChara* AlterantiveFindForBChara(BattleChara* bChara, BattleChara* basePet)

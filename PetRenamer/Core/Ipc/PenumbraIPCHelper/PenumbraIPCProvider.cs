@@ -2,6 +2,7 @@
 using PetRenamer.Core.Ipc.PenumbraIPCHelper.Enums;
 using Dalamud.Plugin.Ipc;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Ipc.PenumbraIPCHelper;
 
@@ -16,10 +17,17 @@ public static class PenumbraIPCProvider
         getEnabledState = dalamudPluginInterface.GetIpcSubscriber<bool>("Penumbra.GetEnabledState");
     }
 
+    public static void RedrawByID(int id)
+    {
+        PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
+        if (localUser == null) return;
+        if (id > 8000) RedrawMinionByIndex(localUser.Minion.Index);
+        if (id < 8000) RedrawBattlePetByIndex(localUser.BattlePet.Index);
+    }
+
     public static void RedrawByIndex(int index)
-    { 
-        if (index > -1) RedrawMinionByIndex(index);
-        if (index < -1) RedrawBattlePetByIndex(index);
+    {
+       RedrawObjectByIndex(index);
     }
 
     static void RedrawBattlePetByIndex(int index)

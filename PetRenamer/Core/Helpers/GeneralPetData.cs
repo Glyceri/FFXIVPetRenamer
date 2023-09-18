@@ -2,31 +2,54 @@
 using PetRenamer.Core.Serialization;
 using System.Runtime.InteropServices;
 using System;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using Dalamud.Logging;
+using PetRenamer.Utilization.UtilsModule;
+using System.Linq;
 
 namespace PetRenamer.Core.Helpers;
 
-public class GeneralPetData
+public class GeneralPetData : GeneralData
 {
+    readonly Func<int, bool> isValid;
+    public readonly string identifier;
+
+    public nint Pet => _pet;
+    public int ID => _id;
+    public int Index => _index;
+
+    public string CustomName => _customName;
+    public string BaseName => _baseName;
+
+    public bool PetChanged => _petChanged;
+
+    public bool IsNull => _id != -1;
+    public bool IsValid => isValid(_id);
+    public bool Has => _pet != nint.Zero;
+    public string GetName => CustomName == string.Empty ? BaseName : CustomName;
+
+    public GeneralPetData(string identifier, Func<int, bool> isValid)
+    {
+        this.identifier = identifier;
+        this.isValid = isValid;
+    }
+
     nint _pet;
+
     int _id;
-    int _skeletonID;
+    int _index;
 
     string _customName = string.Empty;
     string _baseName = string.Empty;
-    int _index;
 
     bool _petChanged;
 
     int _lastID;
-    int _lastSkeletonID;
     nint _lastPointer;
 
-    public readonly string identifier;
-
-    public GeneralPetData(string identifier) => this.identifier = identifier;
-
-    public unsafe void Set(nint pet, int id, ref SerializableUserV3 serializableUserV3, int skeletonID = -1)
+    public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3)
     {
+        _pet = pet;
         if (pet == nint.Zero)
         {
             _index = -1;
@@ -35,24 +58,19 @@ public class GeneralPetData
             return;
         }
 
-        _pet = pet;
-        GameObject gObject = *(GameObject*)pet;
+        Character gObject = *(Character*)pet;
        
-        _id = id;
-        _skeletonID = skeletonID;
-        _index = gObject.ObjectIndex;
+        _id = RemapUtils.instance.SharesGroupWith(id).First();
+        _index = gObject.GameObject.ObjectIndex;
 
-        if (_lastID == _id && _lastSkeletonID == _skeletonID && _lastPointer == _pet) return;
+        if (_lastID == _id && _lastPointer == _pet) return;
 
         _petChanged = true;
         _lastPointer = _pet;
         _lastID = _id;
-        _lastSkeletonID = _skeletonID;
-        _baseName = Marshal.PtrToStringUTF8((nint)gObject.Name)!;
+        _baseName = Marshal.PtrToStringUTF8((nint)gObject.GameObject.Name)!;
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
-
-    void
 
     public void FullReset()
     {
@@ -61,10 +79,15 @@ public class GeneralPetData
         Reset();
     }
 
+    public void Clear()
+    {
+        _lastID = -1;
+        _customName = string.Empty;
+    }
+
     void Reset()
     {
         _id = -1;
-        _skeletonID = -1;
         _index = -1;
     }
 }
