@@ -18,7 +18,8 @@ internal class CastBarHook : QuickTextHookableElement
 
     bool Allowed(int id)
     {
-        if (id <= -2 && !PluginLink.Configuration.allowCastBarPet) return false;
+        if (id == -1) return false;
+        if (id < 8000 && !PluginLink.Configuration.allowCastBarPet) return false;
         return true;
     }
 

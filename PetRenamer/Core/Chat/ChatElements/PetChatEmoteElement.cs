@@ -48,8 +48,8 @@ internal unsafe class PetChatEmoteElement : ChatElement
             if (chara == null) return;
             ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
         }
-        if (id >= 0 && !PluginLink.Configuration.replaceEmotesOnMinions) return;
-        if (id <= -2 && !PluginLink.Configuration.replaceEmotesBattlePets) return;
+        if (id > 8000 && !PluginLink.Configuration.replaceEmotesOnMinions) return;
+        if (id < 8000 && !PluginLink.Configuration.replaceEmotesBattlePets) return;
         if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
 
         string nickname = string.Empty;

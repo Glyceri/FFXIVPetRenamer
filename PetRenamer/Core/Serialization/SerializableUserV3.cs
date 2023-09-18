@@ -157,7 +157,7 @@ public class SerializableUserV3
         int counter = 0;
         for (int i = 0; i < names.Length!; i++)
         {
-            if (ids[i] <= -1) continue;
+            if (ids[i] < 8000) continue;
             if (names[i] != string.Empty && names[i] != null)
                 counter++;
         }
@@ -169,7 +169,7 @@ public class SerializableUserV3
         int counter = 0;
         for(int i = 0; i < names.Length!; i++)
         {
-            if (ids[i] >= -1) continue;
+            if (ids[i] > 8000) continue;
             if (names[i] != string.Empty && names[i] != null)
                 counter++;
         }

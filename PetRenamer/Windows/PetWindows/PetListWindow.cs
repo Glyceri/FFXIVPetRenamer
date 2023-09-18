@@ -227,9 +227,7 @@ public class PetListWindow : PetWindow
                 return;
             }
             DrawBasicBar("Nickname", $"{user.SerializableUser.names[index]}");
-            string basePetName = user.SerializableUser.ids[index] < -1 ?
-                RemapUtils.instance.PetIDToName(user.SerializableUser.ids[index]) :
-                SheetUtils.instance.GetPetName(user.SerializableUser.ids[index]);
+            string basePetName = SheetUtils.instance.GetPetName(user.SerializableUser.ids[index]);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{user.SerializableUser.ids[index]}");
 
@@ -292,7 +290,7 @@ public class PetListWindow : PetWindow
             string name = importedData.names[i];
             DrawBasicBar("Nickname", $"{name}");
             int id = importedData.ids[i];
-            string basePetName = id < -1 ? RemapUtils.instance.PetIDToName(id) : SheetUtils.instance.GetPetName(id);
+            string basePetName = SheetUtils.instance.GetPetName(id);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{id}");
 
@@ -342,7 +340,7 @@ public class PetListWindow : PetWindow
         () =>
         {
             if (graphPointer == 0) return true;
-            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] >= -1;
+            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] > 8000;
             return false;
         });
 
@@ -543,7 +541,7 @@ public class PetListWindow : PetWindow
         () =>
         {
             if (graphPointer == 0 && !currentIsLocalUser) return true;
-            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] <= -1;
+            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] < 8000;
             return false;
         });
 

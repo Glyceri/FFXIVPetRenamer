@@ -53,7 +53,11 @@ public class PetRenameWindow : PetWindow
         SameLinePretendSpace();
     }
 
-    internal override void OnPetModeChange(PetMode mode) => activeData?.FullReset();
+    internal override void OnPetModeChange(PetMode mode)
+    {
+        if (petMode == PetMode.Normal) activeData = companionData;
+        if (petMode == PetMode.BattlePet) activeData = battlePetData;
+    }
     public override void OnDrawNormal() => Size = baseSize;
     public override void OnDrawBattlePet() => Size = bPetSize;
     public override void OnDrawSharing()
@@ -123,17 +127,18 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
+        if (id == -1) return;
         if (forceOpen) 
         { 
             IsOpen = true; 
             ImGui.SetNextWindowFocus();
             if (id < 8000) SetPetMode(PetMode.BattlePet);
-            else SetPetMode(PetMode.Normal);
+            else if (id > 8000) SetPetMode(PetMode.Normal);
         }
 
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
-        if (id == -1) return;
+
         if (id < 8000) Set(ref battlePetData, id);
         if (id > 8000) Set(ref companionData, id);
     }

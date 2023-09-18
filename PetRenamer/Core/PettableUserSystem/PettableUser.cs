@@ -57,8 +57,8 @@ public unsafe class PettableUser
         _homeworld = homeworld;
         _homeworldName = SheetUtils.instance.GetWorldName(homeworld);
         _serializableUser = serializableUser;
-        _battlePet = new GeneralPetData("Battle Pet", (id) => id < -1);
-        _minion = new GeneralPetData("Minion", (id) => id > -1);
+        _battlePet = new GeneralPetData("Battle Pet", (id) => id < 8000);
+        _minion = new GeneralPetData("Minion", (id) => id > 8000);
     }
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser, nint user) : this(username, homeworld, serializableUser)
