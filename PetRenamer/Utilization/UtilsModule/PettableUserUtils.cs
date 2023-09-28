@@ -37,7 +37,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
             BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
             if (battlePet != null)
                 if (battlePet->Character.CharacterData.Health == 0)
-                    battlePet = AlterantiveFindForBChara(bChara, battlePet);
+                    battlePet = AlternativeFindForBChara(bChara, battlePet);
 
             user.SetBattlePet(battlePet);
         }
@@ -49,7 +49,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (user.BattlePet.Changed) window.OpenForBattleID(user.BattlePet.ID);
     }
 
-    unsafe BattleChara* AlterantiveFindForBChara(BattleChara* bChara, BattleChara* basePet)
+    unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara, BattleChara* basePet)
     {
         for (int i = 2; i < PluginHandlers.ObjectTable.Length; i += 2)
         {

@@ -10,8 +10,6 @@ internal class UtilsRegistryType : IRegistryElement, IDisposable
 
     internal virtual void OnRegistered() { }
     internal virtual void OnLateRegistered() { }
-
     internal virtual void Dispose() { }
-
     void IDisposable.Dispose() => Dispose();
 }

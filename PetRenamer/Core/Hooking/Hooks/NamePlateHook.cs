@@ -18,7 +18,7 @@ public unsafe sealed class NamePlateHook : HookableElement
     Hook<Delegates.UpdateNameplateDelegate>? nameplateHook = null;
 
     [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 4C 89 44 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 74 24 ??", DetourName = nameof(UpdateNameplateNpcDetour))]
-    Hook<Delegates.UpdateNameplateNpcDelegate>? nameplateHookMinion;
+    Hook<Delegates.UpdateNameplateNpcDelegate>? nameplateHookMinion = null;
 
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {

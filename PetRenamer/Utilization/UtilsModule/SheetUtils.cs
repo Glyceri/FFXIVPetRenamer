@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
