@@ -69,7 +69,7 @@ public unsafe class PettableUser
     {
         _user = (nint)user;
 
-        if ((_cType = _serializableUser.ToggleBackChanged()) == ChangedType.Removed)
+        if ((_cType = _serializableUser.ToggleBackChanged()) != ChangedType.Not)
         {
             _minion.Clear();
             _battlePet.Clear();

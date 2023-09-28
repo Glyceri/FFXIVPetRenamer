@@ -8,7 +8,7 @@ public static class PluginConstants
     public const string petConfigCommand = "/minionconfig";
     public const int ffxivNameSize = 64;
     public const int AtkUnitBaseUpdateIndex = 42;
-    public const string forbiddenCharacter = "^";
+    public const char forbiddenCharacter = '^';
 
     public static readonly int[] allowedJobs = new int[]
     {
@@ -27,7 +27,7 @@ public static class PluginConstants
     };
 
     public static readonly string[] removeables = new string[] 
-    { 
+    {
         "the ",
         "den ",
         "des ",

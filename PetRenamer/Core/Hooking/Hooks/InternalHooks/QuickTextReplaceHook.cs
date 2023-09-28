@@ -1,8 +1,10 @@
 ﻿using Dalamud.Hooking;
+using Dalamud.Logging;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -157,13 +159,8 @@ public unsafe class QuickTextReplaceHook : IDisposable
             if (curID != id) continue;
             if (curNickname == string.Empty) continue;
 
-            string tNodeString = tNode->NodeText.ToString();
+            StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname);
 
-            if (curNickname.Contains(replaceName)) tNodeString = Regex.Replace(tNodeString, curNickname, PluginConstants.forbiddenCharacter, RegexOptions.IgnoreCase);
-            tNodeString = Regex.Replace(tNodeString, replaceName, curNickname, RegexOptions.IgnoreCase);
-
-            tNodeString = tNodeString.Replace(PluginConstants.forbiddenCharacter, curNickname);
-            tNode->NodeText.SetString(tNodeString);
             if (nineGridNode != null)
             {
                 tNode->ResizeNodeForCurrentText();
