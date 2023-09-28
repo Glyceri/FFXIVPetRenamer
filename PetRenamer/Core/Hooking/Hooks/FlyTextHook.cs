@@ -19,7 +19,6 @@ internal class FlyTextHook : HookableElement
     unsafe internal override void OnInit()
     {
         PluginHandlers.FlyTextGui.FlyTextCreated += OnFlyTextCreated;
-
         addToScreenLogWithLogMessageId?.Enable();
     }
 
@@ -42,7 +41,6 @@ internal class FlyTextHook : HookableElement
     internal override void OnDispose()
     {
         PluginHandlers.FlyTextGui.FlyTextCreated -= OnFlyTextCreated;
-
         addToScreenLogWithLogMessageId?.Dispose();
     }
 }
