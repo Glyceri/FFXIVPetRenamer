@@ -4,6 +4,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
                 {
                     ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
                 }
-                catch (Exception e) { PluginLog.Log(e.Message); }
+                catch (Exception e) { PetLog.Log(e.Message); }
             }
         }
         else if (userDeclareType == UserDeclareType.Remove)
@@ -85,7 +86,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
                 {
                     ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
                 }
-                catch (Exception e) { PluginLog.Log(e.Message); }
+                catch (Exception e) { PetLog.Log(e.Message); }
                 _users.RemoveAt(i);
             }
         }

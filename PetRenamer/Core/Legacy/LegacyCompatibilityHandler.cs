@@ -1,4 +1,5 @@
 using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
@@ -10,9 +11,9 @@ namespace PetRenamer.Core.Legacy;
 internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAttribute>
 { 
     int lastInternalVersion = -1;
-    int currentInternalVersion = 0;
+    readonly int currentInternalVersion = 0;
 
-    List<LegacyElement> correctElements = new List<LegacyElement>();
+    readonly List<LegacyElement> correctElements = new List<LegacyElement>();
 
     public LegacyCompatibilityHandler() : base()
     {
@@ -37,7 +38,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
             legacyElement.OnStartup(currentInternalVersion);
     }
 
-    internal void OnUpdate(Framework frameWork)
+    internal void OnUpdate(IFramework frameWork)
     {
         if(lastInternalVersion != currentInternalVersion)
         {

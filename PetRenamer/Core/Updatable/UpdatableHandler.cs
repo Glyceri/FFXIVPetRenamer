@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
@@ -33,9 +34,9 @@ namespace PetRenamer.Core.Updatable
 
         public void ClearAllUpdatables() => ClearAllElements();
 
-        void MainUpdate(Framework framework)
+        void MainUpdate(IFramework framework)
         {
-            if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
+            if (!(PluginHandlers.ClientState is { LocalPlayer: { } })) return;
 
             foreach (Updatable updatable in updatables)
                 updatable.Update(framework);

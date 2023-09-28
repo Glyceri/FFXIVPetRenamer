@@ -7,6 +7,7 @@ using PetRenamer.Utilization.UtilsModule;
 using System.Runtime.InteropServices;
 using System;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
+using Dalamud.Plugin.Services;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -21,19 +22,19 @@ public unsafe class ActionMenuHook : HookableElement
 
     AtkUnitBase* actionMenuReplaceList;
 
-    internal override void OnUpdate(Framework framework)
+    internal override void OnUpdate(IFramework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         actionMenu = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenu");
         actionMenuReplaceList = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenuReplaceList");
         if (actionMenu != null) {
-            addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(actionMenu->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
+            addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(actionMenu->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
             addonupdatehook?.Enable();
         }
 
         if (actionMenuReplaceList != null)
         {
-            addonupdatehookreplacelist ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(actionMenuReplaceList->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
+            addonupdatehookreplacelist ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(actionMenuReplaceList->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
             addonupdatehookreplacelist?.Enable();
         }
     }

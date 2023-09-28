@@ -51,7 +51,7 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
-        DalamudContextMenu = new DalamudContextMenu();
+        DalamudContextMenu = new DalamudContextMenu(dalamud);
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();

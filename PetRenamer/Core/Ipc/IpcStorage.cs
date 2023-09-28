@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ public class IpcStorage : IDisposable
         }
     }
 
-    public void OnUpdate(Framework framework)
+    public void OnUpdate(IFramework framework)
     {
         if (touched)
         {

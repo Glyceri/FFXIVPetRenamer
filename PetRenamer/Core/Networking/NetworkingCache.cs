@@ -1,4 +1,5 @@
-﻿using ImGuiScene;
+﻿using Dalamud.Interface.Internal;
+using ImGuiScene;
 using PetRenamer.Core.Attributes;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace PetRenamer.Core.Networking;
 // This is a very dumb class where I manually put in lists or dictionaries or w/e to store networking results.
 public class NetworkingCache : IDisposable, IInitializable
 {
-    internal Dictionary<(string, uint), TextureWrap> textureCache = new Dictionary<(string, uint), TextureWrap>();
+    internal Dictionary<(string, uint), IDalamudTextureWrap> textureCache = new Dictionary<(string, uint), IDalamudTextureWrap>();
 
     public void Initialize()
     {
@@ -27,7 +28,7 @@ public class NetworkingCache : IDisposable, IInitializable
 
     public void DisposeTextureCache()
     {
-        foreach (TextureWrap texture in textureCache.Values)
+        foreach (IDalamudTextureWrap texture in textureCache.Values)
             texture?.Dispose();
         ClearTextureCache();
     }

@@ -2,13 +2,14 @@ using Dalamud.Game;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Handlers;
+using Dalamud.Plugin.Services;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
 [Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
-    public override void Update(Framework frameWork)
+    public override void Update(IFramework frameWork)
     {
         if (PluginLink.Configuration.serializableUsersV3! == null) return;
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;

@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Windows.Attributes;
@@ -9,7 +10,7 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable(1)]
 internal class AutoBattlePetUpdatable : Updatable
 {
-    public override void Update(Framework frameWork)
+    public override void Update(IFramework frameWork)
     {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;

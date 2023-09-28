@@ -6,7 +6,6 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
 using System;
-using Dalamud.Logging;
 using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
@@ -17,7 +16,8 @@ using PetRenamer.Core.Sharing;
 using PetRenamer.Core.Sharing.Importing;
 using PetRenamer.Core.Sharing.Importing.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using Dalamud.Interface.Internal;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -25,9 +25,9 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
-    int maxBoxHeight = 675;
-    int maxBoxHeightBattle = 631;
-    int maxBoxHeightSharing = 655;
+    readonly int maxBoxHeight = 675;
+    readonly int maxBoxHeightBattle = 631;
+    readonly int maxBoxHeightSharing = 655;
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
@@ -62,7 +62,7 @@ public class PetListWindow : PetWindow
     string minionSearchField = string.Empty;
 
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
-    List<TextureWrap> TextureWraps = new List<TextureWrap>();
+    readonly List<IDalamudTextureWrap> TextureWraps = new List<IDalamudTextureWrap>();
 
     SucceededImportData importedData = null!;
 
@@ -91,8 +91,7 @@ public class PetListWindow : PetWindow
 
         if (user == null) return;
 
-        if (temporaryUser == null)
-            temporaryUser = new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
+        temporaryUser ??= new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
 
         currentIsLocalUser = user.UserName == localUser.UserName && user.Homeworld == localUser.Homeworld;
         if (!currentIsLocalUser) SetOpenedAddPet(false);
@@ -232,6 +231,7 @@ public class PetListWindow : PetWindow
             string basePetName = user.SerializableUser.ids[index] < -1 ?
                 RemapUtils.instance.PetIDToName(user.SerializableUser.ids[index]) :
                 SheetUtils.instance.GetPetName(user.SerializableUser.ids[index]);
+            basePetName = StringUtils.instance.MakeTitleCase(basePetName);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{user.SerializableUser.ids[index]}");
 
@@ -295,6 +295,7 @@ public class PetListWindow : PetWindow
             DrawBasicBar("Nickname", $"{name}");
             int id = importedData.ids[i];
             string basePetName = id < -1 ? RemapUtils.instance.PetIDToName(id) : SheetUtils.instance.GetPetName(id);
+            basePetName = StringUtils.instance.MakeTitleCase(basePetName);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{id}");
 
@@ -470,7 +471,7 @@ public class PetListWindow : PetWindow
     {
         SetAdvancedMode(false);
         ImportData data = ImportHandler.SetImportString(ImGui.GetClipboardText());
-        if (data is FailedImportData failedImportData) PluginLog.Log($"Import Error occured: {failedImportData.ErrorMessage}");
+        if (data is FailedImportData failedImportData) PetLog.Log($"Import Error occured: {failedImportData.ErrorMessage}");
         if (data is SucceededImportData succeededImportData)
         {
             importedData = succeededImportData;
@@ -579,7 +580,7 @@ public class PetListWindow : PetWindow
         if (textureID == 0) return;
         string iconPath = PluginHandlers.TextureProvider.GetIconPath(textureID)!;
         if (iconPath == null) return;
-        TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
         TextureWraps!.Add(textureWrap);
     }
 
@@ -655,7 +656,7 @@ public class PetListWindow : PetWindow
     void DisposeTextures()
     {
         lastUser = user;
-        foreach (TextureWrap tWrap in TextureWraps)
+        foreach (IDalamudTextureWrap tWrap in TextureWraps)
             tWrap?.Dispose();
         TextureWraps?.Clear();
     }

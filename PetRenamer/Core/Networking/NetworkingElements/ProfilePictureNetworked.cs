@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System;
 using System.Threading;
+using Dalamud.Interface.Internal;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
 
@@ -41,7 +42,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
     {
         string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
         if (iconPath == null) return nint.Zero;
-        TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
         if (textureWrap == null) return nint.Zero;
         return textureWrap.ImGuiHandle;
     }
@@ -101,7 +102,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             catch { }
             try
             {
-                TextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
+                IDalamudTextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
                 if (wrap == null) return;
                 Cache.textureCache.Add(characterData, wrap);
             }

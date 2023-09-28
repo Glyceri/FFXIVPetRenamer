@@ -1,4 +1,4 @@
-﻿using Dalamud.Game;
+﻿using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
@@ -13,7 +13,7 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable(-10)]
 internal class UserFindUpdatable : Updatable
 {
-    public override void Update(Framework frameWork)
+    public override void Update(IFramework frameWork)
     {
         PluginLink.PettableUserHandler.LoopThroughUsers(OnUser);
     }

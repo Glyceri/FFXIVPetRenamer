@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
@@ -42,6 +43,6 @@ internal class CastBarHook : QuickTextHookableElement
         return null!;
     }
 
-    internal override void OnUpdate(Framework framework) => 
+    internal override void OnUpdate(IFramework framework) => 
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowCastBarPet);
 }

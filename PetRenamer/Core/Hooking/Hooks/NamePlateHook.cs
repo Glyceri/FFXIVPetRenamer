@@ -32,8 +32,6 @@ public unsafe sealed class NamePlateHook : HookableElement
         return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 
-    string lastBattlePetNameToUse = string.Empty;
-
     void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)

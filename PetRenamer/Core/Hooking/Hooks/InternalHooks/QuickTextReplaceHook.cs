@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -47,16 +48,17 @@ public unsafe class QuickTextReplaceHook : IDisposable
     {
         baseElement = null;
         addonupdatehook?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     bool allow = true;
 
-    public void OnUpdate(Framework framework, bool allow)
+    public void OnUpdate(IFramework framework, bool allow)
     {
         this.allow = allow;
         baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName(AddonName);
         if (baseElement == null) return;
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
+        addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
         addonupdatehook?.Enable();
     }
 
@@ -77,13 +79,13 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (TextPos.Length > 1)
         {
             ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
-            for (int i = 1; i < TextPos.Count() - 1; i++)
+            for (int i = 1; i < TextPos.Length - 1; i++)
             {
                 if (cNode == null) return addonupdatehook!.Original(baseElement);
                 cNode = cNode.GetComponentNode(TextPos[i]);
             }
             if (cNode == null) return addonupdatehook!.Original(baseElement);
-            tNode = cNode.GetNode<AtkTextNode>(TextPos[TextPos.Length - 1]);
+            tNode = cNode.GetNode<AtkTextNode>(TextPos[^1]);
         }
         else
         {

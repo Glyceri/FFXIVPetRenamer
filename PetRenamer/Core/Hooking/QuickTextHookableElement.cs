@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.Hooking.Hooks.InternalHooks;
 using PetRenamer.Core.PettableUserSystem;
 using System;
@@ -20,9 +21,9 @@ public class QuickTextHookableElement : HookableElement
         OnQuickInit(); 
     }
 
-    internal override void OnUpdate(Framework framework) { }
+    internal override void OnUpdate(IFramework framework) { }
 
-    protected void OnBaseUpdate(Framework framework, bool allow)
+    protected void OnBaseUpdate(IFramework framework, bool allow)
     {
         foreach (QuickTextReplaceHook el in quickTextReplaceHooks)
             el?.OnUpdate(framework, allow);

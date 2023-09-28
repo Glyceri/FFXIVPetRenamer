@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -27,11 +28,11 @@ internal unsafe class PartyListHook : HookableElement
     AddonPartyList* partyList;
 
 
-    internal override void OnUpdate(Framework framework)
+    internal override void OnUpdate(IFramework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
+        addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
     }
 

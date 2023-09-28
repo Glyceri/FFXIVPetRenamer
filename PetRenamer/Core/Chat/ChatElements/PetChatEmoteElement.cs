@@ -24,15 +24,15 @@ internal unsafe class PetChatEmoteElement : ChatElement
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;
         ulong target = bChara->Character.GetTargetId();
-        uint softTarget = bChara->Character.PlayerTargetObjectID;
-        if (softTarget != 0)
-            target = softTarget;
+        GameObjectID softTarget = bChara->Character.LookTargetId;
+        if (softTarget.ObjectID != 0)
+            target = softTarget.ObjectID;
 
         string nameString = string.Empty;
         int id = -1;
         string ownerName = string.Empty;
 
-        FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
+        FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((uint)target);
         if (lookedUpChar2 == null) return;
         GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
         if (gObj != null)
@@ -45,7 +45,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
         {
             if (!RemapUtils.instance.skeletonToClass.ContainsKey(lookedUpChar2->CharacterData.ModelCharaId)) return;
             nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
-            BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
+            BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId(lookedUpChar2->GameObject!.OwnerID!);
             if (chara == null) return;
             id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
             ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;

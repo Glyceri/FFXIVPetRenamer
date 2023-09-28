@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -56,7 +57,7 @@ internal class TooltipHook : QuickTextHookableElement
         ItemDetailOnUpdateHook?.Dispose();
     }
 
-    internal override void OnUpdate(Framework framework) =>
+    internal override void OnUpdate(IFramework framework) =>
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
 
     IntPtr lastTooltip;

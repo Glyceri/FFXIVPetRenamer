@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 
@@ -18,7 +19,7 @@ public unsafe class MinionNotebookHook : QuickTextHookableElement
             RegisterHook("MinionNoteBook", new uint[3] { 25, index, 6 });
     }
 
-    internal override void OnUpdate(Framework framework)
+    internal override void OnUpdate(IFramework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.showNamesInMinionBook);

@@ -11,6 +11,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Logging;
 using Dalamud.Memory;
 using System;
+using Dalamud.Plugin.Services;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -23,7 +25,7 @@ internal unsafe class TargetBarHooking : HookableElement
     AtkUnitBase* baseElement;
     AtkUnitBase* baseElement2;
 
-    internal override void OnUpdate(Framework framework)
+    internal override void OnUpdate(IFramework framework)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
@@ -31,12 +33,12 @@ internal unsafe class TargetBarHooking : HookableElement
 
         baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_TargetInfoMainTarget");
 
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
+        addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
 
         baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_FocusTargetInfo");
 
-        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
+        addonupdatehook2 ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(baseElement2->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
         addonupdatehook2?.Enable();
     }
 
@@ -79,7 +81,7 @@ internal unsafe class TargetBarHooking : HookableElement
             GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
             SetFor(textNode, gObj);
         }
-        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+        catch (Exception ex) { PetLog.Log(ex.ToString()); }
     }
 
     void HandleTargetOfTargetBar()
@@ -97,14 +99,14 @@ internal unsafe class TargetBarHooking : HookableElement
 
             if (targetObjectKind == TargetObjectKind.Player)
             {
-                FFBattleCharacter* bChara = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target.ObjectId);
+                FFBattleCharacter* bChara = PluginLink.CharacterManager->LookupBattleCharaByObjectId(target.ObjectId);
                 if (bChara == null) return;
                 ulong targetID2 = bChara->Character.GetTargetId();
                 if (!targetID2.ToString("X").StartsWith("4")) return;
 
                 targetObjectKind = TargetObjectKind.Companion;
 
-                FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetID2);
+                FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((uint)targetID2);
                 if (lookedUpChar2 == null) return;
                 GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
                 if(gObj == null) return;
@@ -116,7 +118,7 @@ internal unsafe class TargetBarHooking : HookableElement
             GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(index);
             SetFor(textNode2, gObj2);
         }
-        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+        catch (Exception ex) { PetLog.Log(ex.ToString()); }
     }
 
     void HandleTargetBar()

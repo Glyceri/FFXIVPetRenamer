@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Utility.Signatures;
+﻿using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
@@ -10,7 +9,7 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
 {
     protected override void OnElementCreation(HookableElement element)
     {
-        SignatureHelper.Initialise(element);
+        PluginHandlers.Hooking.InitializeFromAttributes(element);
         element.OnInit();
     }
 
@@ -24,7 +23,7 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
         PluginHandlers.Framework.Update -= OnUpdate;
     }
 
-    protected void OnUpdate(Framework framework)
+    protected void OnUpdate(IFramework framework)
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         foreach (HookableElement el in elements)
