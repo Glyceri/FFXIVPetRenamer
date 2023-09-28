@@ -50,7 +50,7 @@ public class Configuration : IPluginConfiguration
 
     void CurrentInitialize()
     {
-        serializableUsersV3 ??= new SerializableUserV3[0];
+        serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
     }
 
     public void Save() 
@@ -84,20 +84,20 @@ public class Configuration : IPluginConfiguration
     [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
     public bool usePartyList { get; set; } = false;
 
-    [Obsolete] public bool replaceEmotes { get; set; } = true;
-    [Obsolete] public bool allowTooltips { get; set; } = true;
-    [Obsolete] public bool useContextMenus { get; set; } = true;
-    [Obsolete] public bool useCustomNamesInChat { get; set; } = true;
-    [Obsolete] public bool useCustomFlyoutInChat { get; set; } = true;
-    [Obsolete] public bool allowCastBar { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool replaceEmotes { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowTooltips { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useContextMenus { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomNamesInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomFlyoutInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowCastBar { get; set; } = true;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialize()
     {
-        users ??= new SerializableNickname[0];
-        serializableUsers ??= new SerializableUser[0];
-        serializableUsersV2 ??= new SerializableUserV2[0];
+        users ??= Array.Empty<SerializableNickname>();
+        serializableUsers ??= Array.Empty<SerializableUser>();
+        serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

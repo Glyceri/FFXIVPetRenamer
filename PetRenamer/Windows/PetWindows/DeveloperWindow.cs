@@ -28,7 +28,7 @@ internal class DeveloperWindow : PetWindow
 
     int currentTab = 0;
 
-    int maxTabs = 5;
+    readonly int maxTabs = 5;
 
     public override void OnDraw()
     {

@@ -44,8 +44,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public bool PetExistsInANY(string petname)
     {
-        if (lastPets.ContainsKey(petname))
-            return lastPets[petname];
+        if(lastPets.TryGetValue(petname, out bool exists))
+            return exists;
 
         lastPets.Add(petname, false);
         if (lastPets.Count > cacheSizes)
@@ -75,8 +75,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
         if (id <= 0) return string.Empty;
 
-        if (lastBattleIds.ContainsKey(id))
-            return lastBattleIds[id];
+        if(lastBattleIds.TryGetValue(id, out string? battleName))
+            return battleName;
 
         lastBattleIds.Add(id, string.Empty);
         if (lastBattleIds.Count > cacheSizes)
@@ -102,8 +102,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public string GetPetName(int id)
     {
-        if (lastIds.ContainsKey(id))
-            return lastIds[id];
+        if (lastIds.TryGetValue(id, out string? petName))
+            return petName;
 
         lastIds.Add(id, string.Empty);
         if (lastIds.Count > cacheSizes)
@@ -125,8 +125,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public int GetIDFromName(string name)
     {
-        if (lastNames.ContainsKey(name))
-            return lastNames[name];
+        if(lastNames.TryGetValue(name, out int id)) 
+            return id;
 
         lastNames.Add(name, -1);
         if (lastNames.Count > cacheSizes)

@@ -7,8 +7,8 @@ namespace PetRenamer.Windows.PetWindows;
 
 public class ConfirmPopup : TemporaryPetWindow
 {
-    string message;
-    Window blackenedWindow;
+    readonly string message;
+    readonly Window blackenedWindow;
 
     public ConfirmPopup(string message, Action<object> callback, Window blackenedWindow = null!) : base(message, callback, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar)
     {

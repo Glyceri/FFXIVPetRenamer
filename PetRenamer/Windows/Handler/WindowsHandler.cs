@@ -10,11 +10,11 @@ namespace PetRenamer.Windows.Handler;
 
 internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttribute>
 {
-    WindowSystem windowSystem = new WindowSystem("Pet Nicknames");
+    readonly WindowSystem windowSystem = new WindowSystem("Pet Nicknames");
     public WindowSystem WindowSystem { get => windowSystem; }
 
     List<PetWindow> petWindows => elements;
-    List<TemporaryPetWindow> temporaryPetWindows = new List<TemporaryPetWindow>();
+    readonly List<TemporaryPetWindow> temporaryPetWindows = new List<TemporaryPetWindow>();
 
     public WindowsHandler() : base()
     {

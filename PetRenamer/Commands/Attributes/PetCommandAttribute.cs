@@ -8,7 +8,7 @@ public class PetCommandAttribute : Attribute
     public string command = string.Empty;
     public string description = string.Empty;
     public bool showInHelp = true;
-    public string[] extraCommands = new string[0];
+    public string[] extraCommands = Array.Empty<string>();
 
     public PetCommandAttribute(string command, string description, bool showInHelp)
     {

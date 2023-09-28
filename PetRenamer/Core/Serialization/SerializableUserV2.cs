@@ -44,7 +44,7 @@ public class SerializableUserV2
     [JsonIgnore]
     public int length => ids.Length;
 
-    public SerializableUserV2(string username, ushort homeworld) : this(new int[0], new string[0], username, homeworld) { }
+    public SerializableUserV2(string username, ushort homeworld) : this(Array.Empty<int>(), Array.Empty<string>(), username, homeworld) { }
     public SerializableUserV2(SerializableNickname[] nicknames, string username, ushort homeworld) : this(username, homeworld)
     {
         ids = new int[nicknames.Length];

@@ -45,7 +45,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         PushStyleColor(ImGuiCol.TitleBgCollapsed, StylingColours.tileBgCollapsed);
     }
 
-    int ButtonCount = 3;
+    readonly int ButtonCount = 3;
     protected void DrawModeToggle()
     {
         int pressed = -1;
