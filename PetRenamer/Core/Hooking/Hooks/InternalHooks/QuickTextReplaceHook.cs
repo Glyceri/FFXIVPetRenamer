@@ -3,7 +3,6 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -24,6 +23,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
     readonly Action<string> latestOutcome;
 
     bool allow = true;
+    string lastAnswer = string.Empty;
 
     public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!) : this(addonName, new uint[1] { textPos }, allowedToFunction, atkPos, recallAction, latestOutcome) { }
     public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
@@ -52,8 +52,6 @@ public unsafe class QuickTextReplaceHook : IDisposable
         addonupdatehook?.Enable();
     }
 
-    string lastAnswer = string.Empty;
-
     byte Handle(AtkUnitBase* baseElement)
     {
         if (!allow || TextPos.Length == 0) return addonupdatehook!.Original(baseElement);
@@ -68,8 +66,8 @@ public unsafe class QuickTextReplaceHook : IDisposable
         AtkTextNode* tNode = GetTextNode(ref bNode);
         if (tNode == null) return addonupdatehook!.Original(baseElement);
 
-        string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == null) return addonupdatehook!.Original(baseElement);
+        string tNodeText = tNode->NodeText.ToString() ?? string.Empty;
+        if (tNodeText == string.Empty) return addonupdatehook!.Original(baseElement);
         if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
         if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
 
@@ -79,11 +77,9 @@ public unsafe class QuickTextReplaceHook : IDisposable
         PettableUser user = GetUser();
         if (user == null) return addonupdatehook!.Original(baseElement);
 
-
         (int, string) data = GetName(SheetUtils.instance.GetIDFromName(tNodeText), tNodeText);
         int id = data.Item1;
         string replaceName = data.Item2;
-
         if (replaceName == string.Empty) return addonupdatehook!.Original(baseElement);
 
         if (id == -1)
@@ -91,6 +87,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
             lastAnswer = tNodeText;
             return addonupdatehook!.Original(baseElement);
         }
+
         if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
         string curNickname = user.SerializableUser.GetNameFor(id);
@@ -117,23 +114,11 @@ public unsafe class QuickTextReplaceHook : IDisposable
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
     }
 
-    PettableUser GetUser()
-    {
-        if (recallAction == null) return PluginLink.PettableUserHandler.LocalUser()!;
-        PettableUser tempUser = recallAction.Invoke();
-        if (tempUser != null) return tempUser;
-        return null!;
-    }
-
-    AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode)
-    {
-        if (AtkPos != -1) return bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
-        return null!;
-    }
+    PettableUser GetUser() => recallAction?.Invoke() ?? PluginLink.PettableUserHandler.LocalUser()!;
+    AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
 
     (int, string) GetName(int id, string replaceName)
     {
-        PetLog.Log(id + " : " + replaceName);
         string textNodeText = replaceName;
         if (id != -1) return (id, replaceName);
 

@@ -27,5 +27,5 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
     DGameObject RequestFocusTarget() => PluginHandlers.TargetManager.FocusTarget!;
     DGameObject RequestTarget() => PluginHandlers.TargetManager.SoftTarget! ?? PluginHandlers.TargetManager.Target!;
 
-    bool Allowed(int id) => id < -1 && !PluginLink.Configuration.allowCastBarPet;
+    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet;
 }
