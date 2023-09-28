@@ -27,14 +27,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
             action.Invoke(user);
     }
 
-    public void LoopThroughBreakable(Func<PettableUser, bool> func)
-    {
-        if (func == null) return;
-        foreach (PettableUser user in _users)
-            if (func.Invoke(user))
-                break;
-    }
-
     public void Dispose()
     {
         _users?.Clear();

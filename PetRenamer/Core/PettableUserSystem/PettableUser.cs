@@ -73,7 +73,6 @@ public unsafe class PettableUser
         }
     }
 
-
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
