@@ -1,15 +1,12 @@
 ﻿using Dalamud.Hooking;
-using Dalamud.Logging;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
@@ -100,7 +97,6 @@ public unsafe class QuickTextReplaceHook : IDisposable
         if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
         if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
 
-
         AtkNineGridNode* nineGridNode = null;
         if (AtkPos != -1) nineGridNode = bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
         if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
@@ -152,24 +148,10 @@ public unsafe class QuickTextReplaceHook : IDisposable
         }
         if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
-        for (int i = 0; i < user.SerializableUser.length; i++)
-        {
-            int curID = user.SerializableUser.ids[i];
-            string curNickname = user.SerializableUser.names[i];
-            if (curID != id) continue;
-            if (curNickname == string.Empty) continue;
-
-            StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname);
-
-            if (nineGridNode != null)
-            {
-                tNode->ResizeNodeForCurrentText();
-                nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
-            }
-
-            lastAnswer = curNickname;
-            break;
-        }
+        string curNickname = user.SerializableUser.GetNameFor(id);
+        if (curNickname == string.Empty) return addonupdatehook!.Original(baseElement);
+        StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname, nineGridNode);
+        lastAnswer = curNickname;
 
         return addonupdatehook!.Original(baseElement);
     }

@@ -2,6 +2,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
@@ -126,6 +127,22 @@ internal class PettableUserHandler : IDisposable, IInitializable
             return false;
         });
         return returnThis;
+    }
+
+    public PettableUser GetUser(nint address)
+    {
+        if (address == nint.Zero) return null!;
+        foreach (PettableUser user in Users)
+        {
+            if (user.nintUser == address) return user;
+            foreach (PetBase pet in user.Pets)
+            {
+                if (pet.Pet != address) continue;
+                return user;
+            }
+        }
+
+        return null!;
     }
 
     public PettableUser? LocalUser()

@@ -21,14 +21,14 @@ internal class TooltipHook : QuickTextHookableElement
     // Hook from: https://github.com/Kouzukii/ffxiv-whichpatchwasthat/blob/main/WhichPatchWasThat/Hooks.cs
     // Actually its now from: https://github.com/Caraxi/SimpleTweaksPlugin/blob/b390e0686c1f8b30e163306dcc3420390b67f340/Tweaks/Tooltips/AdditionalItemInfo.cs#L21
     [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 4C 8B AA ?? ?? ?? ??", DetourName = nameof(ItemDetailOnUpdateDetour))]
-    private Hook<Delegates.AddonOnRequestedUpdate>? ItemDetailOnUpdateHook { get; init; }
+    Hook<Delegates.AddonOnRequestedUpdate>? ItemDetailOnUpdateHook { get; init; }
 
     public static string latestOutcome = string.Empty;
 
     internal override void OnQuickInit()
     {
         RegisterHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
-        RegisterHook("Tooltip", 2, Allowed, 3, TooltipDetour);
+        RegisterHook("Tooltip", 2, Allowed, 3, () => TooltipHelper.nextUser);
 
         showTooltip?.Enable();
         ItemDetailOnUpdateHook?.Enable();
@@ -47,10 +47,6 @@ internal class TooltipHook : QuickTextHookableElement
         return true;
     }
 
-    PettableUser TooltipDetour()
-    {
-        return TooltipHelper.nextUser;
-    }
     internal override void OnQuickDispose()
     {
         showTooltip?.Dispose();

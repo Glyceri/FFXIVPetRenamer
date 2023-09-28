@@ -81,17 +81,22 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
 
     public string MakeString(char c, int count) => new string(c, count);
 
-    public unsafe void ReplaceAtkString(AtkTextNode* textNode, ref (string, string)[] validNames)
+    public unsafe void ReplaceAtkString(AtkTextNode* textNode, ref (string, string)[] validNames, AtkNineGridNode* nineGridNode = null)
     {
         if (validNames.Length == 0) return;
         string? outcomeText = textNode->NodeText.ToString();
         ReplaceString(ref outcomeText, ref validNames);
         textNode->NodeText.SetString(outcomeText);
+
+        if (nineGridNode == null) return;
+
+        textNode->ResizeNodeForCurrentText();
+        nineGridNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    public unsafe void ReplaceAtkString(AtkTextNode* textNode, string baseName, string replaceName)
+    public unsafe void ReplaceAtkString(AtkTextNode* textNode, string baseName, string replaceName, AtkNineGridNode* nineGridNode = null)
     {
         (string, string)[] strs = new (string, string)[] { (baseName, replaceName) };
-        ReplaceAtkString(textNode, ref strs);
+        ReplaceAtkString(textNode, ref strs, nineGridNode);
     }
 }
