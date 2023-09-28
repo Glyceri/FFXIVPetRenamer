@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
 using PetRenamer.Core.Serialization;
@@ -9,7 +10,7 @@ namespace PetRenamer.Core.Legacy.LegacyElements;
 [Legacy(new int[1] { 4 })]
 internal class LegacyNamingVer4 : LegacyElement
 {
-    internal override void OnPlayerAvailable(int detectedVersion)
+    internal override void OnPlayerAvailable(int detectedVersion, ref PlayerCharacter player)
     {
         if (detectedVersion != 4) return;
 

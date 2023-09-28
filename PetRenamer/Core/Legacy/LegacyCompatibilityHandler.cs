@@ -1,4 +1,5 @@
 using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
@@ -9,7 +10,7 @@ using System.Linq;
 namespace PetRenamer.Core.Legacy;
 
 internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAttribute>
-{ 
+{
     int lastInternalVersion = -1;
     readonly int currentInternalVersion = 0;
 
@@ -26,21 +27,21 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
     {
         hasFoundPlayer = false;
         correctElements.Clear();
-        for(int i = 0; i < elements.Count; i++)
+        for (int i = 0; i < elements.Count; i++)
         {
             LegacyElement element = elements[i];
             LegacyAttribute attribute = attributes[i];
-            if(attribute.forVersions.Contains(currentInternalVersion))
+            if (attribute.forVersions.Contains(currentInternalVersion))
                 correctElements.Add(element);
         }
 
-        foreach(LegacyElement legacyElement in correctElements)
+        foreach (LegacyElement legacyElement in correctElements)
             legacyElement.OnStartup(currentInternalVersion);
     }
 
-    internal void OnUpdate(IFramework frameWork)
+    internal void OnUpdate(ref IFramework frameWork, ref PlayerCharacter player)
     {
-        if(lastInternalVersion != currentInternalVersion)
+        if (lastInternalVersion != currentInternalVersion)
         {
             Reset();
             lastInternalVersion = currentInternalVersion;
@@ -50,11 +51,10 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
             legacyElement.OnUpdate(frameWork, currentInternalVersion);
 
         if (hasFoundPlayer) return;
+        hasFoundPlayer = true;
 
-        hasFoundPlayer = PluginHandlers.ClientState.LocalPlayer != null;
-        if (hasFoundPlayer)
-            foreach (LegacyElement legacyElement in correctElements)
-                legacyElement.OnPlayerAvailable(currentInternalVersion);
-        
+        foreach (LegacyElement legacyElement in correctElements)
+            legacyElement.OnPlayerAvailable(currentInternalVersion, ref player);
+
     }
 }

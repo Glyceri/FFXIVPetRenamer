@@ -1,8 +1,9 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
-#pragma warning disable CS0612 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
 using PetRenamer.Core.Serialization;
+using static Lumina.Data.Parsing.Layer.LayerCommon;
 
 namespace PetRenamer.Core.Legacy.LegacyElements;
 
@@ -10,12 +11,12 @@ namespace PetRenamer.Core.Legacy.LegacyElements;
 internal class LegacyNamingVer2 : LegacyElement
 {
 
-    internal override void OnPlayerAvailable(int detectedVersion)
+    internal override void OnPlayerAvailable(int detectedVersion, ref PlayerCharacter player)
     {
         if (detectedVersion != 2) return;
         if (PluginLink.Configuration.users!.Length == 0) return;
 
-        SerializableUser newSerializableUser = new SerializableUser((SerializableNickname[])PluginLink.Configuration.users.Clone(), PluginHandlers.ClientState.LocalPlayer!.Name.ToString(), (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id);
+        SerializableUser newSerializableUser = new SerializableUser((SerializableNickname[])PluginLink.Configuration.users.Clone(), player.Name.ToString(), (ushort)player.HomeWorld.Id);
         PluginLink.Configuration.users = null;
         PluginLink.Configuration.Version = 3;
         PluginLink.Configuration.serializableUsers = new SerializableUser[1] { newSerializableUser };
@@ -23,4 +24,3 @@ internal class LegacyNamingVer2 : LegacyElement
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete
-#pragma warning restore CS0612 // Type or member is obsolete
