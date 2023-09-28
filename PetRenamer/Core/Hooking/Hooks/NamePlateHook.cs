@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
 
 namespace PetRenamer.Core.Hooking.Hooks;
@@ -37,18 +36,12 @@ public unsafe sealed class NamePlateHook : HookableElement
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
 
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-        {
-            if (!user.UserExists) continue;
-            foreach (PetBase pet in user.Pets)
-            {
-                if (pet.Pet != obj) continue;
-                string nameToUse = pet.CustomName == string.Empty ? pet.BaseName : pet.CustomName;
-                if (nameToUse == string.Empty) continue;
-                namePlateInfo->Name.SetString(nameToUse);
-                return;
-            }
-        }
+        PetBase currentPet = PluginLink.PettableUserHandler.GetPet(obj);
+        if (currentPet == null) return;
+
+        string nameToUse = currentPet.CustomName == string.Empty ? currentPet.BaseName : currentPet.CustomName;
+        if (nameToUse == string.Empty) return;
+        namePlateInfo->Name.SetString(nameToUse);
     }
 
     internal override void OnInit()
@@ -59,12 +52,7 @@ public unsafe sealed class NamePlateHook : HookableElement
 
     internal override void OnDispose()
     {
-        nameplateHook?.Disable();
         nameplateHook?.Dispose();
-        nameplateHook = null;
-
-        nameplateHookMinion?.Disable();
         nameplateHookMinion?.Dispose();
-        nameplateHookMinion = null;
     }
 }

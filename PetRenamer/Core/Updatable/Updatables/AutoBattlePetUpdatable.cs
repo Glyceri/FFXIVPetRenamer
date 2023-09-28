@@ -20,16 +20,13 @@ internal class AutoBattlePetUpdatable : Updatable
         foreach(int id in PluginConstants.allowedNegativePetIDS)
         {
             bool found = false;
-            user.SerializableUser.LoopThroughBreakable(nickname => {
-                if (nickname.Item1 == id) 
-                { 
-                    found = true; 
-                    return true; 
-                }
-                return false; 
-            });
-            if(!found)
-            missingIDs.Add(id);
+            for(int i = 0; i < user.SerializableUser.length; i++)
+            {
+                if (user.SerializableUser.ids[i] != id) continue;
+                found = true;
+                break;
+            }
+            if(!found) missingIDs.Add(id);
         }
 
         foreach (int id in missingIDs)

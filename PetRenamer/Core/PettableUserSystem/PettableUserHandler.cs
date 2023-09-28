@@ -20,13 +20,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
 
-    public void BackwardsSAFELoopThroughUser(Action<PettableUser> action)
-    {
-        if (action == null) return;
-        for (int i = _users.Count - 1; i >= 0; i--)
-            action.Invoke(_users[i]);
-    }
-
     public void LoopThroughUsers(Action<PettableUser> action)
     {
         if (action == null) return;
@@ -59,37 +52,47 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
     {
-        if (userDeclareType == UserDeclareType.Add)
-        {
-            if (force)
-                for (int i = _users.Count - 1; i >= 0; i--)
-                    if (_users[i].UserName == user.username && _users[i].Homeworld == user.homeworld)
-                        _users.RemoveAt(i);
-            if (!Contains(user))
-            {
-                PettableUser u = new PettableUser(user.username, user.homeworld, user);
-                _users.Add(u);
-                try
-                {
-                    ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
-                }
-                catch (Exception e) { PetLog.Log(e.Message); }
-            }
-        }
-        else if (userDeclareType == UserDeclareType.Remove)
-        {
-            for (int i = _users.Count - 1; i >= 0; i--)
-            {
-                if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
+        if (userDeclareType == UserDeclareType.Add) AddUser(user, force);
+        else if (userDeclareType == UserDeclareType.Remove) RemoveUser(user);
+    }
 
-                try
-                {
-                    ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
-                }
-                catch (Exception e) { PetLog.Log(e.Message); }
-                _users.RemoveAt(i);
+    void RemoveUser(SerializableUserV3 user)
+    {
+        for (int i = _users.Count - 1; i >= 0; i--)
+        {
+            if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
+
+            try
+            {
+                ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
             }
+            catch (Exception e) { PetLog.Log(e.Message); }
+            _users.RemoveAt(i);
         }
+    }
+
+    void AddUser(SerializableUserV3 user, bool force = false)
+    {
+        if (force) ForceRemoveUser(user);
+        if (Contains(user)) return;
+
+        PettableUser u;
+        _users.Add(u = new PettableUser(user.username, user.homeworld, user));
+        try
+        {
+            ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
+        }
+        catch (Exception e) { PetLog.Log(e.Message); }
+    }
+
+    void ForceRemoveUser(SerializableUserV3 user)
+    {
+        for (int i = _users.Count - 1; i >= 0; i--)
+            if (_users[i].EqualsUser(user))
+            {
+                _users.RemoveAt(i);
+                return;
+            }
     }
 
     public bool LocalPetChanged()
@@ -99,40 +102,19 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return user.AnyPetChanged;
     }
 
-    public PettableUser? GetUser(string name)
-    {
-        PettableUser? returnThis = null;
-        LoopThroughBreakable((user) =>
-        {
-            if (name.Contains(user.UserName))
-            {
-                returnThis = user;
-                return true;
-            }
-            return false;
-        });
-        return returnThis;
-    }
-
+    public PettableUser? GetUser(string name) => GetUser(name, 9999);
     public PettableUser? GetUser(string name, ushort homeworld)
     {
-        PettableUser? returnThis = null;
-        LoopThroughBreakable((user) =>
-        {
-            if (name.Contains(user.UserName) && homeworld == user.Homeworld)
-            {
-                returnThis = user;
-                return true;
-            }
-            return false;
-        });
-        return returnThis;
+        foreach (PettableUser user in _users)
+            if (name.Contains(user.UserName) && (homeworld == 9999 || homeworld == user.Homeworld))
+                return user;
+        return null!;
     }
 
     public PettableUser GetUser(nint address)
     {
         if (address == nint.Zero) return null!;
-        foreach (PettableUser user in Users)
+        foreach (PettableUser user in _users)
         {
             if (user.nintUser == address) return user;
             foreach (PetBase pet in user.Pets)
@@ -145,26 +127,35 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return null!;
     }
 
+    public PetBase GetPet(nint address)
+    {
+        if (address == nint.Zero) return null!;
+
+        foreach (PettableUser user in _users)
+        {
+            if (!user.UserExists) continue;
+            foreach (PetBase pet in user.Pets)
+            {
+                if (pet.Pet != address) continue;
+                return pet;
+            }
+        }
+
+        return null!;
+    }
+
     public PettableUser? LocalUser()
     {
-        PettableUser? returnThis = null;
-        LoopThroughBreakable((user) =>
-        {
+        foreach (PettableUser user in _users)
             if (user.LocalUser)
-            {
-                returnThis = user;
-                return true;
-            }
-            return false;
-        });
-
-        return returnThis;
+                return user;
+        return null!;
     }
 
     public PettableUser? LastCastedUser()
     {
         PettableUser user = null!;
-        foreach (PettableUser user1 in PluginLink.PettableUserHandler.Users)
+        foreach (PettableUser user1 in _users)
         {
             if (user1 == null) continue;
             if (!user1.UserExists) continue;
@@ -200,15 +191,12 @@ internal class PettableUserHandler : IDisposable, IInitializable
     bool Contains(SerializableUserV3 user)
     {
         for (int i = 0; i < _users.Count; i++)
-            if (_users[i].UserName.ToLowerInvariant().Trim().Normalize() == user.username.ToLowerInvariant().Trim().Normalize() && _users[i].Homeworld == user.homeworld)
+            if (_users[i].EqualsUser(user))
                 return true;
         return false;
     }
 
-    public void SetLastCast(IntPtr castUser, IntPtr castDealer)
-    {
-        _lastCast = new LastActionUsed(castUser, castDealer);
-    }
+    public void SetLastCast(IntPtr castUser, IntPtr castDealer) => _lastCast = new LastActionUsed(castUser, castDealer);
 }
 
 public struct LastActionUsed

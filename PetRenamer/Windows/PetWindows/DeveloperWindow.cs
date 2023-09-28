@@ -114,35 +114,23 @@ internal class DeveloperWindow : PetWindow
                         (ushort)((PlayerCharacter)target).HomeWorld.Id), UserDeclareType.Add);
             }
 
-        if (Button("Add ALL Users EMPTY"))
-        {
-            AddUser(false, 0);
-        }
-
-        if (Button("Add ALL Users"))
-        {
-            AddUser(true, 1000);
-        }
-
-        if (Button("Add ALL Users Small"))
-        {
-            AddUser(true, 0);
-        }
+        if (Button("Add ALL Users EMPTY"))  AddUser(false, 0);
+        if (Button("Add ALL Users"))        AddUser(true, 1000);
+        if (Button("Add ALL Users Small"))  AddUser(true, 0);
+        
 
         if (Button("Remove all custom users"))
         {
-            PluginLink.PettableUserHandler.BackwardsSAFELoopThroughUser((user) => 
+            for(int i = PluginLink.PettableUserHandler.Users.Count - 1; i >= 0; i--)
             {
-                user.SerializableUser.LoopThroughBreakable(nickname =>
+                PettableUser user = PluginLink.PettableUserHandler.Users[i];
+                SerializableUserV3 serializableUser = user.SerializableUser;
+                for (int f = 0; f < user.SerializableUser.length; f++)
                 {
-                    if (nickname.Item2 == "[TESTNAME]")
-                    {
-                        PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
-                        return true;
-                    }
-                    return false;
-                });
-            });
+                    if (serializableUser.names[i] != "[TESTNAME]") continue;
+                    PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
+                }
+            }
         }
     }
 

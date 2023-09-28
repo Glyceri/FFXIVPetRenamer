@@ -34,14 +34,6 @@ public class SerializableUserV3
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
     }
 
-    public void LoopThroughBreakable(Func<(int, string), bool> callback)
-    {
-        if (callback == null) return;
-        for (int i = 0; i < ids.Length; i++)
-            if (callback.Invoke((ids[i], names[i])))
-                break;
-    }
-
     public void LoopThrough(Action<(int, string)> callback)
     {
         if (callback == null) return;

@@ -1,9 +1,6 @@
-﻿using Dalamud.Game;
-using Dalamud.Hooking;
-using Dalamud.Logging;
+﻿using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;

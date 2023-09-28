@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;

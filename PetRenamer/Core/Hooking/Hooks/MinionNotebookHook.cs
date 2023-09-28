@@ -18,9 +18,6 @@ public unsafe class MinionNotebookHook : QuickTextHookableElement
             RegisterHook("MinionNoteBook", new uint[3] { 25, index, 6 });
     }
 
-    internal override void OnUpdate(IFramework framework)
-    {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
+    internal override void OnUpdate(IFramework framework) => 
         OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.showNamesInMinionBook);
-    }
 }
