@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Plugin.Services;
+﻿using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
@@ -12,18 +11,10 @@ namespace PetRenamer.Core.Updatable
     {
         List<Updatable> updatables => elements;
 
-        public unsafe UpdatableHandler() 
-        {
-            PluginHandlers.Framework.Update += MainUpdate;
-        }
-
-        protected override void OnDipose()
-        {
-            PluginHandlers.Framework.Update -= MainUpdate;
-        }
-
+        public UpdatableHandler() => PluginHandlers.Framework.Update += MainUpdate;
+        protected override void OnDipose() => PluginHandlers.Framework.Update -= MainUpdate;
         protected override void OnAllRegistered() => updatables?.Sort(Compare);
-        
+        public void ClearAllUpdatables() => ClearAllElements();
 
         int Compare(Updatable a, Updatable b)
         {
@@ -32,14 +23,12 @@ namespace PetRenamer.Core.Updatable
             return aVal.CompareTo(bVal);
         }
 
-        public void ClearAllUpdatables() => ClearAllElements();
-
         void MainUpdate(IFramework framework)
         {
-            if (!(PluginHandlers.ClientState is { LocalPlayer: { } })) return;
+            if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
 
             foreach (Updatable updatable in updatables)
-                updatable.Update(framework);
+                updatable.Update(ref framework, ref player);
         }
     }
 }
