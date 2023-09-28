@@ -1,27 +1,20 @@
 using Dalamud.ContextMenu;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.ContextMenu.Attributes;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Windows;
 using PetRenamer.Windows.PetWindows;
-using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
-using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Hooking.Hooks;
+using PetRenamer.Core.PettableUserSystem.Pet;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 
 [ContextMenu]
 internal unsafe class PetContextMenu : ContextMenuElement
 {
-    PettableUser user = null!;
     internal override void OnOpenMenu(GameObjectContextMenuOpenArgs args)
     {
-        user = PluginLink.PettableUserHandler.LocalUser()!;
-        if (user == null) return;
-
         if (args.ParentAddonName != null && args.ParentAddonName != "MinionNoteBook") return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
         if (args.ObjectId == 0xE000000) return;
@@ -44,33 +37,19 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
     void HandleNonNotebook(GameObjectContextMenuOpenArgs args)
     {
-        DBGameObject target = PluginHandlers.TargetManager.Target!;
-        if (PluginHandlers.TargetManager.SoftTarget != null)
-            target = PluginHandlers.TargetManager.SoftTarget;
-        if (target == null) return;
-        TargetObjectKind targetObjectKind = target.ObjectKind;
-        if (targetObjectKind != TargetObjectKind.BattleNpc && targetObjectKind != TargetObjectKind.Companion) return;
-        uint ownerID = target.OwnerId;
-        if (targetObjectKind == TargetObjectKind.Companion)
-            ownerID = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex)->GetObjectID().ObjectID;
-        if (ownerID != PluginHandlers.ClientState.LocalPlayer!.ObjectId) return;
+        nint address = PluginHandlers.TargetManager.Target?.Address ?? nint.Zero;
+        PettableUser targetUser = PluginLink.PettableUserHandler.GetUser(address);
+        if (targetUser == null) return;
+        if (!targetUser.LocalUser) return;
 
-        string name = args.Text?.ToString() ?? string.Empty;
-        // This is commented out, because so far I havent seen a reason that it needs to be active, but this is and end all fix (its just costly)
-        // If there are still exceptions out there, or its laggy, or you know... w/e I'll turn it on
-        // if (!SheetUtils.instance.PetExistsInANY(name)) return;
-
-        if (targetObjectKind == TargetObjectKind.Companion && !PluginLink.Configuration.useContextMenuOnMinions) return;
-        if (targetObjectKind == TargetObjectKind.BattleNpc && !PluginLink.Configuration.useContextMenuOnBattlePets) return;
+        PetBase pet = PluginLink.PettableUserHandler.GetPet(targetUser, address);
+        if (pet == null) return;
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) =>
         {
-            if (targetObjectKind == TargetObjectKind.Companion) PetWindow.SetPetMode(PetMode.Normal);
-            else PetWindow.SetPetMode(PetMode.BattlePet);
-
             PetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
-            if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.Minion.ID, true);
-            else petWindow?.OpenForBattleID(user.BattlePet.ID, true);
+            if (pet.ID > -1) petWindow.OpenForId(pet.ID, true);
+            else if (pet.ID < -1) petWindow.OpenForBattleID(pet.ID, true);
         }
         ));
     }

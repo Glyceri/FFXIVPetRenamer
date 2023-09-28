@@ -130,17 +130,24 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public PetBase GetPet(nint address)
     {
         if (address == nint.Zero) return null!;
-
         foreach (PettableUser user in _users)
         {
-            if (!user.UserExists) continue;
-            foreach (PetBase pet in user.Pets)
-            {
-                if (pet.Pet != address) continue;
-                return pet;
-            }
+            PetBase pet = GetPet(user, address);
+            if (pet == null) continue;
+            return pet;
         }
+        return null!;
+    }
 
+    public PetBase GetPet(PettableUser user, nint address)
+    {
+        if (address == nint.Zero) return null!;
+        if (!user.UserExists) return null!;
+        foreach (PetBase pet in user.Pets)
+        {
+            if (pet.Pet != address) continue;
+            return pet;
+        }
         return null!;
     }
 
