@@ -60,6 +60,8 @@ public class PetBase
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
 
+    public void SetChanged() => _petChanged = true;  
+
     public void FullReset()
     {
         _pet = nint.Zero;

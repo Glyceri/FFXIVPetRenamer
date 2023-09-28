@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;

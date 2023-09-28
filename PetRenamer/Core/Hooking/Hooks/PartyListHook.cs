@@ -23,10 +23,9 @@ internal unsafe class PartyListHook : HookableElement
     // VVVVVV ACTUAL BYTE CODE GENEROUSLY PROVIDED BY: Nuko
     // [Signature("48 83 EC ?? F6 81 ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 8B 81", DetourName = nameof(PartyListHookUpdate))]
 
-    private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
+    Hook<Delegates.AddonUpdate>? addonupdatehook = null;
 
     AddonPartyList* partyList;
-
 
     internal override void OnUpdate(IFramework framework)
     {
@@ -54,11 +53,11 @@ internal unsafe class PartyListHook : HookableElement
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         if (!user.BattlePet.Has) return;
-        if (user.BattlePet.CustomName != string.Empty)
-            partyNode->Pet.Name->SetText(user.BattlePet.CustomName);
+        if (user.BattlePet.CustomName == string.Empty) return;
+        partyNode->Pet.Name->SetText(user.BattlePet.CustomName);
     }
 
-    void SetCastlist(AtkUnitBase * baseD, AddonPartyList * partyNode)
+    void SetCastlist(AtkUnitBase* baseD, AddonPartyList* partyNode)
     {
         List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
             partyNode->PartyMember.PartyMember0,
@@ -73,13 +72,13 @@ internal unsafe class PartyListHook : HookableElement
 
         TooltipHelper.partyListInfos.Clear();
 
-        foreach(PartyListMemberStruct member in partyMemberNames)
+        foreach (PartyListMemberStruct member in partyMemberNames)
         {
             string memberName = member.Name->NodeText.ToString()!;
             if (memberName == null) continue;
             if (memberName == string.Empty) continue;
             string[] splitName = memberName.Split(' ');
-            if(splitName.Length != 3) continue;
+            if (splitName.Length != 3) continue;
             memberName = $"{splitName[1]} {splitName[2]}";
 
             BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);

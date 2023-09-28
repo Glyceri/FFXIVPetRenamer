@@ -17,6 +17,8 @@ public unsafe class PettableUser
     readonly PetBase _minion;
     readonly PetBase _battlePet;
 
+    ChangedType _cType;
+
     public PetBase Minion => _minion;
     public PetBase BattlePet => _battlePet;
 
@@ -27,6 +29,7 @@ public unsafe class PettableUser
     public nint nintUser => _user;
 
     public SerializableUserV3 SerializableUser => _serializableUser;
+    public ChangedType ChangedType => _cType;
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
@@ -66,7 +69,7 @@ public unsafe class PettableUser
     {
         _user = (nint)user;
 
-        if (_serializableUser?.ToggleBackChanged() ?? false)
+        if ((_cType = _serializableUser.ToggleBackChanged()) == ChangedType.Removed)
         {
             _minion.Clear();
             _battlePet.Clear();

@@ -1,7 +1,5 @@
 using ImGuiNET;
-using PetRenamer.Logging;
 using PetRenamer.Theming;
-using System;
 
 namespace PetRenamer.Windows;
 
@@ -34,20 +32,13 @@ public abstract class PetWindow : PetWindowHelpers
             _lastMode = petMode;
             OnPetModeChange(petMode);
         }
-        try
-        {
-            OnDraw();
-        
+
+        OnDraw();
         if (petMode == PetMode.Normal) OnDrawNormal();
         else if (petMode == PetMode.BattlePet) OnDrawBattlePet();
         else OnDrawSharing();
         OnLateDraw();
 
-        }
-        catch (NullReferenceException nExc)
-        {
-            PetLog.LogError(nExc, nExc.TargetSite?.Name.ToString() ?? string.Empty);
-        }
         _PopAllStyleColours();
     }
 

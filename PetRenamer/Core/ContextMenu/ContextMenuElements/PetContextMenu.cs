@@ -16,8 +16,12 @@ namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 [ContextMenu]
 internal unsafe class PetContextMenu : ContextMenuElement
 {
+    PettableUser user = null!;
     internal override void OnOpenMenu(GameObjectContextMenuOpenArgs args)
     {
+        user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return;
+
         if (args.ParentAddonName != null && args.ParentAddonName != "MinionNoteBook") return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
         if (args.ObjectId == 0xE000000) return;
@@ -61,9 +65,6 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) =>
         {
-            PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-            if (user == null) return;
-
             if (targetObjectKind == TargetObjectKind.Companion) PetWindow.SetPetMode(PetMode.Normal);
             else PetWindow.SetPetMode(PetMode.BattlePet);
 

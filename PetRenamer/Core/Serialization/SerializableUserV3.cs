@@ -14,7 +14,7 @@ public class SerializableUserV3
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
 
-    [JsonIgnore] public bool changed = false;
+    [JsonIgnore] public ChangedType changed = ChangedType.Not;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
     [JsonIgnore] public bool hasCompanion { get; private set; } = false;
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
@@ -60,14 +60,14 @@ public class SerializableUserV3
         return names[index] ?? string.Empty;
     }
 
-    public bool ToggleBackChanged()
+    public ChangedType ToggleBackChanged()
     {
-        if (changed)
+        ChangedType curType = changed;
+        if (changed != ChangedType.Not)
         {
-            changed = false;
-            return true;
+            changed = ChangedType.Not;
         }
-        return false;
+        return curType;
     }
 
     public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
@@ -100,7 +100,7 @@ public class SerializableUserV3
         namesList.Add(name);
         ids = idList.ToArray();
         names = namesList.ToArray();
-        changed = true;
+        changed = ChangedType.Added;
         if(notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
@@ -110,7 +110,7 @@ public class SerializableUserV3
         if (index == -1) return;
         if (names[index] == name) return;
         names[index] = name;
-        changed = true;
+        changed = ChangedType.Renamed;
         if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
@@ -118,7 +118,7 @@ public class SerializableUserV3
     {
         int index = IndexOf(id);
         if (index == -1) return;
-        changed = true;
+        changed = ChangedType.Removed;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.RemoveAt(index);
@@ -180,4 +180,12 @@ public class SerializableUserV3
         ids = Array.Empty<int>();
         names = Array.Empty<string>();
     }
+}
+
+public enum ChangedType 
+{
+    Not,
+    Added,
+    Removed,
+    Renamed
 }

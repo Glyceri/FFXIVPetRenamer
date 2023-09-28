@@ -46,7 +46,7 @@ public unsafe sealed class NamePlateHook : HookableElement
                 string nameToUse = pet.CustomName == string.Empty ? pet.BaseName : pet.CustomName;
                 if (nameToUse == string.Empty) continue;
                 namePlateInfo->Name.SetString(nameToUse);
-                break;
+                return;
             }
         }
     }

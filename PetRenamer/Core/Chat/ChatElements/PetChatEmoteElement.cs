@@ -34,6 +34,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
             foreach (PetBase pet in user.Pets)
             {
                 if (!pet.Has) continue;
+                // TODO: Make configuration better
                 if (pet.ID < -1 && !PluginLink.Configuration.replaceEmotesBattlePets) continue;
                 if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
                 if (pet.ObjectID != emoteTarget.ObjectID) continue;
