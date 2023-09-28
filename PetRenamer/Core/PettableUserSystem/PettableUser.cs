@@ -20,13 +20,11 @@ public unsafe class PettableUser
     public PetBase Minion => _minion;
     public PetBase BattlePet => _battlePet;
 
-    public PetBase[] PetDatas => new PetBase[2] { _minion, _battlePet };
+    public PetBase[] Pets => new PetBase[2] { _minion, _battlePet };
 
     readonly SerializableUserV3 _serializableUser;
 
     public nint nintUser => _user;
-    public nint nintBattlePet => _battlePet.Pet;
-    public nint nintCompanion => _minion.Pet;
 
     public SerializableUserV3 SerializableUser => _serializableUser;
     public string UserName => _username;
@@ -45,7 +43,7 @@ public unsafe class PettableUser
     }
     public bool UserExists => _user != nint.Zero;
     public bool AnyPetChanged => _battlePet.Changed || _minion.Changed;
-    public bool HasAny => !_battlePet.IsNull || !_minion.IsNull;
+    public bool HasAny => SerializableUser.length > 0;
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser)
     {

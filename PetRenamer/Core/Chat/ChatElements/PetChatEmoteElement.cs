@@ -24,30 +24,23 @@ internal unsafe class PetChatEmoteElement : ChatElement
         GameObjectID emoteTarget = bChara->Character.EmoteController.Target;
         if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return;
 
-        if(emoteTarget.Type == 4)
+        if (emoteTarget.Type == 4)
             emoteTarget.ObjectID = bChara->Character.CompanionObject->Character.GameObject.ObjectID;
-
-        string baseName = string.Empty;
-        string customName = string.Empty;
 
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (!user.HasAny) continue;
 
-            foreach(PetBase pet in user.PetDatas)
+            foreach (PetBase pet in user.Pets)
             {
                 if (!pet.Has) continue;
                 if (pet.ID < -1 && !PluginLink.Configuration.replaceEmotesBattlePets) continue;
                 if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
-                if (pet.ObjectID == emoteTarget.ObjectID)
-                {
-                    baseName = pet.BaseName;
-                    customName = pet.CustomName;
-                    break;
-                }
+                if (pet.ObjectID != emoteTarget.ObjectID) continue;
+
+                StringUtils.instance.ReplaceSeString(ref message, pet.BaseName, pet.CustomName);
+                return;
             }
         }
-
-        StringUtils.instance.ReplaceSeString(ref message, baseName, customName);
     }
 }

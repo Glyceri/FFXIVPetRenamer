@@ -1,6 +1,7 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
@@ -25,7 +26,8 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
             foreach ((string, string) element in validNames)
             {
                 if (element.Item1 == string.Empty || element.Item2 == string.Empty) continue;
-                tPayload.Text = Regex.Replace(tPayload.Text!, element.Item1, element.Item2, RegexOptions.IgnoreCase);
+                foreach(string filler in PluginConstants.removeables)
+                    tPayload.Text = Regex.Replace(tPayload.Text!, filler + element.Item1, element.Item2, RegexOptions.IgnoreCase);
             }
             message.Payloads[i] = tPayload;
         }
@@ -39,7 +41,8 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
             if (message.Payloads[i] is not TextPayload tPayload) continue;
 
             if (baseString == string.Empty || replaceString == string.Empty) continue;
-            tPayload.Text = Regex.Replace(tPayload.Text!, baseString, replaceString, RegexOptions.IgnoreCase);
+            foreach (string filler in PluginConstants.removeables)
+                tPayload.Text = Regex.Replace(tPayload.Text!, filler + baseString, replaceString, RegexOptions.IgnoreCase);
 
             message.Payloads[i] = tPayload;
         }
@@ -63,7 +66,8 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         {
             if (element.Item1 == string.Empty || element.Item2 == string.Empty) continue;
             string baseString = textNode->NodeText.ToString();
-            textNode->NodeText.SetString(Regex.Replace(baseString, element.Item1, element.Item2, RegexOptions.IgnoreCase));
+            foreach (string filler in PluginConstants.removeables)
+                textNode->NodeText.SetString(Regex.Replace(baseString, filler + element.Item1, element.Item2, RegexOptions.IgnoreCase));
         }
     }
 }

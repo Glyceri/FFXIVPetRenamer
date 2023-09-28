@@ -13,6 +13,8 @@ using Dalamud.Memory;
 using System;
 using Dalamud.Plugin.Services;
 using PetRenamer.Logging;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Pet;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -136,22 +138,17 @@ internal unsafe class TargetBarHooking : HookableElement
 
     void SetFor(AtkTextNode* textNode, GameObject* gObj)
     {
-        PluginLink.PettableUserHandler.LoopThroughBreakable(user =>
+        foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (user.nintCompanion == (nint)gObj)
+            if (!user.UserExists) continue;
+            foreach(PetBase pet in user.Pets)
             {
-                if (user.Minion.CustomName != string.Empty)
-                    textNode->NodeText.SetString(user.Minion.CustomName);
-                return true;
+                if (pet.Pet != (nint)gObj) continue;
+                if (pet.CustomName != string.Empty)
+                    textNode->NodeText.SetString(pet.CustomName);
+                return;
             }
-            if (user.nintBattlePet == (nint)gObj)
-            {
-                if (user.BattlePet.CustomName != string.Empty)
-                    textNode->NodeText.SetString(user.BattlePet.CustomName);
-                return true;
-            }
-            return false;
-        });
+        }
     }
 
     internal override void OnDispose()

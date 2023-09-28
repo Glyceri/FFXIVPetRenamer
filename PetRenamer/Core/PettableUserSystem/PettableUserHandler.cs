@@ -151,7 +151,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
         {
             if (user1 == null) continue;
             if (!user1.UserExists) continue;
-            if (user1.nintUser != _lastCast.castDealer && user1.nintBattlePet != _lastCast.castDealer) continue;
+            if (user1.nintUser != _lastCast.castDealer && user1.BattlePet.Pet != _lastCast.castDealer) continue;
             user = user1;
             break;
         }

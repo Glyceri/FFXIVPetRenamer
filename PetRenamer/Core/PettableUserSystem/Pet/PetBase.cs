@@ -9,10 +9,10 @@ public class PetBase
     public nint Pet => _pet;
     public int ID => _id;
     public int Index => _index;
-    public int ObjectID => _objectID;
+    public uint ObjectID => _objectID;
 
-    public string CustomName => _customName;
-    public string BaseName => _baseName;
+    public string CustomName => _customName ?? string.Empty;
+    public string BaseName => _baseName ?? string.Empty;
 
     public bool Changed => _petChanged;
 
@@ -24,7 +24,7 @@ public class PetBase
 
     int _id;
     int _index;
-    int _objectID;
+    uint _objectID;
 
     string _customName = string.Empty;
     string _baseName = string.Empty;
@@ -49,7 +49,7 @@ public class PetBase
 
         _id = id;
         _index = gObject.GameObject.ObjectIndex;
-        _objectID = (int)gObject.GameObject.ObjectID;
+        _objectID = gObject.GameObject.ObjectID;
 
         if (_lastID == _id && _lastPointer == _pet) return;
 
@@ -77,6 +77,6 @@ public class PetBase
     {
         _id = -1;
         _index = -1;
-        _objectID = -1;
+        _objectID = 0;
     }
 }

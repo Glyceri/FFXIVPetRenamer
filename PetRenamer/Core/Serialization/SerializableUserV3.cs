@@ -49,15 +49,15 @@ public class SerializableUserV3
             callback.Invoke((ids[i], names[i]));
     }
 
-    public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
-    public string? GetNameFor(int id)
+    public string GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
+    public string GetNameFor(int id)
     {
         int index = IndexOf(id);
-        if (index == -1) return null;
-        if (names.Length < index) return null;
+        if (index == -1) return string.Empty;
+        if (names.Length < index) return string.Empty;
         if (names[index].Length > PluginConstants.ffxivNameSize)
             return names[index][..PluginConstants.ffxivNameSize];
-        return names[index];
+        return names[index] ?? string.Empty;
     }
 
     public bool ToggleBackChanged()
