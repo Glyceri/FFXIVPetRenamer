@@ -79,7 +79,7 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
-        if (battlePet != null) id = battlePet->Character.CharacterData.ModelCharaId;
+        if (battlePet != null) id = RemapUtils.instance.GetPetIDFromClass(((BattleChara*)_user)->Character.CharacterData.ClassJob);
         _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 
