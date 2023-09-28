@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Plugin.Services;
+﻿using Dalamud.Plugin.Services;
 using PetRenamer.Core.Hooking.Hooks.InternalHooks;
 using PetRenamer.Core.PettableUserSystem;
 using System;

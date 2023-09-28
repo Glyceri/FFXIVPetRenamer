@@ -23,7 +23,7 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
         PluginLink.IpcStorage.Deregister(OnIpcChange);
     }
 
-    public void OnIpcChange(Dictionary<(string, uint), NicknameData> data)
+    public void OnIpcChange(ref Dictionary<(string, uint), NicknameData> data)
     {
         foreach (var kvp in data)
         {

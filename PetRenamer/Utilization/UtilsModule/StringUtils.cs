@@ -15,7 +15,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public static StringUtils instance { get; set; } = null!;
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
-    public void ReplaceSeString(ref SeString message, (string, string)[] validNames)
+    public void ReplaceSeString(ref SeString message, ref (string, string)[] validNames)
     {
         if (validNames.Length == 0) return;
         if (message == null) return;
@@ -32,7 +32,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         }
     }
 
-    public unsafe void ReplaceAtkString(AtkTextNode* textNode, (string, string)[] validNames)
+    public unsafe void ReplaceAtkString(AtkTextNode* textNode, ref (string, string)[] validNames)
     {
         if (validNames.Length == 0) return;
         foreach ((string, string) element in validNames)

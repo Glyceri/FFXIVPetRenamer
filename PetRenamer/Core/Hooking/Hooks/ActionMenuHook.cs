@@ -60,7 +60,7 @@ public unsafe class ActionMenuHook : HookableElement
             AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
             if (tNode == null) continue;
             (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
-            StringUtils.instance.ReplaceAtkString(tNode, validNames);
+            StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
         return addonupdatehookreplacelist!.Original(baseD);
     }
@@ -82,7 +82,7 @@ public unsafe class ActionMenuHook : HookableElement
             AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(8);
             if (tNode == null) continue;
             (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
-            StringUtils.instance.ReplaceAtkString(tNode, validNames);
+            StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
 
         return addonupdatehook!.Original(baseD);

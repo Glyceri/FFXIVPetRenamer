@@ -20,6 +20,6 @@ internal unsafe class BattleChatElement : ChatElement
 
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;
         (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, message.ToString());
-        StringUtils.instance.ReplaceSeString(ref message, validNames);
+        StringUtils.instance.ReplaceSeString(ref message, ref validNames);
     }
 }

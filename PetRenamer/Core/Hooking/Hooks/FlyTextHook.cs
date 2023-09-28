@@ -29,8 +29,8 @@ internal class FlyTextHook : HookableElement
         if (!PluginLink.Configuration.useCustomFlyoutPet) return;
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;
         (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, text1.ToString() + text2.ToString());
-        StringUtils.instance.ReplaceSeString(ref text1, validNames);
-        StringUtils.instance.ReplaceSeString(ref text2, validNames);
+        StringUtils.instance.ReplaceSeString(ref text1, ref validNames);
+        StringUtils.instance.ReplaceSeString(ref text2, ref validNames);
     }
 
     unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int a3, char a4, int a5, int a6, int a7, int a8)
