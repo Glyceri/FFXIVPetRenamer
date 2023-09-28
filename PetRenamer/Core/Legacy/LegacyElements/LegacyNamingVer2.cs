@@ -3,7 +3,6 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
 using PetRenamer.Core.Serialization;
-using static Lumina.Data.Parsing.Layer.LayerCommon;
 
 namespace PetRenamer.Core.Legacy.LegacyElements;
 

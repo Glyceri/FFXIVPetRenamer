@@ -1,5 +1,4 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
-#pragma warning disable CS0612 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Legacy.Attributes;
 using PetRenamer.Core.Serialization;
@@ -25,5 +24,4 @@ internal class LegacyNamingVer3 : LegacyElement
         PluginLink.Configuration.Save();
     }
 }
-#pragma warning restore CS0612 // Type or member is obsolete
 #pragma warning restore CS0618 // Type or member is obsolete

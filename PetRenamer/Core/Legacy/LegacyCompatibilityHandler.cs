@@ -1,4 +1,3 @@
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
@@ -13,15 +12,11 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
 {
     int lastInternalVersion = -1;
     readonly int currentInternalVersion = 0;
-
     readonly List<LegacyElement> correctElements = new List<LegacyElement>();
 
-    public LegacyCompatibilityHandler() : base()
-    {
-        currentInternalVersion = PluginLink.Configuration.Version;
-    }
-
     bool hasFoundPlayer = false;
+
+    public LegacyCompatibilityHandler() => currentInternalVersion = PluginLink.Configuration.Version;
 
     void Reset()
     {
