@@ -7,7 +7,6 @@ using PetRenamer.Windows.PetWindows;
 using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 using DBGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using PetRenamer.Core.PettableUserSystem;
-using Dalamud.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Hooking.Hooks;

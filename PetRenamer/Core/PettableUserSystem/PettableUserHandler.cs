@@ -1,5 +1,4 @@
-﻿using Dalamud.Logging;
-using PetRenamer.Core.Attributes;
+﻿using PetRenamer.Core.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem.Enums;

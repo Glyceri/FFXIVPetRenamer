@@ -1,7 +1,6 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
@@ -30,6 +29,31 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
             }
             message.Payloads[i] = tPayload;
         }
+    }
+
+    public void ReplaceSeString(ref SeString message, string baseString, string replaceString)
+    {
+        if (message == null) return;
+        for (int i = 0; i < message.Payloads.Count; i++)
+        {
+            if (message.Payloads[i] is not TextPayload tPayload) continue;
+
+            if (baseString == string.Empty || replaceString == string.Empty) continue;
+            tPayload.Text = Regex.Replace(tPayload.Text!, baseString, replaceString, RegexOptions.IgnoreCase);
+
+            message.Payloads[i] = tPayload;
+        }
+    }
+
+    public PlayerPayload? GetPlayerPayload(ref SeString message)
+    {
+        if (message == null) return null!;
+        for (int i = 0; i < message.Payloads.Count; i++)
+        {
+            if (message.Payloads[i] is not PlayerPayload pPayload) continue;
+            return pPayload;
+        }
+        return null!;
     }
 
     public unsafe void ReplaceAtkString(AtkTextNode* textNode, ref (string, string)[] validNames)

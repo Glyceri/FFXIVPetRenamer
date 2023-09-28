@@ -5,7 +5,6 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Core.Handlers;
 using System.IO;
 using PetRenamer.Utilization.UtilsModule;
-using ImGuiScene;
 using PetRenamer.Core.Networking.Structs;
 using System.Collections.Generic;
 using System.Net.Http;
