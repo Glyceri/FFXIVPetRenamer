@@ -7,6 +7,7 @@ using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
@@ -149,23 +150,29 @@ public unsafe class QuickTextReplaceHook : IDisposable
         }
         if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
-        user.SerializableUser.LoopThroughBreakable(nickname =>
+        for (int i = 0; i < user.SerializableUser.length; i++)
         {
-            if (nickname.Item1 == id)
-            {
-                if (nickname.Item2 == string.Empty) return false;
-                tNode->NodeText.SetString(tNode->NodeText.ToString().Replace(replaceName, nickname.Item2));
-                if (nineGridNode != null)
-                {
-                    tNode->ResizeNodeForCurrentText();
-                    nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
-                }
+            int curID = user.SerializableUser.ids[i];
+            string curNickname = user.SerializableUser.names[i];
+            if (curID != id) continue;
+            if (curNickname == string.Empty) continue;
 
-                lastAnswer = nickname.Item2;
-                return true;
+            string tNodeString = tNode->NodeText.ToString();
+
+            if (curNickname.Contains(replaceName)) tNodeString = Regex.Replace(tNodeString, curNickname, PluginConstants.forbiddenCharacter, RegexOptions.IgnoreCase);
+            tNodeString = Regex.Replace(tNodeString, replaceName, curNickname, RegexOptions.IgnoreCase);
+
+            tNodeString = tNodeString.Replace(PluginConstants.forbiddenCharacter, curNickname);
+            tNode->NodeText.SetString(tNodeString);
+            if (nineGridNode != null)
+            {
+                tNode->ResizeNodeForCurrentText();
+                nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
             }
-            return false;
-        });
+
+            lastAnswer = curNickname;
+            break;
+        }
 
         return addonupdatehook!.Original(baseElement);
     }
