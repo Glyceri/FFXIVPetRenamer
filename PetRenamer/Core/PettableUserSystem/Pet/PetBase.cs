@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.PettableUserSystem.Pet;
 
-internal class PetBase
+public class PetBase
 {
     public nint Pet => _pet;
     public int ID => _id;
