@@ -9,11 +9,9 @@ namespace PetRenamer.Core.Updatable;
 
 internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
 {
-    List<Updatable> updatables => elements;
-
     public UpdatableHandler() => PluginHandlers.Framework.Update += MainUpdate;
     protected override void OnDipose() => PluginHandlers.Framework.Update -= MainUpdate;
-    protected override void OnAllRegistered() => updatables?.Sort(Compare);
+    protected override void OnAllRegistered() => elements?.Sort(Compare);
     public void ClearAllUpdatables() => ClearAllElements();
 
     int Compare(Updatable a, Updatable b)
@@ -27,7 +25,7 @@ internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
     {
         if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
 
-        foreach (Updatable updatable in updatables)
+        foreach (Updatable updatable in elements)
             updatable.Update(ref framework, ref player);
     }
 }

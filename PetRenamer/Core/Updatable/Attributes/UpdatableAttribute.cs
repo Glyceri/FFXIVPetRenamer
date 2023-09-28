@@ -2,7 +2,7 @@
 
 namespace PetRenamer.Windows.Attributes;
 
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class UpdatableAttribute : Attribute 
 {
     public int order = 0;

@@ -10,14 +10,15 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable(1)]
 internal class AutoBattlePetUpdatable : Updatable
 {
+    List<int> missingIDs = new List<int>();
+
     public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
+        missingIDs.Clear();
 
-        List<int> missingIDs = new List<int>();
-
-        foreach(int id in PluginConstants.allowedNegativePetIDS)
+        foreach (int id in PluginConstants.allowedNegativePetIDS)
         {
             bool found = false;
             for(int i = 0; i < user.SerializableUser.length; i++)
