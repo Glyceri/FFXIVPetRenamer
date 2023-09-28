@@ -159,7 +159,7 @@ public class PetRenameWindow : InitializablePetWindow
     {
         if (Button("Save Nickname", new Vector2(144, 25), "[Required to see a nickname]"))
         {
-            user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
+            user.SerializableUser.SaveNickname(theID, internalTempText.Replace(PluginConstants.forbiddenCharacter.ToString(), ""), notifyICP: true);
             PluginLink.Configuration.Save();
             if (companionID == theID)
             {

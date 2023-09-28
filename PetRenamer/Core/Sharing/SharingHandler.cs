@@ -49,7 +49,7 @@ public static class SharingHandler
             for (int i = 0; i < user.SerializableUser.length; i++)
             {
                 if (user.SerializableUser.names[i] != string.Empty && containsList[i])
-                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
+                    exportString += $"{user.SerializableUser.ids[i]}{PluginConstants.forbiddenCharacter}{user.SerializableUser.names[i]}\n";
             }
             string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
             ImGui.SetClipboardText(convertedString);

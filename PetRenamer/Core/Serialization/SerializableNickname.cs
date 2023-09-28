@@ -30,7 +30,7 @@ namespace PetRenamer.Core.Serialization
 
         public override string ToString() => $"ID:{ID},Name:{Name},BaseName:{BaseName}";
 
-        public string ToSaveString() => $"{ID}^{Name}";
+        public string ToSaveString() => $"{ID}{PluginConstants.forbiddenCharacter}{Name}";
 
         public bool Valid() => Name != string.Empty && Name != null && ID != -1;
 
