@@ -38,8 +38,8 @@ public unsafe sealed class NamePlateHook : HookableElement
         {
             if (!user.UserExists) continue;
             string nameToUse = string.Empty;
-            if (user.nintCompanion == obj) nameToUse = user.CustomCompanionName == string.Empty ? user.CompanionBaseName : user.CustomCompanionName;
-            if (user.nintBattlePet == obj) nameToUse = user.BattlePetCustomName == string.Empty ? user.BaseBattlePetName : user.BattlePetCustomName;
+            if (user.nintCompanion == obj) nameToUse = user.Minion.CustomName == string.Empty ? user.Minion.BaseName : user.Minion.CustomName;
+            if (user.nintBattlePet == obj) nameToUse = user.BattlePet.CustomName == string.Empty ? user.BattlePet.BaseName : user.BattlePet.CustomName;
             if (nameToUse != string.Empty) 
             { 
                 namePlateInfo->Name.SetString(nameToUse);

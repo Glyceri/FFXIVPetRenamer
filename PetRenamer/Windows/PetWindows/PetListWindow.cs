@@ -260,8 +260,8 @@ public class PetListWindow : PetWindow
                 else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
 
-            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePetIndex);
-            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.MinionIndex);
+            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePet.Index);
+            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.Minion.Index);
 
             removeMeUser = null!;
             existingUser = null!;

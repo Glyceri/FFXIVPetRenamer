@@ -212,26 +212,26 @@ internal class DeveloperWindow : PetWindow
         SameLine();
         NewLabel(user.SerializableUser.length.ToString(), Styling.ListIDField);
         totalCount += user.SerializableUser.length;
-        if (user.HasBattlePet)
+        if (user.BattlePet.Has)
         {
-            NewLabel(user.BattlePetID.ToString(), Styling.ListIDField);
+            NewLabel(user.BattlePet.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.BattlePetSkeletonID.ToString(), Styling.ListIDField);
+            NewLabel(user.BattlePet.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.BattlePetCustomName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.BattlePet.CustomName.ToString(), Styling.ListSmallNameField);
             SameLine();
-            NewLabel(user.BaseBattlePetName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.BattlePet.BaseName.ToString(), Styling.ListSmallNameField);
         }
 
-        if (user.HasCompanion)
+        if (user.Minion.Has)
         {
-            NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
+            NewLabel(user.Minion.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
+            NewLabel(user.Minion.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.CustomCompanionName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.Minion.CustomName.ToString(), Styling.ListSmallNameField);
             SameLine();
-            NewLabel(user.CompanionBaseName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.Minion.BaseName.ToString(), Styling.ListSmallNameField);
         }
 
         NewLine();

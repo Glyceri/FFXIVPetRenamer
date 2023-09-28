@@ -44,10 +44,8 @@ public unsafe class PettableUser
         }
     }
     public bool UserExists => _user != nint.Zero;
-
-    public bool BattlePetChanged => _battlePet.PetChanged;
-    public bool MinionChanged => _minion.PetChanged;
-    public bool AnyPetChanged => _battlePet.PetChanged || _minion.PetChanged;
+    public bool AnyPetChanged => _battlePet.Changed || _minion.Changed;
+    public bool HasAny => !_battlePet.IsNull || !_minion.IsNull;
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser)
     {

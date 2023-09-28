@@ -6,6 +6,7 @@ using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Pet;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
@@ -33,20 +34,16 @@ internal unsafe class PetChatEmoteElement : ChatElement
         {
             if (!user.HasAny) continue;
 
-            if (user.HasBattlePet && PluginLink.Configuration.replaceEmotesBattlePets)
+            foreach(PetBase pet in user.PetDatas)
             {
-                if (user.BattlePet->Character.GameObject.ObjectID == emoteTarget.ObjectID)
+                if (!pet.Has) continue;
+                if (pet.ID < -1 && !PluginLink.Configuration.replaceEmotesBattlePets) continue;
+                if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
+                if (pet.ObjectID == emoteTarget.ObjectID)
                 {
-                    baseName = user.BaseBattlePetName;
-                    customName = user.BattlePetCustomName;
-                }
-            }
-            if (user.HasCompanion && PluginLink.Configuration.replaceEmotesOnMinions)
-            {
-                if (user.Companion->Character.GameObject.ObjectID == emoteTarget.ObjectID)
-                {
-                    baseName = user.CompanionBaseName;
-                    customName = user.CustomCompanionName;
+                    baseName = pet.BaseName;
+                    customName = pet.CustomName;
+                    break;
                 }
             }
         }

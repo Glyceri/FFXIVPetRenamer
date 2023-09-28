@@ -68,8 +68,8 @@ internal unsafe class PetContextMenu : ContextMenuElement
             else PetWindow.SetPetMode(PetMode.BattlePet);
 
             PetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
-            if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.CompanionID, true);
-            else petWindow?.OpenForBattleID(user.BattlePetID, true);
+            if (targetObjectKind == TargetObjectKind.Companion) petWindow?.OpenForId(user.Minion.ID, true);
+            else petWindow?.OpenForBattleID(user.BattlePet.ID, true);
         }
         ));
     }

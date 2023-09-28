@@ -46,11 +46,11 @@ public class PetRenameWindow : InitializablePetWindow
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
 
-        if (companionID == -1 && user.HasCompanion)
+        if (companionID == -1 && user.Minion.Has)
         {
-            companionID = user.CompanionID;
-            companionName = user.CustomCompanionName;
-            companionBaseName = user.CompanionBaseName;
+            companionID = user.Minion.ID;
+            companionName = user.Minion.CustomName;
+            companionBaseName = user.Minion.BaseName;
             temporaryCompanionName = companionName;
         }
         else if (companionID == -1)
@@ -59,11 +59,11 @@ public class PetRenameWindow : InitializablePetWindow
             textureWrap = null!;
         }
 
-        if (battlePetID == -1 && user.HasBattlePet)
+        if (battlePetID == -1 && user.BattlePet.Has)
         {
-            battlePetID = user.BattlePetID;
-            battlePetBaseName = user.BaseBattlePetName;
-            battlePetName = user.BattlePetCustomName;
+            battlePetID = user.BattlePet.ID;
+            battlePetBaseName = user.BattlePet.BaseName;
+            battlePetName = user.BattlePet.CustomName;
             temporaryBattlePetName = battlePetName;
         }
         else if (battlePetID == -1)
@@ -163,12 +163,12 @@ public class PetRenameWindow : InitializablePetWindow
             if (companionID == theID)
             {
                 companionName = internalTempText;
-                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
+                PenumbraIPCProvider.RedrawMinionByIndex(user.Minion.Index);
             }
             if (battlePetID == theID)
             {
                 battlePetName = internalTempText;
-                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
+                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePet.Index);
             }
         }
         ImGui.SameLine(0, 1f);
@@ -179,12 +179,12 @@ public class PetRenameWindow : InitializablePetWindow
             if (companionID == theID)
             {
                 companionID = -1;
-                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
+                PenumbraIPCProvider.RedrawMinionByIndex(user.Minion.Index);
             }
             if (battlePetID == theID)
             {
                 battlePetID = -1;
-                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
+                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePet.Index);
             }
         }
     }

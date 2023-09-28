@@ -111,8 +111,8 @@ public static class IpcProvider
                 if (!user.SerializableUser.Equals(player.Item1, (ushort)player.Item2)) continue;
                 (int, string) cStr = (-1, string.Empty);
                 (int, string) bStr = (-1, string.Empty);
-                if (user.HasCompanion) cStr = (user.CompanionID, user.CustomCompanionName);
-                if (user.HasBattlePet) bStr = (user.BattlePetID, user.BattlePetCustomName);
+                if (user.Minion.Has) cStr = (user.Minion.ID, user.Minion.CustomName);
+                if (user.BattlePet.Has) bStr = (user.BattlePet.ID, user.BattlePet.CustomName);
 
                 data.ID = cStr.Item1;
                 data.Nickname = cStr.Item2;

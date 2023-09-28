@@ -140,14 +140,14 @@ internal unsafe class TargetBarHooking : HookableElement
         {
             if (user.nintCompanion == (nint)gObj)
             {
-                if (user.CustomCompanionName != string.Empty)
-                    textNode->NodeText.SetString(user.CustomCompanionName);
+                if (user.Minion.CustomName != string.Empty)
+                    textNode->NodeText.SetString(user.Minion.CustomName);
                 return true;
             }
             if (user.nintBattlePet == (nint)gObj)
             {
-                if (user.BattlePetCustomName != string.Empty)
-                    textNode->NodeText.SetString(user.BattlePetCustomName);
+                if (user.BattlePet.CustomName != string.Empty)
+                    textNode->NodeText.SetString(user.BattlePet.CustomName);
                 return true;
             }
             return false;
