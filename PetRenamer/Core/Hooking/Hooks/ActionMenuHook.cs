@@ -28,13 +28,13 @@ public unsafe class ActionMenuHook : HookableElement
         actionMenu = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenu");
         actionMenuReplaceList = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenuReplaceList");
         if (actionMenu != null) {
-            addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(actionMenu->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
+            addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(actionMenu->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
             addonupdatehook?.Enable();
         }
 
         if (actionMenuReplaceList != null)
         {
-            addonupdatehookreplacelist ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(actionMenuReplaceList->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
+            addonupdatehookreplacelist ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(actionMenuReplaceList->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
             addonupdatehookreplacelist?.Enable();
         }
     }

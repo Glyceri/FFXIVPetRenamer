@@ -17,6 +17,8 @@ namespace PetRenamer.Core.Chat.ChatElements;
 [Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
+    // Should rewrite using Character.EmoteController :D
+
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;

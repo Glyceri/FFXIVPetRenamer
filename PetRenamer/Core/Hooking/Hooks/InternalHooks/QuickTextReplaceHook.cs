@@ -58,7 +58,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
         this.allow = allow;
         baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName(AddonName);
         if (baseElement == null) return;
-        addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
+        addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
         addonupdatehook?.Enable();
     }
 

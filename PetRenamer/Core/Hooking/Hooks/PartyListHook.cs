@@ -32,7 +32,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         if (PluginHandlers.ClientState.LocalPlayer! == null) return;
         partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
-        addonupdatehook ??= PluginHandlers.Hooking.HookFromFunctionPointerVariable<Delegates.AddonUpdate>(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
+        addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
         addonupdatehook?.Enable();
     }
 
