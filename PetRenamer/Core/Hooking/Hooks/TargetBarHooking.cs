@@ -11,14 +11,14 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
 {
     internal override void OnQuickInit()
     {
-        RegisterHook("_TargetInfoMainTarget",   10, null!,  -1, TargetUser);
-        RegisterHook("_TargetInfoMainTarget",   7,  null!,  -1, TargetOfTargetUser);
-        RegisterHook("_FocusTargetInfo",        10, null!,  -1, FocusTargetUser);
-        RegisterHook("_TargetInfoCastBar",      4, Allowed, -1, TargetUser);
-        RegisterHook("_FocusTargetInfo",        5, Allowed, -1, FocusTargetUser);
+        RegisterHook("_TargetInfoMainTarget",   10, Display,  -1, TargetUser);
+        RegisterHook("_TargetInfoMainTarget",   7,  Display,  -1, TargetOfTargetUser);
+        RegisterHook("_FocusTargetInfo",        10, Display,  -1, FocusTargetUser);
+        RegisterHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
+        RegisterHook("_FocusTargetInfo",        5,  Allowed,  -1, FocusTargetUser);
     }
 
-    internal override void OnUpdate(IFramework framework) => OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
+    internal override void OnUpdate(IFramework framework) => OnBaseUpdate(framework);
 
     PettableUser TargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.Address ?? nint.Zero);
     PettableUser TargetOfTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.TargetObject?.Address ?? nint.Zero);
@@ -27,5 +27,6 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
     DGameObject RequestFocusTarget() => PluginHandlers.TargetManager.FocusTarget!;
     DGameObject RequestTarget() => PluginHandlers.TargetManager.SoftTarget! ?? PluginHandlers.TargetManager.Target!;
 
-    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet;
+    bool Display(int id) => PluginLink.Configuration.displayCustomNames;
+    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames;
 }

@@ -83,7 +83,7 @@ public unsafe class PettableUser
     public void SetCompanion(Companion* companion)
     {
         int minionID = -1;
-        if (companion != null) minionID = companion->Character.CharacterData.ModelSkeletonId;
+        if (companion != null) minionID = companion->Character.CharacterData.ModelCharaId;
         _minion.Set((nint)companion, minionID, _serializableUser);
     }
 

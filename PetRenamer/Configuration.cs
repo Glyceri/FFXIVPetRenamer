@@ -12,9 +12,8 @@ namespace PetRenamer;
 public class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 6;
-
-    public int Version { get; set; } = 6;
+    public const int currentSaveFileVersion = 7;
+    public int Version { get; set; } = currentSaveFileVersion;
 
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------

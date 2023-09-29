@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using PetRenamer.Core.Singleton;
 using System.Linq;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -40,6 +41,17 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
         maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
+        Print();
+    }
+
+    public unsafe void Print()
+    {
+        foreach(Companion c in petSheet)
+        {
+            PetLog.Log($"{c.Singular} {c.Model.Value.Model} {c.Model.Value.RowId}");
+        }
+
+        PetLog.Log(PluginLink.CharacterManager->LookupBattleCharaByObjectId(PluginHandlers.ClientState.LocalPlayer!.ObjectId)->Character.Companion.CompanionObject->Character.CharacterData.ModelCharaId);
     }
 
     public bool PetExistsInANY(string petname)
@@ -113,7 +125,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         {
             if (pet == null) continue;
 
-            if (pet.Model.Value!.Model == id)
+            if (pet.Model.Value!.RowId == id)
             {
                 string endName = pet.Singular.ToString();
                 lastIds[id] = endName;
@@ -137,7 +149,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             if (pet == null) continue;
             if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
             {
-                int val = pet.Model.Value!.Model;
+                int val = (int)pet.Model.Value!.RowId;
                 lastNames[name] = val;
                 return val;
             }
@@ -161,7 +173,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
-            int petModel = pet.Model.Value!.Model;
+            uint petModel = pet.Model.Value!.RowId;
             string petName = pet.Singular.ToString();
             string customPetName = string.Empty;
 
@@ -172,7 +184,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
                 customPetName = user.SerializableUser.GetNameFor(petName) ?? string.Empty;
 
             if (petModel.ToString().Contains(querry) || petName.Contains(querry) || (customPetName.Contains(querry) && customPetName.Length != 0))
-                serializableNicknames.Add(new SerializableNickname(petModel, customPetName));
+                serializableNicknames.Add(new SerializableNickname((int)petModel, customPetName));
         }
 
         return lastList = serializableNicknames;

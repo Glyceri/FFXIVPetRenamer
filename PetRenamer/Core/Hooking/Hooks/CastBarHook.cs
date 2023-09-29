@@ -7,10 +7,10 @@ namespace PetRenamer.Core.Hooking.Hooks;
 [Hook]
 internal class CastBarHook : QuickTextHookableElement
 {
-    internal override void OnQuickInit() => RegisterHook("_CastBar", 4, Allowed, -1);
+    internal override void OnQuickInit() => RegisterHook("_CastBar", 4, Allowed);
 
-    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet;
+    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames;
 
     internal override void OnUpdate(IFramework framework) => 
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.allowCastBarPet);
+        OnBaseUpdate(framework);
 }

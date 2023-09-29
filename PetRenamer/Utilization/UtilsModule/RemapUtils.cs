@@ -144,7 +144,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
             foreach (Companion companion in SheetUtils.instance.petSheet)
             {
                 if (companion == null) continue;
-                if (companion.Model!.Value!.Model! == companionID)
+                if (companion.Model!.Value!.RowId! == companionID)
                     return companion.Icon;
             }
         }else if (companionID <= -2)

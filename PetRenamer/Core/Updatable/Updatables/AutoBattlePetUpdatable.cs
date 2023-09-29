@@ -10,7 +10,7 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable(1)]
 internal class AutoBattlePetUpdatable : Updatable
 {
-    List<int> missingIDs = new List<int>();
+    readonly List<int> missingIDs = new List<int>();
 
     public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {

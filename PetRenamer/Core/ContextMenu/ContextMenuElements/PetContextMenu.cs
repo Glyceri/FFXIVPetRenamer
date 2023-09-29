@@ -30,7 +30,7 @@ internal unsafe class PetContextMenu : ContextMenuElement
             if (c.Singular.ToString() == string.Empty) continue;
             if (petname.ToLower().Normalize() == string.Empty) continue;
             if (c.Singular.ToString().ToLower().Normalize().Trim() != petname.ToLower().Normalize().Trim()) continue;
-            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(c.Model.Value!.Model, true)));
+            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId((int)c.Model.Value!.RowId, true)));
             break;
         }
     }

@@ -40,6 +40,7 @@ internal class TooltipHook : QuickTextHookableElement
 
     bool Allowed(int id)
     {
+        if (!PluginLink.Configuration.displayCustomNames) return false;
         if (id >= 0 && !PluginLink.Configuration.allowTooltipsOnMinions) return false;
         if (id <= -2 && !PluginLink.Configuration.allowTooltipsBattlePets) return false;
         return true;
@@ -52,7 +53,7 @@ internal class TooltipHook : QuickTextHookableElement
     }
 
     internal override void OnUpdate(IFramework framework) =>
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
+        OnBaseUpdate(framework);
 
     IntPtr lastTooltip;
 

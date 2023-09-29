@@ -104,7 +104,7 @@ internal class DeveloperWindow : PetWindow
                 if(companion != null)
                 {
                     minName = "[TESTNAME]";
-                    minID = companion->Character.CharacterData.ModelSkeletonId;
+                    minID = companion->Character.CharacterData.ModelCharaId;
                 }
                 PluginLink.PettableUserHandler.DeclareUser(
                     new SerializableUserV3(
@@ -147,7 +147,7 @@ internal class DeveloperWindow : PetWindow
             if (companion != null)
             {
                 minName = "[TESTNAME]";
-                minID = companion->Character.CharacterData.ModelSkeletonId;
+                minID = companion->Character.CharacterData.ModelCharaId;
             }
             List<int> ids = new List<int>() { -2, minID };
             List<string> names = new List<string>() { "[TESTNAME]", minName };

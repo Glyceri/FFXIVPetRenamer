@@ -22,7 +22,7 @@ public class QuickTextHookableElement : HookableElement
 
     internal override void OnUpdate(IFramework framework) { }
 
-    protected void OnBaseUpdate(IFramework framework, bool allow)
+    protected void OnBaseUpdate(IFramework framework, bool allow = true)
     {
         foreach (QuickTextReplaceHook el in quickTextReplaceHooks)
             el?.OnUpdate(framework, allow);

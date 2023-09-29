@@ -21,7 +21,6 @@ internal unsafe class PartyListHook : HookableElement
     // [Signature("48 83 EC ?? F6 81 ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 8B 81", DetourName = nameof(PartyListHookUpdate))]
 
     Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-
     AddonPartyList* partyList;
 
     internal override void OnUpdate(IFramework framework)
