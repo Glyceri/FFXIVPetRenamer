@@ -29,12 +29,13 @@ public abstract class PetWindowHelpers : PetWindowStyling
         { PetMode.ShareMode,    "[Sharing Mode]" }
     };
 
-    readonly List<(string, Type, string)> helpButtons = new List<(string, Type, string)>()
+    readonly List<(string, Type, string, Func<bool>)> helpButtons = new List<(string, Type, string, Func<bool>)>()
     {
-        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]"),
-        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]"),
-        (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]"),
-        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]")
+        (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", () => PluginLink.Configuration.debugMode),
+        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
+        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
+        (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]", null!)
     };
 
     public sealed override void PreDraw()
@@ -46,6 +47,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     }
 
     readonly int ButtonCount = 3;
+
     protected void DrawModeToggle()
     {
         int pressed = -1;
@@ -60,7 +62,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
             SameLineNoMargin();
         }
 
-        float widthLeft = (int)helpButtons.Count * Styling.ToggleButton.X;
+        int validCount = ValidHelpButtonsCount();
+
+        float widthLeft = (int)validCount * Styling.ToggleButton.X;
         float widthRight = ButtonCount * (Styling.helpButtonSize.X + 8);
 
         float setWidth = ImGui.GetWindowSize()!.X - widthLeft - widthRight;
@@ -69,6 +73,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
         for (int i = 0; i < helpButtons.Count; i++)
         {
+            if (helpButtons[i].Item4 != null)
+                if (!helpButtons[i].Item4()) 
+                    continue;
             if (Button(helpButtons[i].Item1, Styling.helpButtonSize)) PluginLink.WindowHandler.OpenWindow(helpButtons[i].Item2);
             SetTooltipHovered(helpButtons[i].Item3);
             if (i != helpButtons.Count - 1) SameLinePretendSpace();
@@ -76,6 +83,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
         if (pressed == -1) return;
         PetWindow.petMode = (PetMode)pressed;
+    }
+
+    int ValidHelpButtonsCount()
+    {
+        int counter = 0;
+        for (int i = 0; i < helpButtons.Count; i++)
+        {
+            if (helpButtons[i].Item4 != null)
+                if (!helpButtons[i].Item4())
+                    continue;
+            counter++;
+        }
+        return counter;
     }
 
     protected void TextColoured(Vector4 colour, string text) => ImGui.TextColored(colour, text);

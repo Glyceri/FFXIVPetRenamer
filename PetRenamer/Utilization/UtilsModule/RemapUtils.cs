@@ -34,7 +34,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     internal override void OnLateRegistered()
     {
         foreach (int skeletonID in battlePetRemap.Keys)
-            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));
+            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));        
     }
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()

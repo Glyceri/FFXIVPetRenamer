@@ -28,6 +28,7 @@ public class ConfigWindow : PetWindow
 
     public override void OnDraw()
     {
+        Size = baseSize;
         if (AnyIllegalsGoingOn())
         {
             Size = baseSize + new Vector2(0, 50);
@@ -125,6 +126,8 @@ public class ConfigWindow : PetWindow
 
     public bool AnyIllegalsGoingOn()
     {
+        if (PluginLink.Configuration.debugMode) return true;
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
         // Comment out this line to unsupport all the Third Party support
         if (PenumbraIPCProvider.PenumbraEnabled()) return true;
 
@@ -178,6 +181,11 @@ public class ConfigWindow : PetWindow
                 if (XButton("Other Plugin Settings", new Vector2(286, 24)))
                     unsupportedMode = true;
             }
+        }
+        else if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.debugMode)
+        {
+           if(Checkbox("Debug Mode", ref PluginLink.Configuration.debugMode))
+                PluginLink.Configuration.Save();
         }
     }
 }

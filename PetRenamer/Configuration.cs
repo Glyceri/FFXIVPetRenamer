@@ -39,6 +39,9 @@ public class Configuration : IPluginConfiguration
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
 
+    // Debug mode
+    public bool debugMode = false;
+
     public SerializableUserV3[]? serializableUsersV3 = null;
     
     public void Initialize()

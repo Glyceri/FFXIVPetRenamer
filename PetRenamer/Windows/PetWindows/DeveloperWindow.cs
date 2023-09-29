@@ -10,20 +10,19 @@ using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Windows.Attributes;
+using PetRenamer.Core.Debug;
+using Dalamud.Interface.Utility.Table;
+using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
+[PersistentPetWindow]
 internal class DeveloperWindow : PetWindow
 {
-    readonly Vector2 baseSize = new Vector2(700, 500);
-
-    Vector2 minSize => GetMinSize();
 
     public DeveloperWindow() : base("Dev Window Pet Renamer")
     {
-        IsOpen = true;
-        Size = baseSize;
+        if(PluginLink.Configuration.debugMode) IsOpen = true;
     }
 
     int currentTab = 0;
@@ -52,47 +51,130 @@ internal class DeveloperWindow : PetWindow
         if (currentTab < 0)
             currentTab = maxTabs - 1;
 
-        if (currentTab == 0) DrawUsers();
+        if (currentTab == 0) Users();
 
         else if (currentTab == 1) DrawHelpField();
-        else if (currentTab == 2) ConfigWindow();
+        else if (currentTab == 2) ChatLog();
         else if (currentTab == 3) PetNameWindow();
-    }
-
-    Vector2 GetMinSize()
-    {
-        Vector2 size = Styling.ToggleButton;
-        size.X *= maxTabs;
-        size.X += 10;
-        return size;
-    }
-
-    void SetSize(Vector2? ss)
-    {
-        if (ss == null) return;
-        Vector2 sss = ss.Value;
-        float x = sss.X;
-        if(x < minSize.X)
-            x = minSize.X;
-        sss.X = x;
-        Size = sss; 
     }
 
     void PetNameWindow()
     {
-        SetSize(PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Size);
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Draw();
     }
 
-    void ConfigWindow()
+    int tableCounter = 0;
+
+    void Users()
     {
-        SetSize(PluginLink.WindowHandler.GetWindow<ConfigWindow>()?.Size);
-        PluginLink.WindowHandler.GetWindow<ConfigWindow>()?.Draw();
+        tableCounter = 0;
+        PluginLink.PettableUserHandler.LoopThroughUsers(NewDrawUser);
+    }
+
+    void NewDrawUser(PettableUser user)
+    {
+        if (!ImGui.BeginTable($"##usersTable{tableCounter++}", 5,  ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+            return;
+
+        ImGui.TableNextRow();
+
+        ImGui.TableSetColumnIndex(0);
+        ImGui.TextUnformatted($"{user.UserName}");
+
+        ImGui.TableSetColumnIndex(1);
+        ImGui.TextUnformatted($"{SheetUtils.instance.GetWorldName(user.Homeworld)}");
+
+        ImGui.TableSetColumnIndex(2);
+        ImGui.TextUnformatted($"{(user.UserExists ? "O" : "X")}");
+
+        ImGui.TableSetColumnIndex(3);
+        ImGui.TextUnformatted($"{user.SerializableUser.length}");
+
+        if (user.BattlePet.Has)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableSetColumnIndex(0);
+            ImGui.TextUnformatted($"{user.BattlePet.ID}");
+
+            ImGui.TableSetColumnIndex(1);
+            ImGui.TextUnformatted($"{user.BattlePet.BaseName}");
+
+            ImGui.TableSetColumnIndex(3);
+            ImGui.TextUnformatted($"{user.BattlePet.CustomName}");
+
+            ImGui.TableSetColumnIndex(4);
+            ImGui.TextUnformatted($"{user.BattlePet.Index}");
+
+            ImGui.TableNextRow();
+        }
+
+        if (user.Minion.Has)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableSetColumnIndex(0);
+            ImGui.TextUnformatted($"{user.Minion.ID}");
+
+            ImGui.TableSetColumnIndex(1);
+            ImGui.TextUnformatted($"{user.Minion.BaseName}");
+
+            ImGui.TableSetColumnIndex(2);
+            ImGui.TextUnformatted($"{user.Minion.BaseNamePlural}");
+
+            ImGui.TableSetColumnIndex(3);
+            ImGui.TextUnformatted($"{user.Minion.CustomName}");
+
+            ImGui.TableSetColumnIndex(4);
+            ImGui.TextUnformatted($"{user.Minion.Index}");
+        }
+
+        ImGui.EndTable();
+        NewLine();
+    }
+
+    void ChatLog()
+    {
+        if (!ImGui.BeginTable("##chatlogtable", 6, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders))
+            return;
+
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Message", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("New Message", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Sender", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("New Sender", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableHeadersRow();
+
+        for(int i = DebugStorage.petChatMessages.Count -1; i >= 0; i--) 
+         {
+            PetChatMessage chatMessage = DebugStorage.petChatMessages[i];
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.SenderId}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.ChatType}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.Message}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.NewMessage}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.Sender}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.NewSender}");
+         }
+
+        ImGui.EndTable();
     }
 
     unsafe void DrawHelpField()
     {
-        SetSize(baseSize);
         GameObject? target = PluginHandlers.TargetManager.Target!;
         if (target != null)
             if (Button("Add Target"))
@@ -178,7 +260,6 @@ internal class DeveloperWindow : PetWindow
 
     void DrawUsers()
     {
-        SetSize(baseSize);
         NewLabel("Totalcount: " + totalCount.ToString(), Styling.ListSmallNameField);
         SameLine();
         NewLabel("Active player count: " + playerCount.ToString(), Styling.ListSmallNameField);
@@ -204,22 +285,23 @@ internal class DeveloperWindow : PetWindow
         {
             NewLabel(user.BattlePet.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.BattlePet.ID.ToString(), Styling.ListIDField);
+            NewLabel(user.BattlePet.Index.ToString(), Styling.ListIDField);
             SameLine();
             NewLabel(user.BattlePet.CustomName.ToString(), Styling.ListSmallNameField);
-            SameLine();
-            NewLabel(user.BattlePet.BaseName.ToString(), Styling.ListSmallNameField);
+            NewLine();
         }
-
+        
         if (user.Minion.Has)
         {
             NewLabel(user.Minion.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.Minion.ID.ToString(), Styling.ListIDField);
+            NewLabel(user.Minion.Index.ToString(), Styling.ListIDField);
             SameLine();
             NewLabel(user.Minion.CustomName.ToString(), Styling.ListSmallNameField);
             SameLine();
             NewLabel(user.Minion.BaseName.ToString(), Styling.ListSmallNameField);
+            SameLine();
+            NewLabel(user.BattlePet.BaseNamePlural.ToString(), Styling.ListSmallNameField);
         }
 
         NewLine();

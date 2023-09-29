@@ -7,22 +7,23 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
 [Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override bool OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return;
-        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
+        if (!PluginLink.Configuration.displayCustomNames) return false;
+        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return false;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
-        if (bChara == null) return;
+        if (bChara == null) return false;
 
         GameObjectID emoteTarget = bChara->Character.EmoteController.Target;
-        if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return;
+        if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return false;
 
         if (emoteTarget.Type == 4)
             emoteTarget.ObjectID = bChara->Character.CompanionObject->Character.GameObject.ObjectID;
@@ -39,10 +40,11 @@ internal unsafe class PetChatEmoteElement : ChatElement
                 if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
                 if (pet.ObjectID != emoteTarget.ObjectID) continue;
 
-                StringUtils.instance.ReplaceSeString(ref message, pet.BaseNamePlural, pet.CustomName);
-                StringUtils.instance.ReplaceSeString(ref message, pet.BaseName, pet.CustomName);
-                return;
+                (string, string)[] replaceNames = new (string, string)[] { (pet.BaseNamePlural, pet.CustomName), (pet.BaseName, pet.CustomName) };
+                StringUtils.instance.ReplaceSeString(ref message, ref replaceNames);
+                return true;
             }
         }
+        return false;
     }
 }

@@ -27,7 +27,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     readonly Dictionary<string, bool> lastPets = new Dictionary<string, bool>(cacheSizes + 1);
     readonly Dictionary<int, string> lastBattleIds = new Dictionary<int, string>(cacheSizes + 1);
-    readonly Dictionary<int, string> lastIds = new Dictionary<int, string>(cacheSizes + 1);
+    readonly Dictionary<(int, NameType), string> lastIds = new Dictionary<(int, NameType), string>(cacheSizes + 1);
     readonly Dictionary<string, int> lastNames = new Dictionary<string, int>(cacheSizes + 1);
     List<SerializableNickname> lastList = new List<SerializableNickname>();
     string lastQuerry = string.Empty;
@@ -41,15 +41,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
         maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
-        Print();
-    }
-
-    public unsafe void Print()
-    {
-        foreach(Companion c in petSheet)
-        {
-            PetLog.Log($"{c.Singular} {c.Plural}");
-        }
     }
 
     public bool PetExistsInANY(string petname)
@@ -112,10 +103,10 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     public string GetPetName(int id, NameType nameType = NameType.Singular)
     {
-        if (lastIds.TryGetValue(id, out string? petName))
+        if (lastIds.TryGetValue((id, nameType), out string? petName))
             return petName;
 
-        lastIds.Add(id, string.Empty);
+        lastIds.Add((id, nameType), string.Empty);
         if (lastIds.Count > cacheSizes)
             lastIds.Remove(lastIds.Keys.ToArray().First());
 
@@ -126,7 +117,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             if (pet.Model.Value!.RowId == id)
             {
                 string endName = nameType == NameType.Singular ? pet.Singular.ToString() : pet.Plural.ToString();
-                lastIds[id] = endName;
+                lastIds[(id, nameType)] = endName;
                 return endName;
             }
         }

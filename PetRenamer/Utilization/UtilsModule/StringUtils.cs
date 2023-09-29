@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
 using System.Text.RegularExpressions;

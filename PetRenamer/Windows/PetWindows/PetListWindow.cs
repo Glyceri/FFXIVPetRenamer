@@ -492,7 +492,6 @@ public class PetListWindow : PetWindow
         temporaryUser.SerializableUser.Reset();
         foreach (SerializableNickname n in foundNicknames)
         {
-            n.Setup();
             if (temporaryUser.SerializableUser.ids.Contains(n.ID)) continue;
             AddTexture(n.ID);
             temporaryUser.SerializableUser.SaveNickname(n.ID, n.Name, false, false, true);
