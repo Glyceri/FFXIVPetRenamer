@@ -23,7 +23,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<Map> maps { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 
-    const int cacheSizes = 25;
+    const int cacheSizes = 55;
 
     readonly Dictionary<string, bool> lastPets = new Dictionary<string, bool>(cacheSizes + 1);
     readonly Dictionary<int, string> lastBattleIds = new Dictionary<int, string>(cacheSizes + 1);
@@ -48,10 +48,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     {
         foreach(Companion c in petSheet)
         {
-            PetLog.Log($"{c.Singular} {c.Model.Value.Model} {c.Model.Value.RowId}");
+            PetLog.Log($"{c.Singular} {c.Plural}");
         }
-
-        PetLog.Log(PluginLink.CharacterManager->LookupBattleCharaByObjectId(PluginHandlers.ClientState.LocalPlayer!.ObjectId)->Character.Companion.CompanionObject->Character.CharacterData.ModelCharaId);
     }
 
     public bool PetExistsInANY(string petname)
@@ -112,7 +110,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return string.Empty;
     }
 
-    public string GetPetName(int id)
+    public string GetPetName(int id, NameType nameType = NameType.Singular)
     {
         if (lastIds.TryGetValue(id, out string? petName))
             return petName;
@@ -127,7 +125,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
             if (pet.Model.Value!.RowId == id)
             {
-                string endName = pet.Singular.ToString();
+                string endName = nameType == NameType.Singular ? pet.Singular.ToString() : pet.Plural.ToString();
                 lastIds[id] = endName;
                 return endName;
             }
@@ -205,4 +203,10 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     }
 
     public string GetWorldName(ushort worldID) => worlds.GetRow(worldID)?.InternalName ?? string.Empty;
+}
+
+public enum NameType
+{
+    Singular,
+    Plural
 }

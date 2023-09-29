@@ -35,6 +35,8 @@ public static class PluginConstants
         "die ",
         "der ",
         "das ",
+        "le ",
+        "la ",
         string.Empty, //Always put last
     };
 

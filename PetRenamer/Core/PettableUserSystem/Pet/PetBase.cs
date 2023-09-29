@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Utilization.UtilsModule;
 using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.PettableUserSystem.Pet;
@@ -13,12 +14,12 @@ public class PetBase
 
     public string CustomName => _customName ?? string.Empty;
     public string BaseName => _baseName ?? string.Empty;
+    public string BaseNamePlural => _baseNamePlural ?? string.Empty;
 
     public bool Changed => _petChanged;
 
     public bool IsNull => _id != -1;
     public bool Has => _pet != nint.Zero;
-    public string GetName => CustomName == string.Empty ? BaseName : CustomName;
 
     nint _pet;
 
@@ -28,6 +29,7 @@ public class PetBase
 
     string _customName = string.Empty;
     string _baseName = string.Empty;
+    string _baseNamePlural = string.Empty;
 
     bool _petChanged;
 
@@ -56,7 +58,8 @@ public class PetBase
         _petChanged = true;
         _lastPointer = _pet;
         _lastID = _id;
-        _baseName = Marshal.PtrToStringUTF8((nint)gObject.GameObject.Name)!;
+        _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
+        _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
 

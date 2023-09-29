@@ -39,6 +39,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
                 if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
                 if (pet.ObjectID != emoteTarget.ObjectID) continue;
 
+                StringUtils.instance.ReplaceSeString(ref message, pet.BaseNamePlural, pet.CustomName);
                 StringUtils.instance.ReplaceSeString(ref message, pet.BaseName, pet.CustomName);
                 return;
             }
