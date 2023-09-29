@@ -16,6 +16,13 @@ public static class PenumbraIPCProvider
         getEnabledState = dalamudPluginInterface.GetIpcSubscriber<bool>("Penumbra.GetEnabledState");
     }
 
+    public static void RedrawPetByIndex(int index)
+    {
+        if (index == -1) return;
+        if (index > -1) RedrawMinionByIndex(index);
+        if (index < -1) RedrawBattlePetByIndex(index);
+    }
+
     public static void RedrawBattlePetByIndex(int index)
     {
         if (!PluginLink.Configuration.redrawBattlePetOnSpawn) return;

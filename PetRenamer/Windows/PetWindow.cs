@@ -1,5 +1,6 @@
 using ImGuiNET;
 using PetRenamer.Theming;
+using System.Numerics;
 
 namespace PetRenamer.Windows;
 
@@ -19,20 +20,18 @@ public abstract class PetWindow : PetWindowHelpers
         }
     }
 
-    internal static void SetPetMode(PetMode mode) => petMode = mode;
+    internal void SetPetMode(PetMode mode) 
+    { 
+        petMode = mode;
+        TickPetModeChanged();
+    }
     internal virtual void OnPetModeChange(PetMode mode) { }
     protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     public sealed override unsafe void Draw()
-    {
+    { 
         if (drawToggle) DrawModeToggle();
-
-        if (_lastMode != petMode)
-        {
-            _lastMode = petMode;
-            OnPetModeChange(petMode);
-        }
-
+        TickPetModeChanged();
         OnDraw();
         if (petMode == PetMode.Normal) OnDrawNormal();
         else if (petMode == PetMode.BattlePet) OnDrawBattlePet();
@@ -42,7 +41,20 @@ public abstract class PetWindow : PetWindowHelpers
         _PopAllStyleColours();
     }
 
-    public sealed override void PostDraw() => _PopAllStyleColours();
+    void TickPetModeChanged()
+    {
+        if (_lastMode != petMode)
+        {
+            _lastMode = petMode;
+            OnPetModeChange(petMode);
+        }
+    }
+
+    public sealed override void PostDraw()
+    {
+        PostDrawHelper();
+        _PopAllStyleColours();
+    }
     public sealed override void OnOpen() => OnWindowOpen();
     public sealed override void OnClose() => OnWindowClose();
 

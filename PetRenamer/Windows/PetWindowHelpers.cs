@@ -32,11 +32,21 @@ public abstract class PetWindowHelpers : PetWindowStyling
     readonly List<(string, Type, string, Func<bool>)> helpButtons = new List<(string, Type, string, Func<bool>)>()
     {
         (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", () => PluginLink.Configuration.debugMode),
-        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(NewPetRenameWindow),        "[Give Nickname]", null!),
+        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]", null!)
     };
+
+    Vector2 oldPadding;
+    Vector2 oldWindowPadding;
+    Vector2 oldCellPadding;
+    Vector2 oldItemSpacing;
+    Vector2 oldItemInnerSpacing;
+    Vector2 touchExtraPadding;
+    float indentSpacing;
+    float scrollbarSize;
+    float grabMinSize;
 
     public sealed override void PreDraw()
     {
@@ -44,6 +54,43 @@ public abstract class PetWindowHelpers : PetWindowStyling
         PushStyleColor(ImGuiCol.TitleBg, StylingColours.titleBg);
         PushStyleColor(ImGuiCol.TitleBgActive, StylingColours.titleBgActive);
         PushStyleColor(ImGuiCol.TitleBgCollapsed, StylingColours.tileBgCollapsed);
+
+        ImGuiStylePtr ptr = ImGui.GetStyle();
+
+        oldPadding = ptr.FramePadding;
+        oldWindowPadding = ptr.WindowPadding;
+        oldCellPadding = ptr.CellPadding;
+        oldItemSpacing = ptr.ItemSpacing;
+        oldItemInnerSpacing = ptr.ItemInnerSpacing;
+        touchExtraPadding = ptr.TouchExtraPadding;
+        indentSpacing = ptr.IndentSpacing;
+        scrollbarSize = ptr.ScrollbarSize;
+        grabMinSize = ptr.GrabMinSize;
+
+        ptr.FramePadding = new Vector2(4, 3);
+        ptr.WindowPadding = new Vector2(8, 8);
+        ptr.CellPadding = new Vector2(4, 4);
+        ptr.ItemSpacing = new Vector2(8, 4);
+        ptr.ItemInnerSpacing = new Vector2(4, 4);
+        ptr.TouchExtraPadding = new Vector2(0, 2);
+        ptr.IndentSpacing = 21;
+        ptr.ScrollbarSize = 16;
+        ptr.GrabMinSize = 10;
+    }
+
+    protected void PostDrawHelper() 
+    {
+        ImGuiStylePtr ptr = ImGui.GetStyle();
+
+        ptr.FramePadding = oldPadding;
+        ptr.WindowPadding = oldWindowPadding;
+        ptr.CellPadding = oldCellPadding;
+        ptr.ItemSpacing = oldItemSpacing;
+        ptr.ItemInnerSpacing = oldItemInnerSpacing;
+        ptr.TouchExtraPadding = touchExtraPadding;
+        ptr.IndentSpacing = indentSpacing;
+        ptr.ScrollbarSize = scrollbarSize;
+        ptr.GrabMinSize = grabMinSize;
     }
 
     protected void DrawModeToggle()
@@ -54,7 +101,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         ImGui.EndListBox();
 
         if (pressed == -1) return;
-        PetWindow.petMode = (PetMode)pressed;
+        (this as PetWindow)!.SetPetMode((PetMode)pressed);
     }
 
     int DotBar()
@@ -182,9 +229,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool TransparentLabel(Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0, 0, 0, 0));
-        PushStyleColor(ImGuiCol.Button, new Vector4(0, 0, 0, 0));
-        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0, 0, 0, 0));
+        PushStyleColours(new Vector4(0, 0, 0, 0), LabelColours);
         PushStyleColor(ImGuiCol.Text, new Vector4(0, 0, 0, 0));
         bool returner = ImGui.Button(string.Empty, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -194,9 +239,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool TransparentLabel(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0, 0, 0, 0));
-        PushStyleColor(ImGuiCol.Button, new Vector4(0, 0, 0, 0));
-        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0, 0, 0, 0));
+        PushStyleColours(new Vector4(0, 0, 0, 0), LabelColours);
         PushStyleColor(ImGuiCol.Text, new Vector4(0, 0, 0, 0));
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -206,9 +249,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColours(StylingColours.idleColor, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
         bool returner = ImGui.Button(text);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -218,9 +259,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColours(StylingColours.idleColor, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -230,63 +269,49 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, Vector4 textColour)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColours(StylingColours.idleColor, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text);
     }
 
     protected bool Label(string text, Vector2 styling, Vector4 textColour)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColours(StylingColours.idleColor, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text, styling);
     }
 
     protected bool NewLabel(string text, Vector2 styling)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.button);
-        PushStyleColor(ImGuiCol.Button, StylingColours.button);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.button);
+        PushStyleColours(StylingColours.button, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.Button(text, styling);
     }
 
     protected bool OverrideLabel(string text, Vector2 styling)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColours(StylingColours.xButton, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.Button(text, styling);
     }
 
     protected bool OverrideLabel(string text)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColours(StylingColours.xButton, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         return ImGui.Button(text);
     }
 
     protected bool OverrideLabel(string text, Vector4 textColour)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColours(StylingColours.xButton, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text);
     }
 
     protected bool OverrideLabel(string text, Vector2 styling, Vector4 textColour)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButton);
+        PushStyleColours(StylingColours.xButton, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text, styling);
     }
@@ -307,6 +332,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void SetTooltipHovered(string text)
     {
+        if (text == string.Empty || text == null) return;
         if (!ImGui.IsItemHovered()) return;
         SetTooltip(text);
     }
@@ -321,9 +347,17 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void PushStyleColor(ImGuiCol imGuiCol, Vector4 colour)
     {
-        if (!PluginLink.Configuration.useCustomTheme) return;
         popCount++;
         ImGui.PushStyleColor(imGuiCol, colour);
+    }
+
+    protected void PushStyleColours(Vector4 colour, params ImGuiCol[] colours)
+    {
+        foreach (ImGuiCol col in colours)
+        {
+            popCount++;
+            ImGui.PushStyleColor(col, colour);
+        }
     }
 
     protected void _PopAllStyleColours()
@@ -456,6 +490,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
         SameLinePretendSpace();
         if (!check) return;
         XButton(buttonString + $"##<Close{internalCounter++}>", Styling.SmallButton, tooltipString, callback.Invoke);
+    }
+
+    protected void DrawImage(nint handle, Vector2 size)
+    {
+        if (PluginLink.Configuration.displayImages) ImGui.Image(handle, size);
+        else
+        {
+            PushStyleColours(StylingColours.defaultBackground, ImGuiCol.Button | ImGuiCol.ButtonActive | ImGuiCol.ButtonHovered);
+            Button("", size);
+        }
     }
 
     protected void SpaceBottomRightButton()

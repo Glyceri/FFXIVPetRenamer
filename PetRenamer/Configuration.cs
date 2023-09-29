@@ -18,9 +18,9 @@ public class Configuration : IPluginConfiguration
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
-    public bool useCustomTheme = true;
     public bool downloadProfilePictures = false;
     public bool displayImages = true;
+    public bool automaticallySwitchPetmode = true;
     // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;

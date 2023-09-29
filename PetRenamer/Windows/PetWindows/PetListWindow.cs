@@ -331,7 +331,7 @@ public class PetListWindow : PetWindow
             if (currentIsLocalUser)
             {
                 DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
@@ -561,7 +561,7 @@ public class PetListWindow : PetWindow
     void OpenID(int id, bool force)
     {
         SetOpenedAddPet(false);
-        PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForId(id, force);
+        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(id, force);
     }
 
     void FillTextureList(PettableUser user = null!)

@@ -9,7 +9,7 @@ internal class SaveFileMismatchWindow : PetWindow
 {
     public SaveFileMismatchWindow() : base("Pet Nicknames Save File Mismatch", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse , true)
     {
-        Size = new System.Numerics.Vector2(450, 75);
+        Size = new System.Numerics.Vector2(500, 75);
 
         if (Configuration.currentSaveFileVersion < PluginLink.Configuration.Version)
             IsOpen = true;

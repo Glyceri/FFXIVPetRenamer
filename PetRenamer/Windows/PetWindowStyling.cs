@@ -34,8 +34,9 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
     protected float FullWidth => ImGui.GetWindowWidth();
 
     protected float FillingWidth => FullWidth - (WindowPaddingX * 2);
-    protected float FillingWidthStepped(int steps = 1) => FillingWidth - (FramePaddingX * 2 * steps);
+    protected float FillingWidthStepped(int steps = 1) => FullWidth - (FramePaddingX * 2 * steps);
 
+    protected ImGuiCol[] LabelColours = new ImGuiCol[] { ImGuiCol.Button, ImGuiCol.ButtonActive, ImGuiCol.ButtonHovered };
 
     public Vector2 ToggleButtonStyle => new Vector2(BarSizePadded, BarSize * 0.5f);
 
@@ -52,7 +53,7 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
         public readonly Vector2 FillSizeSmall = new Vector2(746, 25);
         public readonly Vector2 FillSizeFull = new Vector2(782, 25);
         public readonly Vector2 FillSizeFullSmall = new Vector2(774, 25);
-        
+        public readonly Vector2 PetWindowInsideBar = new Vector2(290, 25);
         public readonly Vector2 helpButtonSize = new Vector2(25, 25);
     }
 
