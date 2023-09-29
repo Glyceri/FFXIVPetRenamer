@@ -20,10 +20,14 @@ internal class LegacyNamingVer6 : LegacyElement
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             List<SerializableNickname> nicknames = new List<SerializableNickname>();
-            for(int i = 0; i < user.SerializableUser.length; i++)
-                foreach(Companion pet in SheetUtils.instance.petSheet)
-                    if(pet.Model!.Value!.Model == user.SerializableUser.ids[i])
+            for (int i = 0; i < user.SerializableUser.length; i++)
+            {
+                foreach (Companion pet in SheetUtils.instance.petSheet)
+                    if (pet.Model!.Value!.Model == user.SerializableUser.ids[i])
                         nicknames.Add(new SerializableNickname((int)pet.Model!.Value!.RowId, user.SerializableUser.names[i]));
+                if (user.SerializableUser.ids[i] < -1) 
+                    nicknames.Add(new SerializableNickname(user.SerializableUser.ids[i], user.SerializableUser.names[i]));
+            }
             user.SerializableUser.Reset();
             foreach (SerializableNickname nickname in nicknames)
                 user.SerializableUser.SaveNickname(nickname.ID, nickname.Name, true);
