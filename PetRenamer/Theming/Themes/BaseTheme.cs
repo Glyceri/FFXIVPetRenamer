@@ -6,7 +6,7 @@ internal class BaseTheme : Theme
 {
     internal override Vector4 defaultBackground { get; set; } = new Vector4(0.60f, 0.70f, 0.80f, 0.95f);
     internal override Vector4 titleBgActive { get; set; } = new Vector4(0.30f, 0.50f, 1f, 1f);
-    internal override Vector4 titleBg { get; set; } = new Vector4(0.20f, 0.30f, 0.4f, 1f);
+    internal override Vector4 titleBg { get; set; } = new Vector4(0.10f, 0.16f, 0.2f, 1f);
     internal override Vector4 tileBgCollapsed { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
 
     internal override Vector4 whiteText { get; set; } = new Vector4(0.95f, 0.95f, 0.95f, 1f);

@@ -60,7 +60,7 @@ internal class DeveloperWindow : PetWindow
 
     void PetNameWindow()
     {
-        PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Draw();
+        PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>()?.Draw();
     }
 
     int tableCounter = 0;

@@ -43,7 +43,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         }
         if (!user.LocalUser) return;
         if (!user.AnyPetChanged) return;
-        PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
+        NewPetRenameWindow window = PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>();
         if (window == null) return;
         if (user.Minion.Changed) window.OpenForId(user.Minion.ID);
         if (user.BattlePet.Changed) window.OpenForBattleID(user.BattlePet.ID);

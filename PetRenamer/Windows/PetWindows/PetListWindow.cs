@@ -29,12 +29,12 @@ public class PetListWindow : PetWindow
     readonly int maxBoxHeightBattle = 631;
     readonly int maxBoxHeightSharing = 655;
 
-    public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
+    public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints()
         {
-            MinimumSize = new Vector2(800, 783 + 64),
-            MaximumSize = new Vector2(800, 783 + 64)
+            MinimumSize = new Vector2(400, 400),
+            MaximumSize = new Vector2(9999999, 9999999)
         };
     }
 
@@ -203,7 +203,7 @@ public class PetListWindow : PetWindow
             current = true;
         }
 
-        BeginListBox("##<6>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
+        BeginListBox("##<6>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightSharing));
 
         DrawPetGraph(user, () =>
         {
@@ -274,7 +274,7 @@ public class PetListWindow : PetWindow
     void DrawListSharing()
     {
         texturePointer = 0;
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
+        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightSharing));
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 7", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
@@ -320,7 +320,7 @@ public class PetListWindow : PetWindow
     void DrawBattlePetList()
     {
         DrawBattlePetWarningHeader();
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightBattle));
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -331,7 +331,7 @@ public class PetListWindow : PetWindow
             if (currentIsLocalUser)
             {
                 DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    () => PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForBattleID(nickname.Item1, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
@@ -354,7 +354,7 @@ public class PetListWindow : PetWindow
 
     void DrawBattlePetWarningHeader()
     {
-        BeginListBox("##WarningHeader", new System.Numerics.Vector2(780, 40));
+        BeginListBox("##WarningHeader", new System.Numerics.Vector2(FillingWidth, 40));
         ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
         ImGui.EndListBox();
     }
@@ -362,7 +362,7 @@ public class PetListWindow : PetWindow
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
+        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg);
 
         DrawUserTexture(user);
 
@@ -500,7 +500,7 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight), StylingColours.titleBg);
+        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg);
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -561,7 +561,7 @@ public class PetListWindow : PetWindow
     void OpenID(int id, bool force)
     {
         SetOpenedAddPet(false);
-        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(id, force);
+        PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForId(id, force);
     }
 
     void FillTextureList(PettableUser user = null!)

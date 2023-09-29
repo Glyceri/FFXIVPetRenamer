@@ -18,19 +18,42 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
 
     public override void Draw() { }
 
-    public static class Styling
+    protected ImGuiStylePtr stylePtr => ImGui.GetStyle();
+
+    protected float WindowPaddingX => stylePtr.WindowPadding.X;
+    protected float WindowPaddingY => stylePtr.WindowPadding.Y;
+
+    protected float FramePaddingX => stylePtr.FramePadding.X;
+    protected float FramePaddingY => stylePtr.FramePadding.Y;
+
+    protected float SpaceSize => 3.0f;
+
+    protected float BarSize => 25;
+    protected float BarSizePadded => BarSize + (FramePaddingY * 2);
+
+    protected float FullWidth => ImGui.GetWindowWidth();
+
+    protected float FillingWidth => FullWidth - (WindowPaddingX * 2);
+    protected float FillingWidthStepped(int steps = 1) => FillingWidth - (FramePaddingX * 2 * steps);
+
+
+    public Vector2 ToggleButtonStyle => new Vector2(BarSizePadded, BarSize * 0.5f);
+
+    protected StylingClass Styling = new StylingClass();
+
+    public class StylingClass
     {
-        public static readonly Vector2 ListButton = new Vector2(150, 25);
-        public static readonly Vector2 ListNameButton = new Vector2(480, 25);
-        public static readonly Vector2 ListIDField = new Vector2(75, 25);
-        public static readonly Vector2 SmallButton = new Vector2(25, 25);
-        public static readonly Vector2 ListSmallNameField = new Vector2(200, 25);
-        public static readonly Vector2 FillSize = new Vector2(755, 25);
-        public static readonly Vector2 FillSizeSmall = new Vector2(746, 25);
-        public static readonly Vector2 FillSizeFull = new Vector2(782, 25);
-        public static readonly Vector2 FillSizeFullSmall = new Vector2(774, 25);
-        public static readonly Vector2 ToggleButton = new Vector2(30, 12);
-        public static readonly Vector2 helpButtonSize = new Vector2(25, 25);
+        public readonly Vector2 ListButton = new Vector2(150, 25);
+        public readonly Vector2 ListNameButton = new Vector2(480, 25);
+        public readonly Vector2 ListIDField = new Vector2(75, 25);
+        public readonly Vector2 SmallButton = new Vector2(25, 25);
+        public readonly Vector2 ListSmallNameField = new Vector2(200, 25);
+        public readonly Vector2 FillSize = new Vector2(755, 25);
+        public readonly Vector2 FillSizeSmall = new Vector2(746, 25);
+        public readonly Vector2 FillSizeFull = new Vector2(782, 25);
+        public readonly Vector2 FillSizeFullSmall = new Vector2(774, 25);
+        
+        public readonly Vector2 helpButtonSize = new Vector2(25, 25);
     }
 
     public static class StylingColours
