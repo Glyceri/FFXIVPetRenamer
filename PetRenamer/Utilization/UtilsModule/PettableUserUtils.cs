@@ -41,12 +41,13 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
             user.SetBattlePet(battlePet);
         }
+        if (!PluginLink.Configuration.automaticallySwitchPetmode) return;
         if (!user.LocalUser) return;
         if (!user.AnyPetChanged) return;
-        NewPetRenameWindow window = PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>();
+        PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
         if (window == null) return;
+        if (user.BattlePet.Changed) window.OpenForId(user.BattlePet.ID);
         if (user.Minion.Changed) window.OpenForId(user.Minion.ID);
-        if (user.BattlePet.Changed) window.OpenForBattleID(user.BattlePet.ID);
     }
 
     unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara, BattleChara* basePet)

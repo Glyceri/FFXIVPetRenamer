@@ -7,11 +7,9 @@ using PetRenamer.Core.PettableUserSystem.Enums;
 using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
 using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using PetRenamer.Windows.Attributes;
 using PetRenamer.Core.Debug;
-using Dalamud.Interface.Utility.Table;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -22,7 +20,7 @@ internal class DeveloperWindow : PetWindow
 
     public DeveloperWindow() : base("Dev Window Pet Renamer")
     {
-        if(PluginLink.Configuration.debugMode) IsOpen = true;
+        if(PluginLink.Configuration.debugMode && PluginLink.Configuration.autoOpenDebug) IsOpen = true;
     }
 
     int currentTab = 0;
@@ -60,7 +58,7 @@ internal class DeveloperWindow : PetWindow
 
     void PetNameWindow()
     {
-        PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>()?.Draw();
+        PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Draw();
     }
 
     int tableCounter = 0;

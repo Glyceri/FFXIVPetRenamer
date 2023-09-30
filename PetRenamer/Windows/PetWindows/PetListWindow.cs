@@ -130,7 +130,8 @@ public class PetListWindow : PetWindow
         DrawWarningLabel(PluginConstants.Strings.userListPfpWarning, SeIconChar.MouseWheel.ToIconString(), "Open Settings Menu", PluginLink.WindowHandler.OpenWindow<ConfigWindow>);
         PettableUser curUser = null!;
 
-        BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg);
+        if (!BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg))
+            return;
 
         DrawGraph(new List<Action<int, int>>()
         {
@@ -331,7 +332,7 @@ public class PetListWindow : PetWindow
             if (currentIsLocalUser)
             {
                 DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
@@ -362,7 +363,8 @@ public class PetListWindow : PetWindow
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg);
+        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg))
+            return;
 
         DrawUserTexture(user);
 
@@ -500,7 +502,8 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg);
+        if (!BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg))
+            return;
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -561,7 +564,7 @@ public class PetListWindow : PetWindow
     void OpenID(int id, bool force)
     {
         SetOpenedAddPet(false);
-        PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>().OpenForId(id, force);
+        PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(id, force);
     }
 
     void FillTextureList(PettableUser user = null!)

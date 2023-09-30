@@ -1,4 +1,5 @@
 ﻿using Lumina.Excel.GeneratedSheets;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
@@ -121,8 +122,12 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
     internal string PetIDToName(int petID)
     {
-        if (!petIDToPetName.ContainsKey(petID)) return string.Empty;
-        return petIDToPetName[petID];
+        if (petID < -1)
+        {
+            if (!petIDToPetName.ContainsKey(petID)) return string.Empty;
+            return petIDToPetName[petID];
+        }
+        return SheetUtils.instance.GetPetName(petID);
     }
 
     internal int GetPetIDFromClass(int jobclass)
@@ -163,4 +168,9 @@ internal enum ClassType
     Summoning,
     Healing,
     Machinist
+}
+
+public static class RemapUtilsHelper
+{
+    public static string GetIconPath(this uint textureID) => PluginHandlers.TextureProvider.GetIconPath(textureID) ?? string.Empty;
 }

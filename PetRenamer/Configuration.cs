@@ -15,12 +15,14 @@ public class Configuration : IPluginConfiguration
     public const int currentSaveFileVersion = 7;
     public int Version { get; set; } = currentSaveFileVersion;
 
+    
+
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
-    public bool useCustomTheme = true;
     public bool downloadProfilePictures = false;
     public bool displayImages = true;
+    public bool automaticallySwitchPetmode = true;
     // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;
@@ -38,9 +40,13 @@ public class Configuration : IPluginConfiguration
     public bool showNamesInMinionBook = true;
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
-
-    // Debug mode
+    // --------------------------- UI SETTINGS ---------------------------
+    public bool spaceOutSettings = false;
+    public bool startSettingsOpen = false;
+    public bool quickButtonsToggle = false;
+    // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
+    public bool autoOpenDebug = true;
 
     public SerializableUserV3[]? serializableUsersV3 = null;
     

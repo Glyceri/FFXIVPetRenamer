@@ -30,7 +30,7 @@ internal unsafe class PetContextMenu : ContextMenuElement
             if (c.Singular.ToString() == string.Empty) continue;
             if (petname.ToLower().Normalize() == string.Empty) continue;
             if (c.Singular.ToString().ToLower().Normalize().Trim() != petname.ToLower().Normalize().Trim()) continue;
-            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>()?.OpenForId((int)c.Model.Value!.RowId, true)));
+            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId((int)c.Model.Value!.RowId, true)));
             break;
         }
     }
@@ -45,12 +45,6 @@ internal unsafe class PetContextMenu : ContextMenuElement
         PetBase pet = PluginLink.PettableUserHandler.GetPet(targetUser, address);
         if (pet == null) return;
 
-        args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) =>
-        {
-            NewPetRenameWindow petWindow = PluginLink.WindowHandler.GetWindow<NewPetRenameWindow>();
-            if (pet.ID > -1) petWindow.OpenForId(pet.ID, true);
-            else if (pet.ID < -1) petWindow.OpenForBattleID(pet.ID, true);
-        }
-        ));
+        args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(pet.ID, true)));
     }
 }

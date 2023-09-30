@@ -3,7 +3,6 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -100,4 +99,9 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         (string, string)[] strs = new (string, string)[] { (baseName, replaceName) };
         ReplaceAtkString(textNode, ref strs, nineGridNode);
     }
+}
+
+public static class StringUtilsHelper
+{
+    public static string MakeTitleCase(this string str) => StringUtils.instance.MakeTitleCase(str);
 }
