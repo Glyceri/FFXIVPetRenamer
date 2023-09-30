@@ -9,7 +9,6 @@ using System;
 using PetRenamer.Core;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using ImGuiScene;
 using Dalamud.Game.Text;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.Sharing;
@@ -31,10 +30,11 @@ public class PetListWindow : PetWindow
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
+        IsOpen = true;
         SizeConstraints = new WindowSizeConstraints()
         {
-            MinimumSize = new Vector2(400, 400),
-            MaximumSize = new Vector2(9999999, 9999999)
+            MinimumSize = new Vector2(800, 783 + 64),
+            MaximumSize = new Vector2(800, 783 + 64)
         };
     }
 
@@ -204,7 +204,7 @@ public class PetListWindow : PetWindow
             current = true;
         }
 
-        BeginListBox("##<6>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightSharing));
+        BeginListBox("##<6>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
 
         DrawPetGraph(user, () =>
         {
@@ -275,7 +275,7 @@ public class PetListWindow : PetWindow
     void DrawListSharing()
     {
         texturePointer = 0;
-        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightSharing));
+        BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 7", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
@@ -321,7 +321,7 @@ public class PetListWindow : PetWindow
     void DrawBattlePetList()
     {
         DrawBattlePetWarningHeader();
-        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeightBattle));
+        BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightBattle));
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -355,7 +355,7 @@ public class PetListWindow : PetWindow
 
     void DrawBattlePetWarningHeader()
     {
-        BeginListBox("##WarningHeader", new System.Numerics.Vector2(FillingWidth, 40));
+        BeginListBox("##WarningHeader", new System.Numerics.Vector2(ContentAvailableX, 40));
         ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
         ImGui.EndListBox();
     }
@@ -363,7 +363,7 @@ public class PetListWindow : PetWindow
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg))
+        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(ContentAvailableX, 90), StylingColours.titleBg))
             return;
 
         DrawUserTexture(user);
@@ -502,7 +502,7 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        if (!BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg))
+        if (!BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeight), StylingColours.titleBg))
             return;
 
         DrawPetGraph(user, null!, (row, column) =>

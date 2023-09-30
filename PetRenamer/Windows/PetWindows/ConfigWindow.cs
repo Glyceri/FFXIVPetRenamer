@@ -19,7 +19,6 @@ public class ConfigWindow : PetWindow
 
     public ConfigWindow() : base("Pet Nicknames Settings")
     {
-        IsOpen = true;
         Size = baseSize;
         SizeCondition = ImGuiCond.FirstUseEver;
         SizeConstraints = new WindowSizeConstraints()
