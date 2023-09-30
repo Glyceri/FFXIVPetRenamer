@@ -30,7 +30,6 @@ public class PetListWindow : PetWindow
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
-        IsOpen = true;
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(800, 783 + 64),
@@ -112,8 +111,8 @@ public class PetListWindow : PetWindow
 
     void SharingHeader()
     {
-        if (advancedMode) DrawUserHeader(user, 0, 32, () => OverrideLabel("Advanced Exporting"));
-        else if (importedData != null && existingUser != null) DrawUserHeader(existingUser, 0, 32, () => OverrideLabel("Importing"));
+        if (advancedMode) DrawUserHeader(user, 0, 32, () => OverrideLabel("Advanced Exporting", new Vector2(200, BarSize)));
+        else if (importedData != null && existingUser != null) DrawUserHeader(existingUser, 0, 32, () => OverrideLabel("Importing", new Vector2(200, BarSize)));
         else DrawBasicUserHeader();
     }
 
@@ -130,7 +129,7 @@ public class PetListWindow : PetWindow
         DrawWarningLabel(PluginConstants.Strings.userListPfpWarning, SeIconChar.MouseWheel.ToIconString(), "Open Settings Menu", PluginLink.WindowHandler.OpenWindow<ConfigWindow>);
         PettableUser curUser = null!;
 
-        if (!BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg))
+        if (!BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle)))
             return;
 
         DrawGraph(new List<Action<int, int>>()
@@ -275,7 +274,7 @@ public class PetListWindow : PetWindow
     void DrawListSharing()
     {
         texturePointer = 0;
-        BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
+        BeginListBox("##<111>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 7", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
@@ -313,7 +312,7 @@ public class PetListWindow : PetWindow
     void DrawImportType(ImportType importType)
     {
         if (importType == ImportType.None) Label("=", Styling.SmallButton);
-        if (importType == ImportType.New) NewLabel("+", Styling.SmallButton);
+        if (importType == ImportType.New)  NewLabel("+", Styling.SmallButton);
         if (importType == ImportType.Rename) NewLabel("O", Styling.SmallButton);
         if (importType == ImportType.Remove) XButtonError("X", Styling.SmallButton);
     }
@@ -356,14 +355,14 @@ public class PetListWindow : PetWindow
     void DrawBattlePetWarningHeader()
     {
         BeginListBox("##WarningHeader", new System.Numerics.Vector2(ContentAvailableX, 40));
-        ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
+        ImGui.TextColored(StylingColours.defaultText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
         ImGui.EndListBox();
     }
 
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(ContentAvailableX, 90), StylingColours.titleBg))
+        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(ContentAvailableX, 90)))
             return;
 
         DrawUserTexture(user);
@@ -502,7 +501,7 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        if (!BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeight), StylingColours.titleBg))
+        if (!BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeight)))
             return;
 
         DrawPetGraph(user, null!, (row, column) =>

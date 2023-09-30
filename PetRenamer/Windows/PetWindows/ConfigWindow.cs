@@ -167,7 +167,7 @@ public class ConfigWindow : PetWindow
             toggles.Add(title, (forceOpen ? forceOpen : PluginLink.Configuration.startSettingsOpen, 0));      
         (bool, float) curToggle = toggles[title];
         currentHeight = curToggle.Item2;
-        bool outcome = BeginListBox($"##{title}[config]{internalCounter++}", new Vector2(ContentAvailableX, currentHeight), StylingColours.titleBg);
+        bool outcome = BeginListBox($"##{title}[config]{internalCounter++}", new Vector2(ContentAvailableX, currentHeight));
         if (!outcome) return false;
         if (!forceOpen)
         {
@@ -228,7 +228,7 @@ internal readonly ref struct ConfigElement
         float complete = 0;
         if (IsUnsafe.IsNullRef(ref value)) return;
         complete += DrawCheckbox(); 
-        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
+        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         if (Tooltip != null && Tooltip != string.Empty && ImGui.IsItemHovered())
             ImGui.SetTooltip(Tooltip);
         ImGui.PopStyleColor();
@@ -239,11 +239,11 @@ internal readonly ref struct ConfigElement
 
     float DrawCheckbox()
     {
-        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
-        ImGui.PushStyleColor(ImGuiCol.CheckMark, StylingColours.defaultText);
-        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.xButtonHovered);
-        ImGui.PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
-        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
+        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        ImGui.PushStyleColor(ImGuiCol.CheckMark, StylingColours.alternativeText);
+        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.buttonAlternativeHovered);
+        ImGui.PushStyleColor(ImGuiCol.FrameBg, StylingColours.buttonAlternative);
+        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.buttonAlternativePressed);
         if (ImGui.Checkbox(Title, ref value)) PluginLink.Configuration.Save();
         ImGui.PopStyleColor(5);
         return ImGui.GetFrameHeight() + ItemSpacingY;
@@ -252,7 +252,7 @@ internal readonly ref struct ConfigElement
     float DrawDescriptionBox()
     {
         float size = 0;
-        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
+        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         foreach (string str in Description)
         {
             if (Description == null || str == starter) continue;

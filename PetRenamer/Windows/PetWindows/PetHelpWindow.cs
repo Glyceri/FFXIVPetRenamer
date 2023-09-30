@@ -212,5 +212,5 @@ internal class PetHelpWindow : PetWindow
         SameLinePretendSpace();
     }
 
-    void DrawType(string type) => OverrideLabel(type, Styling.helpButtonSize);
+    void DrawType(string type) => OverrideLabel(type, Styling.SmallButton);
 }

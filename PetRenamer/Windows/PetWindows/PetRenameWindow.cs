@@ -83,7 +83,7 @@ public class PetRenameWindow : PetWindow
 
     void DrawInputField()
     {
-        if (!BeginListBox("##<stylingboxrenamepannel>", new Vector2(ContentAvailableX - imageBoxSize.X - FramePaddingX, imageBoxSize.Y), StylingColours.titleBg))
+        if (!BeginListBox("##<stylingboxrenamepannel>", new Vector2(ContentAvailableX - imageBoxSize.X - FramePaddingX, imageBoxSize.Y)))
             return;
         DrawInputFieldInsides();
         ImGui.EndListBox();
@@ -96,8 +96,8 @@ public class PetRenameWindow : PetWindow
 
         if (activePet.petID == -1 || activePet.baseName == string.Empty)
         {
-            TextColoured(StylingColours.highlightText, $"Please summon a {activePet.referredToAs}.\nOr open the naming list: ");
-            if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+            Label($"Please summon a {activePet.referredToAs} or open the naming list", new Vector2(ContentAvailableX, BarSize));
+            if (Button("Naming List", new Vector2(ContentAvailableX, BarSize))) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
             SetTooltipHovered($"Opens the {activePet.referredToAs} List");
             return;
         }
@@ -106,7 +106,7 @@ public class PetRenameWindow : PetWindow
 
     void DrawImageBox()
     {
-        if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize, StylingColours.titleBg))
+        if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize))
             return;
         DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
         ImGui.EndListBox();
@@ -121,11 +121,11 @@ public class PetRenameWindow : PetWindow
     {
         string tempText = $"does not have a name!";
         if (activePet.petName.Length != 0) tempText = $"is named:";
-        Label($"Your {activePet.baseName} {tempText}", new Vector2(ContentAvailableX, BarSize), StylingColours.whiteText);
+        Label($"Your {activePet.baseName} {tempText}", new Vector2(ContentAvailableX, BarSize), StylingColours.defaultText);
         SetTooltipHovered($"{activePet.baseName}");
         if (activePet.petName.Length != 0)
         {
-            Label($"{activePet.petName}", new Vector2(ContentAvailableX, BarSize), StylingColours.whiteText);
+            Label($"{activePet.petName}", new Vector2(ContentAvailableX, BarSize), StylingColours.defaultText);
             SetTooltipHovered($"{activePet.petName}");
         }
         InputTextMultiLine(string.Empty, ref activePet._temporaryPetName, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine);

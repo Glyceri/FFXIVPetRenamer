@@ -51,8 +51,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     public sealed override void PreDraw()
     {
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        PushStyleColor(ImGuiCol.TitleBg, StylingColours.titleBg);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
+        PushStyleColor(ImGuiCol.TitleBg, StylingColours.panelColour);
         PushStyleColor(ImGuiCol.TitleBgActive, StylingColours.titleBgActive);
         PushStyleColor(ImGuiCol.TitleBgCollapsed, StylingColours.tileBgCollapsed);
 
@@ -96,7 +96,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawModeToggle()
     {
-        if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded), StylingColours.titleBg)) return;
+        if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
         int pressed = DotBar();
         HelpBar();
         ImGui.EndListBox();
@@ -124,7 +124,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         int validCount = ValidHelpButtonsCount();
 
         float leftArea = ToggleButtonStyle.X * (int)PetMode.COUNT;
-        float buttonArea = validCount * (Styling.helpButtonSize.X + SpaceSize) - SpaceSize;
+        float buttonArea = validCount * (Styling.SmallButton.X + SpaceSize) - SpaceSize;
         float framePadding = FramePaddingX * 2;
         float windowPadding = WindowPaddingX * 4;
         ImGui.SameLine(0, FillingWidth - leftArea - buttonArea - framePadding + windowPadding);
@@ -132,7 +132,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         for (int i = 0; i < helpButtons.Count; i++)
         {
             if (!helpButtons[i].Item4?.Invoke(this) ?? false) continue;
-            if (Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.helpButtonSize, helpButtons[i].Item3))
+            if (Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3))
             {
                 if (PluginLink.Configuration.quickButtonsToggle) PluginLink.WindowHandler.ToggleWindow(helpButtons[i].Item2);
                 else PluginLink.WindowHandler.OpenWindow(helpButtons[i].Item2);
@@ -164,15 +164,15 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool ToggleButtonBad()
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.Button, StylingColours.idleColor);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.idleColor);
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.basicLabelColour);
+        PushStyleColor(ImGuiCol.Button, StylingColours.basicLabelColour);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.basicLabelColour);
         return ImGui.Button($"##{internalCounter++}toggleButtonBad", ToggleButtonStyle);
     }
 
     protected bool Button(string text, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
@@ -187,7 +187,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
         PushStyleColor(ImGuiCol.Button, StylingColours.button);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -196,10 +196,10 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool XButtonError(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButtonHovered);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
-        PushStyleColor(ImGuiCol.Text, StylingColours.errorText);
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonAlternativeHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.buttonAlternative);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonAlternativePressed);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -208,10 +208,10 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool XButton(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.xButtonHovered);
-        PushStyleColor(ImGuiCol.Button, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.xButtonPressed);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonAlternativeHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.buttonAlternative);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonAlternativePressed);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -220,10 +220,10 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool RedownloadButton(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.titleBg);
-        PushStyleColor(ImGuiCol.Button, StylingColours.listBox);
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.panelColour);
+        PushStyleColor(ImGuiCol.Button, StylingColours.panelColour);
         PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
-        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -252,8 +252,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColours(StylingColours.idleColor, LabelColours);
-        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        PushStyleColours(StylingColours.basicLabelColour, LabelColours);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -262,8 +262,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColours(StylingColours.idleColor, LabelColours);
-        PushStyleColor(ImGuiCol.Text, StylingColours.readableBlueText);
+        PushStyleColours(StylingColours.basicLabelColour, LabelColours);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         if (callback != null && returner) callback();
@@ -272,14 +272,14 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Label(string text, Vector4 textColour)
     {
-        PushStyleColours(StylingColours.idleColor, LabelColours);
+        PushStyleColours(StylingColours.basicLabelColour, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text);
     }
 
     protected bool Label(string text, Vector2 styling, Vector4 textColour)
     {
-        PushStyleColours(StylingColours.idleColor, LabelColours);
+        PushStyleColours(StylingColours.basicLabelColour, LabelColours);
         PushStyleColor(ImGuiCol.Text, textColour);
         return ImGui.Button(text, styling);
     }
@@ -287,35 +287,14 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected bool NewLabel(string text, Vector2 styling)
     {
         PushStyleColours(StylingColours.button, LabelColours);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         return ImGui.Button(text, styling);
     }
 
     protected bool OverrideLabel(string text, Vector2 styling)
     {
-        PushStyleColours(StylingColours.xButton, LabelColours);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text, styling);
-    }
-
-    protected bool OverrideLabel(string text)
-    {
-        PushStyleColours(StylingColours.xButton, LabelColours);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.Button(text);
-    }
-
-    protected bool OverrideLabel(string text, Vector4 textColour)
-    {
-        PushStyleColours(StylingColours.xButton, LabelColours);
-        PushStyleColor(ImGuiCol.Text, textColour);
-        return ImGui.Button(text);
-    }
-
-    protected bool OverrideLabel(string text, Vector2 styling, Vector4 textColour)
-    {
-        PushStyleColours(StylingColours.xButton, LabelColours);
-        PushStyleColor(ImGuiCol.Text, textColour);
+        PushStyleColours(StylingColours.buttonAlternative, LabelColours);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         return ImGui.Button(text, styling);
     }
 
@@ -323,11 +302,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool Checkbox(string text, string tooltip, ref bool value)
     {
-        PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
-        PushStyleColor(ImGuiCol.CheckMark, StylingColours.whiteText);
-        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.xButtonHovered);
-        PushStyleColor(ImGuiCol.FrameBg, StylingColours.xButton);
-        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.xButtonPressed);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.CheckMark, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.buttonAlternativeHovered);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.buttonAlternative);
+        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.buttonAlternativePressed);
         bool checkbox = ImGui.Checkbox(text, ref value);
         if (tooltip != string.Empty) SetTooltipHovered(tooltip);
         return checkbox;
@@ -342,7 +321,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void SetTooltip(string text)
     {
-        PushStyleColor(ImGuiCol.Text, StylingColours.whiteText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         ImGui.SetTooltip(text);
     }
 
@@ -369,52 +348,23 @@ public abstract class PetWindowHelpers : PetWindowStyling
         popCount = 0;
     }
 
-    protected bool BeginListBox(string text)
-    {
-        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
-        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
-        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
-        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
-        PushStyleColor(ImGuiCol.FrameBg, StylingColours.listBox);
-        return ImGui.BeginListBox(text);
-    }
-
     protected bool BeginListBox(string text, Vector2 styling)
     {
-        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
-        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
-        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
-        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
-        PushStyleColor(ImGuiCol.FrameBg, StylingColours.listBox);
-        return ImGui.BeginListBox(text, styling);
-    }
-
-    protected bool BeginListBox(string text, Vector2 styling, Vector4 bgColour)
-    {
-        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
-        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
-        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
-        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
-        PushStyleColor(ImGuiCol.FrameBg, bgColour);
-        return ImGui.BeginListBox(text, styling);
-    }
-
-
-    protected bool InputText(string label, ref string input, uint maxLength, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
-    {
-        PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
-        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.textFieldPressed);
-        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-        return ImGui.InputText(label, ref input, maxLength, flags);
+        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
+        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
+        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.panelColour);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.panelColour);
+        return ImGui.BeginListBox(text, styling);
     }
 
     protected bool InputTextMultiLine(string label, ref string input, uint maxLength, Vector2 size, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None, string tooltipText = "")
     {
-        PushStyleColor(ImGuiCol.FrameBg, StylingColours.textField);
-        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.textFieldPressed);
-        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.textFieldHovered);
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.buttonAlternative);
+        PushStyleColor(ImGuiCol.FrameBgActive, StylingColours.buttonAlternativePressed);
+        PushStyleColor(ImGuiCol.FrameBgHovered, StylingColours.buttonAlternativeHovered);
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         bool returnable = ImGui.InputTextMultiline(label, ref input, maxLength, size, flags);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
         return returnable;
@@ -473,7 +423,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     {
         if (column == 0) ImGui.TableNextRow();
         ImGui.TableSetColumnIndex(column);
-        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, ImGui.ColorConvertFloat4ToU32(StylingColours.listBox));
+        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, ImGui.ColorConvertFloat4ToU32(StylingColours.panelColour));
     }
 
     protected void DrawFillerBar(int columns)
@@ -488,7 +438,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawWarningLabel(string message, string buttonIcon, string buttonTooltip, Action onButton)
     {
-        OverrideLabel(message, Styling.FillSize);
+        OverrideLabel(message, new Vector2(ContentAvailableX - Styling.SmallButton.X - FramePaddingX * 2, BarSize));
         SameLinePretendSpace();
         if (XButton(buttonIcon + "##<SafetySettings>", Styling.SmallButton))
             onButton?.Invoke();
