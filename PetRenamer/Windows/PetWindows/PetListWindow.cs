@@ -29,7 +29,7 @@ public class PetListWindow : PetWindow
     readonly int maxBoxHeightBattle = 631;
     readonly int maxBoxHeightSharing = 655;
 
-    public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
         SizeConstraints = new WindowSizeConstraints()
         {

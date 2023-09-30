@@ -15,8 +15,6 @@ public class Configuration : IPluginConfiguration
     public const int currentSaveFileVersion = 7;
     public int Version { get; set; } = currentSaveFileVersion;
 
-    
-
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;

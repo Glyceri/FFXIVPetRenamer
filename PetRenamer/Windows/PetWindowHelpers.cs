@@ -29,13 +29,14 @@ public abstract class PetWindowHelpers : PetWindowStyling
         { PetMode.ShareMode,    "[Sharing Mode]" }
     };
 
-    readonly List<(string, Type, string, Func<bool>)> helpButtons = new List<(string, Type, string, Func<bool>)>()
+    readonly List<(string, Type, string, Func<PetWindowHelpers, bool>)> helpButtons = new List<(string, Type, string, Func<PetWindowHelpers, bool>)>()
     {
-        (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", () => PluginLink.Configuration.debugMode),
-        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
+        (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
+        (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", (pw) => PluginLink.Configuration.debugMode),
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]", null!)
+        (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]", null!),
     };
 
     Vector2 oldPadding;
@@ -130,7 +131,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
         for (int i = 0; i < helpButtons.Count; i++)
         {
-            if (!helpButtons[i].Item4?.Invoke() ?? false) continue;
+            if (!helpButtons[i].Item4?.Invoke(this) ?? false) continue;
             if (Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.helpButtonSize, helpButtons[i].Item3))
             {
                 if (PluginLink.Configuration.quickButtonsToggle) PluginLink.WindowHandler.ToggleWindow(helpButtons[i].Item2);
@@ -145,7 +146,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         int counter = 0;
         for (int i = 0; i < helpButtons.Count; i++)
         {
-            if (!helpButtons[i].Item4?.Invoke() ?? false) continue;
+            if (!helpButtons[i].Item4?.Invoke(this) ?? false) continue;
             counter++;
         }
         return counter;
