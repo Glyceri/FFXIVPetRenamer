@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Text;
+using Dalamud.Game.Text;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.PetWindows;

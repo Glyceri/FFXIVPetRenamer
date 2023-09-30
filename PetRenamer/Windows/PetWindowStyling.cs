@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface.Windowing;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry.Interfaces;
 using PetRenamer.Theming;
