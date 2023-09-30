@@ -15,6 +15,8 @@ public class Configuration : IPluginConfiguration
     public const int currentSaveFileVersion = 7;
     public int Version { get; set; } = currentSaveFileVersion;
 
+    
+
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
@@ -38,7 +40,9 @@ public class Configuration : IPluginConfiguration
     public bool showNamesInMinionBook = true;
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
-
+    // --------------------------- UI SETTINGS ---------------------------
+    public bool spaceOutSettings = false;
+    public bool startSettingsOpen = false;
     // Debug mode
     public bool debugMode = false;
 

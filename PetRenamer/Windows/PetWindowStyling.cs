@@ -18,23 +18,25 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
 
     public override void Draw() { }
 
-    protected ImGuiStylePtr stylePtr => ImGui.GetStyle();
+    public static ImGuiStylePtr stylePtr => ImGui.GetStyle();
 
-    protected float WindowPaddingX => stylePtr.WindowPadding.X;
-    protected float WindowPaddingY => stylePtr.WindowPadding.Y;
+    public static float WindowPaddingX => stylePtr.WindowPadding.X;
+    public static float WindowPaddingY => stylePtr.WindowPadding.Y;
 
-    protected float FramePaddingX => stylePtr.FramePadding.X;
-    protected float FramePaddingY => stylePtr.FramePadding.Y;
+    public static float FramePaddingX => stylePtr.FramePadding.X;
+    public static float FramePaddingY => stylePtr.FramePadding.Y;
 
-    protected float SpaceSize => 3.0f;
+    public static float SpaceSize => 3.0f;
 
-    protected float BarSize => 25;
-    protected float BarSizePadded => BarSize + (FramePaddingY * 2);
+    public static float BarSize => 25;
+    public static float BarSizePadded => BarSize + (FramePaddingY * 2);
 
-    protected float FullWidth => ImGui.GetWindowWidth();
+    public static float FullWidth => ImGui.GetWindowWidth();
 
-    protected float FillingWidth => FullWidth - (WindowPaddingX * 2);
-    protected float FillingWidthStepped(int steps = 1) => FullWidth - (FramePaddingX * 2 * steps);
+    public static float ItemSpacingY => stylePtr.ItemSpacing.Y;
+
+    public static float FillingWidth => FullWidth - (WindowPaddingX * 2);
+    public static float FillingWidthStepped(int steps = 1) => FullWidth - (FramePaddingX * 2 * steps);
 
     protected ImGuiCol[] LabelColours = new ImGuiCol[] { ImGuiCol.Button, ImGuiCol.ButtonActive, ImGuiCol.ButtonHovered };
 

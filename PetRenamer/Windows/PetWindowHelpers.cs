@@ -95,13 +95,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawModeToggle()
     {
-        BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(FillingWidth, BarSizePadded), StylingColours.titleBg);
+        if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(FillingWidth, BarSizePadded), StylingColours.titleBg)) return;
         int pressed = DotBar();
         HelpBar();
         ImGui.EndListBox();
-
-        if (pressed == -1) return;
-        (this as PetWindow)!.SetPetMode((PetMode)pressed);
+        if (pressed != -1) (this as PetWindow)!.SetPetMode((PetMode)pressed);
     }
 
     int DotBar()
@@ -364,6 +362,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
     {
         ImGui.PopStyleColor(popCount);
         popCount = 0;
+    }
+
+    protected bool BeginListBox(string text)
+    {
+        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
+        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
+        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.scrollBarBG);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.listBox);
+        return ImGui.BeginListBox(text);
     }
 
     protected bool BeginListBox(string text, Vector2 styling)

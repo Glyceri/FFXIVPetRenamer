@@ -72,7 +72,8 @@ public class PetRenameWindow : PetWindow
 
     void DrawInputField()
     {
-        BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119), StylingColours.titleBg);
+        if (!BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119), StylingColours.titleBg))
+            return;
         DrawInputFieldInsides();
         ImGui.EndListBox();
     }
@@ -94,7 +95,8 @@ public class PetRenameWindow : PetWindow
 
     void DrawImageBox()
     {
-        BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119), StylingColours.titleBg);
+        if (!BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119), StylingColours.titleBg))
+            return;
         DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
         ImGui.EndListBox();
     }

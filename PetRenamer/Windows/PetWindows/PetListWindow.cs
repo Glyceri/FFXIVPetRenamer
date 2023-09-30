@@ -130,7 +130,8 @@ public class PetListWindow : PetWindow
         DrawWarningLabel(PluginConstants.Strings.userListPfpWarning, SeIconChar.MouseWheel.ToIconString(), "Open Settings Menu", PluginLink.WindowHandler.OpenWindow<ConfigWindow>);
         PettableUser curUser = null!;
 
-        BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg);
+        if (!BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg))
+            return;
 
         DrawGraph(new List<Action<int, int>>()
         {
@@ -362,7 +363,8 @@ public class PetListWindow : PetWindow
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg);
+        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(FillingWidth, 90), StylingColours.titleBg))
+            return;
 
         DrawUserTexture(user);
 
@@ -500,7 +502,8 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg);
+        if (!BeginListBox("##<2>", new System.Numerics.Vector2(FillingWidth, maxBoxHeight), StylingColours.titleBg))
+            return;
 
         DrawPetGraph(user, null!, (row, column) =>
         {
