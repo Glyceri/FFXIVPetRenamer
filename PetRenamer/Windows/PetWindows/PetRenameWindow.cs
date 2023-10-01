@@ -150,18 +150,19 @@ public class PetRenameWindow : PetWindow
     void Save()
     {
         user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName, notifyICP: true);
-        activePet.petName = activePet.temporaryPetName;
         OnButton();
     }
 
     void Delete()
     {
+        activePet.temporaryPetName = string.Empty;
         user.SerializableUser.RemoveNickname(activePet.petID, notifyICP: true);
         OnButton();
     }
 
     void OnButton()
     {
+        activePet.petName = activePet.temporaryPetName;
         PluginLink.Configuration.Save();
         PenumbraIPCProvider.RedrawPetByIndex(activePet.petID);
     }
@@ -189,14 +190,12 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForMinion(int id)
     {
-        //PetLog.Log("Changed Minion!");
         if (id == -1) pets[0]?.Clear();
         else OpenForId(id);
     }
 
     public void OpenForBattlePet(int id)
     {
-        //PetLog.Log("Changed Battle Pet!");
         if (id == -1) pets[1]?.Clear();
         else OpenForId(id);
     }
