@@ -21,7 +21,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         user.Reset();
         if (!PluginLink.Configuration.displayCustomNames) return;
 
-        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName.ToLowerInvariant()), true, (short)user.Homeworld);
+        BattleChara * bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
         if (bChara == null) return;
         user.SetUser(bChara);
 
@@ -38,7 +38,6 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
             if (battlePet != null)
                 if (battlePet->Character.CharacterData.Health == 0)
                     battlePet = AlternativeFindForBChara(bChara, battlePet);
-
             user.SetBattlePet(battlePet);
         }
         if (!PluginLink.Configuration.automaticallySwitchPetmode) return;
