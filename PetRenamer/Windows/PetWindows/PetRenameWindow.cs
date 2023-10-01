@@ -189,14 +189,14 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForMinion(int id)
     {
-        PetLog.Log("Changed Minion!");
+        //PetLog.Log("Changed Minion!");
         if (id == -1) pets[0]?.Clear();
         else OpenForId(id);
     }
 
     public void OpenForBattlePet(int id)
     {
-        PetLog.Log("Changed Battle Pet!");
+        //PetLog.Log("Changed Battle Pet!");
         if (id == -1) pets[1]?.Clear();
         else OpenForId(id);
     }

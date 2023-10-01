@@ -52,6 +52,8 @@ public class PetBase
             return;
         }
 
+        if (_lastID != id || _lastPointer != pet) _petChanged = true;
+
         Character gObject = *(Character*)pet;
 
         _id = id;
@@ -74,6 +76,12 @@ public class PetBase
     public void FullReset()
     {
         _pet = nint.Zero;
+        SoftReset();
+        Reset();
+    }
+
+    public void SoftReset()
+    {
         _petChanged = false;
         Reset();
     }

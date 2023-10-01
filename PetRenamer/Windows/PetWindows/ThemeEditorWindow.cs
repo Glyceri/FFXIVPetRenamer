@@ -15,7 +15,6 @@ internal class ThemeEditorWindow : PetWindow
 
     public ThemeEditorWindow() : base("Pet Nicknames Theme Editor")
     {
-        IsOpen = true;
         Size = baseSize;
         SizeCondition = ImGuiCond.FirstUseEver;
         SizeConstraints = new WindowSizeConstraints()
