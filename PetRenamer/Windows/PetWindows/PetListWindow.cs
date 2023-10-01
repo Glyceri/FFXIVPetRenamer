@@ -616,15 +616,7 @@ public class PetListWindow : PetWindow
     void DrawTexture(nint thenint)
     {
         TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
-        nint texturePointer = thenint;
-        if (!PluginLink.Configuration.displayImages)
-        {
-            PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
-            ImGui.Button("", new System.Numerics.Vector2(83, 83));
-        }
-        else if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
+        DrawImage(thenint, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 

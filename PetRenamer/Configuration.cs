@@ -2,6 +2,7 @@ using Dalamud.Configuration;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Theming.Themes;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -42,12 +43,17 @@ public class Configuration : IPluginConfiguration
     public bool spaceOutSettings = false;
     public bool startSettingsOpen = false;
     public bool quickButtonsToggle = false;
+    public bool newUseCustomTheme = false;
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;
 
     public SerializableUserV3[]? serializableUsersV3 = null;
-    
+
+    public BaseTheme  CustomBaseTheme = null!;
+    public RedTheme   CustomRedTheme = null!;
+    public GreenTheme CustomGreenTheme = null!;
+
     public void Initialize()
     {
         LegacyInitialize();
@@ -57,6 +63,9 @@ public class Configuration : IPluginConfiguration
     void CurrentInitialize()
     {
         serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
+        CustomBaseTheme ??= new BaseTheme();
+        CustomRedTheme ??= new RedTheme();
+        CustomGreenTheme ??= new GreenTheme();
     }
 
     public void Save() 

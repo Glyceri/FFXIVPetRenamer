@@ -316,12 +316,13 @@ public abstract class PetWindowHelpers : PetWindowStyling
     {
         if (text == string.Empty || text == null) return;
         if (!ImGui.IsItemHovered()) return;
+        PushStyleColor(ImGuiCol.Text, StylingColours.tooltipText);
         SetTooltip(text);
     }
 
     protected void SetTooltip(string text)
     {
-        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.Text, StylingColours.tooltipText);
         ImGui.SetTooltip(text);
     }
 

@@ -1,6 +1,6 @@
 using ImGuiNET;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Theming;
-using System.Numerics;
 
 namespace PetRenamer.Windows;
 
@@ -14,14 +14,28 @@ public abstract class PetWindow : PetWindowHelpers
         set
         {
             _petMode = value;
-            if (petMode == PetMode.Normal) ThemeHandler.SetTheme(ThemeHandler.baseTheme);
-            else if (petMode == PetMode.BattlePet) ThemeHandler.SetTheme(ThemeHandler.greenTheme);
-            else if (petMode == PetMode.ShareMode) ThemeHandler.SetTheme(ThemeHandler.redTheme);
+            SetTheme();
+        }
+    }
+
+    internal static void SetTheme()
+    {
+        if (PluginLink.Configuration.newUseCustomTheme)
+        {
+            if (_petMode == PetMode.Normal) ThemeHandler.SetTheme(PluginLink.Configuration.CustomBaseTheme);
+            else if (_petMode == PetMode.BattlePet) ThemeHandler.SetTheme(PluginLink.Configuration.CustomGreenTheme);
+            else if (_petMode == PetMode.ShareMode) ThemeHandler.SetTheme(PluginLink.Configuration.CustomRedTheme);
+        }
+        else
+        {
+            if (_petMode == PetMode.Normal) ThemeHandler.SetTheme(ThemeHandler.baseTheme);
+            else if (_petMode == PetMode.BattlePet) ThemeHandler.SetTheme(ThemeHandler.greenTheme);
+            else if (_petMode == PetMode.ShareMode) ThemeHandler.SetTheme(ThemeHandler.redTheme);
         }
     }
 
     internal void SetPetMode(PetMode mode) 
-    { 
+    {
         petMode = mode;
         TickPetModeChanged();
     }

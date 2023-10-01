@@ -57,13 +57,14 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
 
     public static class StylingColours
     {
-        public static Vector4 defaultBackground => ThemeHandler.ActiveTheme.defaultBackground;
+        public static Vector4 defaultBackground => ThemeHandler.ActiveTheme.imageReplacementColour;
         public static Vector4 titleBgActive => ThemeHandler.ActiveTheme.titleBgActive;
         public static Vector4 panelColour => ThemeHandler.ActiveTheme.panelColour;
         public static Vector4 tileBgCollapsed => ThemeHandler.ActiveTheme.tileBgCollapsed;
 
         public static Vector4 defaultText => ThemeHandler.ActiveTheme.defaultText;
         public static Vector4 alternativeText => ThemeHandler.ActiveTheme.alternativeText;
+        public static Vector4 tooltipText => ThemeHandler.ActiveTheme.tooltipText;
 
         public static Vector4 basicLabelColour => ThemeHandler.ActiveTheme.basicLabelColour;
 
