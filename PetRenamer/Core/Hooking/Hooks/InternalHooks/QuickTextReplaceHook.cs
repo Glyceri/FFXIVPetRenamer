@@ -114,7 +114,11 @@ public unsafe class QuickTextReplaceHook : IDisposable
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
     }
 
-    PettableUser GetUser() => recallAction?.Invoke() ?? PluginLink.PettableUserHandler.LocalUser()!;
+    PettableUser GetUser() 
+    { 
+        if (recallAction != null) return recallAction.Invoke()!;
+        return PluginLink.PettableUserHandler.LocalUser()!;
+    }
     AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
 
     (int, string) GetName(int id, string replaceName)

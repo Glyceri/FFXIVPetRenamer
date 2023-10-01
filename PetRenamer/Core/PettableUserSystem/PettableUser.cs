@@ -33,6 +33,8 @@ public unsafe class PettableUser
     public (string, ushort) Data => (_username, _homeworld);
     public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
+    uint _objectID = 0;
+    public uint ObjectID => _objectID;
     public int UserChangedID => _ChangedID;
     public bool UserChanged => _UserChanged || AnyPetChanged;
     int _ChangedID = 0;
@@ -68,6 +70,7 @@ public unsafe class PettableUser
     public void SetUser(BattleChara* user)
     {
         if (user == null) return;
+        _objectID = user->Character.GameObject.ObjectID;
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;

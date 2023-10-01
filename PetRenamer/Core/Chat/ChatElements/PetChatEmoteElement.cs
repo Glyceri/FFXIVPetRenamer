@@ -26,8 +26,10 @@ internal unsafe class PetChatEmoteElement : ChatElement
         if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return false;
 
         if (emoteTarget.Type == 4)
-            emoteTarget.ObjectID = bChara->Character.CompanionObject->Character.GameObject.ObjectID;
-
+            foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+                if (user.ObjectID == emoteTarget.ObjectID)
+                    emoteTarget.ObjectID = user.Minion.ObjectID;
+        
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (!user.HasAny) continue;

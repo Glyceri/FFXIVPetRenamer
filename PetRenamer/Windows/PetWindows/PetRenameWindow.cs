@@ -1,13 +1,10 @@
 using Dalamud.Interface.Internal;
-using Dalamud.Logging;
 using ImGuiNET;
-using ImGuizmoNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
@@ -36,11 +33,6 @@ public class PetRenameWindow : PetWindow
     Vector2 imageBoxSize = new Vector2(119, 119);
 
     public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse) { }
-
-    public override void OnWindowOpen()
-    {
-        
-    }
 
     public override void OnDraw()
     {
