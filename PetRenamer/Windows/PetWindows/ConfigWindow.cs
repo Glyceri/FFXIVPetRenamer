@@ -51,6 +51,7 @@ public class ConfigWindow : PetWindow
         if (BeginElementBox("UI Settings"))
         {
             DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
+            DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images"); 
             DrawConfigElement(ref PluginLink.Configuration.spaceOutSettings, "Space Out Settings", "Spaces Out Settings making it Easier to Read.");
             DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings unfolded", "Upon Starting the Plugin, Automatically Unfold all Setting Panels.");
             DrawConfigElement(ref PluginLink.Configuration.quickButtonsToggle, "Quick Buttons Toggle Instead of Open", "The Quick Buttons in the Top Bar Toggle Instead of Open.");
@@ -59,7 +60,6 @@ public class ConfigWindow : PetWindow
         if (BeginElementBox("Global Settings"))
         {
             DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
-            DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images");
             DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
             DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
             EndElementBox();
