@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Runtime.InteropServices;
@@ -52,15 +53,13 @@ public class PetBase
             return;
         }
 
-        if (_lastID != id || _lastPointer != pet) _petChanged = true;
-
         Character gObject = *(Character*)pet;
 
         _id = id;
         _index = gObject.GameObject.ObjectIndex;
         _objectID = gObject.GameObject.ObjectID;
 
-        if (!_petChanged) return;
+        if (!_petChanged && !serializableUserV3.changed) return;
 
         _lastPointer = _pet;
         _lastID = _id;
@@ -69,6 +68,8 @@ public class PetBase
         _baseName = Marshal.PtrToStringUTF8((IntPtr)gObject.GameObject.Name)!;
         _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
+
+        PetLog.Log(_customName);
     }
 
     public void SetChanged() => _petChanged = true;  

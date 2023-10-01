@@ -8,7 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using System;
 using System.Runtime.InteropServices;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -66,6 +65,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
             }
             else user.SetBattlePet((BattleChara*)user.BattlePet.Pet);
         }
+        user.SerializableUser.ToggleBackChanged();  
         if (!PluginLink.Configuration.automaticallySwitchPetmode) return;
         if (!user.LocalUser) return;
         if (user.UserChanged)

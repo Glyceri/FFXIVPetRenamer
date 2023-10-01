@@ -69,7 +69,7 @@ public unsafe class PettableUser
     {
         if (user == null) return;
         _user = (nint)user;
-        bool _cType = SerializableUser.ToggleBackChanged();
+        bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
         _ChangedID = SerializableUser.lastTouchedID;
         if (_ChangedID == Minion.ID) _minion.Clear();
