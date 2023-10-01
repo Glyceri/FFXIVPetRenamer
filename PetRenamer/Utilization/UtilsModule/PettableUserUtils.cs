@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using System;
 using System.Runtime.InteropServices;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -35,7 +36,10 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
             {
                 (string, uint) data = GetData2(((Companion*)user.Minion.Pet)->Character);
                 if (data.Item2 != bChara->Character.GameObject.ObjectID || data.Item1 != user.Minion.BaseName)
+                {
                     user.Minion.FullReset();
+                    petOnly = true;
+                }
             }
 
             if (user.Minion.Pet == nint.Zero && (complete || petOnly))
@@ -50,16 +54,21 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (user.SerializableUser.hasBattlePet || user.LocalUser)
         {
             if (user.BattlePet.Pet != nint.Zero)
-            {               (string, uint) data = GetData2(((BattleChara*)user.BattlePet.Pet)->Character);
-                if (data.Item2 != bChara->Character.GameObject.ObjectID || data.Item1 != user.BattlePet.BaseName)
+            {
+                Character chara = ((BattleChara*)user.BattlePet.Pet)->Character;
+                (string, uint) data = GetData2(chara);
+                if (data.Item2 != bChara->Character.GameObject.ObjectID || data.Item1 != user.BattlePet.BaseName || chara.CharacterData.Health <= 0)
+                {
+                    petOnly = true;
                     user.BattlePet.FullReset();
+                }
             }
 
             if (user.BattlePet.Pet == nint.Zero && (complete || petOnly))
             {
                 BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
                 if (battlePet != null)
-                    if (battlePet->Character.CharacterData.Health == 0)
+                    if (battlePet->Character.CharacterData.Health <= 0)
                         battlePet = AlternativeFindForBChara(bChara, battlePet);
                 user.SetBattlePet(battlePet);
             }

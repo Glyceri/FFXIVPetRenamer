@@ -68,8 +68,6 @@ public class PetBase
         _baseName = Marshal.PtrToStringUTF8((IntPtr)gObject.GameObject.Name)!;
         _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
-
-        PetLog.Log(_customName);
     }
 
     public void SetChanged() => _petChanged = true;  
