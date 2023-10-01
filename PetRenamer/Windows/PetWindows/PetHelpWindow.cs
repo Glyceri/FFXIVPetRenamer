@@ -18,6 +18,24 @@ internal class PetHelpWindow : PetWindow
 
     HelpMode curMode { get; set; } = HelpMode.Naming;
 
+    readonly string[] themingHelpBox1 = new string[]
+    {
+        "You can open the theme editor window by typing the following command(s).",
+        "[/pettheme] or [/miniontheme],",
+        "or by clicking the Theme Editor button in the Pet Nicknames Settings window.",
+        "Please enable Use Custom Themes in the Pet Nicknames Settings window."
+    };
+
+    readonly string[] themingHelpBox2 = new string[]
+    {
+        "You may switch between Pet Modes to edit their respective themes.",
+        "On the left you can choose a colour for a given element.",
+        "On the right you will see how the colour looks when applied.",
+        "Clicking on Reset Colour will reset that colour back to the last saved colour.",
+        "Clicking on Reset To Base Colour will reset that colour back to the colour used in the build in theme.",
+        "Please do NOT forget to save by clicking the S button in the top bar."
+    };
+
     readonly string[] namingBox1Help = new string[]
     {
         "You can open the naming window by right-clicking on your minion or pet and choosing the [Give Nickname] option.",
@@ -160,6 +178,9 @@ internal class PetHelpWindow : PetWindow
     {
         DrawSimpleBar("!", "Help with Editing a Theme.");
         NewLine();
+
+        DrawBox(themingHelpBox1);
+        DrawBox(themingHelpBox2);
     }
 
     void DrawNamingHelp()

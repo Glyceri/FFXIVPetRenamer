@@ -3,8 +3,6 @@ using PetRenamer.Core.Hooking.Attributes;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.PettableUserSystem;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -17,7 +15,7 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
         RegisterHook("_TargetInfoMainTarget",   7,  Display,  -1, TargetOfTargetUser);
         RegisterHook("_FocusTargetInfo",        10, Display,  -1, FocusTargetUser);
         RegisterHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
-        RegisterHook("_FocusTargetInfo", 5, Allowed, -1, FocusTargetUser);
+        RegisterHook("_FocusTargetInfo",        5,  Allowed,  -1, FocusTargetUser);
     }
 
     internal override void OnUpdate(IFramework framework) => OnBaseUpdate(framework);
@@ -37,8 +35,9 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
         string targetString = targetID.ToString("X");
         bool isCompanion = targetString.StartsWith("4");
         if (!isCompanion) return nint.Zero;
+        targetString = targetString.TrimStart('4');
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-            if (user.ObjectID.ToString("X") == targetString.TrimStart('4'))
+            if (user.ObjectID.ToString("X") == targetString)
             {
                 lastID = targetID;
                 return lastNint = user.Minion.Pet;
