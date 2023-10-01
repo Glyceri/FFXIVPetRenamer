@@ -12,7 +12,8 @@ internal class PetHelpWindow : PetWindow
     {
         Naming,
         Modes,
-        Sharing
+        Sharing,
+        ThemeEditor
     }
 
     HelpMode curMode { get; set; } = HelpMode.Naming;
@@ -134,22 +135,31 @@ internal class PetHelpWindow : PetWindow
         boxCounter = 0;
         NewLine();
         NewLine();
-        if (!BeginListBox("##HelpBoxBase", new Vector2(ContentAvailableX, 735))) return;
+        if (!BeginListBox("##HelpBoxBase", new Vector2(ContentAvailableX, ContentAvailableY))) return;
 
         DrawHelpHeader();
         if (curMode == HelpMode.Naming) DrawNamingHelp();
         if (curMode == HelpMode.Modes) DrawModesHelp();
         if (curMode == HelpMode.Sharing) DrawSharingHelp();
+        if (curMode == HelpMode.ThemeEditor) DrawThemingHelp();
         ImGui.EndListBox();
     }
 
     void DrawHelpHeader()
     {
-        if (Button("Naming a pet", Styling.ListSmallNameField, "Help with naming a pet.")) curMode = HelpMode.Naming;
+        if (Button("Naming a Pet", "Help with naming a pet.")) curMode = HelpMode.Naming;
         SameLine();
-        if (Button("Modes", Styling.ListSmallNameField, "Help with switching modes and it's implications.")) curMode = HelpMode.Modes;
+        if (Button("Modes", "Help with switching modes and it's implications.")) curMode = HelpMode.Modes;
         SameLine();
-        if (Button("Sharing", Styling.ListSmallNameField, "Help with sharing nicknames.")) curMode = HelpMode.Sharing;
+        if (Button("Sharing", "Help with sharing nicknames.")) curMode = HelpMode.Sharing;
+        SameLine();
+        if (Button("Theme Editor", "Help with Editing Themes.")) curMode = HelpMode.ThemeEditor;
+    }
+
+    void DrawThemingHelp()
+    {
+        DrawSimpleBar("!", "Help with Editing a Theme.");
+        NewLine();
     }
 
     void DrawNamingHelp()

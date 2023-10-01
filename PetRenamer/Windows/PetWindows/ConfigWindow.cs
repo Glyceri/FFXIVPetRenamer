@@ -50,9 +50,9 @@ public class ConfigWindow : PetWindow
 
         if (BeginElementBox("UI Settings"))
         {
-            DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", "You Can Make Your Own Theme, Click Here To Enable That Feature.", OnChange: (value) => SetTheme() );
+            DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
             DrawConfigElement(ref PluginLink.Configuration.spaceOutSettings, "Space Out Settings", "Spaces Out Settings making it Easier to Read.");
-            DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings open", "Upon Starting the Plugin, Automatically Open all Setting Panels.");
+            DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings unfolded", "Upon Starting the Plugin, Automatically Unfold all Setting Panels.");
             DrawConfigElement(ref PluginLink.Configuration.quickButtonsToggle, "Quick Buttons Toggle Instead of Open", "The Quick Buttons in the Top Bar Toggle Instead of Open.");
             EndElementBox();
         }
@@ -212,13 +212,16 @@ public class ConfigWindow : PetWindow
     float DrawDescriptionBox(string[] Description)
     {
         float size = 0;
-        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        
         foreach (string str in Description)
         {
-            if (Description == null || str == starter) continue;
-            ImGui.TextWrapped(str);
-            size += ImGui.CalcTextSize(str, true, ImGui.GetItemRectSize().X).Y + ItemSpacingY;
-            SetTooltipHovered(str.Replace(starter, string.Empty));
+            string newstr = starter + str;
+            if (Description == null || newstr == starter) continue;
+            ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+            ImGui.TextWrapped(newstr);
+            ImGui.PopStyleColor();
+            size += ImGui.CalcTextSize(newstr, true, ImGui.GetItemRectSize().X).Y + ItemSpacingY;
+            SetTooltipHovered(str);
         }
 
         if (size != 0 && PluginLink.Configuration.spaceOutSettings)
@@ -226,7 +229,7 @@ public class ConfigWindow : PetWindow
             size += ImGui.GetTextLineHeight() + ItemSpacingY;
             ImGui.Text("");
         }
-        ImGui.PopStyleColor();
+        
         return size;
     }
 }

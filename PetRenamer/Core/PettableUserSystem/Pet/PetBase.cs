@@ -40,10 +40,14 @@ public class PetBase
     public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3)
     {
         _pet = pet;
+
+        if (_lastID != id || _lastPointer != pet) _petChanged = true;
+
         if (pet == nint.Zero)
         {
             _index = -1;
             _lastID = -1;
+            _lastPointer = pet;
             Reset();
             return;
         }
@@ -54,9 +58,8 @@ public class PetBase
         _index = gObject.GameObject.ObjectIndex;
         _objectID = gObject.GameObject.ObjectID;
 
-        if (_lastID == _id && _lastPointer == _pet) return;
+        if (!_petChanged) return;
 
-        _petChanged = true;
         _lastPointer = _pet;
         _lastID = _id;
         // TODO: Make that work with GetPetName rather than read the pointer :)

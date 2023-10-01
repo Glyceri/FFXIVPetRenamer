@@ -14,11 +14,12 @@ public class SerializableUserV3
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
 
-    [JsonIgnore] public ChangedType changed = ChangedType.Not;
+    [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
     [JsonIgnore] public bool hasCompanion { get; private set; } = false;
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
     [JsonIgnore] public int length => ids.Length;
+    [JsonIgnore] public int lastTouchedID = -1;
 
     public SerializableUserV3(string username, ushort homeworld)
     {
@@ -52,20 +53,17 @@ public class SerializableUserV3
         return names[index] ?? string.Empty;
     }
 
-    public ChangedType ToggleBackChanged()
+    public bool ToggleBackChanged()
     {
-        ChangedType curType = changed;
-        if (changed != ChangedType.Not)
-        {
-            changed = ChangedType.Not;
-        }
-        return curType;
+        bool curChanged = changed;
+        changed = false;
+        return curChanged;
     }
 
     public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
     {
         if (id == -1) return;
-        //if (name == string.Empty && id >= 0) RemoveNickname(id, notifyICP);
+        if (name == string.Empty && id > -1) RemoveNickname(id, notifyICP);
         if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
         else GenerateNewNickname(id, name, notifyICP, force);
 
@@ -83,7 +81,7 @@ public class SerializableUserV3
 
     void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
     {
-        if(!force)
+        if (!force)
             if (id == -1 || name == string.Empty) 
                 return;
         List<int> idList = ids.ToList();
@@ -92,8 +90,11 @@ public class SerializableUserV3
         namesList.Add(name);
         ids = idList.ToArray();
         names = namesList.ToArray();
-        changed = ChangedType.Added;
-        if(notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
+
+        lastTouchedID = id;
+        changed = true;
+
+        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
     public void OverwriteNickname(int id, string name, bool notifyICP = false)
@@ -102,7 +103,10 @@ public class SerializableUserV3
         if (index == -1) return;
         if (names[index] == name) return;
         names[index] = name;
-        changed = ChangedType.Renamed;
+
+        lastTouchedID = id;
+        changed = true;
+
         if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
@@ -110,7 +114,10 @@ public class SerializableUserV3
     {
         int index = IndexOf(id);
         if (index == -1) return;
-        changed = ChangedType.Removed;
+
+        lastTouchedID = id;
+        changed = true;
+
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.RemoveAt(index);
@@ -172,12 +179,4 @@ public class SerializableUserV3
         ids = Array.Empty<int>();
         names = Array.Empty<string>();
     }
-}
-
-public enum ChangedType 
-{
-    Not,
-    Added,
-    Removed,
-    Renamed
 }

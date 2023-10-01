@@ -54,11 +54,17 @@ internal class DeveloperWindow : PetWindow
         else if (currentTab == 1) DrawHelpField();
         else if (currentTab == 2) ChatLog();
         else if (currentTab == 3) PetNameWindow();
+        else if (currentTab == 4) SettingsWindow();
     }
 
     void PetNameWindow()
     {
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Draw();
+    }
+
+    void SettingsWindow()
+    {
+        PluginLink.WindowHandler.GetWindow<ConfigWindow>()?.Draw();
     }
 
     int tableCounter = 0;

@@ -95,7 +95,7 @@ public class PetListWindow : PetWindow
         currentIsLocalUser = user.UserName == localUser.UserName && user.Homeworld == localUser.Homeworld;
         if (!currentIsLocalUser) SetOpenedAddPet(false);
 
-        if (user.AnyPetChanged || user != lastUser)
+        if (user.UserChanged || user != lastUser)
             FillTextureList();
     }
 

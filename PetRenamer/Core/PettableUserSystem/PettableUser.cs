@@ -17,8 +17,6 @@ public unsafe class PettableUser
     readonly PetBase _minion;
     readonly PetBase _battlePet;
 
-    ChangedType _cType;
-
     public PetBase Minion => _minion;
     public PetBase BattlePet => _battlePet;
 
@@ -29,11 +27,15 @@ public unsafe class PettableUser
     public nint nintUser => _user;
 
     public SerializableUserV3 SerializableUser => _serializableUser;
-    public ChangedType ChangedType => _cType;
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
     public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
+
+    public int UserChangedID => _ChangedID;
+    public bool UserChanged => _UserChanged || AnyPetChanged;
+    int _ChangedID = 0;
+    bool _UserChanged = false;
 
     public bool LocalUser
     {
@@ -65,12 +67,11 @@ public unsafe class PettableUser
     public void SetUser(BattleChara* user)
     {
         _user = (nint)user;
-
-        if ((_cType = _serializableUser.ToggleBackChanged()) != ChangedType.Not)
-        {
-            _minion.Clear();
-            _battlePet.Clear();
-        }
+        bool _cType = SerializableUser.ToggleBackChanged();
+        _UserChanged = _cType;
+        _ChangedID = SerializableUser.lastTouchedID;
+        if (_ChangedID == Minion.ID) _minion.Clear();
+        if (_ChangedID == BattlePet.ID) _battlePet.Clear();
     }
 
     public void SetBattlePet(BattleChara* battlePet)

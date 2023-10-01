@@ -1,10 +1,13 @@
 using Dalamud.Interface.Internal;
+using Dalamud.Logging;
 using ImGuiNET;
+using ImGuizmoNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
@@ -34,6 +37,11 @@ public class PetRenameWindow : PetWindow
 
     public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse) { }
 
+    public override void OnWindowOpen()
+    {
+        
+    }
+
     public override void OnDraw()
     {
         Size = baseSize;
@@ -51,7 +59,7 @@ public class PetRenameWindow : PetWindow
     }
 
     internal override void OnPetModeChange(PetMode mode) => activePet = GetPet(mode);
-    
+       
     void HandlePets()
     {
         for (int i = 0; i < user.Pets.Length; i++)
@@ -160,10 +168,12 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        if (forceOpen) ForceOpenForID(id);
-        SetModeForID(id);
-        if ((activePet = GetPet(petMode)) == null) return;
         if ((user ??= PluginLink.PettableUserHandler.LocalUser()!) == null) return;
+        if (forceOpen) ForceOpenForID(id);
+
+        RenamablePet lastPet = activePet;
+
+        if ((activePet = GetPet(FromID(id))) == null) return;
 
         activePet.petID = id;
         activePet.baseName = RemapUtils.instance.PetIDToName(id).MakeTitleCase();
@@ -172,10 +182,28 @@ public class PetRenameWindow : PetWindow
 
         string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
         activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+
+        if (!forceOpen)
+            activePet = lastPet;
+    }
+
+    public void OpenForMinion(int id)
+    {
+        PetLog.Log("Changed Minion!");
+        if (id == -1) pets[0]?.Clear();
+        else OpenForId(id);
+    }
+
+    public void OpenForBattlePet(int id)
+    {
+        PetLog.Log("Changed Battle Pet!");
+        if (id == -1) pets[1]?.Clear();
+        else OpenForId(id);
     }
 
     void ForceOpenForID(int id)
     {
+        SetModeForID(id);
         if (id == -1) return;
         IsOpen = true;
         ImGui.SetNextWindowFocus();
@@ -190,8 +218,18 @@ public class PetRenameWindow : PetWindow
     RenamablePet GetPet(PetMode mode)
     {
         foreach (RenamablePet pet in pets)
-            if (pet.associatedMode == mode) return pet;
+            if (pet.associatedMode == mode) 
+                return pet;
         return null!;
+    }
+
+    PetMode FromID(int id)
+    {
+        if (id == -1) return PetMode.ShareMode;
+        if (id < -1) return PetMode.BattlePet;
+        if (id > -1) return PetMode.Normal;
+
+        return PetMode.Normal;
     }
 
     protected override void OnDispose()
@@ -221,6 +259,14 @@ internal class RenamablePet : IDisposable
     {
         associatedMode = mode;
         this.referredToAs = referredToAs;
+    }
+
+    public void Clear()
+    {
+        petID = -1;
+        baseName = string.Empty;
+        temporaryPetName = string.Empty;
+        Dispose();
     }
 
     public void Dispose()
