@@ -51,9 +51,6 @@ internal class TooltipHook : QuickTextHookableElement
         ItemDetailOnUpdateHook?.Dispose();
     }
 
-    internal override void OnUpdate(IFramework framework) =>
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
-
     IntPtr lastTooltip;
 
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)

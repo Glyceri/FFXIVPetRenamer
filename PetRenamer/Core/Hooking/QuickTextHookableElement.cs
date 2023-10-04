@@ -8,24 +8,9 @@ namespace PetRenamer.Core.Hooking;
 
 public class QuickTextHookableElement : HookableElement
 {
-    internal override sealed void OnDispose() 
-    { 
-        OnQuickDispose(); 
-        foreach(QuickTextReplaceHook el in quickTextReplaceHooks)
-            el?.Dispose();
-    }
-
     internal override sealed void OnInit() 
     { 
         OnQuickInit(); 
-    }
-
-    internal override void OnUpdate(IFramework framework) { }
-
-    protected void OnBaseUpdate(IFramework framework, bool allow)
-    {
-        foreach (QuickTextReplaceHook el in quickTextReplaceHooks)
-            el?.OnUpdate(framework, allow);
     }
 
     internal virtual void OnQuickDispose() { }

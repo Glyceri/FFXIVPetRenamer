@@ -18,8 +18,6 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
         RegisterHook("_FocusTargetInfo",        5, Allowed, -1, FocusTargetUser);
     }
 
-    internal override void OnUpdate(IFramework framework) => OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
-
     PettableUser TargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.Address ?? nint.Zero);
     PettableUser TargetOfTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.TargetObject?.Address ?? nint.Zero);
     PettableUser FocusTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestFocusTarget()?.Address ?? nint.Zero);

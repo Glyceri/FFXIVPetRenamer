@@ -1,53 +1,37 @@
-﻿using Dalamud.Hooking;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Utilization.UtilsModule;
 using System.Runtime.InteropServices;
 using System;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
-using Dalamud.Plugin.Services;
+using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
 public unsafe class ActionMenuHook : HookableElement
 {
-    private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-
-    AtkUnitBase* actionMenu;
-
-    private Hook<Delegates.AddonUpdate>? addonupdatehookreplacelist = null;
-
-    AtkUnitBase* actionMenuReplaceList;
-
-    internal override void OnUpdate(IFramework framework)
+    internal override void OnInit()
     {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        actionMenu = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenu");
-        actionMenuReplaceList = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("ActionMenuReplaceList");
-        if (actionMenu != null) {
-            addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(actionMenu->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
-            addonupdatehook?.Enable();
-        }
-
-        if (actionMenuReplaceList != null)
-        {
-            addonupdatehookreplacelist ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(actionMenuReplaceList->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
-            addonupdatehookreplacelist?.Enable();
-        }
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "ActionMenu", LifeCycleUpdate);
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
     }
 
-    byte Update2(AtkUnitBase* baseD)
+    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdate2(AddonEvent addonEvent, AddonArgs addonArgs) => Update2((AtkUnitBase*)addonArgs.Addon);
+
+    void Update2(AtkUnitBase* baseD)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return addonupdatehookreplacelist!.Original(baseD);
+        if (!PluginLink.Configuration.displayCustomNames) return;
 
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
         if (!baseD->IsVisible || name != "ActionMenuReplaceList")
-            return addonupdatehookreplacelist!.Original(baseD);
+            return;
 
         AtkComponentList* list = (AtkComponentList*)baseD->GetComponentListById(3);
-        if (list == null) return addonupdatehookreplacelist!.Original(baseD);
+        if (list == null) return;
 
         for(int i = 0; i < list->ListLength; i++)
         {
@@ -61,16 +45,16 @@ public unsafe class ActionMenuHook : HookableElement
             (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
             StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
-        return addonupdatehookreplacelist!.Original(baseD);
+        return;
     }
 
-    byte Update(AtkUnitBase* baseD)
+    void Update(AtkUnitBase* baseD)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return addonupdatehook!.Original(baseD);
+        if (!PluginLink.Configuration.displayCustomNames) return;
 
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
         if (!baseD->IsVisible || name != "ActionMenu")
-            return addonupdatehook!.Original(baseD);
+            return;
 
         for(int i = 0; i < baseD->UldManager.NodeListCount; i++)
         {
@@ -84,12 +68,6 @@ public unsafe class ActionMenuHook : HookableElement
             StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
 
-        return addonupdatehook!.Original(baseD);
-    }
-
-    internal override void OnDispose()
-    {
-        addonupdatehook?.Dispose();
-        addonupdatehookreplacelist?.Dispose();
+        return ;
     }
 }
