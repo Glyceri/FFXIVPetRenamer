@@ -1,4 +1,4 @@
-﻿using Dalamud.Hooking;
+using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
+using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -20,28 +22,23 @@ internal unsafe class PartyListHook : HookableElement
     // VVVVVV ACTUAL BYTE CODE GENEROUSLY PROVIDED BY: Nuko
     // [Signature("48 83 EC ?? F6 81 ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 8B 81", DetourName = nameof(PartyListHookUpdate))]
 
-    Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-    AddonPartyList* partyList;
-
-    internal override void OnUpdate(IFramework framework)
+    internal override void OnInit()
     {
-        if (PluginHandlers.ClientState.LocalPlayer! == null) return;
-        partyList = (AddonPartyList*)PluginHandlers.GameGui.GetAddonByName("_PartyList");
-        addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(partyList->AtkUnitBase.AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
-        addonupdatehook?.Enable();
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "_PartyList", LifeCycleUpdate);
     }
 
-    byte Update(AtkUnitBase* baseD)
+    void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
+
+    void Update(AtkUnitBase* baseD)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return addonupdatehook!.Original(baseD);
+        if (!PluginLink.Configuration.displayCustomNames) return;
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name is not "_PartyList")
-            return addonupdatehook!.Original(baseD);
+        if (!baseD->IsVisible || name is not "_PartyList") return;
         AddonPartyList* partyNode = (AddonPartyList*)baseD;
-        if (partyNode == null) return addonupdatehook!.Original(baseD);
+        if (partyNode == null) return;
         SetPetname(baseD, partyNode);
         SetCastlist(baseD, partyNode);
-        return addonupdatehook!.Original(baseD);
+        return;
     }
 
     void SetPetname(AtkUnitBase* baseD, AddonPartyList* partyNode)
@@ -93,11 +90,5 @@ internal unsafe class PartyListHook : HookableElement
             if (PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames)
                 StringUtils.instance.ReplaceAtkString(member.CastingActionName, ref validNames);
         }
-    }
-
-    internal override void OnDispose()
-    {
-        addonupdatehook?.Disable();
-        addonupdatehook?.Dispose();
     }
 }

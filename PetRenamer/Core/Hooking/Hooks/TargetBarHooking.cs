@@ -1,4 +1,4 @@
-﻿using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using Dalamud.Plugin.Services;
@@ -17,8 +17,6 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
         RegisterHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
         RegisterHook("_FocusTargetInfo",        5,  Allowed,  -1, FocusTargetUser);
     }
-
-    internal override void OnUpdate(IFramework framework) => OnBaseUpdate(framework);
 
     PettableUser TargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.Address ?? nint.Zero);
     PettableUser TargetOfTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.TargetObject?.Address ?? GetAlternativeTargetOfTarget());

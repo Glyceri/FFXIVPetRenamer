@@ -1,4 +1,4 @@
-﻿using Dalamud.Hooking;
+using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -51,9 +51,6 @@ internal class TooltipHook : QuickTextHookableElement
         showTooltip?.Dispose();
         ItemDetailOnUpdateHook?.Dispose();
     }
-
-    internal override void OnUpdate(IFramework framework) =>
-        OnBaseUpdate(framework);
 
     IntPtr lastTooltip;
 

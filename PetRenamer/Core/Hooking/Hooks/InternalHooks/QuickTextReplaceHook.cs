@@ -1,5 +1,5 @@
-﻿using Dalamud.Hooking;
-using Dalamud.Plugin.Services;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -10,11 +10,8 @@ using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
-public unsafe class QuickTextReplaceHook : IDisposable
+public unsafe class QuickTextReplaceHook
 {
-    Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-    AtkUnitBase* baseElement;
-
     readonly string AddonName;
     readonly uint[] TextPos;
     readonly int AtkPos;
@@ -34,68 +31,55 @@ public unsafe class QuickTextReplaceHook : IDisposable
         this.recallAction = recallAction;
         this.allowedToFunction = allowedToFunction;
         this.latestOutcome = latestOutcome;
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, addonName, HandleUpdate);
     }
 
-    public void Dispose()
-    {
-        baseElement = null;
-        addonupdatehook?.Dispose();
-        GC.SuppressFinalize(this);
-    }
+    void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Handle((AtkUnitBase*)addonArgs.Addon);
 
-    public void OnUpdate(IFramework framework, bool allow)
+    void Handle(AtkUnitBase* baseElement)
     {
-        this.allow = allow;
-        baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName(AddonName);
-        if (baseElement == null) return;
-        addonupdatehook ??= PluginHandlers.Hooking.HookFromAddress<Delegates.AddonUpdate>(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
-        addonupdatehook?.Enable();
-    }
-
-    byte Handle(AtkUnitBase* baseElement)
-    {
-        if (!allow || TextPos.Length == 0) return addonupdatehook!.Original(baseElement);
+        if (!allow || TextPos.Length == 0) return;
 
         string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
-        if (!baseElement->IsVisible || name != AddonName) return addonupdatehook!.Original(baseElement);
+        if (!baseElement->IsVisible || name != AddonName) return;
 
-        if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
+        if (TooltipHelper.handleAsItem) return;
 
         BaseNode bNode = new BaseNode(name);
-        if (bNode == null) return addonupdatehook!.Original(baseElement);
+        if (bNode == null) return;
         AtkTextNode* tNode = GetTextNode(ref bNode);
-        if (tNode == null) return addonupdatehook!.Original(baseElement);
+        if (tNode == null) return;
 
         string tNodeText = tNode->NodeText.ToString() ?? string.Empty;
-        if (tNodeText == string.Empty) return addonupdatehook!.Original(baseElement);
+        if (tNodeText == string.Empty) return;
         if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
-        if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
+        if (tNodeText == lastAnswer && AddonName != "Tooltip") return;
 
         AtkNineGridNode* nineGridNode = GetBackgroundNode(ref bNode);
-        if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
+        if (AtkPos != -1 && nineGridNode == null) return;
 
         PettableUser user = GetUser();
-        if (user == null) return addonupdatehook!.Original(baseElement);
+        if (user == null) return;
 
         (int, string) data = GetName(SheetUtils.instance.GetIDFromName(tNodeText), tNodeText);
         int id = data.Item1;
         string replaceName = data.Item2;
-        if (replaceName == string.Empty) return addonupdatehook!.Original(baseElement);
+        if (replaceName == string.Empty) return;
 
         if (id == -1)
         {
             lastAnswer = tNodeText;
-            return addonupdatehook!.Original(baseElement);
+            return;
         }
 
-        if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
+        if (!allowedToFunction?.Invoke(id) ?? false) return;
 
         string curNickname = user.SerializableUser.GetNameFor(id);
-        if (curNickname == string.Empty) return addonupdatehook!.Original(baseElement);
+        if (curNickname == string.Empty) return;
         StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname, nineGridNode);
         lastAnswer = curNickname;
 
-        return addonupdatehook!.Original(baseElement);
+        return;
     }
 
     AtkTextNode* GetTextNode(ref BaseNode bNode)

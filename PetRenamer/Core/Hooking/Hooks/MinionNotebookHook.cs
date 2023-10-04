@@ -17,7 +17,4 @@ public unsafe class MinionNotebookHook : QuickTextHookableElement
         foreach(uint index in indexes)
             RegisterHook("MinionNoteBook", new uint[3] { 25, index, 6 });
     }
-
-    internal override void OnUpdate(IFramework framework) => 
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames && PluginLink.Configuration.showNamesInMinionBook);
 }
