@@ -39,13 +39,10 @@ public unsafe class QuickTextReplaceHook
     void Handle(AtkUnitBase* baseElement)
     {
         if (!allow || TextPos.Length == 0) return;
-
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
-        if (!baseElement->IsVisible || name != AddonName) return;
-
+        if (!baseElement->IsVisible) return;
         if (TooltipHelper.handleAsItem) return;
 
-        BaseNode bNode = new BaseNode(name);
+        BaseNode bNode = new BaseNode(AddonName);
         if (bNode == null) return;
         AtkTextNode* tNode = GetTextNode(ref bNode);
         if (tNode == null) return;
@@ -98,11 +95,7 @@ public unsafe class QuickTextReplaceHook
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
     }
 
-    PettableUser GetUser() 
-    { 
-        if (recallAction != null) return recallAction.Invoke()!;
-        return PluginLink.PettableUserHandler.LocalUser()!;
-    }
+    PettableUser GetUser() => recallAction?.Invoke() ?? PluginLink.PettableUserHandler.LocalUser()!;
     AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
 
     (int, string) GetName(int id, string replaceName)

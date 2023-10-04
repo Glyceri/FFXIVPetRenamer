@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
