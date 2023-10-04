@@ -69,10 +69,15 @@ internal class TooltipHook : QuickTextHookableElement
 
 public unsafe static class TooltipHelper
 {
-    public static PettableUser nextUser = null!;
+    static PettableUser _nextUser = null!;
+    public static PettableUser nextUser
+    {
+        get => _nextUser ?? PluginLink.PettableUserHandler.GetUser(PluginHandlers.ClientState.LocalPlayer!.Address);
+        set => _nextUser = value;
+    }
 
     public static bool lastTooltipWasMap = false;
-    public static void SetNextUp(PettableUser user) => nextUser = user;
+    public static void SetNextUp(PettableUser user) => _nextUser = user;
 
     public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
     public static bool handleAsItem = false;
