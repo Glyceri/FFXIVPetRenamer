@@ -24,7 +24,7 @@ internal unsafe class PartyListHook : HookableElement
 
     internal override void OnInit()
     {
-        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "_PartyList", LifeCycleUpdate);
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
     }
 
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
@@ -67,6 +67,7 @@ internal unsafe class PartyListHook : HookableElement
 
         foreach (PartyListMemberStruct member in partyMemberNames)
         {
+            if(member.Name == null) continue;
             string memberName = member.Name->NodeText.ToString()!;
             if (memberName == null) continue;
             if (memberName == string.Empty) continue;
