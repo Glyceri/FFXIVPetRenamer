@@ -63,8 +63,6 @@ internal unsafe class PartyListHook : HookableElement
             partyNode->PartyMember.PartyMember7
         };
 
-        TooltipHelper.partyListInfos.Clear();
-
         foreach (PartyListMemberStruct member in partyMemberNames)
         {
             if(member.Name == null) continue;
@@ -74,12 +72,6 @@ internal unsafe class PartyListHook : HookableElement
             string[] splitName = memberName.Split(' ');
             if (splitName.Length != 3) continue;
             memberName = $"{splitName[1]} {splitName[2]}";
-
-            BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
-            if (bChara == null) continue;
-            BattleChara* carbuncle = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-            BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(bChara);
-            TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, carbuncle != null, chocobo != null));
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
