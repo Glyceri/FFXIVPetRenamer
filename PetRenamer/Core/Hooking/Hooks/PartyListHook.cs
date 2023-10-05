@@ -61,6 +61,7 @@ internal unsafe class PartyListHook : HookableElement
 
         foreach (PartyListMemberStruct member in partyMemberNames)
         {
+            if (member.Name == null) continue;
             if (!TooltipHelper.TickList)
                 if (!member.CastingProgressBar->AtkResNode.IsVisible) 
                     continue;
