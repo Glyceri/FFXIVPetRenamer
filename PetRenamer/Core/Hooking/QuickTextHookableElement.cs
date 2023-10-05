@@ -1,4 +1,3 @@
-using Dalamud.Plugin.Services;
 using PetRenamer.Core.Hooking.Hooks.InternalHooks;
 using PetRenamer.Core.PettableUserSystem;
 using System;
@@ -8,13 +7,8 @@ namespace PetRenamer.Core.Hooking;
 
 public class QuickTextHookableElement : HookableElement
 {
-    internal override sealed void OnInit() 
-    { 
-        OnQuickInit(); 
-    }
-
+    internal override sealed void OnInit() => OnQuickInit(); 
     internal virtual void OnQuickDispose() { }
-
     internal virtual void OnQuickInit() { }
 
     readonly List<QuickTextReplaceHook> quickTextReplaceHooks = new List<QuickTextReplaceHook>();

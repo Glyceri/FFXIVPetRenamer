@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -32,6 +31,12 @@ internal unsafe class MapHook : HookableElement
         TooltipHelper.lastTooltipWasMap = true;
 
         if (elementIndex == last) return naviTooltip!.Original(unitBase, elementIndex);
+        if (TooltipHelper.TickList)
+        {
+            TooltipHelper.TickList = false;
+            return naviTooltip!.Original(unitBase, elementIndex);
+        }
+        TooltipHelper.TickList = true;
         last = (uint)elementIndex;
 
         if (TooltipHelper.partyListInfos.Count == 0) return naviTooltip!.Original(unitBase, elementIndex);
@@ -122,16 +127,21 @@ internal unsafe class MapHook : HookableElement
     {
         if (!PluginLink.Configuration.displayCustomNames || !PluginLink.Configuration.allowTooltipsBattlePets)
             return showTooltipThing!.Original(areaMap, elementIndex, a3);
-
         TooltipHelper.lastTooltipWasMap = true;
         if (elementIndex == last) return showTooltipThing!.Original(areaMap, elementIndex, a3);
+        if (TooltipHelper.TickList)
+        {
+            TooltipHelper.TickList = false;
+            return showTooltipThing!.Original(areaMap, elementIndex, a3);
+        }
+        TooltipHelper.TickList = true;
         last = elementIndex;
 
         if (TooltipHelper.partyListInfos.Count == 0) return showTooltipThing!.Original(areaMap, elementIndex, a3);
 
         BaseNode node = new BaseNode(areaMap);
         if (node == null) return showTooltipThing!.Original(areaMap, elementIndex, a3);
-        ComponentNode mapComponentNode = node.GetComponentNode(44);
+        ComponentNode mapComponentNode = node.GetComponentNode(53);
         if (mapComponentNode == null) return showTooltipThing!.Original(areaMap, elementIndex, a3);
         AtkComponentNode* atkComponentNode = mapComponentNode.GetPointer();
         if (atkComponentNode == null) return showTooltipThing!.Original(areaMap, elementIndex, a3);

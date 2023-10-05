@@ -1,5 +1,4 @@
 using Dalamud.Hooking;
-using Dalamud.Plugin.Services;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -64,6 +63,7 @@ internal class TooltipHook : QuickTextHookableElement
             lastTooltip = a4;
             TooltipHelper.handleAsItem = false;
         }
+
         return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
     }
 }
@@ -73,8 +73,8 @@ public unsafe static class TooltipHelper
     static PettableUser _nextUser = null!;
     public static PettableUser nextUser
     {
-        get => _nextUser ?? PluginLink.PettableUserHandler.GetUser(PluginHandlers.ClientState.LocalPlayer!.Address);
-        set => _nextUser = value;
+        get => _nextUser ;
+        set => _nextUser = value ?? PluginLink.PettableUserHandler.GetUser(PluginHandlers.ClientState.LocalPlayer!.Address);
     }
 
     public static bool lastTooltipWasMap = false;
@@ -82,6 +82,8 @@ public unsafe static class TooltipHelper
 
     public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
     public static bool handleAsItem = false;
+
+    public static bool TickList = false;
 }
 
 public class PartyListInfo

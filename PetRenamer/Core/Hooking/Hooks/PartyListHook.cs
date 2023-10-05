@@ -1,5 +1,3 @@
-using Dalamud.Hooking;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -7,12 +5,11 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
-using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -26,20 +23,17 @@ internal unsafe class PartyListHook : HookableElement
     {
         PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
     }
-
+    
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
 
     void Update(AtkUnitBase* baseD)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return;
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name is not "_PartyList") return;
-        AddonPartyList* partyNode = (AddonPartyList*)baseD;
-        if (partyNode == null) return;
-        SetPetname(baseD, partyNode);
-        SetCastlist(baseD, partyNode);
-        return;
+        if (!CanContinue(baseD)) return;
+        SetPetname(baseD, (AddonPartyList*)baseD);
+        SetCastlist(baseD, (AddonPartyList*)baseD);
     }
+
+    bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible || !PluginLink.Configuration.displayCustomNames || baseD == null);
 
     void SetPetname(AtkUnitBase* baseD, AddonPartyList* partyNode)
     {
@@ -67,18 +61,24 @@ internal unsafe class PartyListHook : HookableElement
 
         foreach (PartyListMemberStruct member in partyMemberNames)
         {
-            string memberName = member.Name->NodeText.ToString()!;
-            if (memberName == null) continue;
+            if (!TooltipHelper.TickList)
+                if (!member.CastingProgressBar->AtkResNode.IsVisible) 
+                    continue;
+
+            string memberName = member.Name->NodeText.ToString() ?? string.Empty;
             if (memberName == string.Empty) continue;
             string[] splitName = memberName.Split(' ');
             if (splitName.Length != 3) continue;
             memberName = $"{splitName[1]} {splitName[2]}";
 
-            BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
-            if (bChara == null) continue;
-            BattleChara* carbuncle = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-            BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(bChara);
-            TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, carbuncle != null, chocobo != null));
+            if (TooltipHelper.TickList)
+            {
+                BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
+                if (bChara == null) continue;
+                BattleChara* carbuncle = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
+                BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(bChara);
+                TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, carbuncle != null, chocobo != null));
+            }
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
@@ -90,5 +90,7 @@ internal unsafe class PartyListHook : HookableElement
             if (PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames)
                 StringUtils.instance.ReplaceAtkString(member.CastingActionName, ref validNames);
         }
+
+        TooltipHelper.TickList = false;
     }
 }
