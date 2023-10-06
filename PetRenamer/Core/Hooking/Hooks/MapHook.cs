@@ -6,10 +6,8 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Logging;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -32,7 +30,6 @@ internal class MapHook : HookableElement
     unsafe char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
         TooltipHelper.lastWasMap = true;
-        TooltipHelper.nextUser = null!;
 
         BaseNode node = new BaseNode(unitBase);
         if (node == null) return naviTooltip!.Original(unitBase, elementIndex);
@@ -68,14 +65,14 @@ internal class MapHook : HookableElement
             AtkTexture texture = asset->AtkTexture;
             AtkTextureResource* textureResource = texture.Resource;
             if (textureResource == null) continue;
-            if (textureResource == null) continue;
             if (textureResource->IconID != petIconID) continue;
             current++;
+            PetLog.Log(elementIndex + ":" + i);
             if (i != elementIndex) continue;
             GetDistanceAt(current);
             return naviTooltip!.Original(unitBase, elementIndex);
         }
-
+        TooltipHelper.nextUser = null!;
         return naviTooltip!.Original(unitBase, elementIndex);
     }
 
