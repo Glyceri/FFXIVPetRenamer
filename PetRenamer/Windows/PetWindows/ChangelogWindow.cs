@@ -58,6 +58,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.0.2"), new CLE("General", "Removed map tooltips completely.", "Weird version bump. What I have internally been calling 1.4.0.1 was publicly known as 1.3.1.1.")) },
         { new CLS(new Version("1.4.1.0"), new CLE("General", "French emotes now work better.", "Fixed a lot of Text Replacement Bugs.", "Some windows wont randomly reset anymore. (Sorry, this includes everything but the pet list :( )", "Cleaned up a lot of the code.", "Increased performance in some areas."), new CLE("UI", "Added a theme editor.", "Better settings menu.", "Added a Changelog Window.", "Most UI is now Resizable."), new CLE("Saving", "Save File Version Updated from Version 6 to Version 7.")) },
         { new CLS(new Version("1.4.1.1"), new CLE("General", "Fixed Redraw not working.")) },
+        { new CLS(new Version("1.4.1.2"), new CLE("General", "Fixed Map Tooltips not working.")) },
     };
 
     const string starter = "  ◉   ";
