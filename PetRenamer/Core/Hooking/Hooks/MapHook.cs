@@ -5,7 +5,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
-using PetRenamer.Logging;
 using System.Collections.Generic;
 using System.Numerics;
 
