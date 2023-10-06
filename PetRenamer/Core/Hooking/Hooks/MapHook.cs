@@ -161,7 +161,10 @@ internal class MapHook : HookableElement
             Vector3 pos2 = playerPos - (Vector3)p2->Character.GameObject.Position;
             return pos1.Length().CompareTo(pos2.Length());
         });
-        TooltipHelper.nextUser = PluginLink.PettableUserHandler.GetUser(pets[at - 1]);
+        int index = at - 1;
+        if (index < 0) return;
+        if (index >= pets.Count) return;    
+        TooltipHelper.nextUser = PluginLink.PettableUserHandler.GetUser(pets[index]);
     }
 
     internal override void OnInit()
