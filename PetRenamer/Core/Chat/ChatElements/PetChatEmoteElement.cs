@@ -22,14 +22,19 @@ internal unsafe class PetChatEmoteElement : ChatElement
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return false;
 
+        nint value = nint.Zero;
+
         GameObjectID emoteTarget = bChara->Character.EmoteController.Target;
         if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return false;
 
         if (emoteTarget.Type == 4)
             foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
                 if (user.ObjectID == emoteTarget.ObjectID)
-                    emoteTarget.ObjectID = user.Minion.ObjectID;
-        
+                {
+                    value = user.Minion.Pet;
+                    break;
+                }
+
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
             if (!user.HasAny) continue;
@@ -40,7 +45,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
                 // TODO: Make configuration better
                 if (pet.ID < -1 && !PluginLink.Configuration.replaceEmotesBattlePets) continue;
                 if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
-                if (pet.ObjectID != emoteTarget.ObjectID) continue;
+                if (pet.ObjectID != emoteTarget.ObjectID && pet.Pet != value) continue;
 
                 (string, string)[] replaceNames = new (string, string)[] { (pet.BaseNamePlural, pet.CustomName), (pet.BaseName, pet.CustomName) };
                 StringUtils.instance.ReplaceSeString(ref message, ref replaceNames);
