@@ -30,6 +30,8 @@ internal class MapHook : HookableElement
     unsafe char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
         TooltipHelper.lastWasMap = true;
+        if (lastIndex != elementIndex) lastIndex = elementIndex;
+        else return naviTooltip!.Original(unitBase, elementIndex);
 
         BaseNode node = new BaseNode(unitBase);
         if (node == null) return naviTooltip!.Original(unitBase, elementIndex);
@@ -128,6 +130,7 @@ internal class MapHook : HookableElement
 
     unsafe void GetDistanceAt(int at)
     {
+        PetLog.Log("I GO!");
         GroupManager* gManager = (GroupManager*)PluginHandlers.PartyList.GroupManagerAddress;
         if (gManager == null) return;
 
