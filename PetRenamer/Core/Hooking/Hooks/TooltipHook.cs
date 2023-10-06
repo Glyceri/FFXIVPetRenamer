@@ -23,10 +23,12 @@ internal class TooltipHook : QuickTextHookableElement
 
     public static string latestOutcome = string.Empty;
 
+
+
     internal override void OnQuickInit()
     {
         RegisterHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
-        RegisterHook("Tooltip", 2, Allowed, 3);
+        RegisterHook("Tooltip", 2, Allowed, 3, () => TooltipHelper.getNextUser);
 
         showTooltip?.Enable();
         ItemDetailOnUpdateHook?.Enable();
@@ -56,18 +58,18 @@ internal class TooltipHook : QuickTextHookableElement
 
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
     {
+        TooltipHelper.handleAsMap = false;
         if (TooltipHelper.lastWasMap)
         {
-            PetLog.Log("Map Tooltip!");
+            TooltipHelper.handleAsMap = true;
+            TooltipHelper.lastWasMap = false;
         }
-
         if (lastTooltip != a4)
         {
             lastTooltip = a4;
             TooltipHelper.handleAsItem = false;
         }
 
-        TooltipHelper.lastWasMap = false;
         return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
     }
 }
@@ -78,6 +80,17 @@ public unsafe static class TooltipHelper
     public static bool handleAsItem = false;
 
     public static bool lastWasMap = false;
+    public static bool handleAsMap = false;
+    public static PettableUser nextUser = null!;
+
+    public static PettableUser getNextUser
+    {
+        get 
+        { 
+            if (handleAsMap) return nextUser;
+            return PluginLink.PettableUserHandler.LocalUser()!; 
+        }
+    }
 }
 
 public class PartyListInfo
