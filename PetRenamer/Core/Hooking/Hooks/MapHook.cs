@@ -29,23 +29,47 @@ internal class MapHook : HookableElement
         int index = (int)a2;
 
         BaseNode node = new BaseNode("AreaMap");
-        ComponentNode cNode = node.GetComponentNode(53);
-        if (cNode == null) return showTooltipThing!.Original(a1, a2, a3);
-        AtkComponentBase* atkComponentBase = (AtkComponentBase*)cNode.GetPointer();
-        if (atkComponentBase == null) return showTooltipThing!.Original(a1, a2, a3);
-        AtkUldManager manager = atkComponentBase->UldManager;
+        ComponentNode cNode1 = node.GetComponentNode(53);
+        if (cNode1 == null) return showTooltipThing!.Original(a1, a2, a3);
+        AtkComponentNode* atkComponentNode = cNode1.GetPointer();
+        if (atkComponentNode == null) return showTooltipThing!.Original(a1, a2, a3);
+        AtkComponentBase* atkCompontentBase = atkComponentNode->Component;
+        if (atkCompontentBase == null) return showTooltipThing!.Original(a1, a2, a3);
+        AtkUldManager manager = atkCompontentBase->UldManager;
 
         for(int i = 0; i < manager.NodeListCount; i++)
         {
-             AtkResNode* resNode = manager.NodeList[i];
+            AtkResNode* curNode = manager.NodeList[i];
+            if (curNode == null) continue;
+            if (!curNode->IsVisible) continue;
+            AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
+            if (cNode == null) continue;
+            AtkComponentBase* cBase = cNode->Component;
+            if (cBase == null) continue;
+            AtkResNode* resNode = cBase->GetImageNodeById(5);
             if (resNode == null) continue;
-            if (!resNode->IsVisible) continue;
-            
+            AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
+            if (imgNode == null) continue;
+            AtkUldPartsList* partsList = imgNode->PartsList;
+            if (partsList == null) continue;
+            AtkUldPart* parts = partsList->Parts;
+            if (parts == null) continue;
+            AtkUldAsset* asset = parts->UldAsset;
+            if (asset == null) continue;
+            AtkTexture texture = asset->AtkTexture;
+            AtkTextureResource* textureResource = texture.Resource;
+            if (textureResource == null) continue;
+            if (textureResource->IconID == petIconID)
+            {
+
+            }
         }
         return showTooltipThing!.Original(a1, a2, a3);
     }
 
-
+    const int playerIconID = 60443;
+    const int petIconID = 60961;
+    const int partyPlayerIconID = 60421;
 
     internal override void OnInit()
     {
