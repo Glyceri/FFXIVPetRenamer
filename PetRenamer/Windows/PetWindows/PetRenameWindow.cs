@@ -156,7 +156,8 @@ public class PetRenameWindow : PetWindow
     {
         activePet.petName = activePet.temporaryPetName;
         PluginLink.Configuration.Save();
-        PenumbraIPCProvider.RedrawPetByIndex(activePet.petID);
+        if (activePet.petID > -1) PenumbraIPCProvider.RedrawMinionByIndex(PluginLink.PettableUserHandler.LocalUser()!.Minion.Index);
+        if (activePet.petID < -1) PenumbraIPCProvider.RedrawBattlePetByIndex(PluginLink.PettableUserHandler.LocalUser()!.BattlePet.Index);
     }
 
     public void OpenForId(int id, bool forceOpen = false)

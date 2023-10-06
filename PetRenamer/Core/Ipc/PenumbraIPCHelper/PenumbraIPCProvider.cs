@@ -2,6 +2,8 @@
 using PetRenamer.Core.Ipc.PenumbraIPCHelper.Enums;
 using Dalamud.Plugin.Ipc;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Logging;
+using System;
 
 namespace PetRenamer.Core.Ipc.PenumbraIPCHelper;
 
@@ -42,7 +44,7 @@ public static class PenumbraIPCProvider
         {
             redrawObjectByIndex?.InvokeAction(index, 0);
         }
-        catch { }
+        catch(Exception e) { PetLog.Log(e.Message); }
     }
 
     public static bool PenumbraEnabled()
