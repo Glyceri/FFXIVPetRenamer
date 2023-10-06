@@ -67,8 +67,7 @@ internal class MapHook : HookableElement
             if (textureResource == null) continue;
             if (textureResource->IconID != petIconID) continue;
             current++;
-            PetLog.Log(elementIndex + ":" + i);
-            if (i != elementIndex) continue;
+            if (i != elementIndex + manager.PartsListCount) continue;
             GetDistanceAt(current);
             return naviTooltip!.Original(unitBase, elementIndex);
         }
