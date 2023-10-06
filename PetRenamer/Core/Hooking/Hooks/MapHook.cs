@@ -29,12 +29,54 @@ internal class MapHook : HookableElement
     [Signature("48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8 ", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<Delegates.AreaMapTooltipDelegate> showTooltipThing = null!;
 
-    unsafe char NaviTooltip(AtkUnitBase* tooltip, int a2)
+    unsafe char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
         TooltipHelper.lastWasMap = true;
         TooltipHelper.nextUser = null!;
-        int index = a2;
-        return naviTooltip!.Original(tooltip, a2);
+
+        BaseNode node = new BaseNode(unitBase);
+        if (node == null) return naviTooltip!.Original(unitBase, elementIndex);
+        ComponentNode mapComponentNode = node.GetComponentNode(18);
+        if (mapComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkComponentNode* atkComponentNode = mapComponentNode.GetPointer();
+        if (atkComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkComponentBase* atkComponentBase = atkComponentNode->Component;
+        if (atkComponentBase == null) return naviTooltip!.Original(unitBase, elementIndex);
+        AtkUldManager manager = atkComponentBase->UldManager;
+
+        current = 0;
+
+        for (int i = 0; i < manager.NodeListCount; i++)
+        {
+            AtkResNode* curNode = manager.NodeList[i];
+            if (curNode == null) continue;
+            if (!curNode->IsVisible) continue;
+            AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
+            if (cNode == null) continue;
+            AtkComponentBase* cBase = cNode->Component;
+            if (cBase == null) continue;
+            AtkResNode* resNode = cBase->GetImageNodeById(3);
+            if (resNode == null) continue;
+            AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
+            if (imgNode == null) continue;
+            AtkUldPartsList* partsList = imgNode->PartsList;
+            if (partsList == null) continue;
+            AtkUldPart* parts = partsList->Parts;
+            if (parts == null) continue;
+            AtkUldAsset* asset = parts->UldAsset;
+            if (asset == null) continue;
+            AtkTexture texture = asset->AtkTexture;
+            AtkTextureResource* textureResource = texture.Resource;
+            if (textureResource == null) continue;
+            if (textureResource == null) continue;
+            if (textureResource->IconID != petIconID) continue;
+            current++;
+            if (i != elementIndex) continue;
+            GetDistanceAt(current);
+            return naviTooltip!.Original(unitBase, elementIndex);
+        }
+
+        return naviTooltip!.Original(unitBase, elementIndex);
     }
 
     unsafe char ShowTooltipDetour(AtkUnitBase* a1, uint a2, char a3)
@@ -46,7 +88,7 @@ internal class MapHook : HookableElement
         current = 0;
         int index = (int)a2;
 
-        BaseNode node = new BaseNode("AreaMap");
+        BaseNode node = new BaseNode(a1);
         ComponentNode cNode1 = node.GetComponentNode(53);
         if (cNode1 == null) return showTooltipThing!.Original(a1, a2, a3);
         AtkComponentNode* atkComponentNode = cNode1.GetPointer();
