@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -23,7 +22,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
     }
-    
+
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
 
     void Update(AtkUnitBase* baseD)
@@ -62,24 +61,14 @@ internal unsafe class PartyListHook : HookableElement
         foreach (PartyListMemberStruct member in partyMemberNames)
         {
             if (member.Name == null) continue;
-            if (!TooltipHelper.TickList)
-                if (!member.CastingProgressBar->AtkResNode.IsVisible) 
-                    continue;
+            if (member.CastingProgressBar == null) continue;
+            if (!member.CastingProgressBar->AtkResNode.IsVisible) continue;
 
             string memberName = member.Name->NodeText.ToString() ?? string.Empty;
             if (memberName == string.Empty) continue;
             string[] splitName = memberName.Split(' ');
             if (splitName.Length != 3) continue;
             memberName = $"{splitName[1]} {splitName[2]}";
-
-            if (TooltipHelper.TickList)
-            {
-                BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(memberName);
-                if (bChara == null) continue;
-                BattleChara* carbuncle = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-                BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(bChara);
-                TooltipHelper.partyListInfos.Add(new PartyListInfo(memberName, carbuncle != null, chocobo != null));
-            }
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
@@ -91,7 +80,5 @@ internal unsafe class PartyListHook : HookableElement
             if (PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames)
                 StringUtils.instance.ReplaceAtkString(member.CastingActionName, ref validNames);
         }
-
-        TooltipHelper.TickList = false;
     }
 }
