@@ -35,12 +35,12 @@ internal class MapHook : HookableElement
         if (atkComponentBase == null) return showTooltipThing!.Original(a1, a2, a3);
         AtkUldManager manager = atkComponentBase->UldManager;
 
-        for(int i = 0; i < manager.AssetCount; i++)
+        for(int i = 0; i < manager.NodeListCount; i++)
         {
-            AtkUldAsset asset = manager.Assets[i];
-            if (asset.Id != index) continue;
-            if (asset.AtkTexture.Resource == null) continue;
-            PetLog.Log(asset.AtkTexture.Resource->IconID.ToString());
+             AtkResNode* resNode = manager.NodeList[i];
+            if (resNode == null) continue;
+            if (!resNode->IsVisible) continue;
+            
         }
         return showTooltipThing!.Original(a1, a2, a3);
     }
