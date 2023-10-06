@@ -130,7 +130,6 @@ internal class MapHook : HookableElement
 
     unsafe void GetDistanceAt(int at)
     {
-        PetLog.Log("I GO!");
         GroupManager* gManager = (GroupManager*)PluginHandlers.PartyList.GroupManagerAddress;
         if (gManager == null) return;
 
