@@ -30,10 +30,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
     };
 
     readonly List<(string, Type, string, Func<PetWindowHelpers, bool>)> helpButtons = new List<(string, Type, string, Func<PetWindowHelpers, bool>)>()
-    {
+    { 
+        (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", (pw) => PluginLink.Configuration.debugMode),
+        (SeIconChar.BoxedLetterL.ToIconString(),        typeof(ChangelogWindow),        "[Changelog]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterT.ToIconString(),        typeof(ThemeEditorWindow),      "[Theme Editor]", (pw) => pw is ConfigWindow),
-        (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", (pw) => PluginLink.Configuration.debugMode),
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
