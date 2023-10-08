@@ -40,10 +40,19 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { -2, 25798 },
-        { -3, 17215 },
-        { -4, 16501 },
-        { -5, 16472 }
+        { 409, 25798 },
+        { 410, 25798 },
+        { 411, 25798 },
+        { 412, 25798 },
+        { 413, 25798 },
+        { 414, 25798 },
+        { 415, 25798 },
+        { 416, 25798 },
+        { 417, 25798 },
+        { 407, 17215 },
+        { 408, 17215 },
+        { 2618, 16501 },
+        { 2621, 16472 }
     };
 
     // [Populated]
