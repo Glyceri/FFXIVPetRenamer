@@ -1,7 +1,9 @@
 ﻿using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -37,7 +39,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     internal override void OnLateRegistered()
     {
         foreach (int skeletonID in battlePetRemap.Keys)
-            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));        
+            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(-skeletonID));
     }
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
@@ -88,9 +90,9 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
     internal string PetIDToName(int petID)
     {
-       if (petID < -1 && bakedBattlePetSkeletonToName.TryGetValue(petID > 0 ? -petID : petID, out var name))
-            return name;
-        return SheetUtils.instance.GetPetName(petID);
+       if (petID < -1 && bakedBattlePetSkeletonToName.TryGetValue(petID, out var name)) return name;
+       else if (petID > -1) return SheetUtils.instance.GetPetName(petID);
+       return string.Empty;
     }
 
     internal int BattlePetSkeletonToNameID(int skeletonID)
@@ -117,6 +119,35 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
         return 786;
     }
+
+    #region OBSOLETE
+    [Obsolete("We dont use classes anymore")]
+    public readonly Dictionary<int, int> battlePetToClass = new Dictionary<int, int>()
+    {
+        { -407,  -3  }, //EOS
+        { -408,  -3  }, //Selene
+
+        { -409,  -2  }, //Emerald Carbuncle
+        { -410,  -2 }, //Ruby Carbuncle
+        { -411,  -2 }, //Carbuncle
+        { -412,  -2  }, //Topaz Carbuncle
+
+        { -415,  -2 }, //Ifrit-Egi
+        { -416,  -2 }, //Titan-Egi
+        { -417,  -2 }, //Garuda-Egi 
+
+        { -1027, -4 }, //Rook Autoturret MCHN
+        { -2619, -3 }, //Seraph
+        { -2618, -4 }, //Automaton Queen
+        { -2621, -5 }, //Esteem DRK
+
+        { -2620, -2 }, //Demi-Phoenix
+        { -1930, -2 }, //Demi-Bahamut
+        { -3124, -2 }, //Topaz-Titan
+        { -3123, -2 }, //Emerald-Garuda
+        { -3122, -2 }, //Ruby-Iffrit
+    };
+    #endregion
 }
 
 internal enum ClassType

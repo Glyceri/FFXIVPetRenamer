@@ -20,7 +20,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
     public ExcelSheet<Action> actions { get; set; } = null!;
-    ExcelSheet<Map> maps { get; set; } = null!;
     ExcelSheet<TextCommand> textCommands { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 
@@ -41,7 +40,6 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
-        maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
         textCommands = PluginHandlers.DataManager.GetExcelSheet<TextCommand>()!;
     }
 
@@ -69,18 +67,14 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return false;
     }
 
-    public Map GetMap(uint id)
-    {
-        return maps.GetRow(id)!;
-    }
-
     public Action GetAction(uint actionID) => actions?.GetRow(actionID)!;
 
     public string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
-        if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
-        if (id <= 0) return string.Empty;
+        if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(-id);
+        else if (id <= 0) return string.Empty;
+        if (id < -1) id = -id;
 
         if(lastBattleIds.TryGetValue(id, out string? battleName))
             return battleName;
@@ -116,6 +110,12 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (lastIds.Count > cacheSizes)
             lastIds.Remove(lastIds.Keys.ToArray().First());
 
+        string tempName = RemapUtils.instance.PetIDToName(id);
+        if (tempName != string.Empty)
+        {
+            lastIds[(id, nameType)] = tempName;
+            return tempName;
+        }
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
