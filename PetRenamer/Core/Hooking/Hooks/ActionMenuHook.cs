@@ -41,8 +41,8 @@ public unsafe class ActionMenuHook : HookableElement
             AtkComponentButton button = renderer->AtkComponentButton;
             AtkComponentBase cBase = button.AtkComponentBase;
             AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
-            if (tNode == null) continue;
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
+            if (tNode == null) continue;        
+            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString(), true);
             StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
         return;
@@ -63,8 +63,8 @@ public unsafe class ActionMenuHook : HookableElement
             if (node->Component == null) continue;
             if (node->Component->UldManager.NodeListCount != 9) continue;
             AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(8);
-            if (tNode == null) continue;
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString());
+            if (tNode == null) continue; 
+            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString(), true);
             StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
         }
 

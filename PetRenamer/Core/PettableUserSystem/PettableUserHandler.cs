@@ -8,6 +8,7 @@ using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
@@ -166,20 +167,33 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return user;
     }
 
-    public (string, string)[] GetValidNames(PettableUser user, string beContainedIn, bool soft = true)
+    public (string, string)[] GetValidNames(PettableUser user, string beContainedIn, bool strict, bool soft = true)
     {
         List<(string, string)> validNames = new List<(string, string)>();
         if (beContainedIn == null) return validNames.ToArray();
         if (user == null) return validNames.ToArray();
         if (!user.UserExists) return validNames.ToArray();
+        if (strict) 
+        {
+            bool any = false;
+            foreach (string s in RemapUtils.instance.bakedActionIDToName.Values)
+                if (beContainedIn.StartsWith(s))
+                {
+                    any = true;
+                    break;
+                }
+
+            if(!any) return validNames.ToArray();
+        }
         foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
         {
             int sId = skelID;
             string bPetname = SheetUtils.instance.GetBattlePetName(-sId) ?? string.Empty;
             if (bPetname == string.Empty) continue;
             if (!beContainedIn.ToString().Contains(bPetname)) continue;
-            if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) sId = soft ? user.SerializableUser.softSmnrSkeleton : user.SerializableUser.mainSmnrSkeleton;
-            if (user.ClassJob == PluginConstants.scholarJob) sId = soft ? user.SerializableUser.softSchlrSkeleton : user.SerializableUser.mainSchlrSkeleton;
+            int tempId = user.GetPetSkeleton(soft, sId);
+            if (tempId != -1) sId = tempId;
+
             string cName = user.SerializableUser.GetNameFor(sId) ?? string.Empty;
             if (cName == string.Empty || cName == null) continue;
             validNames.Add((bPetname, cName));

@@ -119,15 +119,19 @@ public unsafe class PettableUser
 
     public int GetPetSkeleton(bool soft, int additional)
     {
+        bool valid = RemapUtils.instance.mutatableID.Contains(additional);
+
+        if (!valid) return additional;
+
         if (!soft)
         {
-            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob) && additional == -2) return SerializableUser.mainSmnrSkeleton;
-            if ((ClassJob == PluginConstants.scholarJob) && additional == -3) return SerializableUser.mainSchlrSkeleton;
+            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob)) return SerializableUser.mainSmnrSkeleton;
+            if ((ClassJob == PluginConstants.scholarJob)) return SerializableUser.mainSchlrSkeleton;
         }
         else if (soft)
         {
-            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob) && additional == -2) return SerializableUser.softSmnrSkeleton;
-            if ((ClassJob == PluginConstants.scholarJob) && additional == -3) return SerializableUser.softSchlrSkeleton;
+            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob)) return SerializableUser.softSmnrSkeleton;
+            if ((ClassJob == PluginConstants.scholarJob)) return SerializableUser.softSchlrSkeleton;
         }
 
         return additional;

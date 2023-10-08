@@ -18,7 +18,7 @@ internal unsafe class BattleChatElement : ChatElement
         if (Enum.IsDefined(typeof(XivChatType), type)) return false;
 
         PettableUser user = PluginLink.PettableUserHandler.LastCastedUser()!;
-        (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, message.ToString());
+        (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, message.ToString(), false);
         StringUtils.instance.ReplaceSeString(ref message, ref validNames);
         return true;
     }

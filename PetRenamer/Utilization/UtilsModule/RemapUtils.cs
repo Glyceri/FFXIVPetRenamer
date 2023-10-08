@@ -44,15 +44,25 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
         foreach (int actionID in allowedActions)
             bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
-
-        foreach (int actionID in allowedActions)
-            PetLog.Log(bakedActionIDToName[actionID]);
     }
+
+    public readonly List<int> mutatableID = new List<int>()
+    {
+        -407,
+        -408,
+        -409,
+        -410,
+        -411,
+        -412,
+        -413,
+        -414,
+        -415,
+        -416,
+        -417
+    };
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { -2, 25798 },
-        { -3, 17215 },
         { -409, 25804 },
         { -410, 25802 },
         { -411, 25798 },

@@ -1,6 +1,4 @@
-﻿using Dalamud.Plugin.Services;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Hooking.Attributes;
+﻿using PetRenamer.Core.Hooking.Attributes;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
