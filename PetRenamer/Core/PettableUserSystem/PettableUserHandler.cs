@@ -177,11 +177,13 @@ internal class PettableUserHandler : IDisposable, IInitializable
         {
             bool any = false;
             foreach (string s in RemapUtils.instance.bakedActionIDToName.Values)
-                if (beContainedIn.StartsWith(s))
+            {
+                if (beContainedIn.Trim().StartsWith(s))
                 {
                     any = true;
                     break;
                 }
+            }
 
             if(!any) return validNames.ToArray();
         }
