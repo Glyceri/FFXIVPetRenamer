@@ -8,6 +8,7 @@ using System;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
+// TODO: FIX
 [Chat]
 internal unsafe class BattleChatElement : ChatElement
 {

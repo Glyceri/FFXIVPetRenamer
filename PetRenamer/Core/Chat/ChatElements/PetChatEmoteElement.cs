@@ -7,7 +7,6 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
