@@ -88,45 +88,44 @@ public unsafe class PettableUser
     int lastID = -1;
     int lastCast = -1;
 
+    void HandleCast(int id)
+    {
+        int cast = PluginLink.PettableUserHandler.LastCastSoft.castID;
+        if (id == lastID && lastCast == cast) return;
+
+        lastID = id;
+        lastCast = cast;
+        if (!RemapUtils.instance.mutatableID.Contains(id)) return;
+
+        foreach (KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction)
+        {
+            if (cast != kvp.Value) continue;
+            int index = -1;
+            for (int i = 0; i < PluginConstants.baseSkeletons.Length; i++)
+            {
+                if (PluginConstants.baseSkeletons[i] != kvp.Key) continue;
+                index = i;
+                break;
+            }
+
+            if (index == -1) break;
+
+            if (SerializableUser.mainSkeletons[index] == id) break;
+            SerializableUser.mainSkeletons[index] = id;
+            SerializableUser.softSkeletons[index] = id;
+            PluginLink.Configuration.Save();
+
+            break;
+        }
+    }
+
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
         if (battlePet != null)
         {
             id = -battlePet->Character.CharacterData.ModelCharaId;
-            int cast = PluginLink.PettableUserHandler.LastCastSoft.castID;
-            if (id != lastID || lastCast != cast)
-            {
-                lastID = id;
-                lastCast = cast;
-                if (RemapUtils.instance.mutatableID.Contains(id))
-                {
-                    foreach(KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction)
-                    {
-                        if (cast != kvp.Value) continue;
-                        int index = -1;
-                        for(int i = 0; i < PluginConstants.baseSkeletons.Length; i++)
-                        {
-                            if (PluginConstants.baseSkeletons[i] == kvp.Key)
-                            {
-                                index = i;
-                                break;
-                            }
-                        }
-
-                        if(index != -1)
-                        {
-                            if (SerializableUser.mainSkeletons[index] != id)
-                            {
-                                SerializableUser.mainSkeletons[index] = id;
-                                SerializableUser.softSkeletons[index] = id;
-                                PluginLink.Configuration.Save();
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
+            HandleCast(id);
         }
         _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
