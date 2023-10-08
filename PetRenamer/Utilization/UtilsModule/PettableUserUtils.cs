@@ -6,6 +6,9 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Windows.PetWindows;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using PetRenamer.Core;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -63,5 +66,31 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
                 return curPet;
         }
         return basePet;
+    }
+
+    public (int, string) GetNameRework(string tNodeText, ref PettableUser user, bool softHook = false)
+    {
+        int id = SheetUtils.instance.GetIDFromName(tNodeText);
+        if (id > -1) return (id, tNodeText);
+
+        List<KeyValuePair<int, string>> listy = RemapUtils.instance.bakedBattlePetSkeletonToName
+          .Where(v => tNodeText.Contains(v.Value))
+          .OrderBy(v => v.Value.Length)
+          .ToList();
+
+        if (listy.Count == 0) return (id, string.Empty);
+
+        int nameSkelID = listy.Last().Key;
+        if (!softHook)
+        {
+            if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = user.SerializableUser.mainSmnrSkeleton;
+            if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = user.SerializableUser.mainSchlrSkeleton;
+        }
+        else if (softHook)
+        {
+            if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = user.SerializableUser.softSmnrSkeleton;
+            if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = user.SerializableUser.softSchlrSkeleton;
+        }
+        return (nameSkelID, listy.Last().Value);
     }
 }

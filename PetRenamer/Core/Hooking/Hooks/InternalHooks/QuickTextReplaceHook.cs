@@ -3,7 +3,6 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -18,13 +17,15 @@ public unsafe class QuickTextReplaceHook
     readonly Func<PettableUser> recallAction;
     readonly Func<int, bool> allowedToFunction;
     readonly Action<string> latestOutcome;
+    readonly bool softHook = false;
 
     bool allow = true;
     string lastAnswer = string.Empty;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!) : this(addonName, new uint[1] { textPos }, allowedToFunction, atkPos, recallAction, latestOutcome) { }
-    public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
+    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false) : this(addonName, new uint[1] { textPos }, allowedToFunction, atkPos, recallAction, latestOutcome, soft) { }
+    public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false)
     {
+        softHook = soft;
         TextPos = textPos;
         AtkPos = atkPos;
         this.recallAction = recallAction;
@@ -54,7 +55,7 @@ public unsafe class QuickTextReplaceHook
         PettableUser user = GetUser();
         if (user == null) return;
 
-        (int, string) currentName = GetNameRework(tNodeText, ref user);
+        (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNodeText, ref user, softHook);
 
         int id = currentName.Item1;
         string replaceName = currentName.Item2;
@@ -96,23 +97,4 @@ public unsafe class QuickTextReplaceHook
         else return PluginLink.PettableUserHandler.LocalUser()!;
     }
     AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
-
-    (int, string) GetNameRework(string tNodeText, ref PettableUser user)
-    {
-        int id = SheetUtils.instance.GetIDFromName(tNodeText);
-        if (id > -1) return (id, tNodeText);
-
-        List<KeyValuePair<int, string>> listy = RemapUtils.instance.bakedBattlePetSkeletonToName
-          .Where(v => tNodeText.Contains(v.Value))
-          .OrderBy(v => v.Value.Length)
-          .ToList();
-
-        if (listy.Count == 0) return (id, string.Empty);
-
-        int nameSkelID = listy.Last().Key;
-        if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = -user.SerializableUser.mainSmnrSkeleton;
-        if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = -user.SerializableUser.mainSchlrSkeleton;
-
-        return (nameSkelID, listy.Last().Value);
-    }
 }

@@ -70,15 +70,16 @@ internal unsafe class PartyListHook : HookableElement
             if (splitName.Length != 3) continue;
             memberName = $"{splitName[1]} {splitName[2]}";
 
+            if (!PluginLink.Configuration.allowCastBarPet || !PluginLink.Configuration.displayCustomNames) continue;
+
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
 
             PettableUser? user = PluginLink.PettableUserHandler.GetUser(memberName);
             if (user == null) continue;
 
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(user, castString);
-            if (PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames)
-                StringUtils.instance.ReplaceAtkString(member.CastingActionName, ref validNames);
+            (int, string) pet = PettableUserUtils.instance.GetNameRework(castString, ref user, true);
+            StringUtils.instance.ReplaceAtkString(member.CastingActionName, pet.Item2, user.SerializableUser.GetNameFor(pet.Item1));
         }
     }
 }

@@ -13,7 +13,7 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
         RegisterHook("_TargetInfoMainTarget",   10, Display,  -1, TargetUser);
         RegisterHook("_TargetInfoMainTarget",   7,  Display,  -1, TargetOfTargetUser);
         RegisterHook("_FocusTargetInfo",        10, Display,  -1, FocusTargetUser);
-        RegisterHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
+        RegisterSoftHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
         RegisterHook("_FocusTargetInfo",        5,  Allowed,  -1, FocusTargetUser);
     }
 

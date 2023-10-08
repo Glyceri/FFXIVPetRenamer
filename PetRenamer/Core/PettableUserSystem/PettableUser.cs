@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics.Metrics;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Logging;
@@ -86,7 +88,20 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
-        if (battlePet != null) id = -battlePet->Character.CharacterData.ModelCharaId;
+        if (battlePet != null)
+        {
+            id = -battlePet->Character.CharacterData.ModelCharaId;
+            if (SerializableUser.mainSchlrSkeleton != id && _jobClass == PluginConstants.scholarJob)
+            {
+                SerializableUser.mainSchlrSkeleton = id;
+                PluginLink.Configuration.Save();
+            }
+            if (SerializableUser.mainSmnrSkeleton != id && (_jobClass == PluginConstants.summonerJob || _jobClass == PluginConstants.arcanistJob))
+            {
+                SerializableUser.mainSmnrSkeleton = id;
+                PluginLink.Configuration.Save();
+            }
+        }
         _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 

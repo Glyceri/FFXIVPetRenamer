@@ -174,12 +174,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
         if (!user.UserExists) return validNames.ToArray();
         foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
         {
-            string bPetname = SheetUtils.instance.GetBattlePetName(skelID) ?? string.Empty;
+            string bPetname = SheetUtils.instance.GetBattlePetName(-skelID) ?? string.Empty;
             if (bPetname == string.Empty) continue;
             if (!beContainedIn.ToString().Contains(bPetname)) continue;
-            if (!RemapUtils.instance.skeletonToClass.ContainsKey(skelID)) continue;
-            int jobID = RemapUtils.instance.skeletonToClass[skelID];
-            string cName = user.SerializableUser.GetNameFor(jobID) ?? string.Empty;
+            string cName = user.SerializableUser.GetNameFor(-skelID) ?? string.Empty;
             if (cName == string.Empty || cName == null) continue;
             validNames.Add((bPetname, cName));
         }

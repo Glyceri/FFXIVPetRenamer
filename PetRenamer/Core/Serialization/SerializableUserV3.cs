@@ -13,10 +13,10 @@ public class SerializableUserV3
     public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
-    [JsonIgnore]
-    public int mainSmnrSkeleton { get; set; } = PluginConstants.baseSummonerSkeleton;
-    [JsonIgnore]
-    public int mainSchlrSkeleton { get; set; } = PluginConstants.baseScholarSkeleton;
+    public int mainSmnrSkeleton { get; set; } = -PluginConstants.baseSummonerSkeleton;
+    public int mainSchlrSkeleton { get; set; } = -PluginConstants.baseScholarSkeleton;
+    public int softSmnrSkeleton { get; set; } = -PluginConstants.baseSummonerSkeleton;
+    public int softSchlrSkeleton { get; set; } = -PluginConstants.baseScholarSkeleton;
 
     [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
@@ -31,10 +31,15 @@ public class SerializableUserV3
         this.homeworld = homeworld;
     }
 
-    public SerializableUserV3(string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton) : this(username, homeworld)
+    public SerializableUserV3(string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton, int softSmnrSkeleton, int softSchlrSkeleton) : this(username, homeworld)
     {
-        //this.mainSchlrSkeleton = mainSchlrSkeleton;
-        //this.mainSmnrSkeleton = mainSmnrSkeleton;
+        foreach (int skel in RemapUtils.instance.battlePetRemap.Keys)
+        {
+            if (skel == -mainSchlrSkeleton) this.mainSchlrSkeleton = mainSchlrSkeleton;
+            else if (skel == -mainSmnrSkeleton) this.mainSmnrSkeleton = mainSmnrSkeleton;
+            if (skel == -softSmnrSkeleton) this.softSmnrSkeleton = softSmnrSkeleton;
+            else if (skel == -softSchlrSkeleton) this.softSchlrSkeleton = softSchlrSkeleton;
+        }
     }
 
     public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld) : this(username, homeworld)
@@ -45,7 +50,7 @@ public class SerializableUserV3
     }
 
     [JsonConstructor]
-    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton) : this(username, homeworld, mainSmnrSkeleton, mainSchlrSkeleton)
+    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton, int softSmnrSkeleton, int softSchlrSkeleton) : this(username, homeworld, mainSmnrSkeleton, mainSchlrSkeleton, softSmnrSkeleton, softSchlrSkeleton)
     {
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)

@@ -25,8 +25,8 @@ internal class TooltipHook : QuickTextHookableElement
 
     internal override void OnQuickInit()
     {
-        RegisterHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
-        RegisterHook("Tooltip", 2, Allowed, 3, () => TooltipHelper.getNextUser);
+        RegisterSoftHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
+        RegisterSoftHook("Tooltip", 2, Allowed, 3, () => TooltipHelper.getNextUser);
 
         showTooltip?.Enable();
         ItemDetailOnUpdateHook?.Enable();
