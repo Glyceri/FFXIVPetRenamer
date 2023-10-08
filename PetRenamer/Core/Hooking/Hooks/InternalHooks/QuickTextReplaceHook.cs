@@ -40,7 +40,6 @@ public unsafe class QuickTextReplaceHook
     {
         if (!allow || TextPos.Length == 0) return;
         if (!baseElement->IsVisible) return;
-        if (TooltipHelper.handleAsItem) return;
 
         BaseNode bNode = new BaseNode(baseElement);
         AtkTextNode* tNode = GetTextNode(ref bNode);

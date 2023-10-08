@@ -6,9 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Windows.PetWindows;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
-using PetRenamer.Core;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -73,24 +71,35 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
         if (id > -1) return (id, tNodeText);
 
-        List<KeyValuePair<int, string>> listy = RemapUtils.instance.bakedBattlePetSkeletonToName
-          .Where(v => tNodeText.Contains(v.Value))
-          .OrderBy(v => v.Value.Length)
-          .ToList();
-
-        if (listy.Count == 0) return (id, string.Empty);
-
-        int nameSkelID = listy.Last().Key;
-        if (!softHook)
+        foreach(KeyValuePair<int, string> kvp in RemapUtils.instance.bakedBattlePetSkeletonToName)
         {
-            if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = user.SerializableUser.mainSmnrSkeleton;
-            if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = user.SerializableUser.mainSchlrSkeleton;
+            if (!tNodeText.Equals(kvp.Value, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            return (kvp.Key, kvp.Value);
         }
-        else if (softHook)
+
+        (int, string) action = GetAction(tNodeText);
+        return (user.GetPetSkeleton(softHook, action.Item1), CleanupString(action.Item2));
+    }
+
+    string CleanupString(string str)
+    {
+        return str.Replace("サモン・", string.Empty, System.StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("Summon ", string.Empty, System.StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("Invocation ", string.Empty, System.StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("-Beschwörung", string.Empty, System.StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    (int, string) GetAction(string tNodeText)
+    {
+        foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedActionIDToName)
         {
-            if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = user.SerializableUser.softSmnrSkeleton;
-            if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = user.SerializableUser.softSchlrSkeleton;
+            if (!tNodeText.Contains(kvp.Value)) continue;
+            foreach (KeyValuePair<int, uint> kvp2 in RemapUtils.instance.petIDToAction)
+            {
+                if (kvp2.Value != kvp.Key) continue;
+                return (kvp2.Key, kvp.Value);
+            }
         }
-        return (nameSkelID, listy.Last().Value);
+        return (-1, string.Empty);
     }
 }

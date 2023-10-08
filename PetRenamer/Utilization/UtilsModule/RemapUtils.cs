@@ -5,6 +5,7 @@ using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -40,23 +41,59 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     {
         foreach (int skeletonID in battlePetRemap.Keys)
             bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(-skeletonID));
+
+        foreach (int actionID in allowedActions)
+            bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
+
+        foreach (int actionID in allowedActions)
+            PetLog.Log(bakedActionIDToName[actionID]);
     }
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { -409, 25798 },
-        { -410, 25798 },
+        { -2, 25798 },
+        { -3, 17215 },
+        { -409, 25804 },
+        { -410, 25802 },
         { -411, 25798 },
-        { -412, 25798 },
-        { -413, 25798 },
-        { -414, 25798 },
-        { -415, 25798 },
-        { -416, 25798 },
-        { -417, 25798 },
+        { -412, 25803 },
+        { -415, 25805 },
+        { -416, 25806 },
+        { -417, 25807 },
         { -407, 17215 },
         { -408, 17215 },
         { -2618, 16501 },
-        { -2621, 16472 }
+        { -2619, 16545 }, //Seraph
+        { -2621, 16472 },
+        { -3122, 25838 },
+        { -3123, 25840 },
+        { -3124, 25839 },
+        { -2620, 25831 },
+        { -1930, 7427 },
+        { -1027, 2864 }
+    };
+
+    // [Populated]
+    public readonly Dictionary<int, string> bakedActionIDToName = new Dictionary<int, string>();
+
+    public readonly List<int> allowedActions = new List<int>()
+    {
+        25798,
+        25802,
+        25803,
+        25804,
+        25805,
+        25806,
+        25807,
+        17215,
+        16501,
+        16545,
+        16472,
+        25838,
+        25839,
+        25840,
+        7427,
+        2864
     };
 
     // [Populated]

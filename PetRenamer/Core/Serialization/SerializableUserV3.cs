@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace PetRenamer.Core.Serialization;
 
@@ -99,7 +101,7 @@ public class SerializableUserV3
             if (curID <= -1) hasBattlePet = true;
             if (hasCompanion && hasBattlePet) break;
         }
-    }
+    }   
 
     void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
     {

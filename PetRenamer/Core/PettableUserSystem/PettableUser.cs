@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.Metrics;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem;
@@ -117,6 +115,22 @@ public unsafe class PettableUser
         _user = nint.Zero;
         _battlePet.SoftReset();
         _minion.SoftReset();
+    }
+
+    public int GetPetSkeleton(bool soft, int additional)
+    {
+        if (!soft)
+        {
+            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob) && additional == -2) return SerializableUser.mainSmnrSkeleton;
+            if ((ClassJob == PluginConstants.scholarJob) && additional == -3) return SerializableUser.mainSchlrSkeleton;
+        }
+        else if (soft)
+        {
+            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob) && additional == -2) return SerializableUser.softSmnrSkeleton;
+            if ((ClassJob == PluginConstants.scholarJob) && additional == -3) return SerializableUser.softSchlrSkeleton;
+        }
+
+        return additional;
     }
 
     public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID)!;

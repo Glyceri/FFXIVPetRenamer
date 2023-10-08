@@ -70,6 +70,7 @@ public class Configuration : IPluginConfiguration
 
     public void Save() 
     {
+        if (currentSaveFileVersion < Version) return;
         List<SerializableUserV3> users = new List<SerializableUserV3>();
         foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
             users.Add(user.SerializableUser);
