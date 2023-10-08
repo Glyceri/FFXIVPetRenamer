@@ -7,6 +7,9 @@ using PetRenamer.Windows.PetWindows;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using System.Collections.Generic;
+using PetRenamer.Logging;
+using System;
+using Dalamud.Game.Text.SeStringHandling;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -68,6 +71,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
     public (int, string) GetNameRework(string tNodeText, ref PettableUser user, bool softHook = false)
     {
+        tNodeText = tNodeText.Split('\r')[0];
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
         if (id > -1) return (id, tNodeText);
 
@@ -93,7 +97,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
     {
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedActionIDToName)
         {
-            if (!tNodeText.Contains(kvp.Value)) continue;
+            if (!tNodeText.Contains(kvp.Value, System.StringComparison.InvariantCultureIgnoreCase)) continue;
             foreach (KeyValuePair<int, uint> kvp2 in RemapUtils.instance.petIDToAction)
             {
                 if (kvp2.Value != kvp.Key) continue;

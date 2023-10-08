@@ -2,22 +2,20 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Utilization.UtilsModule;
-using System.Runtime.InteropServices;
-using System;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
-// TODO: FIX
 [Hook]
 public unsafe class ActionMenuHook : HookableElement
 {
     internal override void OnInit()
     {
-        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "ActionMenu", LifeCycleUpdate);
-        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "ActionMenu", LifeCycleUpdate);
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
     }
 
     void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
@@ -26,15 +24,13 @@ public unsafe class ActionMenuHook : HookableElement
     void Update2(AtkUnitBase* baseD)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
+        if (!baseD->IsVisible) return;
 
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name != "ActionMenuReplaceList")
-            return;
-
-        AtkComponentList* list = (AtkComponentList*)baseD->GetComponentListById(3);
+        AtkComponentList* list = baseD->GetComponentListById(3);
         if (list == null) return;
-
-        for(int i = 0; i < list->ListLength; i++)
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return;
+        for (int i = 0; i < list->ListLength; i++)
         {
             ListItem lItem = list->ItemRendererList[i];
             AtkComponentListItemRenderer* renderer = lItem.AtkComponentListItemRenderer;
@@ -42,9 +38,9 @@ public unsafe class ActionMenuHook : HookableElement
             AtkComponentButton button = renderer->AtkComponentButton;
             AtkComponentBase cBase = button.AtkComponentBase;
             AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
-            if (tNode == null) continue;        
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString(), true);
-            StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
+            if (tNode == null) continue;
+            (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNode->NodeText.ToString(), ref user, true);
+            StringUtils.instance.ReplaceAtkString(tNode, currentName.Item2, user.SerializableUser.GetNameFor(currentName.Item1));
         }
         return;
     }
@@ -52,12 +48,11 @@ public unsafe class ActionMenuHook : HookableElement
     void Update(AtkUnitBase* baseD)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
+        if (!baseD->IsVisible) return;
 
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseD->Name);
-        if (!baseD->IsVisible || name != "ActionMenu")
-            return;
-
-        for(int i = 0; i < baseD->UldManager.NodeListCount; i++)
+        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
+        if (user == null) return;
+        for (int i = 0; i < baseD->UldManager.NodeListCount; i++)
         {
             AtkComponentNode* node = baseD->UldManager.NodeList[i]->GetAsAtkComponentNode();
             if (node == null) continue;
@@ -65,8 +60,8 @@ public unsafe class ActionMenuHook : HookableElement
             if (node->Component->UldManager.NodeListCount != 9) continue;
             AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(8);
             if (tNode == null) continue;
-            (string, string)[] validNames = PluginLink.PettableUserHandler.GetValidNames(PluginLink.PettableUserHandler.LocalUser()!, tNode->NodeText.ToString(), true);
-            StringUtils.instance.ReplaceAtkString(tNode, ref validNames);
+            (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNode->NodeText.ToString(), ref user, true);
+            StringUtils.instance.ReplaceAtkString(tNode, currentName.Item2, user.SerializableUser.GetNameFor(currentName.Item1));
         }
 
         return ;
