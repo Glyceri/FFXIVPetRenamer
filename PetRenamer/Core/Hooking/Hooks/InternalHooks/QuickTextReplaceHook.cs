@@ -3,6 +3,7 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -101,14 +102,17 @@ public unsafe class QuickTextReplaceHook
         int id = SheetUtils.instance.GetIDFromName(tNodeText);
         if (id > -1) return (id, tNodeText);
 
-        id = RemapUtils.instance.GetPetIDFromClass(user.JobClass);
-
         List<KeyValuePair<int, string>> listy = RemapUtils.instance.bakedBattlePetSkeletonToName
           .Where(v => tNodeText.Contains(v.Value))
           .OrderBy(v => v.Value.Length)
           .ToList();
-        
+
         if (listy.Count == 0) return (id, string.Empty);
-        return (id, listy.Last().Value);
+
+        int nameSkelID = listy.Last().Key;
+        if (user.ClassJob == PluginConstants.arcanistJob || user.ClassJob == PluginConstants.summonerJob) nameSkelID = -user.SerializableUser.mainSmnrSkeleton;
+        if (user.ClassJob == PluginConstants.scholarJob) nameSkelID = -user.SerializableUser.mainSchlrSkeleton;
+
+        return (nameSkelID, listy.Last().Value);
     }
 }

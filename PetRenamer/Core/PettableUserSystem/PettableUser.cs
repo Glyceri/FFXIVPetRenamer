@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem;
@@ -30,8 +31,8 @@ public unsafe class PettableUser
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
-    public byte JobClass => _jobClass;
     public (string, ushort) Data => (_username, _homeworld);
+    public byte ClassJob => _jobClass;
     public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
     uint _objectID = 0;
@@ -85,7 +86,7 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
-        if (battlePet != null) id = RemapUtils.instance.GetPetIDFromClass(_jobClass);
+        if (battlePet != null) id = -battlePet->Character.CharacterData.ModelCharaId;
         _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 

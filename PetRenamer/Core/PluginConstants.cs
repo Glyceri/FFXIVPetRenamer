@@ -12,6 +12,10 @@ public static class PluginConstants
     public const int baseSummonerSkeleton = 411;
     public const int baseScholarSkeleton = 407;
 
+    public const int arcanistJob = 26;
+    public const int summonerJob = 27;
+    public const int scholarJob = 28;
+
     public static readonly int[] allowedJobs = new int[]
     {
         26,     //Arcanist
