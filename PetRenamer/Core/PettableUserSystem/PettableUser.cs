@@ -30,6 +30,7 @@ public unsafe class PettableUser
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
+    public byte JobClass => _jobClass;
     public (string, ushort) Data => (_username, _homeworld);
     public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
@@ -39,6 +40,7 @@ public unsafe class PettableUser
     public bool UserChanged => _UserChanged || AnyPetChanged;
     int _ChangedID = 0;
     bool _UserChanged = false;
+    byte _jobClass = 0;
 
     public bool LocalUser
     {
@@ -71,6 +73,7 @@ public unsafe class PettableUser
     {
         if (user == null) return;
         _objectID = user->Character.GameObject.ObjectID;
+        _jobClass = user->Character.CharacterData.ClassJob;
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
@@ -82,7 +85,7 @@ public unsafe class PettableUser
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
-        if (battlePet != null) id = RemapUtils.instance.GetPetIDFromClass(((BattleChara*)_user)->Character.CharacterData.ClassJob);
+        if (battlePet != null) id = RemapUtils.instance.GetPetIDFromClass(_jobClass);
         _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 

@@ -60,6 +60,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.1.1"), new CLE("General", "Fixed Redraw not working.")) },
         { new CLS(new Version("1.4.1.2"), new CLE("General", "Fixed Map Tooltips not working.")) },
         { new CLS(new Version("1.4.1.3"), new CLE("General", "Fixed Emotes not working in certain conditions.")) },
+        { new CLS(new Version("1.4.1.4"), new CLE("General", "Fixed wrong names displaying in certain situations when having used /petglamour. (/petglamour will very soon receive a full rework).")) },
     };
 
     const string starter = "  ◉   ";

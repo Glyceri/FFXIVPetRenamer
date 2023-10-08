@@ -6,12 +6,12 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
 public unsafe class QuickTextReplaceHook
 {
-    readonly string AddonName;
     readonly uint[] TextPos;
     readonly int AtkPos;
     readonly Func<PettableUser> recallAction;
@@ -25,7 +25,6 @@ public unsafe class QuickTextReplaceHook
     public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
     {
         TextPos = textPos;
-        AddonName = addonName;
         AtkPos = atkPos;
         this.recallAction = recallAction;
         this.allowedToFunction = allowedToFunction;
@@ -33,33 +32,31 @@ public unsafe class QuickTextReplaceHook
         PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, addonName, HandleUpdate);
     }
 
-    void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Handle((AtkUnitBase*)addonArgs.Addon);
+    void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
 
-    void Handle(AtkUnitBase* baseElement)
+    void HandleRework(AtkUnitBase* baseElement)
     {
         if (!allow || TextPos.Length == 0) return;
         if (!baseElement->IsVisible) return;
         if (TooltipHelper.handleAsItem) return;
 
-        BaseNode bNode = new BaseNode(AddonName);
-        if (bNode == null) return;
+        BaseNode bNode = new BaseNode(baseElement);
         AtkTextNode* tNode = GetTextNode(ref bNode);
         if (tNode == null) return;
 
         string tNodeText = tNode->NodeText.ToString() ?? string.Empty;
-        if (tNodeText == string.Empty) return;
-        if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
-        if (tNodeText == lastAnswer) return;
+        if (tNodeText == string.Empty || tNodeText == lastAnswer) return;
+        latestOutcome?.Invoke(tNodeText);
 
         AtkNineGridNode* nineGridNode = GetBackgroundNode(ref bNode);
-        if (AtkPos != -1 && nineGridNode == null) return;
 
         PettableUser user = GetUser();
         if (user == null) return;
 
-        (int, string) data = GetName(SheetUtils.instance.GetIDFromName(tNodeText), tNodeText);
-        int id = data.Item1;
-        string replaceName = data.Item2;
+        (int, string) currentName = GetNameRework(tNodeText, ref user);
+
+        int id = currentName.Item1;
+        string replaceName = currentName.Item2;
         if (replaceName == string.Empty) return;
 
         if (id == -1)
@@ -74,8 +71,6 @@ public unsafe class QuickTextReplaceHook
         if (curNickname == string.Empty) return;
         StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname, nineGridNode);
         lastAnswer = curNickname;
-
-        return;
     }
 
     AtkTextNode* GetTextNode(ref BaseNode bNode)
@@ -101,33 +96,19 @@ public unsafe class QuickTextReplaceHook
     }
     AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
 
-    (int, string) GetName(int id, string replaceName)
+    (int, string) GetNameRework(string tNodeText, ref PettableUser user)
     {
-        string textNodeText = replaceName;
-        if (id != -1) return (id, replaceName);
+        int id = SheetUtils.instance.GetIDFromName(tNodeText);
+        if (id > -1) return (id, tNodeText);
 
-        List<(string, int)> correctNames = new List<(string, int)>();
-        foreach (int nameID in RemapUtils.instance.battlePetRemap.Keys)
-        {
-            if (!RemapUtils.instance.bakedBattlePetSkeletonToName.ContainsKey(nameID)) continue;
-            string bPetName = RemapUtils.instance.bakedBattlePetSkeletonToName[nameID];
-            if (textNodeText.Contains(bPetName))
-                correctNames.Add((bPetName, nameID));
-        }
-        if (correctNames.Count != 0)
-        {
-            int shortestEl = 0;
-            for (int i = 1; i < correctNames.Count; i++)
-            {
-                if (correctNames[i].Item1.Length < correctNames[shortestEl].Item1.Length)
-                    shortestEl = i;
-            }
-            int item2 = correctNames[shortestEl].Item2;
-            if (RemapUtils.instance.skeletonToClass.ContainsKey(item2))
-                id = RemapUtils.instance.skeletonToClass[item2];
-            replaceName = correctNames[shortestEl].Item1;
-        }
+        id = RemapUtils.instance.GetPetIDFromClass(user.JobClass);
 
-        return (id, replaceName);
+        List<KeyValuePair<int, string>> listy = RemapUtils.instance.bakedBattlePetSkeletonToName
+          .Where(v => tNodeText.Contains(v.Value))
+          .OrderBy(v => v.Value.Length)
+          .ToList();
+        
+        if (listy.Count == 0) return (id, string.Empty);
+        return (id, listy.Last().Value);
     }
 }
