@@ -6,6 +6,7 @@ using Lumina.Text.Payloads;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -61,11 +62,7 @@ internal class PetGlamourChat : ChatElement
 
             string payloadString = (curPayload as TextPayload)!.RawString;
 
-            if (counter < 5)
-            {
-                if (counter < 4) nameToClass.Add((payloadString, -2));
-                else nameToClass.Add((payloadString, -3));
-            }
+            if (counter < 5) nameToClass.Add((payloadString, counter));
             else break;
             counter++;
         }
@@ -129,13 +126,11 @@ internal class PetGlamourChat : ChatElement
 
     void SetClassJobToSkeleton(int classJob, int skeleton)
     {
-        if (classJob == -1) return;
-
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if(localUser == null) return;
+        if (classJob == -1 || classJob > localUser.SerializableUser.softSkeletons.Length) return;
 
-        if (classJob == -2) localUser.SerializableUser.softSmnrSkeleton = skeleton == -1 ? PluginConstants.baseSummonerSkeleton : skeleton;
-        if (classJob == -3) localUser.SerializableUser.softSchlrSkeleton = skeleton == -1 ? PluginConstants.baseScholarSkeleton : skeleton;
+        localUser.SerializableUser.softSkeletons[classJob] = skeleton == -1 ? PluginConstants.baseSkeletons[classJob] : skeleton;
 
         PluginLink.Configuration.Save();
     }

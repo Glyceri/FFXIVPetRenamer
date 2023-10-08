@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem;
@@ -83,21 +85,47 @@ public unsafe class PettableUser
         if (_ChangedID == BattlePet.ID) _battlePet.Clear();
     }
 
+    int lastID = -1;
+    int lastCast = -1;
+
     public void SetBattlePet(BattleChara* battlePet)
     {
         int id = -1;
         if (battlePet != null)
         {
             id = -battlePet->Character.CharacterData.ModelCharaId;
-            if (SerializableUser.mainSchlrSkeleton != id && _jobClass == PluginConstants.scholarJob)
+            int cast = PluginLink.PettableUserHandler.LastCastSoft.castID;
+            if (id != lastID || lastCast != cast)
             {
-                SerializableUser.mainSchlrSkeleton = id;
-                PluginLink.Configuration.Save();
-            }
-            if (SerializableUser.mainSmnrSkeleton != id && (_jobClass == PluginConstants.summonerJob || _jobClass == PluginConstants.arcanistJob))
-            {
-                SerializableUser.mainSmnrSkeleton = id;
-                PluginLink.Configuration.Save();
+                lastID = id;
+                lastCast = cast;
+                if (RemapUtils.instance.mutatableID.Contains(id))
+                {
+                    foreach(KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction)
+                    {
+                        if (cast != kvp.Value) continue;
+                        int index = -1;
+                        for(int i = 0; i < PluginConstants.baseSkeletons.Length; i++)
+                        {
+                            if (PluginConstants.baseSkeletons[i] == kvp.Key)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if(index != -1)
+                        {
+                            if (SerializableUser.mainSkeletons[index] != id)
+                            {
+                                SerializableUser.mainSkeletons[index] = id;
+                                SerializableUser.softSkeletons[index] = id;
+                                PluginLink.Configuration.Save();
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
         _battlePet.Set((nint)battlePet, id, _serializableUser);
@@ -123,16 +151,22 @@ public unsafe class PettableUser
 
         if (!valid) return additional;
 
-        if (!soft)
+        int[] array;
+
+        if (!soft) array = SerializableUser.mainSkeletons;
+        else array = SerializableUser.softSkeletons;
+
+        int index = -1;
+
+        for (int i = 0; i < PluginConstants.baseSkeletons.Length; i++)
         {
-            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob)) return SerializableUser.mainSmnrSkeleton;
-            if ((ClassJob == PluginConstants.scholarJob)) return SerializableUser.mainSchlrSkeleton;
+            if (PluginConstants.baseSkeletons[i] == additional)
+            {
+                index = i;
+                break;
+            }
         }
-        else if (soft)
-        {
-            if ((ClassJob == PluginConstants.arcanistJob || ClassJob == PluginConstants.summonerJob)) return SerializableUser.softSmnrSkeleton;
-            if ((ClassJob == PluginConstants.scholarJob)) return SerializableUser.softSchlrSkeleton;
-        }
+        if (index >= 0 && index < array.Length) return array[index];
 
         return additional;
     }

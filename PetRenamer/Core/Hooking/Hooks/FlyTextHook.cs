@@ -32,10 +32,11 @@ internal class FlyTextHook : HookableElement
         StringUtils.instance.ReplaceSeString(ref text2, ref validNames);
     }
 
-    unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int a3, char a4, int a5, int a6, int a7, int a8)
+    unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int a3, char a4, int castID, int a6, int a7, int a8)
     {
-        addToScreenLogWithLogMessageId?.Original(target, castDealer, a3, a4, a5, a6, a7, a8);
-        PluginLink.PettableUserHandler.SetLastCast(target, castDealer);
+        addToScreenLogWithLogMessageId?.Original(target, castDealer, a3, a4, castID, a6, a7, a8);
+        PluginLink.PettableUserHandler.SetLastCast(target, castDealer, castID);
+        if(RemapUtils.instance.allowedActions.Contains(castID)) PluginLink.PettableUserHandler.SetLastCastSoft(target, castDealer, castID);
     }
 
     internal override void OnDispose()

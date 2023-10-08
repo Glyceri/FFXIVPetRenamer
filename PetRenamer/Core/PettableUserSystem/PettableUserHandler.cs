@@ -8,7 +8,6 @@ using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
@@ -18,8 +17,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public List<PettableUser> Users { get => _users; set => _users = value; }
 
+    LastActionUsed _lastCastSoft;
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
+    public LastActionUsed LastCastSoft { get => _lastCastSoft; private set => _lastCastSoft = value; }
 
     public void LoopThroughUsers(Action<PettableUser> action)
     {
@@ -173,20 +174,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
         if (beContainedIn == null) return validNames.ToArray();
         if (user == null) return validNames.ToArray();
         if (!user.UserExists) return validNames.ToArray();
-        if (strict) 
-        {
-            bool any = false;
-            foreach (string s in RemapUtils.instance.bakedActionIDToName.Values)
-            {
-                if (beContainedIn.Trim().StartsWith(s))
-                {
-                    any = true;
-                    break;
-                }
-            }
-
-            if(!any) return validNames.ToArray();
-        }
         foreach (int skelID in RemapUtils.instance.battlePetRemap.Keys)
         {
             int sId = skelID;
@@ -212,18 +199,21 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return false;
     }
 
-    public void SetLastCast(IntPtr castUser, IntPtr castDealer) => _lastCast = new LastActionUsed(castUser, castDealer);
+    public void SetLastCast(IntPtr castUser, IntPtr castDealer, int castID) => _lastCast = new LastActionUsed(castUser, castDealer, castID);
+    public void SetLastCastSoft(IntPtr castUser, IntPtr castDealer, int castID) => _lastCastSoft = new LastActionUsed(castUser, castDealer, castID);
 }
 
 public struct LastActionUsed
 {
     public IntPtr castUser;
     public IntPtr castDealer;
+    public int castID;
 
-    public LastActionUsed(IntPtr castUser, IntPtr castDealer)
+    public LastActionUsed(IntPtr castUser, IntPtr castDealer, int castID)
     {
         this.castUser = castUser;
         this.castDealer = castDealer;
+        this.castID = castID;
     }
 }
 
