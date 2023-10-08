@@ -21,6 +21,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
     public ExcelSheet<Action> actions { get; set; } = null!;
     ExcelSheet<Map> maps { get; set; } = null!;
+    ExcelSheet<TextCommand> textCommands { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 
     const int cacheSizes = 55;
@@ -41,7 +42,12 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
         maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
+        textCommands = PluginHandlers.DataManager.GetExcelSheet<TextCommand>()!;
     }
+
+    //226 is /egiglamour
+    //33 is /petmirage
+    public TextCommand GetCommand(uint id) => textCommands.GetRow(id)!;
 
     public bool PetExistsInANY(string petname)
     {

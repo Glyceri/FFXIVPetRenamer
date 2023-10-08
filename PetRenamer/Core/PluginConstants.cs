@@ -9,6 +9,8 @@ public static class PluginConstants
     public const int ffxivNameSize = 64;
     public const int AtkUnitBaseUpdateIndex = 42;
     public const char forbiddenCharacter = '^';
+    public const int baseSummonerSkeleton = 411;
+    public const int baseScholarSkeleton = 407;
 
     public static readonly int[] allowedJobs = new int[]
     {

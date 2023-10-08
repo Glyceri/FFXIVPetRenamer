@@ -13,6 +13,8 @@ public class SerializableUserV3
     public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
+    public int mainSmnrSkeleton { get; private set; } = PluginConstants.baseSummonerSkeleton;
+    public int mainSchlrSkeleton { get; private set; } = PluginConstants.baseScholarSkeleton;
 
     [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
@@ -27,8 +29,21 @@ public class SerializableUserV3
         this.homeworld = homeworld;
     }
 
-    [JsonConstructor]
+    public SerializableUserV3(string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton) : this(username, homeworld)
+    {
+        this.mainSchlrSkeleton = mainSchlrSkeleton;
+        this.mainSmnrSkeleton = mainSmnrSkeleton;
+    }
+
     public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld) : this(username, homeworld)
+    {
+        if (ids.Length != names.Length) return;
+        for (int i = 0; i < ids.Length; i++)
+            SaveNickname(ids[i], names[i], i == ids.Length - 1);
+    }
+
+    [JsonConstructor]
+    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int mainSmnrSkeleton, int mainSchlrSkeleton) : this(username, homeworld, mainSmnrSkeleton, mainSchlrSkeleton)
     {
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
