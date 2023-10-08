@@ -13,10 +13,10 @@ public class SerializableUserV3
     public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
-    public int mainSmnrSkeleton { get; set; } = -PluginConstants.baseSummonerSkeleton;
-    public int mainSchlrSkeleton { get; set; } = -PluginConstants.baseScholarSkeleton;
-    public int softSmnrSkeleton { get; set; } = -PluginConstants.baseSummonerSkeleton;
-    public int softSchlrSkeleton { get; set; } = -PluginConstants.baseScholarSkeleton;
+    public int mainSmnrSkeleton { get; set; } = PluginConstants.baseSummonerSkeleton;
+    public int mainSchlrSkeleton { get; set; } = PluginConstants.baseScholarSkeleton;
+    public int softSmnrSkeleton { get; set; } = PluginConstants.baseSummonerSkeleton;
+    public int softSchlrSkeleton { get; set; } = PluginConstants.baseScholarSkeleton;
 
     [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
@@ -35,10 +35,10 @@ public class SerializableUserV3
     {
         foreach (int skel in RemapUtils.instance.battlePetRemap.Keys)
         {
-            if (skel == -mainSchlrSkeleton) this.mainSchlrSkeleton = mainSchlrSkeleton;
-            else if (skel == -mainSmnrSkeleton) this.mainSmnrSkeleton = mainSmnrSkeleton;
-            if (skel == -softSmnrSkeleton) this.softSmnrSkeleton = softSmnrSkeleton;
-            else if (skel == -softSchlrSkeleton) this.softSchlrSkeleton = softSchlrSkeleton;
+            if (skel == mainSchlrSkeleton) this.mainSchlrSkeleton = mainSchlrSkeleton;
+            else if (skel == mainSmnrSkeleton) this.mainSmnrSkeleton = mainSmnrSkeleton;
+            if (skel == softSmnrSkeleton) this.softSmnrSkeleton = softSmnrSkeleton;
+            else if (skel == softSchlrSkeleton) this.softSchlrSkeleton = softSchlrSkeleton;
         }
     }
 

@@ -9,8 +9,8 @@ public static class PluginConstants
     public const int ffxivNameSize = 64;
     public const int AtkUnitBaseUpdateIndex = 42;
     public const char forbiddenCharacter = '^';
-    public const int baseSummonerSkeleton = 411;
-    public const int baseScholarSkeleton = 407;
+    public const int baseSummonerSkeleton = -411;
+    public const int baseScholarSkeleton = -407;
 
     public const int arcanistJob = 26;
     public const int summonerJob = 27;
@@ -23,13 +23,6 @@ public static class PluginConstants
         28,     //Scholar
         31,     //Machinist 
         32,     //Dark Knight
-    };
-    public static readonly int[] allowedNegativePetIDS = new int[]
-    {
-        -2,     //Arcanist/Summoner
-        -3,     //Scholar
-        -4,     //Machinist
-        -5,     //Dark Knight
     };
 
     public static readonly string[] removeables = new string[] 

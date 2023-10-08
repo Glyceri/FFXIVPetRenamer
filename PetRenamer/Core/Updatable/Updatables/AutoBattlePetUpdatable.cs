@@ -2,6 +2,7 @@
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ internal class AutoBattlePetUpdatable : Updatable
         if (user == null) return;
         missingIDs.Clear();
 
-        foreach (int id in PluginConstants.allowedNegativePetIDS)
+        foreach (int id in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
         {
             bool found = false;
             for(int i = 0; i < user.SerializableUser.length; i++)

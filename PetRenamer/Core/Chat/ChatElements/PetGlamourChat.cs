@@ -134,8 +134,8 @@ internal class PetGlamourChat : ChatElement
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if(localUser == null) return;
 
-        if (classJob == -2) localUser.SerializableUser.softSmnrSkeleton = skeleton == -1 ? -PluginConstants.baseSummonerSkeleton : -skeleton;
-        if (classJob == -3) localUser.SerializableUser.softSchlrSkeleton = skeleton == -1 ? -PluginConstants.baseScholarSkeleton : -skeleton;
+        if (classJob == -2) localUser.SerializableUser.softSmnrSkeleton = skeleton == -1 ? PluginConstants.baseSummonerSkeleton : skeleton;
+        if (classJob == -3) localUser.SerializableUser.softSchlrSkeleton = skeleton == -1 ? PluginConstants.baseScholarSkeleton : skeleton;
 
         PluginLink.Configuration.Save();
     }
