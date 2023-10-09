@@ -103,23 +103,10 @@ public static class IpcProvider
         try
         {
             if (character is not PlayerCharacter playerCharacter) return string.Empty;
-            (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
-            NicknameData? data = new NicknameData();
+            PettableUser user = PluginLink.PettableUserHandler.GetUser(character.Address);
+            if (user == null) return string.Empty;
 
-            foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
-            {
-                if (!user.SerializableUser.Equals(player.Item1, (ushort)player.Item2)) continue;
-                (int, string) cStr = (-1, string.Empty);
-                (int, string) bStr = (-1, string.Empty);
-                if (user.Minion.Has) cStr = (user.Minion.ID, user.Minion.CustomName);
-                if (user.BattlePet.Has) bStr = (user.BattlePet.ID, user.BattlePet.CustomName);
-
-                data.ID = cStr.Item1;
-                data.Nickname = cStr.Item2;
-                data.BattleID = bStr.Item1;
-                data.BattleNickname = bStr.Item2;
-                break;
-            }
+            NicknameData data = new NicknameData(user.Minion.ID, user.Minion.UsedName, user.BattlePet.ID, user.BattlePet.UsedName);
             string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);
             return jsonString;
         }

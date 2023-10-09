@@ -39,7 +39,7 @@ public unsafe sealed class NamePlateHook : HookableElement
         PetBase currentPet = PluginLink.PettableUserHandler.GetPet(obj);
         if (currentPet == null) return;
 
-        string nameToUse = currentPet.CustomName == string.Empty ? currentPet.BaseName : currentPet.CustomName;
+        string nameToUse = currentPet.UsedName;
         if (nameToUse == string.Empty) return;
         namePlateInfo->Name.SetString(nameToUse);
     }

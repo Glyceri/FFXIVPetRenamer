@@ -38,8 +38,9 @@ internal unsafe class PartyListHook : HookableElement
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         if (!user.BattlePet.Has) return;
-        if (user.BattlePet.CustomName == string.Empty) return;
-        partyNode->Pet.Name->SetText(user.BattlePet.CustomName);
+        string nickname = user.BattlePet.UsedName;
+        if (nickname == string.Empty) return;
+        partyNode->Pet.Name->SetText(nickname);
     }
 
     void SetCastlist(AddonPartyList* partyNode)

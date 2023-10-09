@@ -11,9 +11,10 @@ public class PetBase
     public int Index => _index;
     public uint ObjectID => _objectID;
 
-    public string CustomName => _faulty ? string.Empty : _customName ?? string.Empty;
+    public string CustomName => _customName ?? string.Empty;
     public string BaseName => _baseName ?? string.Empty;
     public string BaseNamePlural => _baseNamePlural ?? string.Empty;
+    public string UsedName => Faulty ? BaseName : CustomName == string.Empty ? BaseName : CustomName;
 
     public bool Changed => _petChanged;
     public bool Faulty => _faulty;
