@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using System.Collections.Generic;
 using System;
+using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -95,15 +96,24 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
     (int, string) GetAction(string tNodeText)
     {
+        List<(int, string)> kvps = new List<(int, string)> ();
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedActionIDToName)
         {
             if (!tNodeText.Contains(kvp.Value, StringComparison.InvariantCultureIgnoreCase)) continue;
-            foreach (KeyValuePair<int, uint> kvp2 in RemapUtils.instance.petIDToAction)
-            {
-                if (kvp2.Value != kvp.Key) continue;
-                return (kvp2.Key, kvp.Value);
-            }
+            kvps.Add((kvp.Key, kvp.Value));
         }
+
+        if (kvps.Count == 0) return (-1, string.Empty);
+
+        kvps.Sort((a, b) => a.Item2.Length.CompareTo(b.Item2.Length));
+        kvps.Reverse();
+
+        foreach (KeyValuePair<int, uint> kvp2 in RemapUtils.instance.petIDToAction)
+        {
+            if (kvp2.Value != kvps[0].Item1) continue;
+            return (kvp2.Key, kvps[0].Item2);
+        }
+
         return (-1, string.Empty);
     }
 }

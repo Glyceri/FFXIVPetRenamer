@@ -1,6 +1,7 @@
 ﻿using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -40,8 +41,9 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         foreach (int skeletonID in battlePetRemap.Keys)
             bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(-skeletonID));
 
-        foreach (int actionID in allowedActions)
-            bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
+        foreach (int actionID in petIDToAction.Values)
+            if(!bakedActionIDToName.ContainsKey(actionID))
+                bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
     }
 
     public readonly List<int> mutatableID = new List<int>()
@@ -72,37 +74,17 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { -408, 17215 },
         { -2618, 16501 },
         { -2619, 16545 }, //Seraph
+        { -2620, 25831 },
         { -2621, 16472 },
         { -3122, 25838 },
         { -3123, 25840 },
         { -3124, 25839 },
-        { -2620, 25831 },
         { -1930, 7427 },
-        { -1027, 2864 }
+        { -1027, 2864 },
     };
 
     // [Populated]
     public readonly Dictionary<int, string> bakedActionIDToName = new Dictionary<int, string>();
-
-    public readonly List<int> allowedActions = new List<int>()
-    {
-        25798,
-        25802,
-        25803,
-        25804,
-        25805,
-        25806,
-        25807,
-        17215,
-        16501,
-        16545,
-        16472,
-        25838,
-        25839,
-        25840,
-        7427,
-        2864
-    };
 
     // [Populated]
     public readonly Dictionary<int, string> bakedBattlePetSkeletonToName = new Dictionary<int, string>();

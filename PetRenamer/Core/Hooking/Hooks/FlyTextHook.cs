@@ -7,6 +7,7 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;
 using PetRenamer.Utilization.UtilsModule;
+using System.Linq;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -37,7 +38,7 @@ internal class FlyTextHook : HookableElement
     {
         addToScreenLogWithLogMessageId?.Original(target, castDealer, a3, a4, castID, a6, a7, a8);
         PluginLink.PettableUserHandler.SetLastCast(target, castDealer, castID);
-        if(RemapUtils.instance.allowedActions.Contains(castID)) PluginLink.PettableUserHandler.SetLastCastSoft(target, castDealer, castID);
+        if(RemapUtils.instance.petIDToAction.Values.Contains((uint)castID)) PluginLink.PettableUserHandler.SetLastCastSoft(target, castDealer, castID);
     }
 
     internal override void OnDispose()
