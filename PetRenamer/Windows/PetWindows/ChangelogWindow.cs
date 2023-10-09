@@ -61,7 +61,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.1.2"), new CLE("General", "Fixed Map Tooltips not working.")) },
         { new CLS(new Version("1.4.1.3"), new CLE("General", "Fixed Emotes not working in certain conditions.")) },
         { new CLS(new Version("1.4.1.4"), new CLE("General", "Fixed wrong names displaying in certain situations when having used /petglamour. (/petglamour will very soon receive a full rework).")) },
-        { new CLS(new Version("1.4.2.0"), new CLE("General", "Every different Battle Pet model can now be assigned a name. No more naming per class.")) },
+        { new CLS(new Version("1.4.2.0"), new CLE("General", "Every different Battle Pet model can now be assigned a name. No more naming per class.", "You can no longer see names on models that are Human. Sorry to those that enjoyed this feature, but it is problematic :("), new CLE("Saving", "Save File Version Updated from Version 7 to Version 8.")) },
     };
 
     const string starter = "  ◉   ";
