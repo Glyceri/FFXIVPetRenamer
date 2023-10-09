@@ -8,7 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using System.Collections.Generic;
 using System;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Utilization.UtilsModule;
 

@@ -3,11 +3,8 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 

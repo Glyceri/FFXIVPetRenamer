@@ -42,45 +42,43 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
             bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(-skeletonID));
 
         foreach (int actionID in petIDToAction.Values)
-            if(!bakedActionIDToName.ContainsKey(actionID))
+            if (!bakedActionIDToName.ContainsKey(actionID))
                 bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
     }
 
     public readonly List<int> mutatableID = new List<int>()
     {
-        -407,
-        -408,
-        -409,
-        -410,
-        -411,
-        -412,
-        -413,
-        -414,
-        -415,
-        -416,
-        -417
+        -407, //Eos
+        -408, //Selene
+        -409, //Emerald Carbuncle
+        -410, //Ruby Carbuncle
+        -411, //Carbuncle
+        -412, //Topaz Carbuncle
+        -415, //Ifrit-Egi
+        -416, //Titan-Egi
+        -417 //Garuda-Egi
     };
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { -409, 25804 },
-        { -410, 25802 },
-        { -411, 25798 },
-        { -412, 25803 },
-        { -415, 25805 },
-        { -416, 25806 },
-        { -417, 25807 },
-        { -407, 17215 },
-        { -408, 17215 },
-        { -2618, 16501 },
-        { -2619, 16545 }, //Seraph
-        { -2620, 25831 },
-        { -2621, 16472 },
-        { -3122, 25838 },
-        { -3123, 25840 },
-        { -3124, 25839 },
-        { -1930, 7427 },
-        { -1027, 2864 },
+        { -409, 25804 }, //Summon Emerald
+        { -410, 25802 }, //Summon Ruby
+        { -411, 25798 }, //Summon Carbuncle
+        { -412, 25803 }, //Summon Topaz
+        { -415, 25805 }, //Summon Ifrit
+        { -416, 25806 }, //Summon Titan
+        { -417, 25807 }, //Summon Garuda
+        { -407, 17215 }, //Summon Eos
+        { -408, 17215 }, //Summon Eos
+        { -2618, 16501 }, //Automaton Queen
+        { -2619, 16545 }, //Summon Seraph
+        { -2620, 25831 }, //Summon Phoenix
+        { -2621, 16472 }, //Living Shadow
+        { -3122, 25838 }, //Summon Ifrit II
+        { -3123, 25840 }, //Summon Garuda II
+        { -3124, 25839 }, //Summon Titan II
+        { -1930, 7427 }, //Summon Bahamut
+        { -1027, 2864 }, //Rook Autoturret
     };
 
     // [Populated]
