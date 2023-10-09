@@ -78,10 +78,7 @@ internal class PetGlamourChat : ChatElement
     readonly Regex changeRegex;
     readonly Regex resetRegex;
     readonly Regex fullRegex;
-    readonly Regex spacingRegex;
-
-    readonly Regex spacingRegexNml = new(@"^(?<petname>.+)  (?<petname2>.+)");
-    readonly Regex spacingRegexJp = new(@"^(?<petname>.+)  (?<petname2>.+)");
+    readonly Regex spacingRegex = new(@"^(?<petname>.+)  (?<petname2>.+)");
 
     readonly List<(string, int)> nameToClass = new List<(string, int)>();
 
@@ -126,15 +123,6 @@ internal class PetGlamourChat : ChatElement
             ClientLanguage.German => changeRegexDe,
             ClientLanguage.French => changeRegexFr,
             _ => changeRegexEn,
-        };
-
-        spacingRegex = PluginHandlers.ClientState.ClientLanguage switch
-        {
-            ClientLanguage.Japanese => spacingRegexJp,
-            ClientLanguage.English => spacingRegexNml,
-            ClientLanguage.German => spacingRegexNml,
-            ClientLanguage.French => spacingRegexNml,
-            _ => spacingRegexNml,
         };
 
         fullRegex = PluginHandlers.ClientState.ClientLanguage switch

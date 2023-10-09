@@ -33,7 +33,6 @@ public unsafe class PettableUser
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
     public (string, ushort) Data => (_username, _homeworld);
-    public byte ClassJob => _jobClass;
     public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
     uint _objectID = 0;
@@ -42,7 +41,6 @@ public unsafe class PettableUser
     public bool UserChanged => _UserChanged || AnyPetChanged;
     int _ChangedID = 0;
     bool _UserChanged = false;
-    byte _jobClass = 0;
 
     public bool LocalUser
     {
@@ -75,7 +73,6 @@ public unsafe class PettableUser
     {
         if (user == null) return;
         _objectID = user->Character.GameObject.ObjectID;
-        _jobClass = user->Character.CharacterData.ClassJob;
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
