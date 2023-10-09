@@ -1,10 +1,13 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
@@ -32,13 +35,13 @@ public unsafe class PettableUser
     public string UserName => _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
-    public (string, ushort) Data => (_username, _homeworld);
-    public NicknameData NicknameData => new NicknameData(_minion.ID, _minion.CustomName, _battlePet.ID, _battlePet.CustomName);
 
     uint _objectID = 0;
     public uint ObjectID => _objectID;
     public int UserChangedID => _ChangedID;
     public bool UserChanged => _UserChanged || AnyPetChanged;
+    public bool UserFaulty => Pets.Any(p => p.Faulty);
+
     int _ChangedID = 0;
     bool _UserChanged = false;
 
@@ -123,14 +126,22 @@ public unsafe class PettableUser
             id = -battlePet->Character.CharacterData.ModelCharaId;
             HandleCast(id);
         }
-        _battlePet.Set((nint)battlePet, id, _serializableUser);
+        _battlePet.Set((nint)battlePet, id, _serializableUser, CatchFaultyPlayer(&battlePet->Character.GameObject));
+    }
+
+    bool CatchFaultyPlayer(GameObject* gObject)
+    {
+        if (!gObject->IsCharacter()) return true;
+        if (gObject->GetDrawObject() == null) return false;
+        if(((CharacterBase*)gObject->GetDrawObject())->GetModelType() != CharacterBase.ModelType.Monster) return true;
+        return false;
     }
 
     public void SetCompanion(Companion* companion)
     {
         int minionID = -1;
         if (companion != null) minionID = companion->Character.CharacterData.ModelCharaId;
-        _minion.Set((nint)companion, minionID, _serializableUser);
+        _minion.Set((nint)companion, minionID, _serializableUser, false);
     }
 
     public void Reset()

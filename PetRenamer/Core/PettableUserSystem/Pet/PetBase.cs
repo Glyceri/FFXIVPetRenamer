@@ -11,11 +11,12 @@ public class PetBase
     public int Index => _index;
     public uint ObjectID => _objectID;
 
-    public string CustomName => _customName ?? string.Empty;
+    public string CustomName => _faulty ? string.Empty : _customName ?? string.Empty;
     public string BaseName => _baseName ?? string.Empty;
     public string BaseNamePlural => _baseNamePlural ?? string.Empty;
 
     public bool Changed => _petChanged;
+    public bool Faulty => _faulty;
 
     public bool IsNull => _id != -1;
     public bool Has => _pet != nint.Zero;
@@ -34,11 +35,12 @@ public class PetBase
 
     int _lastID;
     nint _lastPointer;
+    bool _faulty;
 
-    public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3)
+    public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3, bool faulty)
     {
         _pet = pet;
-
+        _faulty = faulty;
         if (_lastID != id || _lastPointer != pet) _petChanged = true;
 
         if (pet == nint.Zero)
