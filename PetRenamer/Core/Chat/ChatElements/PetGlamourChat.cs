@@ -6,6 +6,7 @@ using Lumina.Text.Payloads;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -16,6 +17,7 @@ namespace PetRenamer.Core.Chat.ChatElements;
 [Chat]
 internal class PetGlamourChat : ChatElement
 {
+
     //The next Carbuncle summoned will appear glamoured as Ruby Carbuncle.
     //The next Carbuncle summoned will appear unglamoured.
 
@@ -27,6 +29,41 @@ internal class PetGlamourChat : ChatElement
 
     //Carbuncle aura l'apparence de Carbuncle émeraude lors de sa prochaine invocation.
     //Carbuncle reprendra son apparence d'origine lors de sa prochaine invocation.
+
+    //----------------------------------
+
+    //Pet glamour settings
+    //Eos  Ruby Carbuncle
+    //Carbuncle  Ruby Carbuncle
+    //Ifrit-Egi  Ruby Carbuncle
+    //Titan-Egi  Topaz Carbuncle
+    //Garuda-Egi  Garuda-Egi
+
+    //ペットの見た目の設定状態
+    //フェアリー・エオス  カーバンクル・ルビー
+    //カーバンクル  カーバンクル・ルビー
+    //イフリート・エギ  カーバンクル・ルビー
+    //タイタン・エギ  カーバンクル・トパーズ
+    //ガルーダ・エギ  ガルーダ・エギ
+
+    //Momentanes Aussehen deiner Familiare:
+    //Eos  Rubin-Karfunkel
+    //Karfunkel  Rubin-Karfunkel
+    //Ifrit-Egi  Rubin-Karfunkel
+    //Titan-Egi  Topas-Karfunkel
+    //Garuda-Egi  Garuda-Egi
+
+    //Apparences de vos familiers
+    //Eos  Carbuncle rubis
+    //Carbuncle  Carbuncle rubis
+    //Ifrit-Egi  Carbuncle rubis
+    //Titan-Egi  Carbuncle topaze
+    //Garuda-Egi  Garuda-Egi
+
+    readonly Regex fullRegexEn = new(@"Pet glamour settings", RegexOptions.Compiled);
+    readonly Regex fullRegexJp = new(@"ペットの見た目の設定状態", RegexOptions.Compiled);
+    readonly Regex fullRegexDe = new(@"Momentanes Aussehen deiner Familiare:", RegexOptions.Compiled);
+    readonly Regex fullRegexFr = new(@"Apparences de vos familiers", RegexOptions.Compiled);
 
     readonly Regex changeRegexEn = new(@"^The next (?<petname>.+) summoned will appear glamoured as (?<petname2>.+)\.$", RegexOptions.Compiled);
     readonly Regex changeRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を「(?<petname2>.+)」に変更しました\。$", RegexOptions.Compiled);
@@ -40,8 +77,15 @@ internal class PetGlamourChat : ChatElement
 
     readonly Regex changeRegex;
     readonly Regex resetRegex;
+    readonly Regex fullRegex;
+    readonly Regex spacingRegex;
+
+    readonly Regex spacingRegexNml = new(@"^(?<petname>.+)  (?<petname2>.+)");
+    readonly Regex spacingRegexJp = new(@"^(?<petname>.+)  (?<petname2>.+)");
 
     readonly List<(string, int)> nameToClass = new List<(string, int)>();
+
+    int nextRow = 0;
 
     public PetGlamourChat()
     {
@@ -83,11 +127,35 @@ internal class PetGlamourChat : ChatElement
             ClientLanguage.French => changeRegexFr,
             _ => changeRegexEn,
         };
+
+        spacingRegex = PluginHandlers.ClientState.ClientLanguage switch
+        {
+            ClientLanguage.Japanese => spacingRegexJp,
+            ClientLanguage.English => spacingRegexNml,
+            ClientLanguage.German => spacingRegexNml,
+            ClientLanguage.French => spacingRegexNml,
+            _ => spacingRegexNml,
+        };
+
+        fullRegex = PluginHandlers.ClientState.ClientLanguage switch
+        {
+            ClientLanguage.Japanese => fullRegexJp,
+            ClientLanguage.English => fullRegexEn,
+            ClientLanguage.German => fullRegexDe,
+            ClientLanguage.French => fullRegexFr,
+            _ => fullRegexEn,
+        };
     }
 
     internal override bool OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (type != XivChatType.SystemMessage) return false;
+
+        if(nextRow > 0)
+        {
+            MatchChange(spacingRegex.Match(message.TextValue));
+            return false;
+        }
 
         Match match = changeRegex.Match(message.TextValue);
         if (match.Success) MatchChange(match);
@@ -95,11 +163,18 @@ internal class PetGlamourChat : ChatElement
         Match match2 = resetRegex.Match(message.TextValue);
         if (match2.Success) MatchReset(match2);
 
+        Match match3 = fullRegex.Match(message.TextValue);
+        if (match3.Success) MatchFull();
+
         return false;
     }
 
+    void MatchFull() => nextRow = 5;
+
     void MatchChange(Match match)
     {
+        if (nextRow > 0) nextRow--;
+
         string basePetName = match.Groups["petname"].Value;
         string changedPetName = match.Groups["petname2"].Value;
 
