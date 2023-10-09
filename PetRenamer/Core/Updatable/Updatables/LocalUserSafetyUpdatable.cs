@@ -1,8 +1,8 @@
-using PetRenamer.Windows.Attributes;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Core.Handlers;
-using Dalamud.Plugin.Services;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin.Services;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Serialization;
+using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 

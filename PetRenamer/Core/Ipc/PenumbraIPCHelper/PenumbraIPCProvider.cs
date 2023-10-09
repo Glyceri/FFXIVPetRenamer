@@ -1,7 +1,7 @@
 ﻿using Dalamud.Plugin;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper.Enums;
 using Dalamud.Plugin.Ipc;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.PenumbraIPCHelper.Enums;
 using PetRenamer.Logging;
 using System;
 

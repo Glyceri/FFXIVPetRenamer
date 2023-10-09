@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Windows.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 using IsUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace PetRenamer.Windows.PetWindows;

@@ -6,7 +6,6 @@ using Lumina.Text.Payloads;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;

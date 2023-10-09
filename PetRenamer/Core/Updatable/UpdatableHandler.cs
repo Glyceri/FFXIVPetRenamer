@@ -2,7 +2,6 @@
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace PetRenamer.Core.Updatable;

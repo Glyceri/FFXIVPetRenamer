@@ -1,12 +1,12 @@
 using Dalamud.ContextMenu;
+using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.ContextMenu.Attributes;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Windows.PetWindows;
-using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Utilization.UtilsModule;
-using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Hooking.Hooks;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 

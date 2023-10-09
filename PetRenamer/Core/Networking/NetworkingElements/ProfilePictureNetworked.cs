@@ -1,18 +1,18 @@
-﻿using PetRenamer.Core.Networking.Attributes;
-using PetRenamer.Core.PettableUserSystem.Enums;
-using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Singleton;
+﻿using Dalamud.Interface.Internal;
 using PetRenamer.Core.Handlers;
-using System.IO;
-using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Core.Networking.Attributes;
 using PetRenamer.Core.Networking.Structs;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Text.Json;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
-using Dalamud.Interface.Internal;
+using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
 

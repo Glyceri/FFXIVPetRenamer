@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PetRenamer.Core.AutoRegistry.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
-using PetRenamer.Core.AutoRegistry.Interfaces;
 using System.Linq;
+using System.Reflection;
 
 namespace PetRenamer.Core.AutoRegistry;
 

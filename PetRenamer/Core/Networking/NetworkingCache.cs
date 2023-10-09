@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface.Internal;
-using ImGuiScene;
 using PetRenamer.Core.Attributes;
 using System;
 using System.Collections.Generic;

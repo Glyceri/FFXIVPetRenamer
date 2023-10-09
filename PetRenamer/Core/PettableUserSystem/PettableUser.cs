@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
+using System;
+using System.Collections.Generic;
 
 namespace PetRenamer.Core.PettableUserSystem;
 

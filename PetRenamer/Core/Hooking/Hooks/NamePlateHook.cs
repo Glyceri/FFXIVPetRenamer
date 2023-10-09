@@ -2,8 +2,8 @@
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem.Pet;
 
 namespace PetRenamer.Core.Hooking.Hooks;

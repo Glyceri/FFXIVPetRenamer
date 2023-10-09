@@ -1,9 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
-using System;
-using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.PettableUserSystem.Pet;
 

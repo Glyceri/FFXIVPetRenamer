@@ -5,8 +5,8 @@ using Dalamud.Utility.Signatures;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
-using System;
 using PetRenamer.Utilization.UtilsModule;
+using System;
 using System.Linq;
 
 namespace PetRenamer.Core.Hooking.Hooks;

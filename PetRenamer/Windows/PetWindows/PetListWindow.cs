@@ -1,22 +1,22 @@
+using Dalamud.Game.Text;
+using Dalamud.Interface.Internal;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
-using PetRenamer.Windows.Attributes;
-using System.Collections.Generic;
-using System;
 using PetRenamer.Core;
-using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using Dalamud.Game.Text;
 using PetRenamer.Core.Networking.NetworkingElements;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Sharing;
 using PetRenamer.Core.Sharing.Importing;
 using PetRenamer.Core.Sharing.Importing.Data;
-using System.Linq;
-using Dalamud.Interface.Internal;
 using PetRenamer.Logging;
+using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 

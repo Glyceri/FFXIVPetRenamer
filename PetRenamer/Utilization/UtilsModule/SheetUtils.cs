@@ -1,12 +1,12 @@
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
-using PetRenamer.Core.Singleton;
 using System.Linq;
-using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Utilization.UtilsModule;
 

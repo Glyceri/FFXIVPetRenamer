@@ -1,16 +1,16 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using ImGuiNET;
+using PetRenamer.Core.Debug;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Serialization;
 using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core.Serialization;
+using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
+using System.Collections.Generic;
 using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
-using System.Collections.Generic;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using PetRenamer.Windows.Attributes;
-using PetRenamer.Core.Debug;
-using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Windows.PetWindows;
 

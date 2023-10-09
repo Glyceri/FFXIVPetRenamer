@@ -1,13 +1,13 @@
-﻿using PetRenamer.Core.Handlers;
-using PetRenamer.Utilization.Attributes;
-using PetRenamer.Core.Singleton;
-using PetRenamer.Core.PettableUserSystem;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Utilization.UtilsModule;
 

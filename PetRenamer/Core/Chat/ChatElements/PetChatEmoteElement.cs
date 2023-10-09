@@ -4,9 +4,9 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 

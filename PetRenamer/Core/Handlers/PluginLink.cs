@@ -11,7 +11,6 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Updatable;
 using PetRenamer.Utilization;
 using PetRenamer.Windows.Handler;
-using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.Handlers;
 

@@ -1,11 +1,11 @@
-﻿using PetRenamer.Windows.Attributes;
+﻿using ImGuiNET;
+using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using CLS = PetRenamer.Windows.PetWindows.ChangeLogStruct;
-using CLE = PetRenamer.Windows.PetWindows.ChangeLogElement;
-using ImGuiNET;
 using System.Numerics;
+using System.Reflection;
+using CLE = PetRenamer.Windows.PetWindows.ChangeLogElement;
+using CLS = PetRenamer.Windows.PetWindows.ChangeLogStruct;
 
 namespace PetRenamer.Windows.PetWindows;
 
