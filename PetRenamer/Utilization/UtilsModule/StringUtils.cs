@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -76,7 +77,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public void SanitizeString(ref string baseString, string finder, int count)
     {
         foreach (string filler in PluginConstants.removeables)
-            baseString = Regex.Replace(baseString, filler + finder, MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+           baseString = Regex.Replace(baseString, @$"\b{filler + finder}\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
     }
 
     public string MakeString(char c, int count) => new string(c, count);

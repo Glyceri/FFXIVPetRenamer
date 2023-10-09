@@ -229,6 +229,12 @@ public class PetRenameWindow : PetWindow
         foreach (RenamablePet pet in pets)
             pet?.Dispose();
     }
+
+    public void Reset()
+    {
+        foreach (var pet in pets)
+            pet.Clear();
+    }
 }
 
 internal class RenamablePet : IDisposable

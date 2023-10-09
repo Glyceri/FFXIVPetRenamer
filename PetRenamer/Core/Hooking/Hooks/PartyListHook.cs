@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using PetRenamer.Logging;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -28,13 +27,13 @@ internal unsafe class PartyListHook : HookableElement
     void Update(AtkUnitBase* baseD)
     {
         if (!CanContinue(baseD)) return;
-        SetPetname(baseD, (AddonPartyList*)baseD);
-        SetCastlist(baseD, (AddonPartyList*)baseD);
+        SetPetname((AddonPartyList*)baseD);
+        SetCastlist((AddonPartyList*)baseD);
     }
 
     bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible || !PluginLink.Configuration.displayCustomNames || baseD == null);
 
-    void SetPetname(AtkUnitBase* baseD, AddonPartyList* partyNode)
+    void SetPetname(AddonPartyList* partyNode)
     {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
@@ -43,7 +42,7 @@ internal unsafe class PartyListHook : HookableElement
         partyNode->Pet.Name->SetText(user.BattlePet.CustomName);
     }
 
-    void SetCastlist(AtkUnitBase* baseD, AddonPartyList* partyNode)
+    void SetCastlist(AddonPartyList* partyNode)
     {
         List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
             partyNode->PartyMember.PartyMember0,

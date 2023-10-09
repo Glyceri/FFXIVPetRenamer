@@ -355,7 +355,7 @@ public class PetListWindow : PetWindow
     void DrawBattlePetWarningHeader()
     {
         BeginListBox("##WarningHeader", new System.Numerics.Vector2(ContentAvailableX, 40));
-        ImGui.TextColored(StylingColours.defaultText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
+        ImGui.TextColored(StylingColours.defaultText, "Please note: /petglamour,/petmirage now works. You can no longer name pets based on your job.\nIf you, for example, name a ruby carbuncle they will have that same name regardless of job.");
         ImGui.EndListBox();
     }
 
@@ -694,5 +694,36 @@ public class PetListWindow : PetWindow
         releaseGraph = false;
         ImGui.EndTable();
         ImGui.PopStyleVar();
+    }
+
+
+    public void Reset()
+    {
+        texturePointer = 0;
+        graphPointer = -1;
+        user = null!;
+        lastUser = null!;
+        temporaryUser = null!;
+        existingUser = null!;
+        removeMeUser = null!;
+        youSureUser = null!;
+
+        userMode = false;
+        currentIsLocalUser = false;
+        current = true;
+        releaseGraph = false;
+        _openedAddPet = false;
+        youSureMode = false;
+        advancedMode=false;
+        existed= false;
+        searchField = string.Empty;
+        minionSearchField = string.Empty;
+
+        foundNicknames.Clear();
+        foreach (IDalamudTextureWrap tWrap in TextureWraps)
+            tWrap?.Dispose();
+        TextureWraps.Clear();
+
+        importedData = null!;
     }
 }

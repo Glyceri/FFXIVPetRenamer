@@ -111,11 +111,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
         foreach (PettableUser user in _users)
         {
             if (user.nintUser == address) return user;
-            foreach (PetBase pet in user.Pets)
-            {
-                if (pet.Pet != address) continue;
-                return user;
-            }
+            if (GetPet(user, address) != null) return user;
         }
 
         return null!;

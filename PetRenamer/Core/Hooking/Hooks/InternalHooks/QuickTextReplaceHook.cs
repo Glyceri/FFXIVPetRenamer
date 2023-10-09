@@ -3,6 +3,7 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,6 @@ public unsafe class QuickTextReplaceHook
         if (user == null) return;
 
         (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNodeText, ref user, softHook);
-
         int id = currentName.Item1;
         string replaceName = currentName.Item2;
         if (replaceName == string.Empty) return;
