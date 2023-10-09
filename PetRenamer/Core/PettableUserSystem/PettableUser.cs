@@ -126,22 +126,14 @@ public unsafe class PettableUser
             id = -battlePet->Character.CharacterData.ModelCharaId;
             HandleCast(id);
         }
-        _battlePet.Set((nint)battlePet, id, _serializableUser, CatchFaultyPlayer(&battlePet->Character.GameObject));
-    }
-
-    bool CatchFaultyPlayer(GameObject* gObject)
-    {
-        if (!gObject->IsCharacter()) return true;
-        if (gObject->GetDrawObject() == null) return false;
-        if(((CharacterBase*)gObject->GetDrawObject())->GetModelType() != CharacterBase.ModelType.Monster) return true;
-        return false;
+        _battlePet.Set((nint)battlePet, id, _serializableUser);
     }
 
     public void SetCompanion(Companion* companion)
     {
         int minionID = -1;
         if (companion != null) minionID = companion->Character.CharacterData.ModelCharaId;
-        _minion.Set((nint)companion, minionID, _serializableUser, CatchFaultyPlayer(&companion->Character.GameObject));
+        _minion.Set((nint)companion, minionID, _serializableUser);
     }
 
     public void Reset()

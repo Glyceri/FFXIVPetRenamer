@@ -1,4 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 
@@ -38,10 +40,9 @@ public class PetBase
     nint _lastPointer;
     bool _faulty;
 
-    public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3, bool faulty)
+    public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3)
     {
         _pet = pet;
-        _faulty = faulty;
         if (_lastID != id || _lastPointer != pet) _petChanged = true;
 
         if (pet == nint.Zero)
@@ -54,6 +55,7 @@ public class PetBase
         }
 
         Character gObject = *(Character*)pet;
+        _faulty = CatchFaultyPlayer(gObject.GameObject);
 
         _id = id;
         _index = gObject.GameObject.ObjectIndex;
@@ -67,6 +69,14 @@ public class PetBase
         _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
         _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
+    }
+
+    unsafe bool CatchFaultyPlayer(GameObject gObject)
+    {
+        if (!gObject.IsCharacter()) return true;
+        if (gObject.GetDrawObject() == null) return false;
+        if (((CharacterBase*)gObject.GetDrawObject())->GetModelType() != CharacterBase.ModelType.Monster) return true;
+        return false;
     }
 
     public void SetChanged() => _petChanged = true;  
