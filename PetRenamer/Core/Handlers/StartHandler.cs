@@ -1,5 +1,6 @@
 ﻿using Dalamud.Plugin;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
+using PetRenamer.Windows;
 
 namespace PetRenamer.Core.Handlers;
 
@@ -14,5 +15,7 @@ internal class StartHandler
         IpcProvider.NotifyReady();
 
         PenumbraIPCProvider.Init(ref dalamudPluginInterface);
+
+        PetWindow.petMode = PetMode.Normal;
     }
 }

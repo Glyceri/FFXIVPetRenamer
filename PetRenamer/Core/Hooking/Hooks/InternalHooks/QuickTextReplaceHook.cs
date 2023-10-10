@@ -1,172 +1,97 @@
-﻿using Dalamud.Game;
-using Dalamud.Hooking;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
-public unsafe class QuickTextReplaceHook : IDisposable
+public unsafe class QuickTextReplaceHook
 {
-    Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-    AtkUnitBase* baseElement;
-
-    readonly string AddonName;
     readonly uint[] TextPos;
     readonly int AtkPos;
     readonly Func<PettableUser> recallAction;
     readonly Func<int, bool> allowedToFunction;
     readonly Action<string> latestOutcome;
+    readonly bool softHook = false;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
-    {
-        AddonName = addonName;
-        TextPos = new uint[1] { textPos };
-        AtkPos = atkPos;
-        this.recallAction = recallAction;
-        this.allowedToFunction = allowedToFunction;
-        this.latestOutcome = latestOutcome;
-    }
+    bool allow = true;
+    string lastAnswer = string.Empty;
 
-    public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!)
+    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false) : this(addonName, new uint[1] { textPos }, allowedToFunction, atkPos, recallAction, latestOutcome, soft) { }
+    public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false)
     {
-        AddonName = addonName;
+        softHook = soft;
         TextPos = textPos;
         AtkPos = atkPos;
         this.recallAction = recallAction;
         this.allowedToFunction = allowedToFunction;
         this.latestOutcome = latestOutcome;
+        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, addonName, HandleUpdate);
     }
 
-    public void Dispose()
+    void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
+
+    void HandleRework(AtkUnitBase* baseElement)
     {
-        baseElement = null;
-        addonupdatehook?.Dispose();
-    }
+        if (!allow || TextPos.Length == 0) return;
+        if (!baseElement->IsVisible) return;
 
-    bool allow = true;
+        BaseNode bNode = new BaseNode(baseElement);
+        AtkTextNode* tNode = GetTextNode(ref bNode);
+        if (tNode == null) return;
 
-    public void OnUpdate(Framework framework, bool allow)
-    {
-        this.allow = allow;
-        baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName(AddonName);
-        if (baseElement == null) return;
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Handle);
-        addonupdatehook?.Enable();
-    }
+        string tNodeText = tNode->NodeText.ToString() ?? string.Empty;
+        if (tNodeText == string.Empty || tNodeText == lastAnswer) return;
+        latestOutcome?.Invoke(tNodeText);
 
-    string lastAnswer = string.Empty;
+        AtkNineGridNode* nineGridNode = GetBackgroundNode(ref bNode);
 
-    byte Handle(AtkUnitBase* baseElement)
-    {
-        if (TextPos.Length == 0) return addonupdatehook!.Original(baseElement);
-        if (!allow) return addonupdatehook!.Original(baseElement);
+        PettableUser user = GetUser();
+        if (user == null) return;
+        if (user.UserFaulty) return;
 
-        string? name = Marshal.PtrToStringUTF8((IntPtr)baseElement->Name);
-        if (!baseElement->IsVisible || name != AddonName)
-            return addonupdatehook!.Original(baseElement);
-
-        BaseNode bNode = new BaseNode(name);
-        if (bNode == null) return addonupdatehook!.Original(baseElement);
-        AtkTextNode* tNode = null!;
-        if (TextPos.Length > 1)
-        {
-            ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
-            for (int i = 1; i < TextPos.Count() - 1; i++)
-            {
-                if (cNode == null) return addonupdatehook!.Original(baseElement);
-                cNode = cNode.GetComponentNode(TextPos[i]);
-            }
-            if (cNode == null) return addonupdatehook!.Original(baseElement);
-            tNode = cNode.GetNode<AtkTextNode>(TextPos[TextPos.Length - 1]);
-        }
-        else
-        {
-            tNode = bNode.GetNode<AtkTextNode>(TextPos[0]);
-        }
-
-        if (tNode == null) return addonupdatehook!.Original(baseElement);
-        if (TooltipHelper.handleAsItem) return addonupdatehook!.Original(baseElement);
-        string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == null) return addonupdatehook!.Original(baseElement);
-        if (tNodeText != lastAnswer) latestOutcome?.Invoke(tNodeText);
-        if (tNodeText == lastAnswer && AddonName != "Tooltip") return addonupdatehook!.Original(baseElement);
-
-
-        AtkNineGridNode* nineGridNode = null;
-        if (AtkPos != -1) nineGridNode = bNode.GetNode<AtkNineGridNode>((uint)AtkPos);
-        if (AtkPos != -1 && nineGridNode == null) return addonupdatehook!.Original(baseElement);
-
-        PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-
-        if (recallAction != null)
-        {
-            PettableUser tempUser = recallAction.Invoke();
-            if (tempUser != null) user = tempUser;
-        }
-
-        if (user == null) return addonupdatehook!.Original(baseElement);
-
-        int id = SheetUtils.instance.GetIDFromName(tNodeText);
-        string replaceName = tNodeText;
-
-        if (id == -1)
-        {
-            List<(string, int)> correctNames = new List<(string, int)>();
-            foreach (int nameID in RemapUtils.instance.battlePetRemap.Keys)
-            {
-                if (!RemapUtils.instance.bakedBattlePetSkeletonToName.ContainsKey(nameID)) continue;
-                string bPetName = RemapUtils.instance.bakedBattlePetSkeletonToName[nameID];
-                if (tNodeText.Contains(bPetName))
-                    correctNames.Add((bPetName, nameID));
-            }
-            if (correctNames.Count != 0)
-            {
-                int shortestEl = 0;
-                for (int i = 1; i < correctNames.Count; i++)
-                {
-                    if (correctNames[i].Item1.Length < correctNames[shortestEl].Item1.Length)
-                        shortestEl = i;
-                }
-                int item2 = correctNames[shortestEl].Item2;
-                if (RemapUtils.instance.skeletonToClass.ContainsKey(item2))
-                    id = RemapUtils.instance.skeletonToClass[item2];
-                replaceName = correctNames[shortestEl].Item1;
-            }
-        }
-
-        if (replaceName == string.Empty) return addonupdatehook!.Original(baseElement);
+        (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNodeText, ref user, softHook);
+        int id = currentName.Item1;
+        string replaceName = currentName.Item2;
+        if (replaceName == string.Empty) return;
 
         if (id == -1)
         {
             lastAnswer = tNodeText;
-            return addonupdatehook!.Original(baseElement);
+            return;
         }
-        if (!allowedToFunction?.Invoke(id) ?? false) return addonupdatehook!.Original(baseElement);
 
-        user.SerializableUser.LoopThroughBreakable(nickname =>
-        {
-            if (nickname.Item1 == id)
-            {
-                if (nickname.Item2 == string.Empty) return false;
-                tNode->NodeText.SetString(tNode->NodeText.ToString().Replace(replaceName, nickname.Item2));
-                if (nineGridNode != null)
-                {
-                    tNode->ResizeNodeForCurrentText();
-                    nineGridNode->AtkResNode.SetWidth((ushort)(tNode->AtkResNode.Width + 18));
-                }
+        if (!allowedToFunction?.Invoke(id) ?? false) return;
 
-                lastAnswer = nickname.Item2;
-                return true;
-            }
-            return false;
-        });
-
-        return addonupdatehook!.Original(baseElement);
+        string curNickname = user.SerializableUser.GetNameFor(id);
+        if (curNickname == string.Empty) return;
+        StringUtils.instance.ReplaceAtkString(tNode, replaceName, curNickname, nineGridNode);
+        lastAnswer = curNickname;
     }
+
+    AtkTextNode* GetTextNode(ref BaseNode bNode)
+    {
+        if (TextPos.Length > 1)
+        {
+            ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
+            for (int i = 1; i < TextPos.Length - 1; i++)
+            {
+                if (cNode == null) return null!;
+                cNode = cNode.GetComponentNode(TextPos[i]);
+            }
+            if (cNode == null) return null!;
+            return cNode.GetNode<AtkTextNode>(TextPos[^1]);
+        }
+        return bNode.GetNode<AtkTextNode>(TextPos[0]);
+    }
+
+    PettableUser GetUser()
+    {
+        if (recallAction != null) return recallAction.Invoke();
+        else return PluginLink.PettableUserHandler.LocalUser()!;
+    }
+    AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
 }

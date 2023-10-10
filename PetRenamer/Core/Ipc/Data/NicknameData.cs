@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Core;
 
 namespace PetRenamer;
 
@@ -20,8 +21,8 @@ public class NicknameData
         this.BattleNickname = BattleNickname;
     }
 
-    public new string ToString() => $"{ID}^{Nickname}^{BattleID}^{BattleNickname}";
-    public string ToNormalString() => ToString().Replace("^", ",");
+    public new string ToString() => $"{ID}{PluginConstants.forbiddenCharacter}{Nickname}{PluginConstants.forbiddenCharacter}{BattleID}{PluginConstants.forbiddenCharacter}{BattleNickname}";
+    public string ToNormalString() => ToString().Replace(PluginConstants.forbiddenCharacter.ToString(), ",");
 
     public bool Equals(NicknameData other) => ID == other.ID && Nickname == other.Nickname;
     public bool IDEquals(NicknameData other) => ID == other.ID;

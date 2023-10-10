@@ -1,34 +1,31 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using ImGuiNET;
+using PetRenamer.Core.Debug;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Serialization;
 using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core.Serialization;
+using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
+using System.Collections.Generic;
 using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
 using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
-using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using PetRenamer.Windows.Attributes;
 
 namespace PetRenamer.Windows.PetWindows;
 
-//[PersistentPetWindow]
+[PersistentPetWindow]
 internal class DeveloperWindow : PetWindow
 {
-    readonly Vector2 baseSize = new Vector2(700, 500);
-
-    Vector2 minSize => GetMinSize();
 
     public DeveloperWindow() : base("Dev Window Pet Renamer")
     {
-        IsOpen = true;
-        Size = baseSize;
+        if(PluginLink.Configuration.debugMode && PluginLink.Configuration.autoOpenDebug) IsOpen = true;
     }
 
     int currentTab = 0;
 
-    int maxTabs = 5;
+    readonly int maxTabs = 5;
 
     public override void OnDraw()
     {
@@ -36,17 +33,12 @@ internal class DeveloperWindow : PetWindow
         {
             if (currentTab == i)
             {
-                if (ToggleButton(i + 100))
-                {
-                    currentTab = i;
-                }
+                if (ToggleButton()) currentTab = i;
             }
             else
             {
-                if (ToggleButtonBad(i + 100))
-                {
-                    currentTab = i;
-                }
+                if (ToggleButtonBad()) currentTab = i;
+
             }
             SameLineNoMargin();
         }
@@ -57,47 +49,139 @@ internal class DeveloperWindow : PetWindow
         if (currentTab < 0)
             currentTab = maxTabs - 1;
 
-        if (currentTab == 0) DrawUsers();
+        if (currentTab == 0) Users();
 
         else if (currentTab == 1) DrawHelpField();
-        else if (currentTab == 2) ConfigWindow();
+        else if (currentTab == 2) ChatLog();
         else if (currentTab == 3) PetNameWindow();
-    }
-
-    Vector2 GetMinSize()
-    {
-        Vector2 size = Styling.ToggleButton;
-        size.X *= maxTabs;
-        size.X += 10;
-        return size;
-    }
-
-    void SetSize(Vector2? ss)
-    {
-        if (ss == null) return;
-        Vector2 sss = ss.Value;
-        float x = sss.X;
-        if(x < minSize.X)
-            x = minSize.X;
-        sss.X = x;
-        Size = sss; 
+        else if (currentTab == 4) SettingsWindow();
     }
 
     void PetNameWindow()
     {
-        SetSize(PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Size);
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.Draw();
     }
 
-    void ConfigWindow()
+    void SettingsWindow()
     {
-        SetSize(PluginLink.WindowHandler.GetWindow<ConfigWindow>()?.Size);
         PluginLink.WindowHandler.GetWindow<ConfigWindow>()?.Draw();
+    }
+
+    int tableCounter = 0;
+
+    void Users()
+    {
+        tableCounter = 0;
+        PluginLink.PettableUserHandler.LoopThroughUsers(NewDrawUser);
+    }
+
+    void NewDrawUser(PettableUser user)
+    {
+        if (!ImGui.BeginTable($"##usersTable{tableCounter++}", 5,  ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+            return;
+
+        ImGui.TableNextRow();
+
+        ImGui.TableSetColumnIndex(0);
+        ImGui.TextUnformatted($"{user.UserName}");
+
+        ImGui.TableSetColumnIndex(1);
+        ImGui.TextUnformatted($"{SheetUtils.instance.GetWorldName(user.Homeworld)}");
+
+        ImGui.TableSetColumnIndex(2);
+        ImGui.TextUnformatted($"{(user.UserExists ? "O" : "X")}");
+
+        ImGui.TableSetColumnIndex(3);
+        ImGui.TextUnformatted($"{user.SerializableUser.length}");
+
+        if (user.BattlePet.Has)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableSetColumnIndex(0);
+            ImGui.TextUnformatted($"{user.BattlePet.ID}");
+
+            ImGui.TableSetColumnIndex(1);
+            ImGui.TextUnformatted($"{user.BattlePet.BaseName}");
+
+            ImGui.TableSetColumnIndex(2);
+            ImGui.TextUnformatted($"{user.BattlePet.Faulty}");
+
+            ImGui.TableSetColumnIndex(3);
+            ImGui.TextUnformatted($"{user.BattlePet.CustomName}");
+
+            ImGui.TableSetColumnIndex(4);
+            ImGui.TextUnformatted($"{user.BattlePet.Index}");
+
+            ImGui.TableNextRow();
+        }
+
+        if (user.Minion.Has)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableSetColumnIndex(0);
+            ImGui.TextUnformatted($"{user.Minion.ID}");
+
+            ImGui.TableSetColumnIndex(1);
+            ImGui.TextUnformatted($"{user.Minion.BaseName}");
+
+            ImGui.TableSetColumnIndex(2);
+            ImGui.TextUnformatted($"{user.Minion.BaseNamePlural}");
+
+            ImGui.TableSetColumnIndex(3);
+            ImGui.TextUnformatted($"{user.Minion.CustomName}");
+
+            ImGui.TableSetColumnIndex(4);
+            ImGui.TextUnformatted($"{user.Minion.Index}");
+        }
+
+        ImGui.EndTable();
+        NewLine();
+    }
+
+    void ChatLog()
+    {
+        if (!ImGui.BeginTable("##chatlogtable", 6, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders))
+            return;
+
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Message", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("New Message", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("Sender", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableSetupColumn("New Sender", ImGuiTableColumnFlags.WidthFixed);
+        ImGui.TableHeadersRow();
+
+        for(int i = DebugStorage.petChatMessages.Count -1; i >= 0; i--) 
+         {
+            PetChatMessage chatMessage = DebugStorage.petChatMessages[i];
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.SenderId}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.ChatType}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.Message}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.NewMessage}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.Sender}");
+
+            ImGui.TableNextColumn();
+            ImGui.TextUnformatted($"{chatMessage.NewSender}");
+         }
+
+        ImGui.EndTable();
     }
 
     unsafe void DrawHelpField()
     {
-        SetSize(baseSize);
         GameObject? target = PluginHandlers.TargetManager.Target!;
         if (target != null)
             if (Button("Add Target"))
@@ -109,7 +193,7 @@ internal class DeveloperWindow : PetWindow
                 if(companion != null)
                 {
                     minName = "[TESTNAME]";
-                    minID = companion->Character.CharacterData.ModelSkeletonId;
+                    minID = companion->Character.CharacterData.ModelCharaId;
                 }
                 PluginLink.PettableUserHandler.DeclareUser(
                     new SerializableUserV3(
@@ -119,35 +203,23 @@ internal class DeveloperWindow : PetWindow
                         (ushort)((PlayerCharacter)target).HomeWorld.Id), UserDeclareType.Add);
             }
 
-        if (Button("Add ALL Users EMPTY"))
-        {
-            AddUser(false, 0);
-        }
-
-        if (Button("Add ALL Users"))
-        {
-            AddUser(true, 1000);
-        }
-
-        if (Button("Add ALL Users Small"))
-        {
-            AddUser(true, 0);
-        }
+        if (Button("Add ALL Users EMPTY"))  AddUser(false, 0);
+        if (Button("Add ALL Users"))        AddUser(true, 1000);
+        if (Button("Add ALL Users Small"))  AddUser(true, 0);
+        
 
         if (Button("Remove all custom users"))
         {
-            PluginLink.PettableUserHandler.BackwardsSAFELoopThroughUser((user) => 
+            for(int i = PluginLink.PettableUserHandler.Users.Count - 1; i >= 0; i--)
             {
-                user.SerializableUser.LoopThroughBreakable(nickname =>
+                PettableUser user = PluginLink.PettableUserHandler.Users[i];
+                SerializableUserV3 serializableUser = user.SerializableUser;
+                for (int f = 0; f < user.SerializableUser.length; f++)
                 {
-                    if (nickname.Item2 == "[TESTNAME]")
-                    {
-                        PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
-                        return true;
-                    }
-                    return false;
-                });
-            });
+                    if (serializableUser.names[i] != "[TESTNAME]") continue;
+                    PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
+                }
+            }
         }
     }
 
@@ -164,7 +236,7 @@ internal class DeveloperWindow : PetWindow
             if (companion != null)
             {
                 minName = "[TESTNAME]";
-                minID = companion->Character.CharacterData.ModelSkeletonId;
+                minID = companion->Character.CharacterData.ModelCharaId;
             }
             List<int> ids = new List<int>() { -2, minID };
             List<string> names = new List<string>() { "[TESTNAME]", minName };
@@ -195,7 +267,6 @@ internal class DeveloperWindow : PetWindow
 
     void DrawUsers()
     {
-        SetSize(baseSize);
         NewLabel("Totalcount: " + totalCount.ToString(), Styling.ListSmallNameField);
         SameLine();
         NewLabel("Active player count: " + playerCount.ToString(), Styling.ListSmallNameField);
@@ -217,26 +288,27 @@ internal class DeveloperWindow : PetWindow
         SameLine();
         NewLabel(user.SerializableUser.length.ToString(), Styling.ListIDField);
         totalCount += user.SerializableUser.length;
-        if (user.HasBattlePet)
+        if (user.BattlePet.Has)
         {
-            NewLabel(user.BattlePetID.ToString(), Styling.ListIDField);
+            NewLabel(user.BattlePet.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.BattlePetSkeletonID.ToString(), Styling.ListIDField);
+            NewLabel(user.BattlePet.Index.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.BattlePetCustomName.ToString(), Styling.ListSmallNameField);
-            SameLine();
-            NewLabel(user.BaseBattlePetName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.BattlePet.CustomName.ToString(), Styling.ListSmallNameField);
+            NewLine();
         }
-
-        if (user.HasCompanion)
+        
+        if (user.Minion.Has)
         {
-            NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
+            NewLabel(user.Minion.ID.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.CompanionID.ToString(), Styling.ListIDField);
+            NewLabel(user.Minion.Index.ToString(), Styling.ListIDField);
             SameLine();
-            NewLabel(user.CustomCompanionName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.Minion.CustomName.ToString(), Styling.ListSmallNameField);
             SameLine();
-            NewLabel(user.CompanionBaseName.ToString(), Styling.ListSmallNameField);
+            NewLabel(user.Minion.BaseName.ToString(), Styling.ListSmallNameField);
+            SameLine();
+            NewLabel(user.BattlePet.BaseNamePlural.ToString(), Styling.ListSmallNameField);
         }
 
         NewLine();

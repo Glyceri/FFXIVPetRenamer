@@ -4,83 +4,53 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
-using System.Runtime.InteropServices;
-using System;
-using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using PetRenamer.Utilization.UtilsModule;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using System.Text.RegularExpressions;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Chat.ChatElements;
 
 [Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override bool OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return;
-        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
+        if (!PluginLink.Configuration.displayCustomNames) return false;
+        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return false;
+
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
-        if (bChara == null) return;
-        ulong target = bChara->Character.GetTargetId();
-        uint softTarget = bChara->Character.PlayerTargetObjectID;
-        if (softTarget != 0)
-            target = softTarget;
+        if (bChara == null) return false;
 
-        string nameString = string.Empty;
-        int id = -1;
-        string ownerName = string.Empty;
+        nint value = nint.Zero;
 
-        FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target);
-        if (lookedUpChar2 == null) return;
-        GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
-        if (gObj != null)
-        {
-            nameString = Marshal.PtrToStringUTF8((IntPtr)gObj->Name) ?? string.Empty;
-            id = lookedUpChar2->Companion.CompanionObject->Character.CharacterData.ModelSkeletonId;
-            ownerName = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name)!;
-        }
-        else
-        {
-            if (!RemapUtils.instance.skeletonToClass.ContainsKey(lookedUpChar2->CharacterData.ModelCharaId)) return;
-            nameString = Marshal.PtrToStringUTF8((IntPtr)lookedUpChar2->GameObject.Name) ?? string.Empty;
-            BattleChara* chara = PluginLink.CharacterManager!->LookupBattleCharaByObjectId((int)lookedUpChar2->GameObject!.OwnerID!);
-            if (chara == null) return;
-            id = RemapUtils.instance.GetPetIDFromClass(chara!->Character.CharacterData.ClassJob!);
-            ownerName = Marshal.PtrToStringUTF8((IntPtr)chara->Character.GameObject.Name)!;
-        }
-        if (id >= 0 && !PluginLink.Configuration.replaceEmotesOnMinions) return;
-        if (id <= -2 && !PluginLink.Configuration.replaceEmotesBattlePets) return;
-        if (ownerName == string.Empty || id == -1 || nameString == string.Empty) return;
+        GameObjectID emoteTarget = bChara->Character.EmoteController.Target;
+        if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return false;
 
-        string nickname = string.Empty;
+        if (emoteTarget.Type == 4)
+            foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+                if (user.ObjectID == emoteTarget.ObjectID)
+                {
+                    value = user.Minion.Pet;
+                    break;
+                }
+
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
         {
-            if (!user.UserExists) continue;
-            if (user.UserName.ToLower().Normalize() != ownerName.ToLower().Normalize()) continue;
+            if (!user.HasAny) continue;
 
-            user.SerializableUser.LoopThroughBreakable(n =>
+            foreach (PetBase pet in user.Pets)
             {
-                if (n.Item1 == id)
-                {
-                    nickname = n.Item2;
-                    return true;
-                }
-                return false;
-            });
-            break;
+                if (!pet.Has) continue;
+                // TODO: Make configuration better
+                if (pet.ID < -1 && !PluginLink.Configuration.replaceEmotesBattlePets) continue;
+                if (pet.ID > -1 && !PluginLink.Configuration.replaceEmotesOnMinions) continue;
+                if (pet.ObjectID != emoteTarget.ObjectID && pet.Pet != value) continue;
+
+                (string, string)[] replaceNames = new (string, string)[] { (pet.BaseNamePlural, pet.UsedName), (pet.BaseName, pet.UsedName) };
+                StringUtils.instance.ReplaceSeString(ref message, ref replaceNames);
+                return true;
+            }
         }
-
-        if (nickname == string.Empty) return;
-
-        for (int i = 0; i < message.Payloads.Count; i++)
-        {
-            if (message.Payloads[i] is not TextPayload tPayload) continue;
-
-            foreach (string str in PluginConstants.removeables)
-                tPayload.Text = Regex.Replace(tPayload.Text!, str + nameString, nickname, RegexOptions.IgnoreCase);
-            message.Payloads[i] = tPayload;
-        }
+        return false;
     }
 }

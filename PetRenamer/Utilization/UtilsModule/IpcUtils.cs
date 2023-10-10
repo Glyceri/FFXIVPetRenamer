@@ -1,10 +1,9 @@
 ﻿using PetRenamer.Core.Handlers;
-using PetRenamer.Utilization.Attributes;
-using System.Collections.Generic;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Singleton;
-using Dalamud.Logging;
-using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Utilization.Attributes;
+using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -13,17 +12,10 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
 {
     public static IpcUtils instance { get; set; } = null!;
 
-    internal override void OnRegistered()
-    {
-        PluginLink.IpcStorage.Register(OnIpcChange);
-    }
+    internal override void OnRegistered() => PluginLink.IpcStorage.Register(OnIpcChange);
+    internal override void Dispose() => PluginLink.IpcStorage.Deregister(OnIpcChange);
 
-    internal override void Dispose()
-    {
-        PluginLink.IpcStorage.Deregister(OnIpcChange);
-    }
-
-    public void OnIpcChange(Dictionary<(string, uint), NicknameData> data)
+    public void OnIpcChange(ref Dictionary<(string, uint), NicknameData> data)
     {
         foreach (var kvp in data)
         {

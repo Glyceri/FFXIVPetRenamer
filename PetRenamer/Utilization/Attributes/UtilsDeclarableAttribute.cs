@@ -2,5 +2,5 @@
 
 namespace PetRenamer.Utilization.Attributes;
 
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 internal class UtilsDeclarableAttribute : Attribute { }

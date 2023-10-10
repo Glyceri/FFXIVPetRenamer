@@ -1,12 +1,12 @@
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
-using PetRenamer.Core.Singleton;
 using System.Linq;
-using PetRenamer.Core.PettableUserSystem;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -19,14 +19,14 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     ExcelSheet<Race> races { get; set; } = null!;
     ExcelSheet<ClassJob> classJob { get; set; } = null!;
     public ExcelSheet<Action> actions { get; set; } = null!;
-    ExcelSheet<Map> maps { get; set; } = null!;
+    ExcelSheet<TextCommand> textCommands { get; set; } = null!;
     public static SheetUtils instance { get; set; } = null!;
 
-    const int cacheSizes = 25;
+    const int cacheSizes = 55;
 
     readonly Dictionary<string, bool> lastPets = new Dictionary<string, bool>(cacheSizes + 1);
     readonly Dictionary<int, string> lastBattleIds = new Dictionary<int, string>(cacheSizes + 1);
-    readonly Dictionary<int, string> lastIds = new Dictionary<int, string>(cacheSizes + 1);
+    readonly Dictionary<(int, NameType), string> lastIds = new Dictionary<(int, NameType), string>(cacheSizes + 1);
     readonly Dictionary<string, int> lastNames = new Dictionary<string, int>(cacheSizes + 1);
     List<SerializableNickname> lastList = new List<SerializableNickname>();
     string lastQuerry = string.Empty;
@@ -39,13 +39,17 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
-        maps = PluginHandlers.DataManager.GetExcelSheet<Map>()!;
+        textCommands = PluginHandlers.DataManager.GetExcelSheet<TextCommand>()!;
     }
+
+    //226 is /egiglamour
+    //33 is /petmirage
+    public TextCommand GetCommand(uint id) => textCommands.GetRow(id)!;
 
     public bool PetExistsInANY(string petname)
     {
-        if (lastPets.ContainsKey(petname))
-            return lastPets[petname];
+        if(lastPets.TryGetValue(petname, out bool exists))
+            return exists;
 
         lastPets.Add(petname, false);
         if (lastPets.Count > cacheSizes)
@@ -62,21 +66,17 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return false;
     }
 
-    public Map GetMap(uint id)
-    {
-        return maps.GetRow(id)!;
-    }
-
     public Action GetAction(uint actionID) => actions?.GetRow(actionID)!;
 
     public string GetBattlePetName(int id)
     {
         //Look how generous I am. If you send the wrong ID it auto remaps
-        if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(id);
-        if (id <= 0) return string.Empty;
+        if (id > 100) id = RemapUtils.instance.BattlePetSkeletonToNameID(-id);
+        else if (id <= 0) return string.Empty;
+        if (id < -1) id = -id;
 
-        if (lastBattleIds.ContainsKey(id))
-            return lastBattleIds[id];
+        if(lastBattleIds.TryGetValue(id, out string? battleName))
+            return battleName;
 
         lastBattleIds.Add(id, string.Empty);
         if (lastBattleIds.Count > cacheSizes)
@@ -100,36 +100,39 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return string.Empty;
     }
 
-
-    public string GetPetName(int id)
+    public string GetPetName(int id, NameType nameType = NameType.Singular)
     {
-        if (lastIds.ContainsKey(id))
-            return lastIds[id];
+        if (lastIds.TryGetValue((id, nameType), out string? petName))
+            return petName;
 
-        lastIds.Add(id, string.Empty);
+        lastIds.Add((id, nameType), string.Empty);
         if (lastIds.Count > cacheSizes)
             lastIds.Remove(lastIds.Keys.ToArray().First());
 
+        string tempName = RemapUtils.instance.PetIDToName(id);
+        if (tempName != string.Empty)
+        {
+            lastIds[(id, nameType)] = tempName;
+            return tempName;
+        }
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
 
-            if (pet.Model.Value!.Model == id)
+            if (pet.Model.Value!.RowId == id)
             {
-                string endName = pet.Singular.ToString();
-                lastIds[id] = endName;
+                string endName = nameType == NameType.Singular ? pet.Singular.ToString() : pet.Plural.ToString();
+                lastIds[(id, nameType)] = endName;
                 return endName;
             }
         }
         return string.Empty;
     }
 
-
-
     public int GetIDFromName(string name)
     {
-        if (lastNames.ContainsKey(name))
-            return lastNames[name];
+        if(lastNames.TryGetValue(name, out int id)) 
+            return id;
 
         lastNames.Add(name, -1);
         if (lastNames.Count > cacheSizes)
@@ -140,7 +143,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             if (pet == null) continue;
             if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
             {
-                int val = pet.Model.Value!.Model;
+                int val = (int)pet.Model.Value!.RowId;
                 lastNames[name] = val;
                 return val;
             }
@@ -164,7 +167,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
-            int petModel = pet.Model.Value!.Model;
+            uint petModel = pet.Model.Value!.RowId;
             string petName = pet.Singular.ToString();
             string customPetName = string.Empty;
 
@@ -175,7 +178,7 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
                 customPetName = user.SerializableUser.GetNameFor(petName) ?? string.Empty;
 
             if (petModel.ToString().Contains(querry) || petName.Contains(querry) || (customPetName.Contains(querry) && customPetName.Length != 0))
-                serializableNicknames.Add(new SerializableNickname(petModel, customPetName));
+                serializableNicknames.Add(new SerializableNickname((int)petModel, customPetName));
         }
 
         return lastList = serializableNicknames;
@@ -196,4 +199,10 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
     }
 
     public string GetWorldName(ushort worldID) => worlds.GetRow(worldID)?.InternalName ?? string.Empty;
+}
+
+public enum NameType
+{
+    Singular,
+    Plural
 }

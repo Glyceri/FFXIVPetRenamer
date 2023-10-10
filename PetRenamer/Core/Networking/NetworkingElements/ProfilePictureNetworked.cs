@@ -1,18 +1,18 @@
-﻿using PetRenamer.Core.Networking.Attributes;
-using PetRenamer.Core.PettableUserSystem.Enums;
-using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Core.Singleton;
+﻿using Dalamud.Interface.Internal;
 using PetRenamer.Core.Handlers;
-using System.IO;
-using PetRenamer.Utilization.UtilsModule;
-using ImGuiScene;
+using PetRenamer.Core.Networking.Attributes;
 using PetRenamer.Core.Networking.Structs;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Text.Json;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core.Singleton;
+using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
 
@@ -41,7 +41,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
     {
         string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
         if (iconPath == null) return nint.Zero;
-        TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
         if (textureWrap == null) return nint.Zero;
         return textureWrap.ImGuiHandle;
     }
@@ -101,7 +101,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             catch { }
             try
             {
-                TextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
+                IDalamudTextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
                 if (wrap == null) return;
                 Cache.textureCache.Add(characterData, wrap);
             }

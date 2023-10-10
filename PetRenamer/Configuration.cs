@@ -2,6 +2,7 @@ using Dalamud.Configuration;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Theming.Themes;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -12,16 +13,15 @@ namespace PetRenamer;
 public class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 6;
-
-    public int Version { get; set; } = 6;
+    public const int currentSaveFileVersion = 8;
+    public int Version { get; set; } = currentSaveFileVersion;
 
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
-    public bool useCustomTheme = true;
     public bool downloadProfilePictures = false;
     public bool displayImages = true;
+    public bool automaticallySwitchPetmode = true;
     // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;
@@ -39,9 +39,21 @@ public class Configuration : IPluginConfiguration
     public bool showNamesInMinionBook = true;
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
+    // --------------------------- UI SETTINGS ---------------------------
+    public bool spaceOutSettings = false;
+    public bool startSettingsOpen = false;
+    public bool quickButtonsToggle = false;
+    public bool newUseCustomTheme = false;
+    // -------------------------- DEBUG SETTINGS -------------------------
+    public bool debugMode = false;
+    public bool autoOpenDebug = true;
 
     public SerializableUserV3[]? serializableUsersV3 = null;
-    
+
+    public BaseTheme  CustomBaseTheme = null!;
+    public RedTheme   CustomRedTheme = null!;
+    public GreenTheme CustomGreenTheme = null!;
+
     public void Initialize()
     {
         LegacyInitialize();
@@ -50,11 +62,15 @@ public class Configuration : IPluginConfiguration
 
     void CurrentInitialize()
     {
-        serializableUsersV3 ??= new SerializableUserV3[0];
+        serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
+        CustomBaseTheme ??= new BaseTheme();
+        CustomRedTheme ??= new RedTheme();
+        CustomGreenTheme ??= new GreenTheme();
     }
 
     public void Save() 
     {
+        if (currentSaveFileVersion < Version) return;
         List<SerializableUserV3> users = new List<SerializableUserV3>();
         foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
             users.Add(user.SerializableUser);
@@ -84,20 +100,20 @@ public class Configuration : IPluginConfiguration
     [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
     public bool usePartyList { get; set; } = false;
 
-    [Obsolete] public bool replaceEmotes { get; set; } = true;
-    [Obsolete] public bool allowTooltips { get; set; } = true;
-    [Obsolete] public bool useContextMenus { get; set; } = true;
-    [Obsolete] public bool useCustomNamesInChat { get; set; } = true;
-    [Obsolete] public bool useCustomFlyoutInChat { get; set; } = true;
-    [Obsolete] public bool allowCastBar { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool replaceEmotes { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowTooltips { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useContextMenus { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomNamesInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomFlyoutInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowCastBar { get; set; } = true;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialize()
     {
-        users ??= new SerializableNickname[0];
-        serializableUsers ??= new SerializableUser[0];
-        serializableUsersV2 ??= new SerializableUserV2[0];
+        users ??= Array.Empty<SerializableNickname>();
+        serializableUsers ??= Array.Empty<SerializableUser>();
+        serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

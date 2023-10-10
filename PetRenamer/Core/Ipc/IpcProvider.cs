@@ -1,11 +1,11 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using System;
 
 namespace PetRenamer;
@@ -62,7 +62,7 @@ public static class IpcProvider
     internal static void NotifyDisposing() => Disposing?.SendMessage();
     internal static void ChangedPetNickname(NicknameData? data)
     {
-        PluginLog.Log("Set nickname data: " + data?.ToNormalString() ?? string.Empty);
+        PetLog.Log("Set nickname data: " + data?.ToNormalString() ?? string.Empty);
 
         if (PluginHandlers.ClientState.LocalPlayer is PlayerCharacter playerCharacter)
         {
@@ -89,7 +89,7 @@ public static class IpcProvider
             if (data == null) return;
             PluginLink.IpcStorage.IpcAssignedNicknames.Add((playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id), data);
         }
-        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(SetCharacterNickname)} IPC."); }
+        catch (Exception e) { PetLog.LogError(e, $"Error handling {nameof(SetCharacterNickname)} IPC."); }
     }
 
     public static string GetLocalCharacterNicknameCallback()
@@ -103,27 +103,14 @@ public static class IpcProvider
         try
         {
             if (character is not PlayerCharacter playerCharacter) return string.Empty;
-            (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
-            NicknameData? data = new NicknameData();
+            PettableUser user = PluginLink.PettableUserHandler.GetUser(character.Address);
+            if (user == null) return string.Empty;
 
-            foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
-            {
-                if (!user.SerializableUser.Equals(player.Item1, (ushort)player.Item2)) continue;
-                (int, string) cStr = (-1, string.Empty);
-                (int, string) bStr = (-1, string.Empty);
-                if (user.HasCompanion) cStr = (user.CompanionID, user.CustomCompanionName);
-                if (user.HasBattlePet) bStr = (user.BattlePetID, user.BattlePetCustomName);
-
-                data.ID = cStr.Item1;
-                data.Nickname = cStr.Item2;
-                data.BattleID = bStr.Item1;
-                data.BattleNickname = bStr.Item2;
-                break;
-            }
+            NicknameData data = new NicknameData(user.Minion.ID, user.Minion.UsedName, user.BattlePet.ID, user.BattlePet.UsedName);
             string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);
             return jsonString;
         }
-        catch (Exception e) { PluginLog.Error(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
+        catch (Exception e) { PetLog.LogError(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
 
         return string.Empty;
     }

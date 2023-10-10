@@ -1,163 +1,50 @@
-﻿using Dalamud.Game;
-using Dalamud.Hooking;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
-using FFBattleCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
-using FFCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using TargetObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
+using PetRenamer.Core.PettableUserSystem;
 using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using Dalamud.Logging;
-using Dalamud.Memory;
-using System;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
-internal unsafe class TargetBarHooking : HookableElement
+internal unsafe class TargetBarHooking : QuickTextHookableElement
 {
-    private Hook<Delegates.AddonUpdate>? addonupdatehook = null;
-    private Hook<Delegates.AddonUpdate>? addonupdatehook2 = null;
-
-    AtkUnitBase* baseElement;
-    AtkUnitBase* baseElement2;
-
-    internal override void OnUpdate(Framework framework)
+    internal override void OnQuickInit()
     {
-        if (!PluginLink.Configuration.displayCustomNames) return;
-        if (PluginHandlers.ClientState.LocalPlayer == null) return;
-        HandleTargetElements();
-
-        baseElement = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_TargetInfoMainTarget");
-
-        addonupdatehook ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update);
-        addonupdatehook?.Enable();
-
-        baseElement2 = (AtkUnitBase*)PluginHandlers.GameGui.GetAddonByName("_FocusTargetInfo");
-
-        addonupdatehook2 ??= Hook<Delegates.AddonUpdate>.FromAddress(new nint(baseElement2->AtkEventListener.vfunc[PluginConstants.AtkUnitBaseUpdateIndex]), Update2);
-        addonupdatehook2?.Enable();
+        RegisterHook("_TargetInfoMainTarget",   10, Display,  -1, TargetUser);
+        RegisterHook("_TargetInfoMainTarget",   7,  Display,  -1, TargetOfTargetUser);
+        RegisterHook("_FocusTargetInfo",        10, Display,  -1, FocusTargetUser);
+        RegisterSoftHook("_TargetInfoCastBar",      4,  Allowed,  -1, TargetUser);
+        RegisterHook("_FocusTargetInfo",        5,  Allowed,  -1, FocusTargetUser);
     }
 
-    DGameObject target = null!;
-    DGameObject targetOfTarget = null!;
-    DGameObject focusTarget = null!;
+    PettableUser TargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.Address ?? nint.Zero);
+    PettableUser TargetOfTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestTarget()?.TargetObject?.Address ?? GetAlternativeTargetOfTarget());
+    PettableUser FocusTargetUser() => PluginLink.PettableUserHandler.GetUser(RequestFocusTarget()?.Address ?? nint.Zero);
 
-    void HandleTargetElements()
+    nint lastNint;
+    ulong lastID;
+
+    nint GetAlternativeTargetOfTarget()
     {
-        target = PluginHandlers.TargetManager.Target!;
-        if (PluginHandlers.TargetManager.SoftTarget != null) target = PluginHandlers.TargetManager.SoftTarget;
-        if (target != null) targetOfTarget = target.TargetObject!;
-        focusTarget = PluginHandlers.TargetManager.FocusTarget!;
-    }
-
-    byte Update(AtkUnitBase* baseD)
-    {
-        HandleTargetBar();
-        HandleTargetOfTargetBar();
-        return addonupdatehook!.Original(baseD);
-    }
-
-    byte Update2(AtkUnitBase* baseD)
-    {
-        HandleFocusBar();
-        return addonupdatehook2!.Original(baseD);
-    }
-
-    void HandleFocusBar()
-    {
-        if (focusTarget == null) return;
-        try
-        {
-            TargetObjectKind targetObjectKind = focusTarget.ObjectKind;
-            BaseNode resNode = new BaseNode("_FocusTargetInfo");
-            if (resNode == null) return;
-            AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
-            if (textNode == null) return;
-            if (!textNode->NodeText.ToString().Contains(focusTarget.Name.ToString())) return;
-            GameObject* gObj = GameObjectManager.GetGameObjectByIndex(focusTarget.ObjectIndex);
-            SetFor(textNode, gObj);
-        }
-        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
-    }
-
-    void HandleTargetOfTargetBar()
-    {
-        if (target == null || targetOfTarget == null) return;
-        try
-        {
-            TargetObjectKind targetObjectKind = targetOfTarget.ObjectKind;
-            BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
-            if (resNode == null) return;
-            AtkTextNode* textNode2 = resNode.GetNode<AtkTextNode>(7);
-            if (textNode2 == null) return;
-            string nameString = targetOfTarget.Name.ToString();
-            int index = targetOfTarget.ObjectIndex;
-
-            if (targetObjectKind == TargetObjectKind.Player)
+        ulong targetID = RequestTarget()?.TargetObjectId ?? 0;
+        if (targetID == lastID) return lastNint;
+        if (targetID == 0) return nint.Zero;
+        string targetString = targetID.ToString("X");
+        bool isCompanion = targetString.StartsWith("4");
+        if (!isCompanion) return nint.Zero;
+        targetString = targetString.TrimStart('4');
+        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+            if (user.ObjectID.ToString("X") == targetString)
             {
-                FFBattleCharacter* bChara = PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)target.ObjectId);
-                if (bChara == null) return;
-                ulong targetID2 = bChara->Character.GetTargetId();
-                if (!targetID2.ToString("X").StartsWith("4")) return;
-
-                targetObjectKind = TargetObjectKind.Companion;
-
-                FFCharacter* lookedUpChar2 = (FFCharacter*)PluginLink.CharacterManager->LookupBattleCharaByObjectId((int)targetID2);
-                if (lookedUpChar2 == null) return;
-                GameObject* gObj = (GameObject*)lookedUpChar2->Companion.CompanionObject;
-                if(gObj == null) return;
-                nameString = MemoryHelper.ReadSeString((nint)gObj->Name, 64).ToString();
-                index = gObj->ObjectIndex;
+                lastID = targetID;
+                return lastNint = user.Minion.Pet;
             }
-
-            if (!textNode2->NodeText.ToString().Contains(nameString)) return;
-            GameObject* gObj2 = GameObjectManager.GetGameObjectByIndex(index);
-            SetFor(textNode2, gObj2);
-        }
-        catch (Exception ex) { PluginLog.Log(ex.ToString()); }
+        return nint.Zero;
     }
 
-    void HandleTargetBar()
-    {
-        if (target == null) return;
-        TargetObjectKind targetObjectKind = target.ObjectKind;
-        BaseNode resNode = new BaseNode("_TargetInfoMainTarget");
-        if (resNode == null) return;
-        AtkTextNode* textNode = resNode.GetNode<AtkTextNode>(10);
-        if (textNode == null) return;
-        if (target.Name.ToString() != textNode->NodeText.ToString()) return;
-        GameObject* gObj = GameObjectManager.GetGameObjectByIndex(target.ObjectIndex);
-        SetFor(textNode, gObj);
-    }
+    DGameObject RequestFocusTarget() => PluginHandlers.TargetManager.FocusTarget!;
+    DGameObject RequestTarget() => PluginHandlers.TargetManager.SoftTarget! ?? PluginHandlers.TargetManager.Target!;
 
-    void SetFor(AtkTextNode* textNode, GameObject* gObj)
-    {
-        PluginLink.PettableUserHandler.LoopThroughBreakable(user =>
-        {
-            if (user.nintCompanion == (nint)gObj)
-            {
-                if (user.CustomCompanionName != string.Empty)
-                    textNode->NodeText.SetString(user.CustomCompanionName);
-                return true;
-            }
-            if (user.nintBattlePet == (nint)gObj)
-            {
-                if (user.BattlePetCustomName != string.Empty)
-                    textNode->NodeText.SetString(user.BattlePetCustomName);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    internal override void OnDispose()
-    {
-        addonupdatehook?.Disable();
-        addonupdatehook?.Dispose();
-
-        addonupdatehook2?.Disable();
-        addonupdatehook2?.Dispose();
-    }
+    bool Display(int id) => PluginLink.Configuration.displayCustomNames;
+    bool Allowed(int id) => id < -1 && PluginLink.Configuration.allowCastBarPet && PluginLink.Configuration.displayCustomNames;
 }

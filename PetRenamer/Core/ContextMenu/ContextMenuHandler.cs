@@ -6,13 +6,9 @@ namespace PetRenamer.Core.ContextMenu;
 
 internal class ContextMenuHandler : RegistryBase<ContextMenuElement, ContextMenuAttribute>
 {
-    protected override void OnElementCreation(ContextMenuElement element)
-    {
+    protected override void OnElementCreation(ContextMenuElement element) =>
         PluginLink.DalamudContextMenu.OnOpenGameObjectContextMenu += element.OnOpenMenu;
-    }
-
-    protected override void OnElementDestroyed(ContextMenuElement element)
-    {
+    
+    protected override void OnElementDestroyed(ContextMenuElement element) =>
         PluginLink.DalamudContextMenu.OnOpenGameObjectContextMenu -= element.OnOpenMenu;
-    }
 }

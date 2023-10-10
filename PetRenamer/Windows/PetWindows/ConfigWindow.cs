@@ -1,10 +1,11 @@
-using System.Numerics;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using PetRenamer.Core.Networking.NetworkingElements;
-using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Windows.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using IsUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -13,171 +14,222 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class ConfigWindow : PetWindow
 {
-    Vector2 baseSize = new Vector2(300, 442);
-    bool unsupportedMode = false;
+    Vector2 baseSize = new Vector2(500, 400);
 
-    public ConfigWindow() : base(
-        "Pet Nicknames Configuration",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
+    public ConfigWindow() : base("Pet Nicknames Settings")
     {
         Size = baseSize;
-        SizeCondition = ImGuiCond.Always;
+        SizeCondition = ImGuiCond.FirstUseEver;
+        SizeConstraints = new WindowSizeConstraints()
+        {
+            MinimumSize = baseSize,
+            MaximumSize = new Vector2(9999, 9999)
+        };
     }
 
-    bool lastDownloadAll = false;
+    bool anythingIllegals = false;
+
+    const string starter = "  ◉   ";
+    float currentHeight = 0;
+    bool canDraw = true;
+    readonly Dictionary<string, (bool, float)> toggles = new Dictionary<string, (bool, float)>();
+    string currentTitle = string.Empty;
 
     public override void OnDraw()
     {
-        if (AnyIllegalsGoingOn())
-        {
-            Size = baseSize + new Vector2(0, 50);
-        }
-        if (unsupportedMode)
-        {
-            OverrideLabel("Only INSTALLED plugins will show up!", new Vector2(286, 24));
-            BeginListBox("##SharingConfig", new Vector2(286, 102));
-            TextColoured(new Vector4(1, 0.6f, 0.6f, 1), "Do NOT send feedback or issues for these\nsettings on discord or via the official \n[Send Feedback] button!\nONLY Github Issues are ALLOWED!");
-            if (Checkbox("Understood!", ref PluginLink.Configuration.understoodWarningThirdPartySettings))
-                PluginLink.Configuration.Save();
-            ImGui.EndListBox();
-            if (Button("Back to Normal Settings", new Vector2(286, 24)))
-                unsupportedMode = false;
+        anythingIllegals = AnyIllegalsGoingOn();
 
-            NewLine();
-        }
-        else
+        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
         {
-            if (Checkbox("Display Custom Names", ref PluginLink.Configuration.displayCustomNames) ||
-                Checkbox("Use Custom Theme", ref PluginLink.Configuration.useCustomTheme))
-                PluginLink.Configuration.Save();
-
-            if(Checkbox("Allow Automatic Profile Pictures", ref PluginLink.Configuration.downloadProfilePictures))
-                PluginLink.Configuration.Save();
-            SetTooltipHovered("This will automatically download profile pictures from Lodestone");
-
-            if (lastDownloadAll != PluginLink.Configuration.downloadProfilePictures)
+            if (BeginElementBox("Third Party WARNING", true))
             {
-                lastDownloadAll = PluginLink.Configuration.downloadProfilePictures;
-                if (PluginLink.Configuration.downloadProfilePictures)
-                    for(int i = 0; i < PluginLink.PettableUserHandler.Users.Count; i++)
-                        ProfilePictureNetworked.instance.OnDeclare(PluginLink.PettableUserHandler.Users[i], Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
+                DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Do NOT send feedback or issues for these settings on discord or via the official [Send Feedback] button!", "ONLY Github Issues are ALLOWED!", "Enables Settings Related to Other Plugins (Main Repo or Not)!" }, "READ THE WARNING!");
+                EndElementBox();
             }
+        }
 
-            if (Checkbox("Display Images", ref PluginLink.Configuration.displayImages))
-                PluginLink.Configuration.Save();
+        if (BeginElementBox("UI Settings"))
+        {
+            DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
+            DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images"); 
+            DrawConfigElement(ref PluginLink.Configuration.spaceOutSettings, "Space Out Settings", "Spaces Out Settings making it Easier to Read.");
+            DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings unfolded", "Upon Starting the Plugin, Automatically Unfold all Setting Panels.");
+            DrawConfigElement(ref PluginLink.Configuration.quickButtonsToggle, "Quick Buttons Toggle Instead of Open", "The Quick Buttons in the Top Bar Toggle Instead of Open.");
+            EndElementBox();
+        }
+        if (BeginElementBox("Global Settings"))
+        {
+            DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
+            DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
+            DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
+            EndElementBox();
         }
     }
 
     public override void OnDrawNormal()
     {
-        if (unsupportedMode)
+        if (BeginElementBox("Minion Settings"))
         {
-            if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
-            BeginListBox("##MinionConfig", new Vector2(286, 194));
-            OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
-            if (Checkbox("Redraw On Change [Penumbra]", ref PluginLink.Configuration.redrawMinionOnSpawn))
-                PluginLink.Configuration.Save();
-            SetTooltipHovered("Redraws your Minion upon changing or spawning\nThis fixes bugs like names lingering on, or appearing too late.");
-            ImGui.EndListBox();
-            return;
-        }
-        
-        BeginListBox("##MinionConfig", new Vector2(286, 194));
-        OverrideLabel("Minion Specific Settings", new Vector2(278, 25));
-        if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnMinions) ||
-            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsOnMinions) ||
-            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesOnMinions) ||
-            Checkbox("Show names in Minion Notebook", ref PluginLink.Configuration.showNamesInMinionBook))
-            PluginLink.Configuration.Save();
+            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnMinions, "Allow Context Menus for Minions", "Rightclicking on a Minion will add the [Give Nickname] Option.");
+            DrawConfigElement(ref PluginLink.Configuration.allowTooltipsOnMinions, "Allow Tooltips for Minions", "Display Minion Nicknames in Tooltips.", "Allow Tooltips for Minions");
+            DrawConfigElement(ref PluginLink.Configuration.replaceEmotesOnMinions, "Allow Custom Nicknames in Emotes for Minions", "Replace a Minions in-game Name with your Custom Nickname.");
+            DrawConfigElement(ref PluginLink.Configuration.showNamesInMinionBook, "Show Nicknames in the Minion Journal", "Shows your Custom Nicknames in the Minion Journal.");
 
-        ImGui.EndListBox();
+            if (PenumbraValid)
+            {
+                Header("[Penumbra]");
+                DrawConfigElement(ref PluginLink.Configuration.redrawMinionOnSpawn, "Redraw Minion", new string[] { "Redraw a Minion upon a Name Change (Fixes nameplate bugs).", "Requires [Penumbra]" });
+            }
+
+            EndElementBox();
+        }
     }
 
     public override void OnDrawBattlePet()
     {
-        if (unsupportedMode )
+        if (BeginElementBox("Battle Pet Settings"))
         {
-            if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
-            if (PenumbraIPCProvider.PenumbraEnabled())
+            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnBattlePets, "Allow Context Menus for Battle Pets", "Rightclicking on a Battle Pet will add the [Give Nickname] Option.");
+            DrawConfigElement(ref PluginLink.Configuration.allowTooltipsBattlePets, "Allow Tooltips for Battle Pets", "Display Battle Pet Nicknames in Tooltips.");
+            DrawConfigElement(ref PluginLink.Configuration.replaceEmotesBattlePets, "Allow Custom Nicknames in Emotes for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
+            DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInBattleChat, "Allow Custom Nicknames in the Battle Log for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
+            DrawConfigElement(ref PluginLink.Configuration.allowCastBarPet, "Show Battle Pet Nickname on Cast Bars", "Shows your Custom Nicknames on Cast bars.");
+            DrawConfigElement(ref PluginLink.Configuration.useCustomFlyoutPet, "Show Battle Pet Nickname on Flyout Text", "Shows your Custom Nicknames on Flyout Text.");
+            
+            if (PenumbraValid)
             {
-                BeginListBox("##BattleConfig", new Vector2(286, 194));
-                OverrideLabel("Battle Pet Specific Settings", new Vector2(278, 25));
-                if (Checkbox("Redraw On Change [Penumbra]", ref PluginLink.Configuration.redrawBattlePetOnSpawn))
-                    PluginLink.Configuration.Save();
-                SetTooltipHovered("Redraws the Battle Pet upon changing or spawning\nThis fixes bugs like names lingering on, or appearing too late.");
-                ImGui.EndListBox();
+                Header("[Penumbra]");
+                DrawConfigElement(ref PluginLink.Configuration.redrawBattlePetOnSpawn, "Redraw Battle Pet", new string[] { "Redraw a Battle Pet upon a Name Change (Fixes nameplate bugs).", "Requires [Penumbra]" });
             }
-            return;
+
+            EndElementBox();
         }
-        BeginListBox("##BattleConfig", new Vector2(286, 194));
-        OverrideLabel("Battle Pet Specific Settings", new Vector2(278, 25));
-
-        if (Checkbox("Allow Context Menus", ref PluginLink.Configuration.useContextMenuOnBattlePets) ||
-            Checkbox("Allow Tooltips", ref PluginLink.Configuration.allowTooltipsBattlePets) ||
-            Checkbox("Replace Emotes", ref PluginLink.Configuration.replaceEmotesBattlePets) ||
-            Checkbox("Battle Chat", ref PluginLink.Configuration.useCustomPetNamesInBattleChat) ||
-            Checkbox("Replace Flyout Text", ref PluginLink.Configuration.useCustomFlyoutPet) ||
-            Checkbox("Allow Cast Bar", ref PluginLink.Configuration.allowCastBarPet))
-            PluginLink.Configuration.Save();
-
-        ImGui.EndListBox();
     }
 
-    public bool AnyIllegalsGoingOn()
+    void AddNewLine()
     {
-        // Comment out this line to unsupport all the Third Party support
-        if (PenumbraIPCProvider.PenumbraEnabled()) return true;
+        if (!canDraw) return;
+        currentHeight += ImGui.GetTextLineHeight() + ItemSpacingY;
+        ImGui.Text("");
+    }
 
-        unsupportedMode = false;
-        return false;
+    void Header(string title)
+    {
+        if (!canDraw) return;
+        AddNewLine();
+        currentHeight += BarSize + (ItemSpacingY * 2);
+        NewLabel(title + $"##title{internalCounter++}", new Vector2(FillingWidthStepped(), BarSize));
     }
 
     public override void OnDrawSharing()
     {
-        if (unsupportedMode)
+        if (BeginElementBox("Sharing Settings"))
         {
-            if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
-            BeginListBox("##SharingConfig2", new Vector2(286, 194));
-            OverrideLabel("Sharing Mode Specific Settings", new Vector2(278, 25));
-
-            ImGui.EndListBox();
-
-            return;
+            DrawConfigElement(ref PluginLink.Configuration.alwaysOpenAdvancedMode, "Always open Advanced Mode", "Holding [L-Shift] when Exporting Opens Advanced Mode. Is this Enabled, Advanced Mode will Always Open.");
+            EndElementBox();
         }
-
-        BeginListBox("##SharingConfig3", new Vector2(286, 194));
-        OverrideLabel("Sharing Mode Specific Settings", new Vector2(278, 25));
-
-        if (Checkbox("Always open Advanced Mode [Export]", ref PluginLink.Configuration.alwaysOpenAdvancedMode))
-            PluginLink.Configuration.Save();
-
-        ImGui.EndListBox();
     }
-
-    public override void OnWindowOpen() =>  unsupportedMode = false;
-    public override void OnWindowClose() => unsupportedMode = false;
 
     public override void OnLateDraw()
     {
-        NewLine();
-
-        if (!unsupportedMode)
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || DebugMode)
         {
-            if (Button("Clear All Nicknames", new Vector2(286, 24)))
-                PluginLink.WindowHandler.AddTemporaryWindow<ConfirmPopup>(
-                    "Are you sure you want to clear all Nicknames\nfor every user?",
-                    (outcome) => { if ((bool)outcome) { PluginLink.Configuration.ClearAllNicknames(); } }
-                    , this);
-
-            if (Button("Credits", new Vector2(286, 24)))
-                PluginLink.WindowHandler.OpenWindow<CreditsWindow>();
-
-            if (AnyIllegalsGoingOn())
+            if (BeginElementBox("Debug Mode"))
             {
-                NewLine();
-                if (XButton("Other Plugin Settings", new Vector2(286, 24)))
-                    unsupportedMode = true;
+                DrawConfigElement(ref PluginLink.Configuration.debugMode, "Debug Mode", "Toggles Debug Mode");
+                if(PluginLink.Configuration.debugMode)
+                    DrawConfigElement(ref PluginLink.Configuration.autoOpenDebug, "Automatically open Debug Window", "Automatically open Debug Window on Plugin Startup.");
+                EndElementBox();
             }
         }
+    }
+
+    public bool AnyIllegalsGoingOn()
+    {
+        if (PluginLink.Configuration.debugMode) return true;
+        if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
+
+        // Comment out this line to unsupport all the Third Party support
+        if (PenumbraIPCProvider.PenumbraEnabled()) return true;
+
+        return false;
+    }
+
+    public bool PenumbraValid => (HasReadWarning && PenumbraIPCProvider.PenumbraEnabled()) || DebugMode;
+    public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
+    public bool DebugMode => PluginLink.Configuration.debugMode;
+
+    bool BeginElementBox(string title, bool forceOpen = false)
+    {
+        currentTitle = title;
+        if (!toggles.ContainsKey(title))
+            toggles.Add(title, (forceOpen ? forceOpen : PluginLink.Configuration.startSettingsOpen, 0));      
+        (bool, float) curToggle = toggles[title];
+        currentHeight = curToggle.Item2;
+        bool outcome = BeginListBox($"##{title}[config]{internalCounter++}", new Vector2(ContentAvailableX, currentHeight));
+        if (!outcome) return false;
+        if (!forceOpen)
+        {
+            if (Button(toggles[title].Item1 ? "v" : ">", new Vector2(BarSize, BarSize)))
+                curToggle.Item1 ^= true;
+            canDraw = toggles[title].Item1;
+            SameLine();
+        }
+        NewLabel(title + $"##title{internalCounter++}", new Vector2(ContentAvailableX, BarSize));
+        currentHeight = BarSize + (ItemSpacingY * 2);
+        toggles[title] = curToggle;
+        return outcome;
+    }
+
+    void EndElementBox()
+    {
+        ImGui.EndListBox();
+        canDraw = true;
+        toggles[currentTitle] = (toggles[currentTitle].Item1, currentHeight);
+        currentHeight = 0;
+        if (PluginLink.Configuration.spaceOutSettings) NewLine();
+    }
+
+    void DrawConfigElement(ref bool value, string Title, string Description = "", string Tooltip = "", Action<bool> OnChange = null!) => DrawConfigElement(ref value, Title, new string[] { Description }, Tooltip, OnChange);
+    void DrawConfigElement(ref bool value, string Title, string[] Description, string Tooltip = "", Action<bool> OnChange = null!)
+    {
+        if (!canDraw) return;
+        float complete = 0;
+        if (IsUnsafe.IsNullRef(ref value)) return;
+        complete += DrawCheckbox(ref value, Title, OnChange);
+        if (Tooltip == string.Empty || Tooltip == null) Tooltip = Title;
+        SetTooltipHovered(Tooltip);
+        complete += DrawDescriptionBox(Description);
+        currentHeight += complete;
+    }
+
+    float DrawCheckbox(ref bool value, string Title, Action<bool> OnChange)
+    {
+        if (Checkbox(Title, ref value)) { PluginLink.Configuration.Save(); OnChange?.Invoke(value); }
+        return ImGui.GetFrameHeight() + ItemSpacingY;
+    }
+
+    float DrawDescriptionBox(string[] Description)
+    {
+        float size = 0;
+        
+        foreach (string str in Description)
+        {
+            string newstr = starter + str;
+            if (Description == null || newstr == starter) continue;
+            ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+            ImGui.TextWrapped(newstr);
+            ImGui.PopStyleColor();
+            size += ImGui.CalcTextSize(newstr, true, ImGui.GetItemRectSize().X).Y + ItemSpacingY;
+            SetTooltipHovered(str);
+        }
+
+        if (size != 0 && PluginLink.Configuration.spaceOutSettings)
+        {
+            size += ImGui.GetTextLineHeight() + ItemSpacingY;
+            ImGui.Text("");
+        }
+        
+        return size;
     }
 }

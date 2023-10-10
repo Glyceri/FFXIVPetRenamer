@@ -1,6 +1,6 @@
-﻿using Dalamud.Logging;
-using ImGuiNET;
+﻿using ImGuiNET;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +9,7 @@ namespace PetRenamer.Core.Sharing;
 
 public static class SharingHandler
 {
-    static List<bool> containsList = new List<bool>();
+    readonly static List<bool> containsList = new List<bool>();
     static PettableUser lastSet = null!;
 
     public static bool HasSetup(PettableUser user) => lastSet == user;
@@ -46,15 +46,13 @@ public static class SharingHandler
         {
             string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
             for (int i = 0; i < user.SerializableUser.length; i++)
-            {
                 if (user.SerializableUser.names[i] != string.Empty && containsList[i])
-                    exportString += $"{user.SerializableUser.ids[i]}^{user.SerializableUser.names[i]}\n";
-            }
+                    exportString += $"{user.SerializableUser.ids[i]}{PluginConstants.forbiddenCharacter}{user.SerializableUser.names[i]}\n";
             string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
             ImGui.SetClipboardText(convertedString);
             return true;
         }
-        catch (Exception e) { PluginLog.Log($"Export Error occured: {e}"); }
+        catch (Exception e) { PetLog.Log($"Export Error occured: {e}"); }
         return false;
     }
 }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PetRenamer.Core.AutoRegistry.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
-using PetRenamer.Core.AutoRegistry.Interfaces;
 using System.Linq;
+using System.Reflection;
 
 namespace PetRenamer.Core.AutoRegistry;
 
@@ -28,6 +28,7 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         foreach (Type type in elementTypes)
         {
             T createdElement = CreateInstance(type)!;
+            LocalOnElementCreation(createdElement);
             OnElementCreation(createdElement);
             elements.Add(createdElement);
             attributes.Add(createdElement.GetType().GetCustomAttribute<TT>()!);
@@ -63,6 +64,15 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         }
         elements.Clear();
         attributes.Clear();
+    }
+
+    void LocalOnElementCreation(T element)
+    {
+        Type t = element.GetType();
+        PropertyInfo[] properties = t.GetProperties();
+        foreach (PropertyInfo property in properties)
+            if (property.PropertyType == t && property.Name == "instance")
+                property.SetValue(element, element);
     }
 
     protected virtual void OnSelfInitialize() { }

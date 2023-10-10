@@ -1,9 +1,9 @@
-using System;
 using Newtonsoft.Json;
+using System;
 
 namespace PetRenamer.Core.Serialization;
 
-[Obsolete]
+[Obsolete("Use SerializableUserV3 instead")]
 [Serializable]
 public class SerializableUser
 {
@@ -21,7 +21,7 @@ public class SerializableUser
 
     public SerializableUser(string username, ushort homeworld)
     {
-        this.nicknames = new SerializableNickname[0];
+        nicknames = Array.Empty<SerializableNickname>();
         this.username = username;
         this.homeworld = homeworld;
     }

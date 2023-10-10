@@ -1,11 +1,13 @@
-﻿using Dalamud.Interface.Internal;
+using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
+using System;
 using System.Numerics;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -13,222 +15,261 @@ namespace PetRenamer.Windows.PetWindows;
 [MainPetWindow]
 [PersistentPetWindow]
 [ModeTogglePetWindow]
-public class PetRenameWindow : InitializablePetWindow
+public class PetRenameWindow : PetWindow
 {
-    string companionName = string.Empty;
-    string battlePetName = string.Empty;
-
-    string temporaryCompanionName = string.Empty;
-    string temporaryBattlePetName = string.Empty;
-
-    string companionBaseName = string.Empty;
-    string battlePetBaseName = string.Empty;
-
-    int companionID = -1;
-    int battlePetID = -1;
-
-    Vector2 baseSize = new Vector2(437, 188);
-    Vector2 bPetSize = new Vector2(437, 188);
-    Vector2 wideSize = new Vector2(335, 127);
-
-    IDalamudTextureWrap textureWrap = null!;
-    IDalamudTextureWrap textureWrapPet = null!;
-
-    public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse)
+    readonly RenamablePet[] pets = new RenamablePet[2]
     {
-        Size = baseSize;
-    }
+        new RenamablePet(PetMode.Normal, "Minion"),
+        new RenamablePet(PetMode.BattlePet, "Battle Pet")
+    };
 
     PettableUser user = null!;
+    RenamablePet activePet = null!;
+
+    Vector2 minSize = new Vector2(220, 192);
+    Vector2 baseSize = new Vector2(437, 192);
+    Vector2 wideSize = new Vector2(1500, 192);
+
+    Vector2 imageBoxSize = new Vector2(119, 119);
+
+    public PetRenameWindow() : base("Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse) { }
 
     public override void OnDraw()
     {
+        Size = baseSize;
+        SizeCondition = ImGuiCond.FirstUseEver;
+
+        SizeConstraints = new WindowSizeConstraints()
+        {
+            MinimumSize = minSize,
+            MaximumSize = wideSize
+        };
+
         user ??= PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
+        HandlePets();
+    }
 
-        if (companionID == -1 && user.HasCompanion)
+    internal override void OnPetModeChange(PetMode mode) => activePet = GetPet(mode);
+       
+    void HandlePets()
+    {
+        for (int i = 0; i < user.Pets.Length; i++)
         {
-            companionID = user.CompanionID;
-            companionName = user.CustomCompanionName;
-            companionBaseName = user.CompanionBaseName;
-            temporaryCompanionName = companionName;
+            PetBase pet = user.Pets[i];
+            if (pets[i].petID == -1 && pet.Has)
+            {
+                pets[i].petID = pet.ID;
+                pets[i].petName = pet.CustomName;
+                pets[i].baseName = pet.BaseName;
+                pets[i].temporaryPetName = pet.CustomName;
+            }
+            else if (pets[i].petID == -1) pets[i].Dispose();
         }
-        else if (companionID == -1)
-        {
-            textureWrap?.Dispose();
-            textureWrap = null!;
-        }
-
-        if (battlePetID == -1 && user.HasBattlePet)
-        {
-            battlePetID = user.BattlePetID;
-            battlePetBaseName = user.BaseBattlePetName;
-            battlePetName = user.BattlePetCustomName;
-            temporaryBattlePetName = battlePetName;
-        }
-        else if (battlePetID == -1)
-        {
-            textureWrapPet?.Dispose();
-            textureWrapPet = null!;
-        }
-
-        if (petMode != PetMode.ShareMode)
-        BeginListBox("##<stylingboxrenamepannel>", new Vector2(298, 119), StylingColours.titleBg);
     }
 
     public override void OnLateDraw()
     {
-        if (petMode != PetMode.ShareMode) 
-        { 
-            ImGui.EndListBox();
+        if (petMode == PetMode.ShareMode) return;
+        if (activePet == null) return;
+        if (activePet.textureWrap == null) return;
 
-            if (petMode == PetMode.Normal && textureWrap == null) return;
-            if (petMode == PetMode.BattlePet && textureWrapPet == null) return;
-            SameLinePretendSpace();
-            BeginListBox("##<stylingboxrenamepanne2l>", new Vector2(119, 119), StylingColours.titleBg);
-            if(PluginLink.Configuration.displayImages)
-            ImGui.Image(petMode == PetMode.Normal ? textureWrap.ImGuiHandle : textureWrapPet.ImGuiHandle, new Vector2(111, 112));
-            else
-            {
-                PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
-                PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
-                PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
-                ImGui.Button("", new Vector2(111, 112));
-            } 
-                
-            ImGui.EndListBox();
-        }
+        SameLinePretendSpace();
+        DrawImageBox();
     }
 
-    public override void OnDrawNormal()
+    public override void OnDrawNormal() => DrawInputField();
+    public override void OnDrawBattlePet() => DrawInputField();
+
+    void DrawInputField()
     {
-        Size = baseSize;
-        if (user == null) return;
-        if (companionID == -1)
-        {
-            TextColoured(StylingColours.highlightText, $"Please summon a minion.\nOr open the naming list: ");
-            if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
-            SetTooltipHovered("Opens the Minion List");
-        }
-        else DrawPetNameField(companionBaseName, ref companionName, ref temporaryCompanionName, ref companionID);
+        if (!BeginListBox("##<stylingboxrenamepannel>", new Vector2(ContentAvailableX - imageBoxSize.X - FramePaddingX, imageBoxSize.Y)))
+            return;
+        DrawInputFieldInsides();
+        ImGui.EndListBox();
     }
 
-    public override void OnDrawBattlePet()
+    void DrawInputFieldInsides()
     {
-        Size = bPetSize;
         if (user == null) return;
-        if (battlePetID == -1)
+        if (activePet == null) return;
+
+        if (activePet.petID == -1 || activePet.baseName == string.Empty)
         {
-            if (battlePetBaseName == string.Empty)
-            {
-                TextColoured(StylingColours.highlightText, $"Please summon a Battle Pet.\nOr open the naming list: ");
-                if (Button("Naming List")) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
-                SetTooltipHovered("Opens the Battle Pet List");
-            }
-            else TextColoured(StylingColours.highlightText, $"Please summon your {battlePetBaseName}.");
+            Label($"Please summon a {activePet.referredToAs} or open the naming list", new Vector2(ContentAvailableX, BarSize));
+            if (Button("Naming List", new Vector2(ContentAvailableX, BarSize))) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+            SetTooltipHovered($"Opens the {activePet.referredToAs} List");
+            return;
         }
-        else DrawPetNameField(battlePetBaseName, ref battlePetName, ref temporaryBattlePetName, ref battlePetID);
+        DrawPetNameField();
+    }
+
+    void DrawImageBox()
+    {
+        if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize))
+            return;
+        DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
+        ImGui.EndListBox();
     }
 
     public override void OnDrawSharing()
     {
-        Size = wideSize;
         PluginLink.WindowHandler.GetWindow<PetListWindow>()?.DrawExportHeader();
     }
 
-    void DrawPetNameField(string basePet, ref string temporaryName, ref string temporaryCustomName, ref int theID)
+    void DrawPetNameField()
     {
         string tempText = $"does not have a name!";
-        if (temporaryName.Length != 0) tempText = $"is named:";
-        Label($"Your {basePet} {tempText}", new Vector2(290, 25),StylingColours.whiteText);
-        if (basePet != string.Empty) SetTooltipHovered($"{basePet}");
-        if (temporaryName.Length != 0)
+        if (activePet.petName.Length != 0) tempText = $"is named:";
+        Label($"Your {activePet.baseName} {tempText}", new Vector2(ContentAvailableX, BarSize), StylingColours.defaultText);
+        SetTooltipHovered($"{activePet.baseName}");
+        if (activePet.petName.Length != 0)
         {
-            Label($"{temporaryName}", new Vector2(290, 25), StylingColours.whiteText);
-            SetTooltipHovered($"{temporaryName}");
+            Label($"{activePet.petName}", new Vector2(ContentAvailableX, BarSize), StylingColours.defaultText);
+            SetTooltipHovered($"{activePet.petName}");
         }
-        
-        InputTextMultiLine(string.Empty, ref temporaryCustomName, PluginConstants.ffxivNameSize, new Vector2(290, 25), ImGuiInputTextFlags.CtrlEnterForNewLine);
+        InputTextMultiLine(string.Empty, ref activePet._temporaryPetName, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine);
         SetTooltipHovered("Put in a nickname here.");
-        temporaryCustomName = temporaryCustomName.Trim();
-        DrawValidName(temporaryCustomName, ref theID);
+        DrawValidName();
     }
 
-    void DrawValidName(string internalTempText, ref int theID)
+    void DrawValidName()
     {
-        if (Button("Save Nickname", new Vector2(144, 25), "[Required to see a nickname]"))
-        {
-            user.SerializableUser.SaveNickname(theID, internalTempText.Replace("^", ""), notifyICP: true);
-            PluginLink.Configuration.Save();
-            if (companionID == theID)
-            {
-                companionName = internalTempText;
-                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
-            }
-            if (battlePetID == theID)
-            {
-                battlePetName = internalTempText;
-                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
-            }
-        }
-        ImGui.SameLine(0, 1f);
-        if (Button("Clear Nickname", new Vector2(144, 25), "Clears the nickname from your list."))
-        {
-            user.SerializableUser.RemoveNickname(theID, notifyICP: true);
-            PluginLink.Configuration.Save();
-            if (companionID == theID)
-            {
-                companionID = -1;
-                PenumbraIPCProvider.RedrawMinionByIndex(user.MinionIndex);
-            }
-            if (battlePetID == theID)
-            {
-                battlePetID = -1;
-                PenumbraIPCProvider.RedrawBattlePetByIndex(user.BattlePetIndex);
-            }
-        }
+        Button("Save Nickname", new Vector2(ContentAvailableX / 2 - FramePaddingX, 25), "[Required to see a nickname]", Save); ImGui.SameLine(0, 1f);
+        Button("Clear Nickname", new Vector2(ContentAvailableX, 25), "[Clears the nickname from your list.]", Delete);
+    }
+
+    void Save()
+    {
+        user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName, notifyICP: true);
+        OnButton();
+    }
+
+    void Delete()
+    {
+        activePet.temporaryPetName = string.Empty;
+        user.SerializableUser.RemoveNickname(activePet.petID, notifyICP: true);
+        OnButton();
+    }
+
+    void OnButton()
+    {
+        activePet.petName = activePet.temporaryPetName;
+        PluginLink.Configuration.Save();
+        if (activePet.petID > -1) PenumbraIPCProvider.RedrawMinionByIndex(PluginLink.PettableUserHandler.LocalUser()!.Minion.Index);
+        if (activePet.petID < -1) PenumbraIPCProvider.RedrawBattlePetByIndex(PluginLink.PettableUserHandler.LocalUser()!.BattlePet.Index);
     }
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        if (forceOpen) { IsOpen = true; ImGui.SetWindowFocus(); }
-        user ??= PluginLink.PettableUserHandler.LocalUser()!;
-        if (user == null) return;
-        companionID = id;
-        companionBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(companionID));
-        companionName = user.GetCustomName(companionID);
-        temporaryCompanionName = companionName;
+        if ((user ??= PluginLink.PettableUserHandler.LocalUser()!) == null) return;
+        if (forceOpen) ForceOpenForID(id);
 
-        if (companionID == -1) return;
-        string iconPath = PluginHandlers.TextureProvider.GetIconPath(RemapUtils.instance.GetTextureID(companionID))!;
-        if (iconPath == null) return;
-        textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        RenamablePet lastPet = activePet;
+
+        if ((activePet = GetPet(FromID(id))) == null) return;
+
+        activePet.petID = id;
+        activePet.baseName = RemapUtils.instance.PetIDToName(id).MakeTitleCase();
+        activePet.petName = user.GetCustomName(id);
+        activePet.temporaryPetName = activePet.petName;
+
+        string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
+        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+
+        if (!forceOpen)
+            activePet = lastPet;
     }
 
-    public void OpenForBattleID(int id, bool forceOpen = false)
+    public void OpenForMinion(int id)
     {
-        if (forceOpen) { IsOpen = true; ImGui.SetWindowFocus(); }
-        user ??= PluginLink.PettableUserHandler.LocalUser()!;
-        if (user == null) return;
-        battlePetID = id;
-        battlePetBaseName = RemapUtils.instance.PetIDToName(id);
-        battlePetName = user.GetCustomName(battlePetID);
-        temporaryBattlePetName = battlePetName;
-
-        if (battlePetID == -1) return;
-        string iconPath = PluginHandlers.TextureProvider.GetIconPath(RemapUtils.instance.GetTextureID(battlePetID))!;
-        if (iconPath == null) return;
-        textureWrapPet = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        if (id == -1) pets[0]?.Clear();
+        else OpenForId(id);
     }
 
-    public override void OnInitialized()
+    public void OpenForBattlePet(int id)
     {
+        if (id == -1) pets[1]?.Clear();
+        else OpenForId(id);
+    }
 
+    void ForceOpenForID(int id)
+    {
+        SetModeForID(id);
+        if (id == -1) return;
+        IsOpen = true;
+        ImGui.SetNextWindowFocus();
+    }
+
+    void SetModeForID(int id)
+    {
+        if (id == -1) return;
+        SetPetMode(id < -1 ? PetMode.BattlePet : PetMode.Normal);
+    }
+
+    RenamablePet GetPet(PetMode mode)
+    {
+        foreach (RenamablePet pet in pets)
+            if (pet.associatedMode == mode) 
+                return pet;
+        return null!;
+    }
+
+    PetMode FromID(int id)
+    {
+        if (id == -1) return PetMode.ShareMode;
+        if (id < -1) return PetMode.BattlePet;
+        if (id > -1) return PetMode.Normal;
+
+        return PetMode.Normal;
     }
 
     protected override void OnDispose()
     {
+        foreach (RenamablePet pet in pets)
+            pet?.Dispose();
+    }
+
+    public void Reset()
+    {
+        foreach (var pet in pets)
+            pet.Clear();
+    }
+}
+
+internal class RenamablePet : IDisposable
+{
+    internal string petName = string.Empty;
+    internal string _temporaryPetName = string.Empty;
+    internal string temporaryPetName
+    {
+        get => (_temporaryPetName ?? string.Empty).Trim().Replace(PluginConstants.forbiddenCharacter.ToString(), "");
+        set => _temporaryPetName = value ?? string.Empty;
+    }
+    internal string baseName = string.Empty;
+    internal int petID = -1;
+    internal IDalamudTextureWrap textureWrap = null!;
+
+    internal PetMode associatedMode = PetMode.Normal;
+    internal string referredToAs = string.Empty;
+
+    internal RenamablePet(PetMode mode, string referredToAs)
+    {
+        associatedMode = mode;
+        this.referredToAs = referredToAs;
+    }
+
+    public void Clear()
+    {
+        petID = -1;
+        baseName = string.Empty;
+        temporaryPetName = string.Empty;
+        Dispose();
+    }
+
+    public void Dispose()
+    {
         textureWrap?.Dispose();
-        textureWrapPet?.Dispose();
+        textureWrap = null!;
     }
 }

@@ -1,7 +1,6 @@
 using Dalamud.ContextMenu;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Commands;
 using PetRenamer.Core.Chat;
 using PetRenamer.Core.ContextMenu;
@@ -51,7 +50,7 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
-        DalamudContextMenu = new DalamudContextMenu();
+        DalamudContextMenu = new DalamudContextMenu(dalamud);
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();

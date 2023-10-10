@@ -1,21 +1,21 @@
+using Dalamud.Game.Text;
+using Dalamud.Interface.Internal;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Serialization;
-using PetRenamer.Utilization.UtilsModule;
-using PetRenamer.Windows.Attributes;
-using System.Collections.Generic;
-using System;
-using Dalamud.Logging;
 using PetRenamer.Core;
-using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
-using ImGuiScene;
-using Dalamud.Game.Text;
 using PetRenamer.Core.Networking.NetworkingElements;
+using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Sharing;
 using PetRenamer.Core.Sharing.Importing;
 using PetRenamer.Core.Sharing.Importing.Data;
+using PetRenamer.Logging;
+using PetRenamer.Utilization.UtilsModule;
+using PetRenamer.Windows.Attributes;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -24,9 +24,9 @@ namespace PetRenamer.Windows.PetWindows;
 [ModeTogglePetWindow]
 public class PetListWindow : PetWindow
 {
-    int maxBoxHeight = 675;
-    int maxBoxHeightBattle = 631;
-    int maxBoxHeightSharing = 655;
+    readonly int maxBoxHeight = 675;
+    readonly int maxBoxHeightBattle = 631;
+    readonly int maxBoxHeightSharing = 655;
 
     public PetListWindow() : base("Pet Nicknames List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize)
     {
@@ -61,7 +61,7 @@ public class PetListWindow : PetWindow
     string minionSearchField = string.Empty;
 
     List<SerializableNickname> foundNicknames = new List<SerializableNickname>();
-    List<TextureWrap> TextureWraps = new List<TextureWrap>();
+    readonly List<IDalamudTextureWrap> TextureWraps = new List<IDalamudTextureWrap>();
 
     SucceededImportData importedData = null!;
 
@@ -90,13 +90,12 @@ public class PetListWindow : PetWindow
 
         if (user == null) return;
 
-        if (temporaryUser == null)
-            temporaryUser = new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
+        temporaryUser ??= new PettableUser(user.UserName, user.Homeworld, new SerializableUserV3(user.UserName, user.Homeworld));
 
         currentIsLocalUser = user.UserName == localUser.UserName && user.Homeworld == localUser.Homeworld;
         if (!currentIsLocalUser) SetOpenedAddPet(false);
 
-        if (user.AnyPetChanged || user != lastUser)
+        if (user.UserChanged || user != lastUser)
             FillTextureList();
     }
 
@@ -112,8 +111,8 @@ public class PetListWindow : PetWindow
 
     void SharingHeader()
     {
-        if (advancedMode) DrawUserHeader(user, 0, 32, () => OverrideLabel("Advanced Exporting"));
-        else if (importedData != null && existingUser != null) DrawUserHeader(existingUser, 0, 32, () => OverrideLabel("Importing"));
+        if (advancedMode) DrawUserHeader(user, 0, 32, () => OverrideLabel("Advanced Exporting", new Vector2(200, BarSize)));
+        else if (importedData != null && existingUser != null) DrawUserHeader(existingUser, 0, 32, () => OverrideLabel("Importing", new Vector2(200, BarSize)));
         else DrawBasicUserHeader();
     }
 
@@ -130,7 +129,8 @@ public class PetListWindow : PetWindow
         DrawWarningLabel(PluginConstants.Strings.userListPfpWarning, SeIconChar.MouseWheel.ToIconString(), "Open Settings Menu", PluginLink.WindowHandler.OpenWindow<ConfigWindow>);
         PettableUser curUser = null!;
 
-        BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle), StylingColours.titleBg);
+        if (!BeginListBox("##<4>", new System.Numerics.Vector2(780, maxBoxHeightBattle)))
+            return;
 
         DrawGraph(new List<Action<int, int>>()
         {
@@ -203,7 +203,7 @@ public class PetListWindow : PetWindow
             current = true;
         }
 
-        BeginListBox("##<6>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
+        BeginListBox("##<6>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
 
         DrawPetGraph(user, () =>
         {
@@ -231,6 +231,7 @@ public class PetListWindow : PetWindow
             string basePetName = user.SerializableUser.ids[index] < -1 ?
                 RemapUtils.instance.PetIDToName(user.SerializableUser.ids[index]) :
                 SheetUtils.instance.GetPetName(user.SerializableUser.ids[index]);
+            basePetName = StringUtils.instance.MakeTitleCase(basePetName);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{user.SerializableUser.ids[index]}");
 
@@ -259,8 +260,8 @@ public class PetListWindow : PetWindow
                 else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
 
-            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePetIndex);
-            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.MinionIndex);
+            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePet.Index);
+            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.Minion.Index);
 
             removeMeUser = null!;
             existingUser = null!;
@@ -273,7 +274,7 @@ public class PetListWindow : PetWindow
     void DrawListSharing()
     {
         texturePointer = 0;
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightSharing));
+        BeginListBox("##<111>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightSharing));
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 01f));
         ImGui.BeginTable("##Image Table 7", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.ScrollY);
@@ -294,6 +295,7 @@ public class PetListWindow : PetWindow
             DrawBasicBar("Nickname", $"{name}");
             int id = importedData.ids[i];
             string basePetName = id < -1 ? RemapUtils.instance.PetIDToName(id) : SheetUtils.instance.GetPetName(id);
+            basePetName = StringUtils.instance.MakeTitleCase(basePetName);
             DrawBasicBar("Type", $"{basePetName}");
             DrawBasicBar("ID", $"{id}");
 
@@ -310,7 +312,7 @@ public class PetListWindow : PetWindow
     void DrawImportType(ImportType importType)
     {
         if (importType == ImportType.None) Label("=", Styling.SmallButton);
-        if (importType == ImportType.New) NewLabel("+", Styling.SmallButton);
+        if (importType == ImportType.New)  NewLabel("+", Styling.SmallButton);
         if (importType == ImportType.Rename) NewLabel("O", Styling.SmallButton);
         if (importType == ImportType.Remove) XButtonError("X", Styling.SmallButton);
     }
@@ -318,7 +320,7 @@ public class PetListWindow : PetWindow
     void DrawBattlePetList()
     {
         DrawBattlePetWarningHeader();
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeightBattle));
+        BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeightBattle));
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -329,7 +331,7 @@ public class PetListWindow : PetWindow
             if (currentIsLocalUser)
             {
                 DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattleID(nickname.Item1, true),
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
@@ -352,15 +354,16 @@ public class PetListWindow : PetWindow
 
     void DrawBattlePetWarningHeader()
     {
-        BeginListBox("##WarningHeader", new System.Numerics.Vector2(780, 40));
-        ImGui.TextColored(StylingColours.highlightText, "Please note: If you use /petglamour and change a pets glamour, it will retain the same name.");
+        BeginListBox("##WarningHeader", new System.Numerics.Vector2(ContentAvailableX, 40));
+        ImGui.TextColored(StylingColours.defaultText, "Please note: /petglamour,/petmirage now works. You can no longer name pets based on your job.\nIf you, for example, name a ruby carbuncle they will have that same name regardless of job.");
         ImGui.EndListBox();
     }
 
     void DrawUserHeader(PettableUser user, float xOffset, float yOffset, Action drawMidElement)
     {
         if (user == null) return;
-        BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(780, 90), StylingColours.titleBg);
+        if (!BeginListBox($"##<PetList{internalCounter++}>", new System.Numerics.Vector2(ContentAvailableX, 90)))
+            return;
 
         DrawUserTexture(user);
 
@@ -469,7 +472,7 @@ public class PetListWindow : PetWindow
     {
         SetAdvancedMode(false);
         ImportData data = ImportHandler.SetImportString(ImGui.GetClipboardText());
-        if (data is FailedImportData failedImportData) PluginLog.Log($"Import Error occured: {failedImportData.ErrorMessage}");
+        if (data is FailedImportData failedImportData) PetLog.Log($"Import Error occured: {failedImportData.ErrorMessage}");
         if (data is SucceededImportData succeededImportData)
         {
             importedData = succeededImportData;
@@ -490,7 +493,6 @@ public class PetListWindow : PetWindow
         temporaryUser.SerializableUser.Reset();
         foreach (SerializableNickname n in foundNicknames)
         {
-            n.Setup();
             if (temporaryUser.SerializableUser.ids.Contains(n.ID)) continue;
             AddTexture(n.ID);
             temporaryUser.SerializableUser.SaveNickname(n.ID, n.Name, false, false, true);
@@ -499,7 +501,8 @@ public class PetListWindow : PetWindow
 
     void DrawList()
     {
-        BeginListBox("##<2>", new System.Numerics.Vector2(780, maxBoxHeight), StylingColours.titleBg);
+        if (!BeginListBox("##<2>", new System.Numerics.Vector2(ContentAvailableX, maxBoxHeight)))
+            return;
 
         DrawPetGraph(user, null!, (row, column) =>
         {
@@ -578,7 +581,7 @@ public class PetListWindow : PetWindow
         if (textureID == 0) return;
         string iconPath = PluginHandlers.TextureProvider.GetIconPath(textureID)!;
         if (iconPath == null) return;
-        TextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
         TextureWraps!.Add(textureWrap);
     }
 
@@ -613,15 +616,7 @@ public class PetListWindow : PetWindow
     void DrawTexture(nint thenint)
     {
         TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
-        nint texturePointer = thenint;
-        if (!PluginLink.Configuration.displayImages)
-        {
-            PushStyleColor(ImGuiCol.Button, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
-            PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.defaultBackground);
-            ImGui.Button("", new System.Numerics.Vector2(83, 83));
-        }
-        else if (texturePointer != nint.Zero) ImGui.Image(texturePointer, new Vector2(83, 83));
+        DrawImage(thenint, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 
@@ -654,7 +649,7 @@ public class PetListWindow : PetWindow
     void DisposeTextures()
     {
         lastUser = user;
-        foreach (TextureWrap tWrap in TextureWraps)
+        foreach (IDalamudTextureWrap tWrap in TextureWraps)
             tWrap?.Dispose();
         TextureWraps?.Clear();
     }
@@ -699,5 +694,36 @@ public class PetListWindow : PetWindow
         releaseGraph = false;
         ImGui.EndTable();
         ImGui.PopStyleVar();
+    }
+
+
+    public void Reset()
+    {
+        texturePointer = 0;
+        graphPointer = -1;
+        user = null!;
+        lastUser = null!;
+        temporaryUser = null!;
+        existingUser = null!;
+        removeMeUser = null!;
+        youSureUser = null!;
+
+        userMode = false;
+        currentIsLocalUser = false;
+        current = true;
+        releaseGraph = false;
+        _openedAddPet = false;
+        youSureMode = false;
+        advancedMode=false;
+        existed= false;
+        searchField = string.Empty;
+        minionSearchField = string.Empty;
+
+        foundNicknames.Clear();
+        foreach (IDalamudTextureWrap tWrap in TextureWraps)
+            tWrap?.Dispose();
+        TextureWraps.Clear();
+
+        importedData = null!;
     }
 }

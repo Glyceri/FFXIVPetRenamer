@@ -1,6 +1,4 @@
-﻿using Dalamud.Game;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -17,58 +15,36 @@ internal class TooltipHook : QuickTextHookableElement
     [Signature("66 44 89 44 24 ?? 53 55", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<Delegates.AccurateShowTooltip> showTooltip = null!;
 
-    // Hook from: https://github.com/Kouzukii/ffxiv-whichpatchwasthat/blob/main/WhichPatchWasThat/Hooks.cs
-    // Actually its now from: https://github.com/Caraxi/SimpleTweaksPlugin/blob/b390e0686c1f8b30e163306dcc3420390b67f340/Tweaks/Tooltips/AdditionalItemInfo.cs#L21
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 4C 8B AA ?? ?? ?? ??", DetourName = nameof(ItemDetailOnUpdateDetour))]
-    private Hook<Delegates.AddonOnRequestedUpdate>? ItemDetailOnUpdateHook { get; init; }
-
     public static string latestOutcome = string.Empty;
 
     internal override void OnQuickInit()
     {
-        RegisterHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
-        RegisterHook("Tooltip", 2, Allowed, 3, TooltipDetour);
+        RegisterSoftHook("ActionDetail", 5, Allowed, -1, null!, (str) => latestOutcome = str);
+        RegisterSoftHook("Tooltip", 2, Allowed, 3, () => TooltipHelper.getNextUser);
 
         showTooltip?.Enable();
-        ItemDetailOnUpdateHook?.Enable();
-    }
-
-    private unsafe IntPtr ItemDetailOnUpdateDetour(IntPtr a1, IntPtr a2, IntPtr a3)
-    {
-        TooltipHelper.handleAsItem = true;
-        return ItemDetailOnUpdateHook!.Original(a1, a2, a3);
     }
 
     bool Allowed(int id)
     {
+        if (!PluginLink.Configuration.displayCustomNames) return false;
         if (id >= 0 && !PluginLink.Configuration.allowTooltipsOnMinions) return false;
         if (id <= -2 && !PluginLink.Configuration.allowTooltipsBattlePets) return false;
         return true;
     }
 
-    PettableUser TooltipDetour()
-    {
-        return TooltipHelper.nextUser;
-    }
     internal override void OnQuickDispose()
     {
         showTooltip?.Dispose();
-        ItemDetailOnUpdateHook?.Dispose();
     }
-
-    internal override void OnUpdate(Framework framework) =>
-        OnBaseUpdate(framework, PluginLink.Configuration.displayCustomNames);
-
-    IntPtr lastTooltip;
 
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte a2, uint a3, IntPtr a4, IntPtr a5, IntPtr a6, char a7, char a8)
     {
-        if (!TooltipHelper.lastTooltipWasMap) TooltipHelper.nextUser = null!;
-        TooltipHelper.lastTooltipWasMap = false;
-        if (lastTooltip != a4)
+        TooltipHelper.handleAsMap = false;
+        if (TooltipHelper.lastWasMap)
         {
-            lastTooltip = a4;
-            TooltipHelper.handleAsItem = false;
+            TooltipHelper.handleAsMap = true;
+            TooltipHelper.lastWasMap = false;
         }
         return showTooltip!.Original(tooltip, a2, a3, a4, a5, a6, a7, a8);
     }
@@ -76,13 +52,20 @@ internal class TooltipHook : QuickTextHookableElement
 
 public unsafe static class TooltipHelper
 {
+    public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
+
+    public static bool lastWasMap = false;
+    public static bool handleAsMap = false;
     public static PettableUser nextUser = null!;
 
-    public static bool lastTooltipWasMap = false;
-    public static void SetNextUp(PettableUser user) => nextUser = user;
-
-    public static List<PartyListInfo> partyListInfos = new List<PartyListInfo>();
-    public static bool handleAsItem = false;
+    public static PettableUser getNextUser
+    {
+        get 
+        { 
+            if (handleAsMap) return nextUser;
+            return PluginLink.PettableUserHandler.LocalUser()!; 
+        }
+    }
 }
 
 public class PartyListInfo

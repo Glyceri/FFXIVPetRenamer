@@ -13,12 +13,15 @@ public class SerializableUserV3
     public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
+    public int[] mainSkeletons { get; set; } = PluginConstants.baseSkeletons;
+    public int[] softSkeletons { get; set; } = PluginConstants.baseSkeletons;
 
     [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
     [JsonIgnore] public bool hasCompanion { get; private set; } = false;
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
     [JsonIgnore] public int length => ids.Length;
+    [JsonIgnore] public int lastTouchedID = -1;
 
     public SerializableUserV3(string username, ushort homeworld)
     {
@@ -26,7 +29,12 @@ public class SerializableUserV3
         this.homeworld = homeworld;
     }
 
-    [JsonConstructor]
+    public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld)
+    {
+        if (mainSkeletons?.Length == 5) this.mainSkeletons = mainSkeletons;
+        if (softSkeletons?.Length == 5) this.softSkeletons = softSkeletons;
+    }
+
     public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld) : this(username, homeworld)
     {
         if (ids.Length != names.Length) return;
@@ -34,12 +42,12 @@ public class SerializableUserV3
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
     }
 
-    public void LoopThroughBreakable(Func<(int, string), bool> callback)
+    [JsonConstructor]
+    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld, mainSkeletons, softSkeletons)
     {
-        if (callback == null) return;
+        if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
-            if (callback.Invoke((ids[i], names[i])))
-                break;
+            SaveNickname(ids[i], names[i], i == ids.Length - 1);
     }
 
     public void LoopThrough(Action<(int, string)> callback)
@@ -49,31 +57,28 @@ public class SerializableUserV3
             callback.Invoke((ids[i], names[i]));
     }
 
-    public string? GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
-    public string? GetNameFor(int id)
+    public string GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
+    public string GetNameFor(int id)
     {
         int index = IndexOf(id);
-        if (index == -1) return null;
-        if (names.Length < index) return null;
+        if (index == -1) return string.Empty;
+        if (names.Length < index) return string.Empty;
         if (names[index].Length > PluginConstants.ffxivNameSize)
             return names[index][..PluginConstants.ffxivNameSize];
-        return names[index];
+        return names[index] ?? string.Empty;
     }
 
     public bool ToggleBackChanged()
     {
-        if (changed)
-        {
-            changed = false;
-            return true;
-        }
-        return false;
+        bool curChanged = changed;
+        changed = false;
+        return curChanged;
     }
 
     public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
     {
         if (id == -1) return;
-        //if (name == string.Empty && id >= 0) RemoveNickname(id, notifyICP);
+        if (name == string.Empty && id > -1) RemoveNickname(id, notifyICP);
         if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
         else GenerateNewNickname(id, name, notifyICP, force);
 
@@ -87,11 +92,11 @@ public class SerializableUserV3
             if (curID <= -1) hasBattlePet = true;
             if (hasCompanion && hasBattlePet) break;
         }
-    }
+    }   
 
     void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
     {
-        if(!force)
+        if (!force)
             if (id == -1 || name == string.Empty) 
                 return;
         List<int> idList = ids.ToList();
@@ -100,8 +105,11 @@ public class SerializableUserV3
         namesList.Add(name);
         ids = idList.ToArray();
         names = namesList.ToArray();
+
+        lastTouchedID = id;
         changed = true;
-        if(notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
+
+        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
     public void OverwriteNickname(int id, string name, bool notifyICP = false)
@@ -110,7 +118,10 @@ public class SerializableUserV3
         if (index == -1) return;
         if (names[index] == name) return;
         names[index] = name;
+
+        lastTouchedID = id;
         changed = true;
+
         if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
@@ -118,7 +129,10 @@ public class SerializableUserV3
     {
         int index = IndexOf(id);
         if (index == -1) return;
+
+        lastTouchedID = id;
         changed = true;
+
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         idList.RemoveAt(index);

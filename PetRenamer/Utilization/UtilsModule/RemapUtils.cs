@@ -1,6 +1,8 @@
 ﻿using Lumina.Excel.GeneratedSheets;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -8,6 +10,8 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 {
+    public static RemapUtils instance { get; set; } = null!;
+
     //ClassJob ID's reminder
     //Adventurer        : 0                 Warrior         : 21
     //Gladiator         : 1                 Dragoon         : 22
@@ -34,101 +38,85 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     internal override void OnLateRegistered()
     {
         foreach (int skeletonID in battlePetRemap.Keys)
-            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(skeletonID));
+            bakedBattlePetSkeletonToName.Add(skeletonID, SheetUtils.instance.GetBattlePetName(-skeletonID));
+
+        foreach (int actionID in petIDToAction.Values)
+            if (!bakedActionIDToName.ContainsKey(actionID))
+                bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
     }
+
+    public readonly List<int> mutatableID = new List<int>()
+    {
+        -407, //Eos
+        -408, //Selene
+        -409, //Emerald Carbuncle
+        -410, //Ruby Carbuncle
+        -411, //Carbuncle
+        -412, //Topaz Carbuncle
+        -415, //Ifrit-Egi
+        -416, //Titan-Egi
+        -417 //Garuda-Egi
+    };
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { -2, 25798 },
-        { -3, 17215 },
-        { -4, 16501 },
-        { -5, 16472 }
+        { -409, 25804 }, //Summon Emerald
+        { -410, 25802 }, //Summon Ruby
+        { -411, 25798 }, //Summon Carbuncle
+        { -412, 25803 }, //Summon Topaz
+        { -415, 25805 }, //Summon Ifrit
+        { -416, 25806 }, //Summon Titan
+        { -417, 25807 }, //Summon Garuda
+        { -407, 17215 }, //Summon Eos
+        { -408, 17215 }, //Summon Eos
+        { -2618, 16501 }, //Automaton Queen
+        { -2619, 16545 }, //Summon Seraph
+        { -2620, 25831 }, //Summon Phoenix
+        { -2621, 16472 }, //Living Shadow
+        { -3122, 25838 }, //Summon Ifrit II
+        { -3123, 25840 }, //Summon Garuda II
+        { -3124, 25839 }, //Summon Titan II
+        { -1930, 7427 }, //Summon Bahamut
+        { -1027, 2864 }, //Rook Autoturret
     };
+
+    // [Populated]
+    public readonly Dictionary<int, string> bakedActionIDToName = new Dictionary<int, string>();
 
     // [Populated]
     public readonly Dictionary<int, string> bakedBattlePetSkeletonToName = new Dictionary<int, string>();
 
     public readonly Dictionary<int, int> battlePetRemap = new Dictionary<int, int>() 
     {
-        { 407,  6  }, //EOS
-        { 408,  7  }, //Selene
+        { -407,  6  }, //EOS
+        { -408,  7  }, //Selene
 
-        { 409,  1  }, //Emerald Carbuncle
-        { 410,  38 }, //Ruby Carbuncle
-        { 411,  36 }, //Carbuncle
-        { 412,  2  }, //Topaz Carbuncle
+        { -409,  1  }, //Emerald Carbuncle
+        { -410,  38 }, //Ruby Carbuncle
+        { -411,  36 }, //Carbuncle
+        { -412,  2  }, //Topaz Carbuncle
 
-        { 415,  27 }, //Ifrit-Egi
-        { 416,  28 }, //Titan-Egi
-        { 417,  29 }, //Garuda-Egi 
+        { -415,  27 }, //Ifrit-Egi
+        { -416,  28 }, //Titan-Egi
+        { -417,  29 }, //Garuda-Egi 
 
-        { 1027, 8  }, //Rook Autoturret MCHN
-        { 2619, 21 }, //Seraph
-        { 2618, 18 }, //Automaton Queen
-        { 2621, 17 }, //Esteem DRK
+        { -1027, 8  }, //Rook Autoturret MCHN
+        { -2619, 21 }, //Seraph
+        { -2618, 18 }, //Automaton Queen
+        { -2621, 17 }, //Esteem DRK
 
-        { 2620, 14 }, //Demi-Phoenix
-        { 1930, 10 }, //Demi-Bahamut
-        { 3124, 31 }, //Topaz-Titan
-        { 3123, 32 }, //Emerald-Garuda
-        { 3122, 30 }, //Ruby-Iffrit
+        { -2620, 14 }, //Demi-Phoenix
+        { -1930, 10 }, //Demi-Bahamut
+        { -3124, 31 }, //Topaz-Titan
+        { -3123, 32 }, //Emerald-Garuda
+        { -3122, 30 }, //Ruby-Iffrit
     };
-
-    public readonly Dictionary<int, int> skeletonToClass = new Dictionary<int, int>()
-    {
-        { 407,  -3  }, //EOS
-        { 408,  -3  }, //Selene
-
-        { 409,  -2  }, //Emerald Carbuncle
-        { 410,  -2 }, //Ruby Carbuncle
-        { 411,  -2 }, //Carbuncle
-        { 412,  -2  }, //Topaz Carbuncle
-
-        { 415,  -2 }, //Ifrit-Egi
-        { 416,  -2 }, //Titan-Egi
-        { 417,  -2 }, //Garuda-Egi 
-
-        { 1027, -4  }, //Rook Autoturret MCHN
-        { 2619, -3 }, //Seraph
-        { 2618, -4 }, //Automaton Queen
-        { 2621, -5 }, //Esteem DRK
-
-        { 2620, -2 }, //Demi-Phoenix
-        { 1930, -2 }, //Demi-Bahamut
-        { 3124, -2 }, //Topaz-Titan
-        { 3123, -2 }, //Emerald-Garuda
-        { 3122, -2 }, //Ruby-Iffrit
-    };
-
-    private readonly Dictionary<int, int> classToPetID = new Dictionary<int, int>()
-    {
-        { 26,   -2 }, //Arcanist to Carbuncle  
-        { 27,   -2 }, //Summoner to Carbuncle  
-        { 28,   -3 }, //Scholar to Faerie
-        { 31,   -4 }, //Machinist to Automaton Queen
-        { 32,   -5 }, //Dark Knight Esteem
-    };
-
-    private readonly Dictionary<int, string> petIDToPetName = new Dictionary<int, string>()
-    {
-        { -2, "Carbuncle" },
-        { -3, "Faerie" },
-        { -4, "Automaton Queen" },
-        { -5, "Esteem" },
-    };
-
-    public static RemapUtils instance { get; set; } = null!;
 
     internal string PetIDToName(int petID)
     {
-        if (!petIDToPetName.ContainsKey(petID)) return string.Empty;
-        return petIDToPetName[petID];
-    }
-
-    internal int GetPetIDFromClass(int jobclass)
-    {
-        if (!classToPetID.ContainsKey(jobclass)) return -1;
-        return classToPetID[jobclass];
+       if (petID < -1 && bakedBattlePetSkeletonToName.TryGetValue(petID, out var name)) return name;
+       else if (petID > -1) return SheetUtils.instance.GetPetName(petID);
+       return string.Empty;
     }
 
     internal int BattlePetSkeletonToNameID(int skeletonID)
@@ -144,7 +132,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
             foreach (Companion companion in SheetUtils.instance.petSheet)
             {
                 if (companion == null) continue;
-                if (companion.Model!.Value!.Model! == companionID)
+                if (companion.Model!.Value!.RowId! == companionID)
                     return companion.Icon;
             }
         }else if (companionID <= -2)
@@ -155,6 +143,35 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
         return 786;
     }
+
+    #region OBSOLETE
+    [Obsolete("We dont use classes anymore")]
+    public readonly Dictionary<int, int> battlePetToClass = new Dictionary<int, int>()
+    {
+        { -407,  -3  }, //EOS
+        { -408,  -3  }, //Selene
+
+        { -409,  -2  }, //Emerald Carbuncle
+        { -410,  -2 }, //Ruby Carbuncle
+        { -411,  -2 }, //Carbuncle
+        { -412,  -2  }, //Topaz Carbuncle
+
+        { -415,  -2 }, //Ifrit-Egi
+        { -416,  -2 }, //Titan-Egi
+        { -417,  -2 }, //Garuda-Egi 
+
+        { -1027, -4 }, //Rook Autoturret MCHN
+        { -2619, -3 }, //Seraph
+        { -2618, -4 }, //Automaton Queen
+        { -2621, -5 }, //Esteem DRK
+
+        { -2620, -2 }, //Demi-Phoenix
+        { -1930, -2 }, //Demi-Bahamut
+        { -3124, -2 }, //Topaz-Titan
+        { -3123, -2 }, //Emerald-Garuda
+        { -3122, -2 }, //Ruby-Iffrit
+    };
+    #endregion
 }
 
 internal enum ClassType
@@ -163,4 +180,9 @@ internal enum ClassType
     Summoning,
     Healing,
     Machinist
+}
+
+public static class RemapUtilsHelper
+{
+    public static string GetIconPath(this uint textureID) => PluginHandlers.TextureProvider.GetIconPath(textureID) ?? string.Empty;
 }

@@ -1,4 +1,4 @@
-﻿using Dalamud.Game;
+﻿using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ public class IpcStorage : IDisposable
     // (string, uint) is the Equivelant of PetRenamer.Core.Serialization.SerializableUser
     // Which is now Obsolete ;)
 
-    public delegate void OnIpcChange(Dictionary<(string, uint), NicknameData> change);
+    public delegate void OnIpcChange(ref Dictionary<(string, uint), NicknameData> change);
     public event OnIpcChange IpcChange = null!;
 
     private Dictionary<(string, uint), NicknameData> _IpcAssignedNicknames = new Dictionary<(string, uint), NicknameData>();
@@ -31,12 +31,12 @@ public class IpcStorage : IDisposable
         }
     }
 
-    public void OnUpdate(Framework framework)
+    public void OnUpdate(IFramework framework)
     {
         if (touched)
         {
             touched = false;
-            IpcChange?.Invoke(_IpcAssignedNicknames);
+            IpcChange?.Invoke(ref _IpcAssignedNicknames);
         }
     }
 
