@@ -56,6 +56,7 @@ public class PetBase
 
         Character gObject = *(Character*)pet;
         _faulty = CatchFaultyPlayer(gObject.GameObject);
+        if (id == -2621) _faulty = false;
 
         _id = id;
         _index = gObject.GameObject.ObjectIndex;
