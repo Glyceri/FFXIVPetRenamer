@@ -63,7 +63,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.1.4"), new CLE("General", "Fixed wrong names displaying in certain situations when having used /petglamour. (/petglamour will very soon receive a full rework).")) },
         { new CLS(new Version("1.4.2.0"), new CLE("General", "Every different Battle Pet model can now be assigned a name. No more naming per Job.", "You can no longer see names on models that are Human. Sorry to those that enjoyed this feature, but it is problematic :("), new CLE("Saving", "Save File Version Updated from Version 7 to Version 8.")) },
         { new CLS(new Version("1.4.2.1"), new CLE("General", "Fixed a bug where Legacy Compatibily would only update your file by 1 step compared to all the steps.")) },
-        { new CLS(new Version("1.4.2.2"), new CLE("General", "Custom names will show up on Esteem again.")) },
+        { new CLS(new Version("1.4.2.2"), new CLE("General", "Custom names will show up on Esteem again.", "Added new IPC endpoints for way, WAY better integration.")) },
     };
 
     const string starter = "  ◉   ";

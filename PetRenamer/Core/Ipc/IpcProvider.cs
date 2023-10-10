@@ -5,6 +5,7 @@ using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Logging;
 using System;
 
@@ -20,6 +21,7 @@ public static class IpcProvider
     private static ICallGateProvider<(uint, uint)>? ApiVersion;
     private static ICallGateProvider<object>? Ready;
     private static ICallGateProvider<object>? Disposing;
+    private static ICallGateProvider<bool>? Enabled;
 
     private static ICallGateProvider<Character, string, object>? SetCharacterNickname;
     private static ICallGateProvider<Character, string>? GetCharacterNickname;
@@ -27,13 +29,20 @@ public static class IpcProvider
     private static ICallGateProvider<string, object>? LocalCharacterChangedNickname;
     private static ICallGateProvider<Character, object>? ClearCharacter;
 
+    private static ICallGateProvider<GameObject, string>? GetPetNickname;
+    private static ICallGateProvider<nint, string>? GetPetNicknameNint;
+
     public const string NameSpace = "PetRenamer.";
     public const string ApiVersionIdentifier = $"{NameSpace}{nameof(ApiVersion)}";
     public const string ReadyIdentifier = $"{NameSpace}{nameof(Ready)}";
+    public const string EnabledIdentifier = $"{NameSpace}{nameof(Enabled)}";
     public const string DisposingIdentifier = $"{NameSpace}{nameof(Disposing)}";
     public const string SetCharacterNicknameIdentifier = $"{NameSpace}{nameof(SetCharacterNickname)}";
     public const string GetCharacterNicknameIdentifier = $"{NameSpace}{nameof(GetCharacterNickname)}";
     public const string GetLocalCharacterPetNicknameIdentifier = $"{NameSpace}{nameof(GetLocalCharacterNickname)}";
+
+    public const string GetPetNicknameIdentifier = $"{NameSpace}{nameof(GetPetNickname)}";
+    public const string GetPetNicknameNintIdentifier = $"{NameSpace}{nameof(GetPetNicknameNint)}";
 
     public const string ClearCharacterIdentifier = $"{NameSpace}{nameof(ClearCharacter)}";
     public const string LocalCharacterChangedPetNicknameIdentifier = $"{NameSpace}{nameof(LocalCharacterChangedNickname)}";
@@ -43,6 +52,7 @@ public static class IpcProvider
         ApiVersion = dalamudPluginInterface.GetIpcProvider<(uint, uint)>(ApiVersionIdentifier);
         Ready = dalamudPluginInterface.GetIpcProvider<object>(ReadyIdentifier);
         Disposing = dalamudPluginInterface.GetIpcProvider<object>(DisposingIdentifier);
+        Enabled = dalamudPluginInterface.GetIpcProvider<bool>(EnabledIdentifier);
 
         SetCharacterNickname = dalamudPluginInterface.GetIpcProvider<Character, string, object>(SetCharacterNicknameIdentifier);
         GetCharacterNickname = dalamudPluginInterface.GetIpcProvider<Character, string>(GetCharacterNicknameIdentifier);
@@ -50,11 +60,18 @@ public static class IpcProvider
         ClearCharacter = dalamudPluginInterface.GetIpcProvider<Character, object>(ClearCharacterIdentifier);
         LocalCharacterChangedNickname = dalamudPluginInterface.GetIpcProvider<string, object>(LocalCharacterChangedPetNicknameIdentifier);
 
+        GetPetNickname = dalamudPluginInterface.GetIpcProvider<GameObject, string>(GetPetNicknameIdentifier);
+        GetPetNicknameNint = dalamudPluginInterface.GetIpcProvider<nint, string>(GetPetNicknameNintIdentifier);
+
         ApiVersion.RegisterFunc(VersionFunction);
+        Enabled.RegisterFunc(() => true);
         SetCharacterNickname.RegisterAction(SetCharacterNicknameCallback);
         GetCharacterNickname.RegisterFunc(GetCharacterNicknameCallback);
         GetLocalCharacterNickname.RegisterFunc(GetLocalCharacterNicknameCallback);
         ClearCharacter.RegisterAction(ClearCharacterCallback);
+
+        GetPetNickname.RegisterFunc(GetPetNicknameCallback);
+        GetPetNicknameNint.RegisterFunc(GetPetNicknameFromNintCallback);
     }
 
 
@@ -62,8 +79,6 @@ public static class IpcProvider
     internal static void NotifyDisposing() => Disposing?.SendMessage();
     internal static void ChangedPetNickname(NicknameData? data)
     {
-        PetLog.Log("Set nickname data: " + data?.ToNormalString() ?? string.Empty);
-
         if (PluginHandlers.ClientState.LocalPlayer is PlayerCharacter playerCharacter)
         {
             (string, uint) player = (playerCharacter.Name.TextValue, playerCharacter.HomeWorld.Id);
@@ -98,6 +113,15 @@ public static class IpcProvider
         return GetCharacterNicknameCallback(PluginHandlers.ClientState.LocalPlayer);
     }
 
+    static string GetPetNicknameFromNintCallback(nint pet)
+    {
+        PetBase pBase = PluginLink.PettableUserHandler.GetPet(pet);
+        if (pBase == null) return string.Empty;
+        return pBase.CustomName;
+    }
+
+    static unsafe string GetPetNicknameCallback(GameObject pet) => GetPetNicknameFromNintCallback(pet?.Address ?? nint.Zero);
+
     static string GetCharacterNicknameCallback(Character character)
     {
         try
@@ -107,8 +131,7 @@ public static class IpcProvider
             if (user == null) return string.Empty;
 
             NicknameData data = new NicknameData(user.Minion.ID, user.Minion.UsedName, user.BattlePet.ID, user.BattlePet.UsedName);
-            string jsonString = data == null ? string.Empty : JsonConvert.SerializeObject(data);
-            return jsonString;
+            return data == null ? string.Empty : JsonConvert.SerializeObject(data);
         }
         catch (Exception e) { PetLog.LogError(e, $"Error handling {nameof(GetCharacterNickname)} IPC."); }
 
@@ -124,6 +147,10 @@ public static class IpcProvider
     internal static void DeInit()
     {
         ApiVersion?.UnregisterFunc();
+        Enabled?.UnregisterFunc();
+
+        GetPetNickname?.UnregisterFunc();
+        GetPetNicknameNint?.UnregisterFunc();
 
         SetCharacterNickname?.UnregisterAction();
         GetCharacterNickname?.UnregisterFunc();
