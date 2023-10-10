@@ -11,12 +11,10 @@ namespace PetRenamer.Core.Legacy;
 internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAttribute>
 {
     int lastInternalVersion = -1;
-    readonly int currentInternalVersion = 0;
+    int currentInternalVersion => PluginLink.Configuration.Version;
     readonly List<LegacyElement> correctElements = new List<LegacyElement>();
 
     bool hasFoundPlayer = false;
-
-    public LegacyCompatibilityHandler() => currentInternalVersion = PluginLink.Configuration.Version;
 
     void Reset()
     {
