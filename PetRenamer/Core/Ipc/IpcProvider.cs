@@ -7,6 +7,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Logging;
+using PetRenamer.Utilization.UtilsModule;
 using System;
 
 namespace PetRenamer;

@@ -67,8 +67,8 @@ public class PetBase
         _lastPointer = _pet;
         _lastID = _id;
 
-        _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
-        _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
+        _baseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(_id, NameType.Singular));
+        _baseNamePlural = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(_id, NameType.Plural));
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
 
