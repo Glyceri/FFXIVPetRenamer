@@ -65,6 +65,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.2.1"), new CLE("General", "Fixed a bug where Legacy Compatibily would only update your file by 1 step compared to all the steps.")) },
         { new CLS(new Version("1.4.2.2"), new CLE("General", "Custom names will show up on Esteem again.", "Added new IPC endpoints for way, WAY better integration.")) },
         { new CLS(new Version("1.4.2.3"), new CLE("General", "Fixed an issue where sometimes pet names would show as lower case variants.")) },
+        { new CLS(new Version("1.4.2.4"), new CLE("General", "Fixed an issue where the pet search bar would crash your game.")) },
     };
 
     const string starter = "  ◉   ";
