@@ -16,7 +16,9 @@ public class PetBase
     public string CustomName => _customName ?? string.Empty;
     public string BaseName => _baseName ?? string.Empty;
     public string BaseNamePlural => _baseNamePlural ?? string.Empty;
-    public string UsedName => Faulty ? BaseName : CustomName == string.Empty ? BaseName : CustomName;
+    public string BaseNameCapitalized => StringUtils.instance.MakeTitleCase(BaseName);
+    public string BaseNamePluralCapitalized => StringUtils.instance.MakeTitleCase(BaseNamePlural);
+    public string UsedName => Faulty ? BaseNameCapitalized : CustomName == string.Empty ? BaseNameCapitalized : CustomName;
 
     public bool Changed => _petChanged;
     public bool Faulty => _faulty;
@@ -67,8 +69,8 @@ public class PetBase
         _lastPointer = _pet;
         _lastID = _id;
 
-        _baseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(_id, NameType.Singular));
-        _baseNamePlural = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(_id, NameType.Plural));
+        _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
+        _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
 
