@@ -109,12 +109,16 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (lastIds.Count > cacheSizes)
             lastIds.Remove(lastIds.Keys.ToArray().First());
 
-        string tempName = RemapUtils.instance.PetIDToName(id);
-        if (tempName != string.Empty)
+        if (id < -1)
         {
-            lastIds[(id, nameType)] = tempName;
-            return tempName;
+            string tempName = RemapUtils.instance.PetIDToName(id);
+            if (tempName != string.Empty)
+            {
+                lastIds[(id, nameType)] = tempName;
+                return tempName;
+            }
         }
+
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;

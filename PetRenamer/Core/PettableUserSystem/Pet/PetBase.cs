@@ -16,7 +16,9 @@ public class PetBase
     public string CustomName => _customName ?? string.Empty;
     public string BaseName => _baseName ?? string.Empty;
     public string BaseNamePlural => _baseNamePlural ?? string.Empty;
-    public string UsedName => Faulty ? BaseName : CustomName == string.Empty ? BaseName : CustomName;
+    public string BaseNameCapitalized => StringUtils.instance.MakeTitleCase(BaseName);
+    public string BaseNamePluralCapitalized => StringUtils.instance.MakeTitleCase(BaseNamePlural);
+    public string UsedName => Faulty ? BaseNameCapitalized : CustomName == string.Empty ? BaseNameCapitalized : CustomName;
 
     public bool Changed => _petChanged;
     public bool Faulty => _faulty;
@@ -56,6 +58,7 @@ public class PetBase
 
         Character gObject = *(Character*)pet;
         _faulty = CatchFaultyPlayer(gObject.GameObject);
+        if (id == -2621) _faulty = false;
 
         _id = id;
         _index = gObject.GameObject.ObjectIndex;
