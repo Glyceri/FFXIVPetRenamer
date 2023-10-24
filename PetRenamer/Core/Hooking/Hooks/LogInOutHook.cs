@@ -22,16 +22,16 @@ internal class LogInOutHook : HookableElement
 
     void OnLogin()
     {
-        DoThing();
+        ResetWindows();
     }
 
     void OnLogout()
     {
         PluginLink.WindowHandler.CloseAllWindows();
-        DoThing();
+        ResetWindows();
     }
 
-    void DoThing()
+    void ResetWindows()
     {
         PluginLink.WindowHandler.GetWindow<PetListWindow>().Reset();
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>().Reset();

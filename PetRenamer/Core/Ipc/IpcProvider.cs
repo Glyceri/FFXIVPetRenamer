@@ -117,7 +117,7 @@ public static class IpcProvider
     static string GetPetNicknameFromNintCallback(nint pet)
     {
         PetBase pBase = PluginLink.PettableUserHandler.GetPet(pet);
-        if (pBase == null) return string.Empty;
+        if (pBase == null) return null!;
         return pBase.CustomName;
     }
 
