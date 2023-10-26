@@ -16,12 +16,15 @@ public class SerializableUserV3
     public int[] mainSkeletons { get; set; } = PluginConstants.baseSkeletons;
     public int[] softSkeletons { get; set; } = PluginConstants.baseSkeletons;
 
+    [JsonIgnore] public string[] ipcNames { get; private set; } = Array.Empty<string>();
     [JsonIgnore] public bool changed = false;
     [JsonIgnore] public bool hasAny => hasCompanion || hasBattlePet;
     [JsonIgnore] public bool hasCompanion { get; private set; } = false;
     [JsonIgnore] public bool hasBattlePet { get; private set; } = false;
     [JsonIgnore] public int length => ids.Length;
     [JsonIgnore] public int lastTouchedID = -1;
+    [JsonIgnore] public QuickName this[int i] => new QuickName(ids[i], names[i], ipcNames[i]);
+    public bool Contains(int id) => ids.Contains(id);
 
     public SerializableUserV3(string username, ushort homeworld)
     {
@@ -37,6 +40,7 @@ public class SerializableUserV3
 
     public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld) : this(username, homeworld)
     {
+        if (ids == null || names == null) return;
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
@@ -45,6 +49,7 @@ public class SerializableUserV3
     [JsonConstructor]
     public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld, mainSkeletons, softSkeletons)
     {
+        if (ids == null || names == null) return;
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
@@ -58,14 +63,16 @@ public class SerializableUserV3
     }
 
     public string GetNameFor(string name) => GetNameFor(SheetUtils.instance.GetIDFromName(name));
-    public string GetNameFor(int id)
+    public string GetNameFor(int id, bool allowIPC = true)
     {
         int index = IndexOf(id);
         if (index == -1) return string.Empty;
         if (names.Length < index) return string.Empty;
-        if (names[index].Length > PluginConstants.ffxivNameSize)
-            return names[index][..PluginConstants.ffxivNameSize];
-        return names[index] ?? string.Empty;
+        string currentName = allowIPC ? ipcNames[index] : string.Empty;
+        if (currentName == string.Empty) currentName = names[index];
+        if (currentName.Length > PluginConstants.ffxivNameSize)
+            return currentName[..PluginConstants.ffxivNameSize];
+        return currentName ?? string.Empty;
     }
 
     public bool ToggleBackChanged()
@@ -75,12 +82,12 @@ public class SerializableUserV3
         return curChanged;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true, bool notifyICP = false, bool force = false)
+    public void SaveNickname(int id, string name, bool doCheck = true, bool force = false, bool isIPCName = false)
     {
         if (id == -1) return;
-        if (name == string.Empty && id > -1) RemoveNickname(id, notifyICP);
-        if (ids.Contains(id)) OverwriteNickname(id, name, notifyICP);
-        else GenerateNewNickname(id, name, notifyICP, force);
+        if (name == string.Empty && id > -1 && !isIPCName) RemoveNickname(id);
+        if (ids.Contains(id)) OverwriteNickname(id, name, isIPCName);
+        else GenerateNewNickname(id, name, force, isIPCName);
 
         if (!doCheck) return;
         hasCompanion = false;
@@ -92,40 +99,47 @@ public class SerializableUserV3
             if (curID <= -1) hasBattlePet = true;
             if (hasCompanion && hasBattlePet) break;
         }
-    }   
+    }
 
-    void GenerateNewNickname(int id, string name, bool notifyICP = false, bool force = false)
+    void GenerateNewNickname(int id, string name, bool force = false, bool isIpcName = false)
     {
         if (!force)
             if (id == -1 || name == string.Empty) 
                 return;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
+        List<string> ipcList = ipcNames.ToList();
         idList.Add(id);
-        namesList.Add(name);
+        namesList.Add(isIpcName ? string.Empty : name);
+        ipcList.Add(isIpcName ?  name : string.Empty);
         ids = idList.ToArray();
         names = namesList.ToArray();
+        ipcNames = ipcList.ToArray();
 
         lastTouchedID = id;
         changed = true;
-
-        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
-    public void OverwriteNickname(int id, string name, bool notifyICP = false)
+    public void OverwriteNickname(int id, string name, bool isIPCName = false)
     {
         int index = IndexOf(id);
         if (index == -1) return;
-        if (names[index] == name) return;
-        names[index] = name;
+        if (!isIPCName)
+        {
+            if (names[index] == name) return;
+            names[index] = name;
+        }
+        else
+        {
+            if (ipcNames[index] == name) return;
+            ipcNames[index] = name;
+        }
 
         lastTouchedID = id;
         changed = true;
-
-        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, name, id, name));
     }
 
-    public void RemoveNickname(int id, bool notifyICP = false)
+    public void RemoveNickname(int id)
     {
         int index = IndexOf(id);
         if (index == -1) return;
@@ -135,11 +149,13 @@ public class SerializableUserV3
 
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
+        List<string> ipcList = ipcNames.ToList();
         idList.RemoveAt(index);
         namesList.RemoveAt(index);
+        ipcList.RemoveAt(index);
         ids = idList.ToArray();
         names = namesList.ToArray();
-        if (notifyICP) IpcProvider.ChangedPetNickname(new NicknameData(id, string.Empty, id, string.Empty));
+        ipcNames = ipcList.ToArray();
     }
 
     int IndexOf(int id)
@@ -189,9 +205,35 @@ public class SerializableUserV3
         return counter;
     }
 
+    public int AccurateIPCCount()
+    {
+        int counter = 0;
+        for (int i = 0; i < ipcNames.Length!; i++)
+        {
+            if (ipcNames[i] != string.Empty && ipcNames[i] != null)
+                counter++;
+        }
+        return counter;
+    }
+
     public void Reset()
     {
         ids = Array.Empty<int>();
         names = Array.Empty<string>();
+    }
+}
+
+public struct QuickName
+{
+    public int ID;
+    public string RawName;
+    public string Name => IpcName == string.Empty ? RawName : IpcName;
+    public string IpcName;
+    
+    public QuickName(int id, string name, string ipcName)
+    {
+        ID = id;
+        RawName = name;
+        IpcName = ipcName;
     }
 }

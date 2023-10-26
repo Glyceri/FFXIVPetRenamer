@@ -2,6 +2,7 @@ namespace PetRenamer.Core;
 
 public static class PluginConstants
 {
+    public const string apiNamespace = "PetRenamer.";
     public const string internalName = "PetRenamer";
     public const string pluginName = "Pet Nicknames";
     public const string mainCommandAlt = "/petname";

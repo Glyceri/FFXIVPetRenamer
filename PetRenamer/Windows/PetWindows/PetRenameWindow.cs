@@ -141,14 +141,14 @@ public class PetRenameWindow : PetWindow
 
     void Save()
     {
-        user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName, notifyICP: true);
+        user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName);
         OnButton();
     }
 
     void Delete()
     {
         activePet.temporaryPetName = string.Empty;
-        user.SerializableUser.RemoveNickname(activePet.petID, notifyICP: true);
+        user.SerializableUser.RemoveNickname(activePet.petID);
         OnButton();
     }
 

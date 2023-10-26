@@ -39,6 +39,7 @@ public unsafe class PettableUser
     public int UserChangedID => _ChangedID;
     public bool UserChanged => _UserChanged || AnyPetChanged;
     public bool UserFaulty => Pets.Any(p => p.Faulty);
+    public bool IsIPCOnlyUser { get; init; } = false;
 
     int _ChangedID = 0;
     bool _UserChanged = false;
@@ -167,5 +168,5 @@ public unsafe class PettableUser
         return additional;
     }
 
-    public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID)!;
+    public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID, false)!;
 }

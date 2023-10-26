@@ -76,7 +76,10 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public void SanitizeString(ref string baseString, string finder, int count)
     {
         foreach (string filler in PluginConstants.removeables)
-           baseString = Regex.Replace(baseString, @$"\b{filler + finder}\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+        {
+            string newFinder = finder.Replace("[", @"^\[").Replace("]", @"^\]\");
+            baseString = Regex.Replace(baseString, $"\\b{filler + newFinder}\\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+        }
     }
 
     public string MakeString(char c, int count) => new string(c, count);

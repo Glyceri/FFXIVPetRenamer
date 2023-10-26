@@ -5,6 +5,7 @@ using PetRenamer.Core.Networking.Structs;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -48,9 +49,12 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     public void OnDeclare(PettableUser user, UserDeclareType type, bool force)
     {
-        (string, uint) currentUser = (user.UserName, user.Homeworld);
-        if (type == UserDeclareType.Remove) HandleAsRemove(ref currentUser);
-        else if (type == UserDeclareType.Add) HandleAsAdd(ref currentUser, force);
+        try
+        {
+            (string, uint) currentUser = (user.UserName, user.Homeworld);
+            if (type == UserDeclareType.Remove) HandleAsRemove(ref currentUser);
+            else if (type == UserDeclareType.Add) HandleAsAdd(ref currentUser, force);
+        }catch(Exception e) { PetLog.Log(e.Message); }
     }
 
     public void RequestDownload((string, uint) currentUser) => Task.Run(() => DownloadPagination(currentUser));

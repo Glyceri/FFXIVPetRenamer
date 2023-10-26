@@ -272,6 +272,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
         return returner;
     }
 
+    protected bool IPCLabel(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
+    {
+        PushStyleColours(new Vector4(1, 0, 1, 1), LabelColours);
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        bool returner = ImGui.Button(text, styling);
+        if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
+        if (callback != null && returner) callback();
+        return returner;
+    }
+
     protected bool Label(string text, Vector4 textColour)
     {
         PushStyleColours(StylingColours.basicLabelColour, LabelColours);
@@ -409,10 +419,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
         Button("No", Styling.ListIDField, PluginConstants.Strings.keepUserTooltip, noCallback.Invoke);
     }
 
-    protected void DrawBasicBar(string label, string value)
+    protected void DrawBasicBar(string label, string value, bool alternateColour = false)
     {
         DrawBasicLabel(label);
-        Label(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
+        if (!alternateColour) Label(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
+        else IPCLabel(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
         SetTooltipHovered($"{label}: {value}");
     }
 

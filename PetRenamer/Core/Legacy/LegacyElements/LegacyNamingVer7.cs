@@ -21,8 +21,8 @@ internal class LegacyNamingVer7 : LegacyElement
             List<SerializableNickname> nicknames = new List<SerializableNickname>();
             for (int i = 0; i < user.SerializableUser.length; i++)
             {
-                int id = user.SerializableUser.ids[i];
-                string name = user.SerializableUser.names[i];
+                int id = user.SerializableUser[i].ID;
+                string name = user.SerializableUser[i].Name;
                 if (id > -1) nicknames.Add(new SerializableNickname(id, name));
                 else if (id == -1) continue;
 

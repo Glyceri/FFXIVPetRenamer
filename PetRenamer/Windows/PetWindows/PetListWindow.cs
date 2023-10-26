@@ -161,8 +161,8 @@ public class PetListWindow : PetWindow
         if (youSureMode && youSureUser == u) DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}", () => DeleteUser(u), DisableYouSureMode);
         else
         {
-            DrawBasicBar("Homeworld", $"{SheetUtils.instance.GetWorldName(u.Homeworld)}");
-            DrawBasicBar("Petcount", $"Total: {u.SerializableUser.AccurateTotalPetCount()}, Minions: {u.SerializableUser.AccurateMinionCount()}, Battle Pets: {u.SerializableUser.AccurateBattlePetCount()}");
+            DrawBasicBar("Homeworld", $"{SheetUtils.instance.GetWorldName(u.Homeworld)}", u.IsIPCOnlyUser);
+            DrawBasicBar("Petcount", $"Total: {u.SerializableUser.AccurateTotalPetCount()}, Minions: {u.SerializableUser.AccurateMinionCount()}, Battle Pets: {u.SerializableUser.AccurateBattlePetCount()}", u.IsIPCOnlyUser);
         }
     }
 
@@ -227,13 +227,16 @@ public class PetListWindow : PetWindow
                 DrawEmptyBar("X", "Stop Sharing", () => advancedMode = false);
                 return;
             }
-            DrawBasicBar("Nickname", $"{user.SerializableUser.names[index]}");
-            string basePetName = user.SerializableUser.ids[index] < -1 ?
-                RemapUtils.instance.PetIDToName(user.SerializableUser.ids[index]) :
-                SheetUtils.instance.GetPetName(user.SerializableUser.ids[index]);
+
+            QuickName pet = user.SerializableUser[index];
+
+            DrawBasicBar("Nickname", $"{pet.Name}");
+            string basePetName = pet.ID < -1 ?
+                RemapUtils.instance.PetIDToName(pet.ID) :
+                SheetUtils.instance.GetPetName(pet.ID);
             basePetName = StringUtils.instance.MakeTitleCase(basePetName);
             DrawBasicBar("Type", $"{basePetName}");
-            DrawBasicBar("ID", $"{user.SerializableUser.ids[index]}");
+            DrawBasicBar("ID", $"{pet.ID}");
 
         }, () => false);
         ImGui.EndListBox();
@@ -327,25 +330,25 @@ public class PetListWindow : PetWindow
             int index = graphPointer - 1;
             if (index < 0) return;
 
-            (int, string) nickname = (user.SerializableUser.ids[index], user.SerializableUser.names[index]);
+            QuickName nickname = user.SerializableUser[index];
             if (currentIsLocalUser)
             {
-                DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.Item1, true),
+                DrawAdvancedBarWithQuit("Nickname", nickname.Name,
+                    () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true),
                     "X", "Clears the nickname!",
                     () =>
                     {
-                        user.SerializableUser.SaveNickname(nickname.Item1, "", true, true, true);
+                        user.SerializableUser.SaveNickname(nickname.ID, "", true, true);
                         PluginLink.Configuration.Save();
                     });
             }
-            else DrawBasicBar("Nickname", nickname.Item2);
-            DrawFinalBars(StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.Item1)), nickname.Item1.ToString(), "Pet Name", "Pet ID");
+            else DrawBasicBar("Nickname", nickname.Name);
+            DrawFinalBars(StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.ID)), nickname.ID.ToString(), "Pet Name", "Pet ID");
         },
         () =>
         {
             if (graphPointer == 0) return true;
-            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] >= -1;
+            if (graphPointer - 1 >= 0) return user.SerializableUser[graphPointer - 1].ID >= -1;
             return false;
         });
 
@@ -493,9 +496,9 @@ public class PetListWindow : PetWindow
         temporaryUser.SerializableUser.Reset();
         foreach (SerializableNickname n in foundNicknames)
         {
-            if (temporaryUser.SerializableUser.ids.Contains(n.ID)) continue;
+            if (temporaryUser.SerializableUser.Contains(n.ID)) continue;
             AddTexture(n.ID);
-            temporaryUser.SerializableUser.SaveNickname(n.ID, n.Name, false, false, true);
+            temporaryUser.SerializableUser.SaveNickname(n.ID, n.Name, false, true);
         }
     }
 
@@ -520,34 +523,34 @@ public class PetListWindow : PetWindow
             }
             if (index < 0) return;
 
-            (int, string) nickname = (user.SerializableUser.ids[index], user.SerializableUser.names[index]);
+            QuickName nickname = user.SerializableUser[index];
             if (!currentIsLocalUser)
             {
                 SetOpenedAddPet(false);
-                DrawBasicBar("Nickname", nickname.Item2);
+                DrawBasicBar("Nickname", nickname.Name);
             }
             else
             {
                 string closeString = _openedAddPet ? "+" : "X";
                 string tooltipString = _openedAddPet ? "Adds the minion" : "Deletes the nickname!";
 
-                DrawAdvancedBarWithQuit("Nickname", nickname.Item2,
-                () => OpenID(nickname.Item1, true),
+                DrawAdvancedBarWithQuit("Nickname", nickname.Name,
+                () => OpenID(nickname.ID, true),
                 closeString, tooltipString,
                 () =>
                 {
-                    OpenID(nickname.Item1, false);
+                    OpenID(nickname.ID, false);
                     if (_openedAddPet) return;
-                    user.SerializableUser.RemoveNickname(nickname.Item1, true);
+                    user.SerializableUser.RemoveNickname(nickname.ID);
                     PluginLink.Configuration.Save();
                 });
             }
-            DrawFinalBars(StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.Item1)), nickname.Item1.ToString(), "Minion Name", "Minion ID");
+            DrawFinalBars(StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), nickname.ID.ToString(), "Minion Name", "Minion ID");
         },
         () =>
         {
             if (graphPointer == 0 && !currentIsLocalUser) return true;
-            if (graphPointer - 1 >= 0) return user.SerializableUser.ids[graphPointer - 1] <= -1;
+            if (graphPointer - 1 >= 0) return user.SerializableUser[graphPointer - 1].ID <= -1;
             return false;
         });
 

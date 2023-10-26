@@ -17,7 +17,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 {
     public static PettableUserUtils instance { get; set; } = null!;
 
-    public unsafe void Solve(PettableUser user)
+    public unsafe void Solve(PettableUser user, bool dontCare = false)
     {
         if (user == null) return;
 
@@ -28,14 +28,14 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (bChara == null) return;
         user.SetUser(bChara);
 
-        if (user.SerializableUser.hasCompanion || user.LocalUser)
+        if (user.SerializableUser.hasCompanion || user.LocalUser || dontCare)
         {
             int companionIndex = bChara->Character.GameObject.ObjectIndex + 1;
             Companion* companion = (Companion*)GameObjectManager.GetGameObjectByIndex(companionIndex);
             user.SetCompanion(companion);
         }
 
-        if (user.SerializableUser.hasBattlePet || user.LocalUser)
+        if (user.SerializableUser.hasBattlePet || user.LocalUser || dontCare)
         {
             BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
             if (battlePet != null)
