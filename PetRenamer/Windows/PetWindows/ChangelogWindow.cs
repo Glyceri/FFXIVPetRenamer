@@ -67,7 +67,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.2.3"), new CLE("General", "Fixed an issue where sometimes pet names would show as lower case variants.")) },
         { new CLS(new Version("1.4.2.4"), new CLE("General", "Fixed an issue where the pet search bar would crash your game.")) },
         { new CLS(new Version("1.4.2.5"), new CLE("General", "Fixed an issue that caused DelvUI nameplates to not show up with this plugin enabled.")) },
-        { new CLS(new Version("1.4.3.0"), new CLE("General", "Added Wotsit support.", "Your xllog should no longer say my plugin failed to dispose hooks. (It has always properly disposed, but now the error should no longer show up.)", "Changed IPC endpoints so plugins to work properly.", "Fixed a bug where using [ ] in your petnames would cause weirdness... there's probably more weirdness that can appear, sorry for that.")) },
+        { new CLS(new Version("1.4.3.0"), new CLE("General", "Added Wotsit support.", "Your xllog should no longer say my plugin failed to dispose hooks. (It has always properly disposed, but now the error should no longer show up.)", "Changed IPC endpoints.", "Fixed a bug where using [ ] in your petnames would cause weirdness... there's probably more weirdness that can appear, sorry for that.")) },
     };
 
     const string starter = "  ◉   ";
