@@ -7,12 +7,9 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Logging;
-using PetRenamer.Utilization.UtilsModule;
 using System;
 
 namespace PetRenamer;
-
-//Most code blatently stolen from https://github.com/Caraxi/Honorific/blob/master/IpcProvider.cs
 
 public static class IpcProvider
 {
