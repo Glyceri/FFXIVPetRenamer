@@ -20,20 +20,10 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
     internal override void OnRegistered() => PluginLink.IpcStorage.Register(OnIpcChange);
     internal override void Dispose() => PluginLink.IpcStorage.Deregister(OnIpcChange);
 
-    public void OnIpcChange(ref Dictionary<(string, uint), NicknameData> data)
+    public void OnIpcChange(ref List<(nint, string)> data)
     {
-        foreach (var kvp in data)
-        {
-            PluginLink.PettableUserHandler.DeclareUser(new SerializableUserV3(kvp.Key.Item1, (ushort)kvp.Key.Item2), Core.PettableUserSystem.Enums.UserDeclareType.Add);
-            foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-            {
-                if (!user.SerializableUser.Equals(kvp.Key.Item1, (ushort)kvp.Key.Item2)) continue;
-                user.SerializableUser.SaveNickname(kvp.Value.ID, kvp.Value.Nickname!);
-                if (kvp.Value.ID != kvp.Value.BattleID)
-                    user.SerializableUser.SaveNickname(kvp.Value.BattleID, kvp.Value.BattleNickname!);
-            }
-        }
-        PluginLink.Configuration.Save();
+        foreach ((nint, string) item in data)
+            SetNickname(item.Item1, item.Item2);
     }
 
     public string GetNickname(nint pet)

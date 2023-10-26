@@ -1,8 +1,8 @@
 ﻿using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using PetRenamer.Core;
+using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
-using System;
 
 namespace PetRenamer;
 
@@ -66,8 +66,8 @@ public static class IpcProvider
     public static void NotifyClearPetNickname(nint pet) => ClearPetNickname?.SendMessage(pet);
 
     // Actions
-    static void OnClearPetNickname(nint pet) => throw new NotImplementedException();
-    static void OnSetPetNickname(nint pet, string nickname) => throw new NotImplementedException();
+    static void OnClearPetNickname(nint pet) => PluginLink.IpcStorage.Register((pet, string.Empty));
+    static void OnSetPetNickname(nint pet, string nickname) => PluginLink.IpcStorage.Register((pet, nickname));
 
     // Functions
     static (uint, uint) VersionFunction() => (MajorVersion, MinorVersion);

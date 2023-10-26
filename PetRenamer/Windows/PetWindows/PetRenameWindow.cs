@@ -156,8 +156,25 @@ public class PetRenameWindow : PetWindow
     {
         activePet.petName = activePet.temporaryPetName;
         PluginLink.Configuration.Save();
-        if (activePet.petID > -1) PenumbraIPCProvider.RedrawMinionByIndex(PluginLink.PettableUserHandler.LocalUser()!.Minion.Index);
-        if (activePet.petID < -1) PenumbraIPCProvider.RedrawBattlePetByIndex(PluginLink.PettableUserHandler.LocalUser()!.BattlePet.Index);
+        if (activePet.petID > -1) 
+        {
+            PetBase minion = PluginLink.PettableUserHandler.LocalUser()!.Minion;
+            PenumbraIPCProvider.RedrawMinionByIndex(minion.Index);
+            SendIPC(minion);
+        }
+        if (activePet.petID < -1)
+        {
+            PetBase battlePet = PluginLink.PettableUserHandler.LocalUser()!.BattlePet;
+            PenumbraIPCProvider.RedrawBattlePetByIndex(battlePet.Index);
+            SendIPC(battlePet);
+        }
+    }
+
+    void SendIPC(PetBase petBase)
+    {
+        if (!user.LocalUser) return;
+        if (!user.UserChanged) return;
+        IpcProvider.NotifySetPetNickname(petBase.Pet, activePet.petName);
     }
 
     public void OpenForId(int id, bool forceOpen = false)
