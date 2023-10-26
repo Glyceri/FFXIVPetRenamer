@@ -2,6 +2,8 @@ namespace PetRenamer.Core;
 
 public static class PluginConstants
 {
+    public const string internalName = "PetRenamer";
+    public const string pluginName = "Pet Nicknames";
     public const string mainCommandAlt = "/petname";
     public const string petConfigCommandAlt = "/petconfig";
     public const string mainCommand = "/minionname";

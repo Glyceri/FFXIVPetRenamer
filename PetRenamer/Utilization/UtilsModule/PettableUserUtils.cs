@@ -1,6 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
@@ -43,8 +44,9 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
             user.SetBattlePet(battlePet);
         }
-        user.SerializableUser.ToggleBackChanged();
+        bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
+        if (userChanged) FindAnythingIPCProvider.RegisterInitialNames();
         if (!user.AnyPetChanged) return;
         PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
         if (window == null) return;

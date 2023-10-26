@@ -181,16 +181,16 @@ public class PetRenameWindow : PetWindow
             activePet = lastPet;
     }
 
-    public void OpenForMinion(int id)
+    public void OpenForMinion(int id, bool forceOpen = false)
     {
         if (id == -1) pets[0]?.Clear();
-        else OpenForId(id);
+        else OpenForId(id, forceOpen);
     }
 
-    public void OpenForBattlePet(int id)
+    public void OpenForBattlePet(int id, bool forceOpen = false)
     {
         if (id == -1) pets[1]?.Clear();
-        else OpenForId(id);
+        else OpenForId(id, forceOpen);
     }
 
     void ForceOpenForID(int id)
