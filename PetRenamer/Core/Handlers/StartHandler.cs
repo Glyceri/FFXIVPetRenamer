@@ -19,5 +19,7 @@ internal class StartHandler
         FindAnythingIPCProvider.Init(ref dalamudPluginInterface);
 
         PetWindow.petMode = PetMode.Normal;
+        // For some reason update can call instantly upon subscribing, so we have to start it late.
+        PluginLink.UpdatableHandler.ReleaseUpdate();
     }
 }

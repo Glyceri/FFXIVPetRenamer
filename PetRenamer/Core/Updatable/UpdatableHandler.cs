@@ -8,7 +8,7 @@ namespace PetRenamer.Core.Updatable;
 
 internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
 {
-    public UpdatableHandler() => PluginHandlers.Framework.Update += MainUpdate;
+    public void ReleaseUpdate() => PluginHandlers.Framework.Update += MainUpdate;
     protected override void OnDipose() => PluginHandlers.Framework.Update -= MainUpdate;
     protected override void OnAllRegistered() => elements?.Sort(Compare);
     public void ClearAllUpdatables() => ClearAllElements();
