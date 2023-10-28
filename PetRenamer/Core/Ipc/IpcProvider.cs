@@ -3,7 +3,6 @@ using Dalamud.Plugin.Ipc;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Utilization.UtilsModule;
-using System.Xml.Linq;
 
 namespace PetRenamer;
 
@@ -34,6 +33,8 @@ public static class IpcProvider
         // Notifiers
         Ready               = dalamudPluginInterface.GetIpcProvider<object>                 ($"{PluginConstants.apiNamespace}Ready");
         Disposing           = dalamudPluginInterface.GetIpcProvider<object>                 ($"{PluginConstants.apiNamespace}Disposing");
+        // nint is the pointer to the pet
+        // string is the nickname
         SetPetNicknameNint  = dalamudPluginInterface.GetIpcProvider<nint, string, object>   ($"{PluginConstants.apiNamespace}OnSetPetNicknameNint");
         ClearPetNickname    = dalamudPluginInterface.GetIpcProvider<nint, object>           ($"{PluginConstants.apiNamespace}OnClearPetNicknameNint");
 

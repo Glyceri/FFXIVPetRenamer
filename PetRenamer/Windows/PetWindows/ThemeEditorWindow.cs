@@ -192,6 +192,9 @@ internal class ThemeEditorWindow : PetWindow
             refColour = customThemeTemporary.panelColour;
             if (DrawColour(ref refColour, customTheme.panelColour, currentTheme.panelColour, "Panel Background")) customThemeTemporary.panelColour = refColour;
 
+            refColour = customThemeTemporary.ipcLabelColour;
+            if (DrawColour(ref refColour, customTheme.ipcLabelColour, currentTheme.ipcLabelColour, "Ipc Panel Colour")) customThemeTemporary.ipcLabelColour = refColour;
+
             refColour = customThemeTemporary.titleBgActive;
             if (DrawColour(ref refColour, customTheme.titleBgActive, currentTheme.titleBgActive, "Title Background Active")) customThemeTemporary.titleBgActive = refColour;
 

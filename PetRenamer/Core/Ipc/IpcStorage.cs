@@ -7,9 +7,6 @@ namespace PetRenamer;
 
 public class IpcStorage : IDisposable
 {
-    // (string, uint) is the Equivelant of PetRenamer.Core.Serialization.SerializableUser
-    // Which is now Obsolete ;)
-
     public delegate void OnIpcChange(ref List<(nint, string)> change);
     public event OnIpcChange IpcChange = null!;
 
