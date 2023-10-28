@@ -75,6 +75,7 @@ public class PetListWindow : PetWindow
 
     void HandleModeCleanups(PettableUser localUser)
     {
+        if (localUser == null!) return;
         if (petMode != PetMode.Normal) SetOpenedAddPet(false);
         if (petMode != PetMode.ShareMode)
         {
