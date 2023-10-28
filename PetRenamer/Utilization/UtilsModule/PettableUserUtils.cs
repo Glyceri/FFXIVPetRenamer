@@ -23,6 +23,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
         user.Reset();
         if (!PluginLink.Configuration.displayCustomNames) return;
+        if (PluginHandlers.ClientState.IsPvP) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName.ToLowerInvariant()), true, (short)user.Homeworld);
         if (bChara == null) return;

@@ -67,6 +67,7 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
         public static Vector4 tooltipText => ThemeHandler.ActiveTheme.tooltipText;
 
         public static Vector4 basicLabelColour => ThemeHandler.ActiveTheme.basicLabelColour;
+        public static Vector4 ipcLabelColour => ThemeHandler.ActiveTheme.ipcLabelColour;
 
         public static Vector4 buttonHovered => ThemeHandler.ActiveTheme.buttonHovered;
         public static Vector4 buttonPressed => ThemeHandler.ActiveTheme.buttonPressed;

@@ -77,6 +77,7 @@ public class PetBase
         _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
         _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
         _customName = serializableUserV3.GetNameFor(_id)!;
+        _ipcCustomName = string.Empty;
     }
 
     public void SetIPCName(string name) => _ipcCustomName = name;
@@ -107,6 +108,7 @@ public class PetBase
     {
         _lastID = -1;
         _customName = string.Empty;
+        _ipcCustomName = string.Empty;
     }
 
     void Reset()

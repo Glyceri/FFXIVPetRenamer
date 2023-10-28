@@ -16,7 +16,6 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -76,6 +75,7 @@ public class PetListWindow : PetWindow
 
     void HandleModeCleanups(PettableUser localUser)
     {
+        if (localUser == null!) return;
         if (petMode != PetMode.Normal) SetOpenedAddPet(false);
         if (petMode != PetMode.ShareMode)
         {
@@ -152,11 +152,13 @@ public class PetListWindow : PetWindow
     {
         Action callback = u.LocalUser ? null! : () => ToggleSureMode(u);
 
+        string userText = $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}";
+        if (u.IsIPCOnlyUser) userText += "\n(This user will NEVER get saved)";
         DrawAdvancedBarWithQuit("Username", u.UserName, () =>
-        {
-            SetUserMode(false);
-            user = u;
-        }, "X", $"Remove User: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}", callback);
+            {
+                SetUserMode(false);
+                user = u;
+            }, "X", userText, callback, u.IsIPCOnlyUser);
 
         if (youSureMode && youSureUser == u) DrawYesNoBar($"Are you sure you want to remove: {youSureUser.UserName}@{SheetUtils.instance.GetWorldName(youSureUser.Homeworld)}", () => DeleteUser(u), DisableYouSureMode);
         else
@@ -315,7 +317,7 @@ public class PetListWindow : PetWindow
     void DrawImportType(ImportType importType)
     {
         if (importType == ImportType.None) Label("=", Styling.SmallButton);
-        if (importType == ImportType.New)  NewLabel("+", Styling.SmallButton);
+        if (importType == ImportType.New) NewLabel("+", Styling.SmallButton);
         if (importType == ImportType.Rename) NewLabel("O", Styling.SmallButton);
         if (importType == ImportType.Remove) XButtonError("X", Styling.SmallButton);
     }
@@ -331,19 +333,28 @@ public class PetListWindow : PetWindow
             if (index < 0) return;
 
             QuickName nickname = user.SerializableUser[index];
+            string infoString = nickname.HasIPCName ? "IPC Nickname" : "Nickname";
+
             if (currentIsLocalUser)
             {
-                DrawAdvancedBarWithQuit("Nickname", nickname.Name,
+                DrawAdvancedBarWithQuit(infoString, nickname.Name,
                     () => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForId(nickname.ID, true),
-                    "X", "Clears the nickname!",
+                    "X", nickname.HasIPCName ? "Clears the IPC nickname!" : "Clears the nickname!",
                     () =>
                     {
-                        user.SerializableUser.SaveNickname(nickname.ID, "", true, true);
+                        if (nickname.HasIPCName)
+                            if (nickname.ID == user.BattlePet.ID)
+                                IpcProvider.OnSetPetNickname(user.BattlePet.Pet, string.Empty);
+                        user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, true, nickname.HasIPCName);
+
+                        if(nickname.ID == user.BattlePet.ID && nickname.Name != string.Empty)
+                            IpcProvider.NotifySetPetNickname(user.BattlePet.Pet, string.Empty);
+
                         PluginLink.Configuration.Save();
-                    });
+                    }, nickname.HasIPCName);
             }
-            else DrawBasicBar("Nickname", nickname.Name);
-            DrawFinalBars(StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.ID)), nickname.ID.ToString(), "Pet Name", "Pet ID");
+            else DrawBasicBar(infoString, nickname.Name, nickname.HasIPCName);
+            DrawFinalBars(StringUtils.instance.MakeTitleCase(RemapUtils.instance.PetIDToName(nickname.ID)), nickname.ID.ToString(), "Pet Name", "Pet ID", nickname.HasIPCName);
         },
         () =>
         {
@@ -388,8 +399,16 @@ public class PetListWindow : PetWindow
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new System.Numerics.Vector2(Styling.ListButton.X + 8, -Styling.ListButton.Y * 2 - 8));
 
-        OverrideLabel($"[{user?.SerializableUser?.AccurateTotalPetCount()}, {user?.SerializableUser?.AccurateMinionCount()}, {user?.SerializableUser?.AccurateBattlePetCount()}]", Styling.ListButton);
-        SetTooltipHovered($"Total Pet Count: {user?.SerializableUser?.AccurateTotalPetCount()}, Minion Count: {user?.SerializableUser?.AccurateMinionCount()}, Battle Pet Count: {user?.SerializableUser?.AccurateBattlePetCount()}");
+        if (user!.IsIPCOnlyUser)
+        {
+            OverrideLabel($"[User added via IPC]", Styling.ListButton);
+            SetTooltipHovered($"This user is added via the IPC. It will NOT get saved!");
+        }
+        else
+        {
+            OverrideLabel($"[{user?.SerializableUser?.AccurateTotalPetCount()}, {user?.SerializableUser?.AccurateMinionCount()}, {user?.SerializableUser?.AccurateBattlePetCount()}]", Styling.ListButton);
+            SetTooltipHovered($"Total Pet Count: {user?.SerializableUser?.AccurateTotalPetCount()}, Minion Count: {user?.SerializableUser?.AccurateMinionCount()}, Battle Pet Count: {user?.SerializableUser?.AccurateBattlePetCount()}");
+        }
 
         ImGui.EndListBox();
 
@@ -524,28 +543,38 @@ public class PetListWindow : PetWindow
             if (index < 0) return;
 
             QuickName nickname = user.SerializableUser[index];
+
+            string infoString = nickname.HasIPCName ? "IPC Nickname" : "Nickname";
+
             if (!currentIsLocalUser)
             {
                 SetOpenedAddPet(false);
-                DrawBasicBar("Nickname", nickname.Name);
+                DrawBasicBar(infoString, nickname.Name, nickname.HasIPCName);
             }
             else
             {
                 string closeString = _openedAddPet ? "+" : "X";
-                string tooltipString = _openedAddPet ? "Adds the minion" : "Deletes the nickname!";
+                string tooltipString = _openedAddPet ? "Adds the minion" : nickname.HasIPCName ? "Clears the IPC Name" : "Deletes the nickname!";
 
-                DrawAdvancedBarWithQuit("Nickname", nickname.Name,
+                DrawAdvancedBarWithQuit(infoString, _openedAddPet ? nickname.RawName : nickname.Name,
                 () => OpenID(nickname.ID, true),
                 closeString, tooltipString,
                 () =>
                 {
                     OpenID(nickname.ID, false);
                     if (_openedAddPet) return;
-                    user.SerializableUser.RemoveNickname(nickname.ID);
+                    if (nickname.HasIPCName)
+                        if (nickname.ID == user.Minion.ID)
+                            IpcProvider.OnSetPetNickname(user.Minion.Pet, string.Empty);
+                        else user.SerializableUser.OverwriteNickname(nickname.ID, string.Empty, true);
+                    else user.SerializableUser.RemoveNickname(nickname.ID);
+
+                    if (nickname.ID == user.Minion.ID)
+                        IpcProvider.NotifySetPetNickname(user.Minion.Pet, string.Empty);
                     PluginLink.Configuration.Save();
-                });
+                }, nickname.HasIPCName);
             }
-            DrawFinalBars(StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), nickname.ID.ToString(), "Minion Name", "Minion ID");
+            DrawFinalBars(StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), nickname.ID.ToString(), "Minion Name", "Minion ID", nickname.HasIPCName);
         },
         () =>
         {
@@ -557,10 +586,10 @@ public class PetListWindow : PetWindow
         ImGui.EndListBox();
     }
 
-    void DrawFinalBars(string curName, string ID, string nameLabel, string IDLabel)
+    void DrawFinalBars(string curName, string ID, string nameLabel, string IDLabel, bool isIPC = false)
     {
-        DrawBasicBar(nameLabel, curName);
-        DrawBasicBar(IDLabel, ID);
+        DrawBasicBar(nameLabel, curName, isIPC);
+        DrawBasicBar(IDLabel, ID, isIPC);
     }
 
     void OpenID(int id, bool force)
@@ -717,8 +746,8 @@ public class PetListWindow : PetWindow
         releaseGraph = false;
         _openedAddPet = false;
         youSureMode = false;
-        advancedMode=false;
-        existed= false;
+        advancedMode = false;
+        existed = false;
         searchField = string.Empty;
         minionSearchField = string.Empty;
 

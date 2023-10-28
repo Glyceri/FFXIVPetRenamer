@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using ImGuiNET;
-using PetRenamer.Core.Debug;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Enums;
@@ -25,7 +24,7 @@ internal class DeveloperWindow : PetWindow
 
     int currentTab = 0;
 
-    readonly int maxTabs = 5;
+    readonly int maxTabs = 6;
 
     public override void OnDraw()
     {
@@ -50,11 +49,11 @@ internal class DeveloperWindow : PetWindow
             currentTab = maxTabs - 1;
 
         if (currentTab == 0) Users();
-
         else if (currentTab == 1) DrawHelpField();
-        else if (currentTab == 2) ChatLog();
+        else if (currentTab == 2) { }
         else if (currentTab == 3) PetNameWindow();
         else if (currentTab == 4) SettingsWindow();
+        else if (currentTab == 5) { }
     }
 
     void PetNameWindow()
@@ -139,47 +138,7 @@ internal class DeveloperWindow : PetWindow
         ImGui.EndTable();
         NewLine();
     }
-
-    void ChatLog()
-    {
-        if (!ImGui.BeginTable("##chatlogtable", 6, ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders))
-            return;
-
-        ImGui.TableSetupScrollFreeze(0, 1);
-        ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Message", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("New Message", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("Sender", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableSetupColumn("New Sender", ImGuiTableColumnFlags.WidthFixed);
-        ImGui.TableHeadersRow();
-
-        for(int i = DebugStorage.petChatMessages.Count -1; i >= 0; i--) 
-         {
-            PetChatMessage chatMessage = DebugStorage.petChatMessages[i];
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.SenderId}");
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.ChatType}");
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.Message}");
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.NewMessage}");
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.Sender}");
-
-            ImGui.TableNextColumn();
-            ImGui.TextUnformatted($"{chatMessage.NewSender}");
-         }
-
-        ImGui.EndTable();
-    }
-
+  
     unsafe void DrawHelpField()
     {
         GameObject? target = PluginHandlers.TargetManager.Target!;

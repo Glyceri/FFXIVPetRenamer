@@ -30,7 +30,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     };
 
     readonly List<(string, Type, string, Func<PetWindowHelpers, bool>)> helpButtons = new List<(string, Type, string, Func<PetWindowHelpers, bool>)>()
-    { 
+    {
         (SeIconChar.Triangle.ToIconString(),            typeof(DeveloperWindow),        "[Debug Window]", (pw) => PluginLink.Configuration.debugMode),
         (SeIconChar.BoxedLetterL.ToIconString(),        typeof(ChangelogWindow),        "[Changelog]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
@@ -81,7 +81,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         ptr.GrabMinSize = 10;
     }
 
-    protected void PostDrawHelper() 
+    protected void PostDrawHelper()
     {
         ImGuiStylePtr ptr = ImGui.GetStyle();
 
@@ -274,7 +274,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool IPCLabel(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColours(new Vector4(1, 0, 1, 1), LabelColours);
+        PushStyleColours(StylingColours.ipcLabelColour, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -400,9 +400,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
             () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
     }
 
-    protected void DrawAdvancedBarWithQuit(string label, string value, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!)
+    protected void DrawAdvancedBarWithQuit(string label, string value, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!, bool ipcMode = false)
     {
-        DrawBasicLabel(label);
+        DrawBasicLabel(label, ipcMode);
         Button($"          {value} ##<{internalCounter++}>", new Vector2(480, 25), $"{label}: {value.Trim()}", callback.Invoke);
         if (callback2 == null) return;
         SameLinePretendSpace();
@@ -421,15 +421,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawBasicBar(string label, string value, bool alternateColour = false)
     {
-        DrawBasicLabel(label);
+        DrawBasicLabel(label, alternateColour);
         if (!alternateColour) Label(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
         else IPCLabel(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
         SetTooltipHovered($"{label}: {value}");
     }
 
-    protected void DrawBasicLabel(string label)
+    protected void DrawBasicLabel(string label, bool alternative = false)
     {
-        Label(label, Styling.ListButton);
+        if(alternative) IPCLabel(label, Styling.ListButton);
+        else Label(label, Styling.ListButton);
         SameLinePretendSpace2();
     }
 

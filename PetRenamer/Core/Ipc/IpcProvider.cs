@@ -33,6 +33,8 @@ public static class IpcProvider
         // Notifiers
         Ready               = dalamudPluginInterface.GetIpcProvider<object>                 ($"{PluginConstants.apiNamespace}Ready");
         Disposing           = dalamudPluginInterface.GetIpcProvider<object>                 ($"{PluginConstants.apiNamespace}Disposing");
+        // nint is the pointer to the pet
+        // string is the nickname
         SetPetNicknameNint  = dalamudPluginInterface.GetIpcProvider<nint, string, object>   ($"{PluginConstants.apiNamespace}OnSetPetNicknameNint");
         ClearPetNickname    = dalamudPluginInterface.GetIpcProvider<nint, object>           ($"{PluginConstants.apiNamespace}OnClearPetNicknameNint");
 
@@ -60,19 +62,48 @@ public static class IpcProvider
     }
 
     // Notifiers
-    public static void NotifyReady() => Ready?.SendMessage();
-    public static void NotifyDisposing() => Disposing?.SendMessage();
-    public static void NotifySetPetNickname(nint pet, string name) => SetPetNicknameNint?.SendMessage(pet, name);
-    public static void NotifyClearPetNickname(nint pet) => ClearPetNickname?.SendMessage(pet);
+    public static void NotifyReady()
+    {
+        try
+        {
+            Ready?.SendMessage();
+        }
+        catch { }
+    }
+    public static void NotifyDisposing()
+    {
+        try
+        {
+            Disposing?.SendMessage();
+        }
+        catch { }
+    }
+    public static void NotifySetPetNickname(nint pet, string name)
+    {
+        try
+        {
+            if (name == string.Empty || name == null!) ClearPetNickname?.SendMessage(pet);
+            else SetPetNicknameNint?.SendMessage(pet, name);
+        }
+        catch { }
+    }
+    public static void NotifyClearPetNickname(nint pet)
+    {
+        try
+        {
+            ClearPetNickname?.SendMessage(pet);
+        }
+        catch { }
+    }
 
     // Actions
-    static void OnClearPetNickname(nint pet) => PluginLink.IpcStorage.Register((pet, string.Empty));
-    static void OnSetPetNickname(nint pet, string nickname) => PluginLink.IpcStorage.Register((pet, nickname));
+    public static void OnClearPetNickname(nint pet) => PluginLink.IpcStorage.Register((pet, string.Empty));
+    public static void OnSetPetNickname(nint pet, string nickname) => PluginLink.IpcStorage.Register((pet, nickname));
 
     // Functions
-    static (uint, uint) VersionFunction() => (MajorVersion, MinorVersion);
-    static string GetPetNicknameFromNintCallback(nint pet) => IpcUtils.instance.GetNickname(pet);
-    static bool EnabledDetour() => true;
+    public static(uint, uint) VersionFunction() => (MajorVersion, MinorVersion);
+    public static string GetPetNicknameFromNintCallback(nint pet) => IpcUtils.instance.GetNickname(pet);
+    public static bool EnabledDetour() => true;
 
 
     internal static void DeInit()

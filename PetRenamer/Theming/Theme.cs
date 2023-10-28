@@ -14,6 +14,7 @@ public abstract class Theme
     public abstract Vector4 tooltipText { get; set; }
 
     public abstract Vector4 basicLabelColour { get; set; }
+    public abstract Vector4 ipcLabelColour { get; set; }
 
     public abstract Vector4 panelColour { get; set; }
 

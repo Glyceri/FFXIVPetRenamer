@@ -13,18 +13,18 @@ namespace PetRenamer.Core.Chat.ChatElements;
 [Chat]
 internal unsafe class PetChatEmoteElement : ChatElement
 {
-    internal override bool OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!PluginLink.Configuration.displayCustomNames) return false;
-        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return false;
+        if (!PluginLink.Configuration.displayCustomNames) return;
+        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
-        if (bChara == null) return false;
+        if (bChara == null) return;
 
         nint value = nint.Zero;
 
         GameObjectID emoteTarget = bChara->Character.EmoteController.Target;
-        if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return false;
+        if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return;
 
         if (emoteTarget.Type == 4)
             foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
@@ -48,9 +48,9 @@ internal unsafe class PetChatEmoteElement : ChatElement
 
                 (string, string)[] replaceNames = new (string, string)[] { (pet.BaseNamePlural, pet.UsedName), (pet.BaseName, pet.UsedName) };
                 StringUtils.instance.ReplaceSeString(ref message, ref replaceNames);
-                return true;
+                return;
             }
         }
-        return false;
+        return;
     }
 }

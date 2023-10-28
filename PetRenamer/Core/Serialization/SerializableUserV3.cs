@@ -104,14 +104,14 @@ public class SerializableUserV3
     void GenerateNewNickname(int id, string name, bool force = false, bool isIpcName = false)
     {
         if (!force)
-            if (id == -1 || name == string.Empty) 
+            if (id == -1 || name == string.Empty)
                 return;
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         List<string> ipcList = ipcNames.ToList();
         idList.Add(id);
         namesList.Add(isIpcName ? string.Empty : name);
-        ipcList.Add(isIpcName ?  name : string.Empty);
+        ipcList.Add(isIpcName ? name : string.Empty);
         ids = idList.ToArray();
         names = namesList.ToArray();
         ipcNames = ipcList.ToArray();
@@ -146,7 +146,6 @@ public class SerializableUserV3
 
         lastTouchedID = id;
         changed = true;
-
         List<int> idList = ids.ToList();
         List<string> namesList = names.ToList();
         List<string> ipcList = ipcNames.ToList();
@@ -196,7 +195,7 @@ public class SerializableUserV3
     public int AccurateBattlePetCount()
     {
         int counter = 0;
-        for(int i = 0; i < names.Length!; i++)
+        for (int i = 0; i < names.Length!; i++)
         {
             if (ids[i] >= -1) continue;
             if (names[i] != string.Empty && names[i] != null)
@@ -229,7 +228,9 @@ public struct QuickName
     public string RawName;
     public string Name => IpcName == string.Empty ? RawName : IpcName;
     public string IpcName;
-    
+
+    public bool HasIPCName => IpcName != string.Empty && IpcName != null;
+
     public QuickName(int id, string name, string ipcName)
     {
         ID = id;

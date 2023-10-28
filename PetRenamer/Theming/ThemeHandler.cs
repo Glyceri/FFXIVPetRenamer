@@ -34,5 +34,6 @@ internal static class ThemeHandler
         theme.titleBgActive = theme.titleBgActive;
         theme.tileBgCollapsed = theme.tileBgCollapsed;
         theme.panelColour = newTheme.panelColour;
+        theme.ipcLabelColour = newTheme.ipcLabelColour;
     }
 }

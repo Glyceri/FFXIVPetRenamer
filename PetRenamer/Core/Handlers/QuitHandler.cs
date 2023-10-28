@@ -1,5 +1,4 @@
-﻿using PetRenamer.Core.Debug;
-using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
+﻿using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 
 namespace PetRenamer.Core.Handlers;
@@ -18,8 +17,6 @@ internal class QuitHandler
         PluginLink.IpcStorage?.Dispose();
         PluginLink.PettableUserHandler?.Dispose();
         PluginLink.NetworkingHandler?.Dispose();
-
-        DebugStorage.Dispose();
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();
