@@ -265,6 +265,9 @@ public class PetListWindow : PetWindow
                 else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
 
+            if (existingUser.LocalUser)
+                IpcUtils.instance.SendAllData();
+
             PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePet.Index);
             PenumbraIPCProvider.RedrawMinionByIndex(existingUser.Minion.Index);
 
@@ -342,13 +345,8 @@ public class PetListWindow : PetWindow
                     "X", nickname.HasIPCName ? "Clears the IPC nickname!" : "Clears the nickname!",
                     () =>
                     {
-                        if (nickname.HasIPCName)
-                            if (nickname.ID == user.BattlePet.ID)
-                                IpcProvider.OnSetPetNickname(user.BattlePet.Pet, string.Empty);
-                        user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, true, nickname.HasIPCName);
-
-                        if(nickname.ID == user.BattlePet.ID && nickname.Name != string.Empty)
-                            IpcProvider.NotifySetPetNickname(user.BattlePet.Pet, string.Empty);
+                        user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, false, nickname.HasIPCName);
+                        IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
 
                         PluginLink.Configuration.Save();
                     }, nickname.HasIPCName);
@@ -563,14 +561,11 @@ public class PetListWindow : PetWindow
                 {
                     OpenID(nickname.ID, false);
                     if (_openedAddPet) return;
-                    if (nickname.HasIPCName)
-                        if (nickname.ID == user.Minion.ID)
-                            IpcProvider.OnSetPetNickname(user.Minion.Pet, string.Empty);
-                        else user.SerializableUser.OverwriteNickname(nickname.ID, string.Empty, true);
-                    else user.SerializableUser.RemoveNickname(nickname.ID);
 
-                    if (nickname.ID == user.Minion.ID)
-                        IpcProvider.NotifySetPetNickname(user.Minion.Pet, string.Empty);
+                    if (nickname.HasIPCName) user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, false, true);
+                    else user.SerializableUser.RemoveNickname(nickname.ID);
+                    IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
+
                     PluginLink.Configuration.Save();
                 }, nickname.HasIPCName);
             }
