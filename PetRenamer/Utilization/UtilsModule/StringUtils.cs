@@ -15,17 +15,6 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public static StringUtils instance { get; set; } = null!;
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
-    public PlayerPayload? GetPlayerPayload(ref SeString message)
-    {
-        if (message == null) return null!;
-        for (int i = 0; i < message.Payloads.Count; i++)
-        {
-            if (message.Payloads[i] is not PlayerPayload pPayload) continue;
-            return pPayload;
-        }
-        return null!;
-    }
-
     public void ReplaceSeString(ref SeString message, ref (string, string)[] validNames)
     {
         if (validNames.Length == 0) return;

@@ -52,12 +52,24 @@ public static class FindAnythingIPCProvider
 
     static void Register(string prefix, string value, int petID, uint textureID)
     {
-        string guid = cgRegister?.InvokeFunc(PluginConstants.internalName, prefix + value, textureID) ?? null!;
-        if (guid == null || guid == string.Empty) return;
-        guids.Add((guid, petID));
+        try
+        {
+            string guid = cgRegister?.InvokeFunc(PluginConstants.internalName, prefix + value, textureID) ?? null!;
+            if (guid == null || guid == string.Empty) return;
+            guids.Add((guid, petID));
+        }
+        catch { }
     }
 
-    public static void Deregister() => cgUnregisterAll?.InvokeFunc(PluginConstants.internalName);
+    public static void Deregister()
+    {
+        try
+        {
+            cgUnregisterAll?.InvokeFunc(PluginConstants.internalName);
+        }
+        catch { }
+    }
+
     public static void DeInit()
     {
         guids.Clear();
