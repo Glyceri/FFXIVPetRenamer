@@ -157,6 +157,12 @@ public class SerializableUserV3
         ipcNames = ipcList.ToArray();
     }
 
+    public void ClearAllIPC()
+    {
+        string[] newIPCNames = new string[ipcNames.Length];
+        ipcNames = newIPCNames;
+    }
+
     int IndexOf(int id)
     {
         for (int i = 0; i < ids.Length; i++)

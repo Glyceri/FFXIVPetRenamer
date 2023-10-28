@@ -163,18 +163,6 @@ internal class DeveloperWindow : PetWindow
                         (ushort)((PlayerCharacter)target).HomeWorld.Id), UserDeclareType.Add);
             }
         }
-        if (target != null)
-        {
-            if (Button("Add Target as IPC"))
-            {
-                IpcUtils.instance.SetNickname(target.Address, "[Test IPC Name]");
-            }
-
-            if (Button("Clear Target as IPC"))
-            {
-                IpcUtils.instance.SetNickname(target.Address, string.Empty);
-            }
-        }
 
         if (Button("Add ALL Users EMPTY"))  AddUser(false, 0);
         if (Button("Add ALL Users"))        AddUser(true, 1000);
