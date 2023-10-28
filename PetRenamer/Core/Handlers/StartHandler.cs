@@ -20,6 +20,7 @@ internal class StartHandler
 
         PetWindow.petMode = PetMode.Normal;
         // For some reason update can call instantly upon subscribing, so we have to start it late.
+        // This doesn't happen when you automatically reload a plugin upon loading btw, only when you manually enable...
         PluginLink.UpdatableHandler.ReleaseUpdate();
     }
 }
