@@ -184,13 +184,14 @@ internal class DeveloperWindow : PetWindow
     {
         GameObject? target = PluginHandlers.TargetManager.Target!;
         if (target != null)
+        {
             if (Button("Add Target"))
             {
                 int minionTarget = target.ObjectIndex + 1;
                 CSCompanion* companion = (CSCompanion*)CSGameObjectManager.GetGameObjectByIndex(minionTarget);
                 int minID = -1;
                 string minName = string.Empty;
-                if(companion != null)
+                if (companion != null)
                 {
                     minName = "[TESTNAME]";
                     minID = companion->Character.CharacterData.ModelCharaId;
@@ -202,6 +203,19 @@ internal class DeveloperWindow : PetWindow
                         target.Name.ToString(),
                         (ushort)((PlayerCharacter)target).HomeWorld.Id), UserDeclareType.Add);
             }
+        }
+        if (target != null)
+        {
+            if (Button("Add Target as IPC"))
+            {
+                IpcUtils.instance.SetNickname(target.Address, "[Test IPC Name]");
+            }
+
+            if (Button("Clear Target as IPC"))
+            {
+                IpcUtils.instance.SetNickname(target.Address, string.Empty);
+            }
+        }
 
         if (Button("Add ALL Users EMPTY"))  AddUser(false, 0);
         if (Button("Add ALL Users"))        AddUser(true, 1000);
@@ -216,7 +230,7 @@ internal class DeveloperWindow : PetWindow
                 SerializableUserV3 serializableUser = user.SerializableUser;
                 for (int f = 0; f < user.SerializableUser.length; f++)
                 {
-                    if (serializableUser.names[i] != "[TESTNAME]") continue;
+                    if (serializableUser[i].Name != "[TESTNAME]") continue;
                     PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
                 }
             }

@@ -22,6 +22,11 @@ internal unsafe class PartyListHook : HookableElement
         PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
     }
 
+    internal override void OnDispose()
+    {
+        PluginHandlers.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+    }
+
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
 
     void Update(AtkUnitBase* baseD)

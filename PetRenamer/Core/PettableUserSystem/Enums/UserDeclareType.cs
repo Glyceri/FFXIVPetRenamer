@@ -3,5 +3,6 @@
 public enum UserDeclareType
 {
     Add,
-    Remove
+    Remove,
+    IPC
 }

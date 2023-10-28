@@ -11,4 +11,6 @@ internal class ContextMenuHandler : RegistryBase<ContextMenuElement, ContextMenu
     
     protected override void OnElementDestroyed(ContextMenuElement element) =>
         PluginLink.DalamudContextMenu.OnOpenGameObjectContextMenu -= element.OnOpenMenu;
+
+    protected override void OnDipose() => PluginLink.DalamudContextMenu.Dispose();
 }

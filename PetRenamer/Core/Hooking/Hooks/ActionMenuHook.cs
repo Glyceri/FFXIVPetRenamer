@@ -66,4 +66,10 @@ public unsafe class ActionMenuHook : HookableElement
 
         return ;
     }
+
+    internal override void OnDispose()
+    {
+        PluginHandlers.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+        PluginHandlers.AddonLifecycle.UnregisterListener(LifeCycleUpdate2);
+    }
 }

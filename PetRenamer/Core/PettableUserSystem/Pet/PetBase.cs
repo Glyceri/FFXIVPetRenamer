@@ -13,12 +13,14 @@ public class PetBase
     public int Index => _index;
     public uint ObjectID => _objectID;
 
-    public string CustomName => _customName ?? string.Empty;
+    public string IPCName => _ipcCustomName ?? string.Empty;
+    public string RawCustomName => _customName ?? string.Empty;
+    public string CustomName => IPCName == string.Empty ? (_customName ?? string.Empty) : IPCName;
     public string BaseName => _baseName ?? string.Empty;
     public string BaseNamePlural => _baseNamePlural ?? string.Empty;
     public string BaseNameCapitalized => StringUtils.instance.MakeTitleCase(BaseName);
     public string BaseNamePluralCapitalized => StringUtils.instance.MakeTitleCase(BaseNamePlural);
-    public string UsedName => Faulty ? BaseNameCapitalized : CustomName == string.Empty ? BaseNameCapitalized : CustomName;
+    public string UsedName => Faulty ? BaseNameCapitalized : IPCName == string.Empty ? CustomName == string.Empty ? BaseNameCapitalized : CustomName : IPCName; // Yes, very readable :)
 
     public bool Changed => _petChanged;
     public bool Faulty => _faulty;
@@ -26,12 +28,15 @@ public class PetBase
     public bool IsNull => _id != -1;
     public bool Has => _pet != nint.Zero;
 
+    public bool IsIPCPet => _ipcCustomName != null && _ipcCustomName != string.Empty;
+
     nint _pet;
 
     int _id;
     int _index;
     uint _objectID;
 
+    string _ipcCustomName = string.Empty;
     string _customName = string.Empty;
     string _baseName = string.Empty;
     string _baseNamePlural = string.Empty;
@@ -74,6 +79,8 @@ public class PetBase
         _customName = serializableUserV3.GetNameFor(_id)!;
     }
 
+    public void SetIPCName(string name) => _ipcCustomName = name;
+
     unsafe bool CatchFaultyPlayer(GameObject gObject)
     {
         if (!gObject.IsCharacter()) return true;
@@ -88,7 +95,6 @@ public class PetBase
     {
         _pet = nint.Zero;
         SoftReset();
-        Reset();
     }
 
     public void SoftReset()

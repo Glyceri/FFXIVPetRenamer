@@ -72,8 +72,11 @@ public class Configuration : IPluginConfiguration
     {
         if (currentSaveFileVersion < Version) return;
         List<SerializableUserV3> users = new List<SerializableUserV3>();
-        foreach(PettableUser user in PluginLink.PettableUserHandler.Users)
-            users.Add(user.SerializableUser);
+
+        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
+            if(user is not PettableIPCUser)
+                users.Add(user.SerializableUser);
+
         serializableUsersV3 = users.ToArray();
         PluginLink.DalamudPlugin.SavePluginConfig(this); 
     }

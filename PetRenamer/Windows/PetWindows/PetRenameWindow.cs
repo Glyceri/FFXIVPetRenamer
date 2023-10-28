@@ -141,14 +141,14 @@ public class PetRenameWindow : PetWindow
 
     void Save()
     {
-        user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName, notifyICP: true);
+        user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName);
         OnButton();
     }
 
     void Delete()
     {
         activePet.temporaryPetName = string.Empty;
-        user.SerializableUser.RemoveNickname(activePet.petID, notifyICP: true);
+        user.SerializableUser.RemoveNickname(activePet.petID);
         OnButton();
     }
 
@@ -156,8 +156,25 @@ public class PetRenameWindow : PetWindow
     {
         activePet.petName = activePet.temporaryPetName;
         PluginLink.Configuration.Save();
-        if (activePet.petID > -1) PenumbraIPCProvider.RedrawMinionByIndex(PluginLink.PettableUserHandler.LocalUser()!.Minion.Index);
-        if (activePet.petID < -1) PenumbraIPCProvider.RedrawBattlePetByIndex(PluginLink.PettableUserHandler.LocalUser()!.BattlePet.Index);
+        if (activePet.petID > -1) 
+        {
+            PetBase minion = PluginLink.PettableUserHandler.LocalUser()!.Minion;
+            PenumbraIPCProvider.RedrawMinionByIndex(minion.Index);
+            SendIPC(minion);
+        }
+        if (activePet.petID < -1)
+        {
+            PetBase battlePet = PluginLink.PettableUserHandler.LocalUser()!.BattlePet;
+            PenumbraIPCProvider.RedrawBattlePetByIndex(battlePet.Index);
+            SendIPC(battlePet);
+        }
+    }
+
+    void SendIPC(PetBase petBase)
+    {
+        if (!user.LocalUser) return;
+        if (!user.UserChanged) return;
+        IpcProvider.NotifySetPetNickname(petBase.Pet, activePet.petName);
     }
 
     public void OpenForId(int id, bool forceOpen = false)
@@ -181,16 +198,16 @@ public class PetRenameWindow : PetWindow
             activePet = lastPet;
     }
 
-    public void OpenForMinion(int id)
+    public void OpenForMinion(int id, bool forceOpen = false)
     {
         if (id == -1) pets[0]?.Clear();
-        else OpenForId(id);
+        else OpenForId(id, forceOpen);
     }
 
-    public void OpenForBattlePet(int id)
+    public void OpenForBattlePet(int id, bool forceOpen = false)
     {
         if (id == -1) pets[1]?.Clear();
-        else OpenForId(id);
+        else OpenForId(id, forceOpen);
     }
 
     void ForceOpenForID(int id)

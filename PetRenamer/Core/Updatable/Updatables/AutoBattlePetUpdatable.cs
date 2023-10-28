@@ -24,7 +24,7 @@ internal class AutoBattlePetUpdatable : Updatable
             bool found = false;
             for(int i = 0; i < user.SerializableUser.length; i++)
             {
-                if (user.SerializableUser.ids[i] != id) continue;
+                if (user.SerializableUser[i].ID != id) continue;
                 found = true;
                 break;
             }
@@ -32,6 +32,6 @@ internal class AutoBattlePetUpdatable : Updatable
         }
 
         foreach (int id in missingIDs)
-            user.SerializableUser.SaveNickname(id, "", true, false, true);
+            user.SerializableUser.SaveNickname(id, "", true, true);
     }
 }

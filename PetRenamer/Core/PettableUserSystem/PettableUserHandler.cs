@@ -46,7 +46,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
     {
-        if (userDeclareType == UserDeclareType.Add) AddUser(user, force);
+        if (userDeclareType == UserDeclareType.Add || userDeclareType == UserDeclareType.IPC) AddUser(user, force, userDeclareType == UserDeclareType.IPC);
         else if (userDeclareType == UserDeclareType.Remove) RemoveUser(user);
     }
 
@@ -55,23 +55,20 @@ internal class PettableUserHandler : IDisposable, IInitializable
         for (int i = _users.Count - 1; i >= 0; i--)
         {
             if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
-
-            try
-            {
-                ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
-            }
-            catch (Exception e) { PetLog.Log(e.Message); }
+            ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
             _users.RemoveAt(i);
         }
     }
 
-    void AddUser(SerializableUserV3 user, bool force = false)
+    void AddUser(SerializableUserV3 user, bool force = false, bool ipc = false)
     {
         if (force) ForceRemoveUser(user);
         if (Contains(user)) return;
 
         PettableUser u;
-        _users.Add(u = new PettableUser(user.username, user.homeworld, user));
+        if(!ipc)    _users.Add(u = new PettableUser(user.username, user.homeworld, user));
+        else        _users.Add(u = new PettableIPCUser(user.username, user.homeworld, user));
+
         try
         {
             ProfilePictureNetworked.instance.OnDeclare(u, UserDeclareType.Add, false);
@@ -100,7 +97,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public PettableUser? GetUser(string name, ushort homeworld)
     {
         foreach (PettableUser user in _users)
-            if (name.Contains(user.UserName) && (homeworld == 9999 || homeworld == user.Homeworld))
+            if (name.Contains(user.UserName, StringComparison.CurrentCultureIgnoreCase) && (homeworld == 9999 || homeworld == user.Homeworld))
                 return user;
         return null!;
     }

@@ -10,25 +10,16 @@ public class IpcStorage : IDisposable
     // (string, uint) is the Equivelant of PetRenamer.Core.Serialization.SerializableUser
     // Which is now Obsolete ;)
 
-    public delegate void OnIpcChange(ref Dictionary<(string, uint), NicknameData> change);
+    public delegate void OnIpcChange(ref List<(nint, string)> change);
     public event OnIpcChange IpcChange = null!;
 
-    private Dictionary<(string, uint), NicknameData> _IpcAssignedNicknames = new Dictionary<(string, uint), NicknameData>();
-
+    List<(nint, string)> nicknames = new List<(nint, string)>();
     bool touched = false;
 
-    public Dictionary<(string, uint), NicknameData> IpcAssignedNicknames 
+    public void Register((nint, string) nickname)
     {
-        get 
-        {
-            touched = true;
-            return _IpcAssignedNicknames;
-        }
-        set
-        {
-            touched = true;
-            _IpcAssignedNicknames = value;
-        }
+        nicknames.Add(nickname);
+        touched = true;
     }
 
     public void OnUpdate(IFramework framework)
@@ -36,8 +27,9 @@ public class IpcStorage : IDisposable
         if (touched)
         {
             touched = false;
-            IpcChange?.Invoke(ref _IpcAssignedNicknames);
+            IpcChange?.Invoke(ref nicknames);
         }
+        nicknames.Clear();
     }
 
     public void Register(OnIpcChange IpcChange)
@@ -59,6 +51,6 @@ public class IpcStorage : IDisposable
     public void Dispose()
     {
         PluginHandlers.Framework.Update -= OnUpdate;
-        _IpcAssignedNicknames.Clear();
+        nicknames.Clear();
     }
 }

@@ -15,17 +15,6 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public static StringUtils instance { get; set; } = null!;
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
-    public PlayerPayload? GetPlayerPayload(ref SeString message)
-    {
-        if (message == null) return null!;
-        for (int i = 0; i < message.Payloads.Count; i++)
-        {
-            if (message.Payloads[i] is not PlayerPayload pPayload) continue;
-            return pPayload;
-        }
-        return null!;
-    }
-
     public void ReplaceSeString(ref SeString message, ref (string, string)[] validNames)
     {
         if (validNames.Length == 0) return;
@@ -76,7 +65,10 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public void SanitizeString(ref string baseString, string finder, int count)
     {
         foreach (string filler in PluginConstants.removeables)
-           baseString = Regex.Replace(baseString, @$"\b{filler + finder}\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+        {
+            string newFinder = finder.Replace("[", @"^\[").Replace("]", @"^\]\");
+            baseString = Regex.Replace(baseString, $"\\b{filler + newFinder}\\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+        }
     }
 
     public string MakeString(char c, int count) => new string(c, count);

@@ -22,4 +22,14 @@ internal class HookHandler : RegistryBase<HookableElement, HookAttribute>
         foreach (HookableElement el in elements)
             el?.OnUpdate(framework);
     }
+
+    public void ResetHook<T>() where T : HookableElement
+    {
+        foreach (HookableElement el in elements)
+        {
+            if (el is not T tEl) continue;
+            tEl.ResetHook();
+            break;
+        }
+    }
 }

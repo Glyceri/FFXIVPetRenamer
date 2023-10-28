@@ -8,7 +8,7 @@ using System;
 
 namespace PetRenamer.Core.Hooking.Hooks.InternalHooks;
 
-public unsafe class QuickTextReplaceHook
+public unsafe class QuickTextReplaceHook : IDisposable
 {
     readonly uint[] TextPos;
     readonly int AtkPos;
@@ -94,4 +94,6 @@ public unsafe class QuickTextReplaceHook
         else return PluginLink.PettableUserHandler.LocalUser()!;
     }
     AtkNineGridNode* GetBackgroundNode(ref BaseNode bNode) => AtkPos != -1 ? bNode.GetNode<AtkNineGridNode>((uint)AtkPos) : null!;
+
+    public void Dispose() => PluginHandlers.AddonLifecycle.UnregisterListener(HandleUpdate);
 }

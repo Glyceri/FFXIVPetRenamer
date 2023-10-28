@@ -36,23 +36,22 @@ public class SucceededImportData : ImportData
         List<string> listStrings = new List<string>();
         List<ImportType> importTypes = new List<ImportType>();
         
-        for(int i = 0; i < me.ids.Length; i++)
+        for(int i = 0; i < me.length; i++)
         {
-            int id = me.ids[i];
-            string name = me.names[i];
-            listIds.Add(id);
+            QuickName pet = me[i];
+            listIds.Add(pet.ID);
 
-            if (ids.Contains(id))
+            if (ids.Contains(pet.ID))
             {
-                int index = ids.ToList().IndexOf(id);
+                int index = ids.ToList().IndexOf(pet.ID);
                 string n = names[index];
                 listStrings.Add(n);
-                if (n == name) importTypes.Add(ImportType.None);
+                if (n == pet.Name) importTypes.Add(ImportType.None);
                 else importTypes.Add(ImportType.Rename);
             }
             else 
             {
-                listStrings.Add(me.names[i]);
+                listStrings.Add(pet.Name);
                 importTypes.Add(ImportType.Remove); 
             }
         }
@@ -61,7 +60,7 @@ public class SucceededImportData : ImportData
         {
             int id = ids[i];
             string name = names[i];
-            if (!me.ids.Contains(id))
+            if (!me.Contains(id))
             {
                 listIds.Add(id);
                 listStrings.Add(name);

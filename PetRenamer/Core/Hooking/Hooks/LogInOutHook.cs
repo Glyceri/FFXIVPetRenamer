@@ -1,13 +1,13 @@
 ﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
+using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
 [Hook]
 internal class LogInOutHook : HookableElement
-{
-
+{ 
     internal override void OnInit()
     {
         PluginHandlers.ClientState.Login += OnLogin;
@@ -22,18 +22,19 @@ internal class LogInOutHook : HookableElement
 
     void OnLogin()
     {
-        DoThing();
+        ResetWindows();
     }
 
     void OnLogout()
     {
         PluginLink.WindowHandler.CloseAllWindows();
-        DoThing();
+        ResetWindows();
     }
 
-    void DoThing()
+    void ResetWindows()
     {
         PluginLink.WindowHandler.GetWindow<PetListWindow>().Reset();
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>().Reset();
+        FindAnythingIPCProvider.Deregister();
     }
 }

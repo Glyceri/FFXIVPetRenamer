@@ -1,4 +1,5 @@
 ﻿using PetRenamer.Core.Debug;
+using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 
 namespace PetRenamer.Core.Handlers;
@@ -22,6 +23,8 @@ internal class QuitHandler
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();
+
+        FindAnythingIPCProvider.DeInit();
 
         PenumbraIPCProvider.DeInit();
     }
