@@ -5,6 +5,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
@@ -141,6 +142,7 @@ public class PetRenameWindow : PetWindow
 
     void Save()
     {
+        if (user.GetCustomName(activePet.petID) == activePet.temporaryPetName) return;
         user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName);
         OnButton();
     }
@@ -148,6 +150,7 @@ public class PetRenameWindow : PetWindow
     void Delete()
     {
         activePet.temporaryPetName = string.Empty;
+        if (user.GetCustomName(activePet.petID) == activePet.temporaryPetName) return;
         user.SerializableUser.RemoveNickname(activePet.petID);
         OnButton();
     }
@@ -159,12 +162,14 @@ public class PetRenameWindow : PetWindow
         if (activePet.petID > -1) 
         {
             PetBase minion = PluginLink.PettableUserHandler.LocalUser()!.Minion;
+            if (activePet.petID != minion.ID) return;
             PenumbraIPCProvider.RedrawMinionByIndex(minion.Index);
             SendIPC(minion);
         }
         if (activePet.petID < -1)
         {
             PetBase battlePet = PluginLink.PettableUserHandler.LocalUser()!.BattlePet;
+            if (activePet.petID != battlePet.ID) return;
             PenumbraIPCProvider.RedrawBattlePetByIndex(battlePet.Index);
             SendIPC(battlePet);
         }
@@ -173,7 +178,6 @@ public class PetRenameWindow : PetWindow
     void SendIPC(PetBase petBase)
     {
         if (!user.LocalUser) return;
-        if (!user.UserChanged) return;
         IpcProvider.NotifySetPetNickname(petBase.Pet, activePet.petName);
     }
 

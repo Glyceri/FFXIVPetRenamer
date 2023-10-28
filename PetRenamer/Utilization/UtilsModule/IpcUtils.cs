@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using System.Runtime.InteropServices;
 using System;
 using PetRenamer.Core.PettableUserSystem.Enums;
+using PetRenamer.Core;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -30,15 +31,36 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
     {
         PetBase pBase = PluginLink.PettableUserHandler.GetPet(pet);
         if (pBase == null) return null!;
-        string customName = pBase.CustomName;
+        string customName = pBase.RawCustomName;
         if (customName == string.Empty) return null!;
         return customName;
     }
 
     public void SetNickname(nint pet, string nickname)
     {
+        if (!IsPetAccepted(pet)) return;
+        if (!IsNicknameAccepted(ref nickname)) return;
         if (SetUser(pet, nickname)) return;
         HandleAsNonExistingUser(pet, nickname);
+    }
+
+    bool IsPetAccepted(nint pet)
+    {
+        PettableUser user = PluginLink.PettableUserHandler.GetUser(pet);
+        if (user == null) return true;
+        if (user.LocalUser) return false;
+        return true;
+    }
+
+    bool IsNicknameAccepted(ref string nickname)
+    {
+        // No null allowed
+        if (nickname == null) return false;
+        // Nicknames cannot be longer than 64 characters
+        if (nickname.Length > PluginConstants.ffxivNameSize) return false;
+        // Don't set a name to a valid URL
+        if (Uri.TryCreate(nickname, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)) return false;
+        return true;
     }
 
     bool SetUser(nint pet, string nickname)

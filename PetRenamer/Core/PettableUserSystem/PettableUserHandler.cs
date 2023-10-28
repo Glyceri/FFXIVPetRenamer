@@ -64,6 +64,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     {
         if (force) ForceRemoveUser(user);
         if (Contains(user)) return;
+        if (!ipc) ForceRemoveUser(user);
 
         PettableUser u;
         if(!ipc)    _users.Add(u = new PettableUser(user.username, user.homeworld, user));
@@ -188,7 +189,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
     {
         for (int i = 0; i < _users.Count; i++)
             if (_users[i].EqualsUser(user))
-                return true;
+                if(_users[i] is not PettableIPCUser)
+                    return true;
         return false;
     }
 

@@ -135,14 +135,14 @@ internal class PetGlamourChat : ChatElement
         };
     }
 
-    internal override bool OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (type != XivChatType.SystemMessage) return false;
+        if (type != XivChatType.SystemMessage) return;
 
         if(nextRow > 0)
         {
             MatchChange(spacingRegex.Match(message.TextValue));
-            return false;
+            return;
         }
 
         Match match = changeRegex.Match(message.TextValue);
@@ -153,8 +153,6 @@ internal class PetGlamourChat : ChatElement
 
         Match match3 = fullRegex.Match(message.TextValue);
         if (match3.Success) MatchFull();
-
-        return false;
     }
 
     void MatchFull() => nextRow = 5;

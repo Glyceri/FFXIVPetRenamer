@@ -14,6 +14,7 @@ public class BlackWhiteTheme : Theme
     public override Vector4 tooltipText { get; set; } = new Vector4(1f, 1f, 1f, 1f);
 
     public override Vector4 basicLabelColour { get; set; } = new Vector4(0.3f, 0.3f, 0.3f, 1f);
+    public override Vector4 ipcLabelColour { get; set; } = new Vector4(0.3f, 0.3f, 0.3f, 1f);
 
     public override Vector4 buttonHovered { get; set; } = new Vector4(0.3f, 0.3f, 0.3f, 1f);
     public override Vector4 buttonPressed { get; set; } = new Vector4(0.2f, 0.2f, 0.2f, 1f);
