@@ -40,7 +40,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(PetListWindow),          "[Pet/Minion List]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),          "[Pet/Minion List]", null!),
     };
 
     Vector2 oldPadding;

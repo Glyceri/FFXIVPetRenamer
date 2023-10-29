@@ -47,8 +47,8 @@ public static class SharingHandler
         {
             string exportString = string.Concat("[PetExport]\n", user.UserName.ToString(), "\n", user.Homeworld.ToString(), "\n");
             for (int i = 0; i < user.SerializableUser.length; i++)
-                if (user.SerializableUser[i].Name != string.Empty && containsList[i])
-                    exportString += $"{user.SerializableUser[i].ID}{PluginConstants.forbiddenCharacter}{user.SerializableUser[i].Name}\n";
+                if (user.SerializableUser[i].RawName != string.Empty && containsList[i])
+                    exportString += $"{user.SerializableUser[i].ID}{PluginConstants.forbiddenCharacter}{user.SerializableUser[i].RawName}\n";
             string convertedString = Convert.ToBase64String(Encoding.Unicode.GetBytes(exportString));
             ImGui.SetClipboardText(convertedString);
             return true;

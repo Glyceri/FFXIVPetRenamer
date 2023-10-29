@@ -37,7 +37,7 @@ internal class NewPetListWindow : PetWindow
 
     bool userlistActive = false;
 
-    public NewPetListWindow() : base("New Pet Nicknames List")
+    public NewPetListWindow() : base("Pet Nicknames List")
     {
         Size = baseSize;
         SizeCondition = ImGuiCond.FirstUseEver;
@@ -246,6 +246,7 @@ internal class NewPetListWindow : PetWindow
 
     void FillExportList()
     {
+        IsOpen = true;
         SetPetMode(PetMode.ShareMode);
         SetActiveToLocal();
         if (activeUser == null) return;
@@ -306,8 +307,14 @@ internal class NewPetListWindow : PetWindow
 
     void DoImport(SucceededImportData data)
     {
-        PluginLink.PettableUserHandler.DeclareUser(data.CreateSerializableUser(), Core.PettableUserSystem.Enums.UserDeclareType.Add, true);
+        for (int i = 0; i < data.ids.Length; i++)
+        {
+            if (data.importTypes[i] == ImportType.Remove) activeUser.SerializableUser.RemoveNickname(data.ids[i]);
+            else activeUser.SerializableUser.SaveNickname(data.ids[i], data.names[i], data.importTypes[i] == ImportType.New || data.importTypes[i] == ImportType.Rename, false);
+        }
         PluginLink.Configuration.Save();
+        activeUser = PluginLink.PettableUserHandler.GetUser(data.UserName, data.HomeWorld)!;
+        if (activeUser.LocalUser) IpcUtils.instance.SendAllData();
         if (petMode == PetMode.ShareMode) ClearList();
         footerElement = null!;
     }

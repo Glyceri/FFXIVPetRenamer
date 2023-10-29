@@ -98,7 +98,7 @@ public class PetRenameWindow : PetWindow
         if (activePet.petID == -1 || activePet.baseName == string.Empty)
         {
             Label($"Please summon a {activePet.referredToAs} or open the naming list", new Vector2(ContentAvailableX, BarSize));
-            if (Button("Naming List", new Vector2(ContentAvailableX, BarSize))) PluginLink.WindowHandler.OpenWindow<PetListWindow>();
+            if (Button("Naming List", new Vector2(ContentAvailableX, BarSize))) PluginLink.WindowHandler.OpenWindow<NewPetListWindow>();
             SetTooltipHovered($"Opens the {activePet.referredToAs} List");
             return;
         }
@@ -115,7 +115,8 @@ public class PetRenameWindow : PetWindow
 
     public override void OnDrawSharing()
     {
-        PluginLink.WindowHandler.GetWindow<PetListWindow>()?.DrawExportHeader();
+        NewLine();
+        PluginLink.WindowHandler.GetWindow<NewPetListWindow>()?.DrawShareHeader();
     }
 
     void DrawPetNameField()

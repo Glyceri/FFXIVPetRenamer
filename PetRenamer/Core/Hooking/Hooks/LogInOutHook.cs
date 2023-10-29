@@ -33,7 +33,6 @@ internal class LogInOutHook : HookableElement
 
     void ResetWindows()
     {
-        PluginLink.WindowHandler.GetWindow<PetListWindow>().Reset();
         PluginLink.WindowHandler.GetWindow<PetRenameWindow>().Reset();
         FindAnythingIPCProvider.Deregister();
     }
