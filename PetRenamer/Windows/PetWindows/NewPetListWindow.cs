@@ -28,11 +28,9 @@ internal class NewPetListWindow : PetWindow
     const int InnerHeaderHeight = 90;
 
     PettableUser activeUser = null!;
-
     List<DrawableElement> drawableElements = new List<DrawableElement>();
 
     SearchBarElement searchBarElement = new SearchBarElement();
-
     DrawableElement footerElement = null!;
 
     bool userlistActive = false;
@@ -46,8 +44,6 @@ internal class NewPetListWindow : PetWindow
             MinimumSize = minSize,
             MaximumSize = new Vector2(9999, 9999)
         };
-
-        IsOpen = true;
     }
 
     public override void OnDraw()
@@ -56,6 +52,7 @@ internal class NewPetListWindow : PetWindow
         if ((activeUser ??= localUser!) == null) return;
         if (activeUser.UserChanged || activeUser.SerializableUser.changed || PluginLink.PettableUserHandler.Changed) HandleChanged();
         DrawHeader();
+        DrawShareHeader();
     }
 
     public override void OnLateDraw()
@@ -72,9 +69,6 @@ internal class NewPetListWindow : PetWindow
         footerElement?.Draw(ref internalCounter, this);
     }
 
-    public override void OnDrawNormal() => DrawShareHeader();
-    public override void OnDrawBattlePet() => DrawShareHeader();
-    public override void OnDrawSharing() => DrawShareHeader();
     public override void OnWindowOpen() => OnPetModeChange(petMode);
     public override void OnWindowClose() => ClearList();
     internal override void OnPetModeChange(PetMode mode) => HandleChanged();
