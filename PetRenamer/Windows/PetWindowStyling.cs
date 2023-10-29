@@ -31,6 +31,7 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
     public static float BarSize => 25;
     public static float BarSizePadded => BarSize + (FramePaddingY * 2);
 
+    public static Vector2 ContentAvailable => ImGui.GetContentRegionAvail();
     public static float ContentAvailableY => ImGui.GetContentRegionAvail().Y;
     public static float ContentAvailableX => ImGui.GetContentRegionAvail().X;
     public static float FullWidth => ImGui.GetWindowWidth();
@@ -60,6 +61,7 @@ public abstract class PetWindowStyling : Window, IDisposableRegistryElement
         public static Vector4 defaultBackground => ThemeHandler.ActiveTheme.imageReplacementColour;
         public static Vector4 titleBgActive => ThemeHandler.ActiveTheme.titleBgActive;
         public static Vector4 panelColour => ThemeHandler.ActiveTheme.panelColour;
+        public static Vector4 panelSubColour => ThemeHandler.ActiveTheme.panelSubColour;
         public static Vector4 tileBgCollapsed => ThemeHandler.ActiveTheme.tileBgCollapsed;
 
         public static Vector4 defaultText => ThemeHandler.ActiveTheme.defaultText;

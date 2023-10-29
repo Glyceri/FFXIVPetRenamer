@@ -29,9 +29,6 @@ public class Configuration : IPluginConfiguration
     public bool useContextMenuOnBattlePets = true;
     public bool allowTooltipsBattlePets = true;
     public bool replaceEmotesBattlePets = true;
-    // ---- Penumbra REQUIRED ----
-    public bool redrawBattlePetOnSpawn = true;
-    public bool redrawMinionOnSpawn = true;
     // ------------------------- Minion Settings -------------------------
     public bool useContextMenuOnMinions = true;
     public bool allowTooltipsOnMinions = true;

@@ -7,6 +7,7 @@ public class RedTheme : BaseTheme
     public override Vector4 imageReplacementColour { get; set; } = new Vector4(0.60f, 0.70f, 0.80f, 0.95f);
     public override Vector4 titleBgActive { get; set; } = new Vector4(0.8f, 0.30f, 0.30f, 1f);
     public override Vector4 panelColour { get; set; } = new Vector4(0.60f, 0.20f, 0.2f, 1f);
+    public override Vector4 panelSubColour { get; set; } = new Vector4(0.65f, 0.25f, 0.25f, 1f);
     public override Vector4 tileBgCollapsed { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
 
     public override Vector4 defaultText { get; set; } = new Vector4(0.95f, 0.95f, 0.95f, 1f);

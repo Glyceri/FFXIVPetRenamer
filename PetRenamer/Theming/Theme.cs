@@ -17,6 +17,7 @@ public abstract class Theme
     public abstract Vector4 ipcLabelColour { get; set; }
 
     public abstract Vector4 panelColour { get; set; }
+    public abstract Vector4 panelSubColour { get; set; }
 
     public abstract Vector4 buttonHovered { get; set; }
     public abstract Vector4 buttonPressed { get; set; }

@@ -1,9 +1,12 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Logging;
+using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.PetWindows;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.Core.Ipc.FindAnythingIPCHelper;
@@ -58,7 +61,7 @@ public static class FindAnythingIPCProvider
             if (guid == null || guid == string.Empty) return;
             guids.Add((guid, petID));
         }
-        catch { }
+        catch{ }
     }
 
     public static void Deregister()

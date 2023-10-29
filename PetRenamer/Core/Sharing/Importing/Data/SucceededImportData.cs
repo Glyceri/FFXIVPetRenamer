@@ -16,6 +16,30 @@ public class SucceededImportData : ImportData
     public readonly string[] names;
     public readonly ImportType[] importTypes;
 
+    public SerializableUserV3 CreateSerializableUser()
+    {
+        List<int> newIDs = new List<int>();
+        List<string> newNames = new List<string>();
+        for(int i = 0; i < ids.Length; i++)
+        {
+            if (importTypes[i] == ImportType.Remove) continue;
+            newIDs.Add(ids[i]);
+            newNames.Add(names[i]);
+        }
+        return new SerializableUserV3(newIDs.ToArray(), newNames.ToArray(), UserName, HomeWorld, PluginConstants.baseSkeletons, PluginConstants.baseSkeletons);
+    }
+    public string GetString(ImportType type)
+    {
+        return type switch
+        {
+            ImportType.Rename => "N",
+            ImportType.New => "+",
+            ImportType.Remove => "X",
+            ImportType.None => "=",
+            _ => "=",
+        };
+    }
+
     public SucceededImportData(string UserName, ushort HomeWorld, int[] ids, string[] names)
     {
         this.UserName = UserName;

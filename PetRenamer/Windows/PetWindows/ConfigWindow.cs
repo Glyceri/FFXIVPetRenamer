@@ -1,6 +1,5 @@
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -74,13 +73,6 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.allowTooltipsOnMinions, "Allow Tooltips for Minions", "Display Minion Nicknames in Tooltips.", "Allow Tooltips for Minions");
             DrawConfigElement(ref PluginLink.Configuration.replaceEmotesOnMinions, "Allow Custom Nicknames in Emotes for Minions", "Replace a Minions in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.showNamesInMinionBook, "Show Nicknames in the Minion Journal", "Shows your Custom Nicknames in the Minion Journal.");
-
-            if (PenumbraValid)
-            {
-                Header("[Penumbra]");
-                DrawConfigElement(ref PluginLink.Configuration.redrawMinionOnSpawn, "Redraw Minion", new string[] { "Redraw a Minion upon a Name Change (Fixes nameplate bugs).", "Requires [Penumbra]" });
-            }
-
             EndElementBox();
         }
     }
@@ -95,13 +87,6 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInBattleChat, "Allow Custom Nicknames in the Battle Log for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.allowCastBarPet, "Show Battle Pet Nickname on Cast Bars", "Shows your Custom Nicknames on Cast bars.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomFlyoutPet, "Show Battle Pet Nickname on Flyout Text", "Shows your Custom Nicknames on Flyout Text.");
-            
-            if (PenumbraValid)
-            {
-                Header("[Penumbra]");
-                DrawConfigElement(ref PluginLink.Configuration.redrawBattlePetOnSpawn, "Redraw Battle Pet", new string[] { "Redraw a Battle Pet upon a Name Change (Fixes nameplate bugs).", "Requires [Penumbra]" });
-            }
-
             EndElementBox();
         }
     }
@@ -149,13 +134,10 @@ public class ConfigWindow : PetWindow
         if (PluginLink.Configuration.debugMode) return true;
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
 
-        // Comment out this line to unsupport all the Third Party support
-        if (PenumbraIPCProvider.PenumbraEnabled()) return true;
 
         return false;
     }
 
-    public bool PenumbraValid => (HasReadWarning && PenumbraIPCProvider.PenumbraEnabled()) || DebugMode;
     public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
     public bool DebugMode => PluginLink.Configuration.debugMode;
 

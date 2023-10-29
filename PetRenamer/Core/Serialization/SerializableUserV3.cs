@@ -160,7 +160,10 @@ public class SerializableUserV3
     public void ClearAllIPC()
     {
         string[] newIPCNames = new string[ipcNames.Length];
+        for (int i = 0; i < ipcNames.Length; i++)
+            newIPCNames[i] = string.Empty;
         ipcNames = newIPCNames;
+        changed = true;
     }
 
     int IndexOf(int id)
