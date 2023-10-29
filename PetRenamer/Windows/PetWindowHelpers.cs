@@ -1,5 +1,6 @@
 using Dalamud.Game.Text;
 using ImGuiNET;
+using ImGuiScene;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
@@ -9,6 +10,7 @@ using PetRenamer.Windows.PetWindows;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.Windows;
 
@@ -222,9 +224,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected bool RedownloadButton(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
-        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.panelColour);
-        PushStyleColor(ImGuiCol.Button, StylingColours.panelColour);
-        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.defaultBackground);
+        PushStyleColor(ImGuiCol.ButtonHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.Button, StylingColours.button);
+        PushStyleColor(ImGuiCol.ButtonActive, StylingColours.buttonPressed);
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
@@ -268,6 +270,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
         bool returner = ImGui.Button(text, styling);
         if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
+        else SetTooltipHovered(text);
         if (callback != null && returner) callback();
         return returner;
     }
@@ -303,11 +306,13 @@ public abstract class PetWindowHelpers : PetWindowStyling
         return ImGui.Button(text, styling);
     }
 
-    protected bool OverrideLabel(string text, Vector2 styling)
+    protected bool OverrideLabel(string text, Vector2 styling, string tooltip = "")
     {
         PushStyleColours(StylingColours.buttonAlternative, LabelColours);
         PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
-        return ImGui.Button(text, styling);
+        bool outcome = ImGui.Button(text, styling);
+        if (tooltip != string.Empty) SetTooltipHovered(tooltip);
+        return outcome;
     }
 
     protected bool Checkbox(string text, ref bool value) => Checkbox(text, string.Empty, ref value);
@@ -372,6 +377,41 @@ public abstract class PetWindowHelpers : PetWindowStyling
         return ImGui.BeginListBox(text, styling);
     }
 
+    protected bool BeginListBoxSub(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
+        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
+        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.panelSubColour);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.panelSubColour);
+        return ImGui.BeginListBox(text, styling);
+    }
+
+    protected bool BeginListBoxIPC(string text, Vector2 styling)
+    {
+        PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        PushStyleColor(ImGuiCol.ScrollbarGrab, StylingColours.button);
+        PushStyleColor(ImGuiCol.ScrollbarGrabActive, StylingColours.buttonPressed);
+        PushStyleColor(ImGuiCol.ScrollbarGrabHovered, StylingColours.buttonHovered);
+        PushStyleColor(ImGuiCol.ScrollbarBg, StylingColours.ipcLabelColour);
+        PushStyleColor(ImGuiCol.FrameBg, StylingColours.ipcLabelColour);
+        return ImGui.BeginListBox(text, styling);
+    }
+
+    protected bool BeginListBoxAutomatic(string text, Vector2 styling, bool isIPC)
+    {
+        if (!isIPC) return BeginListBox(text, styling);
+        return BeginListBoxIPC(text, styling);
+    }
+
+    protected bool BeginListBoxAutomaticSub(string text, Vector2 styling, bool isIPC)
+    {
+        if (!isIPC) return BeginListBoxSub(text, styling);
+        return BeginListBoxIPC(text, styling);
+    }
+
+
     protected bool InputTextMultiLine(string label, ref string input, uint maxLength, Vector2 size, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None, string tooltipText = "")
     {
         PushStyleColor(ImGuiCol.FrameBg, StylingColours.buttonAlternative);
@@ -388,7 +428,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (drawMe == null) return;
         ImGui.SetItemAllowOverlap();
         SameLine();
-        ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(35, -59));
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(37, -58));
         drawMe.Invoke();
     }
 
@@ -403,7 +443,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected void DrawAdvancedBarWithQuit(string label, string value, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!, bool ipcMode = false)
     {
         DrawBasicLabel(label, ipcMode);
-        Button($"          {value} ##<{internalCounter++}>", new Vector2(480, 25), $"{label}: {value.Trim()}", callback.Invoke);
+        float width = ContentAvailableX;
+        if (callback2 != null) width -= Styling.SmallButton.X + FramePaddingX;
+        Button($"          {value} ##<{internalCounter++}>", new Vector2(width, 25), $"{label}: {value.Trim()}", callback.Invoke);
         if (callback2 == null) return;
         SameLinePretendSpace();
         XButton(quitText + $"##<Close{internalCounter++}>", Styling.SmallButton, quitTooltip, callback2.Invoke);
@@ -411,19 +453,17 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawYesNoBar(string label, Action yesCallback, Action noCallback)
     {
-        TransparentLabel("", new Vector2(1, 25));
-        Label(label + $"##<{internalCounter++}>", new Vector2(508, 25));
-        SameLinePretendSpace2();
-        Button("Yes", Styling.ListIDField, PluginConstants.Strings.deleteUserTooltip, yesCallback.Invoke);
+        Label(label + $"##<{internalCounter++}>", new Vector2(ContentAvailableX, BarSize));
+        Button("Yes", new Vector2(ContentAvailableX / 2, BarSize), PluginConstants.Strings.deleteUserTooltip, yesCallback.Invoke);
         SameLinePretendSpace();
-        Button("No", Styling.ListIDField, PluginConstants.Strings.keepUserTooltip, noCallback.Invoke);
+        Button("No", new Vector2(ContentAvailableX , BarSize), PluginConstants.Strings.keepUserTooltip, noCallback.Invoke);
     }
 
     protected void DrawBasicBar(string label, string value, bool alternateColour = false)
     {
         DrawBasicLabel(label, alternateColour);
-        if (!alternateColour) Label(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
-        else IPCLabel(value.ToString() + $"##<{internalCounter++}>", new Vector2(508, 25));
+        if (!alternateColour) Label(value.ToString() + $"##<{internalCounter++}>", new Vector2(ContentAvailableX, 25));
+        else IPCLabel(value.ToString() + $"##<{internalCounter++}>", new Vector2(ContentAvailableX, 25));
         SetTooltipHovered($"{label}: {value}");
     }
 
@@ -451,13 +491,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
         }
     }
 
-    protected void DrawWarningLabel(string message, string buttonIcon, string buttonTooltip, Action onButton)
+    protected bool DrawWarningLabel(string message, string buttonIcon, string buttonTooltip, Action onButton)
     {
-        OverrideLabel(message, new Vector2(ContentAvailableX - Styling.SmallButton.X - FramePaddingX * 2, BarSize));
-        SameLinePretendSpace();
-        if (XButton(buttonIcon + "##<SafetySettings>", Styling.SmallButton))
-            onButton?.Invoke();
-        SetTooltipHovered(buttonTooltip);
+        float width = ContentAvailableX;
+        if (onButton != null) width -= (Styling.SmallButton.X + FramePaddingX * 2);
+        bool returner = OverrideLabel(message, new Vector2(width, BarSize));
+        if (onButton != null)
+        {
+            SameLinePretendSpace();
+            if (XButton(buttonIcon + "##<SafetySettings>", Styling.SmallButton))
+                onButton?.Invoke();
+            SetTooltipHovered(buttonTooltip);
+        }
+        return returner;
     }
 
     protected void DrawEmptyBar(string buttonString, string tooltipString, Action callback, bool check = true)
@@ -485,6 +531,34 @@ public abstract class PetWindowHelpers : PetWindowStyling
         NewLine();
         ImGui.SameLine(638);
     }
+
+    protected void DrawTexture(nint theint, Action drawExtraButton)
+    {
+        DrawTexture(theint);
+        DrawRedownloadButton(drawExtraButton);
+    }
+
+    protected void DrawUserTextureEncased(PettableUser u)
+    {
+        if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
+        {
+            DrawUserTexture(u);
+            ImGui.EndListBox();
+        }
+    }
+    protected void DrawUserTexture(PettableUser u) => DrawTexture(u, () => DrawRedownloadButton(u));
+    protected void DrawTexture(PettableUser u, Action drawExtraButton)
+    {
+        DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
+        DrawRedownloadButton(drawExtraButton);
+    }
+
+    protected void DrawTexture(nint thenint)
+    {
+        DrawImage(thenint, new Vector2(83, 83));
+        SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
+    }
+
 
     protected void SameLine() => ImGui.SameLine();
     protected void SameLineNoMargin() => ImGui.SameLine(0, 0);

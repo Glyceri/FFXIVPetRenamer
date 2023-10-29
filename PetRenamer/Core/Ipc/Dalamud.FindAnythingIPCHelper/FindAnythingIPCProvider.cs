@@ -61,7 +61,7 @@ public static class FindAnythingIPCProvider
             if (guid == null || guid == string.Empty) return;
             guids.Add((guid, petID));
         }
-        catch(Exception e) { PetLog.Log(e.Message); }
+        catch{ }
     }
 
     public static void Deregister()

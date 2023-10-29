@@ -9,6 +9,7 @@ using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -55,10 +56,11 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
             if (user == null)
             {
                 PluginLink.PettableUserHandler.DeclareUser(new SerializableUserV3(player.Name.ToString(), (ushort)player.HomeWorld.Id), UserDeclareType.IPC);
-                PluginLink.PettableUserHandler.GetUser(player.Name.ToString(), (ushort)player.HomeWorld.Id);
+                user = PluginLink.PettableUserHandler.GetUser(player.Name.ToString(), (ushort)player.HomeWorld.Id)!;
                 if (user == null) return;
             }
 
+            if (identifier == PluginConstants.IpcAll) Clear(user);
             if (identifier == PluginConstants.IpcAll || identifier == PluginConstants.IpcSingle) SetAll(user, lines);
         }
         catch { }
@@ -76,8 +78,22 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
         {
             (int, string) parsedData = DataFromLine(line);
             if (parsedData.Item1 == -1) continue;
+            if (!NameIsValid(parsedData.Item2)) continue;
             user.SerializableUser.SaveNickname(parsedData.Item1, parsedData.Item2, true, false, true);
         }
+    }
+
+    // Checks for URL
+    Regex validateDateRegex = new Regex("^[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$");
+    Regex validateUrlRegex = new Regex("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$");
+
+    bool NameIsValid(string name)
+    {
+        if (name == null) return false;
+        if (name.Length > 64) return false;
+        if (validateDateRegex.IsMatch(name)) return false;
+        if (validateUrlRegex.IsMatch(name)) return false;
+        return true;
     }
 
     (int, string) DataFromLine(string line)
@@ -104,8 +120,8 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
         for (int i = 0; i < localPlayer.SerializableUser.length; i++)
         {
             QuickName quickName = localPlayer.SerializableUser[i];
-            builder.AppendLine(quickName.ID.ToString());
-            builder.AppendLine(PluginConstants.forbiddenCharacter.ToString());
+            builder.Append(quickName.ID.ToString());
+            builder.Append(PluginConstants.forbiddenCharacter.ToString());
             builder.AppendLine(quickName.RawName);
         }
         return builder.ToString();

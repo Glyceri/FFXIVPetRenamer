@@ -7,6 +7,7 @@ public class BlackWhiteTheme : Theme
     public override Vector4 imageReplacementColour { get; set; } = new Vector4(0.80f, 0.80f, 0.80f, 0.95f);
     public override Vector4 titleBgActive { get; set; } = new Vector4(0.30f, 0.50f, 1f, 1f);
     public override Vector4 panelColour { get; set; } = new Vector4(0f, 0f, 0f, 1f);
+    public override Vector4 panelSubColour { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
     public override Vector4 tileBgCollapsed { get; set; } = new Vector4(0.1f, 0.1f, 0.1f, 1f);
 
     public override Vector4 defaultText { get; set; } = new Vector4(1, 1f, 1f, 1f);

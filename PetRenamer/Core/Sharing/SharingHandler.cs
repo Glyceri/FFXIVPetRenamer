@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Logging;
+using ImGuiNET;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Logging;
 using System;

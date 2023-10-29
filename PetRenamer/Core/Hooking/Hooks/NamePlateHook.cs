@@ -1,4 +1,5 @@
 ﻿using Dalamud.Hooking;
+using Dalamud.Logging;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -42,6 +43,7 @@ public unsafe sealed class NamePlateHook : HookableElement
         string nameToUse = currentPet.UsedName;
         if (nameToUse == string.Empty) return;
         namePlateInfo->Name.SetString(nameToUse);
+        if (currentPet.nameChanged) namePlateInfo->IsDirty = true;
     }
 
     internal override void OnInit()

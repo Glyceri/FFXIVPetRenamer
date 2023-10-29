@@ -22,6 +22,7 @@ public class PetBase
     public string BaseNamePluralCapitalized => StringUtils.instance.MakeTitleCase(BaseNamePlural);
     public string UsedName => Faulty ? BaseNameCapitalized : IPCName == string.Empty ? CustomName == string.Empty ? BaseNameCapitalized : CustomName : IPCName; // Yes, very readable :)
 
+    public bool nameChanged => _nameChanged;
     public bool Changed => _petChanged;
     public bool Faulty => _faulty;
 
@@ -42,6 +43,7 @@ public class PetBase
     string _baseNamePlural = string.Empty;
 
     bool _petChanged;
+    bool _nameChanged;
 
     int _lastID;
     nint _lastPointer;
@@ -69,7 +71,9 @@ public class PetBase
         _index = gObject.GameObject.ObjectIndex;
         _objectID = gObject.GameObject.ObjectID;
 
-        if (!_petChanged && !serializableUserV3.changed) return;
+        _nameChanged = serializableUserV3.changed;
+
+        if (!_petChanged && !_nameChanged) return;
 
         _lastPointer = _pet;
         _lastID = _id;

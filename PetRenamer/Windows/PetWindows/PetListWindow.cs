@@ -1,10 +1,10 @@
 using Dalamud.Game.Text;
 using Dalamud.Interface.Internal;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Common.Math;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
@@ -34,6 +34,8 @@ public class PetListWindow : PetWindow
             MinimumSize = new Vector2(800, 783 + 64),
             MaximumSize = new Vector2(800, 783 + 64)
         };
+
+        IsOpen = true;
     }
 
     int texturePointer = 0;
@@ -265,11 +267,7 @@ public class PetListWindow : PetWindow
                 else existingUser.SerializableUser.SaveNickname(importedData.ids[i], importedData.names[i], importedData.importTypes[i] == ImportType.New || importedData.importTypes[i] == ImportType.Rename, false);
             }
 
-            if (existingUser.LocalUser)
-                IpcUtils.instance.SendAllData();
-
-            PenumbraIPCProvider.RedrawBattlePetByIndex(existingUser.BattlePet.Index);
-            PenumbraIPCProvider.RedrawMinionByIndex(existingUser.Minion.Index);
+            if (existingUser.LocalUser) IpcUtils.instance.SendAllData();
 
             removeMeUser = null!;
             existingUser = null!;
@@ -346,7 +344,7 @@ public class PetListWindow : PetWindow
                     () =>
                     {
                         user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, false, nickname.HasIPCName);
-                        IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
+                        if (!nickname.HasIPCName) IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
 
                         PluginLink.Configuration.Save();
                     }, nickname.HasIPCName);
@@ -563,8 +561,11 @@ public class PetListWindow : PetWindow
                     if (_openedAddPet) return;
 
                     if (nickname.HasIPCName) user.SerializableUser.SaveNickname(nickname.ID, string.Empty, true, false, true);
-                    else user.SerializableUser.RemoveNickname(nickname.ID);
-                    IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
+                    else
+                    {
+                        user.SerializableUser.RemoveNickname(nickname.ID);
+                        IpcUtils.instance.NotifyChange(nickname.ID, string.Empty);
+                    }
 
                     PluginLink.Configuration.Save();
                 }, nickname.HasIPCName);
@@ -618,33 +619,12 @@ public class PetListWindow : PetWindow
         TransparentLabel(new Vector2(25, 0));
     }
 
-    void DrawTexture(ref int textureIndex, Action drawExtra = null!)
+    protected void DrawTexture(ref int textureIndex, Action drawExtra = null!)
     {
         nint texturePointer = nint.Zero;
         if (textureIndex < TextureWraps.Count)
             texturePointer = TextureWraps[textureIndex].ImGuiHandle;
         DrawTexture(texturePointer, drawExtra);
-    }
-
-    void DrawTexture(nint theint, Action drawExtraButton)
-    {
-        DrawTexture(theint);
-        DrawRedownloadButton(drawExtraButton);
-    }
-
-    void DrawUserTexture(PettableUser u) => DrawTexture(u, () => DrawRedownloadButton(u));
-
-    void DrawTexture(PettableUser u, Action drawExtraButton)
-    {
-        DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-        DrawRedownloadButton(drawExtraButton);
-    }
-
-    void DrawTexture(nint thenint)
-    {
-        TransparentLabel("", new Vector2(4, 0)); SameLineNoMargin();
-        DrawImage(thenint, new Vector2(83, 83));
-        SameLineNoMargin(); TransparentLabel("", new Vector2(4, 0));
     }
 
     public void SetOpenedAddPet(bool value)
@@ -687,7 +667,7 @@ public class PetListWindow : PetWindow
         {
             (row, column) => DrawTexture(ref texturePointer, drawExtra),
             columnMid.Invoke,
-            (row, column) =>DrawRightHeading(column)
+            (row, column) => DrawRightHeading(column)
         }, () => graphPointer++ < forUser.SerializableUser.length, skipFunc);
     }
 

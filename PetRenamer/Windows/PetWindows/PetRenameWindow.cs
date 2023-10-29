@@ -2,10 +2,8 @@ using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Ipc.PenumbraIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
@@ -161,21 +159,7 @@ public class PetRenameWindow : PetWindow
     {
         activePet.petName = activePet.temporaryPetName;
         PluginLink.Configuration.Save();
-        if (activePet.petID > -1) 
-        {
-            SendIPC();
-            PetBase minion = user!.Minion;
-            if (activePet.petID != minion.ID) return;
-            PenumbraIPCProvider.RedrawMinionByIndex(minion.Index);
-            
-        }
-        if (activePet.petID < -1)
-        {
-            SendIPC();
-            PetBase battlePet = user!.BattlePet;
-            if (activePet.petID != battlePet.ID) return;
-            PenumbraIPCProvider.RedrawBattlePetByIndex(battlePet.Index);
-        }
+        SendIPC();
     }
 
     void SendIPC()

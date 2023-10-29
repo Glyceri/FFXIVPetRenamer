@@ -29,6 +29,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         try
         {
             if (user == null) return nint.Zero;
+            if (user.Homeworld == 9999) return GetSearchingTexture();
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (!Cache.textureCache.ContainsKey(currentUser)) return GetSearchingTexture();
             nint returner = Cache.textureCache[currentUser]?.ImGuiHandle ?? nint.Zero;

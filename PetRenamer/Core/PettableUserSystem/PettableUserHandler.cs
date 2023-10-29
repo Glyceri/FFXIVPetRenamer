@@ -21,6 +21,18 @@ internal class PettableUserHandler : IDisposable, IInitializable
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
     public LastActionUsed LastCastSoft { get => _lastCastSoft; private set => _lastCastSoft = value; }
+    bool _changed= false;
+    public bool Changed
+    {
+        get
+        {
+            bool val = _changed;
+            _changed = false;
+            return val;
+        }
+        private set => _changed = value;
+    }
+
 
     public void LoopThroughUsers(Action<PettableUser> action)
     {
@@ -57,6 +69,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             if (_users[i].UserName != user.username || _users[i].Homeworld != user.homeworld) continue;
             ProfilePictureNetworked.instance.OnDeclare(_users[i], UserDeclareType.Remove, false);
             _users.RemoveAt(i);
+            Changed = true;
         }
     }
 
@@ -65,10 +78,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
         if (force) ForceRemoveUser(user);
         if (Contains(user)) return;
         if (!ipc) ForceRemoveUser(user);
-
+        Changed = true;
         PettableUser u;
-        if(!ipc)    _users.Add(u = new PettableUser(user.username, user.homeworld, user));
-        else        _users.Add(u = new PettableIPCUser(user.username, user.homeworld, user));
+        if (!ipc)   _users.Add(u = new PettableUser(user.username, user.homeworld, user) { Declared = true });
+        else        _users.Add(u = new PettableIPCUser(user.username, user.homeworld, user) { Declared = true });
 
         try
         {

@@ -59,8 +59,8 @@ public abstract class PetWindow : PetWindowHelpers
     {
         if (_lastMode != petMode)
         {
-            _lastMode = petMode;
             OnPetModeChange(petMode);
+            _lastMode = petMode;
         }
     }
 
