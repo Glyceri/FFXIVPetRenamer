@@ -41,6 +41,7 @@ public class Configuration : IPluginConfiguration
     public bool startSettingsOpen = false;
     public bool quickButtonsToggle = false;
     public bool newUseCustomTheme = false;
+    public bool showKofiButton = true;
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;

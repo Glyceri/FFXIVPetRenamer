@@ -42,6 +42,10 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
         {
             if (data == null!) return;
             PettableUser user = PluginLink.PettableUserHandler.GetUser(player.Address);
+            // You may not edit the local user!
+            if (user != null) 
+                if (user.LocalUser) 
+                    return;
             string[] lines = data.Split('\n');
             if (lines.Length == 0) return;
             string identifier = lines[0];
@@ -49,7 +53,7 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
 
             if (identifier == PluginConstants.IpcClear) 
             {
-                Clear(user);
+                Clear(user!);
                 return;
             }
 

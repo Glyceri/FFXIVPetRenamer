@@ -54,6 +54,7 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.spaceOutSettings, "Space Out Settings", "Spaces Out Settings making it Easier to Read.");
             DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings unfolded", "Upon Starting the Plugin, Automatically Unfold all Setting Panels.");
             DrawConfigElement(ref PluginLink.Configuration.quickButtonsToggle, "Quick Buttons Toggle Instead of Open", "The Quick Buttons in the Top Bar Toggle Instead of Open.");
+            DrawConfigElement(ref PluginLink.Configuration.showKofiButton, "Show Ko-fi button");
             EndElementBox();
         }
         if (BeginElementBox("Global Settings"))

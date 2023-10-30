@@ -58,7 +58,7 @@ internal class NewPetListWindow : PetWindow
     public override void OnLateDraw()
     {
         if (drawableElements.Count == 0) return;
-        if (!BeginListBox($"##<PetList{internalCounter++}>", new Vector2(ContentAvailableX, ContentAvailableY - (footerElement == null ? 0 : BarSizePadded + WindowPaddingY))))
+        if (!BeginListBox($"##<PetList{++internalCounter}>", new Vector2(ContentAvailableX, ContentAvailableY - (footerElement == null ? 0 : BarSizePadded + WindowPaddingY))))
             return;
 
         foreach (DrawableElement element in drawableElements)
@@ -421,7 +421,7 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), isIpc))
             {
-                window.DrawAdvancedBarWithQuit("Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
+                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
                 window.DrawBasicBar($"{identifier} Name", baseName);
                 window.DrawBasicBar($"{identifier} ID", baseId.ToString());
                 ImGui.EndListBox();
@@ -440,7 +440,7 @@ internal class NewPetListWindow : PetWindow
         {
             bool outcome = false;
             if (!window.BeginListBoxSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, BarSizePadded))) return false;
-            window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Filter on Minion ID or Name.");
+            window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Search through all Minions in the game and add them for nicknaming.\n(Search possible on Name and ID)");
             window.SameLinePretendSpace();
             window.XButton("X", window.Styling.SmallButton, "Clear search field", () => searchText = string.Empty);
             if (searchText != lastText)
@@ -462,7 +462,7 @@ internal class NewPetListWindow : PetWindow
                             StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), 
                             nickname.ID, 
                             (id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true),
-                            "+", "Add Minion", (id, ipc) => 
+                            $"+##{++internalcounter}", $"Add Minion", (id, ipc) => 
                             {
                                 Clear();
                                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true);
@@ -499,7 +499,7 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit("UserName", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"UserName##{++internalcounter}", myUser.UserName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;
@@ -508,13 +508,13 @@ internal class NewPetListWindow : PetWindow
                 }, "X", $"Remove User: {myUser.UserName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
                 if (!sureMode)
                 {
-                    window.DrawBasicBar("Homeworld", myUser.HomeWorldName);
-                    window.DrawBasicBar("Petcount", $"Total: {myUser.SerializableUser.AccurateTotalPetCount()}, Minions: {myUser.SerializableUser.AccurateMinionCount()}, Battle Pets: {myUser.SerializableUser.AccurateBattlePetCount()}");
+                    window.DrawBasicBar($"Homeworld##{++internalcounter}", myUser.HomeWorldName);
+                    window.DrawBasicBar($"Petcount##{++internalcounter}", $"Total: {myUser.SerializableUser.AccurateTotalPetCount()}, Minions: {myUser.SerializableUser.AccurateMinionCount()}, Battle Pets: {myUser.SerializableUser.AccurateBattlePetCount()}");
                 }
                 else
                 {
                     if (myUser.LocalUser) sureMode = false;
-                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}", () => PluginLink.PettableUserHandler.DeclareUser(myUser.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove), () => sureMode = false);
+                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", () => PluginLink.PettableUserHandler.DeclareUser(myUser.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove), () => sureMode = false);
                 }
                 ImGui.EndListBox();
             }

@@ -21,7 +21,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
     public LastActionUsed LastCastSoft { get => _lastCastSoft; private set => _lastCastSoft = value; }
-    bool _changed= false;
+    bool _changed = false;
+
     public bool Changed
     {
         get
@@ -41,11 +42,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
             action.Invoke(user);
     }
 
-    public void Dispose()
-    {
-        _users?.Clear();
-    }
-
+    public void Dispose() => _users?.Clear();
+    
     public void Initialize()
     {
         int length = PluginLink.Configuration.serializableUsersV3!.Length;

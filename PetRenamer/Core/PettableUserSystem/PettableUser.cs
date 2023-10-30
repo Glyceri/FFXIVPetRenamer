@@ -75,7 +75,8 @@ public unsafe class PettableUser
     public void SetUser(BattleChara* user)
     {
         if (user == null) return;
-        _objectID = user->Character.GameObject.ObjectID;
+        _resetCounter = 0;
+         _objectID = user->Character.GameObject.ObjectID;
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
@@ -86,6 +87,8 @@ public unsafe class PettableUser
 
     int lastID = -1;
     int lastCast = -1;
+
+    int _resetCounter = 0;
 
     void HandleCast(int id)
     {
@@ -138,9 +141,11 @@ public unsafe class PettableUser
 
     public void Reset()
     {
+        if (_resetCounter < 10) _resetCounter++;
+        else if (_resetCounter == 10) SerializableUser.ClearAllIPC();
         _user = nint.Zero;
-        _battlePet.SoftReset();
-        _minion.SoftReset();
+        _battlePet.FullReset();
+        _minion.FullReset();
     }
 
     public int GetPetSkeleton(bool soft, int additional)
@@ -170,4 +175,13 @@ public unsafe class PettableUser
     }
 
     public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID, false)!;
+
+    bool _isDestroying = false;
+    public void Destroy()
+    {
+        if (_isDestroying) return;
+        _isDestroying = true;
+        SerializableUser.ClearAllIPC();
+    }
+    public bool DeathsMark => _isDestroying;
 }

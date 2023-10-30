@@ -40,7 +40,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),          "[Pet/Minion List]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", null!),
+        (SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
     };
 
     Vector2 oldPadding;
@@ -136,11 +137,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
         for (int i = 0; i < helpButtons.Count; i++)
         {
             if (!helpButtons[i].Item4?.Invoke(this) ?? false) continue;
-            if (Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3))
+            bool buttonPress = false;
+            if (helpButtons[i].Item2 == typeof(KofiPetWindow)) buttonPress = KofiButton(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3);
+            else buttonPress = Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3);
+            if(buttonPress)
             {
                 if (PluginLink.Configuration.quickButtonsToggle) PluginLink.WindowHandler.ToggleWindow(helpButtons[i].Item2);
                 else PluginLink.WindowHandler.OpenWindow(helpButtons[i].Item2);
             }
+
+
             SameLinePretendSpace();
         }
     }
@@ -197,6 +203,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (callback != null && returner) callback();
         return returner;
     }
+
+    protected bool KofiButton(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(1.0f, 0.6f, 0.6f, 1.0f));
+        PushStyleColor(ImGuiCol.Button, new Vector4(1.0f, 0.5f, 0.5f, 1.0f));
+        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(1.0f, 0.4f, 0.4f, 1.0f));
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
+        bool returner = ImGui.Button(text, styling);
+        if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
+        if (callback != null && returner) callback();
+        return returner;
+    }
+
 
     protected bool XButtonError(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {

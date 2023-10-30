@@ -69,7 +69,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.2.5"), new CLE("General", "Fixed an issue that caused DelvUI nameplates to not show up with this plugin enabled.")) },
         { new CLS(new Version("1.4.3.0"), new CLE("General", "Added Wotsit support.", "Your xllog should no longer say my plugin failed to dispose hooks. (It has always properly disposed, but now the error should no longer show up.)", "Changed IPC endpoints.", "Fixed a bug where using [ ] in your petnames would cause weirdness... there's probably more weirdness that can appear, sorry for that.")) },
         { new CLS(new Version("1.4.3.1"), new CLE("General", "Fixed an issue where under certain circumstances this plugin wouldn't close.")) },
-        { new CLS(new Version("1.4.3.2"), new CLE("General", "Updated IPC points.", "Removed dependancy on Penumbra for redrawing nameplates.", "Rewrote the complete Pet List. This has been on my todo for a month now and I'm very happy with the results.")) }
+        { new CLS(new Version("1.4.3.2"), new CLE("General", "Updated IPC points.", "Removed dependency on Penumbra for redrawing nameplates."), new CLE("UI", "Rewrote the complete Pet List. This has been on my todo for a month now and I'm very happy with the results.", "Added a Ko-fi Support button.")) }
     };
 
     const string starter = "  ◉   ";
