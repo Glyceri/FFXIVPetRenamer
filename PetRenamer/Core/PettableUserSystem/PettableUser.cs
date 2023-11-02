@@ -177,11 +177,14 @@ public unsafe class PettableUser
     public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID, false)!;
 
     bool _isDestroying = false;
+    int _destroyCounter = 0;
     public void Destroy()
     {
         if (_isDestroying) return;
         _isDestroying = true;
         SerializableUser.ClearAllIPC();
+        _destroyCounter = 2;
+        _UserChanged = true;
     }
-    public bool DeathsMark => _isDestroying;
+    public bool DeathsMark => _isDestroying && --_destroyCounter <= 0;
 }

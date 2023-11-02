@@ -15,10 +15,10 @@ internal class UserFindUpdatable : Updatable
         for (int i = PluginLink.PettableUserHandler.Users.Count - 1; i >= 0; i--)
         {
             PettableUser user = PluginLink.PettableUserHandler.Users[i];
-            if (user is not PettableIPCUser ipcUser) continue;
-            if (ipcUser.SerializableUser.AccurateIPCCount() != 0) continue;
-            if (ipcUser.DeathsMark) PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, PettableUserSystem.Enums.UserDeclareType.Remove);
-            else ipcUser.Destroy();
+            if (user is PettableIPCUser ipcUser)
+                if (ipcUser.SerializableUser.AccurateIPCCount() == 0)
+                    ipcUser.Destroy();
+            if (user.DeathsMark) PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, PettableUserSystem.Enums.UserDeclareType.Remove);
         }
 
         foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
