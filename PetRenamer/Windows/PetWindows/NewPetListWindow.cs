@@ -514,7 +514,7 @@ internal class NewPetListWindow : PetWindow
                 else
                 {
                     if (myUser.LocalUser) sureMode = false;
-                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", () => PluginLink.PettableUserHandler.DeclareUser(myUser.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove), () => sureMode = false);
+                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.SerializableUser.ClearAllIPC, () => sureMode = false);
                 }
                 ImGui.EndListBox();
             }

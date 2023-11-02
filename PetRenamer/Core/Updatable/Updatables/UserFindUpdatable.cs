@@ -17,7 +17,7 @@ internal class UserFindUpdatable : Updatable
             PettableUser user = PluginLink.PettableUserHandler.Users[i];
             if (user is not PettableIPCUser ipcUser) continue;
             if (ipcUser.SerializableUser.AccurateIPCCount() != 0) continue;
-            if (ipcUser.DeathsMark) PluginLink.PettableUserHandler.Users.Remove(user);
+            if (ipcUser.DeathsMark) PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, PettableUserSystem.Enums.UserDeclareType.Remove);
             else ipcUser.Destroy();
         }
 
