@@ -4,6 +4,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
 using System;
@@ -25,7 +26,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.IsPvP) return;
 
-        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName.ToLowerInvariant()), true, (short)user.Homeworld);
+        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
         if (bChara == null) return;
         user.SetUser(bChara);
 

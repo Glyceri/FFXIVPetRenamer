@@ -175,7 +175,7 @@ public class SerializableUserV3
     }
 
     public bool HasID(int id) => ids.Contains(id);
-    public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim().Normalize() == username.ToLowerInvariant().Trim().Normalize() && this.homeworld == homeworld;
+    public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim() == username.ToLowerInvariant().Trim() && this.homeworld == homeworld;
     public bool Equals((string, ushort) user) => Equals(user.Item1, user.Item2);
 
     public int AccurateTotalPetCount()
