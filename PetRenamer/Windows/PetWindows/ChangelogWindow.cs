@@ -71,6 +71,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.3.1"), new CLE("General", "Fixed an issue where under certain circumstances this plugin wouldn't close.")) },
         { new CLS(new Version("1.4.3.2"), new CLE("General", "Updated IPC points.", "Removed dependency on Penumbra for redrawing nameplates."), new CLE("UI", "Rewrote the complete Pet List. This has been on my todo for a month now and I'm very happy with the results.", "Added a Ko-fi Support button.")) },
         { new CLS(new Version("1.4.3.3"), new CLE("General", "The plugin should work for people with a - in their name now!", "A warning will now be displayed when you enter a PVP area and the plugin disables itself.", "Fixed an IPC issue.")) },
+        { new CLS(new Version("1.4.3.4"), new CLE("General", "The plugin will now save upon removing a user!", "Improved stability upon logging into an alt account.", "Code optimizations."), new CLE("UI", "The pet list will now reset upon relogging.", "Fixed an issue where the pet list wouldn't draw correctly under certain circumstances.")) },
     };
 
     const string starter = "  ◉   ";

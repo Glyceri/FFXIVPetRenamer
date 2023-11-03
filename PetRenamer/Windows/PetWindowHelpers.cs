@@ -102,8 +102,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected void DrawModeToggle()
     {
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
-        int pressed = DotBar();
-        HelpBar();
+        int pressed = -1;
+        if (PluginLink.PettableUserHandler.LocalUser() != null)
+        {
+            pressed = DotBar();
+            HelpBar();
+        }
+        else
+        {
+            PetWindow.petMode = PetMode.Normal;
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX(), ImGui.GetCursorPosY() + (ToggleButtonStyle.Y * 0.25f)));
+            ImGui.TextColored(StylingColours.defaultText, "Pet Nicknames is disabled in PVP mode.");
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX(), ImGui.GetCursorPosY() - (ToggleButtonStyle.Y * 0.25f)));
+        }
         ImGui.EndListBox();
         if (pressed != -1) (this as PetWindow)!.SetPetMode((PetMode)pressed);
     }

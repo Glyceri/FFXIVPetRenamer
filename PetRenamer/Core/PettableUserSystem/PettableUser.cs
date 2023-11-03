@@ -2,6 +2,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -45,12 +46,14 @@ public unsafe class PettableUser
     int _ChangedID = 0;
     bool _UserChanged = false;
 
+    int _objectIndex = -1;
+
     public bool LocalUser
     {
         get
         {
             if (!UserExists) return false;
-            if (((BattleChara*)_user)->Character.GameObject.ObjectIndex == 0) return true;
+            if (_objectIndex == 0) return true;
             return false;
         }
     }
@@ -74,7 +77,10 @@ public unsafe class PettableUser
 
     public void SetUser(BattleChara* user)
     {
+        _objectIndex = -1;
         if (user == null) return;
+        _objectIndex = user->Character.GameObject.ObjectIndex;
+        if (_objectIndex == 0) PluginLink.PettableUserHandler.SetLocalUser(this);
         _resetCounter = 0;
          _objectID = user->Character.GameObject.ObjectID;
         _user = (nint)user;

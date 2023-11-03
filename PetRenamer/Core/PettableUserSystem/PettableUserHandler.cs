@@ -98,13 +98,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
             }
     }
 
-    public bool LocalPetChanged()
-    {
-        PettableUser user = LocalUser()!;
-        if (user == null) return false;
-        return user.AnyPetChanged;
-    }
-
     public PettableUser? GetUser(string name) => GetUser(name, 9999);
     public PettableUser? GetUser(string name, ushort homeworld)
     {
@@ -154,13 +147,14 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return null!;
     }
 
+    PettableUser localUser = null!;
+    public void SetLocalUser(PettableUser user) => localUser = user;
+
     public PettableUser? LocalUser()
     {
         if (PluginHandlers.ClientState.IsPvP) return null!;
-        foreach (PettableUser user in _users)
-            if (user.LocalUser)
-                return user;
-        return null!;
+        if (localUser != null && localUser.DeathsMark) return null!;
+        return localUser;
     }
 
     public PettableUser? LastCastedUser()

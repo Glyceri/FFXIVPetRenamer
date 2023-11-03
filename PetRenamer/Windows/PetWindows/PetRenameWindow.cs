@@ -44,11 +44,12 @@ public class PetRenameWindow : PetWindow
             MaximumSize = wideSize
         };
 
-        user ??= PluginLink.PettableUserHandler.LocalUser()!;
+        user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         HandlePets();
     }
 
+    public override void OnWindowClose() => user = null!;
     internal override void OnPetModeChange(PetMode mode) => activePet = GetPet(mode);
        
     void HandlePets()
@@ -171,7 +172,7 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        if ((user ??= PluginLink.PettableUserHandler.LocalUser()!) == null) return;
+        if ((user = PluginLink.PettableUserHandler.LocalUser()!) == null) return;
         if (forceOpen) ForceOpenForID(id);
 
         RenamablePet lastPet = activePet;
