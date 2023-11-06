@@ -39,6 +39,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
             Reset();
             lastInternalVersion = currentInternalVersion;
         }
+        else return;
 
         foreach (LegacyElement legacyElement in correctElements)
             legacyElement.OnUpdate(frameWork, currentInternalVersion);

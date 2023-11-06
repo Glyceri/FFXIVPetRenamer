@@ -79,12 +79,6 @@ public class Configuration : IPluginConfiguration
         PluginLink.DalamudPlugin.SavePluginConfig(this); 
     }
 
-    public void ClearAllNicknames()
-    {
-        PluginLink.PettableUserHandler.Users.Clear();
-        Save();
-    }
-
     #region OBSOLETE
 
     //---------------------------Legacy Variables---------------------------

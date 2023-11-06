@@ -2,7 +2,6 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -150,6 +149,7 @@ public unsafe class PettableUser
         if (_resetCounter < 10) _resetCounter++;
         else if (_resetCounter == 10) SerializableUser.ClearAllIPC();
         _user = nint.Zero;
+        _objectIndex = -1;
         _battlePet.FullReset();
         _minion.FullReset();
     }

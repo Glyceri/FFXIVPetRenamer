@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,7 @@ public class SerializableUserV3
     {
         this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
         this.homeworld = homeworld;
+        FillBattlePets();
     }
 
     public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld)
@@ -155,6 +158,21 @@ public class SerializableUserV3
         ids = idList.ToArray();
         names = namesList.ToArray();
         ipcNames = ipcList.ToArray();
+    }
+
+    void FillBattlePets()
+    {
+        foreach (int id in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
+        {
+            bool found = false;
+            for (int i = 0; i < length; i++)
+            {
+                if (ids[i] != id) continue;
+                found = true;
+                break;
+            }
+            if (!found) SaveNickname(id, "", true, true);
+        }
     }
 
     public void ClearAllIPC()

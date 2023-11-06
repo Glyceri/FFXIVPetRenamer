@@ -152,7 +152,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public PettableUser? LocalUser()
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvP || !PluginLink.Configuration.displayCustomNames) return null!;
         if (localUser != null && localUser.DeathsMark) return null!;
         return localUser;
     }

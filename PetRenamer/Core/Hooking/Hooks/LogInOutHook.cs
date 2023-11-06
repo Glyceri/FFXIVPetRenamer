@@ -1,6 +1,7 @@
 ﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
+using PetRenamer.Core.Serialization;
 using PetRenamer.Logging;
 using PetRenamer.Windows.PetWindows;
 

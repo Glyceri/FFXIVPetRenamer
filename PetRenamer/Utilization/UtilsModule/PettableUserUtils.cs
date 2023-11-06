@@ -46,6 +46,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
             user.SetBattlePet(battlePet);
         }
+
         bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
         if (userChanged) FindAnythingIPCProvider.RegisterInitialNames();
@@ -78,11 +79,11 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (id > -1) return (id, tNodeText);
 
         (int, string) action = GetAction(tNodeText);
-        if(action.Item1 != -1) return (user.GetPetSkeleton(softHook, action.Item1), CleanupString(action.Item2));
+        if (action.Item1 != -1) return (user.GetPetSkeleton(softHook, action.Item1), CleanupString(action.Item2));
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedBattlePetSkeletonToName)
         {
-            if (!tNodeText.Equals(kvp.Value, StringComparison.InvariantCultureIgnoreCase) && 
-                !tNodeText.StartsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase) && 
+            if (!tNodeText.Equals(kvp.Value, StringComparison.InvariantCultureIgnoreCase) &&
+                !tNodeText.StartsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase) &&
                 !tNodeText.EndsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase)) continue;
             return (kvp.Key, kvp.Value);
         }
@@ -99,7 +100,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
     (int, string) GetAction(string tNodeText)
     {
-        List<(int, string)> kvps = new List<(int, string)> ();
+        List<(int, string)> kvps = new List<(int, string)>();
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedActionIDToName)
         {
             if (!tNodeText.Contains(kvp.Value, StringComparison.InvariantCultureIgnoreCase)) continue;

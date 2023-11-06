@@ -21,7 +21,8 @@ internal class UserFindUpdatable : Updatable
             if (user.DeathsMark) PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, PettableUserSystem.Enums.UserDeclareType.Remove);
         }
 
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-            PettableUserUtils.instance.Solve(user);
+        int userCount = PluginLink.PettableUserHandler.Users.Count;
+        for (int i = 0; i < userCount; i++)
+            PettableUserUtils.instance.Solve(PluginLink.PettableUserHandler.Users[i]);
     }
 }
