@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.Interop;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
@@ -9,7 +10,6 @@ using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
 using System;
 using System.Collections.Generic;
-using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -18,10 +18,8 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 {
     public static PettableUserUtils instance { get; set; } = null!;
 
-    public unsafe void Solve(PettableUser user, bool dontCare = false)
+    public unsafe void Solve(PettableUser user)
     {
-        if (user == null) return;
-
         user.Reset();
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.IsPvP) return;
@@ -30,22 +28,8 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (bChara == null) return;
         user.SetUser(bChara);
 
-        if (user.SerializableUser.hasCompanion || user.LocalUser || dontCare)
-        {
-            int companionIndex = bChara->Character.GameObject.ObjectIndex + 1;
-            Companion* companion = (Companion*)GameObjectManager.GetGameObjectByIndex(companionIndex);
-            user.SetCompanion(companion);
-        }
-
-        if (user.SerializableUser.hasBattlePet || user.LocalUser || dontCare)
-        {
-            BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-            if (battlePet != null)
-                if (battlePet->Character.CharacterData.Health == 0)
-                    battlePet = AlternativeFindForBChara(bChara, battlePet);
-
-            user.SetBattlePet(battlePet);
-        }
+        if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);
+        if (user.SerializableUser.hasBattlePet || user.LocalUser) user.SetBattlePet(AlternativeFindForBChara(bChara));
 
         bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
@@ -57,19 +41,18 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (user.BattlePet.Changed) window.OpenForBattlePet(user.BattlePet.ID);
     }
 
-    unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara, BattleChara* basePet)
+    unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara)
     {
-        for (int i = 2; i < PluginHandlers.ObjectTable.Length; i += 2)
+        uint objectID = bChara->Character.GameObject.ObjectID;
+        foreach (Pointer<BattleChara> chara in PluginLink.CharacterManager->BattleCharaListSpan)
         {
-            DGameObject? current = PluginHandlers.ObjectTable[i];
-            if (current == null) continue;
-            BattleChara* curPet = (BattleChara*)current.Address;
-            if (curPet == null) continue;
-            if (curPet == basePet) continue;
-            if (curPet->Character.GameObject.OwnerID == bChara->Character.GameObject.ObjectID)
-                return curPet;
+            if (chara.Value == null) continue;
+            if (chara.Value == bChara) continue;
+            if (chara.Value->Character.GameObject.OwnerID != objectID) continue;
+            if (chara.Value->Character.CharacterData.Health == 0) continue;
+            return chara;
         }
-        return basePet;
+        return null!;
     }
 
     public (int, string) GetNameRework(string tNodeText, ref PettableUser user, bool softHook = false)

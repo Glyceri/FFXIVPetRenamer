@@ -49,6 +49,12 @@ public class PetRenameWindow : PetWindow
         HandlePets();
     }
 
+    public override void OnWindowOpen()
+    {
+        OnPetModeChange(petMode);
+        string iconPath = RemapUtils.instance.GetTextureID(activePet.petID).GetIconPath();
+        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+    }
     public override void OnWindowClose() => user = null!;
     internal override void OnPetModeChange(PetMode mode) => activePet = GetPet(mode);
        
@@ -178,15 +184,17 @@ public class PetRenameWindow : PetWindow
         RenamablePet lastPet = activePet;
 
         if ((activePet = GetPet(FromID(id))) == null) return;
-
         activePet.petID = id;
         activePet.baseName = RemapUtils.instance.PetIDToName(id).MakeTitleCase();
         activePet.petName = user.GetCustomName(id);
         activePet.temporaryPetName = activePet.petName;
 
-        string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
-        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
-
+        if (IsOpen)
+        {
+            string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
+            activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        }
+        
         if (!forceOpen)
             activePet = lastPet;
     }

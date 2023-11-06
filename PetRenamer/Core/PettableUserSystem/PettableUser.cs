@@ -38,7 +38,6 @@ public unsafe class PettableUser
     public uint ObjectID => _objectID;
     public int UserChangedID => _ChangedID;
     public bool UserChanged => _UserChanged || AnyPetChanged;
-    public bool UserFaulty => Pets.Any(p => p.Faulty);
     public bool IsIPCOnlyUser { get; init; } = false;
     public bool Declared { get; init; } = false;
 

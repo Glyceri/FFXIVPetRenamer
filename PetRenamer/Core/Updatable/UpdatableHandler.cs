@@ -29,13 +29,6 @@ internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
 
         int elementCount = elements.Count;
         for(int i = 0; i < elementCount; i++)
-        {
-            Updatable updatable = elements[i];
-            updatable.Watch();
-            updatable.Update(ref framework, ref player);
-            int seconds = updatable.GetTime().Microseconds;
-            if (seconds > 20)
-                PetLog.Log(updatable.GetType().Name + " : " + seconds.ToString());
-        }
+            elements[i].Update(ref framework, ref player);
     }
 }

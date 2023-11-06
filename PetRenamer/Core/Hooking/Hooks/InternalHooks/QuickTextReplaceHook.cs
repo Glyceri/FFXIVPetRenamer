@@ -51,7 +51,6 @@ public unsafe class QuickTextReplaceHook : IDisposable
 
         PettableUser user = GetUser();
         if (user == null) return;
-        if (user.UserFaulty) return;
 
         (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNodeText, ref user, softHook);
         int id = currentName.Item1;
