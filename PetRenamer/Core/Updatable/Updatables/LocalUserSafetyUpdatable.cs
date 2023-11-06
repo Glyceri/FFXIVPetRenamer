@@ -3,18 +3,18 @@ using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Windows.Attributes;
-using System;
 
 namespace PetRenamer.Core.Updatable.Updatables;
 
 [Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
-    IntPtr lastPlayer = IntPtr.Zero;
+    string lastName = string.Empty;
     public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
-        if (lastPlayer == player.Address) return;
-        lastPlayer = player.Address;
+        string curName = player.Name.TextValue;
+        if (lastName == curName) return;
+        lastName = curName;
         if (PluginLink.Configuration.serializableUsersV3! == null) return;
         int count = PluginLink.Configuration.serializableUsersV3!.Length;
         for (int i = 0; i < count; i++)

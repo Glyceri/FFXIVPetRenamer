@@ -32,7 +32,6 @@ public class SerializableUserV3
     {
         this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
         this.homeworld = homeworld;
-        FillBattlePets();
     }
 
     public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld)
@@ -93,6 +92,7 @@ public class SerializableUserV3
         else GenerateNewNickname(id, name, force, isIPCName);
 
         if (!doCheck) return;
+        FillBattlePets();
         hasCompanion = false;
         hasBattlePet = false;
         for (int i = 0; i < ids.Length; i++)
@@ -144,6 +144,7 @@ public class SerializableUserV3
 
     public void RemoveNickname(int id)
     {
+        FillBattlePets();
         int index = IndexOf(id);
         if (index == -1) return;
 

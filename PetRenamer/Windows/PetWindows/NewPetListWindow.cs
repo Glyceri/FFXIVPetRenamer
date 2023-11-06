@@ -318,7 +318,7 @@ internal class NewPetListWindow : PetWindow
         for (int i = 0; i < data.ids.Length; i++)
         {
             if (data.importTypes[i] == ImportType.Remove) activeUser.SerializableUser.RemoveNickname(data.ids[i]);
-            else activeUser.SerializableUser.SaveNickname(data.ids[i], data.names[i], data.importTypes[i] == ImportType.New || data.importTypes[i] == ImportType.Rename, false);
+            else activeUser.SerializableUser.SaveNickname(data.ids[i], data.names[i], data.importTypes[i] == ImportType.New || data.importTypes[i] == ImportType.Rename || i == data.ids.Length - 1, false);
         }
         PluginLink.Configuration.Save();
         activeUser = PluginLink.PettableUserHandler.GetUser(data.UserName, data.HomeWorld)!;

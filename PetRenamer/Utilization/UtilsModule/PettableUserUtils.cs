@@ -5,7 +5,6 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
 using System;
