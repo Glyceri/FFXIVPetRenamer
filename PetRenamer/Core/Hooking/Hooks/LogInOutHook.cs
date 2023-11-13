@@ -1,6 +1,8 @@
 ﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
+using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.Hooking.Hooks;
@@ -12,18 +14,18 @@ internal class LogInOutHook : HookableElement
     {
         PluginHandlers.ClientState.Login += OnLogin;
         PluginHandlers.ClientState.Logout += OnLogout;
+        PluginHandlers.ClientState.EnterPvP += OnPVPEnter;
     }
 
     internal override void OnDispose()
     {
         PluginHandlers.ClientState.Login -= OnLogin;
-        PluginHandlers.ClientState.Logout -= OnLogout;
+        PluginHandlers.ClientState.Logout -= OnLogout; 
+        PluginHandlers.ClientState.EnterPvP -= OnPVPEnter;
     }
 
-    void OnLogin()
-    {
-        ResetWindows();
-    }
+    void OnPVPEnter() => PluginHandlers.ChatGui.PrintError("Pet Nicknames is disabled in PVP zones.");
+    void OnLogin() => ResetWindows();
 
     void OnLogout()
     {

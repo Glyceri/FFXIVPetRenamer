@@ -8,6 +8,7 @@ using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Numerics;
+using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -44,12 +45,23 @@ public class PetRenameWindow : PetWindow
             MaximumSize = wideSize
         };
 
-        user ??= PluginLink.PettableUserHandler.LocalUser()!;
+        user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;
         HandlePets();
     }
 
-    internal override void OnPetModeChange(PetMode mode) => activePet = GetPet(mode);
+    public override void OnWindowOpen()
+    {
+        OnPetModeChange(petMode);
+        SetImage(activePet.petID);
+    }
+    public override void OnWindowClose() => user = null!;
+    internal override void OnPetModeChange(PetMode mode) 
+    { 
+        activePet = GetPet(mode);
+        if (activePet == null) return;  
+        SetImage(activePet.petID);
+    }
        
     void HandlePets()
     {
@@ -171,21 +183,19 @@ public class PetRenameWindow : PetWindow
 
     public void OpenForId(int id, bool forceOpen = false)
     {
-        if ((user ??= PluginLink.PettableUserHandler.LocalUser()!) == null) return;
+        if ((user = PluginLink.PettableUserHandler.LocalUser()!) == null) return;
         if (forceOpen) ForceOpenForID(id);
 
         RenamablePet lastPet = activePet;
 
         if ((activePet = GetPet(FromID(id))) == null) return;
-
         activePet.petID = id;
         activePet.baseName = RemapUtils.instance.PetIDToName(id).MakeTitleCase();
         activePet.petName = user.GetCustomName(id);
         activePet.temporaryPetName = activePet.petName;
 
-        string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
-        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
-
+        if (IsOpen) SetImage(id);
+        
         if (!forceOpen)
             activePet = lastPet;
     }
@@ -200,6 +210,12 @@ public class PetRenameWindow : PetWindow
     {
         if (id == -1) pets[1]?.Clear();
         else OpenForId(id, forceOpen);
+    }
+
+    void SetImage(int id)
+    {
+        string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
+        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
     }
 
     void ForceOpenForID(int id)

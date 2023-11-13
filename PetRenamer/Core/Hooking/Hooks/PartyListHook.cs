@@ -17,16 +17,9 @@ internal unsafe class PartyListHook : HookableElement
     // VVVVVV ACTUAL BYTE CODE GENEROUSLY PROVIDED BY: Nuko
     // [Signature("48 83 EC ?? F6 81 ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 8B 81", DetourName = nameof(PartyListHookUpdate))]
 
-    internal override void OnInit()
-    {
-        PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
-    }
-
-    internal override void OnDispose()
-    {
-        PluginHandlers.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
-    }
-
+    internal override void OnInit() => PluginHandlers.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "_PartyList", LifeCycleUpdate);
+    internal override void OnDispose() => PluginHandlers.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+    
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
 
     void Update(AtkUnitBase* baseD)

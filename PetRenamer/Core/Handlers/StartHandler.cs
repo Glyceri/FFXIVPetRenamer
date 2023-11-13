@@ -1,5 +1,9 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Interface;
+using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiNET;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
+using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows;
 
 namespace PetRenamer.Core.Handlers;
@@ -15,6 +19,7 @@ internal class StartHandler
         IpcProvider.NotifyReady();
 
         FindAnythingIPCProvider.Init(ref dalamudPluginInterface);
+        IPCMappy.Init(ref dalamudPluginInterface);
 
         PetWindow.petMode = PetMode.Normal;
         // For some reason update can call instantly upon subscribing, so we have to start it late.

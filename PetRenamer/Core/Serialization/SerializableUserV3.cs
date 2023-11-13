@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Core.Handlers;
+using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -90,6 +92,7 @@ public class SerializableUserV3
         else GenerateNewNickname(id, name, force, isIPCName);
 
         if (!doCheck) return;
+        FillBattlePets();
         hasCompanion = false;
         hasBattlePet = false;
         for (int i = 0; i < ids.Length; i++)
@@ -141,6 +144,7 @@ public class SerializableUserV3
 
     public void RemoveNickname(int id)
     {
+        FillBattlePets();
         int index = IndexOf(id);
         if (index == -1) return;
 
@@ -155,6 +159,21 @@ public class SerializableUserV3
         ids = idList.ToArray();
         names = namesList.ToArray();
         ipcNames = ipcList.ToArray();
+    }
+
+    void FillBattlePets()
+    {
+        foreach (int id in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
+        {
+            bool found = false;
+            for (int i = 0; i < length; i++)
+            {
+                if (ids[i] != id) continue;
+                found = true;
+                break;
+            }
+            if (!found) SaveNickname(id, "", true, true);
+        }
     }
 
     public void ClearAllIPC()
@@ -175,7 +194,7 @@ public class SerializableUserV3
     }
 
     public bool HasID(int id) => ids.Contains(id);
-    public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim().Normalize() == username.ToLowerInvariant().Trim().Normalize() && this.homeworld == homeworld;
+    public bool Equals(string username, ushort homeworld) => this.username.ToLowerInvariant().Trim() == username.ToLowerInvariant().Trim() && this.homeworld == homeworld;
     public bool Equals((string, ushort) user) => Equals(user.Item1, user.Item2);
 
     public int AccurateTotalPetCount()

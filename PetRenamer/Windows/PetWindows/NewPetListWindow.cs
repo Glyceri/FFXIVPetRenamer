@@ -58,7 +58,7 @@ internal class NewPetListWindow : PetWindow
     public override void OnLateDraw()
     {
         if (drawableElements.Count == 0) return;
-        if (!BeginListBox($"##<PetList{internalCounter++}>", new Vector2(ContentAvailableX, ContentAvailableY - (footerElement == null ? 0 : BarSizePadded + WindowPaddingY))))
+        if (!BeginListBox($"##<PetList{++internalCounter}>", new Vector2(ContentAvailableX, ContentAvailableY - (footerElement == null ? 0 : BarSizePadded + WindowPaddingY))))
             return;
 
         foreach (DrawableElement element in drawableElements)
@@ -70,10 +70,15 @@ internal class NewPetListWindow : PetWindow
     }
 
     public override void OnWindowOpen() => OnPetModeChange(petMode);
-    public override void OnWindowClose() => ClearList();
+    public override void OnWindowClose()
+    {
+        activeUser = null!;
+        ClearList();
+    }
     internal override void OnPetModeChange(PetMode mode) => HandleChanged();
     void HandleChanged()
     {
+        if (activeUser == null) SetActiveToLocal();
         if (activeUser == null) return;
 
         if (!activeUser.Declared) searchBarElement.Clear();
@@ -148,7 +153,16 @@ internal class NewPetListWindow : PetWindow
     void FillUserList()
     {
         drawableElements.Add(new WarningDrawElement("Help! I cannot see any profile pictures. Please enable: [Allow Automatic Profile Pictures] in the settings menu.", PluginLink.WindowHandler.OpenWindow<ConfigWindow>, SeIconChar.MouseWheel.ToIconString(), "Open settings menu!"));
-        PluginLink.PettableUserHandler.LoopThroughUsers(u => drawableElements.Add(new PlayerDrawElement(u)));
+        PluginLink.PettableUserHandler.LoopThroughUsers(u =>
+        {
+            PlayerDrawElement p = new PlayerDrawElement(u);
+            if (u.LocalUser) 
+            { 
+                drawableElements.Insert(1, p);
+                drawableElements.Insert(2, new InvisibleDrawElement());
+            }
+            else drawableElements.Add(p);
+        });
     }
     void FillMinionOrPetList()
     {
@@ -304,7 +318,7 @@ internal class NewPetListWindow : PetWindow
         for (int i = 0; i < data.ids.Length; i++)
         {
             if (data.importTypes[i] == ImportType.Remove) activeUser.SerializableUser.RemoveNickname(data.ids[i]);
-            else activeUser.SerializableUser.SaveNickname(data.ids[i], data.names[i], data.importTypes[i] == ImportType.New || data.importTypes[i] == ImportType.Rename, false);
+            else activeUser.SerializableUser.SaveNickname(data.ids[i], data.names[i], data.importTypes[i] == ImportType.New || data.importTypes[i] == ImportType.Rename || i == data.ids.Length - 1, false);
         }
         PluginLink.Configuration.Save();
         activeUser = PluginLink.PettableUserHandler.GetUser(data.UserName, data.HomeWorld)!;
@@ -421,7 +435,7 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), isIpc))
             {
-                window.DrawAdvancedBarWithQuit("Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
+                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
                 window.DrawBasicBar($"{identifier} Name", baseName);
                 window.DrawBasicBar($"{identifier} ID", baseId.ToString());
                 ImGui.EndListBox();
@@ -440,7 +454,7 @@ internal class NewPetListWindow : PetWindow
         {
             bool outcome = false;
             if (!window.BeginListBoxSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, BarSizePadded))) return false;
-            window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Filter on Minion ID or Name.");
+            window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Search through all Minions in the game and add them for nicknaming.\n(Search possible on Name and ID)");
             window.SameLinePretendSpace();
             window.XButton("X", window.Styling.SmallButton, "Clear search field", () => searchText = string.Empty);
             if (searchText != lastText)
@@ -462,7 +476,7 @@ internal class NewPetListWindow : PetWindow
                             StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), 
                             nickname.ID, 
                             (id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true),
-                            "+", "Add Minion", (id, ipc) => 
+                            $"+##{++internalcounter}", $"Add Minion", (id, ipc) => 
                             {
                                 Clear();
                                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true);
@@ -484,6 +498,17 @@ internal class NewPetListWindow : PetWindow
         public void Clear() => searchText = string.Empty;
     }
 
+    class InvisibleDrawElement : DrawableElement
+    {
+        public override bool Draw(ref int internalcounter, NewPetListWindow window)
+        {
+            if (!window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, BarSize), false)) return false;
+
+            ImGui.EndListBox();
+            return false;
+        }
+    }
+
     class PlayerDrawElement : DrawableElement
     {
         PettableUser myUser;
@@ -499,7 +524,7 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit("UserName", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"User Name", myUser.UserName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;
@@ -508,13 +533,13 @@ internal class NewPetListWindow : PetWindow
                 }, "X", $"Remove User: {myUser.UserName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
                 if (!sureMode)
                 {
-                    window.DrawBasicBar("Homeworld", myUser.HomeWorldName);
-                    window.DrawBasicBar("Petcount", $"Total: {myUser.SerializableUser.AccurateTotalPetCount()}, Minions: {myUser.SerializableUser.AccurateMinionCount()}, Battle Pets: {myUser.SerializableUser.AccurateBattlePetCount()}");
+                    window.DrawBasicBar($"Homeworld", myUser.HomeWorldName);
+                    window.DrawBasicBar($"Petcount", $"Total: {myUser.SerializableUser.AccurateTotalPetCount()}, Minions: {myUser.SerializableUser.AccurateMinionCount()}, Battle Pets: {myUser.SerializableUser.AccurateBattlePetCount()}");
                 }
                 else
                 {
                     if (myUser.LocalUser) sureMode = false;
-                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}", () => PluginLink.PettableUserHandler.DeclareUser(myUser.SerializableUser, Core.PettableUserSystem.Enums.UserDeclareType.Remove), () => sureMode = false);
+                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
                 }
                 ImGui.EndListBox();
             }

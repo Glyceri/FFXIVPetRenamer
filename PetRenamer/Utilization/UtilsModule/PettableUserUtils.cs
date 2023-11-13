@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.Interop;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
@@ -8,7 +9,6 @@ using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
 using System;
 using System.Collections.Generic;
-using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace PetRenamer.Utilization.UtilsModule;
 
@@ -17,34 +17,19 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 {
     public static PettableUserUtils instance { get; set; } = null!;
 
-    public unsafe void Solve(PettableUser user, bool dontCare = false)
+    public unsafe void Solve(PettableUser user)
     {
-        if (user == null) return;
-
         user.Reset();
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (PluginHandlers.ClientState.IsPvP) return;
 
-        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(StringUtils.instance.MakeTitleCase(user.UserName.ToLowerInvariant()), true, (short)user.Homeworld);
+        BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
         if (bChara == null) return;
         user.SetUser(bChara);
 
-        if (user.SerializableUser.hasCompanion || user.LocalUser || dontCare)
-        {
-            int companionIndex = bChara->Character.GameObject.ObjectIndex + 1;
-            Companion* companion = (Companion*)GameObjectManager.GetGameObjectByIndex(companionIndex);
-            user.SetCompanion(companion);
-        }
+        if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);
+        if (user.SerializableUser.hasBattlePet || user.LocalUser) user.SetBattlePet(AlternativeFindForBChara(bChara));
 
-        if (user.SerializableUser.hasBattlePet || user.LocalUser || dontCare)
-        {
-            BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(bChara);
-            if (battlePet != null)
-                if (battlePet->Character.CharacterData.Health == 0)
-                    battlePet = AlternativeFindForBChara(bChara, battlePet);
-
-            user.SetBattlePet(battlePet);
-        }
         bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
         if (userChanged) FindAnythingIPCProvider.RegisterInitialNames();
@@ -55,19 +40,18 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (user.BattlePet.Changed) window.OpenForBattlePet(user.BattlePet.ID);
     }
 
-    unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara, BattleChara* basePet)
+    unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara)
     {
-        for (int i = 2; i < PluginHandlers.ObjectTable.Length; i += 2)
+        uint objectID = bChara->Character.GameObject.ObjectID;
+        foreach (Pointer<BattleChara> chara in PluginLink.CharacterManager->BattleCharaListSpan)
         {
-            DGameObject? current = PluginHandlers.ObjectTable[i];
-            if (current == null) continue;
-            BattleChara* curPet = (BattleChara*)current.Address;
-            if (curPet == null) continue;
-            if (curPet == basePet) continue;
-            if (curPet->Character.GameObject.OwnerID == bChara->Character.GameObject.ObjectID)
-                return curPet;
+            if (chara.Value == null) continue;
+            if (chara.Value == bChara) continue;
+            if (chara.Value->Character.GameObject.OwnerID != objectID) continue;
+            if (chara.Value->Character.CharacterData.Health == 0) continue;
+            return chara;
         }
-        return basePet;
+        return null!;
     }
 
     public (int, string) GetNameRework(string tNodeText, ref PettableUser user, bool softHook = false)
@@ -77,11 +61,11 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (id > -1) return (id, tNodeText);
 
         (int, string) action = GetAction(tNodeText);
-        if(action.Item1 != -1) return (user.GetPetSkeleton(softHook, action.Item1), CleanupString(action.Item2));
+        if (action.Item1 != -1) return (user.GetPetSkeleton(softHook, action.Item1), CleanupString(action.Item2));
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedBattlePetSkeletonToName)
         {
-            if (!tNodeText.Equals(kvp.Value, StringComparison.InvariantCultureIgnoreCase) && 
-                !tNodeText.StartsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase) && 
+            if (!tNodeText.Equals(kvp.Value, StringComparison.InvariantCultureIgnoreCase) &&
+                !tNodeText.StartsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase) &&
                 !tNodeText.EndsWith(kvp.Value, StringComparison.InvariantCultureIgnoreCase)) continue;
             return (kvp.Key, kvp.Value);
         }
@@ -98,7 +82,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
     (int, string) GetAction(string tNodeText)
     {
-        List<(int, string)> kvps = new List<(int, string)> ();
+        List<(int, string)> kvps = new List<(int, string)>();
         foreach (KeyValuePair<int, string> kvp in RemapUtils.instance.bakedActionIDToName)
         {
             if (!tNodeText.Contains(kvp.Value, StringComparison.InvariantCultureIgnoreCase)) continue;

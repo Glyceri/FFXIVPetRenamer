@@ -43,7 +43,8 @@ public abstract class PetWindow : PetWindowHelpers
     protected PetWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     public sealed override unsafe void Draw()
-    { 
+    {
+        base.Draw();
         if (drawToggle) DrawModeToggle();
         TickPetModeChanged();
         OnDraw();

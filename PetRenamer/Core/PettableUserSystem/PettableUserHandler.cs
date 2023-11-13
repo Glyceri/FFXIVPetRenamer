@@ -21,7 +21,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
     LastActionUsed _lastCast;
     public LastActionUsed LastCast { get => _lastCast; private set => _lastCast = value; }
     public LastActionUsed LastCastSoft { get => _lastCastSoft; private set => _lastCastSoft = value; }
-    bool _changed= false;
+    bool _changed = false;
+
     public bool Changed
     {
         get
@@ -41,11 +42,8 @@ internal class PettableUserHandler : IDisposable, IInitializable
             action.Invoke(user);
     }
 
-    public void Dispose()
-    {
-        _users?.Clear();
-    }
-
+    public void Dispose() => _users?.Clear();
+    
     public void Initialize()
     {
         int length = PluginLink.Configuration.serializableUsersV3!.Length;
@@ -100,13 +98,6 @@ internal class PettableUserHandler : IDisposable, IInitializable
             }
     }
 
-    public bool LocalPetChanged()
-    {
-        PettableUser user = LocalUser()!;
-        if (user == null) return false;
-        return user.AnyPetChanged;
-    }
-
     public PettableUser? GetUser(string name) => GetUser(name, 9999);
     public PettableUser? GetUser(string name, ushort homeworld)
     {
@@ -156,13 +147,14 @@ internal class PettableUserHandler : IDisposable, IInitializable
         return null!;
     }
 
+    PettableUser localUser = null!;
+    public void SetLocalUser(PettableUser user) => localUser = user;
+
     public PettableUser? LocalUser()
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
-        foreach (PettableUser user in _users)
-            if (user.LocalUser)
-                return user;
-        return null!;
+        if (PluginHandlers.ClientState.IsPvP || !PluginLink.Configuration.displayCustomNames) return null!;
+        if (localUser != null && localUser.DeathsMark) return null!;
+        return localUser;
     }
 
     public PettableUser? LastCastedUser()

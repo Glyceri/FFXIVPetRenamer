@@ -1,5 +1,6 @@
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -33,19 +34,13 @@ public class ConfigWindow : PetWindow
     bool canDraw = true;
     readonly Dictionary<string, (bool, float)> toggles = new Dictionary<string, (bool, float)>();
     string currentTitle = string.Empty;
+    const string baseText = "I will NEVER use the ";
 
     public override void OnDraw()
     {
         anythingIllegals = AnyIllegalsGoingOn();
 
-        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
-        {
-            if (BeginElementBox("Third Party WARNING", true))
-            {
-                DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Do NOT send feedback or issues for these settings on discord or via the official [Send Feedback] button!", "ONLY Github Issues are ALLOWED!", "Enables Settings Related to Other Plugins (Main Repo or Not)!" }, "READ THE WARNING!");
-                EndElementBox();
-            }
-        }
+        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode) DrawWarningThing();
 
         if (BeginElementBox("UI Settings"))
         {
@@ -54,6 +49,7 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.spaceOutSettings, "Space Out Settings", "Spaces Out Settings making it Easier to Read.");
             DrawConfigElement(ref PluginLink.Configuration.startSettingsOpen, "Start with all the settings unfolded", "Upon Starting the Plugin, Automatically Unfold all Setting Panels.");
             DrawConfigElement(ref PluginLink.Configuration.quickButtonsToggle, "Quick Buttons Toggle Instead of Open", "The Quick Buttons in the Top Bar Toggle Instead of Open.");
+            DrawConfigElement(ref PluginLink.Configuration.showKofiButton, "Show Ko-fi button");
             EndElementBox();
         }
         if (BeginElementBox("Global Settings"))
@@ -61,6 +57,25 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
             DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
             DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
+            EndElementBox();
+        }
+
+        if ((anythingIllegals && PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
+        {
+            if (BeginElementBox("Third Party Settings", false))
+            {
+                if (IPCMappy.MappyAvailable)
+                    DrawConfigElement(ref PluginLink.Configuration.enableMappyIntegration, "Enable Mappy Integration", new string[] { "Allows Pet Nicknames to display Custom Names on Mappy Pets" });
+                EndElementBox();
+            }
+        }
+    }
+
+    public void DrawWarningThing()
+    {
+        if (BeginElementBox("Third Party WARNING", true))
+        {
+            DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Integration with Third Party Plugins may cause issues that are BEYOND MY CONTROL!", "Some third party settings will drastically lower performance.", "I tested every interaction well, but use at your own risk." }, "READ THE WARNING!");
             EndElementBox();
         }
     }
@@ -98,12 +113,14 @@ public class ConfigWindow : PetWindow
         ImGui.Text("");
     }
 
-    void Header(string title)
+    void Header(string title, bool doNewLine = true, string tooltip = "")
     {
         if (!canDraw) return;
-        AddNewLine();
-        currentHeight += BarSize + (ItemSpacingY * 2);
+        currentHeight += BarSize + ItemSpacingY;
         NewLabel(title + $"##title{internalCounter++}", new Vector2(FillingWidthStepped(), BarSize));
+        if (tooltip == string.Empty) SetTooltipHovered(title);
+        else SetTooltipHovered(tooltip);
+        if (doNewLine) AddNewLine();
     }
 
     public override void OnDrawSharing()
@@ -115,8 +132,18 @@ public class ConfigWindow : PetWindow
         }
     }
 
+    void DrawPerformanceSettings()
+    {
+        if (BeginElementBox("Advanced Performance Settings", false, "Advanced Performance Settings\n[THESE ALL REQUIRE A PLUGIN RESTART]"))
+        {
+            Header("[THESE ALL REQUIRE A PLUGIN RESTART]", false, "(have you tried turning it off and on again)");
+            EndElementBox();
+        }
+    }
+
     public override void OnLateDraw()
     {
+        //DrawPerformanceSettings();
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || DebugMode)
         {
             if (BeginElementBox("Debug Mode"))
@@ -133,7 +160,7 @@ public class ConfigWindow : PetWindow
     {
         if (PluginLink.Configuration.debugMode) return true;
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
-
+        if (IPCMappy.MappyAvailable) return true;
 
         return false;
     }
@@ -141,7 +168,7 @@ public class ConfigWindow : PetWindow
     public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
     public bool DebugMode => PluginLink.Configuration.debugMode;
 
-    bool BeginElementBox(string title, bool forceOpen = false)
+    bool BeginElementBox(string title, bool forceOpen = false, string tooltip = "")
     {
         currentTitle = title;
         if (!toggles.ContainsKey(title))
@@ -158,6 +185,8 @@ public class ConfigWindow : PetWindow
             SameLine();
         }
         NewLabel(title + $"##title{internalCounter++}", new Vector2(ContentAvailableX, BarSize));
+        if (tooltip == string.Empty) SetTooltipHovered(title);
+        else SetTooltipHovered(tooltip);
         currentHeight = BarSize + (ItemSpacingY * 2);
         toggles[title] = curToggle;
         return outcome;

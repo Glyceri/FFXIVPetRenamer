@@ -1,6 +1,8 @@
-﻿using Dalamud.Plugin.Services;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin.Services;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Logging;
 using PetRenamer.Windows.Attributes;
 using System.Reflection;
 
@@ -22,9 +24,11 @@ internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
 
     void MainUpdate(IFramework framework)
     {
-        if (!(PluginHandlers.ClientState is { LocalPlayer: { } player })) return;
+        PlayerCharacter player = PluginHandlers.ClientState.LocalPlayer!;
+        if (player == null) return;
 
-        foreach (Updatable updatable in elements)
-            updatable.Update(ref framework, ref player);
+        int elementCount = elements.Count;
+        for(int i = 0; i < elementCount; i++)
+            elements[i].Update(ref framework, ref player);
     }
 }

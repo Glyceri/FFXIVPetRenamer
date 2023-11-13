@@ -5,7 +5,6 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
@@ -38,19 +37,20 @@ public unsafe class PettableUser
     public uint ObjectID => _objectID;
     public int UserChangedID => _ChangedID;
     public bool UserChanged => _UserChanged || AnyPetChanged;
-    public bool UserFaulty => Pets.Any(p => p.Faulty);
     public bool IsIPCOnlyUser { get; init; } = false;
     public bool Declared { get; init; } = false;
 
     int _ChangedID = 0;
     bool _UserChanged = false;
 
+    int _objectIndex = -1;
+
     public bool LocalUser
     {
         get
         {
             if (!UserExists) return false;
-            if (((BattleChara*)_user)->Character.GameObject.ObjectIndex == 0) return true;
+            if (_objectIndex == 0) return true;
             return false;
         }
     }
@@ -74,8 +74,12 @@ public unsafe class PettableUser
 
     public void SetUser(BattleChara* user)
     {
+        _objectIndex = -1;
         if (user == null) return;
-        _objectID = user->Character.GameObject.ObjectID;
+        _objectIndex = user->Character.GameObject.ObjectIndex;
+        if (_objectIndex == 0) PluginLink.PettableUserHandler.SetLocalUser(this);
+        _resetCounter = 0;
+         _objectID = user->Character.GameObject.ObjectID;
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
@@ -86,6 +90,8 @@ public unsafe class PettableUser
 
     int lastID = -1;
     int lastCast = -1;
+
+    int _resetCounter = 0;
 
     void HandleCast(int id)
     {
@@ -138,9 +144,12 @@ public unsafe class PettableUser
 
     public void Reset()
     {
+        if (_resetCounter < 10) _resetCounter++;
+        else if (_resetCounter == 10) SerializableUser.ClearAllIPC();
         _user = nint.Zero;
-        _battlePet.SoftReset();
-        _minion.SoftReset();
+        _objectIndex = -1;
+        _battlePet.FullReset();
+        _minion.FullReset();
     }
 
     public int GetPetSkeleton(bool soft, int additional)
@@ -170,4 +179,16 @@ public unsafe class PettableUser
     }
 
     public string GetCustomName(int skeletonID) => _serializableUser.GetNameFor(skeletonID, false)!;
+
+    bool _isDestroying = false;
+    int _destroyCounter = 0;
+    public void Destroy()
+    {
+        if (_isDestroying) return;
+        _isDestroying = true;
+        SerializableUser.ClearAllIPC();
+        _destroyCounter = 2;
+        _UserChanged = true;
+    }
+    public bool DeathsMark => _isDestroying && --_destroyCounter <= 0;
 }

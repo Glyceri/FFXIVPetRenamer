@@ -10,7 +10,6 @@ using PetRenamer.Windows.PetWindows;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.Windows;
 
@@ -40,7 +39,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),          "[Pet/Minion List]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", null!),
+        (SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
     };
 
     Vector2 oldPadding;
@@ -55,6 +55,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     public sealed override void PreDraw()
     {
+        base.PreDraw();
         PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         PushStyleColor(ImGuiCol.TitleBg, StylingColours.panelColour);
         PushStyleColor(ImGuiCol.TitleBgActive, StylingColours.titleBgActive);
@@ -85,6 +86,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void PostDrawHelper()
     {
+        base.PostDraw();
         ImGuiStylePtr ptr = ImGui.GetStyle();
 
         ptr.FramePadding = oldPadding;
@@ -101,8 +103,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected void DrawModeToggle()
     {
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
-        int pressed = DotBar();
-        HelpBar();
+        int pressed = -1;
+        if (PluginLink.PettableUserHandler.LocalUser() != null)
+        {
+            pressed = DotBar();
+            HelpBar();
+        }
+        else
+        {
+            PetWindow.petMode = PetMode.Normal;
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX(), ImGui.GetCursorPosY() + (ToggleButtonStyle.Y * 0.25f)));
+            ImGui.TextColored(StylingColours.defaultText, "Pet Nicknames is disabled in PVP mode.");
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX(), ImGui.GetCursorPosY() - (ToggleButtonStyle.Y * 0.25f)));
+        }
         ImGui.EndListBox();
         if (pressed != -1) (this as PetWindow)!.SetPetMode((PetMode)pressed);
     }
@@ -136,11 +149,16 @@ public abstract class PetWindowHelpers : PetWindowStyling
         for (int i = 0; i < helpButtons.Count; i++)
         {
             if (!helpButtons[i].Item4?.Invoke(this) ?? false) continue;
-            if (Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3))
+            bool buttonPress = false;
+            if (helpButtons[i].Item2 == typeof(KofiPetWindow)) buttonPress = KofiButton(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3);
+            else buttonPress = Button(helpButtons[i].Item1 + $"##{internalCounter++}", Styling.SmallButton, helpButtons[i].Item3);
+            if(buttonPress)
             {
                 if (PluginLink.Configuration.quickButtonsToggle) PluginLink.WindowHandler.ToggleWindow(helpButtons[i].Item2);
                 else PluginLink.WindowHandler.OpenWindow(helpButtons[i].Item2);
             }
+
+
             SameLinePretendSpace();
         }
     }
@@ -197,6 +215,19 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (callback != null && returner) callback();
         return returner;
     }
+
+    protected bool KofiButton(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
+    {
+        PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(1.0f, 0.6f, 0.6f, 1.0f));
+        PushStyleColor(ImGuiCol.Button, new Vector4(1.0f, 0.5f, 0.5f, 1.0f));
+        PushStyleColor(ImGuiCol.ButtonActive, new Vector4(1.0f, 0.4f, 0.4f, 1.0f));
+        PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
+        bool returner = ImGui.Button(text, styling);
+        if (tooltipText != string.Empty) SetTooltipHovered(tooltipText);
+        if (callback != null && returner) callback();
+        return returner;
+    }
+
 
     protected bool XButtonError(string text, Vector2 styling, string tooltipText = "", Action callback = null!)
     {
@@ -538,15 +569,18 @@ public abstract class PetWindowHelpers : PetWindowStyling
         DrawRedownloadButton(drawExtraButton);
     }
 
-    protected void DrawUserTextureEncased(PettableUser u)
+    protected void DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
     {
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
         {
-            DrawUserTexture(u);
+            DrawUserTexture(u, drawExtraButton);
             ImGui.EndListBox();
         }
     }
-    protected void DrawUserTexture(PettableUser u) => DrawTexture(u, () => DrawRedownloadButton(u));
+    protected void DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
+    {
+        if (drawExtraButton) DrawRedownloadButton(u);
+    });
     protected void DrawTexture(PettableUser u, Action drawExtraButton)
     {
         DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));

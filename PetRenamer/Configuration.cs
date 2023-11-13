@@ -41,9 +41,16 @@ public class Configuration : IPluginConfiguration
     public bool startSettingsOpen = false;
     public bool quickButtonsToggle = false;
     public bool newUseCustomTheme = false;
+    public bool showKofiButton = true;
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;
+
+    // ------------------------------ MAPPY ------------------------------
+    public bool enableMappyIntegration = false;
+    public bool readMappyIntegration = false;
+
+    // ----------------------- PERFORMANCE SETTINGS ----------------------
 
     public SerializableUserV3[]? serializableUsersV3 = null;
 
@@ -76,12 +83,6 @@ public class Configuration : IPluginConfiguration
 
         serializableUsersV3 = users.ToArray();
         PluginLink.DalamudPlugin.SavePluginConfig(this); 
-    }
-
-    public void ClearAllNicknames()
-    {
-        PluginLink.PettableUserHandler.Users.Clear();
-        Save();
     }
 
     #region OBSOLETE

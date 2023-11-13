@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -33,7 +34,7 @@ public class IpcStorage : IDisposable
     public void Register(OnIpcChange IpcChange)
     {
         if (this.IpcChange == null) this.IpcChange = IpcChange;
-        this.IpcChange += IpcChange;
+        else this.IpcChange += IpcChange;
     }
 
     public void Deregister(OnIpcChange IpcChange)

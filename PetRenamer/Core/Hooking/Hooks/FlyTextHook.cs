@@ -23,7 +23,6 @@ internal class FlyTextHook : HookableElement
         addToScreenLogWithLogMessageId?.Enable();
     }
 
-    // TODO: FIX
     void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;

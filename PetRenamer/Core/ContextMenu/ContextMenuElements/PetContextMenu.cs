@@ -41,7 +41,6 @@ internal unsafe class PetContextMenu : ContextMenuElement
         PettableUser targetUser = PluginLink.PettableUserHandler.GetUser(address);
         if (targetUser == null) return;
         if (!targetUser.LocalUser) return;
-        if (targetUser.UserFaulty) return;
 
         PetBase pet = PluginLink.PettableUserHandler.GetPet(targetUser, address);
         if (pet == null) return;
