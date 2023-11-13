@@ -1,5 +1,6 @@
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -38,14 +39,7 @@ public class ConfigWindow : PetWindow
     {
         anythingIllegals = AnyIllegalsGoingOn();
 
-        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
-        {
-            if (BeginElementBox("Third Party WARNING", true))
-            {
-                DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Do NOT send feedback or issues for these settings on discord or via the official [Send Feedback] button!", "ONLY Github Issues are ALLOWED!", "Enables Settings Related to Other Plugins (Main Repo or Not)!" }, "READ THE WARNING!");
-                EndElementBox();
-            }
-        }
+        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode) DrawWarningThing();
 
         if (BeginElementBox("UI Settings"))
         {
@@ -62,6 +56,25 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
             DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
             DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
+            EndElementBox();
+        }
+
+        if ((anythingIllegals && PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
+        {
+            if (BeginElementBox("Third Party Settings", false))
+            {
+                if (IPCMappy.MappyAvailable)
+                    DrawConfigElement(ref PluginLink.Configuration.enableMappyIntegration, "Enable Mappy Integration", new string[] { "Allows Pet Nicknames to display Custom Names on Mappy Pets" });
+                EndElementBox();
+            }
+        }
+    }
+
+    public void DrawWarningThing()
+    {
+        if (BeginElementBox("Third Party WARNING", true))
+        {
+            DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Integration with Third Party Plugins may cause issues that are BEYOND MY CONTROL!", "Some third party settings will drastically lower performance.", "I tested every interaction well, but use at your own risk." }, "READ THE WARNING!");
             EndElementBox();
         }
     }
@@ -134,7 +147,7 @@ public class ConfigWindow : PetWindow
     {
         if (PluginLink.Configuration.debugMode) return true;
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
-
+        if (IPCMappy.MappyAvailable) return true;
 
         return false;
     }

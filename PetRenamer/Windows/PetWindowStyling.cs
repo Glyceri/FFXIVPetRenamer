@@ -11,12 +11,14 @@ namespace PetRenamer.Windows;
 /// </summary>
 public abstract class PetWindowStyling : Window, IDisposableRegistryElement
 {
-    public PetWindowStyling(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
+    public unsafe PetWindowStyling(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow) { }
 
     public void Dispose() => OnDispose();
     protected virtual void OnDispose() { }
 
+    public override void PreDraw() { }
     public override void Draw() { }
+    public override void PostDraw(){}
 
     public static ImGuiStylePtr stylePtr => ImGui.GetStyle();
 

@@ -5,7 +5,6 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 

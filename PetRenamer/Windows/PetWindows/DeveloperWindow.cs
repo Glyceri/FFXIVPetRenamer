@@ -103,7 +103,6 @@ internal class DeveloperWindow : PetWindow
             ImGui.TableSetColumnIndex(1);
             ImGui.TextUnformatted($"{user.BattlePet.BaseName}");
 
-
             ImGui.TableSetColumnIndex(3);
             ImGui.TextUnformatted($"{user.BattlePet.CustomName}");
 

@@ -10,7 +10,6 @@ using PetRenamer.Windows.PetWindows;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.Windows;
 
@@ -56,6 +55,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     public sealed override void PreDraw()
     {
+        base.PreDraw();
         PushStyleColor(ImGuiCol.Text, StylingColours.alternativeText);
         PushStyleColor(ImGuiCol.TitleBg, StylingColours.panelColour);
         PushStyleColor(ImGuiCol.TitleBgActive, StylingColours.titleBgActive);
@@ -86,6 +86,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void PostDrawHelper()
     {
+        base.PostDraw();
         ImGuiStylePtr ptr = ImGui.GetStyle();
 
         ptr.FramePadding = oldPadding;
@@ -568,15 +569,18 @@ public abstract class PetWindowHelpers : PetWindowStyling
         DrawRedownloadButton(drawExtraButton);
     }
 
-    protected void DrawUserTextureEncased(PettableUser u)
+    protected void DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
     {
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
         {
-            DrawUserTexture(u);
+            DrawUserTexture(u, drawExtraButton);
             ImGui.EndListBox();
         }
     }
-    protected void DrawUserTexture(PettableUser u) => DrawTexture(u, () => DrawRedownloadButton(u));
+    protected void DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
+    {
+        if (drawExtraButton) DrawRedownloadButton(u);
+    });
     protected void DrawTexture(PettableUser u, Action drawExtraButton)
     {
         DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));

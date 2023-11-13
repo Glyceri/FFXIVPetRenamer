@@ -137,7 +137,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         catch { }
     }
 
-    async void AsyncDownload(string URL, (string, uint) charaData)
+    public async void AsyncDownload(string URL, (string, uint) charaData)
     {
         try
         {
@@ -162,7 +162,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
                 }
             }
         }
-        catch { return; }
+        catch(Exception e) { PetLog.Log(e.Message); return; }
 
         DeclareDownload(charaData);
     }

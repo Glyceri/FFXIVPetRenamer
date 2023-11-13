@@ -46,6 +46,10 @@ public class Configuration : IPluginConfiguration
     public bool debugMode = false;
     public bool autoOpenDebug = true;
 
+    // --------------------------- MAPPY ---------------------------
+    public bool enableMappyIntegration = false;
+    public bool readMappyIntegration = false;
+
     public SerializableUserV3[]? serializableUsersV3 = null;
 
     public BaseTheme  CustomBaseTheme = null!;
