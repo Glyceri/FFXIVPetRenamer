@@ -34,6 +34,7 @@ public class ConfigWindow : PetWindow
     bool canDraw = true;
     readonly Dictionary<string, (bool, float)> toggles = new Dictionary<string, (bool, float)>();
     string currentTitle = string.Empty;
+    const string baseText = "I will NEVER use the ";
 
     public override void OnDraw()
     {
@@ -112,12 +113,14 @@ public class ConfigWindow : PetWindow
         ImGui.Text("");
     }
 
-    void Header(string title)
+    void Header(string title, bool doNewLine = true, string tooltip = "")
     {
         if (!canDraw) return;
-        AddNewLine();
-        currentHeight += BarSize + (ItemSpacingY * 2);
+        currentHeight += BarSize + ItemSpacingY;
         NewLabel(title + $"##title{internalCounter++}", new Vector2(FillingWidthStepped(), BarSize));
+        if (tooltip == string.Empty) SetTooltipHovered(title);
+        else SetTooltipHovered(tooltip);
+        if (doNewLine) AddNewLine();
     }
 
     public override void OnDrawSharing()
@@ -129,8 +132,18 @@ public class ConfigWindow : PetWindow
         }
     }
 
+    void DrawPerformanceSettings()
+    {
+        if (BeginElementBox("Advanced Performance Settings", false, "Advanced Performance Settings\n[THESE ALL REQUIRE A PLUGIN RESTART]"))
+        {
+            Header("[THESE ALL REQUIRE A PLUGIN RESTART]", false, "(have you tried turning it off and on again)");
+            EndElementBox();
+        }
+    }
+
     public override void OnLateDraw()
     {
+        //DrawPerformanceSettings();
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || DebugMode)
         {
             if (BeginElementBox("Debug Mode"))
@@ -155,7 +168,7 @@ public class ConfigWindow : PetWindow
     public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
     public bool DebugMode => PluginLink.Configuration.debugMode;
 
-    bool BeginElementBox(string title, bool forceOpen = false)
+    bool BeginElementBox(string title, bool forceOpen = false, string tooltip = "")
     {
         currentTitle = title;
         if (!toggles.ContainsKey(title))
@@ -172,6 +185,8 @@ public class ConfigWindow : PetWindow
             SameLine();
         }
         NewLabel(title + $"##title{internalCounter++}", new Vector2(ContentAvailableX, BarSize));
+        if (tooltip == string.Empty) SetTooltipHovered(title);
+        else SetTooltipHovered(tooltip);
         currentHeight = BarSize + (ItemSpacingY * 2);
         toggles[title] = curToggle;
         return outcome;
