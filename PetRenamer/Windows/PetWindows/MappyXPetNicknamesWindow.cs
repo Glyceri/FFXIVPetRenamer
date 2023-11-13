@@ -27,7 +27,7 @@ internal class MappyXPetNicknamesWindow : PluginXPetwindow
     {
         OverrideLabel("Mappy is now integrated into Pet Nicknames!", new System.Numerics.Vector2(ContentAvailableX, BarSize));
         OverrideLabel("By clicking Enable Mappy you will automatically disable", new System.Numerics.Vector2(ContentAvailableX, BarSize)); 
-        OverrideLabel("Mappy handling Pets, and Allow Pet Nicknames to display", new System.Numerics.Vector2(ContentAvailableX, BarSize));
+        OverrideLabel("Mappy handling Pets, and Allow Pet Nicknames", new System.Numerics.Vector2(ContentAvailableX, BarSize));
         OverrideLabel("to Display Custom Names. Press the [X] button if you", new System.Numerics.Vector2(ContentAvailableX, BarSize));
         OverrideLabel("don't want any of that.", new System.Numerics.Vector2(ContentAvailableX, BarSize));
     }
