@@ -47,7 +47,7 @@ internal unsafe class PetChatEmoteElement : ChatElement
                 if (pet.ObjectID != emoteTarget.ObjectID && pet.Pet != value) continue;
 
                 (string, string)[] replaceNames = new (string, string)[] { (pet.BaseNamePlural, pet.UsedName), (pet.BaseName, pet.UsedName) };
-                StringUtils.instance.ReplaceSeString(ref message, ref replaceNames, false);
+                StringUtils.instance.ReplaceSeString(ref message, ref replaceNames, !(PluginHandlers.ClientState.ClientLanguage == Dalamud.ClientLanguage.Japanese));
                 return;
             }
         }
