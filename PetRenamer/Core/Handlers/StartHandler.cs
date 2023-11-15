@@ -1,7 +1,4 @@
-﻿using Dalamud.Interface;
-using Dalamud.Plugin;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+﻿using Dalamud.Plugin;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows;

@@ -74,7 +74,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.3.4"), new CLE("General", "The plugin will now save upon removing a user!", "Improved stability upon logging into an alt account.", "Code optimizations."), new CLE("UI", "The pet list will now reset upon relogging.", "Fixed an issue where the pet list wouldn't draw correctly under certain circumstances.")) },
         { new CLS(new Version("1.4.3.5"), new CLE("General", "Fixed stutter upon summoning a pet", "You can now give nicknames to pets turned into player characters again.\n(Gamers, I'm serious! If I get even a single report of this being abused again, I will disable the feature again for everybody!)", "Code optimizations.")) },
         { new CLS(new Version("1.4.4.0"), new CLE("General", "Fixed an issue where the Pet Rename Window would sometimes not work.", "Mappy is now integrated into Pet Nicknames.")) },
-        { new CLS(new Version("1.4.4.1"), new CLE("General", "Fixed a typo.")) },
+        { new CLS(new Version("1.4.4.1"), new CLE("General", "Fixed a typo.", "Removed the Kofi button.", "Emotes should work on the Japanese client again!")) },
     };
 
     const string starter = "  ◉   ";

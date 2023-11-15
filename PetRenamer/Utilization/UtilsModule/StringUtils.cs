@@ -15,7 +15,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     public static StringUtils instance { get; set; } = null!;
     public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
-    public void ReplaceSeString(ref SeString message, ref (string, string)[] validNames)
+    public void ReplaceSeString(ref SeString message, ref (string, string)[] validNames, bool checkForEmptySpace = true)
     {
         if (validNames.Length == 0) return;
         if (message == null) return;
@@ -24,7 +24,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
             if (message.Payloads[i] is not TextPayload tPayload) continue;
 
             string curString = tPayload.Text!.ToString();
-            ReplaceString(ref curString, ref validNames);
+            ReplaceString(ref curString, ref validNames, checkForEmptySpace);
             tPayload.Text = curString;
 
             message.Payloads[i] = tPayload;
@@ -37,21 +37,21 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         ReplaceSeString(ref message, ref strs);
     }
 
-    public void ReplaceString(ref string baseString, string standard, string replacer)
+    public void ReplaceString(ref string baseString, string standard, string replacer, bool checkForEmptySpace = true)
     {
         (string, string)[] strs = new (string, string)[] { (standard, replacer) };
-        ReplaceString(ref baseString, ref strs);
+        ReplaceString(ref baseString, ref strs, checkForEmptySpace);
     }
 
-    public void ReplaceString(ref string baseString, ref (string, string)[] validNames)
+    public void ReplaceString(ref string baseString, ref (string, string)[] validNames, bool checkForEmptySpace = true)
     {
         int counter = 1;
 
         foreach ((string, string) str in validNames)
         {
             if (str.Item1 == string.Empty || str.Item2 == string.Empty) continue;
-            SanitizeString(ref baseString, str.Item2, ++counter);
-            SanitizeString(ref baseString, str.Item1, ++counter);
+            SanitizeString(ref baseString, str.Item2, ++counter, checkForEmptySpace);
+            SanitizeString(ref baseString, str.Item1, ++counter, checkForEmptySpace);
         }
         for(int i = validNames.Length - 1; i >= 0; i--)
         {
@@ -62,12 +62,14 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         }
     }
 
-    public void SanitizeString(ref string baseString, string finder, int count)
+    public void SanitizeString(ref string baseString, string finder, int count, bool checkForEmptySpace = true)
     {
         foreach (string filler in PluginConstants.removeables)
         {
             string newFinder = finder.Replace("[", @"^\[").Replace("]", @"^\]\");
-            baseString = Regex.Replace(baseString, $"\\b{filler + newFinder}\\b", MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
+            string regString = $"{filler + newFinder}";
+            if (checkForEmptySpace) regString = $"\\b" + regString + "\\b";
+            baseString = Regex.Replace(baseString, regString, MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
         }
     }
 
