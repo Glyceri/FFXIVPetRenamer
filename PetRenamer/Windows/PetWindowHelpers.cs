@@ -40,7 +40,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
         (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", null!),
-        (SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
+        //(SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
     };
 
     Vector2 oldPadding;
