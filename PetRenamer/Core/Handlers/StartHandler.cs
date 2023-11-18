@@ -13,7 +13,6 @@ internal class StartHandler
         PluginLink.Start(ref dalamudPluginInterface, ref plugin);
 
         IpcProvider.Init(ref dalamudPluginInterface);
-        IpcProvider.NotifyReady();
 
         FindAnythingIPCProvider.Init(ref dalamudPluginInterface);
         IPCMappy.Init(ref dalamudPluginInterface);
@@ -22,5 +21,6 @@ internal class StartHandler
         // For some reason update can call instantly upon subscribing, so we have to start it late.
         // This doesn't happen when you automatically reload a plugin upon loading btw, only when you manually enable...
         PluginLink.UpdatableHandler.ReleaseUpdate();
+        IpcProvider.NotifyReady();
     }
 }
