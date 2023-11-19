@@ -45,6 +45,15 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
                 bakedActionIDToName.Add(actionID, SheetUtils.instance.GetAction((uint)actionID).Name.ToString());
     }
 
+    public readonly byte[] pettableClasses = new byte[]
+    {
+        26,
+        27,
+        28,
+        31,
+        32
+    };
+
     public readonly List<int> mutatableID = new List<int>()
     {
         -407, //Eos

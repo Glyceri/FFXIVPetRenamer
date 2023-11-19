@@ -27,7 +27,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         user.SetUser(bChara);
 
         if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);
-        if (user.SerializableUser.hasBattlePet || user.LocalUser) user.SetBattlePet(AlternativeFindForBChara(bChara));
+        if (user.IsPettableClass && (user.SerializableUser.hasBattlePet || user.LocalUser)) user.SetBattlePet(AlternativeFindForBChara(bChara));
 
         bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
