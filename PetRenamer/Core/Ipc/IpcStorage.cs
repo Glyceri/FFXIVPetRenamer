@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Logging;
 using System;
 using System.Collections.Generic;
 

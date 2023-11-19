@@ -5,6 +5,7 @@ using PetRenamer.Core.Serialization;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.Core.PettableUserSystem;
 
@@ -57,6 +58,7 @@ public unsafe class PettableUser
     public bool UserExists => _user != nint.Zero;
     public bool AnyPetChanged => _battlePet.Changed || _minion.Changed;
     public bool HasAny => SerializableUser.length > 0;
+    public bool IsPettableClass => _isPettableClass;
 
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser)
     {
@@ -80,6 +82,12 @@ public unsafe class PettableUser
         if (_objectIndex == 0) PluginLink.PettableUserHandler.SetLocalUser(this);
         _resetCounter = 0;
          _objectID = user->Character.GameObject.ObjectID;
+        _class = user->Character.CharacterData.ClassJob;
+        if (_lastClass != _class)
+        {
+            _lastClass = _class;
+            _isPettableClass = RemapUtils.instance.pettableClasses.Contains(_class);
+        }
         _user = (nint)user;
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
@@ -92,6 +100,10 @@ public unsafe class PettableUser
     int lastCast = -1;
 
     int _resetCounter = 0;
+
+    bool _isPettableClass = false;
+    byte _lastClass = byte.MaxValue;
+    byte _class = byte.MaxValue;
 
     void HandleCast(int id)
     {

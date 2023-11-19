@@ -1,5 +1,6 @@
 ﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
+using System.Numerics;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -25,10 +26,10 @@ internal class MappyXPetNicknamesWindow : PluginXPetwindow
 
     public override void OnXDraw()
     {
-        OverrideLabel("Mappy is now integrated into Pet Nicknames!", new System.Numerics.Vector2(ContentAvailableX, BarSize));
-        OverrideLabel("By clicking Enable Mappy you will automatically disable", new System.Numerics.Vector2(ContentAvailableX, BarSize)); 
-        OverrideLabel("Mappy handling Pets, and Allow Pet Nicknames to display", new System.Numerics.Vector2(ContentAvailableX, BarSize));
-        OverrideLabel("to Display Custom Names. Press the [X] button if you", new System.Numerics.Vector2(ContentAvailableX, BarSize));
-        OverrideLabel("don't want any of that.", new System.Numerics.Vector2(ContentAvailableX, BarSize));
+        OverrideLabel("Mappy is now integrated into Pet Nicknames!", new Vector2(ContentAvailableX, BarSize));
+        OverrideLabel("By clicking Enable Mappy you will automatically disable", new Vector2(ContentAvailableX, BarSize)); 
+        OverrideLabel("Mappy handling Pets, and Allow Pet Nicknames", new Vector2(ContentAvailableX, BarSize));
+        OverrideLabel("to display Custom Names. Press the [X] button if you", new Vector2(ContentAvailableX, BarSize));
+        OverrideLabel("don't want any of that.", new Vector2(ContentAvailableX, BarSize));
     }
 }

@@ -8,6 +8,10 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable]
 internal class LegacyHandlerUpdatable : Updatable
 {
-    public override void Update(ref IFramework frameWork, ref PlayerCharacter player) => PluginLink.LegacyCompatibilityHandler.OnUpdate(ref frameWork, ref player);
+    public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
+    {
+        if (PluginLink.LegacyCompatibilityHandler.OnUpdate(ref frameWork, ref player)) return;
+        PluginLink.UpdatableHandler.RegisterRemovable(this);
+    }
 }
 

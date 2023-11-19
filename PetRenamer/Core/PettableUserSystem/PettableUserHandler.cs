@@ -102,9 +102,13 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public PettableUser? GetUser(string name, ushort homeworld)
     {
         if (PluginHandlers.ClientState.IsPvP) return null!;
-        foreach (PettableUser user in _users)
+        int userCount = _users.Count;
+        for (int i = 0; i < userCount; i++)
+        {
+            PettableUser user = _users[i];
             if (name.Contains(user.UserName, StringComparison.CurrentCultureIgnoreCase) && (homeworld == 9999 || homeworld == user.Homeworld))
                 return user;
+        }
         return null!;
     }
 
@@ -112,8 +116,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
     {
         if (PluginHandlers.ClientState.IsPvP) return null!;
         if (address == nint.Zero) return null!;
-        foreach (PettableUser user in _users)
+        int userCount = _users.Count;
+        for (int i = 0; i < userCount; i++)
         {
+            PettableUser user = _users[i];
             if (user.nintUser == address) return user;
             if (GetPet(user, address) != null) return user;
         }
@@ -125,8 +131,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
     {
         if (PluginHandlers.ClientState.IsPvP) return null!;
         if (address == nint.Zero) return null!;
-        foreach (PettableUser user in _users)
+        int userCount = _users.Count;
+        for(int i = 0; i < userCount; i++)
         {
+            PettableUser user = _users[i];
             PetBase pet = GetPet(user, address);
             if (pet == null) continue;
             return pet;
@@ -139,8 +147,11 @@ internal class PettableUserHandler : IDisposable, IInitializable
         if (PluginHandlers.ClientState.IsPvP) return null!;
         if (address == nint.Zero) return null!;
         if (!user.UserExists) return null!;
-        foreach (PetBase pet in user.Pets)
+        PetBase[] pets = user.Pets;
+        int petLength = pets.Length;
+        for(int i = 0; i < petLength; i++)
         {
+            PetBase pet = pets[i];
             if (pet.Pet != address) continue;
             return pet;
         }
@@ -161,8 +172,10 @@ internal class PettableUserHandler : IDisposable, IInitializable
     {
         if (PluginHandlers.ClientState.IsPvP) return null!;
         PettableUser user = null!;
-        foreach (PettableUser user1 in _users)
+        int userCount = _users.Count;
+        for (int i = 0; i < userCount; i++)
         {
+            PettableUser user1 = _users[i];
             if (user1 == null) continue;
             if (!user1.UserExists) continue;
             if (user1.nintUser != _lastCast.castDealer && user1.BattlePet.Pet != _lastCast.castDealer) continue;

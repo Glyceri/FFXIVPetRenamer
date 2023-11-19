@@ -32,23 +32,30 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
             legacyElement.OnStartup(currentInternalVersion);
     }
 
-    internal void OnUpdate(ref IFramework frameWork, ref PlayerCharacter player)
+    /// <summary>
+    /// Gets called every frame and invokes Legacy Save Files to update
+    /// </summary>
+    /// <param name="frameWork">IFramework</param>
+    /// <param name="player">Local PlayerCharacter</param>
+    /// <returns>Returns false if it can be killed.</returns>
+    internal bool OnUpdate(ref IFramework frameWork, ref PlayerCharacter player)
     {
         if (lastInternalVersion != currentInternalVersion)
         {
             Reset();
             lastInternalVersion = currentInternalVersion;
         }
-        else return;
+        else return false;
 
         foreach (LegacyElement legacyElement in correctElements)
             legacyElement.OnUpdate(frameWork, currentInternalVersion);
 
-        if (hasFoundPlayer) return;
+        if (hasFoundPlayer) return true;
         hasFoundPlayer = true;
 
         foreach (LegacyElement legacyElement in correctElements)
             legacyElement.OnPlayerAvailable(currentInternalVersion, ref player);
 
+        return true;
     }
 }

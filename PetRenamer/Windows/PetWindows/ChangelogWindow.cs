@@ -72,8 +72,10 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.3.2"), new CLE("General", "Updated IPC points.", "Removed dependency on Penumbra for redrawing nameplates."), new CLE("UI", "Rewrote the complete Pet List. This has been on my todo for a month now and I'm very happy with the results.", "Added a Ko-fi Support button.")) },
         { new CLS(new Version("1.4.3.3"), new CLE("General", "The plugin should work for people with a - in their name now!", "A warning will now be displayed when you enter a PVP area and the plugin disables itself.", "Fixed an IPC issue.")) },
         { new CLS(new Version("1.4.3.4"), new CLE("General", "The plugin will now save upon removing a user!", "Improved stability upon logging into an alt account.", "Code optimizations."), new CLE("UI", "The pet list will now reset upon relogging.", "Fixed an issue where the pet list wouldn't draw correctly under certain circumstances.")) },
-        { new CLS(new Version("1.4.3.5"), new CLE("General", "Fixed stutter upon summoning a pet", "You can now give nicknames to pets turned into player characters again.\n(Gamers, I'm serious! If I get even a single report of this being abused again, I will disable the feature again for everybody!)", "Code optimizations.")) },
+        { new CLS(new Version("1.4.3.5"), new CLE("General", "Fixed stutter upon summoning a pet.", "You can now give nicknames to pets turned into player characters again.\n(Gamers, I'm serious! If I get even a single report of this being abused again, I will disable the feature again for everybody!)", "Code optimizations.")) },
         { new CLS(new Version("1.4.4.0"), new CLE("General", "Fixed an issue where the Pet Rename Window would sometimes not work.", "Mappy is now integrated into Pet Nicknames.")) },
+        { new CLS(new Version("1.4.4.1"), new CLE("General", "Fixed a typo. (I know, gamechanging update this one)", "Removed the Kofi button.", "Emotes should work on the Japanese client again!")) },
+        { new CLS(new Version("1.4.4.2"), new CLE("General", "Massive performance improvements!")) },
     };
 
     const string starter = "  ◉   ";

@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
@@ -28,7 +27,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         user.SetUser(bChara);
 
         if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);
-        if (user.SerializableUser.hasBattlePet || user.LocalUser) user.SetBattlePet(AlternativeFindForBChara(bChara));
+        if (user.IsPettableClass && (user.SerializableUser.hasBattlePet || user.LocalUser)) user.SetBattlePet(AlternativeFindForBChara(bChara));
 
         bool userChanged = user.SerializableUser.ToggleBackChanged();
         if (!user.LocalUser) return;
@@ -43,8 +42,11 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
     unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara)
     {
         uint objectID = bChara->Character.GameObject.ObjectID;
-        foreach (Pointer<BattleChara> chara in PluginLink.CharacterManager->BattleCharaListSpan)
+        Span<Pointer<BattleChara>> charaSpan = PluginLink.CharacterManager->BattleCharaListSpan;
+        int length = charaSpan.Length;
+        for(int i = 0; i < length; i++)
         {
+            Pointer<BattleChara> chara = charaSpan[i];
             if (chara.Value == null) continue;
             if (chara.Value == bChara) continue;
             if (chara.Value->Character.GameObject.OwnerID != objectID) continue;
