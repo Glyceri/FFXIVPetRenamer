@@ -47,13 +47,15 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
     {
         int counter = 1;
 
-        foreach ((string, string) str in validNames)
+        int length = validNames.Length;
+        for(int i = 0; i < length; i++)
         {
+            (string, string) str = validNames[i];
             if (str.Item1 == string.Empty || str.Item2 == string.Empty) continue;
             SanitizeString(ref baseString, str.Item2, ++counter, checkForEmptySpace);
             SanitizeString(ref baseString, str.Item1, ++counter, checkForEmptySpace);
         }
-        for(int i = validNames.Length - 1; i >= 0; i--)
+        for(int i = length - 1; i >= 0; i--)
         {
             (string, string) str = validNames[i];
             if (str.Item1 == string.Empty || str.Item2 == string.Empty) continue;
@@ -64,8 +66,10 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
 
     public void SanitizeString(ref string baseString, string finder, int count, bool checkForEmptySpace = true)
     {
-        foreach (string filler in PluginConstants.removeables)
+        int length = PluginConstants.removeables.Length;
+        for(int i = 0; i < length; i++)
         {
+            string filler = PluginConstants.removeables[i];
             string newFinder = finder.Replace("[", @"^\[").Replace("]", @"^\]\");
             string regString = $"{filler + newFinder}";
             if (checkForEmptySpace) regString = $"\\b" + regString + "\\b";

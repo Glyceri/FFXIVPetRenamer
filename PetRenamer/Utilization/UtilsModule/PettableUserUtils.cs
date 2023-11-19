@@ -43,7 +43,8 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
     {
         uint objectID = bChara->Character.GameObject.ObjectID;
         Span<Pointer<BattleChara>> charaSpan = PluginLink.CharacterManager->BattleCharaListSpan;
-        for(int i = 0; i < charaSpan.Length; i++)
+        int length = charaSpan.Length;
+        for(int i = 0; i < length; i++)
         {
             Pointer<BattleChara> chara = charaSpan[i];
             if (chara.Value == null) continue;

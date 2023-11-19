@@ -9,12 +9,12 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
-    string lastName = string.Empty;
+    PlayerCharacter lastPlayer = null!;
     public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
-        string curName = player.Name.TextValue;
-        if (lastName == curName) return;
-        lastName = curName;
+        if (lastPlayer == player) return;
+        lastPlayer = player;
+        if (player == null) return;
         if (PluginLink.Configuration.serializableUsersV3! == null) return;
         int count = PluginLink.Configuration.serializableUsersV3!.Length;
         for (int i = 0; i < count; i++)

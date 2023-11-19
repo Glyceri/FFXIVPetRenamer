@@ -38,7 +38,7 @@ public static class PluginConstants
         32,     //Dark Knight
     };
 
-    public static readonly string[] removeables = new string[] 
+    public static readonly string[] removeables = new string[]
     {
         "the ",
         "den ",
