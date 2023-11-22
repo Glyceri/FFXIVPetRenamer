@@ -70,7 +70,7 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
 
     public void Draw()
     {
-        PetWindow.internalCounter = 0;
+        PetWindowHelpers.internalCounter = 0;
         windowSystem.Draw();
         if (PluginHandlers.ClientState.LocalPlayer! == null)
         {

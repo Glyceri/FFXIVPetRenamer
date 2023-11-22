@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Threading.Channels;
 
 namespace PetRenamer.Core.Ipc.MappyIPC;
 
@@ -29,7 +28,7 @@ public static class IPCMappy
     public static void Init(ref DalamudPluginInterface pluginInterface)
     {
         AddWorldMarkerIpcFunction = pluginInterface.GetIpcSubscriber<uint, Vector2, uint, string, string, string>("Mappy.World.AddMarker");
-        RemoveMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, bool>("Mappy.RemoveMarker");
+        RemoveMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, bool>("Mappy.Remove");
         UpdateMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, Vector2, bool>("Mappy.UpdateMarker");
         IsReadyIpcFunction = pluginInterface.GetIpcSubscriber<bool>("Mappy.IsReady");
         initialized = true;

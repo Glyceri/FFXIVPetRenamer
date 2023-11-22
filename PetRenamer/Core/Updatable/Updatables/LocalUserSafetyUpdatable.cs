@@ -9,11 +9,15 @@ namespace PetRenamer.Core.Updatable.Updatables;
 [Updatable]
 internal class LocalUserSafetyUpdatable : Updatable
 {
-    PlayerCharacter lastPlayer = null!;
+    uint lastHomeworld = uint.MaxValue;
+    string lastName = string.Empty;
+
     public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
-        if (lastPlayer == player) return;
-        lastPlayer = player;
+        if (lastHomeworld == player.HomeWorld.Id) return;
+        if (lastName == player.Name.TextValue) return;
+        lastHomeworld = player.HomeWorld.Id;
+        lastName = player.Name.TextValue;
         if (player == null) return;
         if (PluginLink.Configuration.serializableUsersV3! == null) return;
         int count = PluginLink.Configuration.serializableUsersV3!.Length;
