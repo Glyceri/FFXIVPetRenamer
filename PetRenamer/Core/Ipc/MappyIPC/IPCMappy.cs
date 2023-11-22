@@ -129,15 +129,20 @@ public static class IPCMappy
         if (!PluginLink.Configuration.enableMappyIntegration)
         {
             ClearMappy();
-            PluginLink.ChatHandler.AddBlacklistedChats(1);
-            PluginHandlers.CommandManager.ProcessCommand("/mappy pets enable");
+            HandleCommand("/mappy pets enable");
         }
         else
         {
             pluginToggled = true;
-            PluginLink.ChatHandler.AddBlacklistedChats(1);
-            PluginHandlers.CommandManager.ProcessCommand("/mappy pets disable");
+            HandleCommand("/mappy pets disable");
         }
+    }
+
+    static void HandleCommand(string command)
+    {
+        PluginLink.ChatHandler.AddBlacklistedChats(1);
+        if (!PluginHandlers.CommandManager.ProcessCommand(command))
+            PluginLink.ChatHandler.RemoveBlacklistedChats(1);
     }
 
     static void HandleTenSeconds(ref IFramework frameWork)

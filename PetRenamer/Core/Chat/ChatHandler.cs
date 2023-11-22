@@ -14,6 +14,7 @@ internal class ChatHandler : RegistryBase<ChatElement, ChatAttribute>
 
     public int BlacklistCount { get; private set; } = 0;
     internal void AddBlacklistedChats(int amount) => BlacklistCount += amount;
+    internal void RemoveBlacklistedChats(int amount) => BlacklistCount -= amount;
     internal bool MinusBlacklistCountHandle()
     {
         bool outcome = BlacklistCount-- > 0;
