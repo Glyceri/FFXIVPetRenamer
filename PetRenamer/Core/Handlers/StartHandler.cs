@@ -5,9 +5,9 @@ using PetRenamer.Windows;
 
 namespace PetRenamer.Core.Handlers;
 
-internal class StartHandler
+internal static class StartHandler
 {
-    public void Start(ref DalamudPluginInterface dalamudPluginInterface, PetRenamerPlugin plugin)
+    internal static void Start(ref DalamudPluginInterface dalamudPluginInterface, PetRenamerPlugin plugin)
     {
         PluginHandlers.Start(ref dalamudPluginInterface);
         PluginLink.Start(ref dalamudPluginInterface, ref plugin);

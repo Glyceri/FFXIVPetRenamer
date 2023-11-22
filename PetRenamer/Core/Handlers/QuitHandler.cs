@@ -3,9 +3,9 @@ using PetRenamer.Core.Ipc.MappyIPC;
 
 namespace PetRenamer.Core.Handlers;
 
-internal class QuitHandler
+internal static class QuitHandler
 {
-    public void Quit() 
+    internal static void Quit() 
     {
         PluginLink.WindowHandler?.Dispose();
         PluginLink.CommandHandler?.Dispose();

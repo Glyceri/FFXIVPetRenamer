@@ -24,7 +24,6 @@ internal class PluginLink
     internal static CommandHandler CommandHandler { get; set; } = null!;
     internal static UpdatableHandler UpdatableHandler { get; set; } = null!;
     internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
-    internal static QuitHandler QuitHandler { get; set; } = null!;
     internal static IpcStorage IpcStorage { get; set; } = null!;
     internal static HookHandler HookHandler { get; set; } = null!;
     internal static ContextMenuHandler ContextMenuHandler { get; set; } = null!;
@@ -54,7 +53,6 @@ internal class PluginLink
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();
-        QuitHandler = new QuitHandler();
         IpcStorage?.LateInitialize();
     }
 }
