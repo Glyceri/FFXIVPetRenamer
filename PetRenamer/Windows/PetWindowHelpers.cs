@@ -484,7 +484,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawYesNoBar(string label, Action yesCallback, Action noCallback)
     {
-        Label(label + $"##<{internalCounter++}>", new Vector2(ContentAvailableX, BarSize));
+        Label(label, new Vector2(ContentAvailableX, BarSize));
         Button("Yes", new Vector2(ContentAvailableX / 2, BarSize), PluginConstants.Strings.deleteUserTooltip, yesCallback.Invoke);
         SameLinePretendSpace();
         Button("No", new Vector2(ContentAvailableX , BarSize), PluginConstants.Strings.keepUserTooltip, noCallback.Invoke);

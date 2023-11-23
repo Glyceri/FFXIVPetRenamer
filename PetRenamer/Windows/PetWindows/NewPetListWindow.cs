@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Internal;
-using static Dalamud.Interface.GameFonts.GameFontLayoutPlan;
 using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -48,8 +47,6 @@ internal class NewPetListWindow : PetWindow
             MinimumSize = minSize,
             MaximumSize = new Vector2(9999, 9999)
         };
-
-        IsOpen = true;
     }
 
     public override void OnDraw()
@@ -452,6 +449,8 @@ internal class NewPetListWindow : PetWindow
 
         bool isIpc;
 
+        bool deleteActive = false;
+
         public override bool IsHovered { get; set; }
 
         public DrawablePet(bool isIpc, IDalamudTextureWrap texture, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!)
@@ -489,9 +488,14 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), isIpc))
             {
-                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
-                window.DrawBasicBar($"{identifier} Name", baseName);
-                window.DrawBasicBar($"{identifier} ID", baseId.ToString());
+                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", () => deleteActive ^= true);
+                if (!deleteActive)
+                {
+                    window.DrawBasicBar($"{identifier} Name", baseName);
+                    window.DrawBasicBar($"{identifier} ID", baseId.ToString());
+                }
+                else window.DrawYesNoBar($"Are you sure you want to delete: {customName}?", intCallback, () => deleteActive = false);
+                
                 ImGui.EndListBox();
             }
             ImGui.EndListBox();
