@@ -173,7 +173,7 @@ internal class NewPetListWindow : PetWindow
             tempList.Add(p);
         });
 
-        drawableElements.Add(new ReorderableList(tempList, (startIndex, endIndex) => 
+        drawableElements.Add(new ReorderableList(true, tempList, (startIndex, endIndex) => 
         {
             if (startIndex == endIndex) return;
             PluginLink.PettableUserHandler.Users = LinqUtils.instance.Swap(PluginLink.PettableUserHandler.Users, startIndex, endIndex).ToList();
@@ -231,10 +231,27 @@ internal class NewPetListWindow : PetWindow
             tempList.Add(new DrawablePet(isIPC, textureWrap, identifier, name.Name, petBaseName, name.ID, internalCallback, "X", isIPC ? "Clear IPC" : "Remove", callback2));
         }
 
-        drawableElements.Add(new ReorderableList(tempList, (startIndex, endIndex) => {
-            PetLog.Log($"On Pet Swap: {startIndex}, {endIndex}");
-        },
-        () => { PetLog.Log("On Save!"); }));
+        ReorderableList list = null!;
+        list = new ReorderableList(activeUser.LocalUser, tempList, (endIndex, startIndex) => {
+
+            DrawableElement element = list.elements.ElementAt(endIndex);
+            if (element is not DrawablePet pet) return;
+            int newID = pet.baseId;
+
+            DrawableElement element2 = list.elements.ElementAt(startIndex);
+            if (element2 is not DrawablePet pet2) return;
+            int oldID = pet2.baseId;
+
+            int indexOld = activeUser.SerializableUser.IndexOf(oldID);
+            int indexNew = activeUser.SerializableUser.IndexOf(newID);
+            if (indexOld == -1 || indexNew == -1) return;
+            activeUser.SerializableUser.Swap(indexOld, indexNew);
+            },
+        () => {
+            PluginLink.Configuration.Save();
+            HandleUserListActive(); 
+        });
+        drawableElements.Add(list);
     }
 
     IDalamudTextureWrap GetTexture(int id)
@@ -425,7 +442,7 @@ internal class NewPetListWindow : PetWindow
         string identifier;
         string customName;
         string baseName;
-        int baseId;
+        public int baseId;
 
         string buttonText;
         string buttonTooltip;
@@ -550,14 +567,16 @@ internal class NewPetListWindow : PetWindow
     {
         Action onSave;
         Action<int, int> onReorder;
-        List<DrawableElement> elements;
+        public List<DrawableElement> elements;
 
         float mouseOffset = 0;
         int clickedIndex = -1;
         int index = -1;
+        bool allowReorder = false;
 
-        public ReorderableList(List<DrawableElement> elements, Action<int, int> onReorder, Action onSave)
+        public ReorderableList(bool allowReorder, List<DrawableElement> elements, Action<int, int> onReorder, Action onSave)
         {
+            this.allowReorder = allowReorder;
             this.onReorder = onReorder;
             this.elements = elements;
             this.onSave = onSave;
@@ -579,7 +598,7 @@ internal class NewPetListWindow : PetWindow
                     Reset();
                     return true;
                 }
-
+                if (!allowReorder) continue;
                 if (element is not HoverableDrawableElement hoverElement) continue;
                 if (!hoverElement.IsHovered) continue;
                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) clickedIndex = i;

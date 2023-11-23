@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -186,7 +183,7 @@ public class SerializableUserV3
         changed = true;
     }
 
-    int IndexOf(int id)
+    public int IndexOf(int id)
     {
         for (int i = 0; i < ids.Length; i++)
             if (ids[i] == id)
@@ -248,6 +245,13 @@ public class SerializableUserV3
     {
         ids = Array.Empty<int>();
         names = Array.Empty<string>();
+    }
+
+    public void Swap(int startIndex, int endIndex)
+    {
+        ids = LinqUtils.instance.Swap(ids.ToList(), startIndex, endIndex).ToArray();
+        names = LinqUtils.instance.Swap(names.ToList(), startIndex, endIndex).ToArray();
+        ipcNames = LinqUtils.instance.Swap(ipcNames.ToList(), startIndex, endIndex).ToArray();
     }
 }
 
