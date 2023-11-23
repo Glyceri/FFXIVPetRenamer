@@ -444,6 +444,7 @@ internal class NewPetListWindow : PetWindow
         string buttonText;
         string buttonTooltip;
         Action intCallback = null!;
+        Action trueCallback = null!;
         Action<int> callback2;
         Action internalCallback = null!;
 
@@ -467,6 +468,7 @@ internal class NewPetListWindow : PetWindow
             if (callback != null) intCallback = () => callback(baseId, isIpc);
             this.callback2 = callback2;
             if (drawExtraButton != null) internalCallback = () => drawExtraButton(index);
+            if (intCallback != null) trueCallback = () => deleteActive ^= true;
         }
 
         public override void OnDispose() => texture?.Dispose();
@@ -488,7 +490,7 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), isIpc))
             {
-                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", () => deleteActive ^= true);
+                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", trueCallback);
                 if (!deleteActive)
                 {
                     window.DrawBasicBar($"{identifier} Name", baseName);
