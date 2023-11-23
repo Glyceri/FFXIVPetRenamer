@@ -23,7 +23,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (PluginHandlers.ClientState.IsPvP) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
-        if (bChara == null) return;
+        if (bChara == null) return; 
         user.SetUser(bChara);
 
         if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);

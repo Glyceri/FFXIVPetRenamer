@@ -69,6 +69,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             _users.RemoveAt(i);
             Changed = true;
         }
+        PluginLink.Configuration.Save();
     }
 
     void AddUser(SerializableUserV3 user, bool force = false, bool ipc = false)

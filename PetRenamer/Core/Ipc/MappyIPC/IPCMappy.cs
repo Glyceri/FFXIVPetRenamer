@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Plugin.Services;
@@ -55,7 +56,7 @@ public static class IPCMappy
         if (!PluginLink.Configuration.enableMappyIntegration && oneTime) { changed = false; return; }
         HandleTenSeconds(ref frameWork);
         if (!mappyReady) return; 
-        HandleMappyWindow();
+        HandleMappyWindow(ref player);
         if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
         HandlePartyListChangedCheck(ref frameWork, ref player);
         UpdatePetPositions();
@@ -101,8 +102,9 @@ public static class IPCMappy
     }
 
 
-    static void HandleMappyWindow()
+    static void HandleMappyWindow(ref PlayerCharacter player)
     {
+        if (player!.StatusFlags == StatusFlags.InCombat) return;
         if (oneTime) return;
         oneTime = true;
         PluginLink.WindowHandler.GetWindow<MappyXPetNicknamesWindow>()?.TryOpen();
