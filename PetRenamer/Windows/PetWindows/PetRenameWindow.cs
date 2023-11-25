@@ -155,8 +155,7 @@ public class PetRenameWindow : PetWindow
 
     void Save()
     {
-        string outcome = user.GetCustomName(activePet.petID);
-        if (outcome != string.Empty && outcome == activePet.temporaryPetName) return;
+        if (user.GetCustomName(activePet.petID) == activePet.temporaryPetName) return;
         user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName);
         OnButton();
     }

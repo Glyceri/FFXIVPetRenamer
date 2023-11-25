@@ -84,7 +84,7 @@ public class SerializableUserV3
         return curChanged;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true, bool force = false, bool isIPCName = false
+    public void SaveNickname(int id, string name, bool doCheck = true, bool force = false, bool isIPCName = false)
     {
         if (id == -1) return;
         if (name == string.Empty && id > -1 && !isIPCName) RemoveNickname(id);
