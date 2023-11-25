@@ -4,11 +4,11 @@ using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Numerics;
-using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -155,7 +155,8 @@ public class PetRenameWindow : PetWindow
 
     void Save()
     {
-        if (user.GetCustomName(activePet.petID) == activePet.temporaryPetName) return;
+        string outcome = user.GetCustomName(activePet.petID);
+        if (outcome != string.Empty && outcome == activePet.temporaryPetName) return;
         user.SerializableUser.SaveNickname(activePet.petID, activePet.temporaryPetName);
         OnButton();
     }

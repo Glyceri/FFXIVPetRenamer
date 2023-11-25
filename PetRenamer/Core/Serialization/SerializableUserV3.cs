@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,7 @@ public class SerializableUserV3
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
+
     }
 
     public void LoopThrough(Action<(int, string)> callback)
@@ -82,7 +84,7 @@ public class SerializableUserV3
         return curChanged;
     }
 
-    public void SaveNickname(int id, string name, bool doCheck = true, bool force = false, bool isIPCName = false)
+    public void SaveNickname(int id, string name, bool doCheck = true, bool force = false, bool isIPCName = false
     {
         if (id == -1) return;
         if (name == string.Empty && id > -1 && !isIPCName) RemoveNickname(id);
@@ -90,7 +92,6 @@ public class SerializableUserV3
         else GenerateNewNickname(id, name, force, isIPCName);
 
         if (!doCheck) return;
-        FillBattlePets();
         hasCompanion = false;
         hasBattlePet = false;
         for (int i = 0; i < ids.Length; i++)
@@ -142,7 +143,6 @@ public class SerializableUserV3
 
     public void RemoveNickname(int id)
     {
-        FillBattlePets();
         int index = IndexOf(id);
         if (index == -1) return;
 
@@ -157,21 +157,6 @@ public class SerializableUserV3
         ids = idList.ToArray();
         names = namesList.ToArray();
         ipcNames = ipcList.ToArray();
-    }
-
-    void FillBattlePets()
-    {
-        foreach (int id in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
-        {
-            bool found = false;
-            for (int i = 0; i < length; i++)
-            {
-                if (ids[i] != id) continue;
-                found = true;
-                break;
-            }
-            if (!found) SaveNickname(id, "", true, true);
-        }
     }
 
     public void ClearAllIPC()
