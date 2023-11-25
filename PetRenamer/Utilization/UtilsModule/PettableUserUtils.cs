@@ -80,7 +80,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         return str.Replace("サモン・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Summon ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+                  .Replace("-Beschwörung", string.Empty, StringComparison.InvariantCultureIgnoreCase);
     }
 
     (int, string) GetAction(string tNodeText)
