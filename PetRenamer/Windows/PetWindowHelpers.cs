@@ -578,10 +578,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
         ImGui.SameLine(638);
     }
 
-    protected void DrawTexture(nint theint, Action drawExtraButton)
+    protected State DrawTexture(nint theint, Action drawExtraButton)
     {
-        DrawTexture(theint);
+        State state = DrawTexture(theint);
         DrawRedownloadButton(drawExtraButton);
+        return state;
     }
 
     protected enum State
@@ -593,37 +594,37 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected State DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
     {
-        bool clicked = false;
+        State state = State.None;
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
         {
-            clicked = DrawUserTexture(u, drawExtraButton);
+            state = DrawUserTexture(u, drawExtraButton);
             ImGui.EndListBox();
         }
-        if (!clicked) return State.None;
+        return state;
+    }
+    protected State DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
+    {
+        if (drawExtraButton) DrawRedownloadButton(u);
+    });
+
+    protected State DrawTexture(PettableUser u, Action drawExtraButton)
+    {
+        State state = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
+        DrawRedownloadButton(drawExtraButton);
+        return state;
+    }
+
+    protected State DrawTexture(nint thenint)
+    {
+        DrawImage(thenint, new Vector2(83, 83));
+        bool hovered = ImGui.IsItemHovered();
+        SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
+        if (!hovered) return State.None;
         else
         {
             if (!Clicked) return State.Hovered;
             return State.Clicked;
         }
-    }
-    protected bool DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
-    {
-        if (drawExtraButton) DrawRedownloadButton(u);
-    });
-
-    protected bool DrawTexture(PettableUser u, Action drawExtraButton)
-    {
-        bool clicked = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-        DrawRedownloadButton(drawExtraButton);
-        return clicked;
-    }
-
-    protected bool DrawTexture(nint thenint)
-    {
-        DrawImage(thenint, new Vector2(83, 83));
-        bool hovered = ImGui.IsItemHovered();
-        SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
-        return hovered;
     }
 
 

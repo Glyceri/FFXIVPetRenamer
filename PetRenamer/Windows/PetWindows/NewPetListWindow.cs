@@ -488,8 +488,17 @@ internal class NewPetListWindow : PetWindow
 
             if (window.BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), isIpc))
             {
-                window.DrawTexture(texture.ImGuiHandle, internalCallback);
+                State state = window.DrawTexture(texture.ImGuiHandle, internalCallback);
+                if (state == State.Hovered)
+                {
+                    if (!window.activeUser.LocalUser) window.SetTooltip(customName);
+                    else window.SetTooltip("Rename: " + customName);
+                }
+                bool clicked = false;
+                if (state == State.Clicked && window.activeUser.LocalUser && petMode != PetMode.ShareMode)
+                    clicked = true;
                 ImGui.EndListBox();
+                if (clicked) callback2(baseId);
             }
 
             window.SameLinePretendSpace();
@@ -613,6 +622,7 @@ internal class NewPetListWindow : PetWindow
                 if (element is not HoverableDrawableElement hoverElement) continue;
                 if (!hoverElement.IsHovered) continue;
                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) clickedIndex = i;
+                if (clickedIndex != -1 && ImGui.IsMouseReleased(ImGuiMouseButton.Left)) clickedIndex = -1;
                 if (!ImGui.IsMouseDragging(ImGuiMouseButton.Left)) continue;
                 if (index == -1)
                 {
