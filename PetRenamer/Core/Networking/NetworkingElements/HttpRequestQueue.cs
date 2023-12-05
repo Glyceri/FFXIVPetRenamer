@@ -19,15 +19,14 @@ public static class HttpRequestQueue
 
     public static void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
-
-        return;
         if(timer <= 0 && queue.Count > 0)
         {
             timer = timerInterval;
             (HttpRequestMessage, Action<HttpResponseMessage>, Action<Exception>) element = queue[0];
+            queue.Remove(element);
             try
             {
-               // Task.Run(() => Execute(element.Item1, element.Item2, element.Item3));
+                Task.Run(async () => await Execute(element.Item1, element.Item2, element.Item3));
             }
             catch (Exception e) { element.Item3?.Invoke(e); }
         }
@@ -35,12 +34,8 @@ public static class HttpRequestQueue
         if (timer > 0) timer -= frameWork.UpdateDelta.TotalSeconds;
     }
 
-    static async void Execute(HttpRequestMessage request, Action<HttpResponseMessage> successCallback, Action<Exception> errorCallback)
+    static async Task Execute(HttpRequestMessage request, Action<HttpResponseMessage> successCallback, Action<Exception> errorCallback)
     {
-        PetLog.LogInfo("Execute!");
-        (HttpRequestMessage, Action<HttpResponseMessage>, Action<Exception>) element = (request, successCallback, errorCallback);
-        queue.Remove(element);
-
         HttpResponseMessage? response;
 
         try
@@ -65,7 +60,6 @@ public static class HttpRequestQueue
 
     public static void Enqueue(HttpRequestMessage httpRequestMessage, Action<HttpResponseMessage> succesResponse, Action<Exception> errorResponse)
     {
-        PetLog.LogInfo("Enqueue!"); 
         queue.Add((httpRequestMessage, succesResponse, errorResponse));
     }
 }

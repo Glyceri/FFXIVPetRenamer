@@ -26,7 +26,11 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (!Cache.textureCache.ContainsKey(currentUser)) return GetSearchingTexture();
             nint returner = Cache.textureCache[currentUser]?.ImGuiHandle ?? nint.Zero;
-            if (returner == nint.Zero) returner = GetSearchingTexture();
+            if (returner == nint.Zero) 
+            {
+                Cache.RemoveTexture(currentUser);
+                returner = GetSearchingTexture(); 
+            }
             return returner;
         }
         catch { return GetSearchingTexture(); }
@@ -48,10 +52,11 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (type == UserDeclareType.Remove) HandleAsRemove(ref currentUser);
             else if (type == UserDeclareType.Add) HandleAsAdd(ref currentUser, force);
-        }catch(Exception e) { PetLog.Log(e.Message); }
+        }
+        catch (Exception e) { PetLog.Log(e.Message); }
     }
 
-    public void RequestDownload((string, uint) currentUser) => Task.Run(() => DownloadPagination(currentUser));
+    public void RequestDownload((string, uint) currentUser) => DownloadPagination(currentUser);
 
     void HandleAsRemove(ref (string, uint) currentUser)
     {
@@ -72,7 +77,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             {
                 Cache.RemoveTexture(currentUser);
                 (string, uint) cUser = currentUser;
-                Task.Run(() => DownloadPagination(cUser));
+                DownloadPagination(cUser);
             }
         }
         catch { }
@@ -107,29 +112,29 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         }
     }
 
-    async Task DownloadPagination((string, uint) characterData)
+    void DownloadPagination((string, uint) characterData)
     {
         Cache.RemoveTexture(characterData);
         try
         {
-            await LodestoneCharacterSearchElement.instance.SearchCharacter(
+            LodestoneCharacterSearchElement.instance.SearchCharacter(
             characterData,
-            (SearchData) => OnSearchData(SearchData, characterData),
-            (exception) => throw exception);
+            async (SearchData) => await OnSearchData(SearchData, characterData),
+            (exception) => PetLog.LogError(exception, exception.Message));
         }
-        catch(Exception e) { PetLog.LogError(e, e.Message); }
-    } 
+        catch (Exception e) { PetLog.LogError(e, e.Message); }
+    }
 
-    async void OnSearchData(SearchData data, (string, uint) characterData)
+    async Task OnSearchData(SearchData data, (string, uint) characterData)
     {
-        await Task.Run(() => 
+        await Task.Run(() =>
         {
             NetworkedImageDownloader.instance.AsyncDownload(
-                data.imageURL!, 
-                characterData, 
-                () => 
-                { 
-                    DeclareDownload(characterData); 
+                data.imageURL!,
+                characterData,
+                () =>
+                {
+                    DeclareDownload(characterData);
 
                 },
                 (exception) => PetLog.Log(exception.Message));

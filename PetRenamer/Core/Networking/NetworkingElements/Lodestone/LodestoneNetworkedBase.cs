@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using System.Net;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,39 +8,24 @@ namespace PetRenamer.Core.Networking.NetworkingElements.Lodestone;
 
 public class LodestoneNetworkedBase : NetworkingElement
 {
-    internal async Task<HtmlDocument?> GetDocument(string url, Action<Exception> errorCallback)
+    internal void GetDocument(string url, Action<HtmlDocument> onSuccess, Action<Exception> errorCallback)
     {
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
-        HttpResponseMessage? response;
+        HttpRequestQueue.Enqueue(request, async (httpResponse) => await OnDocument(httpResponse, onSuccess, errorCallback), errorCallback);
+    }
 
-        try
-        {
-            response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception e)
-        {
-            errorCallback?.Invoke(e);
-            return null!;
-        }
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            errorCallback?.Invoke(new Exception("Response not found."));
-            return null!;
-        }
-
+    internal async Task OnDocument(HttpResponseMessage response, Action<HtmlDocument> onSuccess, Action<Exception> errorCallback)
+    {
         try
         {
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml(await response.Content.ReadAsStringAsync());
-            return document;
+            onSuccess?.Invoke(document);
         }
         catch (Exception e)
         {
             errorCallback?.Invoke(e);
         }
-        return null!;
     }
 
     internal HtmlNode? GetNode(HtmlNode baseNode, string nodeName)
