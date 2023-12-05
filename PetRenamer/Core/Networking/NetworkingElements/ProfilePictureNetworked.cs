@@ -8,6 +8,7 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
@@ -51,7 +52,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (type == UserDeclareType.Remove) HandleAsRemove(ref currentUser);
-            else if (type == UserDeclareType.Add) HandleAsAdd(ref currentUser, force);
+            else if (type == UserDeclareType.Add) Task.Run(() => HandleAsAdd(currentUser, force)).ConfigureAwait(false);
         }
         catch (Exception e) { PetLog.Log(e.Message); }
     }
@@ -63,7 +64,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         Cache.RemoveTexture(currentUser);
     }
 
-    void HandleAsAdd(ref (string, uint) currentUser, bool force)
+    void HandleAsAdd((string, uint) currentUser, bool force)
     {
         if (Cache.textureCache.ContainsKey(currentUser)) return;
         string path = NetworkedImageDownloader.instance.MakeTexturePath(NetworkedImageDownloader.instance.RemapCharacterData(ref currentUser));
@@ -132,11 +133,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             NetworkedImageDownloader.instance.AsyncDownload(
                 data.imageURL!,
                 characterData,
-                () =>
-                {
-                    DeclareDownload(characterData);
-
-                },
+                () => DeclareDownload(characterData),
                 (exception) => PetLog.Log(exception.Message));
         });
     }

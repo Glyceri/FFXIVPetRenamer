@@ -25,6 +25,7 @@ public class SerializableUserV3
     [JsonIgnore] public int length => ids.Length;
     [JsonIgnore] public int lastTouchedID = -1;
     [JsonIgnore] public QuickName this[int i] => new QuickName(ids[i], names[i], ipcNames[i]);
+
     public bool Contains(int id) => ids.Contains(id);
 
     public SerializableUserV3(string username, ushort homeworld)

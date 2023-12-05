@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
-using PetRenamer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -32,6 +31,11 @@ public static class HttpRequestQueue
         }
 
         if (timer > 0) timer -= frameWork.UpdateDelta.TotalSeconds;
+    }
+
+    public static void Dispose()
+    {
+        queue.Clear();
     }
 
     static async Task Execute(HttpRequestMessage request, Action<HttpResponseMessage> successCallback, Action<Exception> errorCallback)

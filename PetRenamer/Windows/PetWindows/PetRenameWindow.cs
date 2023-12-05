@@ -1,7 +1,9 @@
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Hooking.Hooks;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Logging;
@@ -56,13 +58,13 @@ public class PetRenameWindow : PetWindow
         SetImage(activePet.petID);
     }
     public override void OnWindowClose() => user = null!;
-    internal override void OnPetModeChange(PetMode mode) 
-    { 
+    internal override void OnPetModeChange(PetMode mode)
+    {
         activePet = GetPet(mode);
-        if (activePet == null) return;  
+        if (activePet == null) return;
         SetImage(activePet.petID);
     }
-       
+
     void HandlePets()
     {
         for (int i = 0; i < user.Pets.Length; i++)
@@ -121,7 +123,24 @@ public class PetRenameWindow : PetWindow
     {
         if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize))
             return;
-        DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
+        State state = DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
+        if (activePet.petID == user.Minion.ID || activePet.petID == user.BattlePet.ID)
+        {
+            if (state == State.Hovered || state == State.Clicked) SetTooltip("/pet: " + (activePet.petName == string.Empty ? activePet.baseName : activePet.petName));
+            if (state == State.Clicked)
+            {
+                nint pet = nint.Zero;
+                if (activePet.petID == user.Minion.ID) pet = user.Minion.Pet;
+                if (activePet.petID == user.BattlePet.ID) pet = user.BattlePet.Pet;
+                if (pet != nint.Zero)
+                {
+                    GameObject? softTarget = PluginHandlers.TargetManager.SoftTarget;
+                    PluginHandlers.TargetManager.SoftTarget = PluginHandlers.ObjectTable.CreateObjectReference(pet);
+                    if (PluginHandlers.TargetManager.SoftTarget?.DataId != 0) CommandHook.instance.SendChatUnsafe("/stroke");
+                    PluginHandlers.TargetManager.SoftTarget = softTarget;
+                }
+            }
+        }
         ImGui.EndListBox();
     }
 
@@ -195,7 +214,7 @@ public class PetRenameWindow : PetWindow
         activePet.temporaryPetName = activePet.petName;
 
         if (IsOpen) SetImage(id);
-        
+
         if (!forceOpen)
             activePet = lastPet;
     }
@@ -235,7 +254,7 @@ public class PetRenameWindow : PetWindow
     RenamablePet GetPet(PetMode mode)
     {
         foreach (RenamablePet pet in pets)
-            if (pet.associatedMode == mode) 
+            if (pet.associatedMode == mode)
                 return pet;
         return null!;
     }

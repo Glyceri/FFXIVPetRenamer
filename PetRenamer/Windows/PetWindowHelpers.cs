@@ -562,14 +562,25 @@ public abstract class PetWindowHelpers : PetWindowStyling
         XButton(buttonString + $"##<Close{internalCounter++}>", Styling.SmallButton, tooltipString, callback.Invoke);
     }
 
-    protected void DrawImage(nint handle, Vector2 size)
+    protected State DrawImage(nint handle, Vector2 size)
     {
-        if (PluginLink.Configuration.displayImages) ImGui.Image(handle, size);
+        if (PluginLink.Configuration.displayImages) 
+        { 
+            ImGui.Image(handle, size);
+            if (!ImGui.IsItemHovered()) return State.None;
+            else
+            {
+                if (!Clicked) return State.Hovered;
+                return State.Clicked;
+            }
+        }
         else
         {
             PushStyleColours(StylingColours.defaultBackground, ImGuiCol.Button | ImGuiCol.ButtonActive | ImGuiCol.ButtonHovered);
-            Button("", size);
+            if (Button("", size)) return State.Clicked;
+            if (ImGui.IsItemHovered()) return State.Hovered;
         }
+        return State.None;
     }
 
     protected void SpaceBottomRightButton()
@@ -616,15 +627,9 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected State DrawTexture(nint thenint)
     {
-        DrawImage(thenint, new Vector2(83, 83));
-        bool hovered = ImGui.IsItemHovered();
+        State state = DrawImage(thenint, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
-        if (!hovered) return State.None;
-        else
-        {
-            if (!Clicked) return State.Hovered;
-            return State.Clicked;
-        }
+        return state;
     }
 
 

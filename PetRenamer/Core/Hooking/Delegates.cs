@@ -46,5 +46,7 @@ public static unsafe class Delegates
     public delegate char AreaMapTooltipDelegate(AtkUnitBase* a1, uint a2, char a3);
     public delegate IntPtr AreaMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2);
     public delegate IntPtr NaviMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2, IntPtr unk3);
+
+    public delegate void ProcessChatBoxDelegate(nint uiModule, nint message, nint unused, byte a4);
 }
 
