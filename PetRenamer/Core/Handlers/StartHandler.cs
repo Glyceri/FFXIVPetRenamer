@@ -1,7 +1,11 @@
 ﻿using Dalamud.Plugin;
+using HtmlAgilityPack;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.Ipc.MappyIPC;
+using PetRenamer.Logging;
 using PetRenamer.Windows;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Handlers;
 

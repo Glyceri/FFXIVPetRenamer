@@ -9,6 +9,7 @@ namespace PetRenamer.Core.Networking;
 public class NetworkingCache : IDisposable, IInitializable
 {
     internal Dictionary<(string, uint), IDalamudTextureWrap> textureCache = new Dictionary<(string, uint), IDalamudTextureWrap>();
+    internal Dictionary<(string, uint), string> lodestoneID = new Dictionary<(string, uint), string>();
 
     public void Initialize()
     {
@@ -18,7 +19,10 @@ public class NetworkingCache : IDisposable, IInitializable
     public void Dispose()
     {
         DisposeTextureCache();
+        ClearLodestoneCache();
     }
+
+    public void ClearLodestoneCache() => lodestoneID?.Clear();
 
     public void ClearTextureCache()
     {
@@ -30,6 +34,15 @@ public class NetworkingCache : IDisposable, IInitializable
         foreach (IDalamudTextureWrap texture in textureCache.Values)
             texture?.Dispose();
         ClearTextureCache();
+    }
+
+    public void RemoveID((string, uint) character)
+    {
+        lock (lodestoneID)
+        {
+            if (!lodestoneID.ContainsKey(character)) return;
+            lodestoneID?.Remove(character);
+        }
     }
 
     public void RemoveTexture((string, uint) character)
