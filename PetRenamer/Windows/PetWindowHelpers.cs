@@ -5,6 +5,7 @@ using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.PetWindows;
 using System;
@@ -52,6 +53,20 @@ public abstract class PetWindowHelpers : PetWindowStyling
     float indentSpacing;
     float scrollbarSize;
     float grabMinSize;
+
+    protected bool Clicked { get; private set; } = false;
+    bool mouseClickHelper = false;
+    bool lastMouseClickHelper = false;
+    bool isAsMouseDragging = false;
+
+    public override void Draw()
+    {
+        mouseClickHelper = ImGui.IsMouseDown(ImGuiMouseButton.Left);
+        if (!mouseClickHelper && lastMouseClickHelper && !isAsMouseDragging) Clicked = true;
+        else Clicked = false;
+        lastMouseClickHelper = mouseClickHelper;
+        isAsMouseDragging = ImGui.IsMouseDragging(ImGuiMouseButton.Left);
+    }
 
     public sealed override void PreDraw()
     {
@@ -569,28 +584,46 @@ public abstract class PetWindowHelpers : PetWindowStyling
         DrawRedownloadButton(drawExtraButton);
     }
 
-    protected void DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
+    protected enum State
     {
+        None,
+        Hovered,
+        Clicked
+    }
+
+    protected State DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
+    {
+        bool clicked = false;
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
         {
-            DrawUserTexture(u, drawExtraButton);
+            clicked = DrawUserTexture(u, drawExtraButton);
             ImGui.EndListBox();
         }
+        if (!clicked) return State.None;
+        else
+        {
+            if (!Clicked) return State.Hovered;
+            return State.Clicked;
+        }
     }
-    protected void DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
+    protected bool DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
     {
         if (drawExtraButton) DrawRedownloadButton(u);
     });
-    protected void DrawTexture(PettableUser u, Action drawExtraButton)
+
+    protected bool DrawTexture(PettableUser u, Action drawExtraButton)
     {
-        DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
+        bool clicked = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
         DrawRedownloadButton(drawExtraButton);
+        return clicked;
     }
 
-    protected void DrawTexture(nint thenint)
+    protected bool DrawTexture(nint thenint)
     {
         DrawImage(thenint, new Vector2(83, 83));
+        bool hovered = ImGui.IsItemHovered();
         SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
+        return hovered;
     }
 
 

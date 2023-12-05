@@ -119,7 +119,12 @@ internal class NewPetListWindow : PetWindow
         if (!BeginListBox($"##<PetList{internalCounter++}>", new Vector2(250, HeaderHeight)))
             return;
 
-        DrawUserTextureEncased(activeUser);
+        State state = DrawUserTextureEncased(activeUser);
+        if (petMode != PetMode.ShareMode)
+        {
+            if (state == State.Hovered) SetTooltip("[Change User]\nCurrent User: " + activeUsername + "@" + activeUser.HomeWorldName);
+            if (state == State.Clicked) ToggleUserList(true);
+        }
         SameLinePretendSpace();
 
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(ContentAvailableX, ContentAvailableY), ipcUser))
@@ -681,11 +686,19 @@ internal class NewPetListWindow : PetWindow
             Vector2 scale = new Vector2(ContentAvailableX, HeaderHeight);
             if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", scale, myUser.IsIPCOnlyUser)) return false;
             IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
-            window.DrawUserTextureEncased(myUser);
+            State state = window.DrawUserTextureEncased(myUser);
+            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserName + "@" + myUser.HomeWorldName);
+            if (state == State.Clicked)
+            {
+                outcome = true;
+                window.activeUser = myUser;
+                window.searchBarElement.Clear();
+                window.ToggleUserList();
+            }
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit($"User Name", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;

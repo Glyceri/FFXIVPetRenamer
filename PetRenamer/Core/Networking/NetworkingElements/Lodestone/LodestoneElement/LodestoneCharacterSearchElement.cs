@@ -1,7 +1,6 @@
 ﻿using HtmlAgilityPack;
 using PetRenamer.Core.Networking.Attributes;
 using PetRenamer.Core.Singleton;
-using PetRenamer.Logging;
 using System;
 
 namespace PetRenamer.Core.Networking.NetworkingElements.Lodestone.LodestoneElement;
@@ -14,7 +13,7 @@ public class LodestoneCharacterSearchElement : LodestoneNetworkedBase, ISingleto
     public void SearchCharacter((string, uint) character, Action<SearchData> callbackSucces = null!, Action<Exception> callbackError = null!)
     {
         (string, string) chara = NetworkedImageDownloader.instance.RemapCharacterData(ref character);
-        string URL = $"https://eu.finalfantasyxiv.com/lodestone/character/?q={chara.Item1.Replace(" ", "+")}&worldname={chara.Item2}";
+        string URL = $"https://na.finalfantasyxiv.com/lodestone/character/?q={chara.Item1.Replace(" ", "+")}&worldname={chara.Item2}";
         GetDocument(URL, (document) => OnDocument(document, callbackSucces, callbackError), (exception) => callbackError?.Invoke(exception));
     }
 
