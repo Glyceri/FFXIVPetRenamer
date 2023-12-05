@@ -1,7 +1,9 @@
 ﻿using HtmlAgilityPack;
 using PetRenamer.Core.Networking.Attributes;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements.Lodestone.LodestoneElement;
 
@@ -10,22 +12,19 @@ public class LodestoneCharacterSearchElement : LodestoneNetworkedBase, ISingleto
 {
     public static LodestoneCharacterSearchElement instance { get; set; } = null!;
 
-    public void SearchCharacter((string, uint) character, Action<SearchData> callbackSucces = null!, Action<Exception> callbackError = null!)
+    public async Task SearchCharacter((string, uint) character, Action<SearchData> callbackSucces = null!, Action<Exception> callbackError = null!)
     {
         (string, string) chara = NetworkedImageDownloader.instance.RemapCharacterData(ref character);
 
         string URL = $"https://eu.finalfantasyxiv.com/lodestone/character/?q={chara.Item1.Replace(" ", "+")}&worldname={chara.Item2}";
-
-        GetDocument(URL, (document) => OnGetDocument(document, callbackSucces, callbackError), (exception) => callbackError?.Invoke(exception));
-    }
-
-    void OnGetDocument(HtmlDocument document, Action<SearchData> callbackSucces = null!, Action<Exception> callbackError = null!)
-    {
+        PetLog.Log(URL);
+        HtmlDocument? document = await GetDocument(URL, (exception) => callbackError?.Invoke(exception));
         if (document == null)
         {
             callbackError?.Invoke(new Exception("Document is Null"));
             return;
         }
+
         HtmlNode rootNode = document.DocumentNode;
 
         try
@@ -46,8 +45,7 @@ public class LodestoneCharacterSearchElement : LodestoneNetworkedBase, ISingleto
             try
             {
                 data = new SearchData(entryNode);
-            }
-            catch (Exception e)
+            }catch(Exception e)
             {
                 callbackError?.Invoke(new Exception("Search Data unable to be made: " + e.Message));
                 return;

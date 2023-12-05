@@ -1,24 +1,47 @@
 ﻿using HtmlAgilityPack;
+using System.Net;
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace PetRenamer.Core.Networking.NetworkingElements.Lodestone;
 
 public class LodestoneNetworkedBase : NetworkingElement
 {
-    internal void GetDocument(string url, Action<HtmlDocument> successCallback, Action<Exception> errorCallback)
+    internal async Task<HtmlDocument?> GetDocument(string url, Action<Exception> errorCallback)
     {
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
-        HttpRequestQueue.Enqueue(request, async (response) =>
+        HttpResponseMessage? response;
+
+        try
         {
-            try
-            {
-                HtmlDocument document = new HtmlDocument();
-                document.LoadHtml(await response.Content.ReadAsStringAsync());
-                successCallback?.Invoke(document);
-            }catch (Exception e) { errorCallback?.Invoke(e); }
-        }, errorCallback);
+            response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception e)
+        {
+            errorCallback?.Invoke(e);
+            return null!;
+        }
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            errorCallback?.Invoke(new Exception("Response not found."));
+            return null!;
+        }
+
+        try
+        {
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(await response.Content.ReadAsStringAsync());
+            return document;
+        }
+        catch (Exception e)
+        {
+            errorCallback?.Invoke(e);
+        }
+        return null!;
     }
 
     internal HtmlNode? GetNode(HtmlNode baseNode, string nodeName)

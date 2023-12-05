@@ -107,12 +107,12 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         }
     }
 
-    async void DownloadPagination((string, uint) characterData)
+    async Task DownloadPagination((string, uint) characterData)
     {
         Cache.RemoveTexture(characterData);
         try
         {
-            LodestoneCharacterSearchElement.instance.SearchCharacter(
+            await LodestoneCharacterSearchElement.instance.SearchCharacter(
             characterData,
             (SearchData) => OnSearchData(SearchData, characterData),
             (exception) => throw exception);
