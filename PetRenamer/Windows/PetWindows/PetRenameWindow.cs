@@ -123,24 +123,7 @@ public class PetRenameWindow : PetWindow
     {
         if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize))
             return;
-        State state = DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
-        if (activePet.petID == user.Minion.ID || activePet.petID == user.BattlePet.ID)
-        {
-            if (state == State.Hovered || state == State.Clicked) SetTooltip("/pet: " + (activePet.petName == string.Empty ? activePet.baseName : activePet.petName));
-            if (state == State.Clicked)
-            {
-                nint pet = nint.Zero;
-                if (activePet.petID == user.Minion.ID) pet = user.Minion.Pet;
-                if (activePet.petID == user.BattlePet.ID) pet = user.BattlePet.Pet;
-                if (pet != nint.Zero)
-                {
-                    GameObject? softTarget = PluginHandlers.TargetManager.SoftTarget;
-                    PluginHandlers.TargetManager.SoftTarget = PluginHandlers.ObjectTable.CreateObjectReference(pet);
-                    if (PluginHandlers.TargetManager.SoftTarget?.DataId != 0) CommandHook.instance.SendChatUnsafe("/stroke");
-                    PluginHandlers.TargetManager.SoftTarget = softTarget;
-                }
-            }
-        }
+        DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
         ImGui.EndListBox();
     }
 
