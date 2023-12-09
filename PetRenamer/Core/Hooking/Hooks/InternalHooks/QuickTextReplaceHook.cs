@@ -1,10 +1,8 @@
 ﻿using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.Commands.Commands;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 
@@ -22,7 +20,7 @@ public unsafe class QuickTextReplaceHook : IDisposable
     bool allow = true;
     string lastAnswer = string.Empty;
 
-    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false) : this(addonName, [textPos], allowedToFunction, atkPos, recallAction, latestOutcome, soft) { }
+    public QuickTextReplaceHook(string addonName, uint textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false) : this(addonName, new uint[1] { textPos }, allowedToFunction, atkPos, recallAction, latestOutcome, soft) { }
     public QuickTextReplaceHook(string addonName, uint[] textPos, Func<int, bool> allowedToFunction, int atkPos = -1, Func<PettableUser> recallAction = null!, Action<string> latestOutcome = null!, bool soft = false)
     {
         softHook = soft;
