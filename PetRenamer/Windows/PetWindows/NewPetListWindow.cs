@@ -47,8 +47,6 @@ internal class NewPetListWindow : PetWindow
             MinimumSize = minSize,
             MaximumSize = new Vector2(9999, 9999)
         };
-
-        IsOpen = true;
     }
 
     public override void OnDraw()
