@@ -54,13 +54,13 @@ internal class PettableUserHandler : IDisposable, IInitializable
         }
     }
 
-    public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false)
+    public void DeclareUser(SerializableUserV3 user, UserDeclareType userDeclareType, bool force = false, bool save = true)
     {
         if (userDeclareType == UserDeclareType.Add || userDeclareType == UserDeclareType.IPC) AddUser(user, force, userDeclareType == UserDeclareType.IPC);
-        else if (userDeclareType == UserDeclareType.Remove) RemoveUser(user);
+        else if (userDeclareType == UserDeclareType.Remove) RemoveUser(user, save);
     }
 
-    void RemoveUser(SerializableUserV3 user)
+    void RemoveUser(SerializableUserV3 user, bool save = true)
     {
         for (int i = _users.Count - 1; i >= 0; i--)
         {
@@ -69,6 +69,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             _users.RemoveAt(i);
             Changed = true;
         }
+        if (save) PluginLink.Configuration.Save();
     }
 
     void AddUser(SerializableUserV3 user, bool force = false, bool ipc = false)

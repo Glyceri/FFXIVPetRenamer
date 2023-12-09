@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Internal;
+using System.Linq;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -35,6 +36,8 @@ internal class NewPetListWindow : PetWindow
 
     bool userlistActive = false;
 
+    DrawTempElement hoverElement = new DrawTempElement();
+
     public NewPetListWindow() : base("Pet Nicknames List")
     {
         Size = baseSize;
@@ -50,7 +53,7 @@ internal class NewPetListWindow : PetWindow
     {
         PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
         if ((activeUser ??= localUser!) == null) return;
-        if (activeUser.UserChanged || activeUser.SerializableUser.changed || PluginLink.PettableUserHandler.Changed) HandleChanged();
+        if (activeUser.UserChanged || PluginLink.PettableUserHandler.Changed) HandleChanged();
         DrawHeader();
         DrawShareHeader();
     }
@@ -83,7 +86,7 @@ internal class NewPetListWindow : PetWindow
 
         if (!activeUser.Declared) searchBarElement.Clear();
 
-        if((_lastMode == PetMode.ShareMode && petMode != PetMode.ShareMode) || (_lastMode != PetMode.ShareMode && petMode == PetMode.ShareMode))
+        if ((_lastMode == PetMode.ShareMode && petMode != PetMode.ShareMode) || (_lastMode != PetMode.ShareMode && petMode == PetMode.ShareMode))
         {
             SetActiveToLocal();
             ClearList();
@@ -116,7 +119,12 @@ internal class NewPetListWindow : PetWindow
         if (!BeginListBox($"##<PetList{internalCounter++}>", new Vector2(250, HeaderHeight)))
             return;
 
-        DrawUserTextureEncased(activeUser);
+        State state = DrawUserTextureEncased(activeUser);
+        if (petMode != PetMode.ShareMode)
+        {
+            if (state == State.Hovered) SetTooltip("[Change User]\nCurrent User: " + activeUsername + "@" + activeUser.HomeWorldName);
+            if (state == State.Clicked) ToggleUserList(true);
+        }
         SameLinePretendSpace();
 
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(ContentAvailableX, ContentAvailableY), ipcUser))
@@ -153,17 +161,31 @@ internal class NewPetListWindow : PetWindow
     void FillUserList()
     {
         drawableElements.Add(new WarningDrawElement("Help! I cannot see any profile pictures. Please enable: [Allow Automatic Profile Pictures] in the settings menu.", PluginLink.WindowHandler.OpenWindow<ConfigWindow>, SeIconChar.MouseWheel.ToIconString(), "Open settings menu!"));
+
+        List<DrawableElement> tempList = new List<DrawableElement>();
+
         PluginLink.PettableUserHandler.LoopThroughUsers(u =>
         {
             PlayerDrawElement p = new PlayerDrawElement(u);
-            if (u.LocalUser) 
-            { 
+            if (u.LocalUser)
+            {
                 drawableElements.Insert(1, p);
                 drawableElements.Insert(2, new InvisibleDrawElement());
             }
-            else drawableElements.Add(p);
+            tempList.Add(p);
         });
+
+        drawableElements.Add(new ReorderableList(true, tempList, (startIndex, endIndex) => 
+        {
+            if (startIndex == endIndex) return;
+            PluginLink.PettableUserHandler.Users = LinqUtils.instance.Swap(PluginLink.PettableUserHandler.Users, startIndex, endIndex).ToList();
+        }, () => 
+        {
+            PluginLink.Configuration.Save();
+            HandleUserListActive();
+        }));
     }
+
     void FillMinionOrPetList()
     {
         if (activeUser == null) return;
@@ -172,6 +194,9 @@ internal class NewPetListWindow : PetWindow
         Func<int, bool> isValid = null!;
         Action<int> callback = (id) => { };
         Action<int, bool> callback2 = null!;
+
+        List<DrawableElement> tempList = new List<DrawableElement>();
+
         if (activeUser.LocalUser)
         {
             callback2 = (id, ipc) =>
@@ -183,7 +208,7 @@ internal class NewPetListWindow : PetWindow
 
         if (petMode == PetMode.Normal)
         {
-            if(activeUser.LocalUser) drawableElements.Add(searchBarElement);
+            if (activeUser.LocalUser) drawableElements.Add(searchBarElement);
             identifier = "Minion";
             isValid = (id) => id > -1;
             callback = (id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true);
@@ -205,8 +230,30 @@ internal class NewPetListWindow : PetWindow
             bool isIPC = name.HasIPCName;
             Action<int> internalCallback = (id) => { };
             if (activeUser.LocalUser) internalCallback = callback;
-            drawableElements.Add(new DrawablePet(isIPC, textureWrap, identifier, name.Name, petBaseName, name.ID, internalCallback, "X", isIPC ? "Clear IPC" : "Remove", callback2));
+            tempList.Add(new DrawablePet(isIPC, textureWrap, identifier, name.Name, petBaseName, name.ID, internalCallback, "X", isIPC ? "Clear IPC" : "Remove", callback2));
         }
+
+        ReorderableList list = null!;
+        list = new ReorderableList(activeUser.LocalUser, tempList, (endIndex, startIndex) => {
+
+            DrawableElement element = list.elements.ElementAt(endIndex);
+            if (element is not DrawablePet pet) return;
+            int newID = pet.baseId;
+
+            DrawableElement element2 = list.elements.ElementAt(startIndex);
+            if (element2 is not DrawablePet pet2) return;
+            int oldID = pet2.baseId;
+
+            int indexOld = activeUser.SerializableUser.IndexOf(oldID);
+            int indexNew = activeUser.SerializableUser.IndexOf(newID);
+            if (indexOld == -1 || indexNew == -1) return;
+            activeUser.SerializableUser.Swap(indexOld, indexNew);
+            },
+        () => {
+            PluginLink.Configuration.Save();
+            HandleUserListActive(); 
+        });
+        drawableElements.Add(list);
     }
 
     IDalamudTextureWrap GetTexture(int id)
@@ -245,7 +292,7 @@ internal class NewPetListWindow : PetWindow
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || PluginLink.Configuration.alwaysOpenAdvancedMode) FillExportList();
         else
         {
-            if(petMode == PetMode.ShareMode) ClearList();
+            if (petMode == PetMode.ShareMode) ClearList();
             SetActiveToLocal();
             SharingHandler.SetupList(activeUser);
             DoExport();
@@ -290,7 +337,7 @@ internal class NewPetListWindow : PetWindow
 
     void FillImportList(SucceededImportData data)
     {
-        for(int i = 0; i < data.ids.Length; i++)
+        for (int i = 0; i < data.ids.Length; i++)
         {
             string petBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(data.ids[i]));
             IDalamudTextureWrap textureWrap = GetTexture(data.ids[i]);
@@ -341,8 +388,12 @@ internal class NewPetListWindow : PetWindow
         public virtual bool Draw(ref int internalcounter, NewPetListWindow window) => false;
     }
 
+    abstract class HoverableDrawableElement : DrawableElement
+    {
+        public abstract bool IsHovered { get; set; }
+    }
 
-    class ButtonElement : DrawableElement 
+    class ButtonElement : DrawableElement
     {
         string text;
         string tooltip;
@@ -387,21 +438,26 @@ internal class NewPetListWindow : PetWindow
         }
     }
 
-    class DrawablePet : DrawableElement
+    class DrawablePet : HoverableDrawableElement
     {
         IDalamudTextureWrap texture;
         string identifier;
         string customName;
         string baseName;
-        int baseId;
+        public int baseId;
 
         string buttonText;
         string buttonTooltip;
         Action intCallback = null!;
+        Action trueCallback = null!;
         Action<int> callback2;
         Action internalCallback = null!;
 
         bool isIpc;
+
+        bool deleteActive = false;
+
+        public override bool IsHovered { get; set; }
 
         public DrawablePet(bool isIpc, IDalamudTextureWrap texture, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!)
         {
@@ -416,28 +472,46 @@ internal class NewPetListWindow : PetWindow
             this.buttonTooltip = buttonTooltip;
             if (callback != null) intCallback = () => callback(baseId, isIpc);
             this.callback2 = callback2;
-            if(drawExtraButton != null) internalCallback = () => drawExtraButton(index);
+            if (drawExtraButton != null) internalCallback = () => drawExtraButton(index);
+            if (intCallback != null) trueCallback = () => deleteActive ^= true;
         }
 
         public override void OnDispose() => texture?.Dispose();
 
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {
+            IsHovered = false;
             if (texture == null) return false;
+            Vector2 scale = new Vector2(ContentAvailableX, HeaderHeight);
             if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, HeaderHeight), isIpc)) return false;
+            IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
 
             if (window.BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), isIpc))
             {
-                window.DrawTexture(texture.ImGuiHandle, internalCallback);
+                State state = window.DrawTexture(texture.ImGuiHandle, internalCallback);
+                if (state == State.Hovered)
+                {
+                    if (!window.activeUser.LocalUser) window.SetTooltip(customName);
+                    else window.SetTooltip("Rename: " + customName);
+                }
+                bool clicked = false;
+                if (state == State.Clicked && window.activeUser.LocalUser && petMode != PetMode.ShareMode)
+                    clicked = true;
                 ImGui.EndListBox();
+                if (clicked) callback2(baseId);
             }
 
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), isIpc))
             {
-                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", intCallback);
-                window.DrawBasicBar($"{identifier} Name", baseName);
-                window.DrawBasicBar($"{identifier} ID", baseId.ToString());
+                window.DrawAdvancedBarWithQuit($"Nickname", customName, () => callback2(baseId), buttonText, $"{buttonTooltip} {baseName}", trueCallback);
+                if (!deleteActive)
+                {
+                    window.DrawBasicBar($"{identifier} Name", baseName);
+                    window.DrawBasicBar($"{identifier} ID", baseId.ToString());
+                }
+                else window.DrawYesNoBar($"Are you sure you want to delete: {customName}?", intCallback, () => deleteActive = false);
+                
                 ImGui.EndListBox();
             }
             ImGui.EndListBox();
@@ -466,17 +540,17 @@ internal class NewPetListWindow : PetWindow
                     List<SerializableNickname> nicknames = SheetUtils.instance.GetThoseThatContain(searchText);
                     window.activeUser = new PettableUser($"[{searchText}]", 9999, new SerializableUserV3(new int[0], new string[0], searchText, 9999, PluginConstants.baseSkeletons, PluginConstants.baseSkeletons));
                     window.drawableElements.Add(this);
-                    foreach(SerializableNickname nickname in nicknames)
+                    foreach (SerializableNickname nickname in nicknames)
                     {
                         window.drawableElements.Add(
                             new DrawablePet(false,
-                            window.GetTexture(nickname.ID), 
-                            "Minion", 
-                            nickname.Name, 
-                            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)), 
-                            nickname.ID, 
+                            window.GetTexture(nickname.ID),
+                            "Minion",
+                            nickname.Name,
+                            StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)),
+                            nickname.ID,
                             (id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true),
-                            $"+##{++internalcounter}", $"Add Minion", (id, ipc) => 
+                            $"+##{++internalcounter}", $"Add Minion", (id, ipc) =>
                             {
                                 Clear();
                                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true);
@@ -509,22 +583,132 @@ internal class NewPetListWindow : PetWindow
         }
     }
 
-    class PlayerDrawElement : DrawableElement
+    class ReorderableList : DrawableElement
     {
-        PettableUser myUser;
+        Action onSave;
+        Action<int, int> onReorder;
+        public List<DrawableElement> elements;
+
+        float mouseOffset = 0;
+        int clickedIndex = -1;
+        int index = -1;
+        bool allowReorder = false;
+
+        public ReorderableList(bool allowReorder, List<DrawableElement> elements, Action<int, int> onReorder, Action onSave)
+        {
+            this.allowReorder = allowReorder;
+            this.onReorder = onReorder;
+            this.elements = elements;
+            this.onSave = onSave;
+        }
+
+        public override bool Draw(ref int internalcounter, NewPetListWindow window)
+        {
+            for (int i = 0; i < elements.Count; i++)
+            {
+                if (i == index)
+                {
+                    window.hoverElement.Draw(ref internalCounter, window);
+                    continue;
+                }
+                DrawableElement element = elements[i];
+
+                if (element.Draw(ref internalcounter, window))
+                {
+                    Reset();
+                    return true;
+                }
+                if (!allowReorder) continue;
+                if (element is not HoverableDrawableElement hoverElement) continue;
+                if (!hoverElement.IsHovered) continue;
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) clickedIndex = i;
+                if (clickedIndex != -1 && ImGui.IsMouseReleased(ImGuiMouseButton.Left)) clickedIndex = -1;
+                if (!ImGui.IsMouseDragging(ImGuiMouseButton.Left)) continue;
+                if (index == -1)
+                {
+                    index = clickedIndex;
+                    mouseOffset = ImGui.GetMousePos().Y - ImGui.GetCursorScreenPos().Y;
+                }
+                else
+                {
+                    elements = LinqUtils.instance.Swap(elements, index, i).ToList();
+                    onReorder?.Invoke(index, i);
+                    index = i;
+                }
+            }
+
+            if (index != -1)
+            {
+                Vector2 screenPos = ImGui.GetCursorScreenPos();
+                ImGui.SetCursorScreenPos(new Vector2(screenPos.X, ImGui.GetMousePos().Y - mouseOffset - InnerHeaderHeight));
+                elements[index]?.Draw(ref internalCounter, window);
+                ImGui.SetCursorScreenPos(screenPos);
+
+                if (!ImGui.IsMouseDown(ImGuiMouseButton.Left))
+                {
+                    onSave?.Invoke();
+                    Reset();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void Reset()
+        {
+            index = -1;
+            clickedIndex = -1;
+            mouseOffset = 0;
+        }
+    }
+
+    class DrawTempElement : HoverableDrawableElement
+    {
+        public override bool IsHovered { get; set; }
+
+        public override bool Draw(ref int internalcounter, NewPetListWindow window)
+        {
+            IsHovered = false;
+
+            Vector2 scale = new Vector2(ContentAvailableX, HeaderHeight);
+            if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", scale, false)) return false;
+            IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
+            if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), false)) ImGui.EndListBox();
+            ImGui.EndListBox();
+
+            return false;
+        }
+    }
+
+    class PlayerDrawElement : HoverableDrawableElement
+    {
+        public PettableUser myUser;
         public PlayerDrawElement(PettableUser user) => myUser = user;
 
         bool sureMode = false;
 
+        public override bool IsHovered { get; set; } = false;
+
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {
+            IsHovered = false;
             bool outcome = false;
-            if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, HeaderHeight), myUser.IsIPCOnlyUser)) return false;
-            window.DrawUserTextureEncased(myUser);
+            Vector2 scale = new Vector2(ContentAvailableX, HeaderHeight);
+            if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", scale, myUser.IsIPCOnlyUser)) return false;
+            IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
+            State state = window.DrawUserTextureEncased(myUser);
+            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserName + "@" + myUser.HomeWorldName);
+            if (state == State.Clicked)
+            {
+                outcome = true;
+                window.activeUser = myUser;
+                window.searchBarElement.Clear();
+                window.ToggleUserList();
+            }
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit($"User Name", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;
@@ -541,6 +725,7 @@ internal class NewPetListWindow : PetWindow
                     if (myUser.LocalUser) sureMode = false;
                     window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
                 }
+
                 ImGui.EndListBox();
             }
             ImGui.EndListBox();

@@ -5,6 +5,7 @@ using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.NetworkingElements;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.PetWindows;
 using System;
@@ -52,6 +53,20 @@ public abstract class PetWindowHelpers : PetWindowStyling
     float indentSpacing;
     float scrollbarSize;
     float grabMinSize;
+
+    protected bool Clicked { get; private set; } = false;
+    bool mouseClickHelper = false;
+    bool lastMouseClickHelper = false;
+    bool isAsMouseDragging = false;
+
+    public override void Draw()
+    {
+        mouseClickHelper = ImGui.IsMouseDown(ImGuiMouseButton.Left);
+        if (!mouseClickHelper && lastMouseClickHelper && !isAsMouseDragging) Clicked = true;
+        else Clicked = false;
+        lastMouseClickHelper = mouseClickHelper;
+        isAsMouseDragging = ImGui.IsMouseDragging(ImGuiMouseButton.Left);
+    }
 
     public sealed override void PreDraw()
     {
@@ -484,7 +499,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawYesNoBar(string label, Action yesCallback, Action noCallback)
     {
-        Label(label + $"##<{internalCounter++}>", new Vector2(ContentAvailableX, BarSize));
+        Label(label, new Vector2(ContentAvailableX, BarSize));
         Button("Yes", new Vector2(ContentAvailableX / 2, BarSize), PluginConstants.Strings.deleteUserTooltip, yesCallback.Invoke);
         SameLinePretendSpace();
         Button("No", new Vector2(ContentAvailableX , BarSize), PluginConstants.Strings.keepUserTooltip, noCallback.Invoke);
@@ -547,14 +562,25 @@ public abstract class PetWindowHelpers : PetWindowStyling
         XButton(buttonString + $"##<Close{internalCounter++}>", Styling.SmallButton, tooltipString, callback.Invoke);
     }
 
-    protected void DrawImage(nint handle, Vector2 size)
+    protected State DrawImage(nint handle, Vector2 size)
     {
-        if (PluginLink.Configuration.displayImages) ImGui.Image(handle, size);
+        if (PluginLink.Configuration.displayImages) 
+        { 
+            ImGui.Image(handle, size);
+            if (!ImGui.IsItemHovered()) return State.None;
+            else
+            {
+                if (!Clicked) return State.Hovered;
+                return State.Clicked;
+            }
+        }
         else
         {
             PushStyleColours(StylingColours.defaultBackground, ImGuiCol.Button | ImGuiCol.ButtonActive | ImGuiCol.ButtonHovered);
-            Button("", size);
+            if (Button("", size)) return State.Clicked;
+            if (ImGui.IsItemHovered()) return State.Hovered;
         }
+        return State.None;
     }
 
     protected void SpaceBottomRightButton()
@@ -563,34 +589,47 @@ public abstract class PetWindowHelpers : PetWindowStyling
         ImGui.SameLine(638);
     }
 
-    protected void DrawTexture(nint theint, Action drawExtraButton)
+    protected State DrawTexture(nint theint, Action drawExtraButton)
     {
-        DrawTexture(theint);
+        State state = DrawTexture(theint);
         DrawRedownloadButton(drawExtraButton);
+        return state;
     }
 
-    protected void DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
+    protected enum State
     {
+        None,
+        Hovered,
+        Clicked
+    }
+
+    protected State DrawUserTextureEncased(PettableUser u, bool drawExtraButton = true)
+    {
+        State state = State.None;
         if (BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), u.IsIPCOnlyUser))
         {
-            DrawUserTexture(u, drawExtraButton);
+            state = DrawUserTexture(u, drawExtraButton);
             ImGui.EndListBox();
         }
+        return state;
     }
-    protected void DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
+    protected State DrawUserTexture(PettableUser u, bool drawExtraButton = true) => DrawTexture(u, () =>
     {
         if (drawExtraButton) DrawRedownloadButton(u);
     });
-    protected void DrawTexture(PettableUser u, Action drawExtraButton)
+
+    protected State DrawTexture(PettableUser u, Action drawExtraButton)
     {
-        DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
+        State state = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
         DrawRedownloadButton(drawExtraButton);
+        return state;
     }
 
-    protected void DrawTexture(nint thenint)
+    protected State DrawTexture(nint thenint)
     {
-        DrawImage(thenint, new Vector2(83, 83));
+        State state = DrawImage(thenint, new Vector2(83, 83));
         SameLineNoMargin(); TransparentLabel(string.Empty, new Vector2(4, 0));
+        return state;
     }
 
 

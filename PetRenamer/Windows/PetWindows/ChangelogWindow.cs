@@ -76,6 +76,10 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.4.0"), new CLE("General", "Fixed an issue where the Pet Rename Window would sometimes not work.", "Mappy is now integrated into Pet Nicknames.")) },
         { new CLS(new Version("1.4.4.1"), new CLE("General", "Fixed a typo. (I know, gamechanging update this one)", "Removed the Kofi button.", "Emotes should work on the Japanese client again!")) },
         { new CLS(new Version("1.4.4.2"), new CLE("General", "Massive performance improvements!")) },
+        { new CLS(new Version("1.4.4.3"), new CLE("General", "Fixed log spam that could occur.", "Changed to Mappy IPC to be compatible with the new update. (We forgive, but never forget!)", "Fixed an issue where upon switching alts another log would spam.")) },
+        { new CLS(new Version("1.4.4.4"), new CLE("General", "Added the ability to reorder the Petlist.")) },
+        { new CLS(new Version("1.4.4.5"), new CLE("General", "This plugin now works for users with a new save file!")) },
+        { new CLS(new Version("1.4.4.6"), new CLE("UI", "Profile pictures work again.\nThis function got a complete rewrite and should now no longer DDOS a server when misusing /petdev.\nIf you experience any issues with this feature, or notice EXTREMELY LONG startup times, please notify me.", "Fixed some issues with dragging in the Petlist window.", "Profile pictures and Pet Images are now clickable.")) },
     };
 
     const string starter = "  ◉   ";

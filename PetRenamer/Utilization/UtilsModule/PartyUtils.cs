@@ -20,9 +20,11 @@ internal class PartyUtils : UtilsRegistryType, ISingletonBase<PartyUtils>
     internal override void OnRegistered() => Setup();
     public unsafe bool Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
+        Length = 0;
         if (PluginHandlers.PartyList.Count == 0)
         {
             PettableUser localUser = PluginLink.PettableUserHandler.LocalUser()!;
+            if (localUser == null) return false;
             members[0].Set(localUser.nintUser);
             Length = 1;
         }

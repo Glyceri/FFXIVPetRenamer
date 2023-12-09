@@ -1,14 +1,16 @@
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Core.Hooking.Hooks;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Numerics;
-using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -56,13 +58,13 @@ public class PetRenameWindow : PetWindow
         SetImage(activePet.petID);
     }
     public override void OnWindowClose() => user = null!;
-    internal override void OnPetModeChange(PetMode mode) 
-    { 
+    internal override void OnPetModeChange(PetMode mode)
+    {
         activePet = GetPet(mode);
-        if (activePet == null) return;  
+        if (activePet == null) return;
         SetImage(activePet.petID);
     }
-       
+
     void HandlePets()
     {
         for (int i = 0; i < user.Pets.Length; i++)
@@ -195,7 +197,7 @@ public class PetRenameWindow : PetWindow
         activePet.temporaryPetName = activePet.petName;
 
         if (IsOpen) SetImage(id);
-        
+
         if (!forceOpen)
             activePet = lastPet;
     }
@@ -235,7 +237,7 @@ public class PetRenameWindow : PetWindow
     RenamablePet GetPet(PetMode mode)
     {
         foreach (RenamablePet pet in pets)
-            if (pet.associatedMode == mode) 
+            if (pet.associatedMode == mode)
                 return pet;
         return null!;
     }

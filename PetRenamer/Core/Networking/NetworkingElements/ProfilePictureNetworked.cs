@@ -1,17 +1,13 @@
 ﻿using Dalamud.Interface.Internal;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.Attributes;
-using PetRenamer.Core.Networking.Structs;
+using PetRenamer.Core.Networking.NetworkingElements.Lodestone.LodestoneElement;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Enums;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Logging;
-using PetRenamer.Utilization.UtilsModule;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,8 +18,6 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 {
     public static ProfilePictureNetworked instance { get; set; } = null!;
 
-    readonly HttpClient client = new HttpClient();
-
     public nint GetTexture(PettableUser user)
     {
         try
@@ -33,7 +27,11 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (!Cache.textureCache.ContainsKey(currentUser)) return GetSearchingTexture();
             nint returner = Cache.textureCache[currentUser]?.ImGuiHandle ?? nint.Zero;
-            if (returner == nint.Zero) returner = GetSearchingTexture();
+            if (returner == nint.Zero) 
+            {
+                Cache.RemoveTexture(currentUser);
+                returner = GetSearchingTexture(); 
+            }
             return returner;
         }
         catch { return GetSearchingTexture(); }
@@ -54,21 +52,22 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (type == UserDeclareType.Remove) HandleAsRemove(ref currentUser);
-            else if (type == UserDeclareType.Add) HandleAsAdd(ref currentUser, force);
-        }catch(Exception e) { PetLog.Log(e.Message); }
+            else if (type == UserDeclareType.Add) Task.Run(() => HandleAsAdd(currentUser, force)).ConfigureAwait(false);
+        }
+        catch (Exception e) { PetLog.Log(e.Message); }
     }
 
-    public void RequestDownload((string, uint) currentUser) => Task.Run(() => DownloadPagination(currentUser));
+    public void RequestDownload((string, uint) currentUser) => DownloadPagination(currentUser);
 
     void HandleAsRemove(ref (string, uint) currentUser)
     {
         Cache.RemoveTexture(currentUser);
     }
 
-    void HandleAsAdd(ref (string, uint) currentUser, bool force)
+    void HandleAsAdd((string, uint) currentUser, bool force)
     {
         if (Cache.textureCache.ContainsKey(currentUser)) return;
-        string path = MakeTexturePath(RemapCharacterData(ref currentUser));
+        string path = NetworkedImageDownloader.instance.MakeTexturePath(NetworkedImageDownloader.instance.RemapCharacterData(ref currentUser));
         try
         {
             if (Path.Exists(path))
@@ -79,7 +78,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             {
                 Cache.RemoveTexture(currentUser);
                 (string, uint) cUser = currentUser;
-                Task.Run(() => DownloadPagination(cUser));
+                DownloadPagination(cUser);
             }
         }
         catch { }
@@ -97,7 +96,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             FileInfo info = null!;
             try
             {
-                string path = MakeTexturePath(RemapCharacterData(ref characterData));
+                string path = NetworkedImageDownloader.instance.MakeTexturePath(NetworkedImageDownloader.instance.RemapCharacterData(ref characterData));
                 if (!Path.Exists(path)) return;
                 info = new FileInfo(path);
                 if (info == null) return;
@@ -114,65 +113,33 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         }
     }
 
-    async void DownloadPagination((string, uint) characterData)
+    void DownloadPagination((string, uint) characterData)
     {
         Cache.RemoveTexture(characterData);
         try
         {
-            using HttpResponseMessage response = await client?.GetAsync(GetUrl(RemapCharacterData(ref characterData)))!;
-            if (response == null) return;
-            response.EnsureSuccessStatusCode();
-            using Stream str = await response.Content.ReadAsStreamAsync();
-            if (str == null) return;
-            PaginationRoot? paginatedStruct = await JsonSerializer.DeserializeAsync<PaginationRoot>(str);
-            if (paginatedStruct == null) return;
-
-            List<Result> pStruct = paginatedStruct.Results;
-            if (pStruct == null) return;
-            if (pStruct.Count == 0) return;
-            if (pStruct[0].Avatar == null) return;
-
-            await Task.Run(() => AsyncDownload(pStruct[0].Avatar.ToString(), characterData));
+            LodestoneCharacterSearchElement.instance.SearchCharacter(
+            characterData,
+            async (SearchData) => await OnSearchData(SearchData, characterData),
+            (exception) => PetLog.LogError(exception, exception.Message));
         }
-        catch { }
+        catch (Exception e) { PetLog.LogError(e, e.Message); }
     }
 
-    public async void AsyncDownload(string URL, (string, uint) charaData)
+    async Task OnSearchData(SearchData data, (string, uint) characterData)
     {
-        try
+        await Task.Run(() =>
         {
-            CancellationToken cancellationToken = CancellationToken.None;
-            using HttpResponseMessage response = await client.GetAsync(URL);
-            if (response == null) return;
-            response.EnsureSuccessStatusCode();
-
-            // Thank DarkArchon for this code :D
-
-            string path = MakeTexturePath(RemapCharacterData(ref charaData));
-            FileStream fileStream = File.Create(path);
-            await using (fileStream.ConfigureAwait(false))
-            {
-                int bufferSize = response.Content.Headers.ContentLength > 1024 * 1024 ? 4096 : 1024;
-                byte[] buffer = new byte[bufferSize];
-
-                int bytesRead = 0;
-                while ((bytesRead = await (await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false)).ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
-                {
-                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
-                }
-            }
-        }
-        catch(Exception e) { PetLog.Log(e.Message); return; }
-
-        DeclareDownload(charaData);
+            NetworkedImageDownloader.instance.AsyncDownload(
+                data.imageURL!,
+                characterData,
+                () => DeclareDownload(characterData),
+                (exception) => PetLog.Log(exception.Message));
+        });
     }
 
     internal override void OnDispose()
     {
         client?.Dispose();
     }
-
-    string GetUrl((string, string) characterData) => $"https://xivapi.com/character/search?name={characterData.Item1}&server={characterData.Item2}";
-    (string, string) RemapCharacterData(ref (string, uint) characterData) => (characterData.Item1, SheetUtils.instance.GetWorldName((ushort)characterData.Item2));
-    string MakeTexturePath((string, string) characterData) => Path.Combine(Path.GetTempPath(), $"PetNicknames_{characterData.Item1.Replace(" ", "_")}_{characterData.Item2}.jpg");
 }

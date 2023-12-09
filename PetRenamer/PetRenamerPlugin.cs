@@ -5,6 +5,6 @@ namespace PetRenamer;
 
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
-    public PetRenamerPlugin(DalamudPluginInterface dalamud) => new StartHandler().Start(ref dalamud, this);
-    public void Dispose() => PluginLink.QuitHandler.Quit();
+    public PetRenamerPlugin(DalamudPluginInterface dalamud) => StartHandler.Start(ref dalamud, this);
+    public void Dispose() => QuitHandler.Quit();
 }

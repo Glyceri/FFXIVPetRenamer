@@ -175,9 +175,11 @@ internal class DeveloperWindow : PetWindow
                 for (int f = 0; f < user.SerializableUser.length; f++)
                 {
                     if (serializableUser[i].Name != "[TESTNAME]") continue;
-                    PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove);
+                    PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, UserDeclareType.Remove, false, false);
+                    break;
                 }
             }
+            PluginLink.Configuration.Save();
         }
     }
 
@@ -216,8 +218,9 @@ internal class DeveloperWindow : PetWindow
                     ids.ToArray(),
                     names.ToArray(),
                     gObj.Name.ToString(),
-                    (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add);
+                    (ushort)PluginHandlers.ClientState.LocalPlayer!.HomeWorld.Id), UserDeclareType.Add, false, false);
         }
+        PluginLink.Configuration.Save();
     }
 
     int totalCount = 0;

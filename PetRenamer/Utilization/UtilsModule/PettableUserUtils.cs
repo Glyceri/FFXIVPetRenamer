@@ -4,6 +4,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using PetRenamer.Windows.PetWindows;
 using System;
@@ -23,7 +24,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         if (PluginHandlers.ClientState.IsPvP) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
-        if (bChara == null) return;
+        if (bChara == null) return; 
         user.SetUser(bChara);
 
         if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionObject);
@@ -79,7 +80,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         return str.Replace("サモン・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Summon ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+                  .Replace("-Beschwörung", string.Empty, StringComparison.InvariantCultureIgnoreCase);
     }
 
     (int, string) GetAction(string tNodeText)

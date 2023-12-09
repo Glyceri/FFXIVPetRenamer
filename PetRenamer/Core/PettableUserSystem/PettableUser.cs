@@ -2,6 +2,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,7 @@ public unsafe class PettableUser
     public bool Declared { get; init; } = false;
 
     int _ChangedID = 0;
+    int _LastChangedID = 0;
     bool _UserChanged = false;
 
     int _objectIndex = -1;
@@ -92,8 +94,12 @@ public unsafe class PettableUser
         bool _cType = SerializableUser.changed;
         _UserChanged = _cType;
         _ChangedID = SerializableUser.lastTouchedID;
-        if (_ChangedID == Minion.ID) _minion.Clear();
-        if (_ChangedID == BattlePet.ID) _battlePet.Clear();
+        if (_LastChangedID != _ChangedID)
+        {
+            _LastChangedID = _ChangedID;
+            if (_ChangedID == Minion.ID) _minion.Clear();
+            if (_ChangedID == BattlePet.ID) _battlePet.Clear();
+        }
     }
 
     int lastID = -1;

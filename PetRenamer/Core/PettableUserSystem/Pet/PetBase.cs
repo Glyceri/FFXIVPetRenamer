@@ -1,7 +1,9 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.Core.PettableUserSystem.Pet;
 
@@ -49,7 +51,7 @@ public class PetBase
     public unsafe void Set(nint pet, int id, SerializableUserV3 serializableUserV3)
     {
         _pet = pet;
-        if (_lastID != id || _lastPointer != pet) _petChanged = true;
+        if (_lastID != id || _lastPointer != pet) { _petChanged = true; }
 
         if (pet == nint.Zero)
         {
@@ -70,8 +72,8 @@ public class PetBase
 
         if (!_petChanged && !_nameChanged) return;
 
-        _lastPointer = _pet;
         _lastID = _id;
+        _lastPointer = _pet;
 
         _baseName = SheetUtils.instance.GetPetName(_id, NameType.Singular);
         _baseNamePlural = SheetUtils.instance.GetPetName(_id, NameType.Plural);
@@ -89,8 +91,6 @@ public class PetBase
         if (((CharacterBase*)gObject.GetDrawObject())->GetModelType() != CharacterBase.ModelType.Monster) return true;
         return false;
     }
-
-    public void SetChanged() => _petChanged = true;  
 
     public void FullReset()
     {

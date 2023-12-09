@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -26,6 +25,7 @@ public class SerializableUserV3
     [JsonIgnore] public int length => ids.Length;
     [JsonIgnore] public int lastTouchedID = -1;
     [JsonIgnore] public QuickName this[int i] => new QuickName(ids[i], names[i], ipcNames[i]);
+
     public bool Contains(int id) => ids.Contains(id);
 
     public SerializableUserV3(string username, ushort homeworld)
@@ -55,6 +55,7 @@ public class SerializableUserV3
         if (ids.Length != names.Length) return;
         for (int i = 0; i < ids.Length; i++)
             SaveNickname(ids[i], names[i], i == ids.Length - 1);
+
     }
 
     public void LoopThrough(Action<(int, string)> callback)
@@ -92,7 +93,6 @@ public class SerializableUserV3
         else GenerateNewNickname(id, name, force, isIPCName);
 
         if (!doCheck) return;
-        FillBattlePets();
         hasCompanion = false;
         hasBattlePet = false;
         for (int i = 0; i < ids.Length; i++)
@@ -144,7 +144,6 @@ public class SerializableUserV3
 
     public void RemoveNickname(int id)
     {
-        FillBattlePets();
         int index = IndexOf(id);
         if (index == -1) return;
 
@@ -161,21 +160,6 @@ public class SerializableUserV3
         ipcNames = ipcList.ToArray();
     }
 
-    void FillBattlePets()
-    {
-        foreach (int id in RemapUtils.instance.bakedBattlePetSkeletonToName.Keys)
-        {
-            bool found = false;
-            for (int i = 0; i < length; i++)
-            {
-                if (ids[i] != id) continue;
-                found = true;
-                break;
-            }
-            if (!found) SaveNickname(id, "", true, true);
-        }
-    }
-
     public void ClearAllIPC()
     {
         string[] newIPCNames = new string[ipcNames.Length];
@@ -185,7 +169,7 @@ public class SerializableUserV3
         changed = true;
     }
 
-    int IndexOf(int id)
+    public int IndexOf(int id)
     {
         for (int i = 0; i < ids.Length; i++)
             if (ids[i] == id)
@@ -247,6 +231,13 @@ public class SerializableUserV3
     {
         ids = Array.Empty<int>();
         names = Array.Empty<string>();
+    }
+
+    public void Swap(int startIndex, int endIndex)
+    {
+        ids = LinqUtils.instance.Swap(ids.ToList(), startIndex, endIndex).ToArray();
+        names = LinqUtils.instance.Swap(names.ToList(), startIndex, endIndex).ToArray();
+        ipcNames = LinqUtils.instance.Swap(ipcNames.ToList(), startIndex, endIndex).ToArray();
     }
 }
 

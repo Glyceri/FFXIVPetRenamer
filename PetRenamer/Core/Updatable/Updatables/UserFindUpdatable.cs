@@ -17,6 +17,8 @@ internal class UserFindUpdatable : Updatable
 
     List<PettableUser> users = new List<PettableUser>();
 
+    int lastUserCount = -1;
+
     public unsafe override void Update(ref IFramework frameWork, ref PlayerCharacter player)
     {
         for (int i = PluginLink.PettableUserHandler.Users.Count - 1; i >= 0; i--)
@@ -28,8 +30,15 @@ internal class UserFindUpdatable : Updatable
             if (user.DeathsMark) PluginLink.PettableUserHandler.DeclareUser(user.SerializableUser, PettableUserSystem.Enums.UserDeclareType.Remove);
         }
 
+        int curUserCount = PluginLink.PettableUserHandler.Users.Count;
 
-        if ((timer += frameWork.UpdateDelta.TotalSeconds) > maxTimer)
+        if(lastUserCount != curUserCount)
+        {
+            lastUserCount = curUserCount;
+            timer = maxTimer;
+        }
+
+        if ((timer += frameWork.UpdateDelta.TotalSeconds) >= maxTimer)
         {
             timer -= maxTimer;
             int uCount = users.Count;

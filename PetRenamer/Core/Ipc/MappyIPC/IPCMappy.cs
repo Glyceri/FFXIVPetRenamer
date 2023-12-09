@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Plugin.Services;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Threading.Channels;
 
 namespace PetRenamer.Core.Ipc.MappyIPC;
 
@@ -29,7 +29,7 @@ public static class IPCMappy
     public static void Init(ref DalamudPluginInterface pluginInterface)
     {
         AddWorldMarkerIpcFunction = pluginInterface.GetIpcSubscriber<uint, Vector2, uint, string, string, string>("Mappy.World.AddMarker");
-        RemoveMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, bool>("Mappy.RemoveMarker");
+        RemoveMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, bool>("Mappy.Remove");
         UpdateMarkerIpcFunction = pluginInterface.GetIpcSubscriber<string, Vector2, bool>("Mappy.UpdateMarker");
         IsReadyIpcFunction = pluginInterface.GetIpcSubscriber<bool>("Mappy.IsReady");
         initialized = true;
@@ -56,7 +56,7 @@ public static class IPCMappy
         if (!PluginLink.Configuration.enableMappyIntegration && oneTime) { changed = false; return; }
         HandleTenSeconds(ref frameWork);
         if (!mappyReady) return; 
-        HandleMappyWindow();
+        HandleMappyWindow(ref player);
         if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
         HandlePartyListChangedCheck(ref frameWork, ref player);
         UpdatePetPositions();
@@ -102,8 +102,9 @@ public static class IPCMappy
     }
 
 
-    static void HandleMappyWindow()
+    static void HandleMappyWindow(ref PlayerCharacter player)
     {
+        if (player!.StatusFlags == StatusFlags.InCombat) return;
         if (oneTime) return;
         oneTime = true;
         PluginLink.WindowHandler.GetWindow<MappyXPetNicknamesWindow>()?.TryOpen();
@@ -130,15 +131,20 @@ public static class IPCMappy
         if (!PluginLink.Configuration.enableMappyIntegration)
         {
             ClearMappy();
-            PluginLink.ChatHandler.AddBlacklistedChats(1);
-            PluginHandlers.CommandManager.ProcessCommand("/mappy pets enable");
+            HandleCommand("/mappy pets enable");
         }
         else
         {
             pluginToggled = true;
-            PluginLink.ChatHandler.AddBlacklistedChats(1);
-            PluginHandlers.CommandManager.ProcessCommand("/mappy pets disable");
+            HandleCommand("/mappy pets disable");
         }
+    }
+
+    static void HandleCommand(string command)
+    {
+        PluginLink.ChatHandler.AddBlacklistedChats(1);
+        if (!PluginHandlers.CommandManager.ProcessCommand(command))
+            PluginLink.ChatHandler.RemoveBlacklistedChats(1);
     }
 
     static void HandleTenSeconds(ref IFramework frameWork)

@@ -39,10 +39,10 @@ internal class PluginXPetwindow : PetWindow
         if (petRenamerUser == null)
         {
             petRenamerUser = new PettableUser("Pet Nicknames", ushort.MaxValue);
-            ProfilePictureNetworked.instance.AsyncDownload(@"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/PetRenamer/images/icon.png", (petRenamerUser.UserName, petRenamerUser.Homeworld));
+            NetworkedImageDownloader.instance.AsyncDownload(@"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/PetRenamer/images/icon.png", (petRenamerUser.UserName, petRenamerUser.Homeworld));
         }
         pluginUser = new PettableUser(pluginU, ushort.MaxValue);
-        ProfilePictureNetworked.instance.AsyncDownload(pluginIconURL, (pluginUser.UserName, pluginUser.Homeworld));
+        NetworkedImageDownloader.instance.AsyncDownload(pluginIconURL, (pluginUser.UserName, pluginUser.Homeworld));
     }
 
     public sealed override void OnDraw()
@@ -69,10 +69,7 @@ internal class PluginXPetwindow : PetWindow
             Button(bottomButtonText, new Vector2(ContentAvailableX, BarSize), bottomButtonTooltip, callback);
     }
 
-    void DrawThirdPartyWarning()
-    {
-        PluginLink.WindowHandler.GetWindow<ConfigWindow>().DrawWarningThing();
-    }
+    void DrawThirdPartyWarning() => PluginLink.WindowHandler.GetWindow<ConfigWindow>().DrawWarningThing();
 
     public virtual void OnXDraw() { }
 }
