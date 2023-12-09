@@ -202,6 +202,9 @@ internal class NewPetListWindow : PetWindow
             callback2 = (id, ipc) =>
             {
                 activeUser.SerializableUser.SaveNickname(id, string.Empty, true, false, ipc);
+                PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
+                if(window.CurrentOpenID() == id) window.OpenForId(id);
+
                 if (!ipc) IpcUtils.instance.NotifyChange(id, string.Empty);
             };
         }
