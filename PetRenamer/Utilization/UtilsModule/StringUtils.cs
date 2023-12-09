@@ -4,7 +4,9 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
+using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -75,6 +77,18 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
             if (checkForEmptySpace) regString = $"\\b" + regString + "\\b";
             baseString = Regex.Replace(baseString, regString, MakeString(PluginConstants.forbiddenCharacter, count), RegexOptions.IgnoreCase);
         }
+    }
+
+    public string GetInitials(string value)
+    {
+        string[] nameParts = value.Split(' ');
+        string endString = string.Empty;
+        foreach(string str in nameParts)
+        {
+            if (str.Length == 0) continue;
+            endString += str.First().ToString().ToUpperInvariant() + ". ";
+        }
+        return endString;
     }
 
     public string MakeString(char c, int count) => new string(c, count);

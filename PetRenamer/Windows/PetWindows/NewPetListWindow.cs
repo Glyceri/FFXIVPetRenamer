@@ -110,7 +110,7 @@ internal class NewPetListWindow : PetWindow
     void DrawHeader()
     {
         if (activeUser == null) return;
-        string activeUsername = StringUtils.instance.MakeTitleCase(activeUser.UserName);
+        string activeUsername = StringUtils.instance.MakeTitleCase(activeUser.UserDisplayName);
         string homeWorldName = SheetUtils.instance.GetWorldName(activeUser.Homeworld);
         bool ipcUser = activeUser.IsIPCOnlyUser;
         int accuratePetCount = activeUser.SerializableUser.AccurateTotalPetCount();
@@ -697,7 +697,7 @@ internal class NewPetListWindow : PetWindow
             if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", scale, myUser.IsIPCOnlyUser)) return false;
             IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
             State state = window.DrawUserTextureEncased(myUser);
-            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserName + "@" + myUser.HomeWorldName);
+            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserDisplayName + "@" + myUser.HomeWorldName);
             if (state == State.Clicked)
             {
                 outcome = true;
@@ -708,13 +708,13 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserDisplayName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;
                     window.searchBarElement.Clear();
                     window.ToggleUserList();
-                }, "X", $"Remove User: {myUser.UserName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
+                }, "X", $"Remove User: {myUser.UserDisplayName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
                 if (!sureMode)
                 {
                     window.DrawBasicBar($"Homeworld", myUser.HomeWorldName);
@@ -723,7 +723,7 @@ internal class NewPetListWindow : PetWindow
                 else
                 {
                     if (myUser.LocalUser) sureMode = false;
-                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
+                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserDisplayName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
                 }
 
                 ImGui.EndListBox();

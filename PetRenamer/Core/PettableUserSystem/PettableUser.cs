@@ -2,7 +2,6 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,7 @@ namespace PetRenamer.Core.PettableUserSystem;
 public unsafe class PettableUser
 {
     readonly string _username;
+    readonly string _initialsUserName;
     readonly ushort _homeworld;
     readonly string _homeworldName;
 
@@ -32,6 +32,7 @@ public unsafe class PettableUser
 
     public SerializableUserV3 SerializableUser => _serializableUser;
     public string UserName => _username;
+    public string UserDisplayName => PluginLink.Configuration.anonymousMode ? _initialsUserName : _username;
     public ushort Homeworld => _homeworld;
     public string HomeWorldName => _homeworldName;
 
@@ -65,6 +66,7 @@ public unsafe class PettableUser
     public PettableUser(string username, ushort homeworld, SerializableUserV3 serializableUser)
     {
         _username = username;
+        _initialsUserName = StringUtils.instance.GetInitials(_username);
         _homeworld = homeworld;
         _homeworldName = SheetUtils.instance.GetWorldName(homeworld);
         _serializableUser = serializableUser;
