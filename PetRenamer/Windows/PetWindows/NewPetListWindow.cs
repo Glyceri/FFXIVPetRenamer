@@ -47,6 +47,8 @@ internal class NewPetListWindow : PetWindow
             MinimumSize = minSize,
             MaximumSize = new Vector2(9999, 9999)
         };
+
+        IsOpen = true;
     }
 
     public override void OnDraw()
@@ -530,7 +532,16 @@ internal class NewPetListWindow : PetWindow
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {
             bool outcome = false;
+            bool forceRecheck = false;
             if (!window.BeginListBoxSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, BarSizePadded))) return false;
+            if(window.XButton((PluginLink.Configuration.limitLocalSearch ? "✓" : " ") + $"##toggleButton{internalCounter++}", window.Styling.SmallButton, "Limit search to nicknamed pets only"))
+            {
+                PluginLink.Configuration.limitLocalSearch ^= true;
+                PluginLink.Configuration.Save();
+                lastText = string.Empty;
+                forceRecheck = true;
+            }
+            window.SameLinePretendSpace();
             window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Search through all Minions in the game and add them for nicknaming.\n(Search possible on Name and ID)");
             window.SameLinePretendSpace();
             window.XButton("X", window.Styling.SmallButton, "Clear search field", () => searchText = string.Empty);
@@ -540,7 +551,7 @@ internal class NewPetListWindow : PetWindow
                 window.ClearList();
                 if (searchText != string.Empty)
                 {
-                    List<SerializableNickname> nicknames = SheetUtils.instance.GetThoseThatContain(searchText);
+                    List<SerializableNickname> nicknames = SheetUtils.instance.GetThoseThatContain(searchText, forceRecheck);
                     window.activeUser = new PettableUser($"[{searchText}]", 9999, new SerializableUserV3(new int[0], new string[0], searchText, 9999, PluginConstants.baseSkeletons, PluginConstants.baseSkeletons));
                     window.drawableElements.Add(this);
                     foreach (SerializableNickname nickname in nicknames)

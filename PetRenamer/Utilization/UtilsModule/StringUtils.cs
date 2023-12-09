@@ -108,7 +108,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
 
     public unsafe void ReplaceAtkString(AtkTextNode* textNode, string baseName, string replaceName, AtkNineGridNode* nineGridNode = null)
     {
-        (string, string)[] strs = new (string, string)[] { (baseName, replaceName) };
+        (string, string)[] strs = [(baseName, replaceName)];
         ReplaceAtkString(textNode, ref strs, nineGridNode);
     }
 }

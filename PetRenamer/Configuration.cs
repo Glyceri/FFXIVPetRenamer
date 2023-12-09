@@ -17,6 +17,8 @@ public class Configuration : IPluginConfiguration
     public int Version { get; set; } = currentSaveFileVersion;
 
     public bool understoodWarningThirdPartySettings = false;
+    // ------------------------ Unrelated Settings -----------------------
+    public bool limitLocalSearch = false;
     // ------------------------- Global Settings -------------------------
     public bool displayCustomNames = true;
     public bool downloadProfilePictures = false;

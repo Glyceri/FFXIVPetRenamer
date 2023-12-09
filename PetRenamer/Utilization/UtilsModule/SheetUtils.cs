@@ -4,6 +4,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 using System.Linq;
@@ -156,33 +157,32 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return -1;
     }
 
-    public List<SerializableNickname> GetThoseThatContain(string querry)
+    public List<SerializableNickname> GetThoseThatContain(string querry, bool forceRecheck)
     {
         querry = querry.ToLower().Trim();
 
-        if (lastQuerry == querry) return lastList;
+        if (lastQuerry == querry && !forceRecheck) return lastList;
         lastQuerry = querry;
 
         List<SerializableNickname> serializableNicknames = new List<SerializableNickname>();
         if (querry.Length == 0) return lastList = serializableNicknames;
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
-
+        if (user == null) return serializableNicknames;
         foreach (Companion pet in petSheet)
         {
             if (pet == null) continue;
             uint petModel = pet.Model.Value!.RowId;
             string petName = pet.Singular.ToString();
-            string customPetName = string.Empty;
 
             if (petName.Length == 0) continue;
             if (petModel <= 0) continue;
 
-            if (user != null)
-                customPetName = user.SerializableUser.GetNameFor(petName) ?? string.Empty;
+            string customPetName = user.SerializableUser.GetNameFor(petName) ?? string.Empty;
 
-            if (petModel.ToString().Contains(querry) || petName.Contains(querry) || (customPetName.Contains(querry) && customPetName.Length != 0))
-                serializableNicknames.Add(new SerializableNickname((int)petModel, customPetName));
+            if (petModel.ToString().Contains(querry, System.StringComparison.CurrentCultureIgnoreCase) || petName.Contains(querry, System.StringComparison.CurrentCultureIgnoreCase) || (customPetName.Contains(querry, System.StringComparison.CurrentCultureIgnoreCase) && customPetName.Length != 0))
+                if ((PluginLink.Configuration.limitLocalSearch && user.SerializableUser.Contains((int)petModel)) || !PluginLink.Configuration.limitLocalSearch)
+                    serializableNicknames.Add(new SerializableNickname((int)petModel, customPetName));
         }
 
         return lastList = serializableNicknames;
