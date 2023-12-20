@@ -183,6 +183,8 @@ public class PetRenameWindow : PetWindow
         IpcUtils.instance.NotifyChange(activePet.petID, activePet.petName);
     }
 
+    public int CurrentOpenID() => activePet.petID;
+
     public void OpenForId(int id, bool forceOpen = false)
     {
         if ((user = PluginLink.PettableUserHandler.LocalUser()!) == null) return;

@@ -110,7 +110,7 @@ internal class NewPetListWindow : PetWindow
     void DrawHeader()
     {
         if (activeUser == null) return;
-        string activeUsername = StringUtils.instance.MakeTitleCase(activeUser.UserName);
+        string activeUsername = StringUtils.instance.MakeTitleCase(activeUser.UserDisplayName);
         string homeWorldName = SheetUtils.instance.GetWorldName(activeUser.Homeworld);
         bool ipcUser = activeUser.IsIPCOnlyUser;
         int accuratePetCount = activeUser.SerializableUser.AccurateTotalPetCount();
@@ -202,6 +202,9 @@ internal class NewPetListWindow : PetWindow
             callback2 = (id, ipc) =>
             {
                 activeUser.SerializableUser.SaveNickname(id, string.Empty, true, false, ipc);
+                PetRenameWindow window = PluginLink.WindowHandler.GetWindow<PetRenameWindow>();
+                if(window.CurrentOpenID() == id) window.OpenForId(id);
+
                 if (!ipc) IpcUtils.instance.NotifyChange(id, string.Empty);
             };
         }
@@ -527,7 +530,16 @@ internal class NewPetListWindow : PetWindow
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {
             bool outcome = false;
+            bool forceRecheck = false;
             if (!window.BeginListBoxSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, BarSizePadded))) return false;
+            if(window.XButton((PluginLink.Configuration.limitLocalSearch ? "✓" : " ") + $"##toggleButton{internalCounter++}", window.Styling.SmallButton, "Limit search to nicknamed pets only"))
+            {
+                PluginLink.Configuration.limitLocalSearch ^= true;
+                PluginLink.Configuration.Save();
+                lastText = string.Empty;
+                forceRecheck = true;
+            }
+            window.SameLinePretendSpace();
             window.InputTextMultiLine(string.Empty, ref searchText, PluginConstants.ffxivNameSize, new Vector2(ContentAvailableX - window.Styling.SmallButton.X - FramePaddingX - SpaceSize, BarSize), ImGuiInputTextFlags.CtrlEnterForNewLine, $"Search through all Minions in the game and add them for nicknaming.\n(Search possible on Name and ID)");
             window.SameLinePretendSpace();
             window.XButton("X", window.Styling.SmallButton, "Clear search field", () => searchText = string.Empty);
@@ -537,7 +549,7 @@ internal class NewPetListWindow : PetWindow
                 window.ClearList();
                 if (searchText != string.Empty)
                 {
-                    List<SerializableNickname> nicknames = SheetUtils.instance.GetThoseThatContain(searchText);
+                    List<SerializableNickname> nicknames = SheetUtils.instance.GetThoseThatContain(searchText, forceRecheck);
                     window.activeUser = new PettableUser($"[{searchText}]", 9999, new SerializableUserV3(new int[0], new string[0], searchText, 9999, PluginConstants.baseSkeletons, PluginConstants.baseSkeletons));
                     window.drawableElements.Add(this);
                     foreach (SerializableNickname nickname in nicknames)
@@ -697,7 +709,7 @@ internal class NewPetListWindow : PetWindow
             if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", scale, myUser.IsIPCOnlyUser)) return false;
             IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
             State state = window.DrawUserTextureEncased(myUser);
-            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserName + "@" + myUser.HomeWorldName);
+            if (state == State.Hovered) window.SetTooltip("Show Petlist for: " + myUser.UserDisplayName + "@" + myUser.HomeWorldName);
             if (state == State.Clicked)
             {
                 outcome = true;
@@ -708,13 +720,13 @@ internal class NewPetListWindow : PetWindow
             window.SameLinePretendSpace();
             if (window.BeginListBoxAutomatic($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, InnerHeaderHeight), myUser.IsIPCOnlyUser))
             {
-                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserName, () =>
+                window.DrawAdvancedBarWithQuit($"Show Petlist for", myUser.UserDisplayName, () =>
                 {
                     outcome = true;
                     window.activeUser = myUser;
                     window.searchBarElement.Clear();
                     window.ToggleUserList();
-                }, "X", $"Remove User: {myUser.UserName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
+                }, "X", $"Remove User: {myUser.UserDisplayName} @ {myUser.HomeWorldName}", () => sureMode = !sureMode);
                 if (!sureMode)
                 {
                     window.DrawBasicBar($"Homeworld", myUser.HomeWorldName);
@@ -723,7 +735,7 @@ internal class NewPetListWindow : PetWindow
                 else
                 {
                     if (myUser.LocalUser) sureMode = false;
-                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
+                    window.DrawYesNoBar($"Are you sure you want to delete {myUser.UserDisplayName} @ {myUser.HomeWorldName}##{++internalcounter}", myUser.Destroy, () => sureMode = false);
                 }
 
                 ImGui.EndListBox();

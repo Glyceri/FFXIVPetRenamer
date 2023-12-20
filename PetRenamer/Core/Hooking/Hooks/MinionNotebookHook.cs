@@ -12,7 +12,7 @@ public unsafe class MinionNotebookHook : QuickTextHookableElement
         RegisterHook("MinionNoteBook", 67);
         RegisterHook("LovmPaletteEdit", 48);
         RegisterHook("LovmActionDetail", 4);
-        foreach(uint index in indexes)
+        foreach (uint index in indexes)
             RegisterHook("MinionNoteBook", new uint[3] { 25, index, 6 });
     }
 }

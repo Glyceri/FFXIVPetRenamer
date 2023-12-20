@@ -13,10 +13,88 @@ internal class PetHelpWindow : PetWindow
         Naming,
         Modes,
         Sharing,
-        ThemeEditor
+        ThemeEditor,
+        PetList
     }
 
     HelpMode curMode { get; set; } = HelpMode.Naming;
+
+    readonly string[] petListHelpBox1 = new string[]
+    {
+        "And overview of all the petlist features.",
+        "The petlist shows all your nicknamed minions which you can filter/search through.",
+        "The petlist shows all your nicknamed battle pets.",
+        "The petlist shows a list of all users you added.",
+        "The petlist allows you to easily share your list of pet names.",
+    };
+
+    readonly string[] openPetlist = new string[]
+    {
+        "Open the petlist by typing one of the following commands:",
+        "/petlist",
+        "/petnames",
+        "/minionnames",
+        "Or by clicking the Square icon located at the top right of most Pet Nickname windows."
+    };
+
+    readonly string[] petListDidYouKnow1 = new string[]
+    {
+        " ? Did you know ? ",
+        "Every person you ever added is visible in the pet list. You can see all their nicknames just like you can yours."
+    };
+
+    readonly string[] petListDidYouKnow2 = new string[]
+    {
+        " ? Did you know ? ",
+        "You can reorder the petlist to your liking.",
+        "Simply start dragging a pet or player in the list.",
+        "This will automatically get saved."
+    };
+
+    readonly string[] petListHelpBox2 = new string[]
+    {
+        "Minion Mode Petlist.",
+        "In minion mode you see a list of all your nicknamed pets.",
+        "By clicking on a pets profile picture or name you can easily and quickly change it's name.",
+        "By clicking the little X button you will permanently remove their nickname.",
+        "Don't worry. You will get a little confirmation box. And if you accidentally removed a nickname,",
+        "you can just as easily give the pet a nickname again.",
+        "",
+        "Exclusive to the minion mode petlist is the search bar.",
+        "The search bar allows you to search through every single minion in the game.",
+        "The search bar is located at the top of the list.",
+        "Click it and start typing the name (or ID, in case you know those) of a minion.",
+        "The list should now reflect every minion that contains a part of your search querry.",
+        "By clicking on their empty name bar or the little + button you can give them a nickname.",
+        "Very helpful if you don't want to search through the minion guide or have the minion ready."
+    };
+
+    readonly string[] petListHelpBox3 = new string[]
+    {
+        "Battle Pet Mode Petlist.",
+        "This works the same as the [Minion Mode Petlist], so I recommend you read that section first.",
+        "The only notable differences are that the X button will now not permanently remove a nickname, but clear it.",
+        "And the Battle Pet list has no support for a search function. Sorry for that."
+    };
+
+    readonly string[] petListHelpBox4 = new string[]
+    {
+        "Player List",
+        "You can navigate to the player list by clicking your user name or profile picture at the top of each list.",
+        "(This function does not work in Sharing Mode)",
+        "Upon entering Player List mode you will see a list of every player you added.",
+        "By clicking on their name or profile picture you will see a list of their minions or battle pets respectively.",
+        "Do you want to return to your own pet list. Simply click their profile picture or name at the top like before and click it again.",
+        "Double clicking that button will always return you to your own list. You can also search for yourself in the list again.",
+        "Useful to know is that the user you are currently logged in with will always display themselves another time at the top of the list.",
+        "",
+        "There are a couple restrictions when viewing someone else their list.",
+        "You can NOT manually remove, alter, or set nicknames. You can also NOT reorder their list.",
+        "This is by design. No tinkering with their list. You get what they give.",
+        "",
+        "Cliking on the X button next to someones name will permanently delete the user.",
+        "It will ask you for confirmation, but beware. If you lost the code they shared with you, deleting a user is non-recoverable."
+    };
 
     readonly string[] themingHelpBox1 = new string[]
     {
@@ -160,6 +238,7 @@ internal class PetHelpWindow : PetWindow
         if (curMode == HelpMode.Modes) DrawModesHelp();
         if (curMode == HelpMode.Sharing) DrawSharingHelp();
         if (curMode == HelpMode.ThemeEditor) DrawThemingHelp();
+        if (curMode == HelpMode.PetList) DrawPetListHelp();
         ImGui.EndListBox();
     }
 
@@ -169,9 +248,25 @@ internal class PetHelpWindow : PetWindow
         SameLine();
         if (Button("Modes", "Help with switching modes and it's implications.")) curMode = HelpMode.Modes;
         SameLine();
+        if (Button("Pet List", "Help with the Pet List and all it's features.")) curMode = HelpMode.PetList;
+        SameLine();
         if (Button("Sharing", "Help with sharing nicknames.")) curMode = HelpMode.Sharing;
         SameLine();
         if (Button("Theme Editor", "Help with Editing Themes.")) curMode = HelpMode.ThemeEditor;
+    }
+
+    void DrawPetListHelp()
+    {
+        DrawSimpleBar("!", "Help with the Pet List and all it's features.");
+        NewLine();
+
+        DrawBox(openPetlist);
+        DrawBox(petListHelpBox1);
+        DrawBox(petListDidYouKnow1);
+        DrawBox(petListHelpBox2);
+        DrawBox(petListDidYouKnow2);
+        DrawBox(petListHelpBox3);
+        DrawBox(petListHelpBox4);
     }
 
     void DrawThemingHelp()
