@@ -118,6 +118,8 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected void DrawModeToggle()
     {
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
+        ImDrawListPtr bgDrawlist = ImGui.GetBackgroundDrawList();
+        bgDrawlist.AddCircleFilled(new Vector2(100, 100), 100, 1);
         int pressed = -1;
         if (PluginLink.PettableUserHandler.LocalUser() != null)
         {
