@@ -39,6 +39,7 @@ public class Configuration : IPluginConfiguration
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
     // --------------------------- UI SETTINGS ---------------------------
+    public bool allowSnow = true;
     public bool anonymousMode = false;
     public bool spaceOutSettings = false;
     public bool startSettingsOpen = false;

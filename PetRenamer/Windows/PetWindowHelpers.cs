@@ -117,9 +117,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawModeToggle()
     {
+        Vector2 startingPos = ImGui.GetCursorScreenPos();
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
-        ImDrawListPtr bgDrawlist = ImGui.GetBackgroundDrawList();
-        bgDrawlist.AddCircleFilled(new Vector2(100, 100), 100, GetColour(1, 1, 1, 1));
+        ImDrawListPtr bgDrawlist = ImGui.GetWindowDrawList();
+        Vector2 endPos = startingPos + new Vector2(ContentAvailableX + WindowPaddingX, BarSizePadded);
+        PluginLink.SnowHandler.DrawSnowMapped(bgDrawlist, startingPos, endPos);
         int pressed = -1;
         if (PluginLink.PettableUserHandler.LocalUser() != null)
         {
@@ -135,19 +137,6 @@ public abstract class PetWindowHelpers : PetWindowStyling
         }
         ImGui.EndListBox();
         if (pressed != -1) (this as PetWindow)!.SetPetMode((PetMode)pressed);
-    }
-
-    uint GetColour(float r, float g, float b, float a) => GetColour(new Vector4(r, g, b, a));
-    uint GetColour(Vector4 color)
-    {
-        uint ret = (byte)(0.24f * 255);
-        ret <<= 8;
-        ret += (byte)(color.Z * 255);
-        ret <<= 8;
-        ret += (byte)(color.Y * 255);
-        ret <<= 8;
-        ret += (byte)(color.X * 255);
-        return ret;
     }
 
     int DotBar()
