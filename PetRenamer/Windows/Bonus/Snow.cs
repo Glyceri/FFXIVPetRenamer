@@ -7,9 +7,11 @@ public class Snow
     Vector2 _position;
     float _size;
     float _visibility;
+    float _speed;
     public Vector2 Position => _position;
     public float Size => _size;
     public float Visibility => _visibility;
+    public float Speed => _speed;   
 
     float _flickerMin;
     float _flickerMax;
@@ -18,10 +20,11 @@ public class Snow
 
     const float SNOW_POWER = 0.4f;
 
-    public Snow(Vector2 position, float size, Vector3 flickerData)
+    public Snow(Vector2 position, float size, float speed, Vector3 flickerData)
     {
         SetPosition(position);
         _size = size;
+        _speed = speed;
         _visibility = flickerData.Z;
         _flickerMin = flickerData.X;
         _flickerMax = flickerData.Y;

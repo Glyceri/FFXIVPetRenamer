@@ -16,16 +16,19 @@ public class SnowHandler : IDisposable, IInitializable
     const float SIZE_RANGE = 1.2f;
     const float MIN_SNOW_FLICKER = 0.1f;
     const float MAX_SNOW_FLICKER = 0.6f;
+    const float MIN_SPEED = 0.5f;
+    const float MAX_SPEED = 1.5f;
 
     Random rand = new Random();
     List<Snow> snowList = new List<Snow>();
 
     public void Initialize()
     {
-        for(int i = 0; i < SNOW_COUNT; i++)
+        for (int i = 0; i < SNOW_COUNT; i++)
             snowList.Add(new Snow(
-                GetRandomPos(MAP_SIZE_X, MAP_SIZE_Y), 
+                GetRandomPos(MAP_SIZE_X, MAP_SIZE_Y),
                 (float)(rand.NextDouble() * SIZE_RANGE) + 1.0f,
+                (float)(rand.NextDouble() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED),
                 new Vector3(MIN_SNOW_FLICKER, MAX_SNOW_FLICKER, (float)(rand.NextDouble() * MAX_SNOW_FLICKER))));
 
         PluginHandlers.Framework.Update += Update;
@@ -51,7 +54,7 @@ public class SnowHandler : IDisposable, IInitializable
         {
             Snow snow = snowList[i];
             float delta = (float)framework.UpdateDelta.TotalSeconds;
-            Vector2 newPos = snow.Position + new Vector2(0, delta);
+            Vector2 newPos = snow.Position + new Vector2(0, delta * snow.Speed);
             if (newPos.Y > MAP_SIZE_Y) newPos.Y -= MAP_SIZE_Y;
             snow.SetPosition(newPos);
             snow.Flicker(delta);
