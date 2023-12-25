@@ -117,7 +117,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawModeToggle()
     {
+        Vector2 startingPos = ImGui.GetCursorScreenPos();
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
+        ImDrawListPtr bgDrawlist = ImGui.GetWindowDrawList();
+        Vector2 endPos = startingPos + new Vector2(ContentAvailableX + WindowPaddingX, BarSizePadded);
+        PluginLink.SnowHandler.DrawSnowMapped(bgDrawlist, startingPos, endPos);
         int pressed = -1;
         if (PluginLink.PettableUserHandler.LocalUser() != null)
         {

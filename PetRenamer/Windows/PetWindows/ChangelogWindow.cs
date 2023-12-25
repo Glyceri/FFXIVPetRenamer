@@ -80,6 +80,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.4.4"), new CLE("UI", "Added the ability to reorder the Petlist.")) },
         { new CLS(new Version("1.4.4.5"), new CLE("General", "This plugin now works for users with a new save file!")) },
         { new CLS(new Version("1.4.5.0"), new CLE("General", "Fixed lots of search bar issues.", "Added support for the Yokai Watch Guide."), new CLE("UI", "Profile pictures work again.\nThis function got a complete rewrite and should now no longer DDOS a server when misusing /petdev.\nIf you experience any issues with this feature, or notice EXTREMELY LONG startup times, please notify me.", "Anonymouse Mode added.", "Fixed some issues with dragging in the Petlist window.", "Profile pictures and Pet Images are now clickable.", "Fixed an issue where the rename window didn't update properly under certain circumstances. (I need to write a 2.0)")) },
+        { new CLS(new Version("1.4.5.1"), new CLE("UI", "Temporarily adds falling snow to the toolbar.")) },
     };
 
     const string starter = "  ◉   ";

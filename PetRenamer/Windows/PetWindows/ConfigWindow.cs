@@ -44,6 +44,8 @@ public class ConfigWindow : PetWindow
 
         if (BeginElementBox("UI Settings"))
         {
+
+            DrawConfigElement(ref PluginLink.Configuration.allowSnow, "Allow Snow on Toolbar", new string[] { "Shows snow on the toolbar." }, "Allow Snow on Toolbar.");
             DrawConfigElement(ref PluginLink.Configuration.anonymousMode, "Anonymous mode", new string[] { "Hides player names and replaces them with initials.", "Disables profile pictures." }, "Anonymous mode.");
             DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
             DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images"); 

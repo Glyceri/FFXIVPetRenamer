@@ -1,12 +1,9 @@
-using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Hooking.Hooks;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
 using System;
