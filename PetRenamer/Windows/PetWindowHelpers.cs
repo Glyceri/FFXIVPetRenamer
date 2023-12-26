@@ -624,12 +624,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (drawExtraButton) DrawRedownloadButton(u);
     });
 
-    protected State DrawTexture(PettableUser u, Action drawExtraButton)
-    {
-        State state = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-        if (DrawRedownloadButton(drawExtraButton) != State.None) state = State.None;
-        return state;
-    }
+    protected State DrawTexture(PettableUser u, Action drawExtraButton) => DrawTexture(ProfilePictureNetworked.instance.GetTexture(u), drawExtraButton);
 
     protected State DrawTexture(nint thenint)
     {
