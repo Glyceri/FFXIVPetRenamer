@@ -473,13 +473,15 @@ public abstract class PetWindowHelpers : PetWindowStyling
         return returnable;
     }
 
-    protected void DrawRedownloadButton(Action drawMe)
+    protected State DrawRedownloadButton(Action drawMe)
     {
-        if (drawMe == null) return;
+        if (drawMe == null) return State.None;
         ImGui.SetItemAllowOverlap();
         SameLine();
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(37, -58));
         drawMe.Invoke();
+        if (ImGui.IsItemHovered()) return State.Hovered;
+        return State.None;
     }
 
     protected void DrawRedownloadButton(PettableUser u)
@@ -596,7 +598,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected State DrawTexture(nint theint, Action drawExtraButton)
     {
         State state = DrawTexture(theint);
-        DrawRedownloadButton(drawExtraButton);
+        if (DrawRedownloadButton(drawExtraButton) != State.None) state = State.None;
         return state;
     }
 
@@ -625,7 +627,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected State DrawTexture(PettableUser u, Action drawExtraButton)
     {
         State state = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-        DrawRedownloadButton(drawExtraButton);
+        if (DrawRedownloadButton(drawExtraButton) != State.None) state = State.None;
         return state;
     }
 
