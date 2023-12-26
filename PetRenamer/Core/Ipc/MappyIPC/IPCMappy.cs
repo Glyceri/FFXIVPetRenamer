@@ -104,6 +104,8 @@ public static class IPCMappy
 
     static void HandleMappyWindow(ref PlayerCharacter player)
     {
+        if (player!.StatusFlags == StatusFlags.IsCasting) return;
+        if (player!.StatusFlags == StatusFlags.WeaponOut) return;
         if (player!.StatusFlags == StatusFlags.InCombat) return;
         if (oneTime) return;
         oneTime = true;

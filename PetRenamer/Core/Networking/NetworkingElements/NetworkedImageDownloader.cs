@@ -14,7 +14,11 @@ public class NetworkedImageDownloader : NetworkingElement, ISingletonBase<Networ
 {
     public static NetworkedImageDownloader instance { get; set; } = null!;
 
-    public async void AsyncDownload(string URL, (string, uint) character, Action callbackSucces = null!, Action<Exception> callbackError = null!) => AsyncDownload(URL, MakeTexturePath(RemapCharacterData(ref character)), callbackSucces, callbackError);
+    public async void AsyncDownload(string URL, (string, uint) character, Action callbackSucces = null!, Action<Exception> callbackError = null!)
+    {
+        if (callbackSucces == null) callbackSucces = () => ProfilePictureNetworked.instance.DeclareDownload(character);
+        AsyncDownload(URL, MakeTexturePath(RemapCharacterData(ref character)), callbackSucces, callbackError);
+    }
     public async void AsyncDownload(string URL, string savePath, Action callbackSucces = null!, Action<Exception> callbackError = null!)
     {
         try
