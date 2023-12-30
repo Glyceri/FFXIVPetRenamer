@@ -18,7 +18,7 @@ internal static class QuitHandler
         PluginLink.IpcStorage?.Dispose();
         PluginLink.PettableUserHandler?.Dispose();
         PluginLink.NetworkingHandler?.Dispose();
-        PluginLink.SnowHandler?.Dispose();  
+        PluginLink.ToolbarAnimator?.Dispose();  
 
         IpcProvider.NotifyDisposing();
         IpcProvider.DeInit();

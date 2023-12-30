@@ -39,13 +39,13 @@ public class Configuration : IPluginConfiguration
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
     // --------------------------- UI SETTINGS ---------------------------
-    public bool allowSnow = true;
     public bool anonymousMode = false;
     public bool spaceOutSettings = false;
     public bool startSettingsOpen = false;
     public bool quickButtonsToggle = false;
     public bool newUseCustomTheme = false;
     public bool showKofiButton = true;
+    public string activeElement = "Event";
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;

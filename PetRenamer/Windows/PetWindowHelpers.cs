@@ -121,7 +121,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
         ImDrawListPtr bgDrawlist = ImGui.GetWindowDrawList();
         Vector2 endPos = startingPos + new Vector2(ContentAvailableX + WindowPaddingX, BarSizePadded);
-        PluginLink.SnowHandler.DrawSnowMapped(bgDrawlist, startingPos, endPos);
+        PluginLink.ToolbarAnimator.DoDraw(bgDrawlist, startingPos, endPos);
         int pressed = -1;
         if (PluginLink.PettableUserHandler.LocalUser() != null)
         {
