@@ -26,7 +26,7 @@ internal class ToolbarAnimator : RegistryBase<ToolbarAnimation, ToolbarAnimation
         for (int i = 0; i < identifiers.Count; i++)
             _registeredIdentifiers[i] = identifiers[i].Item2;
     }
-    protected override void OnDipose() => PluginHandlers.Framework.Update += OnUpdate;
+    protected override void OnDipose() => PluginHandlers.Framework.Update -= OnUpdate;
 
     public void DoDraw(ImDrawListPtr drawListPtr, Vector2 startingPoint, Vector2 endPoint) => activeAnimation?.Draw(drawListPtr, startingPoint, endPoint);
     public void OnUpdate(IFramework framework) => activeAnimation?.Update(framework.UpdateDelta.TotalSeconds);
@@ -37,6 +37,8 @@ internal class ToolbarAnimator : RegistryBase<ToolbarAnimation, ToolbarAnimation
         activeAnimation?.Clear();
         activeAnimation = animation;
         activeAnimation?.Initialize();
+        PluginHandlers.Framework.Update -= OnUpdate;
+        if (activeAnimation != null) PluginHandlers.Framework.Update += OnUpdate;
     }
 
     ToolbarAnimation FindElement(string elementName)
