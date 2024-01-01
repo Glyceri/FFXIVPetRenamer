@@ -83,6 +83,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.5.1"), new CLE("UI", "Temporarily adds falling snow to the toolbar.")) },
         { new CLS(new Version("1.4.5.2"), new CLE("General", "It will no longer ask to delete a pet when clicking the + button when searching and adding a pet."), new CLE("UI", "The Enable Mappy window will now show images again!")) },
         { new CLS(new Version("1.4.5.3"), new CLE("UI", "Temporarily adds fireworks on the toolbar (You can now also select any of the older toolbar animations).")) },
+        { new CLS(new Version("1.4.5.4"), new CLE("UI", "The setting automatically Switch Petmode should now work again.")) },
     };
 
     const string starter = "  ◉   ";

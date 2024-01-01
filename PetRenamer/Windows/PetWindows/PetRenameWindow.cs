@@ -204,13 +204,21 @@ public class PetRenameWindow : PetWindow
     public void OpenForMinion(int id, bool forceOpen = false)
     {
         if (id == -1) pets[0]?.Clear();
-        else OpenForId(id, forceOpen);
+        else 
+        {
+            if (PluginLink.Configuration.automaticallySwitchPetmode) SetPetMode(PetMode.Normal);
+            OpenForId(id, forceOpen); 
+        }
     }
 
     public void OpenForBattlePet(int id, bool forceOpen = false)
     {
         if (id == -1) pets[1]?.Clear();
-        else OpenForId(id, forceOpen);
+        else 
+        {
+            if (PluginLink.Configuration.automaticallySwitchPetmode) SetPetMode(PetMode.BattlePet);
+            OpenForId(id, forceOpen); 
+        }
     }
 
     void SetImage(int id)
