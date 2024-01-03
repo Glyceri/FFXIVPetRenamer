@@ -28,6 +28,7 @@ public class Configuration : IPluginConfiguration
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;
     public bool useCustomPetNamesInBattleChat = true;
+    public bool useCustomPetNamesInInfoChat = true;
     public bool useContextMenuOnBattlePets = true;
     public bool allowTooltipsBattlePets = true;
     public bool replaceEmotesBattlePets = true;

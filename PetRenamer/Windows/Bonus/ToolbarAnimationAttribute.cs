@@ -1,17 +1,16 @@
-﻿using System;
+﻿using PetRenamer.Core.Attributes;
+using System;
 
 namespace PetRenamer.Windows.Bonus;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-internal class ToolbarAnimationAttribute : Attribute
+internal class ToolbarAnimationAttribute : SortableAttribute
 {
     string s_identifier;
-    int i_order;
     public string Identifier => s_identifier;
-    public int Order => i_order;
-    public ToolbarAnimationAttribute(string identifier, int order = 0)
+
+    public ToolbarAnimationAttribute(string identifier, int order = 0) : base(order)
     {
-        i_order = order;
         s_identifier = identifier;
     }
 }

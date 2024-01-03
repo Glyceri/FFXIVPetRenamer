@@ -1,4 +1,5 @@
-﻿using PetRenamer.Core.AutoRegistry.Interfaces;
+﻿using PetRenamer.Core.Attributes;
+using PetRenamer.Core.AutoRegistry.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,36 @@ internal class RegistryBase<T, TT> : IdentifyableRegistryBase where T : IRegistr
         foreach (T element in elements)
             OnLateElementCreation(element);
 
+        Sort();
         OnAllRegistered();
+    }
+
+    void Sort()
+    {
+        if (!typeof(SortableAttribute).IsAssignableFrom(typeof(TT))) return;
+
+        List<(int, int)> orderAndValueList = new List<(int, int)> ();
+
+        for(int i = 0; i < attributes.Count; i++)
+        {
+            if (attributes[i] is not SortableAttribute sAttribute) continue;
+            orderAndValueList.Add((sAttribute.Order, i));
+        }
+
+        orderAndValueList.Sort((val1, val2) => val1.Item1.CompareTo(val2.Item1));
+
+        List<T> newListT = new List<T>();
+        List<TT> newListTT = new List<TT>();
+
+        for (int i = 0; i < orderAndValueList.Count; i++)
+        {
+            (int, int) vals = orderAndValueList[i];
+            newListT.Add(elements[vals.Item2]);
+            newListTT.Add(attributes[vals.Item2]);
+        }
+
+        elements = newListT;
+        attributes = newListTT;
     }
 
     public void Dispose()

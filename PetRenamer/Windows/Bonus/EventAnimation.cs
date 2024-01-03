@@ -1,6 +1,4 @@
-﻿using PetRenamer.Windows.Bonus.FireworkAnim;
-
-namespace PetRenamer.Windows.Bonus;
+﻿namespace PetRenamer.Windows.Bonus;
 
 [ToolbarAnimation("Event", -1)]
-internal class EventAnimation : FireworkAnimation { }
+internal class EventAnimation : DudAnimation { }

@@ -17,12 +17,8 @@ internal class ToolbarAnimator : RegistryBase<ToolbarAnimation, ToolbarAnimation
     {
         RegisterActiveAnimation(PluginLink.Configuration.activeElement);
         _registeredIdentifiers = new string[attributes.Count];
-        List<(int, string)> identifiers = new List<(int, string)>();
-        for (int i = 0; i < attributes.Count; i++)
-            identifiers.Add((attributes[i].Order, attributes[i].Identifier));
-        identifiers.Sort((el1, el2) => el1.Item1.CompareTo(el2.Item1));
-        for (int i = 0; i < identifiers.Count; i++)
-            _registeredIdentifiers[i] = identifiers[i].Item2;
+        for (int i = 0; i < _registeredIdentifiers.Length; i++)
+            _registeredIdentifiers[i] = attributes[i].Identifier;
     }
     protected override void OnDipose() => PluginHandlers.Framework.Update -= OnUpdate;
 

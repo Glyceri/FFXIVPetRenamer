@@ -4,7 +4,6 @@ using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Numerics;
 using IsUnsafe = System.Runtime.CompilerServices.Unsafe;
 
@@ -47,7 +46,6 @@ public class ConfigWindow : PetWindow
         if (BeginElementBox("UI Settings"))
         {
             DrawConfigElement(ref PluginLink.Configuration.activeElement, PluginLink.ToolbarAnimator.registeredIdentifiers, "Toolbar Animation", new string[] { "Select which toolbar animation you would like to play." }, "Toolbar Animation.", PluginLink.ToolbarAnimator.RegisterActiveAnimation);
-            //DrawConfigElement(ref PluginLink.Configuration.allowSnow, "Allow Snow on Toolbar", new string[] { "Shows snow on the toolbar." }, "Allow Snow on Toolbar.");
             DrawConfigElement(ref PluginLink.Configuration.anonymousMode, "Anonymous mode", new string[] { "Hides player names and replaces them with initials.", "Disables profile pictures." }, "Anonymous mode.");
             DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
             DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images"); 
@@ -105,6 +103,7 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.allowTooltipsBattlePets, "Allow Tooltips for Battle Pets", "Display Battle Pet Nicknames in Tooltips.");
             DrawConfigElement(ref PluginLink.Configuration.replaceEmotesBattlePets, "Allow Custom Nicknames in Emotes for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInBattleChat, "Allow Custom Nicknames in the Battle Log for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
+            DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInInfoChat, "Allow Custom Nicknames in the Info Chat for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.allowCastBarPet, "Show Battle Pet Nickname on Cast Bars", "Shows your Custom Nicknames on Cast bars.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomFlyoutPet, "Show Battle Pet Nickname on Flyout Text", "Shows your Custom Nicknames on Flyout Text.");
             EndElementBox();
