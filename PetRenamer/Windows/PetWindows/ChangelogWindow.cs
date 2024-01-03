@@ -84,7 +84,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.5.2"), new CLE("General", "It will no longer ask to delete a pet when clicking the + button when searching and adding a pet."), new CLE("UI", "The Enable Mappy window will now show images again!")) },
         { new CLS(new Version("1.4.5.3"), new CLE("UI", "Temporarily adds fireworks on the toolbar (You can now also select any of the older toolbar animations).")) },
         { new CLS(new Version("1.4.5.4"), new CLE("UI", "The setting automatically Switch Petmode should now work again.")) },
-        { new CLS(new Version("1.4.6.0"), new CLE("General", "Giving a Battle Pet command or them leaving the battle will now properly show their nicknames in chat."), new CLE("UI", "Fireworks in the toolbar have been removed from the event.")) },
+        { new CLS(new Version("1.4.6.0"), new CLE("General", "Giving a Battle Pet command or them leaving the battle will now properly show their nicknames in chat.", "Tentatively fixed an issue to do with soft skeletons (/petmirage)."), new CLE("UI", "Fireworks in the toolbar have been removed from the event.")) },
     };
 
     const string starter = "  ◉   ";
