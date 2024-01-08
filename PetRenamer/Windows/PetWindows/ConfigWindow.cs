@@ -29,12 +29,13 @@ public class ConfigWindow : PetWindow
 
     bool anythingIllegals = false;
 
+    const string starterUnselected = "  ○   ";
     const string starter = "  ◉   ";
+    const string spacing = "      ";
     float currentHeight = 0;
     bool canDraw = true;
     readonly Dictionary<string, (bool, float)> toggles = new Dictionary<string, (bool, float)>();
     string currentTitle = string.Empty;
-    const string baseText = "I will NEVER use the ";
 
     public override void OnDraw()
     {
@@ -44,8 +45,7 @@ public class ConfigWindow : PetWindow
 
         if (BeginElementBox("UI Settings"))
         {
-
-            DrawConfigElement(ref PluginLink.Configuration.allowSnow, "Allow Snow on Toolbar", new string[] { "Shows snow on the toolbar." }, "Allow Snow on Toolbar.");
+            DrawConfigElement(ref PluginLink.Configuration.activeElement, PluginLink.ToolbarAnimator.registeredIdentifiers, "Toolbar Animation", new string[] { "Select which toolbar animation you would like to play." }, "Toolbar Animation.", PluginLink.ToolbarAnimator.RegisterActiveAnimation);
             DrawConfigElement(ref PluginLink.Configuration.anonymousMode, "Anonymous mode", new string[] { "Hides player names and replaces them with initials.", "Disables profile pictures." }, "Anonymous mode.");
             DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
             DrawConfigElement(ref PluginLink.Configuration.displayImages, "Display Images", "Display Images or Replace them with a Flat Colour?", "Display Images"); 
@@ -103,6 +103,7 @@ public class ConfigWindow : PetWindow
             DrawConfigElement(ref PluginLink.Configuration.allowTooltipsBattlePets, "Allow Tooltips for Battle Pets", "Display Battle Pet Nicknames in Tooltips.");
             DrawConfigElement(ref PluginLink.Configuration.replaceEmotesBattlePets, "Allow Custom Nicknames in Emotes for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInBattleChat, "Allow Custom Nicknames in the Battle Log for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
+            DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInInfoChat, "Allow Custom Nicknames in the Info Chat for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.allowCastBarPet, "Show Battle Pet Nickname on Cast Bars", "Shows your Custom Nicknames on Cast bars.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomFlyoutPet, "Show Battle Pet Nickname on Flyout Text", "Shows your Custom Nicknames on Flyout Text.");
             EndElementBox();
@@ -204,6 +205,30 @@ public class ConfigWindow : PetWindow
         if (PluginLink.Configuration.spaceOutSettings) NewLine();
     }
 
+    void DrawConfigElement(ref string chosenElement, string[] elements, string title, string Description, string Tooltip = "", Action<string> OnChange = null!) => DrawConfigElement(ref chosenElement, elements, title, new string[] { Description }, Tooltip, OnChange);
+    void DrawConfigElement(ref string chosenElement, string[] elements, string title, string[] Description, string Tooltip = "", Action<string> OnChange = null!)
+    {
+        if (!canDraw) return;
+        float complete = 0;
+        if (IsUnsafe.IsNullRef(ref chosenElement)) return;
+        bool alwaysFalseValue = false;
+        complete += DrawCheckbox(ref alwaysFalseValue, title, (val) => { });
+        if (Tooltip == string.Empty || Tooltip == null) Tooltip = title;
+        SetTooltipHovered(Tooltip);
+        complete += DrawDescriptionBox(Description);
+        foreach (string element in elements)
+        {
+            complete += DrawText(element, element == chosenElement ? spacing + starter : spacing + starterUnselected);
+            if (ImGui.IsItemClicked() && chosenElement != element)
+            {
+                chosenElement = element;
+                PluginLink.Configuration.Save();
+                OnChange?.Invoke(chosenElement);    
+            }
+        }
+        currentHeight += complete;  
+    }
+
     void DrawConfigElement(ref bool value, string Title, string Description = "", string Tooltip = "", Action<bool> OnChange = null!) => DrawConfigElement(ref value, Title, new string[] { Description }, Tooltip, OnChange);
     void DrawConfigElement(ref bool value, string Title, string[] Description, string Tooltip = "", Action<bool> OnChange = null!)
     {
@@ -223,19 +248,14 @@ public class ConfigWindow : PetWindow
         return ImGui.GetFrameHeight() + ItemSpacingY;
     }
 
-    float DrawDescriptionBox(string[] Description)
+    float DrawDescriptionBox(string[] Description, string starterString = starter)
     {
         float size = 0;
-        
+
         foreach (string str in Description)
         {
-            string newstr = starter + str;
-            if (Description == null || newstr == starter) continue;
-            ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
-            ImGui.TextWrapped(newstr);
-            ImGui.PopStyleColor();
-            size += ImGui.CalcTextSize(newstr, true, ImGui.GetItemRectSize().X).Y + ItemSpacingY;
-            SetTooltipHovered(str);
+            if (Description == null || str == string.Empty) continue;
+            size += DrawText(str, starterString);
         }
 
         if (size != 0 && PluginLink.Configuration.spaceOutSettings)
@@ -244,6 +264,17 @@ public class ConfigWindow : PetWindow
             ImGui.Text("");
         }
         
+        return size;
+    }
+
+    float DrawText(string str, string starterString)
+    {
+        string newstr = starterString + str;
+        ImGui.PushStyleColor(ImGuiCol.Text, StylingColours.defaultText);
+        ImGui.TextWrapped(newstr);
+        ImGui.PopStyleColor();
+        float size = ImGui.CalcTextSize(newstr, true, ImGui.GetItemRectSize().X).Y + ItemSpacingY;
+        SetTooltipHovered(str);
         return size;
     }
 }

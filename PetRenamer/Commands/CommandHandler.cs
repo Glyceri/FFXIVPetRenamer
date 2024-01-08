@@ -2,6 +2,7 @@
 using PetRenamer.Commands.Attributes;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
+using PetRenamer.Logging;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -11,12 +12,16 @@ internal class CommandHandler : RegistryBase<PetCommand, PetCommandAttribute>
 {
     internal List<PetCommand> commands => elements;
 
-    protected override void OnElementCreation(PetCommand element)
+    protected override void OnAllRegistered()
     {
-        PetCommandAttribute attribute = element.GetType().GetCustomAttribute<PetCommandAttribute>()!;
-        PluginHandlers.CommandManager.AddHandler(attribute.command, new CommandInfo(element.OnCommand) { HelpMessage = attribute.description, ShowInHelp = attribute.showInHelp });
-        foreach(string extraCommand in attribute.extraCommands)
-            PluginHandlers.CommandManager.AddHandler(extraCommand, new CommandInfo(element.OnCommand) { HelpMessage = attribute.description, ShowInHelp = false });
+        for(int i = 0; i < commands.Count; i++) 
+        {
+            PetCommand command = commands[i];
+            PetCommandAttribute attribute = attributes[i];
+            PluginHandlers.CommandManager.AddHandler(attribute.command, new CommandInfo(command.OnCommand) { HelpMessage = attribute.description, ShowInHelp = attribute.showInHelp });
+            foreach (string extraCommand in attribute.extraCommands)
+                PluginHandlers.CommandManager.AddHandler(extraCommand, new CommandInfo(command.OnCommand) { HelpMessage = attribute.description, ShowInHelp = false });
+        }
     }
 
     protected override void OnElementDestroyed(PetCommand element)

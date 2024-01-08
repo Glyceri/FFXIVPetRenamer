@@ -121,7 +121,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (!BeginListBox($"###ModeToggleBox{internalCounter++}", new Vector2(ContentAvailableX, BarSizePadded))) return;
         ImDrawListPtr bgDrawlist = ImGui.GetWindowDrawList();
         Vector2 endPos = startingPos + new Vector2(ContentAvailableX + WindowPaddingX, BarSizePadded);
-        PluginLink.SnowHandler.DrawSnowMapped(bgDrawlist, startingPos, endPos);
+        PluginLink.ToolbarAnimator.DoDraw(bgDrawlist, startingPos, endPos);
         int pressed = -1;
         if (PluginLink.PettableUserHandler.LocalUser() != null)
         {
@@ -473,13 +473,15 @@ public abstract class PetWindowHelpers : PetWindowStyling
         return returnable;
     }
 
-    protected void DrawRedownloadButton(Action drawMe)
+    protected State DrawRedownloadButton(Action drawMe)
     {
-        if (drawMe == null) return;
+        if (drawMe == null) return State.None;
         ImGui.SetItemAllowOverlap();
         SameLine();
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(37, -58));
         drawMe.Invoke();
+        if (ImGui.IsItemHovered()) return State.Hovered;
+        return State.None;
     }
 
     protected void DrawRedownloadButton(PettableUser u)
@@ -596,7 +598,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
     protected State DrawTexture(nint theint, Action drawExtraButton)
     {
         State state = DrawTexture(theint);
-        DrawRedownloadButton(drawExtraButton);
+        if (DrawRedownloadButton(drawExtraButton) != State.None) state = State.None;
         return state;
     }
 
@@ -622,12 +624,7 @@ public abstract class PetWindowHelpers : PetWindowStyling
         if (drawExtraButton) DrawRedownloadButton(u);
     });
 
-    protected State DrawTexture(PettableUser u, Action drawExtraButton)
-    {
-        State state = DrawTexture(ProfilePictureNetworked.instance.GetTexture(u));
-        DrawRedownloadButton(drawExtraButton);
-        return state;
-    }
+    protected State DrawTexture(PettableUser u, Action drawExtraButton) => DrawTexture(ProfilePictureNetworked.instance.GetTexture(u), drawExtraButton);
 
     protected State DrawTexture(nint thenint)
     {

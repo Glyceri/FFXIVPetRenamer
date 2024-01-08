@@ -70,4 +70,8 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Core\Chat\ChatElements\ChatElementHelpers\" />
+  </ItemGroup>
 </Project>

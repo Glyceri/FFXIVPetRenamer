@@ -32,7 +32,7 @@ internal class PluginLink
     internal static ChatHandler ChatHandler { get; private set; } = null!;
     internal static PettableUserHandler PettableUserHandler { get; private set; } = null!;
     internal static NetworkingHandler NetworkingHandler { get; private set; } = null!;
-    internal static SnowHandler SnowHandler { get; private set; } = null!;
+    internal static ToolbarAnimator ToolbarAnimator { get; private set; } = null!;
     unsafe internal static CharacterManager* CharacterManager => FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager.Instance();
 
     internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
@@ -56,7 +56,6 @@ internal class PluginLink
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();
         IpcStorage?.LateInitialize();
-        SnowHandler = new SnowHandler();
-        SnowHandler.Initialize();
+        ToolbarAnimator = new ToolbarAnimator();
     }
 }

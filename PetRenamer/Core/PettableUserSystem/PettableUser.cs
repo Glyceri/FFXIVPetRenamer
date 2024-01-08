@@ -2,6 +2,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -120,6 +121,7 @@ public unsafe class PettableUser
 
         lastID = id;
         lastCast = cast;
+        if (!RemapUtils.instance.basePetIDToAction.ContainsValue((uint)cast)) return;
         if (!RemapUtils.instance.mutatableID.Contains(id)) return;
 
         foreach (KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction)

@@ -1,29 +1,21 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
+using PetRenamer.Core.Attributes;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Windows.Attributes;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace PetRenamer.Core.Updatable;
 
-internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>
+internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>, IInitializable
 {
-    public void ReleaseUpdate() => PluginHandlers.Framework.Update += MainUpdate;
+    public void Initialize() => PluginHandlers.Framework.Update += MainUpdate;
     protected override void OnDipose() => PluginHandlers.Framework.Update -= MainUpdate;
-    protected override void OnAllRegistered() => elements?.Sort(Compare);
     public void ClearAllUpdatables() => ClearAllElements();
 
     bool hasRemovables = false;
     List<Updatable> removables = new List<Updatable>();
-
-    int Compare(Updatable a, Updatable b)
-    {
-        int aVal = a.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
-        int bVal = b.GetType().GetCustomAttribute<UpdatableAttribute>()?.order ?? int.MaxValue;
-        return aVal.CompareTo(bVal);
-    }
 
     void MainUpdate(IFramework framework)
     {

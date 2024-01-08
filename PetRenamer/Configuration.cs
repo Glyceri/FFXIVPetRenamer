@@ -28,6 +28,7 @@ public class Configuration : IPluginConfiguration
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;
     public bool useCustomPetNamesInBattleChat = true;
+    public bool useCustomPetNamesInInfoChat = true;
     public bool useContextMenuOnBattlePets = true;
     public bool allowTooltipsBattlePets = true;
     public bool replaceEmotesBattlePets = true;
@@ -39,13 +40,13 @@ public class Configuration : IPluginConfiguration
     // ---------------------- Sharing Mode Settings ----------------------
     public bool alwaysOpenAdvancedMode = false;
     // --------------------------- UI SETTINGS ---------------------------
-    public bool allowSnow = true;
     public bool anonymousMode = false;
     public bool spaceOutSettings = false;
     public bool startSettingsOpen = false;
     public bool quickButtonsToggle = false;
     public bool newUseCustomTheme = false;
     public bool showKofiButton = true;
+    public string activeElement = "Event";
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;
