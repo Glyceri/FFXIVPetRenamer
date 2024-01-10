@@ -243,8 +243,13 @@ public struct PNCompanion
         {
             checked
             {
-                string newString = baseString.Replace("[p]", "");
-                if (newString.Contains("[a]")) newString = newString.Replace("[a]", pronounList[pronoun]);
+                string newString = baseString;
+                if (PluginHandlers.ClientState.ClientLanguage == Dalamud.ClientLanguage.German)
+                {
+                    newString = newString.Replace("[p]", "");
+                    if (newString.Contains("[a]")) 
+                        newString = newString.Replace("[a]", pronounList[pronoun]);
+                }
                 return newString;
             }
         }
