@@ -39,7 +39,7 @@ internal class PluginXPetwindow : PetWindow
         if (petRenamerUser == null)
         {
             petRenamerUser = new PettableUser("Pet Nicknames", ushort.MinValue);
-            NetworkedImageDownloader.instance.AsyncDownload(@"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/PetRenamer/images/icon.png", (petRenamerUser.UserName, petRenamerUser.Homeworld));
+            NetworkedImageDownloader.instance.AsyncDownload(@"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/PetRenamer/images/Icon.png", (petRenamerUser.UserName, petRenamerUser.Homeworld));
         }
         pluginUser = new PettableUser(pluginU, ushort.MinValue);
         NetworkedImageDownloader.instance.AsyncDownload(pluginIconURL, (pluginUser.UserName, pluginUser.Homeworld));

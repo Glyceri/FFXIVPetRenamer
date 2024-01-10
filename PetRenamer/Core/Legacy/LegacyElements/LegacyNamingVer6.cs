@@ -22,9 +22,9 @@ internal class LegacyNamingVer6 : LegacyElement
             List<SerializableNickname> nicknames = new List<SerializableNickname>();
             for (int i = 0; i < user.SerializableUser.length; i++)
             {
-                foreach (Companion pet in SheetUtils.instance.petSheet)
-                    if (pet.Model!.Value!.Model == user.SerializableUser[i].ID)
-                        nicknames.Add(new SerializableNickname((int)pet.Model!.Value!.RowId, user.SerializableUser[i].Name));
+                foreach (PNCompanion pet in SheetUtils.instance.petSheet)
+                    if (pet.Model == user.SerializableUser[i].ID)
+                        nicknames.Add(new SerializableNickname((int)pet.Model, user.SerializableUser[i].Name));
                 if (user.SerializableUser[i].ID < -1) 
                     nicknames.Add(new SerializableNickname(user.SerializableUser[i].ID, user.SerializableUser[i].Name));
             }

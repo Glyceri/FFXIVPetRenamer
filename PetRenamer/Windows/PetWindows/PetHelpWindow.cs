@@ -34,7 +34,7 @@ internal class PetHelpWindow : PetWindow
         "/petlist",
         "/petnames",
         "/minionnames",
-        "Or by clicking the Square icon located at the top right of most Pet Nickname windows."
+        "Or by clicking the Square Icon located at the top right of most Pet Nickname windows."
     };
 
     readonly string[] petListDidYouKnow1 = new string[]

@@ -1,5 +1,4 @@
-﻿using Lumina.Excel.GeneratedSheets;
-using PetRenamer.Core.Handlers;
+﻿using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System;
@@ -144,10 +143,9 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
     {
         if (companionID >= 0)
         {
-            foreach (Companion companion in SheetUtils.instance.petSheet)
+            foreach (PNCompanion companion in SheetUtils.instance.petSheet)
             {
-                if (companion == null) continue;
-                if (companion.Model!.Value!.RowId! == companionID)
+                if (companion.Model == companionID)
                     return companion.Icon;
             }
         }else if (companionID <= -2)

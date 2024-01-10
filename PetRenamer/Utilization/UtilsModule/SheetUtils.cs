@@ -1,3 +1,4 @@
+using Dalamud.Utility;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.Handlers;
@@ -14,7 +15,7 @@ namespace PetRenamer.Utilization.UtilsModule;
 [UtilsDeclarable]
 internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 {
-    public ExcelSheet<Companion> petSheet { get; set; } = null!;
+    public List<PNCompanion> petSheet = new List<PNCompanion>();
     ExcelSheet<Pet> battlePetSheet { get; set; } = null!;
     ExcelSheet<World> worlds { get; set; } = null!;
     ExcelSheet<Race> races { get; set; } = null!;
@@ -34,13 +35,19 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
     internal override void OnRegistered()
     {
-        petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
         worlds = PluginHandlers.DataManager.GetExcelSheet<World>()!;
         races = PluginHandlers.DataManager.GetExcelSheet<Race>()!;
         classJob = PluginHandlers.DataManager.GetExcelSheet<ClassJob>()!;
         battlePetSheet = PluginHandlers.DataManager.GetExcelSheet<Pet>()!;
         actions = PluginHandlers.DataManager.GetExcelSheet<Action>()!;
         textCommands = PluginHandlers.DataManager.GetExcelSheet<TextCommand>()!;
+
+        ExcelSheet<Companion> petSheet = PluginHandlers.DataManager.GetExcelSheet<Companion>()!;
+        foreach (Companion companion in petSheet)
+        {
+            if (companion == null) continue;
+            this.petSheet.Add(new PNCompanion(companion.Model!.Value!.RowId, companion.Singular.ToDalamudString().TextValue, companion.Plural.ToDalamudString().TextValue, companion.Icon, companion.Pronoun));
+        }
     }
 
     //226 is /egiglamour
@@ -60,8 +67,8 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             if (pet.Name.ToString().Contains(petname))
                 return lastPets[petname] = true;
 
-        foreach (Companion pet in petSheet)
-            if (pet.Singular.ToString().Contains(petname))
+        foreach (PNCompanion pet in petSheet)
+            if (pet.Singular.Contains(petname))
                 return lastPets[petname] = true;
             
         return false;
@@ -120,11 +127,9 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
             }
         }
 
-        foreach (Companion pet in petSheet)
+        foreach (PNCompanion pet in petSheet)
         {
-            if (pet == null) continue;
-
-            if (pet.Model.Value!.RowId == id)
+            if (pet.Model == id)
             {
                 string endName = nameType == NameType.Singular ? pet.Singular.ToString() : pet.Plural.ToString();
                 lastIds[(id, nameType)] = endName;
@@ -143,12 +148,11 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         if (lastNames.Count > cacheSizes)
             lastNames.Remove(lastNames.Keys.ToArray().First());
 
-        foreach (Companion pet in petSheet)
+        foreach (PNCompanion pet in petSheet)
         {
-            if (pet == null) continue;
-            if (pet.Singular.ToString().ToLower().Normalize() == name.ToLower().Normalize())
+            if (pet.Singular.ToLower().Normalize() == name.ToLower().Normalize())
             {
-                int val = (int)pet.Model.Value!.RowId;
+                int val = (int)pet.Model;
                 lastNames[name] = val;
                 return val;
             }
@@ -169,11 +173,10 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
 
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return serializableNicknames;
-        foreach (Companion pet in petSheet)
+        foreach (PNCompanion pet in petSheet)
         {
-            if (pet == null) continue;
-            uint petModel = pet.Model.Value!.RowId;
-            string petName = pet.Singular.ToString();
+            uint petModel = pet.Model;
+            string petName = pet.Singular;
 
             if (petName.Length == 0) continue;
             if (petModel <= 0) continue;
@@ -217,4 +220,45 @@ public enum NameType
 {
     Singular,
     Plural
+}
+
+public struct PNCompanion
+{
+    public readonly uint Model;
+    public readonly string Singular;
+    public readonly string Plural;
+    public readonly uint Icon;
+
+    public PNCompanion(uint Model, string Singular, string Plural, uint Icon, sbyte pronoun)
+    {
+        this.Model = Model;
+        this.Singular = SanitizeString(Singular, pronoun);
+        this.Plural = SanitizeString(Plural, pronoun);
+        this.Icon = Icon;
+    }
+
+    string SanitizeString(string baseString, sbyte pronoun)
+    {
+        try
+        {
+            checked
+            {
+                string newString = baseString.Replace("[p]", "");
+                if (newString.Contains("[a]")) newString = newString.Replace("[a]", pronounList[pronoun]);
+                return newString;
+            }
+        }
+        catch 
+        { 
+            return baseString;
+        }
+    }
+
+    string[] pronounList = new string[]
+    {
+        "er",
+        "e",
+        "es",
+        "en"
+    };
 }

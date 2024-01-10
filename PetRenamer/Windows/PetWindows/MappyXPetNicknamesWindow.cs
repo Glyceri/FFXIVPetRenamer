@@ -7,7 +7,7 @@ namespace PetRenamer.Windows.PetWindows;
 [PersistentPetWindow]
 internal class MappyXPetNicknamesWindow : PluginXPetwindow
 {
-    public MappyXPetNicknamesWindow() : base("Mappy X Pet Nicknames", "Mappy", "Mappy User", @"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/Mappy/images/icon.png", "Enable Mappy", "Clicking this button will disable the Pet Module in Mappy and allow Pet Nicknames to handle Pets in Mappy!", OnButtonClick) { }
+    public MappyXPetNicknamesWindow() : base("Mappy X Pet Nicknames", "Mappy", "Mappy User", @"https://raw.githubusercontent.com/goatcorp/PluginDistD17/main/stable/Mappy/images/Icon.png", "Enable Mappy", "Clicking this button will disable the Pet Module in Mappy and allow Pet Nicknames to handle Pets in Mappy!", OnButtonClick) { }
 
     public void TryOpen()
     {
