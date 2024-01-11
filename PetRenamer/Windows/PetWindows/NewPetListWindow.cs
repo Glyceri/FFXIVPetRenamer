@@ -460,9 +460,11 @@ internal class NewPetListWindow : PetWindow
 
         bool deleteActive = false;
 
+        bool askForDelete;
+
         public override bool IsHovered { get; set; }
 
-        public DrawablePet(bool isIpc, IDalamudTextureWrap texture, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!)
+        public DrawablePet(bool isIpc, IDalamudTextureWrap texture, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!, bool askForDelete = true)
         {
             this.isIpc = isIpc;
             this.identifier = identifier;
@@ -470,7 +472,7 @@ internal class NewPetListWindow : PetWindow
             this.customName = customName;
             this.baseName = baseName;
             this.baseId = baseId;
-
+            this.askForDelete = askForDelete;
             this.buttonText = buttonText;
             this.buttonTooltip = buttonTooltip;
             if (callback != null) intCallback = () => callback(baseId, isIpc);
@@ -513,8 +515,11 @@ internal class NewPetListWindow : PetWindow
                     window.DrawBasicBar($"{identifier} Name", baseName);
                     window.DrawBasicBar($"{identifier} ID", baseId.ToString());
                 }
-                else window.DrawYesNoBar($"Are you sure you want to delete: {customName}?", intCallback, () => deleteActive = false);
-                
+                else
+                {
+                    if (askForDelete) window.DrawYesNoBar($"Are you sure you want to delete: {customName}?", intCallback, () => deleteActive = false);
+                    else intCallback?.Invoke();
+                }
                 ImGui.EndListBox();
             }
             ImGui.EndListBox();
@@ -566,7 +571,8 @@ internal class NewPetListWindow : PetWindow
                             {
                                 Clear();
                                 PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForMinion(id, true);
-                            }));
+                            }, 0, null!, false));
+                        // I hate this fix as well :) Again. I should write a 2.0 but also... Time go brr ngl
                     }
                 }
                 else

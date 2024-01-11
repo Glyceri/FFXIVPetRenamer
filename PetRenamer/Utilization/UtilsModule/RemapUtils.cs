@@ -64,7 +64,7 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         -412, //Topaz Carbuncle
         -415, //Ifrit-Egi
         -416, //Titan-Egi
-        -417 //Garuda-Egi
+        -417  //Garuda-Egi
     };
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
@@ -87,6 +87,12 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
         { -3124, 25839 }, //Summon Titan II
         { -1930, 7427 }, //Summon Bahamut
         { -1027, 2864 }, //Rook Autoturret
+    };
+
+    public readonly Dictionary<int, uint> basePetIDToAction = new Dictionary<int, uint>()
+    {
+        { -411, 25798 }, //Summon Carbuncle
+        { -408, 17215 }, //Summon Eos
     };
 
     // [Populated]

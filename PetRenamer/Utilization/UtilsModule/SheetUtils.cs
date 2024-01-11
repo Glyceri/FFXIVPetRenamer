@@ -202,7 +202,15 @@ internal class SheetUtils : UtilsRegistryType, ISingletonBase<SheetUtils>
         return string.Empty;
     }
 
-    public string GetWorldName(ushort worldID) => worlds.GetRow(worldID)?.InternalName ?? string.Empty;
+    public string GetWorldName(ushort worldID)
+    {
+        try
+        {
+            World? world = worlds.GetRow(worldID);
+            if (world == null) return string.Empty;
+            return world.InternalName;
+        }catch { PetLog.Log("ERROR!");  return string.Empty; }
+    }
 }
 
 public enum NameType

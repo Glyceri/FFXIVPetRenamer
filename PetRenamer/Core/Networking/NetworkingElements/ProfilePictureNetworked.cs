@@ -8,7 +8,6 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Logging;
 using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
@@ -85,7 +84,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         catch { }
     }
 
-    void DeclareDownload((string, uint) characterData)
+    public void DeclareDownload((string, uint) characterData)
     {
         lock (Cache.textureCache)
         {
