@@ -10,6 +10,9 @@ internal unsafe class TargetBarHooking : QuickTextHookableElement
 {
     internal override void OnQuickInit()
     {
+        RegisterHook("_TargetInfo", 16, Display, -1, TargetUser);
+        RegisterHook("_TargetInfo", 7, Display, -1, TargetOfTargetUser);
+
         RegisterHook("_TargetInfoMainTarget",   10, Display,  -1, TargetUser);
         RegisterHook("_TargetInfoMainTarget",   7,  Display,  -1, TargetOfTargetUser);
         RegisterHook("_FocusTargetInfo",        10, Display,  -1, FocusTargetUser);

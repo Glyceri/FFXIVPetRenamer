@@ -86,6 +86,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.5.4"), new CLE("UI", "The setting automatically Switch Petmode should now work again.")) },
         { new CLS(new Version("1.4.6.0"), new CLE("General", "Giving a Battle Pet command or them leaving the battle will now properly show their nicknames in chat.", "Tentatively fixed an issue to do with soft skeletons (/petmirage)."), new CLE("UI", "Fireworks in the toolbar have been removed from the event.")) },
         { new CLS(new Version("1.4.6.1"), new CLE("General", "Names should now display properly in German.")) },
+        { new CLS(new Version("1.4.6.2"), new CLE("UI", "For users that didn't split their target bars. Target Bar renaming and casting functionalities should now work!")) },
     };
 
     const string starter = "  ◉   ";
