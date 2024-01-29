@@ -153,8 +153,11 @@ public class ConfigWindow : PetWindow
             if (BeginElementBox("Debug Mode"))
             {
                 DrawConfigElement(ref PluginLink.Configuration.debugMode, "Debug Mode", "Toggles Debug Mode");
-                if(PluginLink.Configuration.debugMode)
+                if (PluginLink.Configuration.debugMode)
+                {
                     DrawConfigElement(ref PluginLink.Configuration.autoOpenDebug, "Automatically open Debug Window", "Automatically open Debug Window on Plugin Startup.");
+                    DrawConfigElement(ref PluginLink.Configuration.showChatID, "Show Chat ID");
+                }
                 EndElementBox();
             }
         }

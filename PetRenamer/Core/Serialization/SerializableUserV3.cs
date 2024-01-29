@@ -14,8 +14,8 @@ public class SerializableUserV3
     public string[] names { get; private set; } = Array.Empty<string>();
     public string username { get; private set; } = string.Empty;
     public ushort homeworld { get; private set; } = 0;
-    public int[] mainSkeletons { get; set; } = PluginConstants.baseSkeletons;
-    public int[] softSkeletons { get; set; } = PluginConstants.baseSkeletons;
+    public int[] mainSkeletons { get; set; } = PluginConstants.baseSkeletons; // Main skeletons store the active (Summoned) pets pet mirage ID.
+    public int[] softSkeletons { get; set; } = PluginConstants.baseSkeletons; // Soft skeletons stores the new pet mirage ID. Why are these two different? When you pet mirage Eos to a Carbuncle, your current Eos will still remain as Eos until the next summon. BUT! We do need to know the new name for the summon bar and stuff. 
 
     [JsonIgnore] public string[] ipcNames { get; private set; } = Array.Empty<string>();
     [JsonIgnore] public bool changed = false;

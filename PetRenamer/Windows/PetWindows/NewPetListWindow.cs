@@ -218,7 +218,7 @@ internal class NewPetListWindow : PetWindow
         }
         else
         {
-            drawableElements.Add(new WarningDrawElement("Petglamour is now fully compatible!"));
+            drawableElements.Add(new WarningDrawElement("Do your names not match your Pet Glamours? This can happen. Please type /petmirage with the plugin active."));
             identifier = "Battle Pet";
             isValid = (id) => id < -1;
             callback = (id) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>().OpenForBattlePet(id, true);
