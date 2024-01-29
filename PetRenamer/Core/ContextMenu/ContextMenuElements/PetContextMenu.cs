@@ -23,6 +23,7 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
     void HandleNotebook(GameObjectContextMenuOpenArgs args)
     {
+        if (!PluginLink.Configuration.useContextMenuOnMinions) return;
         string petname = TooltipHook.latestOutcome;
         foreach (PNCompanion c in SheetUtils.instance.petSheet)
         {
@@ -43,6 +44,8 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
         PetBase pet = PluginLink.PettableUserHandler.GetPet(targetUser, address);
         if (pet == null) return;
+        if (pet.ID > -1 && !PluginLink.Configuration.useContextMenuOnMinions) return;
+        if (pet.ID < -1 && !PluginLink.Configuration.useContextMenuOnBattlePets) return;
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(pet.ID, true)));
     }
