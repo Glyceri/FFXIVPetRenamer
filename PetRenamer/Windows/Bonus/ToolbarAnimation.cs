@@ -15,7 +15,7 @@ internal abstract class ToolbarAnimation : IDisposableRegistryElement, IInitiali
         for (int i = 0; i < count; i++)
             _animatableElements[i].Update(deltaTime);
     }
-    internal void Draw(ImDrawListPtr drawListPtr, Vector2 startingPoint, Vector2 endPoint)
+    internal virtual void Draw(ImDrawListPtr drawListPtr, Vector2 startingPoint, Vector2 endPoint)
     {
         int count = _animatableElements.Count;
         for (int i = 0; i < count; i++)
