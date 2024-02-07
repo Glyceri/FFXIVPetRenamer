@@ -107,8 +107,8 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
 
         { -409,  1  }, //Emerald Carbuncle
         { -410,  38 }, //Ruby Carbuncle
-        { -411,  36 }, //Carbuncle
         { -412,  2  }, //Topaz Carbuncle
+        { -411,  36 }, //Carbuncle
 
         { -415,  27 }, //Ifrit-Egi
         { -416,  28 }, //Titan-Egi

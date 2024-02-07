@@ -88,7 +88,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.6.1"), new CLE("General", "Names should now display properly in German.")) },
         { new CLS(new Version("1.4.6.2"), new CLE("UI", "For users that didn't split their target bars. Target Bar renaming and casting functionalities should now work!")) },
         { new CLS(new Version("1.4.6.3"), new CLE("General", "Fixed an issue where summoner would overwrite Pet Mirage settings at any given oppertunity.", "The chat should now be less greedy in renaming pet names."), new CLE("UI", "The config settings for allowing context menu's works again.")) },
-        { new CLS(new Version("1.4.6.4"), new CLE("UI", "Toolbar Events are now automatic.")) },
+        { new CLS(new Version("1.4.6.4"), new CLE("UI", "Toolbar Events are now automatic."), new CLE("General", "Fixed a bug where the Topaz Carbuncle target text would not work as intended.") },
     };
 
     const string starter = "  ◉   ";
