@@ -150,8 +150,8 @@ internal class RemapUtils : UtilsRegistryType, ISingletonBase<RemapUtils>
             }
         }else if (companionID <= -2)
         {
-            if (!petIDToAction.ContainsKey(companionID)) return 786;
-            return SheetUtils.instance.actions.GetRow(petIDToAction[companionID])?.Icon ?? 786;
+            if (!petIDToAction.ContainsKey(companionID)) return 567;
+            return SheetUtils.instance.actions.GetRow(petIDToAction[companionID])?.Icon ?? 567;
         }
 
         return 786;

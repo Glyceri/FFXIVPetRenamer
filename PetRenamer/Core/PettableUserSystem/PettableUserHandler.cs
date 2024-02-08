@@ -208,6 +208,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
             validNames.Add((bPetname, cName));
         }
         validNames.Sort((el1, el2) => el1.Item1.Length.CompareTo(el2.Item1.Length));
+        validNames.Reverse();
         return validNames.ToArray();
     }
 

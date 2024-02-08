@@ -39,7 +39,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     nint GetSearchingTexture()
     {
-        string iconPath = PluginHandlers.TextureProvider.GetIconPath(786)!;
+        string iconPath = PluginHandlers.TextureProvider.GetIconPath(201)!;
         if (iconPath == null) return nint.Zero;
         IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
         if (textureWrap == null) return nint.Zero;
