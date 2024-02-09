@@ -1,5 +1,4 @@
 using Dalamud.ContextMenu;
-using Lumina.Excel.GeneratedSheets;
 using PetRenamer.Core.ContextMenu.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Hooks;
@@ -24,13 +23,14 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
     void HandleNotebook(GameObjectContextMenuOpenArgs args)
     {
+        if (!PluginLink.Configuration.useContextMenuOnMinions) return;
         string petname = TooltipHook.latestOutcome;
-        foreach (Companion c in SheetUtils.instance.petSheet)
+        foreach (PNCompanion c in SheetUtils.instance.petSheet)
         {
-            if (c.Singular.ToString() == string.Empty) continue;
+            if (c.Singular == string.Empty) continue;
             if (petname.ToLower().Normalize() == string.Empty) continue;
-            if (c.Singular.ToString().ToLower().Normalize().Trim() != petname.ToLower().Normalize().Trim()) continue;
-            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId((int)c.Model.Value!.RowId, true)));
+            if (c.Singular.ToLower().Normalize().Trim() != petname.ToLower().Normalize().Trim()) continue;
+            args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId((int)c.Model, true)));
             break;
         }
     }
@@ -44,6 +44,8 @@ internal unsafe class PetContextMenu : ContextMenuElement
 
         PetBase pet = PluginLink.PettableUserHandler.GetPet(targetUser, address);
         if (pet == null) return;
+        if (pet.ID > -1 && !PluginLink.Configuration.useContextMenuOnMinions) return;
+        if (pet.ID < -1 && !PluginLink.Configuration.useContextMenuOnBattlePets) return;
 
         args.AddCustomItem(new GameObjectContextMenuItem("Give Nickname", (a) => PluginLink.WindowHandler.GetWindow<PetRenameWindow>()?.OpenForId(pet.ID, true)));
     }

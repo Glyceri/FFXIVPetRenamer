@@ -2,7 +2,6 @@
 using ImGuiNET;
 using PetRenamer.Core.AutoRegistry;
 using PetRenamer.Core.Handlers;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace PetRenamer.Windows.Bonus;

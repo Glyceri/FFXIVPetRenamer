@@ -11,12 +11,13 @@ using PetRenamer.Utilization.UtilsModule;
 namespace PetRenamer.Core.Chat.ChatElements;
 
 [Chat]
-internal unsafe class PetChatEmoteElement : ChatElement
+internal unsafe class PetChatEmoteElement : RestrictedChatElement
 {
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    public PetChatEmoteElement() => RegisterChat(XivChatType.StandardEmote, XivChatType.CustomEmote);
+
+    internal override void OnRestrictedChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (!PluginLink.Configuration.displayCustomNames) return;
-        if (type != XivChatType.StandardEmote && type != XivChatType.CustomEmote) return;
 
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;

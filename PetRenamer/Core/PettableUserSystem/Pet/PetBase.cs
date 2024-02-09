@@ -22,6 +22,7 @@ public class PetBase
     public string BaseNameCapitalized => StringUtils.instance.MakeTitleCase(BaseName);
     public string BaseNamePluralCapitalized => StringUtils.instance.MakeTitleCase(BaseNamePlural);
     public string UsedName => IPCName == string.Empty ? CustomName == string.Empty ? BaseNameCapitalized : CustomName : IPCName; // Yes, very readable :)
+    public string UsedNameNameplate => IPCName == string.Empty ? CustomName : IPCName;
 
     public bool nameChanged => _nameChanged;
     public bool Changed => _petChanged;

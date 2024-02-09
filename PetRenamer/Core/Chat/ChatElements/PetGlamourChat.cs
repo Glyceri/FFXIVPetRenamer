@@ -13,8 +13,8 @@ using System.Text.RegularExpressions;
 namespace PetRenamer.Core.Chat.ChatElements;
 
 // This check is literally here to catch pet glamour changes 1... and I literally mean 1 step early.
-[Chat]
-internal class PetGlamourChat : ChatElement
+[Chat(-1)]
+internal class PetGlamourChat : RestrictedChatElement
 {
 
     //The next Carbuncle summoned will appear glamoured as Ruby Carbuncle.
@@ -85,6 +85,8 @@ internal class PetGlamourChat : ChatElement
 
     public PetGlamourChat()
     {
+        RegisterChat(XivChatType.SystemMessage);
+
         TextCommand command = SheetUtils.instance.GetCommand(33);
 
         int counter = 0;
@@ -134,10 +136,8 @@ internal class PetGlamourChat : ChatElement
         };
     }
 
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnRestrictedChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (type != XivChatType.SystemMessage) return;
-
         if(nextRow > 0)
         {
             MatchChange(spacingRegex.Match(message.TextValue));

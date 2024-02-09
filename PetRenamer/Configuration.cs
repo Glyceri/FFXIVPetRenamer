@@ -50,6 +50,7 @@ public class Configuration : IPluginConfiguration
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;
+    public bool showChatID = false;
 
     // ------------------------------ MAPPY ------------------------------
     public bool enableMappyIntegration = false;

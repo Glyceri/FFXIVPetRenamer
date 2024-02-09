@@ -2,7 +2,6 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -116,33 +115,34 @@ public unsafe class PettableUser
 
     void HandleCast(int id)
     {
-        int cast = PluginLink.PettableUserHandler.LastCastSoft.castID;
-        if (id == lastID && lastCast == cast) return;
+        if (id == -1) return; // No Pet Active
+        int cast = PluginLink.PettableUserHandler.LastCastSoft.castID; // Last Soft Cast (does this trigger before summoning the pet?)
+        if (id == lastID || lastCast == cast) return; // If both are invalid go for a change!
 
-        lastID = id;
-        lastCast = cast;
-        if (!RemapUtils.instance.basePetIDToAction.ContainsValue((uint)cast)) return;
-        if (!RemapUtils.instance.mutatableID.Contains(id)) return;
+        lastID = id; // Set the last ID
+        lastCast = cast; // Set the last Cast
+        if (!RemapUtils.instance.basePetIDToAction.ContainsValue((uint)cast)) return; // Is the action that we just cast a valid action to perform a rename on?
+        if (!RemapUtils.instance.mutatableID.Contains(id)) return; // Is the id of the pet we just cast one that can be mutated by /petmirage?
 
-        foreach (KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction)
+        foreach (KeyValuePair<int, uint> kvp in RemapUtils.instance.petIDToAction) // Loop through every Pet and their respective Action
         {
-            if (cast != kvp.Value) continue;
-            int index = -1;
-            for (int i = 0; i < PluginConstants.baseSkeletons.Length; i++)
+            if (cast != kvp.Value) continue; // Is the current cast not equal to the pets given corresponding cast
+            int index = -1; // Preset index to -1
+            for (int i = 0; i < PluginConstants.baseSkeletons.Length; i++) // Base skeletons is an array with all default skeletons for pet mirage. Loop through it
             {
-                if (PluginConstants.baseSkeletons[i] != kvp.Key) continue;
-                index = i;
-                break;
+                if (PluginConstants.baseSkeletons[i] != kvp.Key) continue; // Is the base skeleton not equal to the key, continue
+                index = i; // If it is, set the current index to i
+                break; // We got the index we are looking for
             }
 
-            if (index == -1) break;
+            if (index == -1) break; // if index is -1 it means nothing is found. So break
 
-            if (SerializableUser.mainSkeletons[index] == id) break;
-            SerializableUser.mainSkeletons[index] = id;
-            SerializableUser.softSkeletons[index] = id;
-            PluginLink.Configuration.Save();
+            if (SerializableUser.mainSkeletons[index] == id) break; // If the main skeleton we are trying to alter is already equal to the skeleton we are altering it to. break
+            SerializableUser.mainSkeletons[index] = id; // Set main skeletons to the new ID
+            SerializableUser.softSkeletons[index] = id; // Set soft skeletons to the new ID
+            PluginLink.Configuration.Save(); // Save
 
-            break;
+            break; // Stop running
         }
     }
 
