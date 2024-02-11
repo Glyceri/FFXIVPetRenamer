@@ -37,10 +37,11 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedLetterL.ToIconString(),        typeof(ChangelogWindow),        "[Changelog]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterT.ToIconString(),        typeof(ThemeEditorWindow),      "[Theme Editor]", (pw) => pw is ConfigWindow),
-        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
+        (SeIconChar.BoxedLetterN.ToIconString(),        typeof(PetNewsWindow),          "[Pet News]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hideNewsButton) return false; return true; }),
+        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hideHelpButton) return false; return true; }),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hidePetListButton) return false; return true; }),
         //(SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
     };
 

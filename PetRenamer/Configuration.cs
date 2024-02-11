@@ -16,6 +16,7 @@ public class Configuration : IPluginConfiguration
     public const int currentSaveFileVersion = 8;
     public int Version { get; set; } = currentSaveFileVersion;
 
+    // 
     public bool understoodWarningThirdPartySettings = false;
     // ------------------------ Unrelated Settings -----------------------
     public bool limitLocalSearch = false;
@@ -47,6 +48,9 @@ public class Configuration : IPluginConfiguration
     public bool newUseCustomTheme = false;
     public bool showKofiButton = true;
     public string activeElement = "Event";
+    public bool hideHelpButton = false;
+    public bool hideNewsButton = false;
+    public bool hidePetListButton = false;
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;
     public bool autoOpenDebug = true;
