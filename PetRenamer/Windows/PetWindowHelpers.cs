@@ -37,7 +37,6 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedLetterL.ToIconString(),        typeof(ChangelogWindow),        "[Changelog]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterT.ToIconString(),        typeof(ThemeEditorWindow),      "[Theme Editor]", (pw) => pw is ConfigWindow),
-        (SeIconChar.BoxedLetterN.ToIconString(),        typeof(PetNewsWindow),          "[Pet News]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hideNewsButton) return false; return true; }),
         (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hideHelpButton) return false; return true; }),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),

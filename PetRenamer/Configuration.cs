@@ -49,7 +49,6 @@ public class Configuration : IPluginConfiguration
     public bool showKofiButton = true;
     public string activeElement = "Event";
     public bool hideHelpButton = false;
-    public bool hideNewsButton = false;
     public bool hidePetListButton = false;
     // -------------------------- DEBUG SETTINGS -------------------------
     public bool debugMode = false;

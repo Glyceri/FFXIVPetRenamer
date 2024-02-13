@@ -46,7 +46,6 @@ public class ConfigWindow : PetWindow
         if (BeginElementBox("UI Settings"))
         {
             DrawConfigElement(ref PluginLink.Configuration.hideHelpButton, "Hide Help Button", new string[] { "Hide the help button in the toolbar?", "Buttons will NEVER hide themselves in the settings window." }, "Hide the Help button.");
-            DrawConfigElement(ref PluginLink.Configuration.hideNewsButton, "Hide News Button", new string[] { "Hide the news button in the toolbar?", "Buttons will NEVER hide themselves in the settings window.", "You can always use [/petnews] to open this panel again." }, "Hide the News button.");
             DrawConfigElement(ref PluginLink.Configuration.hidePetListButton, "Hide Pet List Button", new string[] { "Hide the pet list button in the toolbar?", "Buttons will NEVER hide themselves in the settings window."}, "Hide the Pet List button.");
             DrawConfigElement(ref PluginLink.Configuration.activeElement, PluginLink.ToolbarAnimator.registeredIdentifiers, "Toolbar Animation", new string[] { "Select which toolbar animation you would like to play." }, "Toolbar Animation.", PluginLink.ToolbarAnimator.RegisterActiveAnimation);
             DrawConfigElement(ref PluginLink.Configuration.anonymousMode, "Anonymous mode", new string[] { "Hides player names and replaces them with initials.", "Disables profile pictures." }, "Anonymous mode.");
