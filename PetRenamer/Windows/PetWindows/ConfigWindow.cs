@@ -41,8 +41,6 @@ public class ConfigWindow : PetWindow
     {
         anythingIllegals = AnyIllegalsGoingOn();
 
-        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode) DrawWarningThing();
-
         if (BeginElementBox("UI Settings"))
         {
             DrawConfigElement(ref PluginLink.Configuration.hideHelpButton, "Hide Help Button", new string[] { "Hide the help button in the toolbar?", "Buttons will NEVER hide themselves in the settings window." }, "Hide the Help button.");
@@ -65,7 +63,7 @@ public class ConfigWindow : PetWindow
             EndElementBox();
         }
 
-        if ((anythingIllegals && PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
+        if ((anythingIllegals) || DebugMode)
         {
             if (BeginElementBox("Third Party Settings", false))
             {
@@ -73,15 +71,6 @@ public class ConfigWindow : PetWindow
                     DrawConfigElement(ref PluginLink.Configuration.enableMappyIntegration, "Enable Mappy Integration", new string[] { "Allows Pet Nicknames to display Custom Names on Mappy Pets" });
                 EndElementBox();
             }
-        }
-    }
-
-    public void DrawWarningThing()
-    {
-        if (BeginElementBox("Third Party WARNING", true))
-        {
-            DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Integration with Third Party Plugins may cause issues that are BEYOND MY CONTROL!", "Some third party settings will drastically lower performance.", "I tested every interaction well, but use at your own risk." }, "READ THE WARNING!");
-            EndElementBox();
         }
     }
 
@@ -174,7 +163,6 @@ public class ConfigWindow : PetWindow
         return false;
     }
 
-    public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
     public bool DebugMode => PluginLink.Configuration.debugMode;
 
     bool BeginElementBox(string title, bool forceOpen = false, string tooltip = "")

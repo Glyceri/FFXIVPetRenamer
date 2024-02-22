@@ -22,7 +22,7 @@ internal class LogInOutHook : HookableElement
         PluginHandlers.ClientState.EnterPvP -= OnPVPEnter;
     }
 
-    void OnPVPEnter() => PluginHandlers.ChatGui.PrintError("Pet Nicknames is disabled in PVP zones.");
+    void OnPVPEnter() => PluginHandlers.ChatGui.PrintError("Pet Nicknames is disabled in PVP zones (Excluding the Den).");
     void OnLogin() => ResetWindows();
 
     void OnLogout()

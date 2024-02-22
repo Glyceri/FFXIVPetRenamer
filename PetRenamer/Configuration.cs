@@ -16,8 +16,6 @@ public class Configuration : IPluginConfiguration
     public const int currentSaveFileVersion = 8;
     public int Version { get; set; } = currentSaveFileVersion;
 
-    // 
-    public bool understoodWarningThirdPartySettings = false;
     // ------------------------ Unrelated Settings -----------------------
     public bool limitLocalSearch = false;
     // ------------------------- Global Settings -------------------------
@@ -56,7 +54,7 @@ public class Configuration : IPluginConfiguration
     public bool showChatID = false;
 
     // ------------------------------ MAPPY ------------------------------
-    public bool enableMappyIntegration = false;
+    public bool enableMappyIntegration = true;
     public bool readMappyIntegration = false;
 
     // ----------------------- PERFORMANCE SETTINGS ----------------------

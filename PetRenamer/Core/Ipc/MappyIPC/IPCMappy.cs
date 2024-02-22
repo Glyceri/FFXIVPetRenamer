@@ -6,6 +6,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.PetWindows;
 using System;
@@ -57,7 +58,6 @@ public static class IPCMappy
         HandleTenSeconds(ref frameWork);
         if (!mappyReady) return; 
         HandleMappyWindow(ref player);
-        if (!PluginLink.Configuration.understoodWarningThirdPartySettings) return;
         HandlePartyListChangedCheck(ref frameWork, ref player);
         UpdatePetPositions();
     }
@@ -109,7 +109,14 @@ public static class IPCMappy
         if (player!.StatusFlags == StatusFlags.InCombat) return;
         if (oneTime) return;
         oneTime = true;
-        PluginLink.WindowHandler.GetWindow<MappyXPetNicknamesWindow>()?.TryOpen();
+        if (PluginLink.Configuration.readMappyIntegration) return;
+        if (!PluginLink.Configuration.enableMappyIntegration) return;
+        PluginLink.Configuration.readMappyIntegration = true;
+        PluginLink.Configuration.Save();
+        PluginHandlers.ChatGui.Print(new Dalamud.Game.Text.XivChatEntry() {
+            Message = "Pet Nicknames now handles battle pets for Mappy. (You can disable this by typing /petsettings -> Third Party Settings -> [uncheck] Enable Mappy  Integration)",
+            Type = Dalamud.Game.Text.XivChatType.Debug
+        });
     }
 
     static void HandlePartyListChangedCheck(ref IFramework frameWork, ref PlayerCharacter player)

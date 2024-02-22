@@ -70,6 +70,7 @@ internal class DeveloperWindow : PetWindow
 
     void Users()
     {
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return;
         tableCounter = 0;
         PluginLink.PettableUserHandler.LoopThroughUsers(NewDrawUser);
     }
@@ -138,6 +139,8 @@ internal class DeveloperWindow : PetWindow
   
     unsafe void DrawHelpField()
     {
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return;
+
         GameObject? target = PluginHandlers.TargetManager.Target!;
         if (target != null)
         {

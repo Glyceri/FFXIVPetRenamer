@@ -91,6 +91,8 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.6.4"), new CLE("UI", "Toolbar Events are now automatic."), new CLE("General", "Fixed a bug where the Topaz Carbuncle target text would not work as intended.")) },
         { new CLS(new Version("1.4.7.0"), new CLE("UI", "There is now a new Pet News window.", "You can now hide buttons in the Toolbar.", "Certain default images have been changed.")) },
         { new CLS(new Version("1.4.7.1"), new CLE("General", "Updated the plogon for 6.57.")) },
+        { new CLS(new Version("1.4.8.0"), new CLE("General", "The Mappy popup window is now reduced to a chat message.", "Chat messages that Pet Nicknames sets hidden now properly remain hidden.", "Pet on the Mappy Map will no longer show stuck when you are mounted.", "Pet Nicknames is now enabled in the Wolves' Den Pier, but as a result even more restricted in non-Wolves' Den Pier zones.")) },
+
     };
 
     const string starter = "  ◉   ";

@@ -102,7 +102,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public PettableUser? GetUser(string name) => GetUser(name, 9999);
     public PettableUser? GetUser(string name, ushort homeworld)
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return null!;
         int userCount = _users.Count;
         for (int i = 0; i < userCount; i++)
         {
@@ -115,7 +115,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public PettableUser GetUser(nint address)
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return null!;
         if (address == nint.Zero) return null!;
         int userCount = _users.Count;
         for (int i = 0; i < userCount; i++)
@@ -130,7 +130,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public PetBase GetPet(nint address)
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return null!;
         if (address == nint.Zero) return null!;
         int userCount = _users.Count;
         for(int i = 0; i < userCount; i++)
@@ -145,7 +145,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public PetBase GetPet(PettableUser user, nint address)
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return null!;
         if (address == nint.Zero) return null!;
         if (!user.UserExists) return null!;
         PetBase[] pets = user.Pets;
@@ -164,14 +164,14 @@ internal class PettableUserHandler : IDisposable, IInitializable
 
     public PettableUser? LocalUser()
     {
-        if (PluginHandlers.ClientState.IsPvP || !PluginLink.Configuration.displayCustomNames) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen || !PluginLink.Configuration.displayCustomNames) return null!;
         if (localUser != null && localUser.DeathsMark) return null!;
         return localUser;
     }
 
     public PettableUser? LastCastedUser()
     {
-        if (PluginHandlers.ClientState.IsPvP) return null!;
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return null!;
         PettableUser user = null!;
         int userCount = _users.Count;
         for (int i = 0; i < userCount; i++)
@@ -190,7 +190,7 @@ internal class PettableUserHandler : IDisposable, IInitializable
     public (string, string)[] GetValidNames(PettableUser user, string beContainedIn, bool strict, bool soft = true)
     {
         List<(string, string)> validNames = new List<(string, string)>();
-        if (PluginHandlers.ClientState.IsPvP) return validNames.ToArray();
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return validNames.ToArray();
         if (beContainedIn == null) return validNames.ToArray();
         if (user == null) return validNames.ToArray();
         if (!user.UserExists) return validNames.ToArray();
