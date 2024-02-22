@@ -11,6 +11,6 @@ internal unsafe class BlacklistChatElement : ChatElement
     internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled) { }
     internal override void OnChatMessageHandled(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        isHandled = PluginLink.ChatHandler.MinusBlacklistCountHandle();
+        if (PluginLink.ChatHandler.MinusBlacklistCountHandle()) isHandled = true;
     }
 }
