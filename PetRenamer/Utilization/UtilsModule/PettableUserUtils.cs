@@ -1,5 +1,7 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+﻿using Dalamud.Configuration;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.Interop;
+using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.PettableUserSystem;
@@ -52,6 +54,7 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
             if (chara.Value == bChara) continue;
             if (chara.Value->Character.GameObject.OwnerID != objectID) continue;
             if (chara.Value->Character.CharacterData.Health == 0) continue;
+            if (!RemapUtils.instance.petIDToAction.ContainsKey(-chara.Value->Character.CharacterData.ModelCharaId)) continue;
             return chara;
         }
         return null!;

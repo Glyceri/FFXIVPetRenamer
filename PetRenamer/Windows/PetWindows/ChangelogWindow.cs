@@ -93,7 +93,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.7.1"), new CLE("General", "Updated the plogon for 6.57.")) },
         { new CLS(new Version("1.4.8.0"), new CLE("General", "The Mappy popup window is now reduced to a chat message.", "Chat messages that Pet Nicknames sets hidden now properly remain hidden.", "Pets on the Mappy Map will no longer show stuck when you are mounted.", "Pet Nicknames is now enabled in the Wolves' Den Pier, but as a result even more restricted in non-Wolves' Den Pier zones.")) },
         { new CLS(new Version("1.4.8.1"), new CLE("Chat", "Fixed a chat display bug!")) },
-
+        { new CLS(new Version("1.4.8.2"), new CLE("General", "Properly resolves Battle Pets with Chocobos in your party.")) },
     };
 
     const string starter = "  ◉   ";
