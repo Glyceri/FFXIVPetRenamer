@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Game.Text;
+using ImGuiNET;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -94,6 +95,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.8.0"), new CLE("General", "The Mappy popup window is now reduced to a chat message.", "Chat messages that Pet Nicknames sets hidden now properly remain hidden.", "Pets on the Mappy Map will no longer show stuck when you are mounted.", "Pet Nicknames is now enabled in the Wolves' Den Pier, but as a result even more restricted in non-Wolves' Den Pier zones.")) },
         { new CLS(new Version("1.4.8.1"), new CLE("Chat", "Fixed a chat display bug!")) },
         { new CLS(new Version("1.4.8.2"), new CLE("General", "Properly resolves Battle Pets with Chocobos in your party.")) },
+        { new CLS(new Version("1.4.8.3"), new CLE("Context Menu", $"'Give Nickname' has been renamed to '{SeIconChar.BoxedLetterP.ToIconString()} Rename' (Get used to it)"), new CLE("Icon", "The plugin icon is changed because in reality... I cannot see green properly.")) },
     };
 
     const string starter = "  ◉   ";
