@@ -8,6 +8,7 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
@@ -27,10 +28,10 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             (string, uint) currentUser = (user.UserName, user.Homeworld);
             if (!Cache.textureCache.ContainsKey(currentUser)) return GetSearchingTexture();
             nint returner = Cache.textureCache[currentUser]?.ImGuiHandle ?? nint.Zero;
-            if (returner == nint.Zero) 
+            if (returner == nint.Zero)
             {
                 Cache.RemoveTexture(currentUser);
-                returner = GetSearchingTexture(); 
+                returner = GetSearchingTexture();
             }
             return returner;
         }
@@ -86,35 +87,38 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     public void DeclareDownload((string, uint) characterData)
     {
-        lock (Cache.textureCache)
+        try
         {
-            try
+            Cache.RemoveTexture(characterData);
+        }
+        catch { }
+        Thread.Sleep(3000); // I need dalamud to clear the texture cache first. Hence this stupid sleep, maybe I'm using the texture cache wrong. But I feel like if I manually dispose a texture and load a different one but at the same path, it should just clear.
+        Cache.RemoveRedownloadedUsers(characterData);
+        FileInfo info = null!;
+        try
+        {
+            string path = NetworkedImageDownloader.instance.MakeTexturePath(NetworkedImageDownloader.instance.RemapCharacterData(ref characterData));
+            if (!Path.Exists(path)) return;
+            info = new FileInfo(path);
+            if (info == null) return;
+            if (!info.Exists) return;
+        }
+        catch { }
+        try
+        {
+            lock (Cache.textureCache)
             {
-                Cache.RemoveTexture(characterData);
-            }
-            catch { }
-            FileInfo info = null!;
-            try
-            {
-                string path = NetworkedImageDownloader.instance.MakeTexturePath(NetworkedImageDownloader.instance.RemapCharacterData(ref characterData));
-                if (!Path.Exists(path)) return;
-                info = new FileInfo(path);
-                if (info == null) return;
-                if (!info.Exists) return;
-            }
-            catch { }
-            try
-            {
-                IDalamudTextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info, true)!;
+                IDalamudTextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info)!;
                 if (wrap == null) return;
                 Cache.textureCache.Add(characterData, wrap);
             }
-            catch { }
         }
+        catch { }
     }
 
     void DownloadPagination((string, uint) characterData)
     {
+        Cache.AddRedownloadedUsers(characterData);
         Cache.RemoveTexture(characterData);
         try
         {
@@ -130,6 +134,7 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
     {
         await Task.Run(() =>
         {
+            Cache.AddRedownloadedUsers(characterData);
             NetworkedImageDownloader.instance.AsyncDownload(
                 data.imageURL!,
                 characterData,

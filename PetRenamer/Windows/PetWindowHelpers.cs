@@ -486,10 +486,20 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawRedownloadButton(PettableUser u)
     {
-        RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}",
-            Styling.SmallButton,
-            $"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}",
-            () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
+        if (PluginLink.NetworkingHandler.NetworkingCache.HasRedownloadedUser(u))
+        {
+            RedownloadButton($"{SeIconChar.AutoTranslateOpen.ToIconString()} {SeIconChar.AutoTranslateClose.ToIconString()}",
+               Styling.SmallButton,
+               $"Currently redownloading profile picture for: {u.UserName}@{u.HomeWorldName}",
+               () => { });
+        }
+        else
+        {
+            RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}",
+                Styling.SmallButton,
+                $"Redownload profile picture for: {u.UserName}@{u.HomeWorldName}",
+                () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
+        }
     }
 
     protected void DrawAdvancedBarWithQuit(string label, string value, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!, bool ipcMode = false)
