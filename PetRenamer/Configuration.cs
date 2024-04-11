@@ -23,6 +23,7 @@ public class Configuration : IPluginConfiguration
     public bool downloadProfilePictures = false;
     public bool displayImages = true;
     public bool automaticallySwitchPetmode = true;
+    public bool disablePVPChatMessage = false;
     // ----------------------- Battle Pet Settings -----------------------
     public bool allowCastBarPet = true;
     public bool useCustomFlyoutPet = true;

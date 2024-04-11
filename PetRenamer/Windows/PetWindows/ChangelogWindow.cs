@@ -97,6 +97,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.8.2"), new CLE("General", "Properly resolves Battle Pets with Chocobos in your party.")) },
         { new CLS(new Version("1.4.8.3"), new CLE("Context Menu", $"'Give Nickname' has been renamed to '{SeIconChar.BoxedLetterP.ToIconString()} Rename' (Get used to it)"), new CLE("Icon", "The plugin icon is changed because in reality... I cannot see green properly.")) },
         { new CLS(new Version("1.4.8.4"), new CLE("General", "DotNET 8 update."), new CLE("UI", "Redownloading profile pictures works again.")) },
+        { new CLS(new Version("1.4.8.5"), new CLE("Chat", "You can now hide the PVP warning message.")) },
     };
 
     const string starter = "  ◉   ";

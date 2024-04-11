@@ -57,6 +57,7 @@ public class ConfigWindow : PetWindow
         }
         if (BeginElementBox("Global Settings"))
         {
+            DrawConfigElement(ref PluginLink.Configuration.disablePVPChatMessage, "Disable PVP Chat Warning", "Disables the PVP chat warning.");
             DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
             DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
             DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
