@@ -27,6 +27,7 @@ internal class LocalUserSafetyUpdatable : Updatable
        
         SerializableUserV3 newUser = new SerializableUserV3(player.Name.ToString(), (ushort)player.HomeWorld.Id);
         PluginLink.PettableUserHandler.DeclareUser(newUser, PettableUserSystem.Enums.UserDeclareType.Add);
+        PluginLink.PettableUserHandler.SetLocalUser(PluginLink.PettableUserHandler.GetUser(newUser.username, newUser.homeworld)!);
         PluginLink.Configuration.Save();
     }
 }
