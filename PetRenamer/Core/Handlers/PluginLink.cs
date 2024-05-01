@@ -1,4 +1,3 @@
-using Dalamud.ContextMenu;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Commands;
@@ -28,7 +27,6 @@ internal class PluginLink
     internal static IpcStorage IpcStorage { get; set; } = null!;
     internal static HookHandler HookHandler { get; set; } = null!;
     internal static ContextMenuHandler ContextMenuHandler { get; set; } = null!;
-    internal static DalamudContextMenu DalamudContextMenu { get; private set; } = null!;
     internal static ChatHandler ChatHandler { get; private set; } = null!;
     internal static PettableUserHandler PettableUserHandler { get; private set; } = null!;
     internal static NetworkingHandler NetworkingHandler { get; private set; } = null!;
@@ -51,7 +49,6 @@ internal class PluginLink
         UpdatableHandler = new UpdatableHandler();
         WindowHandler.Initialize();
         LegacyCompatibilityHandler = new LegacyCompatibilityHandler();
-        DalamudContextMenu = new DalamudContextMenu(dalamud);
         ContextMenuHandler = new ContextMenuHandler();
         HookHandler = new HookHandler();
         ChatHandler = new ChatHandler();

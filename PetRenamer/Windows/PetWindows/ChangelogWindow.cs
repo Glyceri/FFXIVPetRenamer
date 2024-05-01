@@ -99,6 +99,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.8.4"), new CLE("General", "DotNET 8 update."), new CLE("UI", "Redownloading profile pictures works again.")) },
         { new CLS(new Version("1.4.8.5"), new CLE("Chat", "You can now hide the PVP warning message.")) },
         { new CLS(new Version("1.4.8.6"), new CLE("General", "Fixes an issue related to alt accounts not working.")) },
+        { new CLS(new Version("1.4.8.7"), new CLE("General", "Updated to the new Context Menu system.")) },
     };
 
     const string starter = "  ◉   ";
