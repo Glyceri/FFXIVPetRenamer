@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface.Internal;
 using PetRenamer.Core.Attributes;
+using PetRenamer.Core.PettableUserSystem;
 using System;
 using System.Collections.Generic;
 
@@ -9,6 +10,7 @@ namespace PetRenamer.Core.Networking;
 public class NetworkingCache : IDisposable, IInitializable
 {
     internal Dictionary<(string, uint), IDalamudTextureWrap> textureCache = new Dictionary<(string, uint), IDalamudTextureWrap>();
+    internal List<(string, uint)> redownloadedUsers = new List<(string, uint)>();
     internal Dictionary<(string, uint), string> lodestoneID = new Dictionary<(string, uint), string>();
 
     public void Initialize()
@@ -53,5 +55,34 @@ public class NetworkingCache : IDisposable, IInitializable
             textureCache[character]?.Dispose();
             textureCache?.Remove(character);
         }
+    }
+
+    public void AddRedownloadedUsers((string, uint) character)
+    {
+        lock (redownloadedUsers)
+        {
+            if (redownloadedUsers.Contains(character)) return;
+            redownloadedUsers.Add(character);
+        }
+    }
+
+    public void RemoveRedownloadedUsers((string, uint) character)
+    {
+        lock (redownloadedUsers)
+        {
+            redownloadedUsers?.Remove(character);
+        }
+    }
+
+    public bool HasRedownloadedUser(PettableUser user)
+    {
+        lock (redownloadedUsers)
+        {
+            foreach((string, uint) u in redownloadedUsers)
+            {
+                if (u.Item1 == user.UserName && u.Item2 == user.Homeworld) return true;
+            }
+        }
+        return false;
     }
 }

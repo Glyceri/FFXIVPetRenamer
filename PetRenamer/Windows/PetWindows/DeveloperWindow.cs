@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
@@ -50,10 +51,21 @@ internal class DeveloperWindow : PetWindow
 
         if (currentTab == 0) Users();
         else if (currentTab == 1) DrawHelpField();
-        else if (currentTab == 2) { }
+        else if (currentTab == 2) DrawUserPictures();
         else if (currentTab == 3) PetNameWindow();
         else if (currentTab == 4) SettingsWindow();
         else if (currentTab == 5) { }
+    }
+
+    void DrawUserPictures()
+    {
+        foreach(var idk in PluginLink.NetworkingHandler.NetworkingCache.textureCache.Keys)
+        {
+            IDalamudTextureWrap texutre = PluginLink.NetworkingHandler.NetworkingCache.textureCache[idk];
+            if (texutre == null) continue;
+
+            ImGui.Image(texutre.ImGuiHandle, new System.Numerics.Vector2(100, 100));
+        }
     }
 
     void PetNameWindow()
@@ -70,6 +82,7 @@ internal class DeveloperWindow : PetWindow
 
     void Users()
     {
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return;
         tableCounter = 0;
         PluginLink.PettableUserHandler.LoopThroughUsers(NewDrawUser);
     }
@@ -138,6 +151,8 @@ internal class DeveloperWindow : PetWindow
   
     unsafe void DrawHelpField()
     {
+        if (PluginHandlers.ClientState.IsPvPExcludingDen) return;
+
         GameObject? target = PluginHandlers.TargetManager.Target!;
         if (target != null)
         {

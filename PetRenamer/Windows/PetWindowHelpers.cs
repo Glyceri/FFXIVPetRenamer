@@ -37,10 +37,10 @@ public abstract class PetWindowHelpers : PetWindowStyling
         (SeIconChar.BoxedLetterL.ToIconString(),        typeof(ChangelogWindow),        "[Changelog]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterC.ToIconString(),        typeof(CreditsWindow),          "[Credits]", (pw) => pw is ConfigWindow),
         (SeIconChar.BoxedLetterT.ToIconString(),        typeof(ThemeEditorWindow),      "[Theme Editor]", (pw) => pw is ConfigWindow),
-        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", null!),
+        (SeIconChar.BoxedQuestionMark.ToIconString(),   typeof(PetHelpWindow),          "[Help]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hideHelpButton) return false; return true; }),
         (SeIconChar.MouseWheel.ToIconString(),          typeof(ConfigWindow),           "[Settings]", null!),
         (SeIconChar.AutoTranslateOpen.ToIconString() + " " + SeIconChar.AutoTranslateClose.ToIconString(),   typeof(PetRenameWindow),        "[Give Nickname]", null!),
-        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", null!),
+        (SeIconChar.Square.ToIconString(),              typeof(NewPetListWindow),       "[Pet/Minion List]", (pw) => { if(pw is ConfigWindow) return true; if (PluginLink.Configuration.hidePetListButton) return false; return true; }),
         //(SeIconChar.BoxedLetterK.ToIconString(),        typeof(KofiPetWindow),          "[Support me on Ko-fi]", (pw) => PluginLink.Configuration.showKofiButton),
     };
 
@@ -486,10 +486,20 @@ public abstract class PetWindowHelpers : PetWindowStyling
 
     protected void DrawRedownloadButton(PettableUser u)
     {
-        RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}",
-            Styling.SmallButton,
-            $"Redownload profile picture for: {u.UserName}@{SheetUtils.instance.GetWorldName(u.Homeworld)}",
-            () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
+        if (PluginLink.NetworkingHandler.NetworkingCache.HasRedownloadedUser(u))
+        {
+            RedownloadButton($"{SeIconChar.AutoTranslateOpen.ToIconString()} {SeIconChar.AutoTranslateClose.ToIconString()}",
+               Styling.SmallButton,
+               $"Currently redownloading profile picture for: {u.UserName}@{u.HomeWorldName}",
+               () => { });
+        }
+        else
+        {
+            RedownloadButton(SeIconChar.QuestSync.ToIconString() + $"##<Redownload>{internalCounter++}",
+                Styling.SmallButton,
+                $"Redownload profile picture for: {u.UserName}@{u.HomeWorldName}",
+                () => ProfilePictureNetworked.instance.RequestDownload((u.UserName, u.Homeworld)));
+        }
     }
 
     protected void DrawAdvancedBarWithQuit(string label, string value, Action callback, string quitText = "", string quitTooltip = "", Action callback2 = null!, bool ipcMode = false)

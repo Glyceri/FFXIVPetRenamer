@@ -3,7 +3,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.Core.Chat.Attributes;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
-using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.Chat.ChatElements;

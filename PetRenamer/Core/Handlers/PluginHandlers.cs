@@ -22,6 +22,7 @@ internal class PluginHandlers
     [PluginService] internal static IGameInteropProvider Hooking { get; set; } = null!;
     [PluginService] internal static IAddonLifecycle AddonLifecycle { get; set; } = null!;
     [PluginService] internal static IPartyList PartyList { get; set; } = null!;
+    [PluginService] internal static IContextMenu ContextMenu { get; set; } = null!;
 
     internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

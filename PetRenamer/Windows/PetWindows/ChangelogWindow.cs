@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Game.Text;
+using ImGuiNET;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -89,6 +90,16 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.6.2"), new CLE("UI", "For users that didn't split their target bars. Target Bar renaming and casting functionalities should now work!")) },
         { new CLS(new Version("1.4.6.3"), new CLE("General", "Fixed an issue where summoner would overwrite Pet Mirage settings at any given oppertunity.", "The chat should now be less greedy in renaming pet names."), new CLE("UI", "The config settings for allowing context menu's works again.")) },
         { new CLS(new Version("1.4.6.4"), new CLE("UI", "Toolbar Events are now automatic."), new CLE("General", "Fixed a bug where the Topaz Carbuncle target text would not work as intended.")) },
+        { new CLS(new Version("1.4.7.0"), new CLE("UI", "There is now a new Pet News window.", "You can now hide buttons in the Toolbar.", "Certain default images have been changed.")) },
+        { new CLS(new Version("1.4.7.1"), new CLE("General", "Updated the plogon for 6.57.")) },
+        { new CLS(new Version("1.4.8.0"), new CLE("General", "The Mappy popup window is now reduced to a chat message.", "Chat messages that Pet Nicknames sets hidden now properly remain hidden.", "Pets on the Mappy Map will no longer show stuck when you are mounted.", "Pet Nicknames is now enabled in the Wolves' Den Pier, but as a result even more restricted in non-Wolves' Den Pier zones.")) },
+        { new CLS(new Version("1.4.8.1"), new CLE("Chat", "Fixed a chat display bug!")) },
+        { new CLS(new Version("1.4.8.2"), new CLE("General", "Properly resolves Battle Pets with Chocobos in your party.")) },
+        { new CLS(new Version("1.4.8.3"), new CLE("Context Menu", $"'Give Nickname' has been renamed to '{SeIconChar.BoxedLetterP.ToIconString()} Rename' (Get used to it)"), new CLE("Icon", "The plugin icon is changed because in reality... I cannot see green properly.")) },
+        { new CLS(new Version("1.4.8.4"), new CLE("General", "DotNET 8 update."), new CLE("UI", "Redownloading profile pictures works again.")) },
+        { new CLS(new Version("1.4.8.5"), new CLE("Chat", "You can now hide the PVP warning message.")) },
+        { new CLS(new Version("1.4.8.6"), new CLE("General", "Fixes an issue related to alt accounts not working.")) },
+        { new CLS(new Version("1.4.8.7"), new CLE("General", "Updated to the new Context Menu system.")) },
     };
 
     const string starter = "  ◉   ";

@@ -41,10 +41,10 @@ public class ConfigWindow : PetWindow
     {
         anythingIllegals = AnyIllegalsGoingOn();
 
-        if ((anythingIllegals && !PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode) DrawWarningThing();
-
         if (BeginElementBox("UI Settings"))
         {
+            DrawConfigElement(ref PluginLink.Configuration.hideHelpButton, "Hide Help Button", new string[] { "Hide the help button in the toolbar?", "Buttons will NEVER hide themselves in the settings window." }, "Hide the Help button.");
+            DrawConfigElement(ref PluginLink.Configuration.hidePetListButton, "Hide Pet List Button", new string[] { "Hide the pet list button in the toolbar?", "Buttons will NEVER hide themselves in the settings window."}, "Hide the Pet List button.");
             DrawConfigElement(ref PluginLink.Configuration.activeElement, PluginLink.ToolbarAnimator.registeredIdentifiers, "Toolbar Animation", new string[] { "Select which toolbar animation you would like to play." }, "Toolbar Animation.", PluginLink.ToolbarAnimator.RegisterActiveAnimation);
             DrawConfigElement(ref PluginLink.Configuration.anonymousMode, "Anonymous mode", new string[] { "Hides player names and replaces them with initials.", "Disables profile pictures." }, "Anonymous mode.");
             DrawConfigElement(ref PluginLink.Configuration.newUseCustomTheme, "Use Custom Theme", new string[] { "You Can Make Your Own Theme, Click Here To Enable That Feature.", "Open using [/pettheme] [/miniontheme]" }, "Use Custom Theme [/pettheme]", OnChange: (value) => SetTheme() );
@@ -57,13 +57,14 @@ public class ConfigWindow : PetWindow
         }
         if (BeginElementBox("Global Settings"))
         {
+            DrawConfigElement(ref PluginLink.Configuration.disablePVPChatMessage, "Disable PVP Chat Warning", "Disables the PVP chat warning.");
             DrawConfigElement(ref PluginLink.Configuration.displayCustomNames, "Display Custom Nicknames", new string[] { "Completely Enables or Disables Custom Nicknames.", "Prevents Most parts of the Plugin from Working!" });
             DrawConfigElement(ref PluginLink.Configuration.automaticallySwitchPetmode, "Automatically Switch Pet Mode", "Upon Summoning a Minion or Battle Pet, Automatically Switch Pet Mode?");
             DrawConfigElement(ref PluginLink.Configuration.downloadProfilePictures, "Automatically Download Profile Pictures", "Upon Importing a User (or yourself). Automatically Download their Profile Picture?");
             EndElementBox();
         }
 
-        if ((anythingIllegals && PluginLink.Configuration.understoodWarningThirdPartySettings) || DebugMode)
+        if ((anythingIllegals) || DebugMode)
         {
             if (BeginElementBox("Third Party Settings", false))
             {
@@ -74,20 +75,11 @@ public class ConfigWindow : PetWindow
         }
     }
 
-    public void DrawWarningThing()
-    {
-        if (BeginElementBox("Third Party WARNING", true))
-        {
-            DrawConfigElement(ref PluginLink.Configuration.understoodWarningThirdPartySettings, "I UNDERSTAND!", new string[] { "Integration with Third Party Plugins may cause issues that are BEYOND MY CONTROL!", "Some third party settings will drastically lower performance.", "I tested every interaction well, but use at your own risk." }, "READ THE WARNING!");
-            EndElementBox();
-        }
-    }
-
     public override void OnDrawNormal()
     {
         if (BeginElementBox("Minion Settings"))
         {
-            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnMinions, "Allow Context Menus for Minions", "Rightclicking on a Minion will add the [Give Nickname] Option.");
+            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnMinions, "Allow Context Menus for Minions", "Rightclicking on a Minion will add the [Rename] Option.");
             DrawConfigElement(ref PluginLink.Configuration.allowTooltipsOnMinions, "Allow Tooltips for Minions", "Display Minion Nicknames in Tooltips.", "Allow Tooltips for Minions");
             DrawConfigElement(ref PluginLink.Configuration.replaceEmotesOnMinions, "Allow Custom Nicknames in Emotes for Minions", "Replace a Minions in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.showNamesInMinionBook, "Show Nicknames in the Minion Journal", "Shows your Custom Nicknames in the Minion Journal.");
@@ -99,7 +91,7 @@ public class ConfigWindow : PetWindow
     {
         if (BeginElementBox("Battle Pet Settings"))
         {
-            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnBattlePets, "Allow Context Menus for Battle Pets", "Rightclicking on a Battle Pet will add the [Give Nickname] Option.");
+            DrawConfigElement(ref PluginLink.Configuration.useContextMenuOnBattlePets, "Allow Context Menus for Battle Pets", "Rightclicking on a Battle Pet will add the [Rename] Option.");
             DrawConfigElement(ref PluginLink.Configuration.allowTooltipsBattlePets, "Allow Tooltips for Battle Pets", "Display Battle Pet Nicknames in Tooltips.");
             DrawConfigElement(ref PluginLink.Configuration.replaceEmotesBattlePets, "Allow Custom Nicknames in Emotes for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
             DrawConfigElement(ref PluginLink.Configuration.useCustomPetNamesInBattleChat, "Allow Custom Nicknames in the Battle Log for Battle Pets", "Replace a Battle Pet in-game Name with your Custom Nickname.");
@@ -172,7 +164,6 @@ public class ConfigWindow : PetWindow
         return false;
     }
 
-    public bool HasReadWarning => PluginLink.Configuration.understoodWarningThirdPartySettings;
     public bool DebugMode => PluginLink.Configuration.debugMode;
 
     bool BeginElementBox(string title, bool forceOpen = false, string tooltip = "")

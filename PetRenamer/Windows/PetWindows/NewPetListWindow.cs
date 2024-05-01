@@ -111,7 +111,7 @@ internal class NewPetListWindow : PetWindow
     {
         if (activeUser == null) return;
         string activeUsername = StringUtils.instance.MakeTitleCase(activeUser.UserDisplayName);
-        string homeWorldName = SheetUtils.instance.GetWorldName(activeUser.Homeworld);
+        string homeWorldName = activeUser.HomeWorldName;
         bool ipcUser = activeUser.IsIPCOnlyUser;
         int accuratePetCount = activeUser.SerializableUser.AccurateTotalPetCount();
         int accurateMinionCount = activeUser.SerializableUser.AccurateMinionCount();

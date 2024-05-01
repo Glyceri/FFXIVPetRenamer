@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Singleton;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.Attributes;
 using System.Collections.Generic;
 
@@ -62,13 +63,15 @@ public class PartyPlayer
     public nint Chocobo { get; private set; } = nint.Zero;
 
     public bool changed { get; private set; } = false;
+
+    public int RenderFlags { get; private set; } = 0;
     public PartyPlayer(nint player) => Set(player);
     public List<nint> ActivePets 
     { 
         get 
         { 
             List<nint> pets = new List<nint>();
-            if (BattlePet != nint.Zero) pets.Add(BattlePet);
+            if (BattlePet != nint.Zero && RenderFlags == 0) pets.Add(BattlePet);
             if (Chocobo != nint.Zero) pets.Add(Chocobo);
             return pets;
         } 
@@ -94,5 +97,10 @@ public class PartyPlayer
         nint tempPet = (nint)PluginLink.CharacterManager->LookupPetByOwnerObject((BattleChara*)player);
         if (BattlePet != tempPet || (PluginLink.PettableUserHandler.GetPet(tempPet)?.nameChanged ?? false)) changed = true;
         BattlePet = tempPet;
+
+        if (BattlePet == nint.Zero) return;
+        int renderFlags = ((BattleChara*)BattlePet)->Character.GameObject.RenderFlags;
+        if (renderFlags != RenderFlags) changed = true;
+        RenderFlags = renderFlags;
     }
 }
