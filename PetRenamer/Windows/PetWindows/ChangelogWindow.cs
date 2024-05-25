@@ -100,6 +100,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.8.5"), new CLE("Chat", "You can now hide the PVP warning message.")) },
         { new CLS(new Version("1.4.8.6"), new CLE("General", "Fixes an issue related to alt accounts not working.")) },
         { new CLS(new Version("1.4.8.7"), new CLE("General", "Updated to the new Context Menu system.")) },
+        { new CLS(new Version("1.4.8.8"), new CLE("General", "PetRenamer.GameObjectRenameDict is now available for other plogons to use!")) },
     };
 
     const string starter = "  ◉   ";

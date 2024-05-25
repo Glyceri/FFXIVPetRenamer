@@ -1,4 +1,5 @@
-﻿using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
 using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Core.Networking.NetworkingElements;
 

@@ -1,6 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 
 namespace PetRenamer.Core.PettableUserSystem.Pet;
@@ -68,6 +69,8 @@ public class PetBase
         _objectID = gObject->ObjectID;
 
         _nameChanged = serializableUserV3.changed;
+
+        if (_customName != null && _customName != string.Empty) IpcProvider.PetNicknameDict.TryAdd(_objectID, _customName);
 
         if (!_petChanged && !_nameChanged) return;
 

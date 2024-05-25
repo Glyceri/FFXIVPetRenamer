@@ -6,6 +6,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Collections.Generic;
 
 namespace PetRenamer;
 
@@ -29,6 +30,8 @@ public static class IpcProvider
     static ICallGateProvider<string, object>? OnPlayerDataChangedSingle;
     static ICallGateProvider<PlayerCharacter, object>? ClearPlayerDataAll;
 
+    internal static Dictionary<uint, string> PetNicknameDict { get; private set; } = new Dictionary<uint, string>();
+
     // ------------------------ READ ME ------------------------
     // {PluginConstants.apiNamespace} = "PetRenamer."
     // When a player does not exist, Pet Nicknames automatically cleans up ALL ipc data connected to that player.
@@ -43,6 +46,11 @@ public static class IpcProvider
     // If you want to completely remove all IPC data from a player call 'ClearPlayerDataAll'
     // This will clear all IPC data send to that player and act as if no data got send ever (clearing data is non-recoverable, you will have to completely resend data to 'SetPlayerDataAll')
     // You can NOT! set data for your Local Player. You can only set data for other players, this is by design.
+
+    internal static void EarlyInit()
+    {
+        RegisterDictionaries();
+    }
 
     internal static void Init(ref DalamudPluginInterface dalamudPluginInterface)
     {
@@ -84,6 +92,11 @@ public static class IpcProvider
         Enabled!.RegisterFunc(EnabledDetour);
         GetPetNicknameNint!.RegisterFunc(GetPetNicknameFromNintDetour);
         GetLocalPlayerDataAll!.RegisterFunc(GetLocalPlayerDataAllDetour);
+    }
+
+    static void RegisterDictionaries()
+    {
+        PetNicknameDict = PluginHandlers.PluginInterface.GetOrCreateData($"{PluginConstants.apiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
     }
 
     // Notifiers
@@ -134,6 +147,8 @@ public static class IpcProvider
 
     internal static void DeInit()
     {
+        PetNicknameDict.Clear();
+        PluginLink.DalamudPlugin.RelinquishData($"{PluginConstants.apiNamespace}GameObjectRenameDict");
         ApiVersion?.UnregisterFunc();
         Enabled?.UnregisterFunc();
         GetPetNicknameNint?.UnregisterFunc();

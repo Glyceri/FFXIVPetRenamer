@@ -10,6 +10,9 @@ internal static class StartHandler
     internal static void Start(ref DalamudPluginInterface dalamudPluginInterface, PetRenamerPlugin plugin)
     {
         PluginHandlers.Start(ref dalamudPluginInterface);
+
+        IpcProvider.EarlyInit();
+
         PluginLink.Start(ref dalamudPluginInterface, ref plugin);
 
         IpcProvider.Init(ref dalamudPluginInterface);

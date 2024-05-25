@@ -55,6 +55,8 @@ internal class UserFindUpdatable : Updatable
             }
         }
 
+        IpcProvider.PetNicknameDict.Clear();
+
         int userCount = users.Count;
         for (int i = 0; i < userCount; i++)
             PettableUserUtils.instance.Solve(users[i]);
