@@ -9,7 +9,7 @@ namespace PetRenamer.Core.Chat.ChatElements;
 [Chat]
 internal class PetDevChatElement : ChatElement
 {
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (!PluginLink.Configuration.debugMode || !PluginLink.Configuration.showChatID) return;
 

@@ -8,6 +8,6 @@ namespace PetRenamer.Core.Updatable
     {
         public void Dispose() => OnDispose();
         protected virtual void OnDispose() { }
-        public abstract unsafe void Update(ref IFramework frameWork, ref PlayerCharacter player);
+        public abstract unsafe void Update(ref IFramework frameWork, ref IPlayerCharacter player);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface.Internal;
+﻿using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.Core.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using System;

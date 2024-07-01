@@ -19,7 +19,7 @@ internal class UserFindUpdatable : Updatable
 
     int lastUserCount = -1;
 
-    public unsafe override void Update(ref IFramework frameWork, ref PlayerCharacter player)
+    public unsafe override void Update(ref IFramework frameWork, ref IPlayerCharacter player)
     {
         for (int i = PluginLink.PettableUserHandler.Users.Count - 1; i >= 0; i--)
         {

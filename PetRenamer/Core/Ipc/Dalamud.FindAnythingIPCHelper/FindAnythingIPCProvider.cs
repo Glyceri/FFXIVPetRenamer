@@ -19,7 +19,7 @@ public static class FindAnythingIPCProvider
 
     static List<(string, int)> guids = new List<(string, int)>();
 
-    public static void Init(ref DalamudPluginInterface dalamudPluginInterface)
+    public static void Init(ref IDalamudPluginInterface dalamudPluginInterface)
     {
         cgRegister = dalamudPluginInterface.GetIpcSubscriber<string, string, uint, string>("FA.Register");
         cgUnregisterAll = dalamudPluginInterface.GetIpcSubscriber<string, bool>("FA.UnregisterAll");

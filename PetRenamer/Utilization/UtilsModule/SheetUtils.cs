@@ -238,7 +238,7 @@ public struct PNCompanion
     }
 
     string SanitizeString(string baseString, sbyte pronoun)
-    {
+    {/*
         try
         {
             checked
@@ -256,7 +256,8 @@ public struct PNCompanion
         catch 
         { 
             return baseString;
-        }
+        }*/
+        return baseString;  
     }
 
     string[] pronounList = new string[]

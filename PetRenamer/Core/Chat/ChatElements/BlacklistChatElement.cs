@@ -8,8 +8,8 @@ namespace PetRenamer.Core.Chat.ChatElements;
 [Chat]
 internal unsafe class BlacklistChatElement : ChatElement
 {
-    internal override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled) { }
-    internal override void OnChatMessageHandled(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled) { }
+    internal override void OnChatMessageHandled(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (PluginLink.ChatHandler.MinusBlacklistCountHandle()) isHandled = true;
     }

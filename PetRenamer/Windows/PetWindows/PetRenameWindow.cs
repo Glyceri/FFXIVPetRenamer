@@ -1,4 +1,3 @@
-using Dalamud.Interface.Internal;
 using ImGuiNET;
 using PetRenamer.Core;
 using PetRenamer.Core.Handlers;
@@ -6,7 +5,6 @@ using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Utilization.UtilsModule;
 using PetRenamer.Windows.Attributes;
-using System;
 using System.Numerics;
 
 namespace PetRenamer.Windows.PetWindows;
@@ -74,7 +72,7 @@ public class PetRenameWindow : PetWindow
                 pets[i].baseName = pet.BaseName;
                 pets[i].temporaryPetName = pet.CustomName;
             }
-            else if (pets[i].petID == -1) pets[i].Dispose();
+            else if(pets[i].petID == -1) pets[i].textureID = int.MaxValue;
         }
     }
 
@@ -82,7 +80,7 @@ public class PetRenameWindow : PetWindow
     {
         if (petMode == PetMode.ShareMode) return;
         if (activePet == null) return;
-        if (activePet.textureWrap == null) return;
+        if (activePet.textureID == uint.MaxValue) return;
         if (user == null) return;
 
         SameLinePretendSpace();
@@ -118,9 +116,10 @@ public class PetRenameWindow : PetWindow
 
     void DrawImageBox()
     {
+        if (activePet.textureID == uint.MaxValue) return;
         if (!BeginListBox("##<stylingboxrenamepanne2l>", imageBoxSize))
             return;
-        DrawImage(activePet.textureWrap.ImGuiHandle, new Vector2(111, 112));
+        DrawImage(PluginHandlers.TextureProvider.GetFromGameIcon(activePet.textureID)?.GetWrapOrDefault()?.ImGuiHandle ?? nint.Zero, new Vector2(111, 112));
         ImGui.EndListBox();
     }
 
@@ -223,8 +222,7 @@ public class PetRenameWindow : PetWindow
 
     void SetImage(int id)
     {
-        string iconPath = RemapUtils.instance.GetTextureID(id).GetIconPath();
-        activePet.textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        activePet.textureID = RemapUtils.instance.GetTextureID(id);
     }
 
     void ForceOpenForID(int id)
@@ -258,12 +256,6 @@ public class PetRenameWindow : PetWindow
         return PetMode.Normal;
     }
 
-    protected override void OnDispose()
-    {
-        foreach (RenamablePet pet in pets)
-            pet?.Dispose();
-    }
-
     public void Reset()
     {
         foreach (var pet in pets)
@@ -271,7 +263,7 @@ public class PetRenameWindow : PetWindow
     }
 }
 
-internal class RenamablePet : IDisposable
+internal class RenamablePet
 {
     internal string petName = string.Empty;
     internal string _temporaryPetName = string.Empty;
@@ -282,7 +274,7 @@ internal class RenamablePet : IDisposable
     }
     internal string baseName = string.Empty;
     internal int petID = -1;
-    internal IDalamudTextureWrap textureWrap = null!;
+    internal uint textureID = uint.MaxValue;
 
     internal PetMode associatedMode = PetMode.Normal;
     internal string referredToAs = string.Empty;
@@ -298,12 +290,6 @@ internal class RenamablePet : IDisposable
         petID = -1;
         baseName = string.Empty;
         temporaryPetName = string.Empty;
-        Dispose();
-    }
-
-    public void Dispose()
-    {
-        textureWrap?.Dispose();
-        textureWrap = null!;
+        textureID = int.MaxValue;
     }
 }

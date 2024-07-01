@@ -27,8 +27,8 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
         BattleChara* bChara = PluginLink.CharacterManager->LookupBattleCharaByName(user.UserName, true, (short)user.Homeworld);
         if (bChara == null) return; 
         user.SetUser(bChara);
-
-        if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.Companion.CompanionObject);
+        
+        if (user.SerializableUser.hasCompanion || user.LocalUser) user.SetCompanion(bChara->Character.CompanionData.CompanionObject);
         if (user.IsPettableClass && (user.SerializableUser.hasBattlePet || user.LocalUser)) user.SetBattlePet(AlternativeFindForBChara(bChara));
 
         bool userChanged = user.SerializableUser.ToggleBackChanged();
@@ -43,15 +43,15 @@ internal class PettableUserUtils : UtilsRegistryType, ISingletonBase<PettableUse
 
     unsafe BattleChara* AlternativeFindForBChara(BattleChara* bChara)
     {
-        uint objectID = bChara->Character.GameObject.ObjectID;
-        Span<Pointer<BattleChara>> charaSpan = PluginLink.CharacterManager->BattleCharaListSpan;
+        uint objectID = bChara->Character.GameObject.GetGameObjectId().ObjectId;
+        Span<Pointer<BattleChara>> charaSpan = PluginLink.CharacterManager->BattleCharas;
         int length = charaSpan.Length;
         for(int i = 0; i < length; i++)
         {
             Pointer<BattleChara> chara = charaSpan[i];
             if (chara.Value == null) continue;
             if (chara.Value == bChara) continue;
-            if (chara.Value->Character.GameObject.OwnerID != objectID) continue;
+            if (chara.Value->Character.GameObject.OwnerId != objectID) continue;
             if (chara.Value->Character.CharacterData.Health == 0) continue;
             if (!RemapUtils.instance.petIDToAction.ContainsKey(-chara.Value->Character.CharacterData.ModelCharaId)) continue;
             return chara;

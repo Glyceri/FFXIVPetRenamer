@@ -10,7 +10,7 @@ namespace PetRenamer.Core.Legacy.LegacyElements;
 [Legacy(new int[1] { 4 })]
 internal class LegacyNamingVer4 : LegacyElement
 {
-    internal override void OnPlayerAvailable(int detectedVersion, ref PlayerCharacter player)
+    internal override void OnPlayerAvailable(int detectedVersion, ref IPlayerCharacter player)
     {
         if (detectedVersion != 4) return;
 

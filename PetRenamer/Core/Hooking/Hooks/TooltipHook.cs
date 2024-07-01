@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
+using PetRenamer.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +13,7 @@ namespace PetRenamer.Core.Hooking.Hooks;
 [Hook]
 internal class TooltipHook : QuickTextHookableElement
 {
-    [Signature("66 44 89 44 24 ?? 53 55", DetourName = nameof(ShowTooltipDetour))]
+    [Signature("E8 ?? ?? ?? ?? B8 5E 01 00 00 ", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<Delegates.AccurateShowTooltip> showTooltip = null!;
 
     public static string latestOutcome = string.Empty;

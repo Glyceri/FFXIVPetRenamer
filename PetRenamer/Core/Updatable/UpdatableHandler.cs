@@ -19,7 +19,7 @@ internal class UpdatableHandler : RegistryBase<Updatable, UpdatableAttribute>, I
 
     void MainUpdate(IFramework framework)
     {
-        PlayerCharacter player = PluginHandlers.ClientState.LocalPlayer!;
+        IPlayerCharacter player = PluginHandlers.ClientState.LocalPlayer!;
         if (player == null) return;
 
         int elementCount = elements.Count;

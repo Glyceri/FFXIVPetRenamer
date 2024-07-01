@@ -26,7 +26,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         if (!CanContinue(baseD)) return;
         SetPetname((AddonPartyList*)baseD);
-        SetCastlist((AddonPartyList*)baseD);
+        //SetCastlist((AddonPartyList*)baseD);
     }
 
     bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible || !PluginLink.Configuration.displayCustomNames || baseD == null);
@@ -40,7 +40,7 @@ internal unsafe class PartyListHook : HookableElement
         if (nickname == string.Empty) return;
         partyNode->Pet.Name->SetText(nickname);
     }
-
+    /*
     void SetCastlist(AddonPartyList* partyNode)
     {
         List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
@@ -79,5 +79,5 @@ internal unsafe class PartyListHook : HookableElement
             (int, string) pet = PettableUserUtils.instance.GetNameRework(castString, ref user, true);
             StringUtils.instance.ReplaceAtkString(member.CastingActionName, pet.Item2, user.SerializableUser.GetNameFor(pet.Item1));
         }
-    }
+    }*/
 }

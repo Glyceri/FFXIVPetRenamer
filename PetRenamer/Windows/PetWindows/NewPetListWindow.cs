@@ -15,6 +15,8 @@ using System;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Internal;
 using System.Linq;
+using Dalamud.Interface.Textures.TextureWraps;
+using Dalamud.Interface.Textures;
 
 namespace PetRenamer.Windows.PetWindows;
 
@@ -263,9 +265,9 @@ internal class NewPetListWindow : PetWindow
     {
         uint textureID = RemapUtils.instance.GetTextureID(id);
         if (textureID == 0) return null!;
-        string iconPath = PluginHandlers.TextureProvider.GetIconPath(textureID)!;
-        if (iconPath == null) return null!;
-        return PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        ISharedImmediateTexture texture = PluginHandlers.TextureProvider.GetFromGameIcon(textureID)!;
+        if (texture == null) return null!;
+        return texture.GetWrapOrEmpty()!;
     }
 
     public void DrawShareHeader()
@@ -480,8 +482,6 @@ internal class NewPetListWindow : PetWindow
             if (drawExtraButton != null) internalCallback = () => drawExtraButton(index);
             if (intCallback != null) trueCallback = () => deleteActive ^= true;
         }
-
-        public override void OnDispose() => texture?.Dispose();
 
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {

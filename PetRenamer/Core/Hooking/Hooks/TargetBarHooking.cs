@@ -1,7 +1,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
-using DGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using DGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 

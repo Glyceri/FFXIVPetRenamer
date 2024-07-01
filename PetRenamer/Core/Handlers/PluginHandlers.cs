@@ -7,7 +7,7 @@ namespace PetRenamer.Core.Handlers;
 
 internal class PluginHandlers
 {
-    [PluginService] internal static DalamudPluginInterface PluginInterface { get; set; } = null!;
+    [PluginService] internal static IDalamudPluginInterface PluginInterface { get; set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; set; } = null!;
     [PluginService] internal static IFramework Framework { get; set; } = null!;
     [PluginService] internal static IDataManager DataManager { get; set; } = null!;
@@ -24,5 +24,5 @@ internal class PluginHandlers
     [PluginService] internal static IPartyList PartyList { get; set; } = null!;
     [PluginService] internal static IContextMenu ContextMenu { get; set; } = null!;
 
-    internal static void Start(ref DalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
+    internal static void Start(ref IDalamudPluginInterface plugin) => plugin.Create<PluginHandlers>(); 
 }

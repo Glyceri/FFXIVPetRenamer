@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Internal;
+﻿using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Networking.Attributes;
 using PetRenamer.Core.Networking.NetworkingElements.Lodestone.LodestoneElement;
@@ -8,7 +9,6 @@ using PetRenamer.Core.Singleton;
 using PetRenamer.Logging;
 using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetRenamer.Core.Networking.NetworkingElements;
@@ -40,11 +40,10 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
 
     nint GetSearchingTexture()
     {
-        string iconPath = PluginHandlers.TextureProvider.GetIconPath(201)!;
-        if (iconPath == null) return nint.Zero;
-        IDalamudTextureWrap textureWrap = PluginHandlers.TextureProvider.GetTextureFromGame(iconPath)!;
+        ISharedImmediateTexture textureWrap = PluginHandlers.TextureProvider.GetFromGameIcon(201)!;
         if (textureWrap == null) return nint.Zero;
-        return textureWrap.ImGuiHandle;
+        IDalamudTextureWrap? tWrap = textureWrap.GetWrapOrDefault();
+        return tWrap?.ImGuiHandle ?? IntPtr.Zero;
     }
 
     public void OnDeclare(PettableUser user, UserDeclareType type, bool force)
@@ -92,7 +91,6 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
             Cache.RemoveTexture(characterData);
         }
         catch { }
-        Thread.Sleep(3000); // I need dalamud to clear the texture cache first. Hence this stupid sleep, maybe I'm using the texture cache wrong. But I feel like if I manually dispose a texture and load a different one but at the same path, it should just clear.
         Cache.RemoveRedownloadedUsers(characterData);
         FileInfo info = null!;
         try
@@ -108,9 +106,14 @@ public class ProfilePictureNetworked : NetworkingElement, ISingletonBase<Profile
         {
             lock (Cache.textureCache)
             {
-                IDalamudTextureWrap wrap = PluginHandlers.TextureProvider.GetTextureFromFile(info)!;
-                if (wrap == null) return;
-                Cache.textureCache.Add(characterData, wrap);
+                ISharedImmediateTexture texture = PluginHandlers.TextureProvider.GetFromFile(info.FullName)!;
+                if (texture != null)
+                {
+                    IDalamudTextureWrap wrap =  texture.RentAsync().Result;
+                    if (wrap == null) return;
+                    Cache.textureCache.Add(characterData, wrap);
+                }
+
             }
         }
         catch { }

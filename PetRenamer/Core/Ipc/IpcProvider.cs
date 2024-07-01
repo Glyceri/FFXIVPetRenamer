@@ -24,11 +24,11 @@ public static class IpcProvider
     static ICallGateProvider<nint, string>? GetPetNicknameNint;
 
     static ICallGateProvider<string>? GetLocalPlayerDataAll;
-    static ICallGateProvider<PlayerCharacter, string, object>? SetPlayerDataAll;
+    static ICallGateProvider<IPlayerCharacter, string, object>? SetPlayerDataAll;
     static ICallGateProvider<string, object>? OnPlayerDataChangedAll;
-    static ICallGateProvider<PlayerCharacter, string, object>? SetPlayerDataSingle;
+    static ICallGateProvider<IPlayerCharacter, string, object>? SetPlayerDataSingle;
     static ICallGateProvider<string, object>? OnPlayerDataChangedSingle;
-    static ICallGateProvider<PlayerCharacter, object>? ClearPlayerDataAll;
+    static ICallGateProvider<IPlayerCharacter, object>? ClearPlayerDataAll;
 
     internal static Dictionary<uint, string> PetNicknameDict { get; private set; } = new Dictionary<uint, string>();
 
@@ -52,14 +52,14 @@ public static class IpcProvider
         RegisterDictionaries();
     }
 
-    internal static void Init(ref DalamudPluginInterface dalamudPluginInterface)
+    internal static void Init(ref IDalamudPluginInterface dalamudPluginInterface)
     {
         RegisterIPCProfiders(ref dalamudPluginInterface);
         RegisterActions();
         RegisterFunctions();
     }
 
-    static void RegisterIPCProfiders(ref DalamudPluginInterface dalamudPluginInterface)
+    static void RegisterIPCProfiders(ref IDalamudPluginInterface dalamudPluginInterface)
     {
         // Notifiers
         Ready                       = dalamudPluginInterface.GetIpcProvider<object>                             ($"{PluginConstants.apiNamespace}Ready");
@@ -74,9 +74,9 @@ public static class IpcProvider
         GetLocalPlayerDataAll       = dalamudPluginInterface.GetIpcProvider<string>                             ($"{PluginConstants.apiNamespace}GetLocalPlayerDataAll");
 
         // Actions
-        SetPlayerDataAll            = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataAll");
-        SetPlayerDataSingle         = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataSingle");
-        ClearPlayerDataAll          = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, object>            ($"{PluginConstants.apiNamespace}ClearPlayerDataAll");
+        SetPlayerDataAll            = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataAll");
+        SetPlayerDataSingle         = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataSingle");
+        ClearPlayerDataAll          = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, object>            ($"{PluginConstants.apiNamespace}ClearPlayerDataAll");
     }
 
     static void RegisterActions()
@@ -135,9 +135,9 @@ public static class IpcProvider
     }
 
     // Actions
-    public static void SetPlayerDataAllDetour(PlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
-    public static void SetPlayerDataSingleDetour(PlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
-    public static void ClearPlayerDataAllDetour(PlayerCharacter character) => PluginLink.IpcStorage.Register((character, PluginConstants.IpcClear));
+    public static void SetPlayerDataAllDetour(IPlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
+    public static void SetPlayerDataSingleDetour(IPlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
+    public static void ClearPlayerDataAllDetour(IPlayerCharacter character) => PluginLink.IpcStorage.Register((character, PluginConstants.IpcClear));
 
     // Functions
     public static(uint, uint) VersionDetour() => (MajorVersion, MinorVersion);

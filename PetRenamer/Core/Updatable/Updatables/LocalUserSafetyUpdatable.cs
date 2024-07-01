@@ -17,7 +17,7 @@ internal class LocalUserSafetyUpdatable : Updatable, ISingletonBase<LocalUserSaf
 
     public LocalUserSafetyUpdatable() => instance = this;
 
-    public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
+    public override void Update(ref IFramework frameWork, ref IPlayerCharacter player)
     {
         if (lastHomeworld == player.HomeWorld.Id) return;
         if (lastName == player.Name.TextValue) return;
