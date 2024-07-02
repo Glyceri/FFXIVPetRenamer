@@ -1,5 +1,6 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using PetRenamer.Core.Serialization;
 using System;
 using System.Text.Json.Serialization;
 
@@ -52,9 +53,12 @@ public class Configuration : IPluginConfiguration
     public bool autoOpenDebug = true;
     public bool showChatID = false;
 
-    public void Initialise(ref IDalamudPluginInterface PetNicknamesPlugin)
+
+
+    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;
+        LegacyInitialise();
         CurrentInitialise();
     }
 
@@ -68,4 +72,42 @@ public class Configuration : IPluginConfiguration
         if (currentSaveFileVersion < Version) return;
         PetNicknamesPlugin?.SavePluginConfig(this); 
     }
+
+    #region OBSOLETE
+
+    //---------------------------Legacy Variables---------------------------
+    // Will be kept for backwards compatibility
+    //---------------------------Legacy Variables---------------------------
+    [Obsolete("NEVER USE THIS VALUE!")]
+    public string __Obsolete_Values__ { get; set; } = "\nThe values from here onwards are obsolete, editing these will result in NOTHING";
+    [Obsolete("Old nickname Save System. Nowadays nicknames get saved per User")]
+    public SerializableNickname[]? users { get; set; } = null;
+    [Obsolete("Old User Save System. Very innefficient.")]
+    public SerializableUser[]? serializableUsers { get; set; } = null;
+    [Obsolete("Old User Save System. Very innefficient.")]
+    public SerializableUserV2[]? serializableUsersV2 { get; set; } = null;
+    [Obsolete("Old User Save System. Very innefficient. Please... OH PLEASE")]
+    public SerializableUserV3[]? serializableUsersV3 = null;
+    [Obsolete("Issue fixed. Just keeping it here so I dont accidentally overwrite it later and fock over people with old savefiles :D")]
+    public bool usePartyList { get; set; } = false;
+
+    [Obsolete("Use the type specific variable instead.")] public bool replaceEmotes { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowTooltips { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useContextMenus { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomNamesInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool useCustomFlyoutInChat { get; set; } = true;
+    [Obsolete("Use the type specific variable instead.")] public bool allowCastBar { get; set; } = true;
+
+#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
+    void LegacyInitialise()
+    {
+        users ??= Array.Empty<SerializableNickname>();
+        serializableUsers ??= Array.Empty<SerializableUser>();
+        serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0612 // Type or member is obsolete
+
+    #endregion
 }

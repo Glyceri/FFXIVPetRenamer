@@ -10,6 +10,9 @@ using FFXIVClientStructs.Interop;
 using System;
 using Dalamud.Game.ClientState.Objects.Types;
 using System.Reflection;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -20,17 +23,19 @@ internal unsafe class PettableUserHandler : IUpdatable
     public bool Enabled { get; set; } = true;
 
     DalamudServices DalamudServices { get; init; }
-    PetServices PetServices { get; init; }
+    IPetServices PetServices { get; init; }
     IPetLog PetLog { get; init; }
+    IPettableDatabase PettableDatabase { get; init; }
 
-    public PettableUserHandler(DalamudServices dalamudServices, PetServices petServices)
+    public PettableUserHandler(DalamudServices dalamudServices, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PetLog = PetServices.PetLog;
+        PettableDatabase = pettableDatabase;
     }
 
-    public void OnUpdate(IFramework framework)
+    public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
     {
         Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
 
@@ -63,7 +68,7 @@ internal unsafe class PettableUserHandler : IUpdatable
             }
             if (alreadyExists) continue;
 
-            IPettableUser newPettableUser = new PettableUser(PetLog, chara);
+            IPettableUser newPettableUser = new PettableUser(PetLog, PettableDatabase, chara);
             pettableUsers.Add(newPettableUser);
             PetLog.Log("Added a new Pettable user: " + newPettableUser.Name + " : " + newPettableUser.ContentID);
         }

@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.Interop;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
@@ -14,8 +15,9 @@ internal unsafe class PettableUser : IPettableUser
     public BattleChara* BattleChara { get; }
 
     IPetLog petLog { get; init; }
+    public IPettableDatabaseEntry DataBaseEntry { get; private set; }
 
-    public PettableUser(IPetLog petLog, Pointer<BattleChara> battleChara)
+    public PettableUser(IPetLog petLog, IPettableDatabase dataBase, Pointer<BattleChara> battleChara)
     {
         this.petLog = petLog;
         BattleChara* bChara = battleChara.Value;
@@ -23,6 +25,9 @@ internal unsafe class PettableUser : IPettableUser
         ContentID = bChara->ContentId;
         Homeworld = bChara->HomeWorld;
         Touched = true;
+        DataBaseEntry = dataBase.GetEntry(ContentID);
+
+        petLog.LogFatal(Name + " has: " + DataBaseEntry.IDs.Length + " nicknames in their database!");
     }
 
     public void Destroy()

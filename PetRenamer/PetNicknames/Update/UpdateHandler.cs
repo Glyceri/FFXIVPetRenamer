@@ -1,5 +1,8 @@
-﻿using Dalamud.Plugin.Services;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Update.Interfaces;
 using PetRenamer.PetNicknames.Update.Updatables;
@@ -11,16 +14,18 @@ namespace PetRenamer.PetNicknames.Update;
 internal class UpdateHandler : IDisposable
 {
     DalamudServices DalamudServices { get; init; }
-    PetServices PetServices { get; init; }
+    IPetServices PetServices { get; init; }
+    IPettableDatabase PettableDatabase { get; init; }
     IPetLog PetLog { get; init; }
 
     List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(DalamudServices dalamudServices, PetServices petServices)
+    public UpdateHandler(DalamudServices dalamudServices, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PetLog = PetServices.PetLog;
+        PettableDatabase = pettableDatabase;
 
         DalamudServices.Framework.Update += OnUpdate;
         Setup();
@@ -28,17 +33,21 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
-        _updatables.Add(new PettableUserHandler(DalamudServices, PetServices));
+        _updatables.Add(new PettableUserHandler(DalamudServices, PettableDatabase, PetServices));
+        _updatables.Add(new LegacyDatabaseHelper(DalamudServices, PettableDatabase, PetServices));
     }
 
     void OnUpdate(IFramework framework)
     {
+        IPlayerCharacter player = DalamudServices.ClientState.LocalPlayer!;
+        if (player == null) return;
+
         int updatableCount = _updatables.Count;
         for(int i = 0; i < updatableCount; i++)
         {
             IUpdatable updatable = _updatables[i];
             if (!updatable.Enabled) continue;
-            updatable.OnUpdate(framework);
+            updatable.OnUpdate(framework, player);
         }
     }
 
