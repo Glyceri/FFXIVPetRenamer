@@ -35,7 +35,7 @@ public static class IpcProvider
     // ------------------------ READ ME ------------------------
     // {PluginConstants.apiNamespace} = "PetRenamer."
     // When a player does not exist, Pet Nicknames automatically cleans up ALL ipc data connected to that player.
-    // When a player comes into existance on your client, or the plugin has boardcasted Ready, you should call 'GetLocalPlayerDataAll'
+    // When a player comes into existance on your client, or the plugin has broadcasted Ready, you should call 'GetLocalPlayerDataAll'
     // For syncing with another player send this whole list to 'SetPlayerDataAll'
     // When a player changes any of their own pet nicknames, an event with that single namechange will broadcast on 'OnPlayerDataChangedSingle'
     // For syncing send this data to 'SetPlayerDataSingle'
