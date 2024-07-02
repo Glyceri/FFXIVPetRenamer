@@ -21,11 +21,11 @@ internal abstract class RestrictedChatElement : ChatElement
             ChatTypes.Add((int)chats[i]);
     }
 
-    internal sealed override void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal sealed override void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (!ChatTypes.Contains((int)type)) return;
-        OnRestrictedChatMessage(type, senderId, ref sender, ref message, ref isHandled);
+        OnRestrictedChatMessage(type, timestamp, ref sender, ref message, ref isHandled);
     }
 
-    internal abstract void OnRestrictedChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled);
+    internal abstract void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled);
 }

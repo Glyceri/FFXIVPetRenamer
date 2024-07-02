@@ -20,7 +20,7 @@ internal class PluginLink
     internal static UtilsHandler Utils { get; set; } = null!;
     internal static PetRenamerPlugin PetRenamerPlugin { get; set; } = null!;
     internal static WindowsHandler WindowHandler { get; set; } = null!;
-    internal static DalamudPluginInterface DalamudPlugin { get; set; } = null!;
+    internal static IDalamudPluginInterface DalamudPlugin { get; set; } = null!;
     internal static CommandHandler CommandHandler { get; set; } = null!;
     internal static UpdatableHandler UpdatableHandler { get; set; } = null!;
     internal static LegacyCompatibilityHandler LegacyCompatibilityHandler { get; set; } = null!;
@@ -33,7 +33,7 @@ internal class PluginLink
     internal static ToolbarAnimator ToolbarAnimator { get; private set; } = null!;
     unsafe internal static CharacterManager* CharacterManager => FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager.Instance();
 
-    internal static void Start(ref DalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
+    internal static void Start(ref IDalamudPluginInterface dalamud, ref PetRenamerPlugin petPlugin)
     {
         DalamudPlugin = dalamud;
         PetRenamerPlugin = petPlugin;

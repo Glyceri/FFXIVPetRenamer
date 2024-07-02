@@ -10,10 +10,10 @@ using PetRenamer.Windows.PetWindows;
 
 namespace PetRenamer.Core.ContextMenu.ContextMenuElements;
 
-[ContextMenu]
+//[ContextMenu]
 internal unsafe class PetContextMenu : ContextMenuElement
 {
-    internal override void OnOpenMenu(MenuOpenedArgs args)
+    internal override void OnOpenMenu(IMenuOpenedArgs args)
     {
         if (args.AddonName != null && args.AddonName != "MinionNoteBook") return;
         if (PluginHandlers.ClientState.LocalPlayer == null) return;
@@ -22,7 +22,7 @@ internal unsafe class PetContextMenu : ContextMenuElement
         else HandleNotebook(args);
     }
 
-    void HandleNotebook(MenuOpenedArgs args)
+    void HandleNotebook(IMenuOpenedArgs args)
     {
         if (!PluginLink.Configuration.useContextMenuOnMinions) return;
         string petname = TooltipHook.latestOutcome;
@@ -42,7 +42,7 @@ internal unsafe class PetContextMenu : ContextMenuElement
         }
     }
 
-    void HandleNonNotebook(MenuOpenedArgs args)
+    void HandleNonNotebook(IMenuOpenedArgs args)
     {
         nint address = PluginHandlers.TargetManager.Target?.Address ?? nint.Zero;
         PettableUser targetUser = PluginLink.PettableUserHandler.GetUser(address);

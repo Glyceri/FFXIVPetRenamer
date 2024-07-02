@@ -57,8 +57,8 @@ public unsafe class ActionMenuHook : HookableElement
             AtkComponentNode* node = baseD->UldManager.NodeList[i]->GetAsAtkComponentNode();
             if (node == null) continue;
             if (node->Component == null) continue;
-            if (node->Component->UldManager.NodeListCount != 9) continue;
-            AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(8);
+            if (node->Component->UldManager.NodeListCount != 11) continue;
+            AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(10);
             if (tNode == null) continue;
             (int, string) currentName = PettableUserUtils.instance.GetNameRework(tNode->NodeText.ToString(), ref user, true);
             StringUtils.instance.ReplaceAtkString(tNode, currentName.Item2, user.SerializableUser.GetNameFor(currentName.Item1));

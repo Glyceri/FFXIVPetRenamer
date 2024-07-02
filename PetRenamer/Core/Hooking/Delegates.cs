@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
@@ -44,6 +45,9 @@ public static unsafe class Delegates
     public delegate char NaviMapTooltip(AtkUnitBase* tooltip, int a2);
 
     public delegate char AreaMapTooltipDelegate(AtkUnitBase* a1, uint a2, char a3);
+
+    public delegate void NewMapDelegate(IntPtr a1);
+
     public delegate IntPtr AreaMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2);
     public delegate IntPtr NaviMapOnMouseMoveDelegate(AtkUnitBase* unk1, IntPtr unk2, IntPtr unk3);
 

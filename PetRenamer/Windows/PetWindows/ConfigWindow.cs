@@ -1,6 +1,5 @@
 using ImGuiNET;
 using PetRenamer.Core.Handlers;
-using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Windows.Attributes;
 using System;
 using System.Collections.Generic;
@@ -68,8 +67,6 @@ public class ConfigWindow : PetWindow
         {
             if (BeginElementBox("Third Party Settings", false))
             {
-                if (IPCMappy.MappyAvailable)
-                    DrawConfigElement(ref PluginLink.Configuration.enableMappyIntegration, "Enable Mappy Integration", new string[] { "Allows Pet Nicknames to display Custom Names on Mappy Pets" });
                 EndElementBox();
             }
         }
@@ -128,18 +125,8 @@ public class ConfigWindow : PetWindow
         }
     }
 
-    void DrawPerformanceSettings()
-    {
-        if (BeginElementBox("Advanced Performance Settings", false, "Advanced Performance Settings\n[THESE ALL REQUIRE A PLUGIN RESTART]"))
-        {
-            Header("[THESE ALL REQUIRE A PLUGIN RESTART]", false, "(have you tried turning it off and on again)");
-            EndElementBox();
-        }
-    }
-
     public override void OnLateDraw()
     {
-        //DrawPerformanceSettings();
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift) || DebugMode)
         {
             if (BeginElementBox("Debug Mode"))
@@ -159,7 +146,6 @@ public class ConfigWindow : PetWindow
     {
         if (PluginLink.Configuration.debugMode) return true;
         if (ImGui.IsKeyDown(ImGuiKey.LeftShift)) return true;
-        if (IPCMappy.MappyAvailable) return true;
 
         return false;
     }

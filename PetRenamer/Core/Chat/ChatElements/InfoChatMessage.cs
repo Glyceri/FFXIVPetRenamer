@@ -15,7 +15,7 @@ internal unsafe class InfoChatMessage : RestrictedChatElement
 
     public InfoChatMessage() => RegisterChat(2105, 2106);
 
-    internal override void OnRestrictedChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     { 
         if (!PluginLink.Configuration.displayCustomNames) return;
         if (!PluginLink.Configuration.useCustomPetNamesInInfoChat) return;

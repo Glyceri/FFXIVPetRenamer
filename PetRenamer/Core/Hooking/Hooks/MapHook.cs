@@ -5,8 +5,11 @@ using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
+using PetRenamer.Logging;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
+using static PetRenamer.Core.Hooking.Delegates;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -20,26 +23,50 @@ internal class MapHook : HookableElement
     const int petIconID = 60961;
     const int partyPlayerIconID = 60421;
 
-    [Signature("40 57 48 83 EC 60 48 8B F9 83 FA 64", DetourName = nameof(NaviTooltip))]
-    readonly Hook<Delegates.NaviMapTooltip> naviTooltip = null!;
+    // 40 57 48 83 EC 60 48 8B F9 83 FA 64
+    [Signature("40 57 48 81 EC B0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 90 00 00 00 ", DetourName = nameof(NewMiniMapHook))]
+    readonly Hook<NewMapDelegate> naviTooltip = null!;
 
-    [Signature("48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8 ", DetourName = nameof(ShowTooltipDetour))]
-    readonly Hook<Delegates.AreaMapTooltipDelegate> showTooltipThing = null!;
+    // "48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8"
+    // This is the 6.58 hook
+    // Everything has changed!
 
-    unsafe char NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
+    [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00 ", DetourName = nameof(MapDetourNew))]
+    readonly Hook<NewMapDelegate> mapTooltipHook = null!;
+
+    unsafe void MapDetourNew(IntPtr a1)
+    {
+        mapTooltipHook!.Original(a1);
+        int mapIndex = (int)(*(uint*)(a1 + 1860));
+        if (mapIndex == -1) return;
+        ShowTooltipDetour((AtkUnitBase*)a1, mapIndex);
+    }
+
+    unsafe void NewMiniMapHook(IntPtr a1)
+    {
+        naviTooltip.Original(a1);
+
+        int navimapIndex = (int)(*(uint*)(a1 + 14888));
+        if (navimapIndex == -1) return;
+
+        NaviTooltip((AtkUnitBase*)a1, navimapIndex);
+    }
+
+
+    unsafe void NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
         TooltipHelper.lastWasMap = true;
         if (lastIndex != elementIndex) lastIndex = elementIndex;
-        else return naviTooltip!.Original(unitBase, elementIndex);
+        else return;
 
         BaseNode node = new BaseNode(unitBase);
-        if (node == null) return naviTooltip!.Original(unitBase, elementIndex);
+        if (node == null) return;
         ComponentNode mapComponentNode = node.GetComponentNode(18);
-        if (mapComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        if (mapComponentNode == null) return;
         AtkComponentNode* atkComponentNode = mapComponentNode.GetPointer();
-        if (atkComponentNode == null) return naviTooltip!.Original(unitBase, elementIndex);
+        if (atkComponentNode == null) return;
         AtkComponentBase* atkComponentBase = atkComponentNode->Component;
-        if (atkComponentBase == null) return naviTooltip!.Original(unitBase, elementIndex);
+        if (atkComponentBase == null) return;
         AtkUldManager manager = atkComponentBase->UldManager;
 
         current = 0;
@@ -48,7 +75,7 @@ internal class MapHook : HookableElement
         {
             AtkResNode* curNode = manager.NodeList[i];
             if (curNode == null) continue;
-            if (!curNode->IsVisible) continue;
+            if (!curNode->IsVisible()) continue;
             AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
             if (cNode == null) continue;
             AtkComponentBase* cBase = cNode->Component;
@@ -66,40 +93,39 @@ internal class MapHook : HookableElement
             AtkTexture texture = asset->AtkTexture;
             AtkTextureResource* textureResource = texture.Resource;
             if (textureResource == null) continue;
-            if (textureResource->IconID != petIconID) continue;
+            if (textureResource->IconId != petIconID) continue;
             current++;
             if (i != elementIndex + manager.PartsListCount) continue;
             GetDistanceAt(current);
-            return naviTooltip!.Original(unitBase, elementIndex);
+            return;
         }
         TooltipHelper.nextUser = null!;
-        return naviTooltip!.Original(unitBase, elementIndex);
+        return;
     }
 
-    unsafe char ShowTooltipDetour(AtkUnitBase* a1, uint a2, char a3)
+    unsafe void ShowTooltipDetour(AtkUnitBase* a1, int index)
     {
         TooltipHelper.lastWasMap = true;
-        if (lastIndex != a2) lastIndex = (int)a2;
-        else return showTooltipThing!.Original(a1, a2, a3);
+        if (lastIndex != index) lastIndex = index;
+        else return;
 
         current = 0;
-        int index = (int)a2;
+        if (index == -1) return;
 
         BaseNode node = new BaseNode(a1);
         ComponentNode cNode1 = node.GetComponentNode(53);
-        if (cNode1 == null) return showTooltipThing!.Original(a1, a2, a3);
+        if (cNode1 == null) return;
         AtkComponentNode* atkComponentNode = cNode1.GetPointer();
-        if (atkComponentNode == null) return showTooltipThing!.Original(a1, a2, a3);
+        if (atkComponentNode == null) return;
         AtkComponentBase* atkCompontentBase = atkComponentNode->Component;
-        if (atkCompontentBase == null) return showTooltipThing!.Original(a1, a2, a3);
+        if (atkCompontentBase == null) return;
         AtkUldManager manager = atkCompontentBase->UldManager;
 
         for (int i = 0; i < manager.NodeListCount; i++)
         {
-
             AtkResNode* curNode = manager.NodeList[i];
             if (curNode == null) continue;
-            if (!curNode->IsVisible) continue;
+            if (!curNode->IsVisible()) continue;
             AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
             if (cNode == null) continue;
             AtkComponentBase* cBase = cNode->Component;
@@ -117,14 +143,13 @@ internal class MapHook : HookableElement
             AtkTexture texture = asset->AtkTexture;
             AtkTextureResource* textureResource = texture.Resource;
             if (textureResource == null) continue;
-            if (textureResource->IconID != petIconID) continue;
+            if (textureResource->IconId != petIconID) continue;
             current++;
-            if (manager.PartsListCount + manager.ObjectCount + manager.AssetCount + i + 1 != a2) continue;
+            if (manager.PartsListCount + manager.ObjectCount + manager.AssetCount + i + 1 != index) continue;
             GetDistanceAt(current);
-            return showTooltipThing!.Original(a1, a2, a3);
+            return;
         }
         TooltipHelper.nextUser = null!;
-        return showTooltipThing!.Original(a1, a2, a3);
     }
 
     unsafe void GetDistanceAt(int at)
@@ -137,9 +162,9 @@ internal class MapHook : HookableElement
         if (pChara == null) return;
         Vector3 playerPos = pChara->Character.GameObject.Position;
 
-        foreach (PartyMember member in gManager->PartyMembersSpan)
+        foreach (PartyMember member in gManager->MainGroup.PartyMembers)
         {
-            BattleChara* player = PluginLink.CharacterManager->LookupBattleCharaByObjectId(member.ObjectID);
+            BattleChara* player = PluginLink.CharacterManager->LookupBattleCharaByEntityId(member.EntityId);
             if (player == null) continue;
             BattleChara* chocobo = PluginLink.CharacterManager->LookupBuddyByOwnerObject(player);
             BattleChara* battlePet = PluginLink.CharacterManager->LookupPetByOwnerObject(player);
@@ -168,13 +193,13 @@ internal class MapHook : HookableElement
 
     internal override void OnInit()
     {
-        showTooltipThing?.Enable();
         naviTooltip?.Enable();
+        mapTooltipHook?.Enable();
     }
 
     internal override void OnDispose()
     {
         naviTooltip?.Dispose();
-        showTooltipThing?.Dispose();
+        mapTooltipHook?.Dispose();
     }
 }

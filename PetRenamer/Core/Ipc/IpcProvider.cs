@@ -6,6 +6,7 @@ using PetRenamer.Core.Handlers;
 using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
+using System.Collections.Generic;
 
 namespace PetRenamer;
 
@@ -23,11 +24,13 @@ public static class IpcProvider
     static ICallGateProvider<nint, string>? GetPetNicknameNint;
 
     static ICallGateProvider<string>? GetLocalPlayerDataAll;
-    static ICallGateProvider<PlayerCharacter, string, object>? SetPlayerDataAll;
+    static ICallGateProvider<IPlayerCharacter, string, object>? SetPlayerDataAll;
     static ICallGateProvider<string, object>? OnPlayerDataChangedAll;
-    static ICallGateProvider<PlayerCharacter, string, object>? SetPlayerDataSingle;
+    static ICallGateProvider<IPlayerCharacter, string, object>? SetPlayerDataSingle;
     static ICallGateProvider<string, object>? OnPlayerDataChangedSingle;
-    static ICallGateProvider<PlayerCharacter, object>? ClearPlayerDataAll;
+    static ICallGateProvider<IPlayerCharacter, object>? ClearPlayerDataAll;
+
+    internal static Dictionary<uint, string> PetNicknameDict { get; private set; } = new Dictionary<uint, string>();
 
     // ------------------------ READ ME ------------------------
     // {PluginConstants.apiNamespace} = "PetRenamer."
@@ -44,14 +47,19 @@ public static class IpcProvider
     // This will clear all IPC data send to that player and act as if no data got send ever (clearing data is non-recoverable, you will have to completely resend data to 'SetPlayerDataAll')
     // You can NOT! set data for your Local Player. You can only set data for other players, this is by design.
 
-    internal static void Init(ref DalamudPluginInterface dalamudPluginInterface)
+    internal static void EarlyInit()
+    {
+        RegisterDictionaries();
+    }
+
+    internal static void Init(ref IDalamudPluginInterface dalamudPluginInterface)
     {
         RegisterIPCProfiders(ref dalamudPluginInterface);
         RegisterActions();
         RegisterFunctions();
     }
 
-    static void RegisterIPCProfiders(ref DalamudPluginInterface dalamudPluginInterface)
+    static void RegisterIPCProfiders(ref IDalamudPluginInterface dalamudPluginInterface)
     {
         // Notifiers
         Ready                       = dalamudPluginInterface.GetIpcProvider<object>                             ($"{PluginConstants.apiNamespace}Ready");
@@ -66,9 +74,9 @@ public static class IpcProvider
         GetLocalPlayerDataAll       = dalamudPluginInterface.GetIpcProvider<string>                             ($"{PluginConstants.apiNamespace}GetLocalPlayerDataAll");
 
         // Actions
-        SetPlayerDataAll            = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataAll");
-        SetPlayerDataSingle         = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataSingle");
-        ClearPlayerDataAll          = dalamudPluginInterface.GetIpcProvider<PlayerCharacter, object>            ($"{PluginConstants.apiNamespace}ClearPlayerDataAll");
+        SetPlayerDataAll            = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataAll");
+        SetPlayerDataSingle         = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, string, object>    ($"{PluginConstants.apiNamespace}SetPlayerDataSingle");
+        ClearPlayerDataAll          = dalamudPluginInterface.GetIpcProvider<IPlayerCharacter, object>            ($"{PluginConstants.apiNamespace}ClearPlayerDataAll");
     }
 
     static void RegisterActions()
@@ -84,6 +92,11 @@ public static class IpcProvider
         Enabled!.RegisterFunc(EnabledDetour);
         GetPetNicknameNint!.RegisterFunc(GetPetNicknameFromNintDetour);
         GetLocalPlayerDataAll!.RegisterFunc(GetLocalPlayerDataAllDetour);
+    }
+
+    static void RegisterDictionaries()
+    {
+        PetNicknameDict = PluginHandlers.PluginInterface.GetOrCreateData($"{PluginConstants.apiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
     }
 
     // Notifiers
@@ -122,9 +135,9 @@ public static class IpcProvider
     }
 
     // Actions
-    public static void SetPlayerDataAllDetour(PlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
-    public static void SetPlayerDataSingleDetour(PlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
-    public static void ClearPlayerDataAllDetour(PlayerCharacter character) => PluginLink.IpcStorage.Register((character, PluginConstants.IpcClear));
+    public static void SetPlayerDataAllDetour(IPlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
+    public static void SetPlayerDataSingleDetour(IPlayerCharacter character, string data) => PluginLink.IpcStorage.Register((character, data));
+    public static void ClearPlayerDataAllDetour(IPlayerCharacter character) => PluginLink.IpcStorage.Register((character, PluginConstants.IpcClear));
 
     // Functions
     public static(uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
@@ -134,6 +147,8 @@ public static class IpcProvider
 
     internal static void DeInit()
     {
+        PetNicknameDict.Clear();
+        PluginLink.DalamudPlugin.RelinquishData($"{PluginConstants.apiNamespace}GameObjectRenameDict");
         ApiVersion?.UnregisterFunc();
         Enabled?.UnregisterFunc();
         GetPetNicknameNint?.UnregisterFunc();

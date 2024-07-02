@@ -13,7 +13,7 @@ internal class AutoBattlePetUpdatable : Updatable
 {
     readonly List<int> missingIDs = new List<int>();
 
-    public override void Update(ref IFramework frameWork, ref PlayerCharacter player)
+    public override void Update(ref IFramework frameWork, ref IPlayerCharacter player)
     {
         PettableUser user = PluginLink.PettableUserHandler.LocalUser()!;
         if (user == null) return;

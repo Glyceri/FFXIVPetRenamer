@@ -1,5 +1,4 @@
 ﻿using PetRenamer.Core.Ipc.FindAnythingIPCHelper;
-using PetRenamer.Core.Ipc.MappyIPC;
 using PetRenamer.Core.Networking.NetworkingElements;
 
 namespace PetRenamer.Core.Handlers;
@@ -24,7 +23,6 @@ internal static class QuitHandler
         IpcProvider.DeInit();
 
         FindAnythingIPCProvider.DeInit();
-        IPCMappy.DeInit();
         HttpRequestQueue.Dispose();
     }
 }

@@ -8,13 +8,13 @@ namespace PetRenamer;
 
 public class IpcStorage : IDisposable
 {
-    public delegate void OnIpcChange(ref List<(PlayerCharacter, string)> change);
+    public delegate void OnIpcChange(ref List<(IPlayerCharacter, string)> change);
     public event OnIpcChange IpcChange = null!;
 
-    List<(PlayerCharacter, string)> nicknames = new List<(PlayerCharacter, string)>();
+    List<(IPlayerCharacter, string)> nicknames = new List<(IPlayerCharacter, string)>();
     bool touched = false;
 
-    public void Register((PlayerCharacter, string) nickname)
+    public void Register((IPlayerCharacter, string) nickname)
     {
         nicknames.Add(nickname);
         touched = true;

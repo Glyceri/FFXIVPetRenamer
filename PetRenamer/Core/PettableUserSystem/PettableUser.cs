@@ -2,6 +2,7 @@
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.PettableUserSystem.Pet;
 using PetRenamer.Core.Serialization;
+using PetRenamer.Logging;
 using PetRenamer.Utilization.UtilsModule;
 using System;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ public unsafe class PettableUser
         _objectIndex = user->Character.GameObject.ObjectIndex;
         if (_objectIndex == 0) PluginLink.PettableUserHandler.SetLocalUser(this);
         _resetCounter = 0;
-         _objectID = user->Character.GameObject.ObjectID;
+         _objectID = user->Character.GameObject.GetGameObjectId().ObjectId;
         _class = user->Character.CharacterData.ClassJob;
         if (_lastClass != _class)
         {
@@ -160,7 +161,10 @@ public unsafe class PettableUser
     public void SetCompanion(Companion* companion)
     {
         int minionID = -1;
-        if (companion != null) minionID = companion->Character.CharacterData.ModelCharaId;
+        if (companion != null)
+        {
+            minionID = companion->Character.CharacterData.ModelCharaId;
+        }
         _minion.Set((nint)companion, minionID, _serializableUser);
     }
 

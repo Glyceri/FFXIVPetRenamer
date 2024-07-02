@@ -5,5 +5,5 @@ namespace PetRenamer.Core.ContextMenu;
 
 internal abstract class ContextMenuElement : IRegistryElement
 {
-    internal abstract void OnOpenMenu(MenuOpenedArgs args);
+    internal abstract void OnOpenMenu(IMenuOpenedArgs args);
 }

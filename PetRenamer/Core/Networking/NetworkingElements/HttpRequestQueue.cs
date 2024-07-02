@@ -16,7 +16,7 @@ public static class HttpRequestQueue
     const double timerInterval = 1.0;
     static double timer = 0;
 
-    public static void Update(ref IFramework frameWork, ref PlayerCharacter player)
+    public static void Update(ref IFramework frameWork, ref IPlayerCharacter player)
     {
         if(timer <= 0 && queue.Count > 0)
         {

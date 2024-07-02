@@ -54,10 +54,6 @@ public class Configuration : IPluginConfiguration
     public bool autoOpenDebug = true;
     public bool showChatID = false;
 
-    // ------------------------------ MAPPY ------------------------------
-    public bool enableMappyIntegration = true;
-    public bool readMappyIntegration = false;
-
     // ----------------------- PERFORMANCE SETTINGS ----------------------
 
     public SerializableUserV3[]? serializableUsersV3 = null;

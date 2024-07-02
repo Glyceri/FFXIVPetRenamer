@@ -38,7 +38,7 @@ internal class LegacyCompatibilityHandler : RegistryBase<LegacyElement, LegacyAt
     /// <param name="frameWork">IFramework</param>
     /// <param name="player">Local PlayerCharacter</param>
     /// <returns>Returns false if it can be killed.</returns>
-    internal bool OnUpdate(ref IFramework frameWork, ref PlayerCharacter player)
+    internal bool OnUpdate(ref IFramework frameWork, ref IPlayerCharacter player)
     {
         if (lastInternalVersion != currentInternalVersion)
         {

@@ -14,7 +14,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
     public WindowSystem WindowSystem { get => windowSystem; }
 
     List<PetWindow> petWindows => elements;
-    readonly List<TemporaryPetWindow> temporaryPetWindows = new List<TemporaryPetWindow>();
 
     public WindowsHandler() : base()
     {
@@ -46,14 +45,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
             PluginHandlers.PluginInterface.UiBuilder.OpenConfigUi += () => PluginLink.WindowHandler.ToggleWindow(element.GetType());
     }
 
-    public T AddTemporaryWindow<T>(string message, Action<object> callback, Window blackenedWindow = null!) where T : TemporaryPetWindow
-    {
-        TemporaryPetWindow petWindow = (Activator.CreateInstance(typeof(T), new object[3] { message, callback, blackenedWindow }) as TemporaryPetWindow)!;
-        temporaryPetWindows.Add(petWindow);
-        windowSystem.AddWindow(petWindow);
-        return (T)petWindow;
-    }
-
     public void ToggleWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = !GetWindow<T>().IsOpen;
     public void CloseWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = false;
     public void OpenWindow<T>() where T : PetWindow => GetWindow<T>().IsOpen = true;
@@ -77,12 +68,6 @@ internal class WindowsHandler : RegistryBase<PetWindow, PersistentPetWindowAttri
             CloseAllWindows();
             return;
         }
-        for (int i = temporaryPetWindows.Count - 1; i >= 0; i--)
-            if (temporaryPetWindows[i].closed)
-            {
-                windowSystem.RemoveWindow(temporaryPetWindows[i]);
-                temporaryPetWindows.RemoveAt(i);
-            }
     }
 
     bool initialized = false;

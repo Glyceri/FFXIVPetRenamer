@@ -21,9 +21,9 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
     internal override void OnRegistered() => PluginLink.IpcStorage.Register(OnIpcChange);
     internal override void Dispose() => PluginLink.IpcStorage.Deregister(OnIpcChange);
 
-    public void OnIpcChange(ref List<(PlayerCharacter, string)> data)
+    public void OnIpcChange(ref List<(IPlayerCharacter, string)> data)
     {
-        foreach ((PlayerCharacter, string) item in data)
+        foreach ((IPlayerCharacter, string) item in data)
             SetNickname(item.Item1, item.Item2);
     }
 
@@ -36,7 +36,7 @@ internal class IpcUtils : UtilsRegistryType, ISingletonBase<IpcUtils>
         return customName;
     }
 
-    public void SetNickname(PlayerCharacter player, string data)
+    public void SetNickname(IPlayerCharacter player, string data)
     {
         try
         {

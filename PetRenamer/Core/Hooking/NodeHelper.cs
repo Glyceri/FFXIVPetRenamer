@@ -101,7 +101,7 @@ internal static unsafe class Node
         {
             var currentNode = uldManager.NodeList[i];
 
-            if (currentNode->NodeID != nodeId) continue;
+            if (currentNode->NodeId != nodeId) continue;
 
             return (T*)currentNode;
         }

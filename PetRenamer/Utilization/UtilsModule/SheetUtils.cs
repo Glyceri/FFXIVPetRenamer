@@ -244,7 +244,7 @@ public struct PNCompanion
             checked
             {
                 string newString = baseString;
-                if (PluginHandlers.ClientState.ClientLanguage == Dalamud.ClientLanguage.German)
+                if (PluginHandlers.ClientState.ClientLanguage == Dalamud.Game.ClientLanguage.German)
                 {
                     newString = newString.Replace("[p]", "");
                     if (newString.Contains("[a]")) 

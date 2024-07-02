@@ -43,24 +43,13 @@ internal unsafe class PartyListHook : HookableElement
 
     void SetCastlist(AddonPartyList* partyNode)
     {
-        List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
-            partyNode->PartyMember.PartyMember0,
-            partyNode->PartyMember.PartyMember1,
-            partyNode->PartyMember.PartyMember2,
-            partyNode->PartyMember.PartyMember3,
-            partyNode->PartyMember.PartyMember4,
-            partyNode->PartyMember.PartyMember5,
-            partyNode->PartyMember.PartyMember6,
-            partyNode->PartyMember.PartyMember7
-        };
-
         TooltipHelper.partyListInfos.Clear();
 
-        foreach (PartyListMemberStruct member in partyMemberNames)
+        foreach (PartyListMemberStruct member in partyNode->PartyMembers)
         {
             if (member.Name == null) continue;
             if (member.CastingProgressBar == null) continue;
-            if (!member.CastingProgressBar->AtkResNode.IsVisible) continue;
+            if (!member.CastingProgressBar->AtkResNode.IsVisible()) continue;
 
             string memberName = member.Name->NodeText.ToString() ?? string.Empty;
             if (memberName == string.Empty) continue;
