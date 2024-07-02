@@ -26,7 +26,7 @@ internal unsafe class PartyListHook : HookableElement
     {
         if (!CanContinue(baseD)) return;
         SetPetname((AddonPartyList*)baseD);
-        //SetCastlist((AddonPartyList*)baseD);
+        SetCastlist((AddonPartyList*)baseD);
     }
 
     bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible || !PluginLink.Configuration.displayCustomNames || baseD == null);
@@ -40,27 +40,16 @@ internal unsafe class PartyListHook : HookableElement
         if (nickname == string.Empty) return;
         partyNode->Pet.Name->SetText(nickname);
     }
-    /*
+
     void SetCastlist(AddonPartyList* partyNode)
     {
-        List<PartyListMemberStruct> partyMemberNames = new List<PartyListMemberStruct>() {
-            partyNode->PartyMember.PartyMember0,
-            partyNode->PartyMember.PartyMember1,
-            partyNode->PartyMember.PartyMember2,
-            partyNode->PartyMember.PartyMember3,
-            partyNode->PartyMember.PartyMember4,
-            partyNode->PartyMember.PartyMember5,
-            partyNode->PartyMember.PartyMember6,
-            partyNode->PartyMember.PartyMember7
-        };
-
         TooltipHelper.partyListInfos.Clear();
 
-        foreach (PartyListMemberStruct member in partyMemberNames)
+        foreach (PartyListMemberStruct member in partyNode->PartyMembers)
         {
             if (member.Name == null) continue;
             if (member.CastingProgressBar == null) continue;
-            if (!member.CastingProgressBar->AtkResNode.IsVisible) continue;
+            if (!member.CastingProgressBar->AtkResNode.IsVisible()) continue;
 
             string memberName = member.Name->NodeText.ToString() ?? string.Empty;
             if (memberName == string.Empty) continue;
@@ -79,5 +68,5 @@ internal unsafe class PartyListHook : HookableElement
             (int, string) pet = PettableUserUtils.instance.GetNameRework(castString, ref user, true);
             StringUtils.instance.ReplaceAtkString(member.CastingActionName, pet.Item2, user.SerializableUser.GetNameFor(pet.Item1));
         }
-    }*/
+    }
 }

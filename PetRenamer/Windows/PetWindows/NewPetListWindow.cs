@@ -231,11 +231,10 @@ internal class NewPetListWindow : PetWindow
             QuickName name = activeUser.SerializableUser[i];
             if (!isValid(name.ID)) continue;
             string petBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(name.ID));
-            IDalamudTextureWrap textureWrap = GetTexture(name.ID);
             bool isIPC = name.HasIPCName;
             Action<int> internalCallback = (id) => { };
             if (activeUser.LocalUser) internalCallback = callback;
-            tempList.Add(new DrawablePet(isIPC, textureWrap, identifier, name.Name, petBaseName, name.ID, internalCallback, "X", isIPC ? "Clear IPC" : "Remove", callback2));
+            tempList.Add(new DrawablePet(isIPC, RemapUtils.instance.GetTextureID(name.ID), identifier, name.Name, petBaseName, name.ID, internalCallback, "X", isIPC ? "Clear IPC" : "Remove", callback2));
         }
 
         ReorderableList list = null!;
@@ -259,15 +258,6 @@ internal class NewPetListWindow : PetWindow
             HandleUserListActive(); 
         });
         drawableElements.Add(list);
-    }
-
-    IDalamudTextureWrap GetTexture(int id)
-    {
-        uint textureID = RemapUtils.instance.GetTextureID(id);
-        if (textureID == 0) return null!;
-        ISharedImmediateTexture texture = PluginHandlers.TextureProvider.GetFromGameIcon(textureID)!;
-        if (texture == null) return null!;
-        return texture.GetWrapOrEmpty()!;
     }
 
     public void DrawShareHeader()
@@ -321,9 +311,8 @@ internal class NewPetListWindow : PetWindow
             if (nickname.RawName == string.Empty) continue;
 
             string petBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID));
-            IDalamudTextureWrap textureWrap = GetTexture(nickname.ID);
             SharingHandler.SetContainsList(i, nickname.Name != string.Empty);
-            drawableElements.Add(new DrawablePet(false, textureWrap, string.Empty, nickname.RawName, petBaseName, nickname.ID, (id) => { }, string.Empty, string.Empty, null!, i, (index) =>
+            drawableElements.Add(new DrawablePet(false, RemapUtils.instance.GetTextureID(nickname.ID), string.Empty, nickname.RawName, petBaseName, nickname.ID, (id) => { }, string.Empty, string.Empty, null!, i, (index) =>
             {
                 bool value = SharingHandler.GetContainsList(index);
                 Checkbox(string.Empty + $"##<checker>{++internalCounter}", "Include pet in export", ref value);
@@ -345,8 +334,7 @@ internal class NewPetListWindow : PetWindow
         for (int i = 0; i < data.ids.Length; i++)
         {
             string petBaseName = StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(data.ids[i]));
-            IDalamudTextureWrap textureWrap = GetTexture(data.ids[i]);
-            drawableElements.Add(new DrawablePet(false, textureWrap, string.Empty, data.names[i], petBaseName, data.ids[i], (id) => { }, string.Empty, string.Empty, null!, i, (index) => Label(data.GetString(data.importTypes[index]), Styling.SmallButton)));
+            drawableElements.Add(new DrawablePet(false, RemapUtils.instance.GetTextureID(data.ids[i]), string.Empty, data.names[i], petBaseName, data.ids[i], (id) => { }, string.Empty, string.Empty, null!, i, (index) => Label(data.GetString(data.importTypes[index]), Styling.SmallButton)));
         }
         footerElement = new ButtonElement("Import", "Import Nicknames List", () => DoImport(data));
     }
@@ -445,7 +433,7 @@ internal class NewPetListWindow : PetWindow
 
     class DrawablePet : HoverableDrawableElement
     {
-        IDalamudTextureWrap texture;
+        uint textureID;
         string identifier;
         string customName;
         string baseName;
@@ -466,11 +454,11 @@ internal class NewPetListWindow : PetWindow
 
         public override bool IsHovered { get; set; }
 
-        public DrawablePet(bool isIpc, IDalamudTextureWrap texture, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!, bool askForDelete = true)
+        public DrawablePet(bool isIpc, uint textureID, string identifier, string customName, string baseName, int baseId, Action<int> callback2, string buttonText, string buttonTooltip, Action<int, bool> callback, int index = 0, Action<int> drawExtraButton = null!, bool askForDelete = true)
         {
             this.isIpc = isIpc;
             this.identifier = identifier;
-            this.texture = texture;
+            this.textureID = textureID;
             this.customName = customName;
             this.baseName = baseName;
             this.baseId = baseId;
@@ -486,14 +474,15 @@ internal class NewPetListWindow : PetWindow
         public override bool Draw(ref int internalcounter, NewPetListWindow window)
         {
             IsHovered = false;
-            if (texture == null) return false;
+            if (textureID == uint.MaxValue) return false;
             Vector2 scale = new Vector2(ContentAvailableX, HeaderHeight);
             if (!window.BeginListBoxAutomaticSub($"##<we>{++internalcounter}", new Vector2(ContentAvailableX, HeaderHeight), isIpc)) return false;
             IsHovered = ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - scale, ImGui.GetCursorScreenPos() + scale);
 
             if (window.BeginListBoxAutomatic($"##<PetList{internalCounter++}>", new Vector2(91, 90), isIpc))
             {
-                State state = window.DrawTexture(texture.ImGuiHandle, internalCallback);
+                ISharedImmediateTexture texture = PluginHandlers.TextureProvider.GetFromGameIcon(textureID);
+                State state = window.DrawTexture(texture.GetWrapOrEmpty().ImGuiHandle, internalCallback);
                 if (state == State.Hovered)
                 {
                     if (!window.activeUser.LocalUser) window.SetTooltip(customName);
@@ -561,7 +550,7 @@ internal class NewPetListWindow : PetWindow
                     {
                         window.drawableElements.Add(
                             new DrawablePet(false,
-                            window.GetTexture(nickname.ID),
+                            RemapUtils.instance.GetTextureID(nickname.ID),
                             "Minion",
                             nickname.Name,
                             StringUtils.instance.MakeTitleCase(SheetUtils.instance.GetPetName(nickname.ID)),

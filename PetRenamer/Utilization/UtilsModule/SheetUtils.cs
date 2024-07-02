@@ -238,13 +238,13 @@ public struct PNCompanion
     }
 
     string SanitizeString(string baseString, sbyte pronoun)
-    {/*
+    {
         try
         {
             checked
             {
                 string newString = baseString;
-                if (PluginHandlers.ClientState.ClientLanguage == Dalamud.ClientLanguage.German)
+                if (PluginHandlers.ClientState.ClientLanguage == Dalamud.Game.ClientLanguage.German)
                 {
                     newString = newString.Replace("[p]", "");
                     if (newString.Contains("[a]")) 
@@ -256,8 +256,7 @@ public struct PNCompanion
         catch 
         { 
             return baseString;
-        }*/
-        return baseString;  
+        }
     }
 
     string[] pronounList = new string[]
