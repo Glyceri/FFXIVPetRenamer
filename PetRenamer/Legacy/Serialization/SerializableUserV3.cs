@@ -1,0 +1,41 @@
+﻿using Newtonsoft.Json;
+using PetRenamer.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace PetRenamer.Core.Serialization;
+
+[Serializable]
+public class SerializableUserV3
+{
+    public int[] ids { get; private set; } = Array.Empty<int>();
+    public string[] names { get; private set; } = Array.Empty<string>();
+    public string username { get; private set; } = string.Empty;
+    public ushort homeworld { get; private set; } = 0;
+    public int[] mainSkeletons { get; set; } = PluginConstants.baseSkeletons; // Main skeletons store the active (Summoned) pets pet mirage ID.
+    public int[] softSkeletons { get; set; } = PluginConstants.baseSkeletons; // Soft skeletons stores the new pet mirage ID. Why are these two different? When you pet mirage Eos to a Carbuncle, your current Eos will still remain as Eos until the next summon. BUT! We do need to know the new name for the summon bar and stuff. 
+
+    public bool Contains(int id) => ids.Contains(id);
+
+    public SerializableUserV3(string username, ushort homeworld)
+    {
+        this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
+        this.homeworld = homeworld;
+    }
+
+    public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld)
+    {
+        if (mainSkeletons?.Length == 5) this.mainSkeletons = mainSkeletons;
+        if (softSkeletons?.Length == 5) this.softSkeletons = softSkeletons;
+    }
+
+    [JsonConstructor]
+    public SerializableUserV3(int[] ids, string[] names, string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld, mainSkeletons, softSkeletons)
+    {
+        if (ids == null || names == null) return;
+        if (ids.Length != names.Length) return;
+        this.ids = ids;
+        this.names = names;
+    }
+}

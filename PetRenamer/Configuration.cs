@@ -1,10 +1,6 @@
 using Dalamud.Configuration;
-using PetRenamer.Core.Handlers;
-using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Core.Serialization;
-using PetRenamer.Theming.Themes;
 using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace PetRenamer;
@@ -13,7 +9,7 @@ namespace PetRenamer;
 public class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 8;
+    public const int currentSaveFileVersion = 9;
     public int Version { get; set; } = currentSaveFileVersion;
 
     // ------------------------ Unrelated Settings -----------------------
@@ -58,10 +54,6 @@ public class Configuration : IPluginConfiguration
 
     public SerializableUserV3[]? serializableUsersV3 = null;
 
-    public BaseTheme  CustomBaseTheme = null!;
-    public RedTheme   CustomRedTheme = null!;
-    public GreenTheme CustomGreenTheme = null!;
-
     public void Initialize()
     {
         LegacyInitialize();
@@ -71,21 +63,11 @@ public class Configuration : IPluginConfiguration
     void CurrentInitialize()
     {
         serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
-        CustomBaseTheme ??= new BaseTheme();
-        CustomRedTheme ??= new RedTheme();
-        CustomGreenTheme ??= new GreenTheme();
     }
 
     public void Save() 
     {
         if (currentSaveFileVersion < Version) return;
-        List<SerializableUserV3> users = new List<SerializableUserV3>();
-
-        foreach (PettableUser user in PluginLink.PettableUserHandler.Users)
-            if(user is not PettableIPCUser)
-                users.Add(user.SerializableUser);
-
-        serializableUsersV3 = users.ToArray();
         PluginLink.DalamudPlugin.SavePluginConfig(this); 
     }
 
