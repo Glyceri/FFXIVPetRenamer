@@ -7,6 +7,9 @@ using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.Interop;
+using System;
+using Dalamud.Game.ClientState.Objects.Types;
+using System.Reflection;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -29,7 +32,41 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     public void OnUpdate(IFramework framework)
     {
+        Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
+
+        List<Pointer<BattleChara>> battlePetsThisFrame = new List<Pointer<BattleChara>>();
+
         int pettableUserCount = pettableUsers.Count;
+        int length = charaSpan.Length;
+        for (int i = 0; i < length; i++)
+        {
+            Pointer<BattleChara> chara = charaSpan[i];
+            if (chara.Value == null) continue;
+            ulong contentID = chara.Value->ContentId;
+            if (contentID == 0)
+            {
+                battlePetsThisFrame.Add(chara);
+                continue;
+            }
+
+            bool alreadyExists = false;
+            for (int c = 0; c < pettableUserCount; c++)
+            {
+                IPettableUser pettableUser = pettableUsers[c];
+                if (pettableUser.ContentID == chara.Value->ContentId)
+                {
+                    pettableUser.Touched = true;
+                    alreadyExists = true;
+                    pettableUser.Set(chara);
+                    break;
+                }
+            }
+            if (alreadyExists) continue;
+
+            IPettableUser newPettableUser = new PettableUser(PetLog, chara);
+            pettableUsers.Add(newPettableUser);
+            PetLog.Log("Added a new Pettable user: " + newPettableUser.Name + " : " + newPettableUser.ContentID);
+        }
 
         for (int i = pettableUserCount - 1; i >= 0 ; i--)
         {
@@ -43,33 +80,6 @@ internal unsafe class PettableUserHandler : IUpdatable
             PetLog.Log("Removed the Pettable User: " + pettableUser.Name + " : " + pettableUser.ContentID);
             pettableUser.Destroy();
             pettableUsers.Remove(pettableUser); 
-        }
-    }
-
-    public void SetCurrentBatch(ref List<Pointer<BattleChara>> batch)
-    {
-        int batchLength = batch.Count;
-        int currBattleCharaListCount = pettableUsers.Count;
-        for (int b = 0; b < batchLength; b++)
-        {
-            Pointer<BattleChara> pointer = batch[b];
-            bool alreadyExists = false;
-            for (int i = 0; i < currBattleCharaListCount; i++)
-            {
-                IPettableUser pettableUser = pettableUsers[i];
-                if (pettableUser.ContentID == pointer.Value->ContentId)
-                {
-                    pettableUser.Touched = true;
-                    alreadyExists = true;
-                    pettableUser.Set(pointer);
-                    break;
-                }
-            }
-            if (alreadyExists) continue;
-
-            IPettableUser newPettableUser = new PettableUser(PetLog, pointer);
-            pettableUsers.Add(newPettableUser);
-            PetLog.Log("Added a new Pettable user: " + newPettableUser.Name + " : " +  newPettableUser.ContentID);
         }
     }
 }

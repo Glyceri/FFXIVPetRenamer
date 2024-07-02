@@ -28,9 +28,7 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
-        PettableUserHandler pettableUserHandler = new PettableUserHandler(DalamudServices, PetServices);
-        _updatables.Add(new UserFindUpdatable(DalamudServices, PetServices, pettableUserHandler));
-        _updatables.Add(pettableUserHandler);
+        _updatables.Add(new PettableUserHandler(DalamudServices, PetServices));
     }
 
     void OnUpdate(IFramework framework)
