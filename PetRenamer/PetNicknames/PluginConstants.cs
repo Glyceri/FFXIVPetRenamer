@@ -2,6 +2,9 @@
 
 public static  class PluginConstants
 {
+    public const int ffxivNameSize = 64;
+    public const char forbiddenCharacter = '^';
+
     public const int BaseSummonerSkeleton = -411;
     public const int BaseScholarSkeleton = -407;
     public const int BaseTitanEgiSkeleton = -416;

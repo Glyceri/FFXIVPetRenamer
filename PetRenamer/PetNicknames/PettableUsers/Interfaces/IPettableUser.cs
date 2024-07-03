@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ internal interface IPettableUser : IBattleUser
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }
     IPettablePet? GetPet(nint pet);
+    IPettablePet? GetPet(GameObjectId gameObjectId);
 
     void Set(Pointer<BattleChara> pointer);
     void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);

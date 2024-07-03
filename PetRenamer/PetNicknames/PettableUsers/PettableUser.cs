@@ -1,6 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
-using Lumina.Data.Files;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -122,6 +122,15 @@ internal unsafe class PettableUser : IPettableUser
         foreach(IPettablePet pPet in PettablePets)
         {
             if (pPet.PetPointer == pet) return pPet;
+        }
+        return null;
+    }
+
+    public IPettablePet? GetPet(GameObjectId gameObjectId)
+    {
+        foreach (IPettablePet pPet in PettablePets)
+        {
+            if (pPet.OldObjectID == gameObjectId.ObjectId || pPet.ObjectID == gameObjectId.ObjectId) return pPet;
         }
         return null;
     }

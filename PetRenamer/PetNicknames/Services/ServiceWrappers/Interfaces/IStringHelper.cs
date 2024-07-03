@@ -1,0 +1,10 @@
+﻿using Dalamud.Game.Text.SeStringHandling;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+
+internal interface IStringHelper
+{
+    string? ReplaceStringPart(string baseString, string replaceString, PetSheetData petData, bool checkForEmptySpaces = true);
+    void ReplaceSeString(ref SeString message, string replaceString, PetSheetData petData, bool checkForEmptySpace = true);
+}
