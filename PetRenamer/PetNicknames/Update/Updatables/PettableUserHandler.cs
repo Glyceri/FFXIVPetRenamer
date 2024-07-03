@@ -2,35 +2,33 @@
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Update.Interfaces;
-using System.Collections.Generic;
 using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.Interop;
 using System;
-using Dalamud.Game.ClientState.Objects.Types;
-using System.Reflection;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal unsafe class PettableUserHandler : IUpdatable
 {
-    List<IPettableUser> pettableUsers = new List<IPettableUser>();
-
     public bool Enabled { get; set; } = true;
 
     DalamudServices DalamudServices { get; init; }
     IPetServices PetServices { get; init; }
+    IPettableUserList PettableUserList { get; init; }
     IPetLog PetLog { get; init; }
     IPettableDatabase PettableDatabase { get; init; }
 
-    public PettableUserHandler(DalamudServices dalamudServices, IPettableDatabase pettableDatabase, IPetServices petServices)
+    public PettableUserHandler(DalamudServices dalamudServices, IPettableUserList pettableUserList, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
+        PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
     }
@@ -39,52 +37,32 @@ internal unsafe class PettableUserHandler : IUpdatable
     {
         Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
 
-        List<Pointer<BattleChara>> battlePetsThisFrame = new List<Pointer<BattleChara>>();
+        List<Pointer<BattleChara>> potentialBattlePets = new List<Pointer<BattleChara>>();
 
-        int pettableUserCount = pettableUsers.Count;
-        int length = charaSpan.Length;
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < charaSpan.Length; i++)
         {
-            Pointer<BattleChara> chara = charaSpan[i];
-            if (chara.Value == null) continue;
-            ulong contentID = chara.Value->ContentId;
-            if (contentID == 0)
+            Pointer<BattleChara> battleChara = charaSpan[i];
+            IPettableUser? pettableUser = PettableUserList.pettableUsers[i];
+
+            ulong pettableContentID = ulong.MaxValue;
+            ulong contentID = ulong.MaxValue;
+            if (battleChara != null) contentID = battleChara.Value->ContentId;
+            if (pettableUser != null) pettableContentID = pettableUser.ContentID;
+
+            if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
             {
-                battlePetsThisFrame.Add(chara);
+                pettableUser?.Destroy();
+                PettableUserList.pettableUsers[i] = null;
+            }
+
+            if (pettableUser == null && battleChara != null && battleChara.Value->GetObjectKind() == FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind.Pc)
+            {
+                IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, battleChara);
+                PettableUserList.pettableUsers[i] = newUser;
                 continue;
             }
 
-            bool alreadyExists = false;
-            for (int c = 0; c < pettableUserCount; c++)
-            {
-                IPettableUser pettableUser = pettableUsers[c];
-                if (pettableUser.ContentID == chara.Value->ContentId)
-                {
-                    pettableUser.Touched = true;
-                    alreadyExists = true;
-                    pettableUser.Set(chara);
-                    break;
-                }
-            }
-            if (alreadyExists) continue;
-
-            IPettableUser newPettableUser = new PettableUser(PetLog, PettableDatabase, chara);
-            pettableUsers.Add(newPettableUser);
-            PetLog.Log("Added a new Pettable user: " + newPettableUser.Name + " : " + newPettableUser.ContentID);
-        }
-
-        for (int i = pettableUserCount - 1; i >= 0 ; i--)
-        {
-            IPettableUser pettableUser = pettableUsers[i];
-            if (pettableUser.Touched)
-            {
-                pettableUser.Touched = false;
-                continue;
-            }
-
-            PetLog.Log("Removed the Pettable User: " + pettableUser.Name + " : " + pettableUser.ContentID);
-            pettableUser.Destroy();
-            pettableUsers.Remove(pettableUser); 
+            pettableUser?.Set(battleChara);
         }
     }
 }

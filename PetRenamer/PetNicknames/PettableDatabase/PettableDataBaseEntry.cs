@@ -27,4 +27,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         this.ContentID = ContentID;
         IsLegacy = false;
     }
+
+    public int Length() => IDs.Length;
 }

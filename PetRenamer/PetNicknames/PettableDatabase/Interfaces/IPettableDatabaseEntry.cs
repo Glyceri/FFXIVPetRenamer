@@ -9,5 +9,6 @@ internal interface IPettableDatabaseEntry
 
     bool IsLegacy { get; }
 
+    int Length();
     void RemoveLegacyStatusWith(ulong ContentID);
 }
