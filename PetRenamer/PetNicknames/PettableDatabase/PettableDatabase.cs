@@ -1,5 +1,4 @@
-﻿using PetRenamer.Core.Serialization;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
@@ -7,25 +6,16 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDatabase : IPettableDatabase
 {
-    List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
+    protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
 
     IPetLog petLog;
 
-    public PettableDatabase(Configuration configuration, IPetLog PetLog)
+    public PettableDatabase(IPetLog PetLog)
     {
         petLog = PetLog;
-        SerializableUserV3[]? serializableUsers = configuration.serializableUsersV3;
-        if (serializableUsers == null)      return;
-        if (serializableUsers.Length == 0)  return; 
-        ContainsLegacy = true;
-        foreach(SerializableUserV3 userV3 in serializableUsers)
-        {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(ulong.MaxValue, userV3.username, userV3.ids, userV3.names, true);
-            _entries.Add(newEntry);
-        }
     }
 
     public IPettableDatabaseEntry? GetEntry(string name)
@@ -34,15 +24,11 @@ internal class PettableDatabase : IPettableDatabase
         for (int i = 0; i < entriesCount; i++)
         {
             IPettableDatabaseEntry entry = _entries[i];
-            petLog.Log(entry.Name + " : " + name);
             if (entry.Name != name) continue;
             return entry;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(ulong.MaxValue, name, [], [], true);
-        ContainsLegacy = true;
-        _entries.Add(newEntry);
-        return newEntry;
+        return null;
     }
 
     public IPettableDatabaseEntry GetEntry(ulong contentID)
@@ -52,23 +38,35 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry entry = _entries[i];
             if (entry.ContentID != contentID) continue;
-            return entry;
+            return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(contentID, "[UNKOWN]", [], [], false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(contentID, "[UNKOWN]", 0, [], [], false);
         _entries.Add(newEntry);
         return newEntry;
     }
 
-    public void CheckLegacyStatus()
+    public bool RemoveEntry(ulong contentID)
     {
-        bool hasLegacy = false;
-        foreach(IPettableDatabaseEntry entry in _entries)
+        bool hasRemoved = false;
+        for (int i = _entries.Count - 1; i >= 0; i--)
         {
-            if (!entry.IsLegacy) continue;
-            hasLegacy = true;
-            break;
+            if (_entries[i].ContentID != contentID) continue;
+            _entries.RemoveAt(i);
+            hasRemoved = true;
         }
-        ContainsLegacy = hasLegacy;
+        return hasRemoved;
+    }
+
+    public bool RemoveEntry(IPettableDatabaseEntry entry)
+    {
+        bool hasRemoved = false;
+        for (int i = _entries.Count - 1; i >= 0; i--)
+        {
+            if (_entries[i].ContentID != entry.ContentID) continue;
+            _entries.RemoveAt(i);
+            hasRemoved = true;
+        }
+        return hasRemoved;
     }
 }

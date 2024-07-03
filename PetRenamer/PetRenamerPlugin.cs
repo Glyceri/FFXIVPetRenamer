@@ -17,6 +17,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     IPetServices _PetServices { get; init; }
     IPettableUserList PettableUserList { get; init; }
     IPettableDatabase PettableDatabase { get; init; }
+    IPettableDatabase LegacyDatabase {  get; init; }
 
     UpdateHandler UpdateHandler { get; init; }
 
@@ -28,14 +29,15 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
         _PetServices = new PetServices(_DalamudServices);
         PettableUserList = new PettableUserList();
-        PettableDatabase = new PettableDatabase(_PetServices.Configuration, _PetServices.PetLog);
-        UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, PettableDatabase, _PetServices);
+        PettableDatabase = new PettableDatabase(_PetServices.PetLog);
+        LegacyDatabase = new LegacyPettableDatabase(_PetServices.Configuration, _PetServices.PetLog);
+        UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LegacyDatabase, PettableDatabase, _PetServices);
 
         WindowSystem = new WindowSystem("Pet Nicknames");
 
         _DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += WindowSystem.Draw;
 
-        window = new TempWindow(PettableUserList);
+        window = new TempWindow(PettableUserList, PettableDatabase);
 
         WindowSystem.AddWindow(window);
         window.IsOpen = true;

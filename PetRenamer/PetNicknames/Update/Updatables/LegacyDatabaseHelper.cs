@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Update.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using PetRenamer.PetNicknames.PettableDatabase;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -17,20 +18,21 @@ internal class LegacyDatabaseHelper : IUpdatable
     IPetServices PetServices { get; init; }
     IPetLog PetLog { get; init; }
     IPettableDatabase PettableDatabase { get; init; }
+    IPettableDatabase LegacyPettableDatabase { get; init; }
 
-    public LegacyDatabaseHelper(DalamudServices dalamudServices, IPettableDatabase pettableDatabase, IPetServices petServices)
+    public LegacyDatabaseHelper(DalamudServices dalamudServices, IPettableDatabase legacyPettableDatabase, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
+        LegacyPettableDatabase = legacyPettableDatabase;
     }
 
     double timer = 0;
 
     public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
     {
-        if (!PettableDatabase.ContainsLegacy) return;
         double elapsedSeconds = framework.UpdateDelta.TotalSeconds;
         timer += elapsedSeconds;
 
@@ -43,14 +45,15 @@ internal class LegacyDatabaseHelper : IUpdatable
 
     unsafe void HandleLegacyDatabase()
     {
-        IPettableDatabaseEntry[] entries = PettableDatabase.DatabaseEntries;
-        foreach(IPettableDatabaseEntry entry in entries)
+        IPettableDatabaseEntry[] entries = LegacyPettableDatabase.DatabaseEntries;
+        for (int i = entries.Length - 1; i >= 0; i--)
         {
-            if (!entry.IsLegacy) continue;
-            BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true);
+            IPettableDatabaseEntry entry = entries[i];
+            BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
             if (character == null) continue;
-            entry.RemoveLegacyStatusWith(character->ContentId);
+            entry.UpdateContentID(character->ContentId);
+            LegacyPettableDatabase.RemoveEntry(entry);
+            entry.MoveToDataBase(PettableDatabase);
         }
-        PettableDatabase.CheckLegacyStatus();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+
+namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDatabaseEntry
 {
@@ -6,9 +8,17 @@ internal interface IPettableDatabaseEntry
     string Name { get; }
     int[] IDs { get; }
     string[] Names { get; }
+    ushort Homeworld { get; }
 
-    bool IsLegacy { get; }
+    bool IsActive { get; }
 
     int Length();
-    void RemoveLegacyStatusWith(ulong ContentID);
+    void UpdateContentID(ulong contentID);
+    void UpdateEntry(IPettableUser pettableUser);
+    /// <summary>
+    /// Moves this entry into the new database.
+    /// </summary>
+    /// <param name="database">The database to move this entry into.</param>
+    /// <returns>If the move succeeded.</returns>
+    bool MoveToDataBase(IPettableDatabase database);
 }

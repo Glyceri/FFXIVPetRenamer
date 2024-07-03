@@ -2,7 +2,6 @@
 
 internal interface IPettableDatabase
 {
-    bool ContainsLegacy { get; }
     IPettableDatabaseEntry[] DatabaseEntries { get; }
 
     /// <summary>
@@ -17,6 +16,16 @@ internal interface IPettableDatabase
     /// <param name="name">Player Content ID</param>
     /// <returns>The Data Base Entry</returns>
     IPettableDatabaseEntry GetEntry(ulong contentID);
-
-    void CheckLegacyStatus();
+    /// <summary>
+    /// Removes the entry from the database.
+    /// </summary>
+    /// <param name="contentID">contentID of the entry to remove.</param>
+    /// <returns>Whether the remove succeeded.</returns>
+    bool RemoveEntry(ulong contentID);
+    /// <summary>
+    /// Removes the entry from the database.
+    /// </summary>
+    /// <param name="entry">Entry to remove.</param>
+    /// <returns>Whether the remove succeeded.</returns>
+    bool RemoveEntry(IPettableDatabaseEntry entry);
 }

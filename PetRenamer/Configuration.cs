@@ -105,6 +105,7 @@ public class Configuration : IPluginConfiguration
         users ??= Array.Empty<SerializableNickname>();
         serializableUsers ??= Array.Empty<SerializableUser>();
         serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
+        serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

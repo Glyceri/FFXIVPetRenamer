@@ -15,7 +15,7 @@ internal interface IPettableUser : IBattleUser
     public List<IPettablePet> PettablePets { get; }
 
     void Set(Pointer<BattleChara> pointer);
-    void CalculateBattlepets(IPettableUserList pettableUserList);
+    void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
 
     void Destroy();
 }

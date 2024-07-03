@@ -3,6 +3,7 @@ using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -27,8 +28,10 @@ internal unsafe class PettableUser : IPettableUser
         Name = bChara->NameString;
         ContentID = bChara->ContentId;
         Homeworld = bChara->HomeWorld;
+        ObjectID = bChara->GetGameObjectId().ObjectId;
         Touched = true;
         DataBaseEntry = dataBase.GetEntry(ContentID);
+        DataBaseEntry.UpdateEntry(this);
     }
 
     public void Destroy()
@@ -38,11 +41,64 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Set(Pointer<BattleChara> pointer)
     {
-        
+        Reset();
+        if (!DataBaseEntry.IsActive) return;
+        if (pointer.Value == null) return;
+        Companion* c = pointer.Value->CompanionData.CompanionObject;
+        if (c == null) return;
+
+        IPettablePet? storedPet = FindPet(c->Character);
+        if (storedPet != null) storedPet.Update((nint)c);
+        else CreateNewPet(new PettableCompanion(c));
     }
 
-    public void CalculateBattlepets(IPettableUserList pettableUserList)
+    IPettablePet? FindPet(Character character)
     {
-        
+        for(int i = 0; i < PettablePets.Count; i++)
+        {
+            IPettablePet pet = PettablePets[i];
+            if (pet.Compare(character)) return pet;
+        }
+        return null;
+    }
+
+    void Reset()
+    {
+        for (int i = PettablePets.Count - 1; i >= 0; i--) 
+        {
+            IPettablePet pet = PettablePets[i];
+
+            if (!pet.Touched) 
+            {
+                pet.Destroy();
+                PettablePets.RemoveAt(i); 
+                continue; 
+            }
+
+            pet.Touched = false;
+        }
+    }
+
+    public void CalculateBattlepets(ref List<Pointer<BattleChara>> pets)
+    {
+        if (!DataBaseEntry.IsActive) return;
+
+        for(int i = pets.Count - 1; i >= 0; i--)
+        {
+            Pointer<BattleChara> bChara = pets[i];
+            if (bChara == null) continue;
+            if (bChara.Value->OwnerId != ObjectID) continue;
+
+            pets.RemoveAt(i);
+
+            IPettablePet? storedPet = FindPet(bChara.Value->Character);
+            if (storedPet != null) storedPet.Update((nint)bChara.Value);
+            else CreateNewPet(new PettableBattlePet(bChara.Value));
+        }
+    }
+
+    void CreateNewPet(IPettablePet pet)
+    {
+        PettablePets.Add(pet);
     }
 }

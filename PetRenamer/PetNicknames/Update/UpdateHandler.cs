@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -18,17 +19,19 @@ internal class UpdateHandler : IDisposable
     IPetServices PetServices { get; init; }
     IPettableUserList PettableUserList { get; init; }
     IPettableDatabase PettableDatabase { get; init; }
+    IPettableDatabase LegacyPettableDatabase { get; init; }
     IPetLog PetLog { get; init; }
 
     List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(DalamudServices dalamudServices, IPettableUserList pettableUserList, IPettableDatabase pettableDatabase, IPetServices petServices)
+    public UpdateHandler(DalamudServices dalamudServices, IPettableUserList pettableUserList, IPettableDatabase legacyDatabase, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
+        LegacyPettableDatabase = legacyDatabase;
 
         DalamudServices.Framework.Update += OnUpdate;
         Setup();
@@ -36,8 +39,8 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
+        _updatables.Add(new LegacyDatabaseHelper(DalamudServices, LegacyPettableDatabase, PettableDatabase, PetServices));
         _updatables.Add(new PettableUserHandler(DalamudServices, PettableUserList, PettableDatabase, PetServices));
-        _updatables.Add(new LegacyDatabaseHelper(DalamudServices, PettableDatabase, PetServices));
     }
 
     void OnUpdate(IFramework framework)
