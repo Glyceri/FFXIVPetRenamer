@@ -3,6 +3,7 @@ using FFXIVClientStructs.Interop;
 using Lumina.Data.Files;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
@@ -19,10 +20,11 @@ internal unsafe class PettableUser : IPettableUser
     public BattleChara* BattleChara { get; }
     public bool IsActive => DataBaseEntry.IsActive;
 
+    IPetServices PetServices { get; init; }
     IPetLog PetLog { get; init; }
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
     
-    public PettableUser(IPetLog petLog, IPettableDatabase dataBase, Pointer<BattleChara> battleChara)
+    public PettableUser(IPetLog petLog, IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
     {
         this.PetLog = petLog;
         BattleChara* bChara = battleChara.Value;
@@ -33,6 +35,7 @@ internal unsafe class PettableUser : IPettableUser
         Touched = true;
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
+        PetServices = petServices;
     }
 
     public void Destroy()
@@ -50,7 +53,7 @@ internal unsafe class PettableUser : IPettableUser
 
         IPettablePet? storedPet = FindPet(ref c->Character);
         if (storedPet != null) storedPet.Update((nint)c);
-        else CreateNewPet(new PettableCompanion(c, DataBaseEntry));
+        else CreateNewPet(new PettableCompanion(c, DataBaseEntry, PetServices));
     }
 
     IPettablePet? FindPet(ref Character character)
@@ -105,7 +108,7 @@ internal unsafe class PettableUser : IPettableUser
 
             IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
             if (storedPet != null) storedPet.Update((nint)bChara.Value);
-            else CreateNewPet(new PettableBattlePet(bChara.Value, DataBaseEntry));
+            else CreateNewPet(new PettableBattlePet(bChara.Value, DataBaseEntry, PetServices));
         }
     }
 

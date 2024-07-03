@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -22,12 +21,10 @@ internal unsafe class NamePlateHook : HookableElement
     readonly Hook<UpdateNameplateNpcDelegate>? nameplateHookMinion = null;
 
     IPettableUserList PettableUserList { get; init; }
-    IPetLog PetLog { get; init; }
 
-    public NamePlateHook(DalamudServices services, IPettableUserList pettableUserList, IPetLog petLog) : base(services) 
+    public NamePlateHook(DalamudServices services, IPettableUserList pettableUserList) : base(services) 
     {
         PettableUserList = pettableUserList;
-        PetLog = petLog;
     }
 
     public override void Init()
@@ -42,13 +39,13 @@ internal unsafe class NamePlateHook : HookableElement
         nameplateHookMinion?.Dispose();
     }
 
-    public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
+    public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
         SetNameplate(namePlateInfo, (nint)battleChara);
         return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
     }
 
-    public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
+    public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
         SetNameplate(namePlateInfo, (nint)gameObject);
         return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
@@ -59,9 +56,7 @@ internal unsafe class NamePlateHook : HookableElement
         IPettablePet? pPet = PettableUserList.GetPet(obj);
         if (pPet == null) return;
         string? customPetName = pPet.CustomName;
-        if (customPetName == null) return;
-
-        namePlateInfo->Name.SetString(customPetName);
+        if (customPetName != null) namePlateInfo->Name.SetString(customPetName);
         namePlateInfo->IsDirty = pPet.Dirty;
     }
 }

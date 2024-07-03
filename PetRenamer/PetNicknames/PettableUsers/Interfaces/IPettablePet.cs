@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
@@ -14,6 +15,7 @@ internal interface IPettablePet
     public string? CustomName { get; }
     public string? CustomSoftName { get; }
     public bool Dirty { get; }
+    public PetSheetData? PetData { get; }
 
     void Update(nint pointer);
     bool Compare(ref Character character);

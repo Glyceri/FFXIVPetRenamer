@@ -29,7 +29,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
-        _PetServices = new PetServices(ref _DalamudServices);
+        _PetServices = new PetServices(_DalamudServices);
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(_PetServices.PetLog);
         LegacyDatabase = new LegacyPettableDatabase(_PetServices.Configuration, _PetServices.PetLog);

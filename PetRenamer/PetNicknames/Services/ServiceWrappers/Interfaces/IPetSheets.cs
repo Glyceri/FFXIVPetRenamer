@@ -1,5 +1,6 @@
 ﻿using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
@@ -18,4 +19,5 @@ internal interface IPetSheets
     Action? GetAction(uint actionID);
     string? GetClassName(int id);
     string? GetWorldName(ushort worldID);
+    PetSheetData? GetPet(int skeletonID);
 }

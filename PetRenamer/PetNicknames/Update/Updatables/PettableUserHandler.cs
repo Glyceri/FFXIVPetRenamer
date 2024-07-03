@@ -66,7 +66,7 @@ internal unsafe class PettableUserHandler : IUpdatable
 
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
-                IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, battleChara);
+                IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, PetServices, battleChara);
                 PettableUserList.pettableUsers[i] = newUser;
                 continue;
             }
