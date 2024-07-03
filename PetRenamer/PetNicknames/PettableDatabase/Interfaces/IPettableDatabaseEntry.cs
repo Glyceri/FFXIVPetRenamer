@@ -6,11 +6,12 @@ internal interface IPettableDatabaseEntry
 {
     ulong ContentID { get; }
     string Name { get; }
-    int[] IDs { get; }
-    string[] Names { get; }
     ushort Homeworld { get; }
 
     bool IsActive { get; }
+
+    public INamesDatabase ActiveDatabase { get; }
+    public INamesDatabase[] AllDatabases { get; }
 
     int Length();
     void UpdateContentID(ulong contentID);

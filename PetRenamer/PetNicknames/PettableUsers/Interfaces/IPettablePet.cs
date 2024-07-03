@@ -13,6 +13,6 @@ internal interface IPettablePet
     public string Name { get; }
 
     void Update(nint pointer);
-    bool Compare(Character character);
+    bool Compare(ref Character character);
     void Destroy();
 }

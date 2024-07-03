@@ -76,10 +76,10 @@ internal class TempWindow : Window
                 ImGui.TableNextRow();
                 ImGui.TableSetColumnIndex(0);
                 if (item == null) ImGui.Text("_");
-                else ImGui.Text(item.IDs[i].ToString());
+                else ImGui.Text(item.ActiveDatabase.IDs[i].ToString());
                 ImGui.TableSetColumnIndex(1);
                 if (item == null) ImGui.Text("_");
-                else ImGui.Text(item.Names[i]);
+                else ImGui.Text(item.ActiveDatabase.Names[i]);
             }
         }
 

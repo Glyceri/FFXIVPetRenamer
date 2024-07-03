@@ -20,7 +20,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
         Touched = true;
         BattlePet = battlePet;
 
-        SkeletonID = battlePet->Character.CharacterData.ModelCharaId;
+        SkeletonID = -battlePet->Character.CharacterData.ModelCharaId;
         Index = battlePet->Character.GameObject.ObjectIndex;
         Name = battlePet->Character.GameObject.NameString;
         ObjectID = battlePet->Character.GetGameObjectId().ObjectId;
@@ -32,13 +32,13 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
         BattlePet = (BattleChara*)pointer;
     }
 
-    public bool Compare(Character character)
+    public bool Compare(ref Character character)
     {
         int skeletonID = character.CharacterData.ModelCharaId;
         ushort index = character.GameObject.ObjectIndex;
         uint objectID = character.EntityId;
 
-        return skeletonID == SkeletonID && index == Index && ObjectID == objectID;
+        return -skeletonID == SkeletonID && index == Index && ObjectID == objectID;
     }
 
     public void Destroy()

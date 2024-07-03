@@ -3,7 +3,6 @@ using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -47,17 +46,17 @@ internal unsafe class PettableUser : IPettableUser
         Companion* c = pointer.Value->CompanionData.CompanionObject;
         if (c == null) return;
 
-        IPettablePet? storedPet = FindPet(c->Character);
+        IPettablePet? storedPet = FindPet(ref c->Character);
         if (storedPet != null) storedPet.Update((nint)c);
         else CreateNewPet(new PettableCompanion(c));
     }
 
-    IPettablePet? FindPet(Character character)
+    IPettablePet? FindPet(ref Character character)
     {
         for(int i = 0; i < PettablePets.Count; i++)
         {
             IPettablePet pet = PettablePets[i];
-            if (pet.Compare(character)) return pet;
+            if (pet.Compare(ref character)) return pet;
         }
         return null;
     }
@@ -70,6 +69,7 @@ internal unsafe class PettableUser : IPettableUser
 
             if (!pet.Touched) 
             {
+                PetLog.Log(Name + " removed: " + pet.Name);
                 pet.Destroy();
                 PettablePets.RemoveAt(i); 
                 continue; 
@@ -91,7 +91,7 @@ internal unsafe class PettableUser : IPettableUser
 
             pets.RemoveAt(i);
 
-            IPettablePet? storedPet = FindPet(bChara.Value->Character);
+            IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
             if (storedPet != null) storedPet.Update((nint)bChara.Value);
             else CreateNewPet(new PettableBattlePet(bChara.Value));
         }
@@ -99,6 +99,7 @@ internal unsafe class PettableUser : IPettableUser
 
     void CreateNewPet(IPettablePet pet)
     {
+        PetLog.Log(Name + " created: " + pet.Name);
         PettablePets.Add(pet);
     }
 }

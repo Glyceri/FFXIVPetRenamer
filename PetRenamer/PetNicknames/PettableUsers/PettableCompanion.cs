@@ -32,7 +32,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
         Companion = (Companion*)pointer;
     }
 
-    public bool Compare(Character character)
+    public bool Compare(ref Character character)
     {
         int skeletonID = character.CharacterData.ModelCharaId;
         ushort index = character.GameObject.ObjectIndex;
