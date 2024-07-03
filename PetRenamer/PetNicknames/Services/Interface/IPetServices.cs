@@ -5,5 +5,6 @@ namespace PetRenamer.PetNicknames.Services.Interface;
 internal interface IPetServices
 {
     public IPetLog PetLog { get; }
+    public IPetSheets PetSheets { get; }
     public Configuration Configuration { get; }
 }

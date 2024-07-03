@@ -9,6 +9,7 @@ internal class PetServices : IPetServices
 {
     public IPetLog PetLog { get; init; }
     public Configuration Configuration { get; init; }
+    public IPetSheets PetSheets { get; init; }
 
     public PetServices(DalamudServices services) 
     {
@@ -16,6 +17,7 @@ internal class PetServices : IPetServices
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialise(services.PetNicknamesPlugin);
         CheckConfigFailure();
+        PetSheets = new SheetsWrapper(ref services);
     }
 
     void CheckConfigFailure()
