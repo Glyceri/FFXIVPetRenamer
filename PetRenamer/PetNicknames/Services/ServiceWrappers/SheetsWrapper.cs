@@ -1,6 +1,7 @@
 ﻿using Dalamud.Utility;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
+using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
@@ -9,7 +10,8 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class SheetsWrapper : IPetSheets
 {
-    List<PetSheetData> petSheetCache = new List<PetSheetData>();
+    readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
+    readonly List<(string, int)> nameToClass = new List<(string, int)>();
 
     public ExcelSheet<Companion>? petSheet { get; init; }
     public ExcelSheet<Pet>? battlePetSheet { get; init; }
@@ -30,6 +32,7 @@ internal class SheetsWrapper : IPetSheets
         textCommands = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
 
         SetupSheetDataCache(ref dalamudServices);
+        SetupSoftSkeletonIndexList();
     }
 
     void SetupSheetDataCache(ref DalamudServices dalamudServices) 
@@ -66,6 +69,30 @@ internal class SheetsWrapper : IPetSheets
         }
     }
 
+    void SetupSoftSkeletonIndexList()
+    {
+        TextCommand? command = GetCommand(33);
+        if (command == null) return;
+        int counter = 0;
+
+        for (int i = 2; i < command.Description.Payloads.Count; i++)
+        {
+            BasePayload secondTolastPayload = command.Description.Payloads[i - 2];
+            BasePayload lastPayload = command.Description.Payloads[i - 1];
+            BasePayload curPayload = command.Description.Payloads[i];
+
+            if (!secondTolastPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.UiColorFill)) continue;
+            if (!lastPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.UiColorBorder)) continue;
+            if (!curPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.Text)) continue;
+
+            string payloadString = (curPayload as TextPayload)!.RawString;
+
+            if (counter < 5) nameToClass.Add((payloadString, counter));
+            else break;
+            counter++;
+        }
+    }
+
     public TextCommand? GetCommand(uint id) => textCommands?.GetRow(id);
     public Action? GetAction(uint actionID) => actions?.GetRow(actionID);
 
@@ -95,6 +122,27 @@ internal class SheetsWrapper : IPetSheets
         }
 
         return null;
+    }
+
+    public int ToSoftSkeleton(int skeletonID, int[] softSkeletons)
+    {
+        bool canBeSoft = mutatableID.Contains(skeletonID);
+
+        if (!canBeSoft) return skeletonID;
+
+        int index = -1;
+
+        for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
+        {
+            if (PluginConstants.BaseSkeletons[i] == skeletonID)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index >= 0 && index < softSkeletons.Length) return softSkeletons[index];
+
+        return skeletonID;
     }
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
@@ -143,5 +191,18 @@ internal class SheetsWrapper : IPetSheets
         { -3124, 25839 }, //Summon Titan II
         { -1930, 7427 }, //Summon Bahamut
         { -1027, 2864 }, //Rook Autoturret
+    };
+
+    public readonly List<int> mutatableID = new List<int>()
+    {
+        -407, //Eos
+        -408, //Selene
+        -409, //Emerald Carbuncle
+        -410, //Ruby Carbuncle
+        -411, //Carbuncle
+        -412, //Topaz Carbuncle
+        -415, //Ifrit-Egi
+        -416, //Titan-Egi
+        -417  //Garuda-Egi
     };
 }

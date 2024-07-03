@@ -15,7 +15,7 @@ internal class LegacyPettableDatabase : PettableDatabase
         if (serializableUsers.Length == 0) return;
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(ulong.MaxValue, userV3.username, userV3.homeworld, userV3.ids, userV3.names, false);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(ulong.MaxValue, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false);
             _entries.Add(newEntry);
         }
     }

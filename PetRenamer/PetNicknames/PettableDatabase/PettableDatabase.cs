@@ -41,7 +41,7 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(contentID, "[UNKOWN]", 0, [], [], false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }

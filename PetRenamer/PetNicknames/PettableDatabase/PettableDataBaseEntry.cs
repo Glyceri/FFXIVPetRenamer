@@ -11,17 +11,22 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public bool IsActive { get; private set; }
     public ushort Homeworld { get; private set; }
 
+    public int[] SoftSkeletons { get; private set; }
+
     public INamesDatabase ActiveDatabase { get; private set; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
-    public bool Dirty { get => ActiveDatabase.IsDirty; }
+    bool _dirty;
+    public bool Dirty { get => _dirty || ActiveDatabase.IsDirty; }
+    
 
-    public PettableDataBaseEntry(ulong contentID, string name, ushort homeworld, int[] ids, string[] names, bool isActive)
+    public PettableDataBaseEntry(ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool isActive)
     {
         ContentID = contentID;
         Name = name;
         ActiveDatabase = new PettableNameDatabase(ids, names);
         IsActive = isActive;
         Homeworld = homeworld;
+        SoftSkeletons = softSkeletons;
     }
 
     public void UpdateEntry(IPettableUser pettableUser)
@@ -53,5 +58,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
     public void SetName(int skeletonID, string? name) => ActiveDatabase.SetName(skeletonID, name);
 
-    public void NotifySeenDirty() => ActiveDatabase.MarkDirtyAsNoticed();
+    public void NotifySeenDirty()
+    {
+        _dirty = false;
+        ActiveDatabase.MarkDirtyAsNoticed();
+    }
 }

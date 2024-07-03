@@ -11,6 +11,8 @@ internal interface IPettableDatabaseEntry
     bool Dirty { get; }
     bool IsActive { get; }
 
+    int[] SoftSkeletons { get; }
+
     public INamesDatabase ActiveDatabase { get; }
     public INamesDatabase[] AllDatabases { get; }
 
