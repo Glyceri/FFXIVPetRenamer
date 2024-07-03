@@ -10,7 +10,7 @@ using System;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using System.Collections.Generic;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -36,17 +36,21 @@ internal unsafe class PettableUserHandler : IUpdatable
     public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
     {
         Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
+        int charaSpanLength = charaSpan.Length;
 
-        List<Pointer<BattleChara>> potentialBattlePets = new List<Pointer<BattleChara>>();
-
-        for (int i = 0; i < charaSpan.Length; i++)
+        for (int i = 0; i < charaSpanLength; i++)
         {
             Pointer<BattleChara> battleChara = charaSpan[i];
             IPettableUser? pettableUser = PettableUserList.pettableUsers[i];
 
+            ObjectKind currentObjectKind = ObjectKind.None;
             ulong pettableContentID = ulong.MaxValue;
             ulong contentID = ulong.MaxValue;
-            if (battleChara != null) contentID = battleChara.Value->ContentId;
+            if (battleChara != null) 
+            {
+                contentID = battleChara.Value->ContentId; 
+                currentObjectKind = battleChara.Value->GetObjectKind();
+            }
             if (pettableUser != null) pettableContentID = pettableUser.ContentID;
 
             if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
@@ -55,14 +59,16 @@ internal unsafe class PettableUserHandler : IUpdatable
                 PettableUserList.pettableUsers[i] = null;
             }
 
-            if (pettableUser == null && battleChara != null && battleChara.Value->GetObjectKind() == FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind.Pc)
+            if (pettableContentID != ulong.MaxValue && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
                 IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, battleChara);
                 PettableUserList.pettableUsers[i] = newUser;
                 continue;
             }
 
-            pettableUser?.Set(battleChara);
+            if (contentID != 0 && contentID != ulong.MaxValue && pettableContentID != ulong.MaxValue)
+            pettableUser!.Set(battleChara);
         }
+
     }
 }

@@ -18,7 +18,7 @@ internal class TempWindow : Window
         };
     }
 
-    public override void Draw()
+    public unsafe override void Draw()
     {
         ImGui.BeginTable("Pet Nicknames Table##1", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail());
 
