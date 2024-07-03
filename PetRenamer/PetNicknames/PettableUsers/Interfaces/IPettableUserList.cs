@@ -3,4 +3,6 @@
 internal interface IPettableUserList
 {
     IPettableUser?[] pettableUsers { get; set; }
+
+    IPettablePet? GetPet(nint pet);
 }

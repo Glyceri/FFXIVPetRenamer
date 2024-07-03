@@ -71,15 +71,18 @@ internal class TempWindow : Window
             if (item == null) ImGui.Text("_____");
             else ImGui.Text(item.ContentID.ToString());
 
-            for(int i = 0; i < item.Length(); i++)
+            if (item != null)
             {
-                ImGui.TableNextRow();
-                ImGui.TableSetColumnIndex(0);
-                if (item == null) ImGui.Text("_");
-                else ImGui.Text(item.ActiveDatabase.IDs[i].ToString());
-                ImGui.TableSetColumnIndex(1);
-                if (item == null) ImGui.Text("_");
-                else ImGui.Text(item.ActiveDatabase.Names[i]);
+                for (int i = 0; i < item!.Length(); i++)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableSetColumnIndex(0);
+                    if (item == null) ImGui.Text("_");
+                    else ImGui.Text(item.ActiveDatabase.IDs[i].ToString());
+                    ImGui.TableSetColumnIndex(1);
+                    if (item == null) ImGui.Text("_");
+                    else ImGui.Text(item.ActiveDatabase.Names[i]);
+                }
             }
         }
 

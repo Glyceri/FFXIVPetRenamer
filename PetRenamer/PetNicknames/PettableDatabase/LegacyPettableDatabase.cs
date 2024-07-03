@@ -1,7 +1,8 @@
-﻿using PetRenamer.Core.Serialization;
+﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
+
+using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -19,3 +20,5 @@ internal class LegacyPettableDatabase : PettableDatabase
         }
     }
 }
+
+#pragma warning restore CS0618

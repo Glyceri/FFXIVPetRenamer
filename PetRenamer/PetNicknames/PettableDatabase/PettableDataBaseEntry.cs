@@ -13,6 +13,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public INamesDatabase ActiveDatabase { get; private set; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
+    public bool Dirty { get; private set; } = false;
 
     public PettableDataBaseEntry(ulong contentID, string name, ushort homeworld, int[] ids, string[] names, bool isActive)
     {
@@ -48,4 +49,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         this.ContentID = contentID;
         IsActive = true;
     }
+
+    public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
+    public void SetName(int skeletonID, string? name) => ActiveDatabase.SetName(skeletonID, name);
 }

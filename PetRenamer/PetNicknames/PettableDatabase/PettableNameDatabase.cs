@@ -12,4 +12,19 @@ internal class PettableNameDatabase : INamesDatabase
         Names = names;
         IDs = ids;
     }
+
+    public string? GetName(int ID)
+    {
+        for (int i = 0; i < IDs.Length; i++)
+        {
+            if (IDs[i] != ID) continue;
+            return Names[i];
+        }
+        return null;
+    }
+
+    public void SetName(int ID, string? name)
+    {
+        throw new System.NotImplementedException();
+    }
 }

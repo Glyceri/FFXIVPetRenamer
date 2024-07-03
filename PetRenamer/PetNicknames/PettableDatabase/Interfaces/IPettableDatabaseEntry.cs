@@ -8,6 +8,7 @@ internal interface IPettableDatabaseEntry
     string Name { get; }
     ushort Homeworld { get; }
 
+    bool Dirty { get; }
     bool IsActive { get; }
 
     public INamesDatabase ActiveDatabase { get; }
@@ -22,4 +23,6 @@ internal interface IPettableDatabaseEntry
     /// <param name="database">The database to move this entry into.</param>
     /// <returns>If the move succeeded.</returns>
     bool MoveToDataBase(IPettableDatabase database);
+    string? GetName(int skeletonID);
+    void SetName(int skeletonID, string name);
 }

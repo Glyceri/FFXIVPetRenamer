@@ -16,10 +16,11 @@ internal unsafe class PettableUser : IPettableUser
     public bool Touched { get; set; }
     public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
     public BattleChara* BattleChara { get; }
+    public bool IsActive => DataBaseEntry.IsActive;
 
     IPetLog PetLog { get; init; }
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
-
+    
     public PettableUser(IPetLog petLog, IPettableDatabase dataBase, Pointer<BattleChara> battleChara)
     {
         this.PetLog = petLog;
@@ -48,7 +49,7 @@ internal unsafe class PettableUser : IPettableUser
 
         IPettablePet? storedPet = FindPet(ref c->Character);
         if (storedPet != null) storedPet.Update((nint)c);
-        else CreateNewPet(new PettableCompanion(c));
+        else CreateNewPet(new PettableCompanion(c, DataBaseEntry));
     }
 
     IPettablePet? FindPet(ref Character character)
@@ -69,7 +70,6 @@ internal unsafe class PettableUser : IPettableUser
 
             if (!pet.Touched) 
             {
-                PetLog.Log(Name + " removed: " + pet.Name);
                 pet.Destroy();
                 PettablePets.RemoveAt(i); 
                 continue; 
@@ -93,13 +93,21 @@ internal unsafe class PettableUser : IPettableUser
 
             IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
             if (storedPet != null) storedPet.Update((nint)bChara.Value);
-            else CreateNewPet(new PettableBattlePet(bChara.Value));
+            else CreateNewPet(new PettableBattlePet(bChara.Value, DataBaseEntry));
         }
     }
 
     void CreateNewPet(IPettablePet pet)
     {
-        PetLog.Log(Name + " created: " + pet.Name);
         PettablePets.Add(pet);
+    }
+
+    public IPettablePet? GetPet(nint pet)
+    {
+        foreach(IPettablePet pPet in PettablePets)
+        {
+            if (pPet.PetPointer == pet) return pPet;
+        }
+        return null;
     }
 }

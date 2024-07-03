@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -13,8 +14,9 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public uint ObjectID { get; init; }
     public ushort Index { get; init; }
     public string Name { get; init; } = "";
+    public string? CustomName { get; }
 
-    public PettableBattlePet(BattleChara* battlePet)
+    public PettableBattlePet(BattleChara* battlePet, IPettableDatabaseEntry entry)
     {
         if (battlePet == null) return;
         Touched = true;
@@ -24,6 +26,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
         Index = battlePet->Character.GameObject.ObjectIndex;
         Name = battlePet->Character.GameObject.NameString;
         ObjectID = battlePet->Character.GetGameObjectId().ObjectId;
+        CustomName = entry.GetName(SkeletonID);
     }
 
     public void Update(nint pointer)
