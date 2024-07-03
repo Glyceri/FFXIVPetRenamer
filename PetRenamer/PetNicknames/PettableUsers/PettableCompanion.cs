@@ -15,6 +15,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public string Name { get; init; } = "";
     public ushort Index { get; init; }
     public string? CustomName { get; }
+    public bool Dirty { get; private set; } = true;
 
     public PettableCompanion(Companion* c, IPettableDatabaseEntry entry)
     {
@@ -33,6 +34,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
     {
         Touched = true; 
         Companion = (Companion*)pointer;
+        Dirty = false;
     }
 
     public bool Compare(ref Character character)

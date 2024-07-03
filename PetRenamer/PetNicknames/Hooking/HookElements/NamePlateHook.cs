@@ -64,6 +64,6 @@ internal unsafe class NamePlateHook : HookableElement
         if (customPetName == null) return;
 
         namePlateInfo->Name.SetString(customPetName);
-        namePlateInfo->IsDirty = true;
+        namePlateInfo->IsDirty = pPet.Dirty;
     }
 }

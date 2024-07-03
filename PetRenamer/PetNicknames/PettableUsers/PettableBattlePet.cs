@@ -15,6 +15,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public ushort Index { get; init; }
     public string Name { get; init; } = "";
     public string? CustomName { get; }
+    public bool Dirty { get; private set; } = true;
 
     public PettableBattlePet(BattleChara* battlePet, IPettableDatabaseEntry entry)
     {
@@ -33,6 +34,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     {
         Touched = true;
         BattlePet = (BattleChara*)pointer;
+        Dirty = false;
     }
 
     public bool Compare(ref Character character)

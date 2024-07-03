@@ -12,6 +12,7 @@ internal interface IPettablePet
     public ushort Index { get; }
     public string Name { get; }
     public string? CustomName { get; }
+    public bool Dirty { get; }
 
     void Update(nint pointer);
     bool Compare(ref Character character);

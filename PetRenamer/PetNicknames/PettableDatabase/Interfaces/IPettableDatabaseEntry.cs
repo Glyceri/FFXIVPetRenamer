@@ -25,4 +25,5 @@ internal interface IPettableDatabaseEntry
     bool MoveToDataBase(IPettableDatabase database);
     string? GetName(int skeletonID);
     void SetName(int skeletonID, string name);
+    void NotifySeenDirty();
 }

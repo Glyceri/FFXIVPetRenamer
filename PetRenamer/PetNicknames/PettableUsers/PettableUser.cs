@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.Interop;
+using Lumina.Data.Files;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -64,6 +65,17 @@ internal unsafe class PettableUser : IPettableUser
 
     void Reset()
     {
+        if (DataBaseEntry.Dirty)
+        {
+            DataBaseEntry.NotifySeenDirty();
+            for (int i = PettablePets.Count - 1; i >= 0; i--)
+            {
+                PettablePets[i].Destroy();
+            }
+            PettablePets.Clear();
+            return;
+        }
+
         for (int i = PettablePets.Count - 1; i >= 0; i--) 
         {
             IPettablePet pet = PettablePets[i];

@@ -11,6 +11,8 @@ internal class TempWindow : Window
     IPettableUserList UserList { get; init; }
     IPettableDatabase Database { get; init; }
 
+    string newName = "";
+
     public TempWindow(IPettableUserList userList, IPettableDatabase database) : base("Temp Window", ImGuiWindowFlags.None, true)
     {
         UserList = userList;
@@ -33,6 +35,13 @@ internal class TempWindow : Window
                 if (bchara == null) continue;
                 item.DataBaseEntry.UpdateContentID(bchara->ContentId);
             }
+        }
+
+        if (ImGui.InputTextMultiline("Pet Name", ref newName, 64, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 25), ImGuiInputTextFlags.CtrlEnterForNewLine))
+        {
+            IPettableDatabaseEntry? databaseEntry = Database.GetEntry("Glyceri Chosuti");
+            if (databaseEntry == null) return;
+            databaseEntry.SetName(2442, newName);
         }
 
         ImGui.BeginTable("Pet Nicknames Table##1", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail() * new System.Numerics.Vector2(1, 0.5f));
