@@ -2,6 +2,7 @@
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Lumina.Text.Payloads;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
@@ -214,13 +215,40 @@ internal class SheetsWrapper : IPetSheets
                 list.Add(pet);
                 return list;
             }
+
             if (pet.BaseSingular == string.Empty || pet.BasePlural == string.Empty || pet.ActionName == string.Empty) continue;
+
             if (line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) ||
                 line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) ||
                 line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase)) list.Add(pet);
         }    
 
         return list;
+    }
+
+    public PetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
+    {
+        List<PetSheetData> data = GetListFromLine(baseString);
+
+        if (data.Count == 0) return null;
+
+        data.Sort((i1, i2) => i1.BaseSingular.CompareTo(i2.BaseSingular));
+        data.Reverse();
+
+        PetSheetData normalPetData = data[0];
+
+        if (!soft) return normalPetData;
+
+        int? softIndex = NameToSoftSkeletonIndex(normalPetData.BasePlural);
+        if (softIndex == null) return normalPetData;
+
+        int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
+        if (softSkeleton == null) return normalPetData;
+
+        PetSheetData? softPetData = GetPet(softSkeleton.Value);
+        if (softPetData == null) return normalPetData;
+
+        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
     }
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()

@@ -1,7 +1,9 @@
 ﻿using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
@@ -24,6 +26,7 @@ internal interface IPetSheets
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
     PetSheetData? GetPetFromName(string name);
     PetSheetData? GetPetFromActionName(string actionName);
+    PetSheetData? GetPetFromString(string text, ref IPettableUser user, bool IsSoft);
     List<PetSheetData> GetListFromLine(string line);
     public int? NameToSoftSkeletonIndex(string name);
     public int? CastToSoftIndex(uint castId);

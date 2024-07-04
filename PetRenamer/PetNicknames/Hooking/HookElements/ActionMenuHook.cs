@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -19,10 +20,36 @@ internal unsafe class ActionMenuHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenu", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "ActionMenu", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenuActionSetting", LifeCycleUpdate3);
     }
 
     void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
     void LifeCycleUpdate2(AddonEvent addonEvent, AddonArgs addonArgs) => Update2((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdate3(AddonEvent addonEvent, AddonArgs addonArgs) => Update3((AtkUnitBase*)addonArgs.Addon);
+
+    void Update3(AtkUnitBase* baseD)
+    {
+        if (!baseD->IsVisible) return;
+
+        IPettableUser? user = UserList.LocalPlayer;
+        if (user == null) return;
+        if (!user.IsActive) return;
+
+        AtkComponentBase* resNode = (AtkComponentBase*)baseD->GetComponentNodeById(6);
+        if (resNode == null) return;
+
+        AtkTextNode* textNode = resNode->GetTextNodeById(10)->GetAsAtkTextNode();
+        if (textNode == null) return;
+
+        AtkComponentBase* resNode2 = (AtkComponentBase*)baseD->GetComponentNodeById(11);
+        if (resNode2 == null) return;
+
+        AtkTextNode* textNode2 = resNode2->GetTextNodeById(10)->GetAsAtkTextNode();
+        if (textNode2 == null) return;
+
+        Rename(textNode, ref user);
+        Rename(textNode2, ref user);
+    }
 
     void Update2(AtkUnitBase* baseD)
     {
@@ -72,36 +99,14 @@ internal unsafe class ActionMenuHook : HookableElement
     {
         string textNodeText = textNode->NodeText.ToString();
         string baseString = textNodeText.Split('\r')[0];
-        string cleanedString = PetServices.StringHelper.CleanupString(baseString);
 
-        List<PetSheetData> petSheetList = PetServices.PetSheets.GetListFromLine(baseString);
-        if (petSheetList.Count == 0) return;
+        PetSheetData? petSheet = PetServices.PetSheets.GetPetFromString(baseString, ref user, true);
+        if (petSheet == null) return;
 
-        petSheetList.Sort((i1, i2) => i1.BasePlural.CompareTo(i2.BasePlural));
-        petSheetList.Reverse();
-
-        PetSheetData petData = GetSoftData(petSheetList[0], cleanedString, ref user);
-
-        string? customName = user.DataBaseEntry.GetName(petData.Model);
+        string? customName = user.DataBaseEntry.GetName(petSheet.Value.Model);
         if (customName == null) return;
 
-        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petData);
-    }
-
-    PetSheetData GetSoftData(PetSheetData normalPetData, string cleanedString, ref IPettableUser user)
-    {
-        int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(cleanedString);
-        if (softIndex == null) return normalPetData;
-
-        int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
-        if (softSkeleton == null) return normalPetData;
-
-        PetSheetData? softPetData = PetServices.PetSheets.GetPet(softSkeleton.Value);
-        if (softPetData == null) return normalPetData;
-
-        DalamudServices services = DalamudServices;
-
-        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
+        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet.Value);
     }
 
     public override void Dispose()
