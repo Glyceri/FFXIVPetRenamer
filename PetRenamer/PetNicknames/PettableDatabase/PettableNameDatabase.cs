@@ -21,7 +21,9 @@ internal class PettableNameDatabase : INamesDatabase
         for (int i = 0; i < IDs.Length; i++)
         {
             if (IDs[i] != ID) continue;
-            return Names[i];
+            string customName = Names[i];
+            if (customName == string.Empty) return null;
+            return customName;
         }
         return null;
     }

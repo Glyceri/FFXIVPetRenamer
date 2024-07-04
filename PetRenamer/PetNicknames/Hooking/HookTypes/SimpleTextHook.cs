@@ -96,7 +96,7 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual PetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
     {
-        string cleanedString = CleanupString(baseString);
+        string cleanedString = PetServices.StringHelper.CleanupString(baseString);
 
         PetSheetData? normalPetData = PetServices.PetSheets.GetPetFromName(cleanedString);
         if (normalPetData == null) return normalPetData;
@@ -128,13 +128,5 @@ internal unsafe class SimpleTextHook : ITextHook
             return cNode.GetNode<AtkTextNode>(TextPos[^1]);
         }
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
-    }
-
-    string CleanupString(string str)
-    {
-        return str.Replace("サモン・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("Summon ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("-Beschwörung", string.Empty, StringComparison.InvariantCultureIgnoreCase);
     }
 }

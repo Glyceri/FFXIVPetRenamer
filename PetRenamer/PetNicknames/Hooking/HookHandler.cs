@@ -31,6 +31,7 @@ internal class HookHandler : IDisposable
 
     void _Register()
     {
+        Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList));

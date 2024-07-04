@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -71,4 +72,12 @@ internal class StringHelperWrapper : IStringHelper
     }
 
     string MakeString(char c, int count) => new string(c, count);
+
+    public string CleanupString(string str)
+    {
+        return str.Replace("サモン・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("Summon ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("-Beschwörung", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+    }
 }

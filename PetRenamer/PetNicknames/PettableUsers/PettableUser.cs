@@ -45,6 +45,7 @@ internal unsafe class PettableUser : IPettableUser
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;
         User = (nint)BattleChara;
+        if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID);
     }
 
     public void Destroy()

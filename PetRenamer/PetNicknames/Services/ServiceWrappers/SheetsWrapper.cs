@@ -5,6 +5,7 @@ using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
@@ -68,7 +69,7 @@ internal class SheetsWrapper : IPetSheets
             ushort petIcon = petAction.Icon;
             sbyte pronoun = 0;
             string name = pet.Name;
-            petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, name, ref dalamudServices));
+            petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, name, petAction.Name, petAction.RowId, ref dalamudServices));
         }
     }
 
@@ -163,6 +164,18 @@ internal class SheetsWrapper : IPetSheets
         {
             PetSheetData pet = petSheetCache[i];
             if (!pet.IsPet(name)) continue;
+            return pet;
+        }
+        return null;
+    }
+
+    public PetSheetData? GetPetFromActionName(string actionName)
+    {
+        int sheetCount = petSheetCache.Count;
+        for (int i = 0; i < sheetCount; i++)
+        {
+            PetSheetData pet = petSheetCache[i];
+            if (!pet.IsAction(actionName)) continue;
             return pet;
         }
         return null;
