@@ -80,4 +80,14 @@ internal class StringHelperWrapper : IStringHelper
                   .Replace("Invocation ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("-Beschwörung", string.Empty, StringComparison.InvariantCultureIgnoreCase);
     }
+
+    public string CleanupActionName(string str)
+    {
+        return str.Replace("カーバンクル・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("・エギ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("-Egi", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("Carbuncle ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace(" Carbuncle", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+    }
 }

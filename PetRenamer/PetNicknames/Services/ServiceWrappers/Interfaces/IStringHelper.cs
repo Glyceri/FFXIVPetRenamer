@@ -10,4 +10,5 @@ internal unsafe interface IStringHelper
     void ReplaceSeString(ref SeString message, string replaceString, PetSheetData petData, bool checkForEmptySpace = true);
     string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, PetSheetData petData, bool checkForEmptySpace = true);
     string CleanupString(string str);
+    string CleanupActionName(string str);
 }

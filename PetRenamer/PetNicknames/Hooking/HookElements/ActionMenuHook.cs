@@ -1,11 +1,12 @@
-﻿using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Game.Addon.Lifecycle;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -15,8 +16,9 @@ internal unsafe class ActionMenuHook : HookableElement
 
     public override void Init()
     {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "ActionMenu", LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenu", LifeCycleUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "ActionMenu", LifeCycleUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
     }
 
     void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
@@ -68,29 +70,27 @@ internal unsafe class ActionMenuHook : HookableElement
 
     void Rename(AtkTextNode* textNode, ref IPettableUser user)
     {
-        string nodeString = textNode->NodeText.ToString();
-        string text = nodeString.Split('\r')[0];
+        string textNodeText = textNode->NodeText.ToString();
+        string baseString = textNodeText.Split('\r')[0];
+        string cleanedString = PetServices.StringHelper.CleanupString(baseString);
 
-        PetSheetData? petData = GetPetFromString(text, ref user);
-        if (petData == null) return;
-        PetSheetData pPet = petData.Value;
+        List<PetSheetData> petSheetList = PetServices.PetSheets.GetListFromLine(baseString);
+        if (petSheetList.Count == 0) return;
 
-        PetServices.PetLog.Log(pPet.BaseSingular +"-------");
+        petSheetList.Sort((i1, i2) => i1.BasePlural.CompareTo(i2.BasePlural));
+        petSheetList.Reverse();
 
-        string? customName = user.DataBaseEntry.GetName(pPet.Model);
+        PetSheetData petData = GetSoftData(petSheetList[0], cleanedString, ref user);
+
+        string? customName = user.DataBaseEntry.GetName(petData.Model);
         if (customName == null) return;
 
-        PetServices.PetLog.Log(customName);
-
-        PetServices.StringHelper.ReplaceATKString(textNode, nodeString, customName, pPet, false);
+        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petData);
     }
 
-    PetSheetData? GetPetFromString(string baseString, ref IPettableUser user)
+    PetSheetData GetSoftData(PetSheetData normalPetData, string cleanedString, ref IPettableUser user)
     {
-        PetSheetData? normalPetData = PetServices.PetSheets.GetPetFromActionName(baseString);
-        if (normalPetData == null) return normalPetData;
-
-        int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(normalPetData.Value.BaseSingular);
+        int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(cleanedString);
         if (softIndex == null) return normalPetData;
 
         int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
@@ -101,7 +101,7 @@ internal unsafe class ActionMenuHook : HookableElement
 
         DalamudServices services = DalamudServices;
 
-        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.Value.BaseSingular, normalPetData.Value.BasePlural, ref services);
+        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
     }
 
     public override void Dispose()

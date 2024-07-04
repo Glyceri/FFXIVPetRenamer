@@ -5,13 +5,13 @@ using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
-using System.Xml.Linq;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class SheetsWrapper : IPetSheets
 {
     DalamudServices services;
+    IStringHelper helper;
 
     readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
     readonly List<string> nameToClass = new List<string>();
@@ -24,9 +24,10 @@ internal class SheetsWrapper : IPetSheets
     public ExcelSheet<Action>? actions { get; init; }
     public ExcelSheet<TextCommand>? textCommands { get; init; }
 
-    public SheetsWrapper(ref DalamudServices dalamudServices)
+    public SheetsWrapper(ref DalamudServices dalamudServices, IStringHelper helper)
     {
         services = dalamudServices;
+        this.helper = helper;
         petSheet = dalamudServices.DataManager.GetExcelSheet<Companion>();
         worlds = dalamudServices.DataManager.GetExcelSheet<World>();
         races = dalamudServices.DataManager.GetExcelSheet<Race>();
@@ -69,7 +70,8 @@ internal class SheetsWrapper : IPetSheets
             ushort petIcon = petAction.Icon;
             sbyte pronoun = 0;
             string name = pet.Name;
-            petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, name, petAction.Name, petAction.RowId, ref dalamudServices));
+            string cleanedActionName = helper.CleanupString(helper.CleanupActionName(petAction.Name));
+            petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
         }
     }
 
@@ -199,6 +201,26 @@ internal class SheetsWrapper : IPetSheets
             if (cast == castId) return i;
         }
         return null;
+    }
+
+    public List<PetSheetData> GetListFromLine(string line)
+    {
+        List<PetSheetData> list = new List<PetSheetData> ();
+        if (line == string.Empty) return list;
+        foreach (PetSheetData pet in petSheetCache)
+        {
+            if (string.Equals(pet.BaseSingular, line, System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                list.Add(pet);
+                return list;
+            }
+            if (pet.BaseSingular == string.Empty || pet.BasePlural == string.Empty || pet.ActionName == string.Empty) continue;
+            if (line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) ||
+                line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) ||
+                line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase)) list.Add(pet);
+        }    
+
+        return list;
     }
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()

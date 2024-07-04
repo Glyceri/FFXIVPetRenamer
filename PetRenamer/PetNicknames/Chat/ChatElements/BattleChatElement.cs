@@ -7,8 +7,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
-using static FFXIVClientStructs.FFXIV.Client.Game.UI.MapMarkerData.Delegates;
-using System.Security.AccessControl;
 using PetRenamer.PetNicknames.Chat.Structs;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
@@ -41,7 +39,6 @@ internal unsafe class BattleChatElement : RestrictedChatElement
         IPettableDatabaseEntry databaseEntry = user.DataBaseEntry;
         INamesDatabase nameDataBase = databaseEntry.ActiveDatabase;
 
-        // I hate using value tuples, but sometimes you have to
         List<SheetGroup> sheetDataList = new List<SheetGroup> ();
 
         for (int i = 0; i < nameDataBase.IDs.Length; i++)

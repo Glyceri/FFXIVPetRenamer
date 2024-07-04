@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -96,13 +97,18 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual PetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
     {
-        string cleanedString = PetServices.StringHelper.CleanupString(baseString);
+        List<PetSheetData> data = PetServices.PetSheets.GetListFromLine(baseString);
 
-        PetSheetData? normalPetData = PetServices.PetSheets.GetPetFromName(cleanedString);
-        if (normalPetData == null) return normalPetData;
+        if (data.Count == 0) return null;
+
+        data.Sort((i1, i2) => i1.BaseSingular.CompareTo(i2.BaseSingular));
+        data.Reverse();
+
+        PetSheetData normalPetData = data[0];
+
         if (!soft) return normalPetData;
 
-        int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(cleanedString);
+        int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(normalPetData.BasePlural);
         if (softIndex == null) return normalPetData;
 
         int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
@@ -111,7 +117,7 @@ internal unsafe class SimpleTextHook : ITextHook
         PetSheetData? softPetData = PetServices.PetSheets.GetPet(softSkeleton.Value);
         if (softPetData == null) return normalPetData;
 
-        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.Value.BaseSingular, normalPetData.Value.BasePlural, ref Services);
+        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref Services);
     }
 
     protected AtkTextNode* GetTextNode(ref BaseNode bNode)
