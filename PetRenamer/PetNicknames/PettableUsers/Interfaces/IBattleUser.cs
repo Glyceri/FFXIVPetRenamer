@@ -8,6 +8,7 @@ internal unsafe interface IBattleUser
     string Name { get; }
     ulong ContentID { get; }
     ushort Homeworld { get; }
-    uint ObjectID { get; }
+    ulong ObjectID { get; }
+    uint ShortObjectID { get; } 
     BattleChara* BattleChara { get; }
 }

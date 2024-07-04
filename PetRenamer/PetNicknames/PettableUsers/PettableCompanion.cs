@@ -13,7 +13,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
 
     public nint PetPointer { get; private set; }
     public int SkeletonID { get; init; }
-    public uint ObjectID { get; init; }
+    public ulong ObjectID { get; init; }
     public uint OldObjectID { get; init; }
     public string Name { get; init; } = "";
     public ushort Index { get; init; }
@@ -32,8 +32,8 @@ internal unsafe class PettableCompanion : IPettableCompanion
         SkeletonID = c->Character.CharacterData.ModelCharaId;
         Index = c->Character.GameObject.ObjectIndex;
         Name = c->Character.GameObject.NameString;
-        ObjectID = c->Character.EntityId;
-        OldObjectID = c->Character.GetGameObjectId().ObjectId;
+        ObjectID = c->Character.GetGameObjectId();
+        OldObjectID = c->Character.EntityId;
         PetType = c->Character.GetGameObjectId().Type;
         CustomName = entry.GetName(SkeletonID);
         PetData = petServices.PetSheets.GetPet(SkeletonID);
@@ -52,7 +52,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
         ushort index = character.GameObject.ObjectIndex;
         uint objectID = character.EntityId;
 
-        return skeletonID == SkeletonID && index == Index && ObjectID == objectID;
+        return skeletonID == SkeletonID && index == Index && OldObjectID == objectID;
     }
 
     public void Destroy()

@@ -10,6 +10,8 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class SheetsWrapper : IPetSheets
 {
+    DalamudServices services;
+
     readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
     readonly List<(string, int)> nameToClass = new List<(string, int)>();
 
@@ -23,6 +25,7 @@ internal class SheetsWrapper : IPetSheets
 
     public SheetsWrapper(ref DalamudServices dalamudServices)
     {
+        services = dalamudServices;
         petSheet = dalamudServices.DataManager.GetExcelSheet<Companion>();
         worlds = dalamudServices.DataManager.GetExcelSheet<World>();
         races = dalamudServices.DataManager.GetExcelSheet<Race>();
@@ -143,6 +146,28 @@ internal class SheetsWrapper : IPetSheets
         if (index >= 0 && index < softSkeletons.Length) return softSkeletons[index];
 
         return skeletonID;
+    }
+
+    public PetSheetData? GetPetFromName(string name)
+    {
+        int sheetCount = petSheetCache.Count;
+        for (int i = 0; i < sheetCount; i++)
+        {
+            PetSheetData pet = petSheetCache[i];
+            if (!pet.IsPet(name)) continue;
+            return pet;
+        }
+        return null;
+    }
+
+    public int? NameToSoftSkeletonIndex(string name)
+    {
+        for(int i = 0; i < nameToClass.Count; i++)
+        {
+            services.PluginLog.Debug("Name: " + name + ", NameToClass: " + nameToClass[i].Item1.ToLower() + " : " + nameToClass[i].Item2);
+            if (nameToClass[i].Item1.ToLower() == name.ToLower()) return nameToClass[i].Item2;
+        }
+        return null;
     }
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()

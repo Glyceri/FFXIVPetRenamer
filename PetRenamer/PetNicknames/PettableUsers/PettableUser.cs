@@ -14,7 +14,7 @@ internal unsafe class PettableUser : IPettableUser
     public string Name { get; private set; } = "";
     public ulong ContentID { get; private set; }
     public ushort Homeworld { get; private set; }
-    public uint ObjectID { get; private set; }
+    public ulong ObjectID { get; private set; }
     public bool Touched { get; set; }
     public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
     public BattleChara* BattleChara { get; }
@@ -23,19 +23,23 @@ internal unsafe class PettableUser : IPettableUser
     IPetServices PetServices { get; init; }
     IPetLog PetLog { get; init; }
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
-    
+    public nint User { get; private set; }
+    public uint ShortObjectID { get; private set; }
+
     public PettableUser(IPetLog petLog, IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
     {
         this.PetLog = petLog;
-        BattleChara* bChara = battleChara.Value;
-        Name = bChara->NameString;
-        ContentID = bChara->ContentId;
-        Homeworld = bChara->HomeWorld;
-        ObjectID = bChara->GetGameObjectId().ObjectId;
+        BattleChara = battleChara.Value;
+        Name = BattleChara->NameString;
+        ContentID = BattleChara->ContentId;
+        Homeworld = BattleChara->HomeWorld;
+        ObjectID = BattleChara->GetGameObjectId();
+        ShortObjectID = BattleChara->GetGameObjectId().ObjectId;
         Touched = true;
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;
+        User = (nint)BattleChara;
     }
 
     public void Destroy()
@@ -46,6 +50,7 @@ internal unsafe class PettableUser : IPettableUser
     public void Set(Pointer<BattleChara> pointer)
     {
         Reset();
+        User = (nint)pointer.Value;
         if (!DataBaseEntry.IsActive) return;
         if (pointer.Value == null) return;
         Companion* c = pointer.Value->CompanionData.CompanionObject;
@@ -102,7 +107,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             Pointer<BattleChara> bChara = pets[i];
             if (bChara == null) continue;
-            if (bChara.Value->OwnerId != ObjectID) continue;
+            if (bChara.Value->OwnerId != ShortObjectID) continue;
 
             pets.RemoveAt(i);
 
@@ -119,8 +124,11 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettablePet? GetPet(nint pet)
     {
-        foreach(IPettablePet pPet in PettablePets)
+        if (!IsActive) return null;
+        int petCount = PettablePets.Count;
+        for (int i = 0; i < petCount; i++)
         {
+            IPettablePet pPet = PettablePets[i];
             if (pPet.PetPointer == pet) return pPet;
         }
         return null;
@@ -130,7 +138,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         foreach (IPettablePet pPet in PettablePets)
         {
-            if (pPet.OldObjectID == gameObjectId.ObjectId || pPet.ObjectID == gameObjectId.ObjectId) return pPet;
+            if (pPet.ObjectID == (ulong)gameObjectId) return pPet;
         }
         return null;
     }

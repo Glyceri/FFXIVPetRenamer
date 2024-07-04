@@ -9,6 +9,7 @@ internal struct PetSheetData
 {
     public int Model { get; private set; }
     public uint Icon { get; private set; }
+    public sbyte Pronoun { get; private set; }
 
     public string[] Singular { get; private set; }
     public string[] Plural   { get; private set; }
@@ -20,6 +21,7 @@ internal struct PetSheetData
     {
         this.Model = Model;
         this.Icon = Icon;
+        this.Pronoun = Pronoun;
 
         ClientLanguage clientLanguage = services.ClientState.ClientLanguage;
 
@@ -103,4 +105,7 @@ internal struct PetSheetData
         foreach(string s in Plural) 
             log.Log(s);
     }
+
+    public bool IsPet(string name) => Normalize(BaseSingular) == Normalize(name);
+    string Normalize(string s) => s.ToLower().Normalize();
 }

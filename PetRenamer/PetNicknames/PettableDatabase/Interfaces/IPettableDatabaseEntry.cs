@@ -26,6 +26,8 @@ internal interface IPettableDatabaseEntry
     /// <returns>If the move succeeded.</returns>
     bool MoveToDataBase(IPettableDatabase database);
     string? GetName(int skeletonID);
+    string? GetSoftName(int softIndex);
+    int? GetSoftSkeleton(int softIndex);
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
 }

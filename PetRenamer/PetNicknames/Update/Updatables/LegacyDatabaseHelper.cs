@@ -36,7 +36,7 @@ internal class LegacyDatabaseHelper : IUpdatable
         double elapsedSeconds = framework.UpdateDelta.TotalSeconds;
         timer += elapsedSeconds;
 
-        if (timer >= 5)
+        if (timer >= 0.1)
         {
             timer = 0;
             HandleLegacyDatabase();

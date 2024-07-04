@@ -73,4 +73,8 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PetNicknames\Hooking\Structs\" />
+  </ItemGroup>
 </Project>

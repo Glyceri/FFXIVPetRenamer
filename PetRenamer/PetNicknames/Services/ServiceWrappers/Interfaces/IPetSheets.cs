@@ -21,4 +21,6 @@ internal interface IPetSheets
     string? GetWorldName(ushort worldID);
     PetSheetData? GetPet(int skeletonID);
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
+    PetSheetData? GetPetFromName(string name);
+    public int? NameToSoftSkeletonIndex(string name);
 }

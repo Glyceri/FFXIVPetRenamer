@@ -46,6 +46,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.Homeworld = this.Homeworld;
         pEntry.ContentID = this.ContentID;
         pEntry.IsActive = true;
+        pEntry.SoftSkeletons = this.SoftSkeletons;
         return true;
     }
 
@@ -62,5 +63,12 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         _dirty = false;
         ActiveDatabase.MarkDirtyAsNoticed();
+    }
+
+    public string? GetSoftName(int softIndex) => GetName(GetSoftSkeleton(softIndex) ?? 0);
+    public int? GetSoftSkeleton(int softIndex)
+    {
+        if (softIndex < 0 || softIndex >= SoftSkeletons.Length) return null;
+        return SoftSkeletons[softIndex];
     }
 }

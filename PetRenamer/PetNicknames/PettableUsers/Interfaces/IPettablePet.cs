@@ -9,7 +9,7 @@ internal interface IPettablePet
 
     public nint PetPointer { get; }
     public int SkeletonID { get; }
-    public uint ObjectID { get; }
+    public ulong ObjectID { get; }
     public uint OldObjectID { get; }
     public byte PetType { get; }
     public ushort Index { get; }

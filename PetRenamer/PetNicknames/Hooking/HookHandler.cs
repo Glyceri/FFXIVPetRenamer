@@ -31,7 +31,8 @@ internal class HookHandler : IDisposable
 
     void _Register()
     {
-        Register(new NamePlateHook(DalamudServices, PettableUserList));
+        Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
+        Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
     }
 
     List<IHookableElement> hookableElements = new List<IHookableElement>();

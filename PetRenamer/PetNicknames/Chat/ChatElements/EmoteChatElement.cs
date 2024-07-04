@@ -40,7 +40,7 @@ internal unsafe class EmoteChatElement : IChatElement
         {
             if (user == null) continue;
             if (!user.IsActive) continue;
-            IPettablePet? pet = user.GetPet(emoteTarget.ObjectId);
+            IPettablePet? pet = user.GetPet(emoteTarget);
             if (pet == null) continue; 
             string? customName = pet.CustomName;
             if (customName == null) continue; 

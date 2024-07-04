@@ -13,6 +13,8 @@ internal interface IPettableUser : IBattleUser
     /// Please do NOT set this value unless you know what you need it for
     /// </summary>
     bool Touched { get; set; }
+    nint User { get; }
+
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }
     IPettablePet? GetPet(nint pet);

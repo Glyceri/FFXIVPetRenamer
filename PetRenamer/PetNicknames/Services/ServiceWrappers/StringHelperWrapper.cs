@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
@@ -9,6 +10,14 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class StringHelperWrapper : IStringHelper
 {
+    public unsafe string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, PetSheetData petData, bool checkForEmptySpace = true)
+    {
+        if (atkNode == null) return baseString;
+        string newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace);
+        atkNode->NodeText.SetString(newString);
+        return newString;
+    }
+
     public void ReplaceSeString(ref SeString message, string replaceString, PetSheetData petData, bool checkForEmptySpace = true)
     {
         if (message == null) return;
