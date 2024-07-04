@@ -6,6 +6,10 @@ using PetRenamer.PetNicknames.Services.Interface;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System.Collections.Generic;
+using static FFXIVClientStructs.FFXIV.Client.Game.UI.MapMarkerData.Delegates;
+using System.Security.AccessControl;
+using PetRenamer.PetNicknames.Chat.Structs;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -36,6 +40,10 @@ internal unsafe class BattleChatElement : RestrictedChatElement
 
         IPettableDatabaseEntry databaseEntry = user.DataBaseEntry;
         INamesDatabase nameDataBase = databaseEntry.ActiveDatabase;
+
+        // I hate using value tuples, but sometimes you have to
+        List<SheetGroup> sheetDataList = new List<SheetGroup> ();
+
         for (int i = 0; i < nameDataBase.IDs.Length; i++)
         {
             int id = nameDataBase.IDs[i];
@@ -44,13 +52,19 @@ internal unsafe class BattleChatElement : RestrictedChatElement
             PetSheetData? sheetData = PetServices.PetSheets.GetPet(id);
             if (sheetData == null) continue;
             if (!sheetData.Value.Contains(stringMessage)) continue;
+            PetSheetData sData = sheetData.Value;
 
             int softSkeletonID = PetServices.PetSheets.ToSoftSkeleton(id, databaseEntry.SoftSkeletons);
             string? customName = nameDataBase.GetName(softSkeletonID);
             if (customName == null) break;
-
-            PetServices.StringHelper.ReplaceSeString(ref message, customName, sheetData.Value);
-            break;
+            sheetDataList.Add(new SheetGroup(ref customName, ref sData));
         }
+
+        if (sheetDataList.Count == 0) return;
+        sheetDataList.Sort((el1, el2) => el1.CompareTo(el2));
+        sheetDataList.Reverse();
+
+        SheetGroup activeGroup = sheetDataList[0];
+        PetServices.StringHelper.ReplaceSeString(ref message, activeGroup.CustomName, activeGroup.PetSheetData);
     }
 }

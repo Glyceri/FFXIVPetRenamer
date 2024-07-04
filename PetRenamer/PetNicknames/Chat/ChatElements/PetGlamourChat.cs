@@ -2,16 +2,12 @@
 using Dalamud.Game;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
-using Lumina.Excel.GeneratedSheets;
-using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using static FFXIVClientStructs.FFXIV.Client.Game.UI.MapMarkerData.Delegates;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -171,7 +167,7 @@ internal class PetGlamourChat : RestrictedChatElement
 
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
-        localUser.DataBaseEntry.SoftSkeletons[classJob.Value] = sheetData.Value.Model;
+        SetDatabaseEntry(localUser, classJob.Value, sheetData.Value.Model);
     }
 
     void MatchReset(Match match)
@@ -185,7 +181,14 @@ internal class PetGlamourChat : RestrictedChatElement
         if (localUser == null) return;
 
         int baseSkeleton = PluginConstants.BaseSkeletons[classJob.Value];
-        localUser.DataBaseEntry.SoftSkeletons[classJob.Value] = baseSkeleton;
+        SetDatabaseEntry(localUser, classJob.Value, baseSkeleton);
+    }
+
+    void SetDatabaseEntry(IPettableUser user, int classJobIndex, int newSkeleton)
+    {
+        bool changed = user.DataBaseEntry.SoftSkeletons[classJobIndex] != newSkeleton;
+        user.DataBaseEntry.SoftSkeletons[classJobIndex] = newSkeleton;
+        if (changed) PetServices.PetLog.Log("Should save the database!");
     }
 
     int? GetClassJob(string basePetName) => PetServices.PetSheets.NameToSoftSkeletonIndex(basePetName);

@@ -106,7 +106,7 @@ internal struct PetSheetData
             log.Log(s);
     }
 
-    public bool IsPet(string name) => Normalize(BaseSingular) == Normalize(name);
+    public bool IsPet(string name) => string.Equals(BaseSingular, name, System.StringComparison.InvariantCultureIgnoreCase);
     string Normalize(string s) => s.ToLower().Normalize();
 
     public bool Contains(string line)
