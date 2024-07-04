@@ -20,7 +20,7 @@ internal unsafe class TargetBarHook : QuickHookableElement
 
         Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed).RegsterTarget(FocusTargetPet);
         Hook<SimpleTextHook>("_CastBar", [4], Allowed, true);
-        Hook<SimpleTextHook>("Tooltip", [2], Allowed, true);
+        Hook<TooltipHook>("Tooltip", [2], Allowed, true).Register(3);
         Hook<SimpleTextHook>("ActionDetail", [5], Allowed, true);
 
         Hook<TargetTextHook>("_TargetInfo", [12], Allowed, true).RegsterTarget(TargetObject, () => UserList.GetUser(Target?.GameObjectId ?? 0));

@@ -79,7 +79,7 @@ internal unsafe class SimpleTextHook : ITextHook
         return true;
     }
 
-    protected void SetText(AtkTextNode* textNode, string text, string customName, PetSheetData pPet)
+    protected virtual void SetText(AtkTextNode* textNode, string text, string customName, PetSheetData pPet)
     {
         if (AllowedToFunction != null)
         {
@@ -96,7 +96,7 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
 
-    protected AtkTextNode* GetTextNode(ref BaseNode bNode)
+    protected virtual AtkTextNode* GetTextNode(ref BaseNode bNode)
     {
         if (TextPos.Length > 1)
         {
