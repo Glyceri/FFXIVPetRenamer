@@ -1,24 +1,34 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.Addon.Lifecycle;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
-internal class TargetTextHook : SimpleTextHook
+internal unsafe class TargetTextHook : SimpleTextHook
 {
-    Func<IPettablePet?>? callGetUser = null;
+    Func<IPettablePet?>? callGetPet = null;
+    Func<IPettableUser?>? callGetUser = null;
 
-    public void RegsterTarget(Func<IPettablePet?> getPet)
+    public void RegsterTarget(Func<IPettablePet?> getPet, Func<IPettableUser?>? callGetUser = null)
     {
-        callGetUser = getPet;
+        this.callGetUser = callGetUser;
+        callGetPet = getPet;
         SetUnfaulty();
     }
 
-    protected override unsafe bool OnTextNode(AtkTextNode* textNode, string text)
+    protected override bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        IPettablePet? pet = callGetUser?.Invoke();
-        if (pet == null) return false;
+        if (!IsSoft) return NotSoftTextNode(textNode, text);
+        return base.OnTextNode(textNode, text);
+    }
+
+    bool NotSoftTextNode(AtkTextNode* textNode, string text)
+    {
+        IPettablePet? pet = callGetPet?.Invoke();
+        if (pet == null) return false; 
 
         PetSheetData? petData = pet.PetData;
         if (petData == null) return false;
@@ -29,4 +39,6 @@ internal class TargetTextHook : SimpleTextHook
         SetText(textNode, text, customName, petData.Value);
         return true;
     }
+
+    protected override IPettableUser? GetUser() => callGetUser?.Invoke();
 }

@@ -12,6 +12,7 @@ namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
 internal unsafe class SimpleTextHook : ITextHook
 {
+    protected string EarlyLastAnswer = "";
     protected string LastAnswer = "";
 
     public bool Faulty { get; protected set; } = true;
@@ -20,10 +21,10 @@ internal unsafe class SimpleTextHook : ITextHook
     protected IPettableUserList PettableUserList { get; set; } = null!;
     protected IPetServices PetServices { get; set; } = null!;
 
-    uint[] TextPos { get; set; } = new uint[0];
+    protected uint[] TextPos { get; set; } = new uint[0];
     Func<int, bool> AllowedToFunction = _ => false;
 
-    bool IsSoft;
+    protected bool IsSoft;
 
     public void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
@@ -46,15 +47,17 @@ internal unsafe class SimpleTextHook : ITextHook
 
         if (TextPos.Length == 0) return;
         if (!baseElement->IsVisible) return;
-
+       
         BaseNode bNode = new BaseNode(baseElement);
         AtkTextNode* tNode = GetTextNode(ref bNode);
         if (tNode == null) return;
 
-        string tNodeText = tNode->NodeText.ToString() ?? string.Empty;
+        string tNodeText = tNode->NodeText.ToString();
         if (tNodeText == string.Empty || tNodeText == LastAnswer) return;
 
-        if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
+        PetServices.PetLog.Log("GO!");
+
+        if(!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
     }
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
@@ -77,21 +80,25 @@ internal unsafe class SimpleTextHook : ITextHook
     {
         if (AllowedToFunction != null)
         {
-            if (!AllowedToFunction.Invoke(pPet.Model)) return;
+            if (!AllowedToFunction.Invoke(pPet.Model))
+            {
+                LastAnswer = text;
+                return;
+            }
         }
         LastAnswer = PetServices.StringHelper.ReplaceATKString(textNode, text, customName, pPet);
     }
 
     protected virtual PetSheetData? GetPetData(string text, ref IPettableUser user) => GetPetFromString(text, ref user, IsSoft);
 
-    protected virtual IPettableUser? GetUser() => null;
+    protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
 
     protected virtual PetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
     {
         string cleanedString = CleanupString(baseString);
 
         PetSheetData? normalPetData = PetServices.PetSheets.GetPetFromName(cleanedString);
-        if (normalPetData == null) return null;
+        if (normalPetData == null) return normalPetData;
         if (!soft) return normalPetData;
 
         int? softIndex = PetServices.PetSheets.NameToSoftSkeletonIndex(cleanedString);
@@ -106,7 +113,7 @@ internal unsafe class SimpleTextHook : ITextHook
         return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.Value.BaseSingular, normalPetData.Value.BasePlural, ref Services);
     }
 
-    AtkTextNode* GetTextNode(ref BaseNode bNode)
+    protected AtkTextNode* GetTextNode(ref BaseNode bNode)
     {
         if (TextPos.Length > 1)
         {

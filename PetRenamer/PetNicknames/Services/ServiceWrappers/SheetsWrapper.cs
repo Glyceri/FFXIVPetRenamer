@@ -164,8 +164,8 @@ internal class SheetsWrapper : IPetSheets
     {
         for(int i = 0; i < nameToClass.Count; i++)
         {
-            services.PluginLog.Debug("Name: " + name + ", NameToClass: " + nameToClass[i].Item1.ToLower() + " : " + nameToClass[i].Item2);
-            if (nameToClass[i].Item1.ToLower() == name.ToLower()) return nameToClass[i].Item2;
+            if (nameToClass[i].Item1.ToLower() == name.ToLower())
+                return nameToClass[i].Item2;
         }
         return null;
     }

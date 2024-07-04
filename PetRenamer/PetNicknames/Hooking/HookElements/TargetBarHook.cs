@@ -19,12 +19,12 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<TargetTextHook>("_TargetInfoMainTarget", [7], Allowed).RegsterTarget(TargetOfTarget);
 
         Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed).RegsterTarget(FocusTargetPet);
-        Hook<TargetTextHook>("_FocusTargetInfo", [5], Allowed).RegsterTarget(FocusTargetPet);
-
-        Hook<SimpleTextHook>("_TargetInfoCastBar", [4], Allowed, true);
-
         Hook<SimpleTextHook>("_CastBar", [4], Allowed, true);
-        Hook<SimpleTextHook>("_TargetInfo", [12], Allowed, true);
+
+
+        Hook<TargetTextHook>("_TargetInfo", [12], Allowed, true).RegsterTarget(TargetObject, () => UserList.GetUser(Target?.GameObjectId ?? 0));
+        Hook<TargetTextHook>("_TargetInfoCastBar", [4], Allowed, true).RegsterTarget(TargetObject, () => UserList.GetUser(Target?.GameObjectId ?? 0));
+        Hook<TargetTextHook>("_FocusTargetInfo", [5], Allowed, true).RegsterTarget(FocusTargetPet, () => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
     }
 
     public override void Dispose()
