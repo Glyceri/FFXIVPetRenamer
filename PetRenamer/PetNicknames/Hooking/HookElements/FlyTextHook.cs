@@ -34,8 +34,14 @@ internal unsafe class FlyTextHook : HookableElement
     unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int a3, char a4, int castID, int a6, int a7, int a8)
     {
         addToScreenLogWithLogMessageId?.Original(target, castDealer, a3, a4, castID, a6, a7, a8);
+        
         PetServices.PetCastHelper.SetLatestCast((BattleChara*)target, (BattleChara*)castDealer, castID);
+
+        // a3 is most likely some cast status flag w/e thing
+        // 534 means a cast FULLY succeeded, which is luckily the only part I really need for soft targeting
+        if (a3 != 534) return;
         if (PetServices.PetSheets.CastToSoftIndex((uint)castID) == null) return;
+        PetServices.PetLog.Log("CAST: " + castID + " : " + a3 + " : " + a4 + " : " + a6 + " : " + a7 + " : " + a8);
         UserList.GetUser(castDealer)?.OnLastCastChanged((uint)castID);
     }
 

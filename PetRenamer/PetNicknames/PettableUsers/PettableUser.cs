@@ -76,6 +76,7 @@ internal unsafe class PettableUser : IPettableUser
 
         int? softIndex = PetServices.PetSheets.CastToSoftIndex(lastCast);
         lastCast = CurrentCastID;
+        if (CurrentCastID != 0) return;
         if (softIndex == null) return;
 
         int sIndex = softIndex.Value;
