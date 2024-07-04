@@ -11,6 +11,7 @@ internal class PetServices : IPetServices
     public Configuration Configuration { get; init; }
     public IPetSheets PetSheets { get; init; }
     public IStringHelper StringHelper { get; init; }
+    public IPetCastHelper PetCastHelper { get; init; }
 
     public PetServices(DalamudServices services) 
     {
@@ -20,6 +21,7 @@ internal class PetServices : IPetServices
         CheckConfigFailure();
         PetSheets = new SheetsWrapper(ref services);
         StringHelper = new StringHelperWrapper();
+        PetCastHelper = new PetCastWrapper();
     }
 
     void CheckConfigFailure()

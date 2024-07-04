@@ -6,12 +6,13 @@ using PetRenamer.PetNicknames.Update.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using PetRenamer.PetNicknames.PettableDatabase;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class LegacyDatabaseHelper : IUpdatable
 {
+    const double secondsPerCheck = 20;
+
     public bool Enabled { get; set; } = true;
 
     DalamudServices DalamudServices { get; init; }
@@ -29,14 +30,15 @@ internal class LegacyDatabaseHelper : IUpdatable
         LegacyPettableDatabase = legacyPettableDatabase;
     }
 
-    double timer = 0;
+    
+    double timer = secondsPerCheck;
 
     public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
     {
         double elapsedSeconds = framework.UpdateDelta.TotalSeconds;
         timer += elapsedSeconds;
 
-        if (timer >= 0.1)
+        if (timer >= secondsPerCheck)
         {
             timer = 0;
             HandleLegacyDatabase();

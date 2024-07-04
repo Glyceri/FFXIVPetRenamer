@@ -25,11 +25,16 @@ internal unsafe class PettableUser : IPettableUser
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
     public nint User { get; private set; }
     public uint ShortObjectID { get; private set; }
+    public uint CurrentCastID { get; private set; }
+    public bool IsLocalPlayer { get; private set; }
+
+    uint lastCast;
 
     public PettableUser(IPetLog petLog, IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
     {
-        this.PetLog = petLog;
+        PetLog = petLog;
         BattleChara = battleChara.Value;
+        IsLocalPlayer = BattleChara->ObjectIndex == 0;
         Name = BattleChara->NameString;
         ContentID = BattleChara->ContentId;
         Homeworld = BattleChara->HomeWorld;
@@ -44,13 +49,15 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Destroy()
     {
-        
+
     }
 
     public void Set(Pointer<BattleChara> pointer)
     {
         Reset();
         User = (nint)pointer.Value;
+        CurrentCastID = BattleChara->CastInfo.ActionId;
+        if (lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
         if (!DataBaseEntry.IsActive) return;
         if (pointer.Value == null) return;
         Companion* c = pointer.Value->CompanionData.CompanionObject;
@@ -61,9 +68,37 @@ internal unsafe class PettableUser : IPettableUser
         else CreateNewPet(new PettableCompanion(c, DataBaseEntry, PetServices));
     }
 
+    public void OnLastCastChanged(uint cast)
+    {
+        if (!IsActive) return;
+        CurrentCastID = cast;
+        if (lastCast == CurrentCastID) return;
+
+        int? softIndex = PetServices.PetSheets.CastToSoftIndex(lastCast);
+        lastCast = CurrentCastID;
+        if (softIndex == null) return;
+
+        int sIndex = softIndex.Value;
+        IPettablePet? youngestPet = GetYoungestPet();
+        if (youngestPet == null) return;
+
+        if (sIndex < 0 || sIndex >= DataBaseEntry.SoftSkeletons.Length) return;
+
+        int oldSkeleton = DataBaseEntry.SoftSkeletons[sIndex];
+        int newSkeleton = youngestPet.SkeletonID;
+
+        if (oldSkeleton == newSkeleton) return;
+
+        DataBaseEntry.SoftSkeletons[sIndex] = newSkeleton;
+
+        if (!IsLocalPlayer) return;
+
+        PetLog.Log("SHOULD!!! save the database");
+    }
+
     IPettablePet? FindPet(ref Character character)
     {
-        for(int i = 0; i < PettablePets.Count; i++)
+        for (int i = 0; i < PettablePets.Count; i++)
         {
             IPettablePet pet = PettablePets[i];
             if (pet.Compare(ref character)) return pet;
@@ -84,15 +119,15 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
-        for (int i = PettablePets.Count - 1; i >= 0; i--) 
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet pet = PettablePets[i];
 
-            if (!pet.Touched) 
+            if (!pet.Touched)
             {
                 pet.Destroy();
-                PettablePets.RemoveAt(i); 
-                continue; 
+                PettablePets.RemoveAt(i);
+                continue;
             }
 
             pet.Touched = false;
@@ -103,7 +138,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         if (!DataBaseEntry.IsActive) return;
 
-        for(int i = pets.Count - 1; i >= 0; i--)
+        for (int i = pets.Count - 1; i >= 0; i--)
         {
             Pointer<BattleChara> bChara = pets[i];
             if (bChara == null) continue;
@@ -136,10 +171,33 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettablePet? GetPet(GameObjectId gameObjectId)
     {
-        foreach (IPettablePet pPet in PettablePets)
+        if (!IsActive) return null;
+        int petCount = PettablePets.Count;
+        for (int i = 0; i < petCount; i++)
         {
+            IPettablePet pPet = PettablePets[i];
             if (pPet.ObjectID == (ulong)gameObjectId) return pPet;
         }
         return null;
     }
+
+    public IPettablePet? GetYoungestPet()
+    {
+        ulong lastLifetime = ulong.MaxValue;
+        IPettablePet? lastPet = null;
+        if (!IsActive) return null;
+        int petCount = PettablePets.Count;
+        for (int i = 0; i < petCount; i++)
+        {
+            IPettablePet pPet = PettablePets[i];
+            if (pPet.Lifetime < lastLifetime)
+            {
+                lastLifetime = pPet.Lifetime;
+                lastPet = pPet;
+            }
+        }
+        return lastPet;
+    }
+
+    bool CastCheck(uint castID) => lastCast == castID && CurrentCastID != castID;
 }

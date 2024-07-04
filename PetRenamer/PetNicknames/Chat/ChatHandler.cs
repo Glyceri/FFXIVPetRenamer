@@ -26,6 +26,7 @@ internal class ChatHandler : IDisposable
     void _Register()
     {
         Register(new EmoteChatElement(DalamudServices, PetServices, PettableUserList));
+        Register(new BattleChatElement(PetServices, PettableUserList));
     }
 
     List<IChatElement> _chatElements = new List<IChatElement>(); 

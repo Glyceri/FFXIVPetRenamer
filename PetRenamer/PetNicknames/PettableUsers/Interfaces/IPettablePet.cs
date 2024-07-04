@@ -18,6 +18,7 @@ internal interface IPettablePet
     public string? CustomSoftName { get; }
     public bool Dirty { get; }
     public PetSheetData? PetData { get; }
+    public ulong Lifetime { get; }
 
     void Update(nint pointer);
     bool Compare(ref Character character);

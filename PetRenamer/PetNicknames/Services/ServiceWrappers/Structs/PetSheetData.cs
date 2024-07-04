@@ -108,4 +108,17 @@ internal struct PetSheetData
 
     public bool IsPet(string name) => Normalize(BaseSingular) == Normalize(name);
     string Normalize(string s) => s.ToLower().Normalize();
+
+    public bool Contains(string line)
+    {
+        for (int i = 0; i < Singular.Length; i++)
+            if (line.Contains(Singular[i], System.StringComparison.InvariantCultureIgnoreCase))
+                return true;
+
+        for (int i = 0; i < Plural.Length; i++)
+            if (line.Contains(Plural[i], System.StringComparison.InvariantCultureIgnoreCase))
+                return true;
+
+        return false;
+    }
 }

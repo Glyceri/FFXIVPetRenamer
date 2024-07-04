@@ -7,5 +7,6 @@ internal interface IPetServices
     public IPetLog PetLog { get; }
     public IPetSheets PetSheets { get; }
     public IStringHelper StringHelper { get; }
+    public IPetCastHelper PetCastHelper { get; }
     public Configuration Configuration { get; }
 }

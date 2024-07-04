@@ -23,4 +23,5 @@ internal interface IPetSheets
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
     PetSheetData? GetPetFromName(string name);
     public int? NameToSoftSkeletonIndex(string name);
+    public int? CastToSoftIndex(uint castId);
 }

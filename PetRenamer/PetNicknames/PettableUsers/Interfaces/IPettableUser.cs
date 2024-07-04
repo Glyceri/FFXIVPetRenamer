@@ -14,12 +14,15 @@ internal interface IPettableUser : IBattleUser
     /// </summary>
     bool Touched { get; set; }
     nint User { get; }
+    bool IsLocalPlayer { get; }
 
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);
+    IPettablePet? GetYoungestPet();
 
+    void OnLastCastChanged(uint cast);
     void Set(Pointer<BattleChara> pointer);
     void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
 

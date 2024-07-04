@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using System.Reflection;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
@@ -10,5 +9,7 @@ internal unsafe interface IBattleUser
     ushort Homeworld { get; }
     ulong ObjectID { get; }
     uint ShortObjectID { get; } 
+    uint CurrentCastID { get; }
+
     BattleChara* BattleChara { get; }
 }

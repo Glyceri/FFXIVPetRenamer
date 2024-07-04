@@ -53,7 +53,7 @@ internal class TempWindow : Window
         }
 
 
-        ImGui.BeginTable("Pet Nicknames Table##1", 5, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail() * new System.Numerics.Vector2(1, 0.5f));
+        ImGui.BeginTable("Pet Nicknames Table##1", 6, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail() * new System.Numerics.Vector2(1, 0.5f));
 
         foreach (IPettableUser? item in UserList.pettableUsers) 
         {
@@ -73,6 +73,9 @@ internal class TempWindow : Window
             ImGui.TableSetColumnIndex(4);
             if (item == null) ImGui.Text("_");
             else ImGui.Text(item.PettablePets.Count.ToString());
+            ImGui.TableSetColumnIndex(5);
+            if (item == null) ImGui.Text("_");
+            else ImGui.Text(item.CurrentCastID.ToString());
         }
 
         ImGui.EndTable();

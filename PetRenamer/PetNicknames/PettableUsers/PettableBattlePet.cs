@@ -23,6 +23,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public PetSheetData? PetData { get; private set; }
     public uint OldObjectID { get; init; }
     public byte PetType { get; init; }
+    public ulong Lifetime { get; private set; }
 
     public PettableBattlePet(BattleChara* battlePet, IPettableDatabaseEntry entry, IPetServices petServices)
     {
@@ -42,6 +43,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
 
     public void Update(nint pointer)
     {
+        Lifetime++;
         Touched = true;
         BattlePet = (BattleChara*)pointer;
         Dirty = false;

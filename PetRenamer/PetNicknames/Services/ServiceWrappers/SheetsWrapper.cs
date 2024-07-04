@@ -5,6 +5,7 @@ using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
@@ -13,7 +14,7 @@ internal class SheetsWrapper : IPetSheets
     DalamudServices services;
 
     readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
-    readonly List<(string, int)> nameToClass = new List<(string, int)>();
+    readonly List<string> nameToClass = new List<string>();
 
     public ExcelSheet<Companion>? petSheet { get; init; }
     public ExcelSheet<Pet>? battlePetSheet { get; init; }
@@ -72,6 +73,14 @@ internal class SheetsWrapper : IPetSheets
         }
     }
 
+    // The reason I do it like this is because I need the EXACT /petmirage names
+    // If nothing changed (And quite frankly nothing has in YEARS)
+    // This should result in a list that looks like this
+    // 0 --> Karfunkel
+    // 1 --> Garuda-Egi
+    // 2 --> Titan-Egi
+    // 3 --> Ifrit-Egi
+    // 4 --> Eos
     void SetupSoftSkeletonIndexList()
     {
         TextCommand? command = GetCommand(33);
@@ -84,13 +93,13 @@ internal class SheetsWrapper : IPetSheets
             BasePayload lastPayload = command.Description.Payloads[i - 1];
             BasePayload curPayload = command.Description.Payloads[i];
 
-            if (!secondTolastPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.UiColorFill)) continue;
-            if (!lastPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.UiColorBorder)) continue;
-            if (!curPayload.PayloadType.HasFlag(Lumina.Text.Payloads.PayloadType.Text)) continue;
+            if (!secondTolastPayload.PayloadType.HasFlag(PayloadType.UiColorFill)) continue;
+            if (!lastPayload.PayloadType.HasFlag(PayloadType.UiColorBorder)) continue;
+            if (!curPayload.PayloadType.HasFlag(PayloadType.Text)) continue;
 
             string payloadString = (curPayload as TextPayload)!.RawString;
 
-            if (counter < 5) nameToClass.Add((payloadString, counter));
+            if (counter < 5) { nameToClass.Add(payloadString); }
             else break;
             counter++;
         }
@@ -164,8 +173,18 @@ internal class SheetsWrapper : IPetSheets
     {
         for(int i = 0; i < nameToClass.Count; i++)
         {
-            if (nameToClass[i].Item1.ToLower() == name.ToLower())
-                return nameToClass[i].Item2;
+            if (nameToClass[i].ToLower() == name.ToLower())
+                return i;
+        }
+        return null;
+    }
+
+    public int? CastToSoftIndex(uint castId)
+    {
+        for(int i = 0; i < castToIndex.Count; i++)
+        {
+            uint cast = castToIndex[i];
+            if (cast == castId) return i;
         }
         return null;
     }
@@ -229,5 +248,22 @@ internal class SheetsWrapper : IPetSheets
         -415, //Ifrit-Egi
         -416, //Titan-Egi
         -417  //Garuda-Egi
+    };
+
+    // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
+    // Soft Mapping is the most hardcoded thing in this plogon :c
+    // 0 --> Karfunkel
+    // 1 --> Garuda-Egi
+    // 2 --> Titan-Egi
+    // 3 --> Ifrit-Egi
+    // 4 --> Eos
+
+    public static readonly IReadOnlyList<uint> castToIndex = new List<uint>()
+    {
+        25798,   // Summon Carbuncle
+        25806,   // Summon Garuda
+        25807,   // Summon Titan
+        25805,   // Summon Ifrit
+        17215,   // Summon Eos
     };
 }

@@ -26,6 +26,8 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected bool IsSoft;
 
+    IPettableUser? lastPettableUser = null;
+
     public void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
         Services = services;
@@ -52,17 +54,16 @@ internal unsafe class SimpleTextHook : ITextHook
         AtkTextNode* tNode = GetTextNode(ref bNode);
         if (tNode == null) return;
 
+        // Make sure it only runs once
         string tNodeText = tNode->NodeText.ToString();
-        if (tNodeText == string.Empty || tNodeText == LastAnswer) return;
+        if ((tNodeText == string.Empty || tNodeText == LastAnswer) && (lastPettableUser != null && !lastPettableUser.DataBaseEntry.Dirty)) return;
 
-        PetServices.PetLog.Log("GO!");
-
-        if(!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
+        if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
     }
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        IPettableUser? user = GetUser();
+        IPettableUser? user = lastPettableUser = GetUser();
         if (user == null) return false;
 
         PetSheetData? pet = GetPetData(text, ref user);

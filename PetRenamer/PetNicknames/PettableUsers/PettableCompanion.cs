@@ -22,6 +22,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public string? CustomSoftName { get; }
     public PetSheetData? PetData { get; private set; }
     public byte PetType { get; private set; }
+    public ulong Lifetime { get; private set; }
 
     public PettableCompanion(Companion* c, IPettableDatabaseEntry entry, IPetServices petServices)
     {
@@ -41,6 +42,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
 
     public void Update(nint pointer)
     {
+        Lifetime++;
         Touched = true; 
         Companion = (Companion*)pointer;
         Dirty = false;
