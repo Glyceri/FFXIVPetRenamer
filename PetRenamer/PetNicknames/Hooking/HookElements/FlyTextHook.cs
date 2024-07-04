@@ -3,7 +3,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -41,7 +40,6 @@ internal unsafe class FlyTextHook : HookableElement
         // 534 means a cast FULLY succeeded, which is luckily the only part I really need for soft targeting
         if (a3 != 534) return;
         if (PetServices.PetSheets.CastToSoftIndex((uint)castID) == null) return;
-        PetServices.PetLog.Log("CAST: " + castID + " : " + a3 + " : " + a4 + " : " + a6 + " : " + a7 + " : " + a8);
         UserList.GetUser(castDealer)?.OnLastCastChanged((uint)castID);
     }
 

@@ -5,7 +5,6 @@ using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
@@ -39,7 +38,7 @@ internal class SheetsWrapper : IPetSheets
         SetupSoftSkeletonIndexList();
     }
 
-    void SetupSheetDataCache(ref DalamudServices dalamudServices) 
+    void SetupSheetDataCache(ref DalamudServices dalamudServices)
     {
         if (petSheet != null)
         {
@@ -129,7 +128,7 @@ internal class SheetsWrapper : IPetSheets
     {
         for (int i = 0; i < petSheetCache.Count; i++)
         {
-            if (petSheetCache[i].Model == skeletonID) 
+            if (petSheetCache[i].Model == skeletonID)
                 return petSheetCache[i];
         }
 
@@ -171,17 +170,17 @@ internal class SheetsWrapper : IPetSheets
 
     public int? NameToSoftSkeletonIndex(string name)
     {
-        for(int i = 0; i < nameToClass.Count; i++)
+        for (int i = 0; i < nameToClass.Count; i++)
         {
-            if (nameToClass[i].ToLower() == name.ToLower())
-                return i;
+            if (!string.Equals(nameToClass[i], name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            return i;
         }
         return null;
     }
 
     public int? CastToSoftIndex(uint castId)
     {
-        for(int i = 0; i < castToIndex.Count; i++)
+        for (int i = 0; i < castToIndex.Count; i++)
         {
             uint cast = castToIndex[i];
             if (cast == castId) return i;
