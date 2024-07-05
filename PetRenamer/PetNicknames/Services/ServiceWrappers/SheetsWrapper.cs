@@ -15,7 +15,7 @@ internal class SheetsWrapper : IPetSheets
     readonly IStringHelper StringHelper;
 
     readonly List<IPetSheetData> petSheetCache = new List<IPetSheetData>();
-    readonly List<string> nameToClass = new List<string>();
+    readonly string[] nameToClass = [];
 
     readonly ExcelSheet<Companion>? petSheet;
     readonly ExcelSheet<Pet>? battlePetSheet;
@@ -170,20 +170,29 @@ internal class SheetsWrapper : IPetSheets
 
     public int? NameToSoftSkeletonIndex(string name)
     {
-        for (int i = 0; i < nameToClass.Count; i++)
+        if (name == string.Empty || name == null) return null;
+        for (int i = 0; i < nameToClass.Length; i++)
         {
-            if (!string.Equals(nameToClass[i], name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            string nameToClassUnmodified = nameToClass[i];
+            string converted = StringHelper.CleanupActionName(nameToClassUnmodified);
+
+            if (!string.Equals(nameToClassUnmodified, name, System.StringComparison.InvariantCultureIgnoreCase) && !string.Equals(converted, name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            
             return i;
         }
+
         return null;
     }
 
     public int? CastToSoftIndex(uint castId)
     {
+        if (castId == 0) return null;
         for (int i = 0; i < castToIndex.Count; i++)
         {
             uint cast = castToIndex[i];
-            if (cast == castId) return i;
+            if (cast != castId) continue;
+
+            return i;
         }
         return null;
     }
@@ -202,9 +211,11 @@ internal class SheetsWrapper : IPetSheets
 
             if (pet.BaseSingular == string.Empty || pet.BasePlural == string.Empty || pet.ActionName == string.Empty) continue;
 
-            if (line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) ||
-                line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) ||
-                line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase)) list.Add(pet);
+            if (!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) &&
+                !line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) &&
+                !line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+
+            list.Add(pet);
         }    
 
         return list;
@@ -332,8 +343,8 @@ internal class SheetsWrapper : IPetSheets
     public readonly IReadOnlyList<uint> castToIndex = new List<uint>()
     {
         25798,   // Summon Carbuncle
-        25806,   // Summon Garuda
-        25807,   // Summon Titan
+        25807,   // Summon Garuda
+        25806,   // Summon Titan
         25805,   // Summon Ifrit
         17215,   // Summon Eos
     };
@@ -345,11 +356,10 @@ internal class SheetsWrapper : IPetSheets
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
-
-    readonly List<string> englishNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> germanNames = new List<string>() { "Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> frenchNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> japaneseNames = new List<string>() { "カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス" };
+    readonly string[] englishNames = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    readonly string[] germanNames = ["Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    readonly string[] frenchNames = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    readonly string[] japaneseNames = ["カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス"];
 
     [System.Obsolete("Classes have been obsolete since 1.4")]
     public readonly Dictionary<int, int[]> battlePetToClass = new Dictionary<int, int[]>()

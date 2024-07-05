@@ -2,7 +2,6 @@
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -46,14 +45,14 @@ internal class StringHelperWrapper : IStringHelper
             part = part.Replace("[", @"^\[").Replace("]", @"^\]\");
             string regString = part;
             if (checkForEmptySpaces) regString = $"\\b" + regString + "\\b";
-            baseString = Regex.Replace(baseString, regString, MakeString(PluginConstants.forbiddenCharacter, (i + 1)), RegexOptions.IgnoreCase);
+            baseString = Regex.Replace(baseString, regString, MakeString(PluginConstants.forbiddenCharacter, i + 1), RegexOptions.IgnoreCase);
         }
 
         for (int i = length - 1; i >= 0; i--)
         {
             string part = parts[i];
             if (part == string.Empty) continue;
-            baseString = baseString.Replace(MakeString(PluginConstants.forbiddenCharacter, (i + 1)), replaceString);
+            baseString = baseString.Replace(MakeString(PluginConstants.forbiddenCharacter, i + 1), replaceString);
         }
 
         return baseString;
