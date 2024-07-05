@@ -45,7 +45,7 @@ internal unsafe class SimpleTextHook : ITextHook
     
     void HandleRework(AtkUnitBase* baseElement)
     {
-        if (Faulty) return;
+        if (BlockedCheck()) return;
 
         if (TextPos.Length == 0) return;
         if (!baseElement->IsVisible) return;
@@ -60,6 +60,8 @@ internal unsafe class SimpleTextHook : ITextHook
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
     }
+
+    protected virtual bool BlockedCheck() => Faulty;
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {

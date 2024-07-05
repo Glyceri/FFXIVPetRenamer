@@ -20,11 +20,19 @@ internal interface IPettableUser : IBattleUser
     List<IPettablePet> PettablePets { get; }
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);
-    IPettablePet? GetYoungestPet();
+    IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
 
     void OnLastCastChanged(uint cast);
     void Set(Pointer<BattleChara> pointer);
     void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
 
     void Destroy();
+
+    enum PetFilter
+    {
+        None,
+        Minion,
+        BattlePet,
+        Chocobo
+    }
 }

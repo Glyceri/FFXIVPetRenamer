@@ -19,7 +19,6 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public string Name { get; init; } = "";
     public string? CustomName { get; }
     public bool Dirty { get; private set; } = true;
-    public string? CustomSoftName { get; }
     public PetSheetData? PetData { get; private set; }
     public uint OldObjectID { get; init; }
     public byte PetType { get; init; }

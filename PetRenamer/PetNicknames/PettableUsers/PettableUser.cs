@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using static PetRenamer.PetNicknames.PettableUsers.Interfaces.IPettableUser;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
@@ -81,7 +82,7 @@ internal unsafe class PettableUser : IPettableUser
         if (softIndex == null) return;
 
         int sIndex = softIndex.Value;
-        IPettablePet? youngestPet = GetYoungestPet();
+        IPettablePet? youngestPet = GetYoungestPet(PetFilter.BattlePet);
         if (youngestPet == null) return;
 
         if (sIndex < 0 || sIndex >= DataBaseEntry.SoftSkeletons.Length) return;
@@ -183,7 +184,7 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
-    public IPettablePet? GetYoungestPet()
+    public IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None)
     {
         ulong lastLifetime = ulong.MaxValue;
         IPettablePet? lastPet = null;
@@ -192,6 +193,14 @@ internal unsafe class PettableUser : IPettableUser
         for (int i = 0; i < petCount; i++)
         {
             IPettablePet pPet = PettablePets[i];
+            if (filter != PetFilter.None)
+            {
+                if (filter != PetFilter.Minion && pPet is PettableCompanion) continue;
+                if (filter != PetFilter.BattlePet && filter != PetFilter.Chocobo && pPet is PettableBattlePet) continue;
+                if (filter == PetFilter.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID)) continue;
+                if (filter == PetFilter.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID)) continue;
+            }
+
             if (pPet.Lifetime < lastLifetime)
             {
                 lastLifetime = pPet.Lifetime;

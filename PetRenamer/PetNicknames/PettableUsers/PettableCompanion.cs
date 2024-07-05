@@ -19,7 +19,6 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public ushort Index { get; init; }
     public string? CustomName { get; }
     public bool Dirty { get; private set; } = true;
-    public string? CustomSoftName { get; }
     public PetSheetData? PetData { get; private set; }
     public byte PetType { get; private set; }
     public ulong Lifetime { get; private set; }

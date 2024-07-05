@@ -15,7 +15,6 @@ internal interface IPettablePet
     public ushort Index { get; }
     public string Name { get; }
     public string? CustomName { get; }
-    public string? CustomSoftName { get; }
     public bool Dirty { get; }
     public PetSheetData? PetData { get; }
     public ulong Lifetime { get; }

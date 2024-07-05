@@ -32,9 +32,13 @@ internal class HookHandler : IDisposable
     void _Register()
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
+        TooltipHook tooltipHook = new TooltipHook(DalamudServices, PetServices, PettableUserList);
+        Register(tooltipHook);
+        Register(new MapHook(DalamudServices, PetServices, PettableUserList, tooltipHook));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList));
+        Register(new PartyHook(DalamudServices, PetServices, PettableUserList));
     }
 
     List<IHookableElement> hookableElements = new List<IHookableElement>();

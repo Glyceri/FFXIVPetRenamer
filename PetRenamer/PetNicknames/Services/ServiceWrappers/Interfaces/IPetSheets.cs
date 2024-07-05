@@ -28,6 +28,7 @@ internal interface IPetSheets
     PetSheetData? GetPetFromActionName(string actionName);
     PetSheetData? GetPetFromString(string text, ref IPettableUser user, bool IsSoft);
     List<PetSheetData> GetListFromLine(string line);
-    public int? NameToSoftSkeletonIndex(string name);
-    public int? CastToSoftIndex(uint castId);
+    int? NameToSoftSkeletonIndex(string name);
+    int? CastToSoftIndex(uint castId);
+    bool IsValidBattlePet(int skeleton);
 }

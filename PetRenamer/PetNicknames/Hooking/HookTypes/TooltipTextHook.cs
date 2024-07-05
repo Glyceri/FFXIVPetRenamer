@@ -8,11 +8,13 @@ using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
-internal unsafe class TooltipHook : SimpleTextHook
+internal unsafe class TooltipTextHook : SimpleTextHook
 {
     uint backgroundNodePos;
-
+    bool blocked = false;
     AtkNineGridNode* bgNode;
+
+    IPettableUser? currentUser = null;
 
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
@@ -27,9 +29,24 @@ internal unsafe class TooltipHook : SimpleTextHook
         SetUnfaulty();
     }
 
+    public void SetBlockedState(bool isBlocked)
+    {
+        blocked = isBlocked;
+    }
+
+    public void SetUser(IPettableUser? pettableUser)
+    {
+        currentUser = pettableUser;
+    }
+
+    protected override bool BlockedCheck() => blocked || base.BlockedCheck();
+
     protected override unsafe AtkTextNode* GetTextNode(ref BaseNode bNode)
     {
-        bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
+        if (backgroundNodePos != uint.MaxValue)
+        {
+            bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
+        }
         return base.GetTextNode(ref bNode);
     }
 
@@ -41,4 +58,5 @@ internal unsafe class TooltipHook : SimpleTextHook
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
+    protected override IPettableUser? GetUser() => currentUser;
 }

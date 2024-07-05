@@ -68,4 +68,19 @@ internal class PettableUserList : IPettableUserList
         }
         return null;
     }
+
+    public IPettableUser? GetUser(string username)
+    {
+        if (username == null || username == string.Empty) return null;
+
+        for (int i = 0; i < PettableUserArraySize; i++)
+        {
+            IPettableUser? pUser = pettableUsers[i];
+            if (pUser == null) continue;
+            if (!pUser.IsActive) continue;
+            if (!string.Equals(pUser.Name, username, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            return pUser;
+        }
+        return null;
+    }
 }

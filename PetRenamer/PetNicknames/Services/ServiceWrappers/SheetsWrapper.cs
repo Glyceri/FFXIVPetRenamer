@@ -251,6 +251,8 @@ internal class SheetsWrapper : IPetSheets
         return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
     }
 
+    public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);
+
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
     {
         { 6,    PluginConstants.Eos                     }, //EOS
