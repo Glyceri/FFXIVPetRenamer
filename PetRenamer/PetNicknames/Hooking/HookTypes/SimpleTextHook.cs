@@ -7,8 +7,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -24,13 +22,13 @@ internal unsafe class SimpleTextHook : ITextHook
     protected IPetServices PetServices { get; set; } = null!;
 
     protected uint[] TextPos { get; set; } = new uint[0];
-    Func<int, bool> AllowedToFunction = _ => false;
+    protected Func<int, bool> AllowedToFunction = _ => false;
 
     protected bool IsSoft;
 
     IPettableUser? lastPettableUser = null;
 
-    public void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
+    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
         Services = services;
         PettableUserList = userList;
@@ -38,12 +36,12 @@ internal unsafe class SimpleTextHook : ITextHook
         TextPos = textPos;
         AllowedToFunction = allowedCallback;
         IsSoft = isSoft;
-        services.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate, AddonName, HandleUpdate);
+        services.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, AddonName, HandleUpdate);
     }
 
     public void SetUnfaulty() => Faulty = false;
 
-    void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
+    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
     
     void HandleRework(AtkUnitBase* baseElement)
     {
@@ -81,15 +79,16 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual void SetText(AtkTextNode* textNode, string text, string customName, PetSheetData pPet)
     {
-        if (AllowedToFunction != null)
-        {
-            if (!AllowedToFunction.Invoke(pPet.Model))
-            {
-                LastAnswer = text;
-                return;
-            }
-        }
+        if (!CheckIfCanFunction(text, pPet)) return;
         LastAnswer = PetServices.StringHelper.ReplaceATKString(textNode, text, customName, pPet);
+    }
+
+    protected virtual bool CheckIfCanFunction(string text, PetSheetData pPet)
+    {
+        if (AllowedToFunction == null) return true;
+        if (AllowedToFunction.Invoke(pPet.Model)) return true;
+        LastAnswer = text;
+        return false;
     }
 
     protected virtual PetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, ref user, IsSoft);

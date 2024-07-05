@@ -26,6 +26,12 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<TargetTextHook>("_TargetInfo", [12], Allowed, true).RegsterTarget(TargetObject, () => UserList.GetUser(Target?.GameObjectId ?? 0));
         Hook<TargetTextHook>("_TargetInfoCastBar", [4], Allowed, true).RegsterTarget(TargetObject, () => UserList.GetUser(Target?.GameObjectId ?? 0));
         Hook<TargetTextHook>("_FocusTargetInfo", [5], Allowed, true).RegsterTarget(FocusTargetPet, () => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
+
+        Hook<NotebookHook>("MinionNoteBook", [67], Allowed);
+        Hook<NotebookHook>("LovmPaletteEdit", [48], Allowed);
+        Hook<NotebookHook>("LovmActionDetail", [4], Allowed);
+
+        Hook<NotebookHook>("YKWNote", [28], Allowed);
     }
 
     public override void Dispose()

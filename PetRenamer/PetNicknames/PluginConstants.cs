@@ -7,11 +7,32 @@ public static class PluginConstants
     public const int ffxivNameSize = 64;
     public const char forbiddenCharacter = '^';
 
-    public const int BaseSummonerSkeleton = -411;
-    public const int BaseScholarSkeleton = -407;
-    public const int BaseTitanEgiSkeleton = -416;
-    public const int BaseGarudaEgiSkeleton = -417;
-    public const int BaseIfritEgiSkeleton = -415;
+    public const int Eos = -407;
+    public const int Selene = -408;
+    public const int EmeraldCarbuncle = -409;
+    public const int RubyCarbuncle = -410;
+    public const int Carbuncle = -411;
+    public const int TopazCarbuncle = -412;
+    public const int IfritEgi = -415;
+    public const int TitanEgi = -416;
+    public const int GarudaEgi = -417;
+    public const int RookAutoTurret = -1027;
+    public const int Bahamut = -1930;
+    public const int AutomatonQueen = -2618;
+    public const int Seraph = -2619;
+    public const int Phoenix = -2620;
+    public const int LivingShadow = -2621;
+    public const int IffritII = -3122;
+    public const int GarudaII = -3123;
+    public const int TitanII = -3124;
+
+
+    public const int BaseScholarSkeleton = Eos;
+    public const int BaseSummonerSkeleton = Carbuncle;
+    public const int BaseIfritEgiSkeleton = IfritEgi;
+    public const int BaseTitanEgiSkeleton = TitanEgi;
+    public const int BaseGarudaEgiSkeleton = GarudaEgi;
+   
 
     // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
     // Soft Mapping is the most hardcoded thing in this plogon :c
