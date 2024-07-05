@@ -17,13 +17,13 @@ internal class SheetsWrapper : IPetSheets
     readonly List<IPetSheetData> petSheetCache = new List<IPetSheetData>();
     List<string> nameToClass = new List<string>();
 
-    public ExcelSheet<Companion>? petSheet { get; init; }
-    public ExcelSheet<Pet>? battlePetSheet { get; init; }
-    public ExcelSheet<World>? worlds { get; init; }
-    public ExcelSheet<Race>? races { get; init; }
-    public ExcelSheet<ClassJob>? classJob { get; init; }
-    public ExcelSheet<Action>? actions { get; init; }
-    public ExcelSheet<TextCommand>? textCommands { get; init; }
+    ExcelSheet<Companion>? petSheet { get; init; }
+    ExcelSheet<Pet>? battlePetSheet { get; init; }
+    ExcelSheet<World>? worlds { get; init; }
+    ExcelSheet<Race>? races { get; init; }
+    ExcelSheet<ClassJob>? classJob { get; init; }
+    ExcelSheet<Action>? actions { get; init; }
+    ExcelSheet<TextCommand>? textCommands { get; init; }
 
     public SheetsWrapper(ref DalamudServices dalamudServices, IStringHelper helper)
     {
