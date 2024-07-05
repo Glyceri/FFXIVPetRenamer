@@ -4,6 +4,8 @@ namespace PetRenamer.PetNicknames;
 
 public static class PluginConstants
 {
+    public const string pluginName = "Pet Nicknames";
+
     public const int ffxivNameSize = 64;
     public const char forbiddenCharacter = '^';
 

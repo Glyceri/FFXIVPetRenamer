@@ -11,6 +11,9 @@ using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Chat;
 using PetRenamer.PetNicknames.Commands;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
+using Una.Drawing;
 
 namespace PetRenamer;
 
@@ -21,16 +24,13 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
     readonly IPettableDatabase LegacyDatabase;
+    readonly IWindowHandler WindowHandler;
 
     // As long as no other module needs one, they won't be interfaced
     readonly UpdateHandler UpdateHandler;
     readonly HookHandler HookHandler;
     readonly ChatHandler ChatHandler;
     readonly CommandHandler CommandHandler;
-
-    // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV EXTREMLEY TEMPORARY! VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-    WindowSystem WindowSystem;
-    TempWindow window;
 
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
@@ -43,23 +43,24 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
+        WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
 
-        WindowSystem = new WindowSystem("Pet Nicknames");
-
-        _DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += WindowSystem.Draw;
-
-        window = new TempWindow(_DalamudServices, PettableUserList, PettableDatabase);
-
-        WindowSystem.AddWindow(window);
-        window.IsOpen = true;
+        WindowHandler.AddWindow(new TempWindow(_DalamudServices, PettableUserList, PettableDatabase));
+        WindowHandler.Open<TempWindow>();
+        
+        _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<TempWindow>())
+        {
+            HelpMessage = "Temporary",
+            ShowInHelp = true
+        });
     }
 
     public void Dispose()
     {
-        _DalamudServices.PetNicknamesPlugin.UiBuilder.Draw -= WindowSystem.Draw;
         UpdateHandler?.Dispose();
         HookHandler?.Dispose();
         ChatHandler?.Dispose();
         CommandHandler?.Dispose();
+        WindowHandler?.Dispose();
     }
 }
