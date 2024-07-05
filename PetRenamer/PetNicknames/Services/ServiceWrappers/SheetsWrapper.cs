@@ -170,6 +170,7 @@ internal class SheetsWrapper : IPetSheets
 
     public int? NameToSoftSkeletonIndex(string name)
     {
+        name = name.Trim();
         if (name == string.Empty || name == null) return null;
         for (int i = 0; i < nameToClass.Length; i++)
         {
