@@ -11,24 +11,25 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class SheetsWrapper : IPetSheets
 {
-    DalamudServices services;
-    IStringHelper helper;
+    readonly DalamudServices DalamudServices;
+    readonly IStringHelper StringHelper;
 
     readonly List<IPetSheetData> petSheetCache = new List<IPetSheetData>();
-    List<string> nameToClass = new List<string>();
+    readonly List<string> nameToClass = new List<string>();
 
-    ExcelSheet<Companion>? petSheet { get; init; }
-    ExcelSheet<Pet>? battlePetSheet { get; init; }
-    ExcelSheet<World>? worlds { get; init; }
-    ExcelSheet<Race>? races { get; init; }
-    ExcelSheet<ClassJob>? classJob { get; init; }
-    ExcelSheet<Action>? actions { get; init; }
-    ExcelSheet<TextCommand>? textCommands { get; init; }
+    readonly ExcelSheet<Companion>? petSheet;
+    readonly ExcelSheet<Pet>? battlePetSheet;
+    readonly ExcelSheet<World>? worlds;
+    readonly ExcelSheet<Race>? races;
+    readonly ExcelSheet<ClassJob>? classJob;
+    readonly ExcelSheet<Action>? actions;
+    readonly ExcelSheet<TextCommand>? textCommands;
 
     public SheetsWrapper(ref DalamudServices dalamudServices, IStringHelper helper)
     {
-        services = dalamudServices;
-        this.helper = helper;
+        DalamudServices = dalamudServices;
+        StringHelper = helper;
+
         petSheet = dalamudServices.DataManager.GetExcelSheet<Companion>();
         worlds = dalamudServices.DataManager.GetExcelSheet<World>();
         races = dalamudServices.DataManager.GetExcelSheet<Race>();
@@ -37,11 +38,19 @@ internal class SheetsWrapper : IPetSheets
         actions = dalamudServices.DataManager.GetExcelSheet<Action>();
         textCommands = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
 
-        SetupSheetDataCache(ref dalamudServices);
-        SetupSoftSkeletonIndexList();
+        SetupSheetDataCache();
+
+        nameToClass = DalamudServices.ClientState.ClientLanguage switch
+        {
+            ClientLanguage.Japanese => japaneseNames,
+            ClientLanguage.English => englishNames,
+            ClientLanguage.German => germanNames,
+            ClientLanguage.French => frenchNames,
+            _ => englishNames,
+        };
     }
 
-    void SetupSheetDataCache(ref DalamudServices dalamudServices)
+    void SetupSheetDataCache()
     {
         if (petSheet != null)
         {
@@ -59,7 +68,7 @@ internal class SheetsWrapper : IPetSheets
                 ushort icon = companion.Icon;
                 sbyte pronoun = companion.Pronoun;
 
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, pronoun, singular, plural, string.Empty, uint.MaxValue, ref dalamudServices));
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, pronoun, singular, plural, string.Empty, uint.MaxValue, in DalamudServices));
             }
         }
         if (battlePetSheet == null) return;
@@ -76,38 +85,12 @@ internal class SheetsWrapper : IPetSheets
             if (petAction == null) continue;
 
             ushort petIcon = petAction.Icon;
-            sbyte pronoun = 0;
             string name = pet.Name;
-            string cleanedActionName = helper.CleanupActionName(helper.CleanupString(petAction.Name));
+            string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(petAction.Name));
 
-            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
+            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, 0, name, cleanedActionName, petAction.Name, petAction.RowId, in DalamudServices));
         }
     }
-
-    // Hardcoded now
-    // This command hasn't changed in a while, and if it does well... I'll have to rework the system anyways
-    // 0 --> Carbuncle
-    // 1 --> Garuda-Egi
-    // 2 --> Titan-Egi
-    // 3 --> Ifrit-Egi
-    // 4 --> Eos
-
-    void SetupSoftSkeletonIndexList()
-    {
-        nameToClass = services.ClientState.ClientLanguage switch
-        {
-            ClientLanguage.Japanese => japaneseNames,
-            ClientLanguage.English => englishNames,
-            ClientLanguage.German => germanNames,
-            ClientLanguage.French => frenchNames,
-            _ => englishNames,
-        };
-    }
-
-    readonly List<string> englishNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> germanNames = new List<string>() { "Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> frenchNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
-    readonly List<string> japaneseNames = new List<string>() { "カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス" };
 
     public TextCommand? GetCommand(uint id) => textCommands?.GetRow(id);
     public Action? GetAction(uint actionID) => actions?.GetRow(actionID);
@@ -249,7 +232,7 @@ internal class SheetsWrapper : IPetSheets
         IPetSheetData? softPetData = GetPet(softSkeleton.Value);
         if (softPetData == null) return normalPetData;
 
-        return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
+        return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, in DalamudServices);
     }
 
     public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);
@@ -271,8 +254,8 @@ internal class SheetsWrapper : IPetSheets
     [System.Obsolete]
     public int[] GetObsoleteIDsFromClass(int classJob)
     {
-        if (battlePetToClass.TryGetValue(classJob, out var id)) return id;
-        return new int[0];
+        if (battlePetToClass.TryGetValue(classJob, out int[]? id)) return id;
+        return System.Array.Empty<int>();  
     }
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
@@ -354,6 +337,19 @@ internal class SheetsWrapper : IPetSheets
         25805,   // Summon Ifrit
         17215,   // Summon Eos
     };
+
+    // Hardcoded now
+    // This command hasn't changed in a while, and if it does well... I'll have to rework the system anyways
+    // 0 --> Carbuncle
+    // 1 --> Garuda-Egi
+    // 2 --> Titan-Egi
+    // 3 --> Ifrit-Egi
+    // 4 --> Eos
+
+    readonly List<string> englishNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> germanNames = new List<string>() { "Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> frenchNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> japaneseNames = new List<string>() { "カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス" };
 
     [System.Obsolete("Classes have been obsolete since 1.4")]
     public readonly Dictionary<int, int[]> battlePetToClass = new Dictionary<int, int[]>()

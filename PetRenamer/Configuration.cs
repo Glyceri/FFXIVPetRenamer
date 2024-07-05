@@ -98,7 +98,6 @@ public class Configuration : IPluginConfiguration
     [Obsolete("Use the type specific variable instead.")] public bool useCustomFlyoutInChat { get; set; } = true;
     [Obsolete("Use the type specific variable instead.")] public bool allowCastBar { get; set; } = true;
 
-#pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialise()
     {
@@ -108,7 +107,6 @@ public class Configuration : IPluginConfiguration
         serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
     }
 #pragma warning restore CS0618 // Type or member is obsolete
-#pragma warning restore CS0612 // Type or member is obsolete
 
     #endregion
 }

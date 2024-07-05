@@ -28,6 +28,6 @@ internal class PetServices : IPetServices
     void CheckConfigFailure()
     {
         if (Configuration.currentSaveFileVersion == Configuration.Version) return;
-        new LegacyStepper(Configuration, this);
+        _ = new LegacyStepper(Configuration, this);
     }
 }

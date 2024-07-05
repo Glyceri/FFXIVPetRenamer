@@ -22,56 +22,57 @@ internal struct PetSheetData : IPetSheetData
 
     public int LegacyModelID { get; private set; }
 
-    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, ref DalamudServices services) 
-        :this(Model, Icon, Pronoun, Singular, Plural, ref services)
+    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, in DalamudServices services) 
+        :this(Model, Icon, Pronoun, Singular, Plural, in services)
     {
-        this.ActionID = actionID;
-        this.ActionName = actionName;
-        this.LegacyModelID = legacyModelID;
+        ActionID = actionID;
+        ActionName = actionName;
+        LegacyModelID = legacyModelID;
     }
-    public PetSheetData(int Model, uint Icon, sbyte Pronoun, string Singular, string Plural, ref DalamudServices services)
+
+    public PetSheetData(int model, uint icon, sbyte pronoun, string singular, string plural, in DalamudServices services)
     {
-        this.Model = Model;
-        this.Icon = Icon;
-        this.Pronoun = Pronoun;
+        Model = model;
+        Icon = icon;
+        Pronoun = pronoun;
 
         ClientLanguage clientLanguage = services.ClientState.ClientLanguage;
 
         if (clientLanguage == ClientLanguage.German)
         {
-            BaseSingular = GermanReplace(Singular, Pronoun);
-            BasePlural = GermanReplace(Plural, Pronoun);
+            BaseSingular = GermanReplace(singular, Pronoun);
+            BasePlural = GermanReplace(plural, Pronoun);
         }
         else
         {
-            BaseSingular = Singular;
-            BasePlural = Plural;
+            BaseSingular = singular;
+            BasePlural = plural;
         }
 
         string[] starterList = GetList(clientLanguage);
         if (clientLanguage == ClientLanguage.German)
         {
-            this.Singular = GetGermanNamedList(starterList, Singular);
-            this.Plural = GetGermanNamedList(starterList, Plural);
+            Singular = GetGermanNamedList(starterList, singular);
+            Plural = GetGermanNamedList(starterList, plural);
         }
         else
         {
-            this.Singular = GetNamedList(starterList, Singular);
-            this.Plural = GetNamedList(starterList, Plural);
+            Singular = AddSuffixToArray(starterList, singular);
+            Plural = AddSuffixToArray(starterList, plural);
         }
     }
 
-    string[] GetGermanNamedList(string[] starterList, string suffix)
+    readonly string[] GetGermanNamedList(string[] starterList, string suffix)
     {
         List<string> list = new List<string>();
         for (int i = 0; i < 4; i++)
         {
-            list.AddRange(GetNamedList(starterList, GermanReplace(suffix, (sbyte)i)));
+            list.AddRange(AddSuffixToArray(starterList, GermanReplace(suffix, (sbyte)i)));
         }
         return list.ToArray();
     }
 
-    string[] GetNamedList(string[] baseArray, string suffix)
+    readonly string[] AddSuffixToArray(string[] baseArray, string suffix)
     {
         string[] newBaseArray = baseArray.ToArray();
         for(int i = 0; i < newBaseArray.Length; i++)
@@ -81,7 +82,7 @@ internal struct PetSheetData : IPetSheetData
         return newBaseArray;
     }
 
-    string GermanReplace(string baseString, sbyte pronoun)
+    readonly string GermanReplace(string baseString, sbyte pronoun)
     {
         try
         {
@@ -101,7 +102,7 @@ internal struct PetSheetData : IPetSheetData
     readonly string[] frenchStarters = ["le ", "la ", string.Empty];
     readonly string[] japaneseStarters = [string.Empty];
 
-    string[] GetList(ClientLanguage clientLanguage) => clientLanguage switch
+    readonly string[] GetList(ClientLanguage clientLanguage) => clientLanguage switch
     {
         ClientLanguage.English => englishStarters,
         ClientLanguage.German => germanStarters,
@@ -110,19 +111,19 @@ internal struct PetSheetData : IPetSheetData
         _ => englishStarters
     };
 
-    public bool IsPet(string name)
+    public readonly bool IsPet(string name)
     {
         if (name == string.Empty || name == null) return false;
         return string.Equals(BaseSingular, name, System.StringComparison.InvariantCultureIgnoreCase);
     }
 
-    public bool IsAction(string action)
+    public readonly bool IsAction(string action)
     {
         if (action == string.Empty || action == null) return false;
         return string.Equals(ActionName, action, System.StringComparison.InvariantCultureIgnoreCase);
     }
 
-    public bool Contains(string line)
+    public readonly bool Contains(string line)
     {
         for (int i = 0; i < Singular.Length; i++)
             if (line.Contains(Singular[i], System.StringComparison.InvariantCultureIgnoreCase))
@@ -131,11 +132,10 @@ internal struct PetSheetData : IPetSheetData
         for (int i = 0; i < Plural.Length; i++)
             if (line.Contains(Plural[i], System.StringComparison.InvariantCultureIgnoreCase))
                 return true;
-
         return false;
     }
 
-    public string LongestIdentifier()
+    public readonly string LongestIdentifier()
     {
         string curIdentifier = BaseSingular;
         if (curIdentifier.Length < BasePlural.Length) curIdentifier = BasePlural;
