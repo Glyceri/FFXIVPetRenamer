@@ -6,36 +6,37 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class PetLogWrapper : IPetLog
 {
-    IPluginLog pluginLog;
-    public PetLogWrapper(IPluginLog pluginLog) => this.pluginLog = pluginLog;
+    readonly IPluginLog PluginLog;
+
+    public PetLogWrapper(IPluginLog pluginLog) => PluginLog = pluginLog;
 
     public void Log(object? message)
     {
         if (message == null) return;
-        pluginLog.Debug($"{message}");
+        PluginLog.Debug($"{message}");
     }
 
     public void LogError(Exception e, object? message)
     {
         if (message == null) return;
-        pluginLog.Error($"{message}");
+        PluginLog.Error($"{message}");
     }
 
     public void LogFatal(object? message)
     {
         if (message == null) return;
-        pluginLog.Fatal($"{message}");
+        PluginLog.Fatal($"{message}");
     }
 
     public void LogInfo(object? message)
     {
         if (message == null) return;
-        pluginLog.Info($"{message}");
+        PluginLog.Info($"{message}");
     }
 
     public void LogWarning(object? message)
     {
         if (message == null) return;
-        pluginLog.Warning($"{message}");
+        PluginLog.Warning($"{message}");
     }
 }

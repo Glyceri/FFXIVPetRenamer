@@ -92,9 +92,9 @@ internal class TempWindow : Window
                 foreach (IPettablePet pet in item.PettablePets)
                 {
                     ImGui.TableNextRow();
-                    ImGui.TableSetColumnIndex(0);
-                    ImGui.Text(pet.Name);
                     ImGui.TableSetColumnIndex(1);
+                    ImGui.Text(pet.Name);
+                    ImGui.TableSetColumnIndex(2);
                     ImGui.Text(pet.SkeletonID.ToString());
 
                 }
@@ -102,7 +102,7 @@ internal class TempWindow : Window
 
             ImGui.EndTable();
         }
-        if (ImGui.BeginTable("Pet Nicknames Table##2", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail() * new System.Numerics.Vector2(1, 0.5f)))
+        if (ImGui.BeginTable("Pet Nicknames Table##2", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail()))
         {
 
             foreach (IPettableDatabaseEntry? item in Database.DatabaseEntries)

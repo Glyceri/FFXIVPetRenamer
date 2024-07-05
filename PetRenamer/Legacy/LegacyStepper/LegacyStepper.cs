@@ -1,5 +1,6 @@
 ﻿using PetRenamer.Legacy.LegacyStepper.LegacyElements;
 using PetRenamer.Legacy.LegacyStepper.LegacyElements.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using System.Collections.Generic;
 
 namespace PetRenamer.Legacy.LegacyStepper;
@@ -7,11 +8,13 @@ namespace PetRenamer.Legacy.LegacyStepper;
 internal class LegacyStepper
 {
     Configuration Configuration { get; init; }
+    PetServices PetServices { get; init; }
 
     List<ILegacyStepperElement> legacyStepperElements = new List<ILegacyStepperElement>();
 
-    public LegacyStepper(Configuration configuration)
+    public LegacyStepper(Configuration configuration, PetServices petServices)
     {
+        PetServices = petServices;
         Configuration = configuration;
 
         if (configuration.Version <= 2 || configuration.Version > Configuration.currentSaveFileVersion)
@@ -29,6 +32,7 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer3());
         legacyStepperElements.Add(new LegacyNamingVer4());
         legacyStepperElements.Add(new LegacyNamingVer5());
+        legacyStepperElements.Add(new LegacyNamingVer6(PetServices));
 
 
         foreach(ILegacyStepperElement legacyStepperElement in legacyStepperElements)
