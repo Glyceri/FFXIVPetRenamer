@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace PetRenamer.PetNicknames;
 
@@ -27,13 +27,16 @@ public static class PluginConstants
     public const int TitanII = -3124;
     public const int SolarBahamut = -4038;
 
-
     public const int BaseScholarSkeleton = Eos;
     public const int BaseSummonerSkeleton = Carbuncle;
     public const int BaseIfritEgiSkeleton = IfritEgi;
     public const int BaseTitanEgiSkeleton = TitanEgi;
     public const int BaseGarudaEgiSkeleton = GarudaEgi;
-   
+
+    [Obsolete("I stopped using classes in 1.4")] public const int LegacySummonerClassID = -2;
+    [Obsolete("I stopped using classes in 1.4")] public const int LegacyScholarClassID = -3;
+    [Obsolete("I stopped using classes in 1.4")] public const int LegacyMachinistClassID = -4;
+    [Obsolete("I stopped using classes in 1.4")] public const int LegacyDarkKnightClassID = -5;
 
     // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
     // Soft Mapping is the most hardcoded thing in this plogon :c
@@ -42,6 +45,5 @@ public static class PluginConstants
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
-
     public static readonly int[] BaseSkeletons = new int[5] { BaseSummonerSkeleton, BaseGarudaEgiSkeleton, BaseTitanEgiSkeleton, BaseIfritEgiSkeleton, BaseScholarSkeleton };
 }

@@ -20,11 +20,14 @@ internal struct PetSheetData : IPetSheetData
     public string ActionName { get; private set; } = "";
     public uint ActionID { get; private set; } = 0;
 
-    public PetSheetData(int Model, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, ref DalamudServices services) 
+    public int LegacyModelID { get; private set; }
+
+    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, ref DalamudServices services) 
         :this(Model, Icon, Pronoun, Singular, Plural, ref services)
     {
         this.ActionID = actionID;
         this.ActionName = actionName;
+        this.LegacyModelID = legacyModelID;
     }
     public PetSheetData(int Model, uint Icon, sbyte Pronoun, string Singular, string Plural, ref DalamudServices services)
     {
@@ -118,8 +121,6 @@ internal struct PetSheetData : IPetSheetData
         if (action == string.Empty || action == null) return false;
         return string.Equals(ActionName, action, System.StringComparison.InvariantCultureIgnoreCase);
     }
-
-    string Normalize(string s) => s.ToLower().Normalize();
 
     public bool Contains(string line)
     {

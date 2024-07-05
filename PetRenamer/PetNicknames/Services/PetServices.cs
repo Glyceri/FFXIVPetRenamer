@@ -18,15 +18,16 @@ internal class PetServices : IPetServices
         PetLog = new PetLogWrapper(services.PluginLog);
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialise(services.PetNicknamesPlugin);
-        CheckConfigFailure();
         StringHelper = new StringHelperWrapper();
         PetSheets = new SheetsWrapper(ref services, StringHelper);
         PetCastHelper = new PetCastWrapper();
+
+        CheckConfigFailure();
     }
 
     void CheckConfigFailure()
     {
         if (Configuration.currentSaveFileVersion == Configuration.Version) return;
-        LegacyStepper legacyStepper = new LegacyStepper(Configuration);
+        new LegacyStepper(Configuration, this);
     }
 }

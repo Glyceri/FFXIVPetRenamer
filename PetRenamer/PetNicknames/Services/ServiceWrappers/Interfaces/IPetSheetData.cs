@@ -15,6 +15,8 @@ internal interface IPetSheetData
     string ActionName { get;  }
     uint ActionID { get; }
 
+    int LegacyModelID { get; }
+
     bool IsPet(string name);
     bool IsAction(string action);
     bool Contains(string line);

@@ -48,14 +48,18 @@ internal class SheetsWrapper : IPetSheets
             foreach (Companion companion in petSheet)
             {
                 if (companion == null) continue;
+
                 ModelChara? model = companion.Model.Value;
                 if (model == null) continue;
+
                 int modelID = (int)model.RowId;
+                int legacyModelID = (int)model.Model;
                 string singular = companion.Singular.ToDalamudString().TextValue;
                 string plural = companion.Plural.ToDalamudString().TextValue;
                 ushort icon = companion.Icon;
                 sbyte pronoun = companion.Pronoun;
-                petSheetCache.Add(new PetSheetData(modelID, icon, pronoun, singular, plural, ref dalamudServices));
+
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, pronoun, singular, plural, string.Empty, uint.MaxValue, ref dalamudServices));
             }
         }
         if (battlePetSheet == null) return;
@@ -76,7 +80,7 @@ internal class SheetsWrapper : IPetSheets
             string name = pet.Name;
             string cleanedActionName = helper.CleanupActionName(helper.CleanupString(petAction.Name));
 
-            petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
+            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
         }
     }
 
@@ -250,6 +254,27 @@ internal class SheetsWrapper : IPetSheets
 
     public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);
 
+    public List<IPetSheetData> GetLegacyPets(int legacyModelID)
+    {
+        List<IPetSheetData> legacyPets = new List<IPetSheetData>();
+
+        for (int i = 0; i < petSheetCache.Count; i++)
+        {
+            IPetSheetData data = petSheetCache[i];
+            if (data.LegacyModelID != legacyModelID) continue;
+            legacyPets.Add(data);
+        }
+
+        return legacyPets;
+    }
+
+    [System.Obsolete]
+    public int[] GetObsoleteIDsFromClass(int classJob)
+    {
+        if (battlePetToClass.TryGetValue(classJob, out var id)) return id;
+        return new int[0];
+    }
+
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
     {
         { 6,    PluginConstants.Eos                     }, // EOS
@@ -321,12 +346,56 @@ internal class SheetsWrapper : IPetSheets
     // 3 --> Ifrit-Egi
     // 4 --> Eos
 
-    public static readonly IReadOnlyList<uint> castToIndex = new List<uint>()
+    public readonly IReadOnlyList<uint> castToIndex = new List<uint>()
     {
         25798,   // Summon Carbuncle
         25806,   // Summon Garuda
         25807,   // Summon Titan
         25805,   // Summon Ifrit
         17215,   // Summon Eos
+    };
+
+    [System.Obsolete("Classes have been obsolete since 1.4")]
+    public readonly Dictionary<int, int[]> battlePetToClass = new Dictionary<int, int[]>()
+    {
+        {
+            PluginConstants.LegacySummonerClassID, 
+            [
+                PluginConstants.Carbuncle,
+                PluginConstants.RubyCarbuncle,
+                PluginConstants.TopazCarbuncle,
+                PluginConstants.EmeraldCarbuncle,
+                PluginConstants.IfritEgi,
+                PluginConstants.TitanEgi,
+                PluginConstants.GarudaEgi,
+                PluginConstants.IffritII,
+                PluginConstants.GarudaII,
+                PluginConstants.TitanII,
+                PluginConstants.Phoenix,
+                PluginConstants.Bahamut,
+                PluginConstants.SolarBahamut
+            ]
+        },
+        {
+            PluginConstants.LegacyScholarClassID, 
+            [
+                PluginConstants.Eos,
+                PluginConstants.Selene,
+                PluginConstants.Seraph
+            ]
+        },
+        {
+            PluginConstants.LegacyMachinistClassID,
+            [
+                PluginConstants.RookAutoTurret,
+                PluginConstants.AutomatonQueen,
+            ]
+        },
+        {
+            PluginConstants.LegacyDarkKnightClassID,
+            [
+                PluginConstants.LivingShadow
+            ]
+        }
     };
 }
