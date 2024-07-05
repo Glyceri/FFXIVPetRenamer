@@ -142,4 +142,12 @@ internal struct PetSheetData
 
         return false;
     }
+
+    public string LongestIdentifier()
+    {
+        string curIdentifier = BaseSingular;
+        if (curIdentifier.Length < BasePlural.Length) curIdentifier = BasePlural;
+        if (curIdentifier.Length < ActionName.Length) curIdentifier = ActionName;
+        return curIdentifier;
+    }
 }

@@ -61,9 +61,8 @@ internal class StringHelperWrapper : IStringHelper
 
     List<string> GetString(PetSheetData petData)
     {
-        List<string> parts = new List<string>();
-        parts.AddRange(petData.Plural);
-        parts.AddRange(petData.Singular);
+        // Can be simplified it said... this is cursed
+        List<string> parts = [.. petData.Plural, .. petData.Singular];
 
         parts.Sort((s1, s2) => s1.Length.CompareTo(s2.Length));
         parts.Reverse();
@@ -86,8 +85,9 @@ internal class StringHelperWrapper : IStringHelper
         return str.Replace("カーバンクル・", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("・エギ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("-Egi", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                  .Replace(" Carbuncle", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Carbuncle ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace(" Carbuncle", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+                  .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+                  
     }
 }

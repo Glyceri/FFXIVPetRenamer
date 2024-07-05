@@ -5,7 +5,6 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableUsers;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
@@ -62,13 +61,9 @@ internal unsafe class PartyHook : HookableElement
             if (memberName == string.Empty) continue;
 
             string[] splitName = memberName.Split(' ');
-            PetServices.PetLog.Log(memberName + ": " + splitName.Length);
-            if (splitName.Length != 3) continue;
+            if (splitName.Length < 2) continue;
 
-            memberName = $"{splitName[1]} {splitName[2]}";
-
-            PetServices.PetLog.Log(memberName);
-
+            memberName = $"{splitName[splitName.Length - 2]} {splitName[splitName.Length - 1]}";
 
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;

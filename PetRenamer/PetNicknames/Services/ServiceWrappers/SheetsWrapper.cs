@@ -1,7 +1,7 @@
-﻿using Dalamud.Utility;
+﻿using Dalamud.Game;
+using Dalamud.Utility;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
-using Lumina.Text.Payloads;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -15,7 +15,7 @@ internal class SheetsWrapper : IPetSheets
     IStringHelper helper;
 
     readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
-    readonly List<string> nameToClass = new List<string>();
+    List<string> nameToClass = new List<string>();
 
     public ExcelSheet<Companion>? petSheet { get; init; }
     public ExcelSheet<Pet>? battlePetSheet { get; init; }
@@ -71,42 +71,35 @@ internal class SheetsWrapper : IPetSheets
             ushort petIcon = petAction.Icon;
             sbyte pronoun = 0;
             string name = pet.Name;
-            string cleanedActionName = helper.CleanupString(helper.CleanupActionName(petAction.Name));
+            string cleanedActionName = helper.CleanupActionName(helper.CleanupString(petAction.Name));
             petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
         }
     }
 
-    // The reason I do it like this is because I need the EXACT /petmirage names
-    // If nothing changed (And quite frankly nothing has in YEARS)
-    // This should result in a list that looks like this
+    // Hardcoded now
+    // This command hasn't changed in a while, and if it does well... I'll have to rework the system anyways
     // 0 --> Carbuncle
     // 1 --> Garuda-Egi
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
+
     void SetupSoftSkeletonIndexList()
     {
-        TextCommand? command = GetCommand(33);
-        if (command == null) return;
-        int counter = 0;
-
-        for (int i = 2; i < command.Description.Payloads.Count; i++)
+        nameToClass = services.ClientState.ClientLanguage switch
         {
-            BasePayload secondTolastPayload = command.Description.Payloads[i - 2];
-            BasePayload lastPayload = command.Description.Payloads[i - 1];
-            BasePayload curPayload = command.Description.Payloads[i];
-
-            if (!secondTolastPayload.PayloadType.HasFlag(PayloadType.UiColorFill)) continue;
-            if (!lastPayload.PayloadType.HasFlag(PayloadType.UiColorBorder)) continue;
-            if (!curPayload.PayloadType.HasFlag(PayloadType.Text)) continue;
-
-            string payloadString = (curPayload as TextPayload)!.RawString;
-
-            if (counter < 5) { nameToClass.Add(payloadString); }
-            else break;
-            counter++;
-        }
+            ClientLanguage.Japanese => japaneseNames,
+            ClientLanguage.English => englishNames,
+            ClientLanguage.German => germanNames,
+            ClientLanguage.French => frenchNames,
+            _ => englishNames,
+        };
     }
+
+    readonly List<string> englishNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> germanNames = new List<string>() { "Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> frenchNames = new List<string>() { "Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos" };
+    readonly List<string> japaneseNames = new List<string>() { "カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス" };
 
     public TextCommand? GetCommand(uint id) => textCommands?.GetRow(id);
     public Action? GetAction(uint actionID) => actions?.GetRow(actionID);
@@ -232,7 +225,7 @@ internal class SheetsWrapper : IPetSheets
 
         if (data.Count == 0) return null;
 
-        data.Sort((i1, i2) => i1.BaseSingular.CompareTo(i2.BaseSingular));
+        data.Sort((i1, i2) => i1.LongestIdentifier().CompareTo(i2.LongestIdentifier()));
         data.Reverse();
 
         PetSheetData normalPetData = data[0];
@@ -274,8 +267,8 @@ internal class SheetsWrapper : IPetSheets
 
         { 14,   PluginConstants.Phoenix                 }, //Demi-Phoenix
         { 10,   PluginConstants.Bahamut                 }, //Demi-Bahamut
-        { 31,   PluginConstants.TitanII                 }, //Topaz-Titan
         { 32,   PluginConstants.GarudaII                }, //Emerald-Garuda
+        { 31,   PluginConstants.TitanII                 }, //Topaz-Titan
         { 30,   PluginConstants.IffritII                }, //Ruby-Iffrit
     };
 
