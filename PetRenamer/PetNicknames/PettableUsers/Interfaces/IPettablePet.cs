@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -16,7 +17,7 @@ internal interface IPettablePet
     public string Name { get; }
     public string? CustomName { get; }
     public bool Dirty { get; }
-    public PetSheetData? PetData { get; }
+    public IPetSheetData? PetData { get; }
     public ulong Lifetime { get; }
 
     void Update(nint pointer);

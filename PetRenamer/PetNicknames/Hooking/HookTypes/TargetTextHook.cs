@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -31,13 +32,13 @@ internal unsafe class TargetTextHook : SimpleTextHook
         IPettablePet? pet = callGetPet?.Invoke();
         if (pet == null) return false; 
 
-        PetSheetData? petData = pet.PetData;
+        IPetSheetData? petData = pet.PetData;
         if (petData == null) return false;
 
         string? customName = pet.CustomName;
         if (customName == null) return false;
 
-        SetText(textNode, text, customName, petData.Value);
+        SetText(textNode, text, customName, petData);
         return true;
     }
 

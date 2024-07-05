@@ -2,11 +2,10 @@
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
-internal struct PetSheetData
+internal struct PetSheetData : IPetSheetData
 {
     public int Model { get; private set; }
     public uint Icon { get; private set; }
@@ -107,14 +106,6 @@ internal struct PetSheetData
         ClientLanguage.Japanese => japaneseStarters,
         _ => englishStarters
     };
-
-    public void Print(IPetLog log)
-    {
-        foreach(string s in Singular)
-            log.Log(s);
-        foreach(string s in Plural) 
-            log.Log(s);
-    }
 
     public bool IsPet(string name)
     {

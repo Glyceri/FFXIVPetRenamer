@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -50,7 +51,7 @@ internal unsafe class TooltipTextHook : SimpleTextHook
         return base.GetTextNode(ref bNode);
     }
 
-    protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, PetSheetData pPet)
+    protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
         base.SetText(textNode, text, customName, pPet);
         if (bgNode == null) return;

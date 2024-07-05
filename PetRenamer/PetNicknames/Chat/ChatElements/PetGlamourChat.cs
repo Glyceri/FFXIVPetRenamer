@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using System.Text.RegularExpressions;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -162,12 +163,12 @@ internal class PetGlamourChat : RestrictedChatElement
         int? classJob = GetClassJob(basePetName);
         if (classJob == null) return;
 
-        PetSheetData? sheetData = PetServices.PetSheets.GetPetFromName(changedPetName);
+        IPetSheetData? sheetData = PetServices.PetSheets.GetPetFromName(changedPetName);
         if (sheetData == null) return;
 
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
-        SetDatabaseEntry(localUser, classJob.Value, sheetData.Value.Model);
+        SetDatabaseEntry(localUser, classJob.Value, sheetData.Model);
     }
 
     void MatchReset(Match match)

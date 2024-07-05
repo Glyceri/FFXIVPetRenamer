@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
 using PetRenamer.PetNicknames.Chat.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -46,15 +47,14 @@ internal unsafe class BattleChatElement : RestrictedChatElement
             int id = nameDataBase.IDs[i];
             if (id > -1) continue;
 
-            PetSheetData? sheetData = PetServices.PetSheets.GetPet(id);
+            IPetSheetData? sheetData = PetServices.PetSheets.GetPet(id);
             if (sheetData == null) continue;
-            if (!sheetData.Value.Contains(stringMessage)) continue;
-            PetSheetData sData = sheetData.Value;
+            if (!sheetData.Contains(stringMessage)) continue;
 
             int softSkeletonID = PetServices.PetSheets.ToSoftSkeleton(id, databaseEntry.SoftSkeletons);
             string? customName = nameDataBase.GetName(softSkeletonID);
             if (customName == null) break;
-            sheetDataList.Add(new SheetGroup(ref customName, ref sData));
+            sheetDataList.Add(new SheetGroup(ref customName, ref sheetData));
         }
 
         if (sheetDataList.Count == 0) return;

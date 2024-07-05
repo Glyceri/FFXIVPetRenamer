@@ -11,7 +11,7 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class StringHelperWrapper : IStringHelper
 {
-    public unsafe string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, PetSheetData petData, bool checkForEmptySpace = true)
+    public unsafe string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true)
     {
         if (atkNode == null) return baseString;
         string newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace);
@@ -19,7 +19,7 @@ internal class StringHelperWrapper : IStringHelper
         return newString;
     }
 
-    public void ReplaceSeString(ref SeString message, string replaceString, PetSheetData petData, bool checkForEmptySpace = true)
+    public void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true)
     {
         if (message == null) return;
         for (int i = 0; i < message.Payloads.Count; i++)
@@ -33,7 +33,7 @@ internal class StringHelperWrapper : IStringHelper
         }
     }
 
-    public string ReplaceStringPart(string baseString, string replaceString, PetSheetData petData, bool checkForEmptySpaces = true)
+    public string ReplaceStringPart(string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpaces = true)
     {
         List<string> parts = GetString(petData);
 
@@ -59,7 +59,7 @@ internal class StringHelperWrapper : IStringHelper
         return baseString;
     }
 
-    List<string> GetString(PetSheetData petData)
+    List<string> GetString(IPetSheetData petData)
     {
         // Can be simplified it said... this is cursed
         List<string> parts = [.. petData.Plural, .. petData.Singular];

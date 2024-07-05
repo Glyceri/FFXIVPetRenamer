@@ -3,6 +3,7 @@ using Lumina.Data.Parsing.Layer;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -19,7 +20,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public string Name { get; init; } = "";
     public string? CustomName { get; }
     public bool Dirty { get; private set; } = true;
-    public PetSheetData? PetData { get; private set; }
+    public IPetSheetData? PetData { get; private set; }
     public uint OldObjectID { get; init; }
     public byte PetType { get; init; }
     public ulong Lifetime { get; private set; }

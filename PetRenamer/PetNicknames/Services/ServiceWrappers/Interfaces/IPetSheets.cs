@@ -22,12 +22,12 @@ internal interface IPetSheets
     Action? GetAction(uint actionID);
     string? GetClassName(int id);
     string? GetWorldName(ushort worldID);
-    PetSheetData? GetPet(int skeletonID);
+    IPetSheetData? GetPet(int skeletonID);
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
-    PetSheetData? GetPetFromName(string name);
-    PetSheetData? GetPetFromActionName(string actionName);
-    PetSheetData? GetPetFromString(string text, ref IPettableUser user, bool IsSoft);
-    List<PetSheetData> GetListFromLine(string line);
+    IPetSheetData? GetPetFromName(string name);
+    IPetSheetData? GetPetFromActionName(string actionName);
+    IPetSheetData? GetPetFromString(string text, ref IPettableUser user, bool IsSoft);
+    List<IPetSheetData> GetListFromLine(string line);
     int? NameToSoftSkeletonIndex(string name);
     int? CastToSoftIndex(uint castId);
     bool IsValidBattlePet(int skeleton);

@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -98,13 +99,13 @@ internal unsafe class ActionMenuHook : HookableElement
         string textNodeText = textNode->NodeText.ToString();
         string baseString = textNodeText.Split('\r')[0];
 
-        PetSheetData? petSheet = PetServices.PetSheets.GetPetFromString(baseString, ref user, true);
+        IPetSheetData? petSheet = PetServices.PetSheets.GetPetFromString(baseString, ref user, true);
         if (petSheet == null) return;
 
-        string? customName = user.DataBaseEntry.GetName(petSheet.Value.Model);
+        string? customName = user.DataBaseEntry.GetName(petSheet.Model);
         if (customName == null) return;
 
-        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet.Value);
+        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet);
     }
 
     public override void Dispose()

@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -68,24 +69,23 @@ internal unsafe class SimpleTextHook : ITextHook
         IPettableUser? user = lastPettableUser = GetUser();
         if (user == null) return false;
 
-        PetSheetData? pet = GetPetData(text, ref user);
+        IPetSheetData? pet = GetPetData(text, ref user);
         if (pet == null) return false;
-        PetSheetData pPet = pet.Value;
 
-        string? customName = user.DataBaseEntry.GetName(pPet.Model);
+        string? customName = user.DataBaseEntry.GetName(pet.Model);
         if (customName == null) return false;
 
-        SetText(textNode, text, customName, pPet);
+        SetText(textNode, text, customName, pet);
         return true;
     }
 
-    protected virtual void SetText(AtkTextNode* textNode, string text, string customName, PetSheetData pPet)
+    protected virtual void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
         if (!CheckIfCanFunction(text, pPet)) return;
         LastAnswer = PetServices.StringHelper.ReplaceATKString(textNode, text, customName, pPet);
     }
 
-    protected virtual bool CheckIfCanFunction(string text, PetSheetData pPet)
+    protected virtual bool CheckIfCanFunction(string text, IPetSheetData pPet)
     {
         if (AllowedToFunction == null) return true;
         if (AllowedToFunction.Invoke(pPet.Model)) return true;
@@ -93,7 +93,7 @@ internal unsafe class SimpleTextHook : ITextHook
         return false;
     }
 
-    protected virtual PetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, ref user, IsSoft);
+    protected virtual IPetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, ref user, IsSoft);
 
     protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
 

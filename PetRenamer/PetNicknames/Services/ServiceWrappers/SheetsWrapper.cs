@@ -14,7 +14,7 @@ internal class SheetsWrapper : IPetSheets
     DalamudServices services;
     IStringHelper helper;
 
-    readonly List<PetSheetData> petSheetCache = new List<PetSheetData>();
+    readonly List<IPetSheetData> petSheetCache = new List<IPetSheetData>();
     List<string> nameToClass = new List<string>();
 
     public ExcelSheet<Companion>? petSheet { get; init; }
@@ -125,7 +125,7 @@ internal class SheetsWrapper : IPetSheets
         return world.InternalName;
     }
 
-    public PetSheetData? GetPet(int skeletonID)
+    public IPetSheetData? GetPet(int skeletonID)
     {
         for (int i = 0; i < petSheetCache.Count; i++)
         {
@@ -157,24 +157,24 @@ internal class SheetsWrapper : IPetSheets
         return skeletonID;
     }
 
-    public PetSheetData? GetPetFromName(string name)
+    public IPetSheetData? GetPetFromName(string name)
     {
         int sheetCount = petSheetCache.Count;
         for (int i = 0; i < sheetCount; i++)
         {
-            PetSheetData pet = petSheetCache[i];
+            IPetSheetData pet = petSheetCache[i];
             if (!pet.IsPet(name)) continue;
             return pet;
         }
         return null;
     }
 
-    public PetSheetData? GetPetFromActionName(string actionName)
+    public IPetSheetData? GetPetFromActionName(string actionName)
     {
         int sheetCount = petSheetCache.Count;
         for (int i = 0; i < sheetCount; i++)
         {
-            PetSheetData pet = petSheetCache[i];
+            IPetSheetData pet = petSheetCache[i];
             if (!pet.IsAction(actionName)) continue;
             return pet;
         }
@@ -201,11 +201,11 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public List<PetSheetData> GetListFromLine(string line)
+    public List<IPetSheetData> GetListFromLine(string line)
     {
-        List<PetSheetData> list = new List<PetSheetData> ();
+        List<IPetSheetData> list = new List<IPetSheetData> ();
         if (line == string.Empty) return list;
-        foreach (PetSheetData pet in petSheetCache)
+        foreach (IPetSheetData pet in petSheetCache)
         {
             if (string.Equals(pet.BaseSingular, line, System.StringComparison.InvariantCultureIgnoreCase))
             {
@@ -223,16 +223,16 @@ internal class SheetsWrapper : IPetSheets
         return list;
     }
 
-    public PetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
+    public IPetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
     {
-        List<PetSheetData> data = GetListFromLine(baseString);
+        List<IPetSheetData> data = GetListFromLine(baseString);
 
         if (data.Count == 0) return null;
 
         data.Sort((i1, i2) => i1.LongestIdentifier().CompareTo(i2.LongestIdentifier()));
         data.Reverse();
 
-        PetSheetData normalPetData = data[0];
+        IPetSheetData normalPetData = data[0];
 
         if (!soft) return normalPetData;
 
@@ -242,10 +242,10 @@ internal class SheetsWrapper : IPetSheets
         int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
         if (softSkeleton == null) return normalPetData;
 
-        PetSheetData? softPetData = GetPet(softSkeleton.Value);
+        IPetSheetData? softPetData = GetPet(softSkeleton.Value);
         if (softPetData == null) return normalPetData;
 
-        return new PetSheetData(softPetData.Value.Model, softPetData.Value.Icon, softPetData.Value.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
+        return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, ref services);
     }
 
     public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);

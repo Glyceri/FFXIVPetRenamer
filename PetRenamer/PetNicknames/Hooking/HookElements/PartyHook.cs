@@ -7,6 +7,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -71,13 +72,13 @@ internal unsafe class PartyHook : HookableElement
             IPettableUser? user = UserList.GetUser(memberName);
             if (user == null) { PetServices.PetLog.Log("User not found: " + memberName); continue; }
 
-            PetSheetData? data = PetServices.PetSheets.GetPetFromString(castString, ref user, true);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromString(castString, ref user, true);
             if (data == null) continue;
 
-            string? customName = user.DataBaseEntry.GetName(data.Value.Model);
+            string? customName = user.DataBaseEntry.GetName(data.Model);
             if (customName == null) continue;
 
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, data.Value, false);
+            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, data, false);
         }
     }
 }

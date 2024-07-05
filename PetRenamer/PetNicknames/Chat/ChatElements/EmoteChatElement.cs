@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -40,14 +41,17 @@ internal unsafe class EmoteChatElement : IChatElement
         {
             if (user == null) continue;
             if (!user.IsActive) continue;
+
             IPettablePet? pet = user.GetPet(emoteTarget);
             if (pet == null) continue; 
+
             string? customName = pet.CustomName;
             if (customName == null) continue; 
-            PetSheetData? data = pet.PetData;
+
+            IPetSheetData? data = pet.PetData;
             if (data == null) continue;
-            PetSheetData pData = data.Value;
-            PetServices.StringHelper.ReplaceSeString(ref message, customName, pData, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese));
+
+            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese));
             break;
         }
     }
