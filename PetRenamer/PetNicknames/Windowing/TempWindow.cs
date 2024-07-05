@@ -3,11 +3,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services;
 
 namespace PetRenamer.PetNicknames.Windowing;
 
 internal class TempWindow : Window
 {
+    DalamudServices DalamudServices { get; init; }
     IPettableUserList UserList { get; init; }
     IPettableDatabase Database { get; init; }
 
@@ -15,8 +17,9 @@ internal class TempWindow : Window
     string newName2 = "";
     string tempSkeleton = "";
 
-    public TempWindow(IPettableUserList userList, IPettableDatabase database) : base("Temp Window", ImGuiWindowFlags.None, true)
+    public TempWindow(DalamudServices dalamudServices, IPettableUserList userList, IPettableDatabase database) : base("Temp Window", ImGuiWindowFlags.None, true)
     {
+        DalamudServices = dalamudServices;
         UserList = userList;
         Database = database;
 
@@ -85,11 +88,21 @@ internal class TempWindow : Window
                 ImGui.TableSetColumnIndex(5);
                 if (item == null) ImGui.Text("_");
                 else ImGui.Text(item.CurrentCastID.ToString());
+                if (item == null) continue;
+                foreach (IPettablePet pet in item.PettablePets)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.Text(pet.Name);
+                    ImGui.TableSetColumnIndex(1);
+                    ImGui.Text(pet.SkeletonID.ToString());
+
+                }
             }
 
             ImGui.EndTable();
         }
-        if (ImGui.BeginTable("Pet Nicknames Table##2", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail()))
+        if (ImGui.BeginTable("Pet Nicknames Table##2", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.ScrollY, ImGui.GetContentRegionAvail() * new System.Numerics.Vector2(1, 0.5f)))
         {
 
             foreach (IPettableDatabaseEntry? item in Database.DatabaseEntries)

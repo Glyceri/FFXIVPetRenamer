@@ -64,14 +64,18 @@ internal class SheetsWrapper : IPetSheets
         {
             if (pet == null) continue;
             uint sheetSkeleton = pet.RowId;
+
             if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton)) continue;
             if (!petIDToAction.TryGetValue(skeleton, out uint actionID)) continue;
+
             Action? petAction = GetAction(actionID);
             if (petAction == null) continue;
+
             ushort petIcon = petAction.Icon;
             sbyte pronoun = 0;
             string name = pet.Name;
             string cleanedActionName = helper.CleanupActionName(helper.CleanupString(petAction.Name));
+
             petSheetCache.Add(new PetSheetData(skeleton, petIcon, pronoun, name, cleanedActionName, petAction.Name, petAction.RowId, ref dalamudServices));
         }
     }
@@ -248,63 +252,65 @@ internal class SheetsWrapper : IPetSheets
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
     {
-        { 6,    PluginConstants.Eos                     }, //EOS
-        { 7,    PluginConstants.Selene                  }, //Selene
+        { 6,    PluginConstants.Eos                     }, // EOS
+        { 7,    PluginConstants.Selene                  }, // Selene
 
-        { 1,    PluginConstants.EmeraldCarbuncle        }, //Emerald Carbuncle
-        { 38,   PluginConstants.RubyCarbuncle           }, //Ruby Carbuncle
-        { 2,    PluginConstants.TopazCarbuncle          }, //Topaz Carbuncle
-        { 36,   PluginConstants.Carbuncle               }, //Carbuncle
+        { 1,    PluginConstants.EmeraldCarbuncle        }, // Emerald Carbuncle
+        { 38,   PluginConstants.RubyCarbuncle           }, // Ruby Carbuncle
+        { 2,    PluginConstants.TopazCarbuncle          }, // Topaz Carbuncle
+        { 36,   PluginConstants.Carbuncle               }, // Carbuncle
 
-        { 27,   PluginConstants.IfritEgi                }, //Ifrit-Egi
-        { 28,   PluginConstants.TitanEgi                }, //Titan-Egi
-        { 29,   PluginConstants.GarudaEgi               }, //Garuda-Egi 
+        { 27,   PluginConstants.IfritEgi                }, // Ifrit-Egi
+        { 28,   PluginConstants.TitanEgi                }, // Titan-Egi
+        { 29,   PluginConstants.GarudaEgi               }, // Garuda-Egi 
 
-        { 8,    PluginConstants.RookAutoTurret          }, //Rook Autoturret MCHN
-        { 21,   PluginConstants.Seraph                  }, //Seraph
-        { 18,   PluginConstants.AutomatonQueen          }, //Automaton Queen
-        { 17,   PluginConstants.LivingShadow            }, //Esteem DRK
+        { 8,    PluginConstants.RookAutoTurret          }, // Rook Autoturret MCHN
+        { 21,   PluginConstants.Seraph                  }, // Seraph
+        { 18,   PluginConstants.AutomatonQueen          }, // Automaton Queen
+        { 17,   PluginConstants.LivingShadow            }, // Esteem DRK
 
-        { 14,   PluginConstants.Phoenix                 }, //Demi-Phoenix
-        { 10,   PluginConstants.Bahamut                 }, //Demi-Bahamut
-        { 32,   PluginConstants.GarudaII                }, //Emerald-Garuda
-        { 31,   PluginConstants.TitanII                 }, //Topaz-Titan
-        { 30,   PluginConstants.IffritII                }, //Ruby-Iffrit
+        { 14,   PluginConstants.Phoenix                 }, // Demi-Phoenix
+        { 10,   PluginConstants.Bahamut                 }, // Demi-Bahamut
+        { 32,   PluginConstants.GarudaII                }, // Emerald-Garuda
+        { 31,   PluginConstants.TitanII                 }, // Topaz-Titan
+        { 30,   PluginConstants.IffritII                }, // Ruby-Iffrit
+        { 46,   PluginConstants.SolarBahamut            }, // Solar Bahamut
     };
 
     public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
     {
-        { PluginConstants.EmeraldCarbuncle      , 25804 }, //Summon Emerald
-        { PluginConstants.RubyCarbuncle         , 25802 }, //Summon Ruby
-        { PluginConstants.Carbuncle             , 25798 }, //Summon Carbuncle
-        { PluginConstants.TopazCarbuncle        , 25803 }, //Summon Topaz
-        { PluginConstants.IfritEgi              , 25805 }, //Summon Ifrit
-        { PluginConstants.TitanEgi              , 25806 }, //Summon Titan
-        { PluginConstants.GarudaEgi             , 25807 }, //Summon Garuda
-        { PluginConstants.Eos                   , 17215 }, //Summon Eos
-        { PluginConstants.Selene                , 17215 }, //Summon Eos
-        { PluginConstants.AutomatonQueen        , 16501 }, //Automaton Queen
-        { PluginConstants.Seraph                , 16545 }, //Summon Seraph
-        { PluginConstants.Phoenix               , 25831 }, //Summon Phoenix
-        { PluginConstants.LivingShadow          , 16472 }, //Living Shadow
-        { PluginConstants.IffritII              , 25838 }, //Summon Ifrit II
-        { PluginConstants.GarudaII              , 25840 }, //Summon Garuda II
-        { PluginConstants.TitanII               , 25839 }, //Summon Titan II
-        { PluginConstants.Bahamut               , 7427  }, //Summon Bahamut
-        { PluginConstants.RookAutoTurret        , 2864  }, //Rook Autoturret
+        { PluginConstants.EmeraldCarbuncle      , 25804 }, // Summon Emerald
+        { PluginConstants.RubyCarbuncle         , 25802 }, // Summon Ruby
+        { PluginConstants.Carbuncle             , 25798 }, // Summon Carbuncle
+        { PluginConstants.TopazCarbuncle        , 25803 }, // Summon Topaz
+        { PluginConstants.IfritEgi              , 25805 }, // Summon Ifrit
+        { PluginConstants.TitanEgi              , 25806 }, // Summon Titan
+        { PluginConstants.GarudaEgi             , 25807 }, // Summon Garuda
+        { PluginConstants.Eos                   , 17215 }, // Summon Eos
+        { PluginConstants.Selene                , 17215 }, // Summon Eos
+        { PluginConstants.AutomatonQueen        , 16501 }, // Automaton Queen
+        { PluginConstants.Seraph                , 16545 }, // Summon Seraph
+        { PluginConstants.Phoenix               , 25831 }, // Summon Phoenix
+        { PluginConstants.LivingShadow          , 16472 }, // Living Shadow
+        { PluginConstants.IffritII              , 25838 }, // Summon Ifrit II
+        { PluginConstants.GarudaII              , 25840 }, // Summon Garuda II
+        { PluginConstants.TitanII               , 25839 }, // Summon Titan II
+        { PluginConstants.Bahamut               , 7427  }, // Summon Bahamut
+        { PluginConstants.RookAutoTurret        , 2864  }, // Rook Autoturret
+        { PluginConstants.SolarBahamut          , 36992 }, // Summon Solar Bahamut        
     };
 
     public readonly List<int> mutatableID = new List<int>()
     {
-        PluginConstants.Eos                 , //Eos
-        PluginConstants.Selene              , //Selene
-        PluginConstants.EmeraldCarbuncle    , //Emerald Carbuncle
-        PluginConstants.RubyCarbuncle       , //Ruby Carbuncle
-        PluginConstants.Carbuncle           , //Carbuncle
-        PluginConstants.TopazCarbuncle      , //Topaz Carbuncle
-        PluginConstants.IfritEgi            , //Ifrit-Egi
-        PluginConstants.TitanEgi            , //Titan-Egi
-        PluginConstants.GarudaEgi             //Garuda-Egi
+        PluginConstants.Eos                 , // Eos
+        PluginConstants.Selene              , // Selene
+        PluginConstants.EmeraldCarbuncle    , // Emerald Carbuncle
+        PluginConstants.RubyCarbuncle       , // Ruby Carbuncle
+        PluginConstants.Carbuncle           , // Carbuncle
+        PluginConstants.TopazCarbuncle      , // Topaz Carbuncle
+        PluginConstants.IfritEgi            , // Ifrit-Egi
+        PluginConstants.TitanEgi            , // Titan-Egi
+        PluginConstants.GarudaEgi             // Garuda-Egi
     };
 
     // Sheets wrapper explains why the order is like this... it's crucial it stays like this.

@@ -25,6 +25,7 @@ public static class PluginConstants
     public const int IffritII = -3122;
     public const int GarudaII = -3123;
     public const int TitanII = -3124;
+    public const int SolarBahamut = -4038;
 
 
     public const int BaseScholarSkeleton = Eos;

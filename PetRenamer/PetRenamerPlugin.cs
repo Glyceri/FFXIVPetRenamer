@@ -43,7 +43,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         _DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += WindowSystem.Draw;
 
-        window = new TempWindow(PettableUserList, PettableDatabase);
+        window = new TempWindow(_DalamudServices, PettableUserList, PettableDatabase);
 
         WindowSystem.AddWindow(window);
         window.IsOpen = true;
