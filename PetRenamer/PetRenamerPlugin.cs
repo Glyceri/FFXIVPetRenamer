@@ -10,22 +10,25 @@ using PetRenamer.PetNicknames.Windowing;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Chat;
+using PetRenamer.PetNicknames.Commands;
 
 namespace PetRenamer;
 
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
     DalamudServices _DalamudServices { get; init; }
-    IPetServices _PetServices { get; init; }
-    IPettableUserList PettableUserList { get; init; }
-    IPettableDatabase PettableDatabase { get; init; }
-    IPettableDatabase LegacyDatabase {  get; init; }
+    readonly IPetServices _PetServices;
+    readonly IPettableUserList PettableUserList;
+    readonly IPettableDatabase PettableDatabase;
+    readonly IPettableDatabase LegacyDatabase;
 
-    UpdateHandler UpdateHandler { get; init; }
-    HookHandler HookHandler { get; init; }
-    ChatHandler ChatHandler { get; init; }
-
-    WindowSystem WindowSystem { get; init; }
+    readonly UpdateHandler UpdateHandler;
+    readonly HookHandler HookHandler;
+    readonly ChatHandler ChatHandler;
+    readonly CommandHandler CommandHandler;
+    
+    // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV EXTREMLEY TEMPORARY!
+    WindowSystem WindowSystem;
     TempWindow window;
 
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
@@ -38,6 +41,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LegacyDatabase, PettableDatabase, _PetServices);
         HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
+        CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
 
         WindowSystem = new WindowSystem("Pet Nicknames");
 
@@ -55,5 +59,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         UpdateHandler?.Dispose();
         HookHandler?.Dispose();
         ChatHandler?.Dispose();
+        CommandHandler?.Dispose();
     }
 }
