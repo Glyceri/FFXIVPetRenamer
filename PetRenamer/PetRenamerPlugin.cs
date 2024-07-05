@@ -22,12 +22,13 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly IPettableDatabase PettableDatabase;
     readonly IPettableDatabase LegacyDatabase;
 
+    // As long as no other module needs one, they won't be interfaced
     readonly UpdateHandler UpdateHandler;
     readonly HookHandler HookHandler;
     readonly ChatHandler ChatHandler;
     readonly CommandHandler CommandHandler;
-    
-    // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV EXTREMLEY TEMPORARY!
+
+    // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV EXTREMLEY TEMPORARY! VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
     WindowSystem WindowSystem;
     TempWindow window;
 

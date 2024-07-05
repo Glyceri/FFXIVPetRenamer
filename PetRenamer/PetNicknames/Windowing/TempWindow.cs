@@ -96,7 +96,8 @@ internal class TempWindow : Window
                     ImGui.Text(pet.Name);
                     ImGui.TableSetColumnIndex(2);
                     ImGui.Text(pet.SkeletonID.ToString());
-
+                    ImGui.TableSetColumnIndex(3);
+                    ImGui.Text(pet.CustomName?.ToString() ?? "[No name]");
                 }
             }
 
