@@ -79,7 +79,7 @@ internal class SheetsWrapper : IPetSheets
     // The reason I do it like this is because I need the EXACT /petmirage names
     // If nothing changed (And quite frankly nothing has in YEARS)
     // This should result in a list that looks like this
-    // 0 --> Karfunkel
+    // 0 --> Carbuncle
     // 1 --> Garuda-Egi
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
