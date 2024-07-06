@@ -15,7 +15,6 @@ internal static class WindowStyles
                     BackgroundColor = new("Window.Background"),
                     StrokeColor = new("Window.Border"),
                     StrokeWidth = 1,
-                    StrokeInset = 1,
                     BorderRadius = 6,
                     IsAntialiased = false,
                     RoundedCorners = RoundedCorners.All,
@@ -36,10 +35,9 @@ internal static class WindowStyles
                         new("Window.TitlebarGradient1"),
                         new("Window.TitlebarGradient2")
                     ),
-                    BackgroundGradientInset = new(0) { Bottom = 0 },
                     BorderColor = new(new("Window.TitlebarBorder")),
                     BorderWidth = new() { Bottom = 1 },
-                    BorderRadius = 4,
+                    BorderRadius = 6,
                     IsAntialiased = false,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
                     Margin = new(1) { Right = -1, Bottom = -1 },
@@ -49,12 +47,11 @@ internal static class WindowStyles
                 ".window--titlebar-text",
                 new()
                 {
-                    FontSize = 15,
+                    FontSize = 16,
                     Color = new("Window.TitlebarText"),
                     OutlineColor = new("Window.TitlebarTextOutline"),
                     OutlineSize = 1,
                     TextAlign = Anchor.MiddleCenter,
-                    TextOffset = new(0, -1),
                     TextOverflow = false,
                     WordWrap = false,
                     Size = new(0, 32),
@@ -110,9 +107,19 @@ internal static class WindowStyles
 
     public static void RegisterDefaultColors()
     {
+        Color.AssignByName("Titlebar.Minion", new Color(255, 194, 63).ToUInt());
+        Color.AssignByName("Titlebar.Minion:Dark", new Color(110, 78, 10).ToUInt());
+        Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37).ToUInt());
+        Color.AssignByName("Titlebar.BattlePet:Dark", new Color(26, 84, 26).ToUInt());
+        Color.AssignByName("Titlebar.Base", new Color(255, 255, 255).ToUInt());
+        Color.AssignByName("Window.Border:Active", new Color(45, 89, 83).ToUInt());
+
+        Color.AssignByName("Window.Border:Inactive", 0xFF404040);
+        Color.AssignByName("ModeToggleButton.Border:Active", 0xFF484848);
+        Color.AssignByName("ModeToggleButton.Border:Hover", new Color(50, 50, 50).ToUInt());
+
         Color.AssignByName("Window.Background", 0xFF212021);
         Color.AssignByName("Window.BackgroundLight", 0xFF292829);
-        Color.AssignByName("Window.Border", 0xFF484848);
         Color.AssignByName("Window.TitlebarBackground", 0xFF101010);
         Color.AssignByName("Window.TitlebarBorder", 0xFF404040);
         Color.AssignByName("Window.TitlebarGradient1", 0xFF2F2E2F);

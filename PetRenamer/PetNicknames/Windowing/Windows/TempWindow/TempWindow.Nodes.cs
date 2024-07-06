@@ -7,9 +7,14 @@ internal partial class TempWindow
     protected sealed override Node Node { get; } = new()
     {
         Stylesheet = PetRenameStyleSheet,
-        Id = "PetRenameWindow2",         
+        Id = "PetRenameNode",
+        Style = new Style()
+        {
+            Flow = Flow.Horizontal,
+            Padding = new(3, 1, 0, 1)
+        },
         ChildNodes = [
-
+            
         ]
     };
 }

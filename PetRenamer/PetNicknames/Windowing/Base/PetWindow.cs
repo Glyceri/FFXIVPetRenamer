@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Windowing.Componenents;
+using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System;
 using System.Numerics;
@@ -11,10 +11,14 @@ namespace PetRenamer.PetNicknames.Windowing.Base;
 
 internal abstract partial class PetWindow : Window, IPetWindow
 {
+    protected PetWindowMode currentMode { get; private set; }
+
     protected abstract string ID { get; }
     protected abstract Vector2 MinSize { get; }
     protected abstract Vector2 MaxSize { get; }
     protected abstract Vector2 DefaultSize { get; }
+
+    protected abstract bool HasModeToggle { get; }
 
     protected Size ContentSize { get; private set; } = new Size();
 
@@ -31,6 +35,10 @@ internal abstract partial class PetWindow : Window, IPetWindow
     {
         DalamudServices = dalamudServices;
         CloseButton.OnClick += _ => Close();
+
+        ContentNode.AppendChild(Node);
+
+        if (HasModeToggle) PetModeConstructor();
     }
 
     public void Close()
@@ -72,9 +80,11 @@ internal abstract partial class PetWindow : Window, IPetWindow
             ContentNode.Style.Size = new((int)size.X - 7, (int)size.Y - 39);
             Node.Style.Margin = new(1);
             ContentSize = new(ContentNode.Style.Size.Width - 2, ContentNode.Style.Size.Height - 2);
+            Node.Style.Size = ContentSize;
 
             // Only enable shadow if the window has focus.
             _windowNode.Style.ShadowSize = IsFocused ? new(64) : new(0);
+            _windowNode.Style.StrokeColor = IsFocused ? new Color("Window.Border:Active") : new Color("Window.Border:Inactive");
 
             TitlebarNode.QuerySelector("TitleText")!.NodeValue = Title;
 
@@ -136,4 +146,6 @@ internal abstract partial class PetWindow : Window, IPetWindow
         | ImGuiWindowFlags.NoScrollbar
         | ImGuiWindowFlags.NoScrollWithMouse
         | ImGuiWindowFlags.NoBackground;
+
+
 }

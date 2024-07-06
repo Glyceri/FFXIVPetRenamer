@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.PetNicknames.Windowing.Interfaces;
+﻿using PetRenamer.PetNicknames.Windowing.Enums;
+
+namespace PetRenamer.PetNicknames.Windowing.Interfaces;
 
 internal interface IPetWindow
 {
@@ -8,4 +10,10 @@ internal interface IPetWindow
 
     void Draw();
     void OnDaw();
+
+    void SetPetMode(PetWindowMode mode);
+    bool RequestsModeChange { get; }
+    PetWindowMode NewMode { get; }
+    void DeclareModeChangedSeen();
+
 }

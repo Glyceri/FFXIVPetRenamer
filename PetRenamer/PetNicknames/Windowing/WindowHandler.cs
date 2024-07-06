@@ -1,20 +1,22 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
+using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using System.Collections.Generic;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing;
 
 internal class WindowHandler : IWindowHandler
 {
+    PetWindowMode _windowMode = PetWindowMode.Minion;
+    public PetWindowMode PetWindowMode { get => _windowMode; set => SetWindowMode(value); }
+
     readonly DalamudServices DalamudServices;
     readonly IPetServices PetServices;
     readonly IPettableUserList UserList;
@@ -40,6 +42,7 @@ internal class WindowHandler : IWindowHandler
     public void AddWindow(PetWindow window)
     {        
         WindowSystem.AddWindow(window);
+        window.SetPetMode(_windowMode);
     }
 
     public void RemoveWindow(PetWindow window)
@@ -68,10 +71,27 @@ internal class WindowHandler : IWindowHandler
                 tWindow.Toggle();
     }
 
+    public void SetWindowMode(PetWindowMode mode)
+    {
+        _windowMode = mode;
+        foreach (IPetWindow window in WindowSystem.Windows)
+        {
+            window.SetPetMode(mode);
+        }
+    }
+
     void Draw()
     {
         Node.ScaleFactor = ImGuiHelpers.GlobalScale;
         WindowSystem.Draw();
+
+        foreach (IPetWindow window in WindowSystem.Windows)
+        {
+            if (!window.RequestsModeChange) continue;
+            SetWindowMode(window.NewMode);
+            window.DeclareModeChangedSeen();
+            break;
+        }
     }
 
     public void Dispose()
