@@ -8,7 +8,6 @@ using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
 using Una.Drawing;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.AozNoteModule;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 
@@ -26,10 +25,6 @@ internal partial class TempWindow : PetWindow
     protected override string Title { get; } = "Pet Nicknames";
     protected override string ID { get; } = "PetRenameWindow";
 
-    string newName = "";
-    string newName2 = "";
-    string tempSkeleton = "";
-
     PetRenameNode? petRenameNode;
 
     IPettableUser? ActiveUser;
@@ -43,7 +38,7 @@ internal partial class TempWindow : PetWindow
         PetServices = petServices;
     }
 
-    public unsafe override void OnDaw()
+    public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
         if (ActiveUser == null || activeSkeleton == -1) 
@@ -104,20 +99,34 @@ internal partial class TempWindow : PetWindow
         string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
         lastCustomName = customName;
 
-        CleanOldNode();
-        Node.AppendChild(petRenameNode = new PetRenameNode(customName, in data));
-        petRenameNode.Reflow();
-        petRenameNode.OnSave += OnSave;
+        if (petRenameNode == null)
+        {
+            AddNode(Node, petRenameNode = new PetRenameNode(customName, in data));
+            petRenameNode.OnSave += OnSave;
+        }
+        else 
+        {
+            petRenameNode.Setup(customName, in data);
+        }
     }
 
     void CleanOldNode()
     {
         if (petRenameNode == null) return;
-        Node.RemoveChild(petRenameNode);
+        RemoveNode(Node, petRenameNode);
         petRenameNode.OnSave -= OnSave;
         petRenameNode?.Dispose();
         petRenameNode = null;
     }
 
     void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
+
+    protected sealed override Node Node { get; } = new()
+    {
+        Style = new Style()
+        {
+            Flow = Flow.Horizontal,
+            Padding = new(3, 1, 0, 1)
+        }
+    };
 }

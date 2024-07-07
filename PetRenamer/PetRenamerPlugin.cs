@@ -15,6 +15,7 @@ using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 using Una.Drawing;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 
 namespace PetRenamer;
 
@@ -48,8 +49,10 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
 
         WindowHandler.AddWindow(new TempWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
+        WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
         WindowHandler.Open<TempWindow>();
-        
+        WindowHandler.Open<PetListWindow>();
+
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<TempWindow>())
         {
             HelpMessage = "Temporary",

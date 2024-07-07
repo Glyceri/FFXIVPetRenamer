@@ -9,11 +9,10 @@ internal interface IPetWindow
     void Toggle();
 
     void Draw();
-    void OnDaw();
+    void OnDraw();
 
     void SetPetMode(PetWindowMode mode);
     bool RequestsModeChange { get; }
     PetWindowMode NewMode { get; }
     void DeclareModeChangedSeen();
-
 }

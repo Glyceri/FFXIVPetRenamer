@@ -1,5 +1,4 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System;
 using Una.Drawing;
@@ -10,6 +9,7 @@ internal class PetRenameNode : Node
 {
     readonly Node RenameNode;
     readonly Node ImageNode;
+    readonly IconNode IconNode;
 
     readonly Node HeaderNode;
 
@@ -35,6 +35,7 @@ internal class PetRenameNode : Node
         Stylesheet = PetRenameStyleSheet;
         ClassList = ["RenameElementStyle"];
 
+        // HA HA
         ChildNodes = [
             RenameNode = new Node()
             {
@@ -60,13 +61,14 @@ internal class PetRenameNode : Node
                     },
                     new Node()
                     {
-                        ChildNodes = [
-                        SaveButton = new Node()
-                        {
-                            Stylesheet = PetRenameStyleSheet,
-                            ClassList = ["RenameElementStyle", "RenameElementMargin", "RenameElementButton"],
-                            NodeValue = Translator.GetLine("PetRenameNode.SaveNickname"),
-                        },
+                        ChildNodes =
+                        [
+                            SaveButton = new Node()
+                            {
+                                Stylesheet = PetRenameStyleSheet,
+                                ClassList = ["RenameElementStyle", "RenameElementMargin", "RenameElementButton"],
+                                NodeValue = Translator.GetLine("PetRenameNode.SaveNickname"),
+                            },
                             ClearButton = new Node()
                             {
                                 Stylesheet = PetRenameStyleSheet,
@@ -83,21 +85,24 @@ internal class PetRenameNode : Node
                 ClassList = ["RenameElementStyle", "RenameElementMargin"],
                 ChildNodes =
                 [
-                    new IconNode(activePet.Icon) { }
+                    IconNode = new IconNode(activePet.Icon) { }
                 ],
             }
         ];
-
-        if (customName == null)
-        {
-            RenameNode.RemoveChild(TextNode);
-        }
 
         InputField.OnValueChanged += (str) => CurrentValue = str;
         SaveButton.OnMouseUp += _ => OnSave?.Invoke(InputField.Value == string.Empty ? null : InputField.Value);
         ClearButton.OnMouseUp += _ => OnSave?.Invoke(null);
 
         BeforeReflow += _Reflow;
+    }
+
+    public void Setup(string? customName, in IPetSheetData activePet)
+    {
+        HeaderNode.NodeValue = string.Format(Translator.GetLine(customName == null ? "PetRenameNode.IsNotRenamed" : "PetRenameNode.IsRenamed"), activePet.BaseSingular);
+        TextNode.NodeValue = customName ?? "";
+        InputField.Value = customName ?? "";
+        IconNode.Style.IconId = activePet.Icon;
     }
 
     bool _Reflow(Node? node = null)
@@ -145,7 +150,7 @@ internal class PetRenameNode : Node
                 TextOffset = new System.Numerics.Vector2(0, 2.5f),
                 Padding = new EdgeSize(Margin),
             }),
-            new (".RenameElementButton", new Style()
+            new(".RenameElementButton", new Style()
             {
                 BackgroundColor = new Color("Window.BackgroundLight"),
                 TextShadowSize = 2,

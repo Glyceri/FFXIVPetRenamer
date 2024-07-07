@@ -33,7 +33,10 @@ internal static class Translator
 
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
     {
-        
+        { "PetRenameNode.IsRenamed", "{0}のニックネームは" },
+        { "PetRenameNode.IsNotRenamed", "{0}にはニックネームがない" },
+        { "PetRenameNode.SaveNickname", "ニックネームをセーブ" },
+        { "PetRenameNode.ClearNickname", "ニックネームを削除" },
     };
 
     internal static void Initialise(DalamudServices dalamudServices)

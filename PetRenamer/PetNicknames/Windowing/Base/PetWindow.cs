@@ -22,7 +22,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected Size ContentSize { get; private set; } = new Size();
 
-    public bool IsFocused { get; private set; }
+    public new bool IsFocused { get; private set; }
     public bool IsHovered { get; private set; }
 
     protected abstract Node Node { get; }
@@ -41,15 +41,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
         if (HasModeToggle) PetModeConstructor();
     }
 
-    public void Close()
-    {
-        IsOpen = false;
-    }
-
-    public void Open()
-    {
-        IsOpen = true;
-    }
+    public void Close() => IsOpen = false;
+    public void Open() => IsOpen = true;
 
     public sealed override void Draw()
     {
@@ -104,7 +97,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
         ImGui.BeginChild($"PetWindow_{id}##{instanceId}", ImGui.GetWindowSize(), false);
 
         // Here to ensure stylevars get popped
-        try { OnDaw(); } catch (Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
+        try { OnDraw(); } catch (Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
 
         Vector2 ps = ImGui.GetWindowPos();
         Point pt = new((int)ps.X + 2, (int)ps.Y + 2);
@@ -139,7 +132,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected Node CloseButton => _windowNode.QuerySelector("CloseButton")!;
 
-    public abstract void OnDaw();
+    public abstract void OnDraw();
 
     static ImGuiWindowFlags ImGuiWindowFlags =>
         ImGuiWindowFlags.NoTitleBar
