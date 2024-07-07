@@ -20,7 +20,7 @@ internal static class WindowStyles
                     RoundedCorners = RoundedCorners.All,
                     ShadowSize = new(64),
                     ShadowInset = 8,
-                    Padding = new(2),
+                    Padding = new(3),
                 }
             ),
             new(
@@ -36,11 +36,11 @@ internal static class WindowStyles
                         new("Window.TitlebarGradient2")
                     ),
                     BorderColor = new(new("Window.TitlebarBorder")),
-                    BorderWidth = new() { Bottom = 1 },
+                    BorderWidth = new(1),
                     BorderRadius = 6,
                     IsAntialiased = false,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
-                    Margin = new(1) { Right = -1, Bottom = -1 },
+                    //Margin = new(1) { Right = -1, Bottom = -1 },
                 }
             ),
             new(
@@ -62,7 +62,7 @@ internal static class WindowStyles
                 ".window--close-button",
                 new()
                 {
-                    Anchor = Anchor.TopRight,
+                    Anchor = Anchor.MiddleRight,
                     Size = new(25, 25),
                     BackgroundColor = new("Window.TitlebarCloseButton"),
                     StrokeColor = new("Window.TitlebarCloseButtonBorder"),
@@ -75,7 +75,7 @@ internal static class WindowStyles
                     Color = new("Window.TitlebarCloseButtonX"),
                     OutlineColor = new("Window.TitlebarCloseButtonXOutline"),
                     TextOverflow = true,
-                    Margin = new() { Top = 2, Right = 4 },
+                    Margin = new() { Top = 3, Right = 4 },
                     IsAntialiased = false,
                 }
             ),
@@ -92,9 +92,12 @@ internal static class WindowStyles
                 ".window--content",
                 new()
                 {
+                    BorderColor = new(new("Window.TitlebarBorder")),
+                    BorderWidth = new(0, 1, 1, 1),
+                    IsAntialiased = false,
                     Anchor = Anchor.TopLeft,
                     Flow = Flow.Vertical,
-                    BorderRadius = 5,
+                    BorderRadius = 6,
                     RoundedCorners = RoundedCorners.BottomLeft | RoundedCorners.BottomRight,
                     ScrollbarTrackColor = new("Window.ScrollbarTrack"),
                     ScrollbarThumbColor = new("Window.ScrollbarThumb"),

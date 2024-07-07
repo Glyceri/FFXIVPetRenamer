@@ -1,25 +1,47 @@
-﻿using Una.Drawing;
+﻿using Dalamud.Interface.Textures;
+using ImGuiNET;
+using PetRenamer.PetNicknames.Services;
+using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class IconNode : Node
 {
-    public IconNode(uint iconId)
+    ISharedImmediateTexture SharedTexture { get; }
+    Node INode;
+
+    public uint? IconID { get => INode.Style.IconId; set => INode.Style.IconId = value; }
+
+    public IconNode(in DalamudServices DalamudServices, uint iconId)
     {
-        Style = new Style()
-        {
-            IconId = iconId,
-            Anchor = Anchor.MiddleCenter,
-        };
+        SharedTexture = DalamudServices.TextureProvider.GetFromGame("ui/uld/DragTargetA_hr1.tex");
+        ChildNodes = [
+            INode = new Node()
+            {
+                Style = new Style()
+                {
+                    IconId = iconId,
+                    Opacity = 0.8f,
+                    Anchor = Anchor.MiddleCenter,
+                    Margin = new(16),
+                }
+            }
+        ];
 
         BeforeReflow += _ => 
         {
-            EdgeSize PaddingSize = new EdgeSize();
-            EdgeSize MarginSize = new EdgeSize();
-            if (ParentNode!.ComputedStyle.Padding != null) PaddingSize = ParentNode!.ComputedStyle.Padding;
-            if (ParentNode!.ComputedStyle.Margin != null) MarginSize = ParentNode!.ComputedStyle.Margin;
-            Style.Size = (ParentNode!.Bounds.ContentSize - PaddingSize.Size - MarginSize.Size) / ScaleFactor;
+            EdgeSize SelfPaddingSize = INode.ComputedStyle.Padding;
+            EdgeSize SelfMarginSize = INode.ComputedStyle.Margin;
+            INode.Style.Size = (ParentNode!.ComputedStyle.Size - SelfPaddingSize.Size - SelfMarginSize.Size) / ScaleFactor;
             return true;
         };
+    }
+
+    protected override void OnDraw(ImDrawListPtr drawList)
+    {
+        nint handle = SharedTexture.GetWrapOrEmpty().ImGuiHandle;
+        Rect contentRect = Bounds.ContentRect;
+        drawList.AddImageQuad(handle, contentRect.BottomRight, contentRect.BottomLeft, contentRect.TopLeft, contentRect.TopRight);
+        base.OnDraw(drawList);
     }
 }

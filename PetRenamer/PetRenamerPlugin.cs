@@ -56,6 +56,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
             HelpMessage = "Temporary",
             ShowInHelp = true
         });
+
+        _DalamudServices.CommandManager.AddHandler("/petlist", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetListWindow>())
+        {
+            HelpMessage = "Temporary",
+            ShowInHelp = true
+        });
     }
 
     public void Dispose()

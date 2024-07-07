@@ -101,7 +101,7 @@ internal partial class PetRenameWindow : PetWindow
 
         if (petRenameNode == null)
         {
-            AddNode(Node, petRenameNode = new PetRenameNode(customName, in data));
+            AddNode(Node, petRenameNode = new PetRenameNode(customName, in data, in DalamudServices));
             petRenameNode.OnSave += OnSave;
         }
         else 
@@ -121,12 +121,5 @@ internal partial class PetRenameWindow : PetWindow
 
     void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
 
-    protected sealed override Node Node { get; } = new()
-    {
-        Style = new Style()
-        {
-            Flow = Flow.Horizontal,
-            Padding = new(3, 1, 0, 1)
-        }
-    };
+    protected sealed override Node Node { get; } = new() { };
 }

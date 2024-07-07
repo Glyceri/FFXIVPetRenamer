@@ -61,18 +61,18 @@ internal abstract partial class PetWindow : Window, IPetWindow
             IsFocused = ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows);
             IsHovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows);
 
-            Vector2 size = ImGui.GetWindowSize() / Node.ScaleFactor;
+            Vector2 size = ImGui.GetWindowSize() * (1.0f / Node.ScaleFactor);
             size.X = (float)Math.Floor(size.X);
             size.Y = (float)Math.Floor(size.Y);
 
-            _windowNode.Style.Size = new Size((int)size.X - 2, (int)size.Y - 2);
+            _windowNode.Style.Size = new Size((int)size.X - 3, (int)size.Y - 3);
 
-            TitlebarNode.Style.Size = new((int)size.X - 7, 32);
+            TitlebarNode.Style.Size = new((int)size.X - 9, 32);
             TitlebarTextNode.Style.Size = new((int)size.X - 64, 32);
 
-            ContentNode.Style.Size = new((int)size.X - 7, (int)size.Y - 39);
+            ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
             Node.Style.Margin = new(1);
-            ContentSize = new(ContentNode.Style.Size.Width - 2, ContentNode.Style.Size.Height - 2);
+            ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
             Node.Style.Size = ContentSize;
 
             // Only enable shadow if the window has focus.
