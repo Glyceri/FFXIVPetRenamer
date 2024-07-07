@@ -7,6 +7,7 @@ internal interface IPettableDatabaseEntry
     ulong ContentID { get; }
     string Name { get; }
     ushort Homeworld { get; }
+    string HomeworldName { get; }
 
     bool Dirty { get; }
     bool IsActive { get; }

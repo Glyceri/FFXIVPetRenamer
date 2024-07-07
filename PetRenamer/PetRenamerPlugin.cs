@@ -38,8 +38,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         Translator.Initialise(_DalamudServices);
         _PetServices = new PetServices(_DalamudServices);
         PettableUserList = new PettableUserList();
-        PettableDatabase = new PettableDatabase(_PetServices.PetLog);
-        LegacyDatabase = new LegacyPettableDatabase(_PetServices.Configuration, _PetServices.PetLog);
+        PettableDatabase = new PettableDatabase(in _PetServices);
+        LegacyDatabase = new LegacyPettableDatabase(_PetServices.Configuration, in _PetServices);
         UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LegacyDatabase, PettableDatabase, _PetServices);
         HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);

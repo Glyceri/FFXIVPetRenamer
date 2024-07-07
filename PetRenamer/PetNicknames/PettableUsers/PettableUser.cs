@@ -30,6 +30,7 @@ internal unsafe class PettableUser : IPettableUser
     public bool IsLocalPlayer { get; private set; }
     public bool Destroyed { get; private set; }
     public bool IsDirty { get; private set; }
+    public string HomeworldName { get; private set; }
 
     uint lastCast;
 
@@ -41,6 +42,7 @@ internal unsafe class PettableUser : IPettableUser
         Name = BattleChara->NameString;
         ContentID = BattleChara->ContentId;
         Homeworld = BattleChara->HomeWorld;
+        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld)?? "[No Homeworld Found]";
         ObjectID = BattleChara->GetGameObjectId();
         ShortObjectID = BattleChara->GetGameObjectId().ObjectId;
         Touched = true;

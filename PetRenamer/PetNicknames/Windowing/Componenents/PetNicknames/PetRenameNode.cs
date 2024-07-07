@@ -47,25 +47,25 @@ internal class PetRenameNode : Node
                 ClassList = ["RenameNode"],
                 ChildNodes = [
                 HeaderNode = new Node()
-                  {
-                      Stylesheet = PetRenameStyleSheet,
-                      ClassList = ["RenameElementTopText", "RenameElementStyle", "RenameElementMargin"],
-                      NodeValue = string.Format(Translator.GetLine(customName == null ? "PetRenameNode.IsNotRenamed" : "PetRenameNode.IsRenamed"), activePet.BaseSingular),
-                  },
-                  TextNode = new Node()
-                  {
-                      Stylesheet = PetRenameStyleSheet,
-                      ClassList = ["RenameElementTopText", "RenameElementStyle", "RenameElementMargin"],
-                      NodeValue = customName ?? "",
-                  },
-                  InputField = new StringInputNode("RenameNode", customName ?? "", PluginConstants.ffxivNameSize)
-                  {
-                      Stylesheet = PetRenameStyleSheet,
-                      ClassList = ["RenameElementStyle", "RenameElementMargin"],
-                  },
-                  new Node()
-                  {
-                      ChildNodes =
+                {
+                    Stylesheet = PetRenameStyleSheet,
+                    ClassList = ["RenameElementTopText", "RenameElementStyle", "RenameElementMargin"],
+                    NodeValue = string.Format(Translator.GetLine(customName == null ? "PetRenameNode.IsNotRenamed" : "PetRenameNode.IsRenamed"), activePet.BaseSingular),
+                },
+                    TextNode = new Node()
+                    {
+                        Stylesheet = PetRenameStyleSheet,
+                        ClassList = ["RenameElementTopText", "RenameElementStyle", "RenameElementMargin"],
+                        NodeValue = customName ?? "",
+                    },
+                    InputField = new StringInputNode("RenameNode", customName ?? "", PluginConstants.ffxivNameSize)
+                    {
+                        Stylesheet = PetRenameStyleSheet,
+                        ClassList = ["RenameElementStyle", "RenameElementMargin"],
+                    },
+                    new Node()
+                    {
+                        ChildNodes =
                       [
                           SaveButton = new Node()
                           {
@@ -80,21 +80,21 @@ internal class PetRenameNode : Node
                               NodeValue = Translator.GetLine("PetRenameNode.ClearNickname"),
                           }
                       ]
-                  }
+                    }
                 ]
             },
-             ImageNode = new Node()
-              {
-                  Stylesheet = PetRenameStyleSheet,
-                  ClassList = ["ImageNode"],
-                  ChildNodes =
+            ImageNode = new Node()
+            {
+                Stylesheet = PetRenameStyleSheet,
+                ClassList = ["ImageNode"],
+                ChildNodes =
                       [
                           IconNode = new IconNode(in DalamudServices, activePet.Icon)
                           {
                               ClassList = ["IconElement"],
                           }
                       ],
-                  }
+            }
         ];
 
         InputField.OnValueChanged += (str) => CurrentValue = str;
@@ -137,27 +137,27 @@ internal class PetRenameNode : Node
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.BottomLeft,
                 StrokeRadius = 6,
-                BorderColor = new(new("Window.TitlebarBorder")),
-                BorderWidth = new EdgeSize(1),
+                //BorderColor = new(new("Window.TitlebarBorder")),
+                //BorderWidth = new EdgeSize(1),
                 Flow = Flow.Vertical,
             }),
             new(".ImageNode", new Style()
             {
                 BorderColor = new(new("Window.TitlebarBorder")),
-                BorderWidth = new EdgeSize(0, 0, 0, 1),
+                BorderWidth = new EdgeSize(0, 0, 0, 2),
                 BorderRadius = 6,
                 StrokeRadius = 6,
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.BottomRight,
-                ShadowSize = new EdgeSize(0, 0, 0, 32),
+                //ShadowSize = new EdgeSize(0, 0, 0, 32),
             }),
             new(".RenameElementStyle", new Style()
             {
                 BackgroundColor = new Color("Window.Background"),
                 BorderColor = new(new("Window.TitlebarBorder")),
-                BorderWidth = new EdgeSize(1, 1, 1, 1),
-                BorderRadius = 6,
-                StrokeRadius = 6,
+                BorderWidth = new EdgeSize(2, 2, 2, 2),
+                BorderRadius = 8,
+                StrokeRadius = 8,
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.All,
             }),
@@ -171,6 +171,7 @@ internal class PetRenameNode : Node
             }),
             new(".RenameElementTopText", new Style()
             {
+                IsAntialiased = false,
                 TextShadowSize = 2,
                 TextShadowColor = new Color("Window.TitlebarTextOutline"),
                 FontSize = 15,
@@ -193,7 +194,7 @@ internal class PetRenameNode : Node
             }),
             new(".IconElement", new Style()
             {
-                Margin = new(0),                
+                Margin = new(0),
             })
         ]
     );

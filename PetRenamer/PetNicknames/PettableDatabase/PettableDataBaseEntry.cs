@@ -1,5 +1,7 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -17,16 +19,20 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
     bool _dirty;
     public bool Dirty { get => _dirty || ActiveDatabase.IsDirty; }
-    
+    public string HomeworldName { get; private set; }
 
-    public PettableDataBaseEntry(ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool isActive)
+    readonly IPetServices PetServices;
+
+    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool isActive)
     {
+        PetServices = petServices;
         ContentID = contentID;
         Name = name;
         ActiveDatabase = new PettableNameDatabase(ids, names);
         IsActive = isActive;
         Homeworld = homeworld;
         SoftSkeletons = softSkeletons;
+        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
     }
 
     public void UpdateEntry(IPettableUser pettableUser)
@@ -44,6 +50,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.ActiveDatabase = this.ActiveDatabase;
         pEntry.Name = this.Name;
         pEntry.Homeworld = this.Homeworld;
+        pEntry.HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
         pEntry.ContentID = this.ContentID;
         pEntry.IsActive = true;
         pEntry.SoftSkeletons = this.SoftSkeletons;

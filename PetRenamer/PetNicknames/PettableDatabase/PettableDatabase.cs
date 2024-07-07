@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
@@ -11,11 +12,11 @@ internal class PettableDatabase : IPettableDatabase
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
 
-    IPetLog petLog;
+    readonly IPetServices PetServices;
 
-    public PettableDatabase(IPetLog PetLog)
+    public PettableDatabase(in IPetServices petSerivces)
     {
-        petLog = PetLog;
+        PetServices = petSerivces;
     }
 
     public IPettableDatabaseEntry? GetEntry(string name)
@@ -41,7 +42,7 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
