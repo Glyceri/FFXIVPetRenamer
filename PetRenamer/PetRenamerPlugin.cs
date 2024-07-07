@@ -7,13 +7,11 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update;
 using PetRenamer.PetNicknames.Windowing;
-using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Chat;
 using PetRenamer.PetNicknames.Commands;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
-using Una.Drawing;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 
@@ -48,12 +46,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
 
-        WindowHandler.AddWindow(new TempWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
+        WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
-        WindowHandler.Open<TempWindow>();
+        WindowHandler.Open<PetRenameWindow>();
         WindowHandler.Open<PetListWindow>();
 
-        _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<TempWindow>())
+        _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {
             HelpMessage = "Temporary",
             ShowInHelp = true

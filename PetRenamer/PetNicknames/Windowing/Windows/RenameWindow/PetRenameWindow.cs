@@ -11,7 +11,7 @@ using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 
-internal partial class TempWindow : PetWindow
+internal partial class PetRenameWindow : PetWindow
 {
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
@@ -31,7 +31,7 @@ internal partial class TempWindow : PetWindow
     int activeSkeleton = 0;
     string? lastCustomName = null!;
 
-    public TempWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window")
+    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window")
     {
         UserList = userList;
         Database = database;
