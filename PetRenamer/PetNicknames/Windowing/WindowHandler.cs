@@ -64,6 +64,14 @@ internal class WindowHandler : IWindowHandler
                 tWindow.Close();
     }
 
+    public T? GetWindow<T>() where T : PetWindow
+    {
+        foreach (IPetWindow window in WindowSystem.Windows)
+            if (window is T tWindow)
+                return tWindow;
+        return null;
+    }
+
     public void Toggle<T>() where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows)

@@ -33,7 +33,7 @@ internal class LegacyDatabaseHelper : IUpdatable
     
     double timer = secondsPerCheck;
 
-    public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
+    public void OnUpdate(IFramework framework)
     {
         double elapsedSeconds = framework.UpdateDelta.TotalSeconds;
         timer += elapsedSeconds;

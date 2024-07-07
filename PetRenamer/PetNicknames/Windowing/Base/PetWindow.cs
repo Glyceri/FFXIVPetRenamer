@@ -11,7 +11,7 @@ namespace PetRenamer.PetNicknames.Windowing.Base;
 
 internal abstract partial class PetWindow : Window, IPetWindow
 {
-    protected PetWindowMode currentMode { get; private set; }
+    protected PetWindowMode CurrentMode { get; private set; }
 
     protected abstract string ID { get; }
     protected abstract Vector2 MinSize { get; }
@@ -29,7 +29,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected abstract string Title { get; }
 
-    readonly DalamudServices DalamudServices;
+    protected readonly DalamudServices DalamudServices;
 
     protected PetWindow(DalamudServices dalamudServices, string name) : base(name, ImGuiWindowFlags, true)
     {

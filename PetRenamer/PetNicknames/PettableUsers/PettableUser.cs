@@ -28,6 +28,8 @@ internal unsafe class PettableUser : IPettableUser
     public uint ShortObjectID { get; private set; }
     public uint CurrentCastID { get; private set; }
     public bool IsLocalPlayer { get; private set; }
+    public bool Destroyed { get; private set; }
+    public bool IsDirty { get; private set; }
 
     uint lastCast;
 
@@ -49,10 +51,7 @@ internal unsafe class PettableUser : IPettableUser
         if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID);
     }
 
-    public void Destroy()
-    {
-
-    }
+    public void Destroy() => Destroyed = true;
 
     public void Set(Pointer<BattleChara> pointer)
     {
@@ -122,6 +121,8 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
+        if (IsDirty) NotifyOfDirty();
+
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet pet = PettablePets[i];
@@ -130,6 +131,7 @@ internal unsafe class PettableUser : IPettableUser
             {
                 pet.Destroy();
                 PettablePets.RemoveAt(i);
+                IsDirty = true;
                 continue;
             }
 
@@ -157,6 +159,7 @@ internal unsafe class PettableUser : IPettableUser
 
     void CreateNewPet(IPettablePet pet)
     {
+        IsDirty = true;
         PettablePets.Add(pet);
     }
 
@@ -211,4 +214,10 @@ internal unsafe class PettableUser : IPettableUser
     }
 
     bool CastCheck(uint castID) => lastCast == castID && CurrentCastID != castID;
+
+    public void NotifyOfDirty()
+    {
+        IsDirty = false;
+        DataBaseEntry.NotifySeenDirty();
+    }
 }

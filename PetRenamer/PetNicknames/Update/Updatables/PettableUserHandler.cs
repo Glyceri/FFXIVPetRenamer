@@ -36,7 +36,7 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     List<Pointer<BattleChara>> availablePets = new List<Pointer<BattleChara>>();
 
-    public void OnUpdate(IFramework framework, IPlayerCharacter playerCharacter)
+    public void OnUpdate(IFramework framework)
     {
         Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
         int charaSpanLength = charaSpan.Length;
@@ -78,7 +78,9 @@ internal unsafe class PettableUserHandler : IUpdatable
 
         IPettableUser?[] users = PettableUserList.pettableUsers;
         int size = users.Length;
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
+        {
             users[i]?.CalculateBattlepets(ref availablePets);
+        }
     }
 }

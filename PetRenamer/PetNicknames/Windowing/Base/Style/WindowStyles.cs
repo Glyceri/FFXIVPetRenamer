@@ -114,12 +114,16 @@ internal static class WindowStyles
         Color.AssignByName("Titlebar.Base", new Color(255, 255, 255).ToUInt());
         Color.AssignByName("Window.Border:Active", new Color(45, 89, 83).ToUInt());
 
+        Color.AssignByName("PetNicknamesButton", new Color(0, 51, 0).ToUInt());
+        Color.AssignByName("PetNicknamesButton:Hover", new Color(0, 80, 0).ToUInt());
+
         Color.AssignByName("Window.Border:Inactive", 0xFF404040);
         Color.AssignByName("ModeToggleButton.Border:Active", 0xFF484848);
         Color.AssignByName("ModeToggleButton.Border:Hover", new Color(50, 50, 50).ToUInt());
 
         Color.AssignByName("Window.Background", 0xFF212021);
         Color.AssignByName("Window.BackgroundLight", 0xFF292829);
+
         Color.AssignByName("Window.TitlebarBackground", 0xFF101010);
         Color.AssignByName("Window.TitlebarBorder", 0xFF404040);
         Color.AssignByName("Window.TitlebarGradient1", 0xFF2F2E2F);

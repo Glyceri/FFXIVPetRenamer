@@ -15,6 +15,8 @@ internal interface IPettableUser : IBattleUser
     bool Touched { get; set; }
     nint User { get; }
     bool IsLocalPlayer { get; }
+    bool IsDirty { get; }
+    bool Destroyed { get; }
 
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }
@@ -25,6 +27,7 @@ internal interface IPettableUser : IBattleUser
     void OnLastCastChanged(uint cast);
     void Set(Pointer<BattleChara> pointer);
     void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
+    void NotifyOfDirty();
 
     void Destroy();
 

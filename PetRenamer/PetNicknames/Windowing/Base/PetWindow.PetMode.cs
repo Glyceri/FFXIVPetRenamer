@@ -32,7 +32,7 @@ internal partial class PetWindow
     public void SetPetMode(PetWindowMode mode)
     {
         activeModeToggleNode?.SetActivePetMode(mode);
-        currentMode = mode;
+        CurrentMode = mode;
 
         if (HasModeToggle)
         {

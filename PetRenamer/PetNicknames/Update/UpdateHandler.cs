@@ -45,15 +45,12 @@ internal class UpdateHandler : IDisposable
 
     void OnUpdate(IFramework framework)
     {
-        IPlayerCharacter player = DalamudServices.ClientState.LocalPlayer!;
-        if (player == null) return;
-
         int updatableCount = _updatables.Count;
         for(int i = 0; i < updatableCount; i++)
         {
             IUpdatable updatable = _updatables[i];
             if (!updatable.Enabled) continue;
-            updatable.OnUpdate(framework, player);
+            updatable.OnUpdate(framework);
         }
     }
 

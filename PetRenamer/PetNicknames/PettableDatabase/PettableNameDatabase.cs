@@ -30,6 +30,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     public void SetName(int ID, string? name)
     {
+        if (ID == -1) return;
         if (name == string.Empty) name = null;
         IsDirty = true;
         int index = IndexOf(ID);

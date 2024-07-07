@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game;
 using PetRenamer.PetNicknames.Services;
 using System.Collections.Generic;
+
 namespace PetRenamer.PetNicknames.TranslatorSystem;
 
 internal static class Translator
@@ -11,14 +12,18 @@ internal static class Translator
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.IsRenamed", "Your {0} has the nickname {1}." },
+        { "PetRenameNode.IsRenamed", "Your {0} has the nickname:" },
         { "PetRenameNode.IsNotRenamed", "Your {0} has no nickname." },
+        { "PetRenameNode.SaveNickname", "Save Nickname" },
+        { "PetRenameNode.ClearNickname", "Clear Nickname" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.IsRenamed", "Ihr {0} trägt den Spitznamen {1}." },
+        { "PetRenameNode.IsRenamed", "Ihr {0} trägt den Spitznamen:" },
         { "PetRenameNode.IsNotRenamed", "Ihr {0} hat keinen Spitznamen." },
+        { "PetRenameNode.SaveNickname", "Spitznamen Speichern" },
+        { "PetRenameNode.ClearNickname", "Spitznamen Löschen" },
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()

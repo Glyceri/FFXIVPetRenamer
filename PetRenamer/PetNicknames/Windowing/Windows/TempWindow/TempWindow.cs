@@ -5,7 +5,10 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
+using Una.Drawing;
+using static FFXIVClientStructs.FFXIV.Client.UI.Misc.AozNoteModule;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 
@@ -15,9 +18,9 @@ internal partial class TempWindow : PetWindow
     readonly IPettableDatabase Database;
     readonly IPetServices PetServices;
 
-    protected override Vector2 MinSize { get; } = new Vector2(400, 190);
+    protected override Vector2 MinSize { get; } = new Vector2(550, 190);
     protected override Vector2 MaxSize { get; } = new Vector2(1500, 190);
-    protected override Vector2 DefaultSize { get; } = new Vector2(400, 190);
+    protected override Vector2 DefaultSize { get; } = new Vector2(550, 190);
     protected override bool HasModeToggle { get; } = true;
 
     protected override string Title { get; } = "Pet Nicknames";
@@ -29,6 +32,10 @@ internal partial class TempWindow : PetWindow
 
     PetRenameNode? petRenameNode;
 
+    IPettableUser? ActiveUser;
+    int activeSkeleton = 0;
+    string? lastCustomName = null!;
+
     public TempWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window")
     {
         UserList = userList;
@@ -38,18 +45,79 @@ internal partial class TempWindow : PetWindow
 
     public unsafe override void OnDaw()
     {
-        if (petRenameNode == null)
+        ActiveUser = UserList.LocalPlayer;
+        if (ActiveUser == null || activeSkeleton == -1) 
+        { 
+            CleanOldNode();
+        }
+        if (ActiveUser != null)
         {
-            IPettableUser? localPlayer = UserList.LocalPlayer;
-            if (localPlayer == null) return;
-
-            IPettablePet? localMinion = localPlayer.GetYoungestPet(IPettableUser.PetFilter.Minion);
-            if (localMinion == null) return;
-
-            IPetSheetData? sheetData = localMinion.PetData;
-            if (sheetData == null) return;
-
-            Node.AppendChild(petRenameNode = new PetRenameNode(in localPlayer, in sheetData));
+            if (ActiveUser.IsDirty)
+            {
+                GetActiveSkeleton();
+            }
         }
     }
+
+    public override void OnOpen() => GetActiveSkeleton();
+
+    public void SetRenameWindow(int newSkeleton, bool openWindow = false)
+    {
+        activeSkeleton = newSkeleton;
+        if (openWindow) IsOpen = true;
+        if (activeSkeleton >= -1) SetPetMode(PetWindowMode.Minion);
+        else SetPetMode(PetWindowMode.BattlePet);
+    }
+
+    protected override void OnPetModeChanged(PetWindowMode mode) => GetActiveSkeleton();
+
+    void GetActiveSkeleton()
+    {
+        if (ActiveUser == null) return;
+        IPettablePet? pet = ActiveUser.GetYoungestPet(CurrentMode == PetWindowMode.Minion ? IPettableUser.PetFilter.Minion : IPettableUser.PetFilter.BattlePet);
+        if (pet == null)
+        {
+            activeSkeleton = -1;
+            return;
+        }
+        bool dirty = activeSkeleton != pet.SkeletonID;
+        string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
+        if (lastCustomName != customName)
+        {
+            lastCustomName = customName;
+            dirty = true;
+        }
+
+        activeSkeleton = pet.SkeletonID;
+        if (dirty) SetNewNode();
+    }
+
+    void SetNewNode()
+    {
+        if (!IsOpen) return;
+        if (ActiveUser == null) return;
+        if (activeSkeleton == -1) return;
+
+        IPetSheetData? data = PetServices.PetSheets.GetPet(activeSkeleton);
+        if (data == null) return;
+
+        string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
+        lastCustomName = customName;
+
+        CleanOldNode();
+        Node.AppendChild(petRenameNode = new PetRenameNode(customName, in data));
+        petRenameNode.Reflow();
+        petRenameNode.OnSave += OnSave;
+    }
+
+    void CleanOldNode()
+    {
+        if (petRenameNode == null) return;
+        Node.RemoveChild(petRenameNode);
+        petRenameNode.OnSave -= OnSave;
+        petRenameNode?.Dispose();
+        petRenameNode = null;
+    }
+
+    void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
 }
