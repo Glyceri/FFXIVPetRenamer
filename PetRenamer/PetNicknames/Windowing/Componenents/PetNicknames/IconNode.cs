@@ -8,8 +8,18 @@ internal class IconNode : Node
     {
         Style = new Style()
         {
-            Size = new Size(64, 64),
             IconId = iconId,
+            Anchor = Anchor.MiddleCenter,
+        };
+
+        BeforeReflow += _ => 
+        {
+            EdgeSize PaddingSize = new EdgeSize();
+            EdgeSize MarginSize = new EdgeSize();
+            if (ParentNode!.ComputedStyle.Padding != null) PaddingSize = ParentNode!.ComputedStyle.Padding;
+            if (ParentNode!.ComputedStyle.Margin != null) MarginSize = ParentNode!.ComputedStyle.Margin;
+            Style.Size = (ParentNode!.Bounds.ContentSize - PaddingSize.Size - MarginSize.Size) / ScaleFactor;
+            return true;
         };
     }
 }

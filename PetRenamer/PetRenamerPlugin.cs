@@ -14,6 +14,7 @@ using PetRenamer.PetNicknames.Commands;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 using Una.Drawing;
+using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer;
 
@@ -35,6 +36,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
+        Translator.Initialise(_DalamudServices);
         _PetServices = new PetServices(_DalamudServices);
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(_PetServices.PetLog);

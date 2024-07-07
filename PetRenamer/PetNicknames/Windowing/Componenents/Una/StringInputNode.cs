@@ -20,18 +20,6 @@ internal class StringInputNode : Node
         }
     }
 
-    public string? Label
-    {
-        get => (string?)LabelNode.NodeValue;
-        set => LabelNode.NodeValue = value;
-    }
-
-    public string? Description
-    {
-        get => (string?)DescriptionNode.NodeValue;
-        set => DescriptionNode.NodeValue = value;
-    }
-
     public uint MaxLength { get; set; }
 
     private string _value;
@@ -41,9 +29,6 @@ internal class StringInputNode : Node
         string id,
         string value,
         uint maxLength,
-        string? label = null,
-        string? description = null,
-        int leftMargin = 32,
         bool immediate = false
     )
     {
@@ -55,55 +40,17 @@ internal class StringInputNode : Node
         ClassList = ["input"];
         Stylesheet = InputStylesheet;
 
-        Style = new()
-        {
-            Padding = new() { Left = leftMargin },
-        };
-
         ChildNodes = [
-            new()
-            {
-                ClassList = ["input--label"],
-                NodeValue = label,
-            },
             new()
             {
                 ClassList = ["input--box"],
             },
-            new()
-            {
-                ClassList = ["input--description"],
-                NodeValue = description,
-            },
         ];
 
-        BeforeReflow += _ => {
-            int maxWidth = ParentNode!.Bounds.ContentSize.Width - ParentNode!.ComputedStyle.Padding.HorizontalSize;
-            int padding = ComputedStyle.Gap + (int)(leftMargin * ScaleFactor);
-            int width = (int)((maxWidth - padding) / ScaleFactor);
-            int labelHeight;
-
-            LabelNode.Style.IsVisible = LabelNode.NodeValue is not null;
-
-            if (LabelNode.Style.Size?.Width == width && DescriptionNode.Style.Size?.Width == width)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty((string?)DescriptionNode.NodeValue))
-            {
-                DescriptionNode.Style.IsVisible = false;
-                labelHeight = 24;
-            }
-            else
-            {
-                DescriptionNode.Style.IsVisible = true;
-                labelHeight = 0;
-            }
-
-            LabelNode.Style.Size = new(width, labelHeight);
-            DescriptionNode.Style.Size = new(width, 0);
-            SelectBoxNode.Style.Size = new(width, 26);
+        BeforeReflow += _ =>
+        {
+            SelectBoxNode.Style.Size = (SelectBoxNode.ParentNode!.Bounds.ContentSize - SelectBoxNode.ParentNode!.ComputedStyle.Margin.Size * 2) / ScaleFactor;
+            SelectBoxNode.Style.Margin = SelectBoxNode.ParentNode!.ComputedStyle.Margin;
 
             return true;
         };
@@ -144,8 +91,6 @@ internal class StringInputNode : Node
     }
 
     private Node SelectBoxNode => QuerySelector(".input--box")!;
-    private Node LabelNode => QuerySelector(".input--label")!;
-    private Node DescriptionNode => QuerySelector(".input--description")!;
 
     private static Stylesheet InputStylesheet { get; } = new(
         [

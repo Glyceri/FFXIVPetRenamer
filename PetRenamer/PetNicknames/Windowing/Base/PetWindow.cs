@@ -103,12 +103,14 @@ internal abstract partial class PetWindow : Window, IPetWindow
         ImGui.SetCursorPos(new(0, 0));
         ImGui.BeginChild($"PetWindow_{id}##{instanceId}", ImGui.GetWindowSize(), false);
 
-        OnDaw();
+        // Here to ensure stylevars get popped
+        try { OnDaw(); } catch (Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
 
         Vector2 ps = ImGui.GetWindowPos();
         Point pt = new((int)ps.X + 2, (int)ps.Y + 2);
 
-        _windowNode.Render(drawList, pt);
+        // Here to ensure stylevars get popped
+        try { _windowNode.Render(drawList, pt); } catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
 
         ImGui.EndChild();
     }
