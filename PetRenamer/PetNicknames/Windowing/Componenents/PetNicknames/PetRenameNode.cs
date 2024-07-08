@@ -200,7 +200,7 @@ internal class PetRenameNode : Node
 
         if (editMode)
         {
-            ImGui.SetCursorPos(new Vector2(178, 337));
+            ImGui.SetCursorPos(new Vector2(89 * Node.ScaleFactor, 168.5f * Node.ScaleFactor));
             ImGui.SetNextItemWidth(NicknameNode.TextNode.Bounds.ContentRect.Width - NicknameNode.LabelNode.Bounds.ContentRect.Width);
             if (ImGui.InputText($"##RenameField", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
             {
@@ -222,12 +222,12 @@ internal class PetRenameNode : Node
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;
 
-        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(2, 0);
+        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
         Vector2 earlyiconPos = iconPos - new Vector2(45, 0);
 
-        drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 4);
-        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 4);
+        drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
     }
 
     Stylesheet stylesheet = new Stylesheet([

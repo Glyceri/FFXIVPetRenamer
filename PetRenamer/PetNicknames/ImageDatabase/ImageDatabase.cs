@@ -29,7 +29,7 @@ internal class ImageDatabase : IImageDatabase
         PettableDatabase = pettableDatabase;
         Networker = networker;
         ImageDownloader = new ImageDownloader(DalamudServices, PetServices, Networker, this);
-        SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(201).RentAsync().Result;
+        SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(66310).RentAsync().Result;
     }
 
     public IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry databaseEntry)

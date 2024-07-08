@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
@@ -23,7 +24,7 @@ internal partial class PetRenameWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(550, 250);
     protected override bool HasModeToggle { get; } = true;
 
-    protected override string Title { get; } = "Pet Nicknames";
+    protected override string Title { get; } = Translator.GetLine("PetRenameWindow.Title");
     protected override string ID { get; } = "PetRenameWindow";
 
     PetRenameNode? petRenameNode;

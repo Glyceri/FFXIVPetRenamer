@@ -20,6 +20,7 @@ internal static class Translator
         { "PetRenameNode.Clear", "Clear" },
         { "PetRenameNode.Save", "Save" },
         { "PetRenameNode.Cancel", "Cancel" },
+        { "PetRenameWindow.Title", "Pet Passport" }
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -32,6 +33,7 @@ internal static class Translator
         { "PetRenameNode.Clear", "Löschen" },
         { "PetRenameNode.Save", "Speichern" },
         { "PetRenameNode.Cancel", "Abbrechen" },
+        { "PetRenameWindow.Title", "Heimtierausweis" }
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()
