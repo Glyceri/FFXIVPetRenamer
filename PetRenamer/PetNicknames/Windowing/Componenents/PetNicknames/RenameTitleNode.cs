@@ -8,8 +8,8 @@ internal class RenameTitleNode : Node
     readonly string Label;
 
     public readonly Node UnderlineNode;
-
-    readonly Node TextNode;
+    public readonly Node TextNode;
+    public readonly Node LabelNode;
 
     public Action? Hovered;
     public Action? HoveredExit;
@@ -20,7 +20,7 @@ internal class RenameTitleNode : Node
         
         Style.Size = new Size(370, 25);
         ChildNodes = [
-            new Node()
+            LabelNode = new Node()
             {
                 Stylesheet = stylesheet,
                 ClassList = ["LabelNode"],
@@ -41,14 +41,28 @@ internal class RenameTitleNode : Node
             }
         ];
 
-        TextNode.OnMouseEnter += _ => Hovered?.Invoke();
-        TextNode.OnMouseLeave += _ => HoveredExit?.Invoke();
+        if (text != string.Empty)
+        {
+            TextNode.OnMouseEnter += HoverInvoke;
+            TextNode.OnMouseLeave += HoverExitInvoke;
+        }
     }
 
+    void HoverInvoke(Node _) => Hovered?.Invoke();
+    void HoverExitInvoke(Node _) => HoveredExit?.Invoke();
 
     public void SetText(string text)
     {
         TextNode.NodeValue = text;
+
+        TextNode.OnMouseEnter -= HoverInvoke;
+        TextNode.OnMouseLeave -= HoverExitInvoke;
+
+        if (text != string.Empty)
+        {
+            TextNode.OnMouseEnter += HoverInvoke;
+            TextNode.OnMouseLeave += HoverExitInvoke;
+        }
     }
 
     Stylesheet stylesheet = new Stylesheet([

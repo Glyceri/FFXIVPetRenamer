@@ -39,6 +39,7 @@ internal partial class PetRenameWindow : PetWindow
         Database = database;
         PetServices = petServices;
         AddNode(Node, petRenameNode = new PetRenameNode(null, null, in DalamudServices));
+        petRenameNode.OnSave += OnSave;
     }
 
     public unsafe override void OnDraw()

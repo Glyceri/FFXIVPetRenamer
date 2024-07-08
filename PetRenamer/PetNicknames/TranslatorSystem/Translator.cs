@@ -12,18 +12,26 @@ internal static class Translator
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.IsRenamed", "Your {0} has the nickname:" },
-        { "PetRenameNode.IsNotRenamed", "Your {0} has no nickname." },
-        { "PetRenameNode.SaveNickname", "Save Nickname" },
-        { "PetRenameNode.ClearNickname", "Clear Nickname" },
+        { "PetRenameNode.Species", "Species" },
+        { "PetRenameNode.Race", "Race" },
+        { "PetRenameNode.Behaviour", "Behaviour" },
+        { "PetRenameNode.Nickname", "Nickname" },
+        { "PetRenameNode.Edit", "Edit" },
+        { "PetRenameNode.Clear", "Clear" },
+        { "PetRenameNode.Save", "Save" },
+        { "PetRenameNode.Cancel", "Cancel" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.IsRenamed", "Ihr {0} trägt den Spitznamen:" },
-        { "PetRenameNode.IsNotRenamed", "Ihr {0} hat keinen Spitznamen." },
-        { "PetRenameNode.SaveNickname", "Spitznamen Speichern" },
-        { "PetRenameNode.ClearNickname", "Spitznamen Löschen" },
+        { "PetRenameNode.Species", "Spezies" },
+        { "PetRenameNode.Race", "Rasse" },
+        { "PetRenameNode.Behaviour", "Verhalten" },
+        { "PetRenameNode.Nickname", "Spitzname" },
+        { "PetRenameNode.Edit", "Bearbeiten" },
+        { "PetRenameNode.Clear", "Löschen" },
+        { "PetRenameNode.Save", "Speichern" },
+        { "PetRenameNode.Cancel", "Abbrechen" },
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()
@@ -33,10 +41,7 @@ internal static class Translator
 
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.IsRenamed", "{0}のニックネームは" },
-        { "PetRenameNode.IsNotRenamed", "{0}にはニックネームがない" },
-        { "PetRenameNode.SaveNickname", "ニックネームをセーブ" },
-        { "PetRenameNode.ClearNickname", "ニックネームを削除" },
+        
     };
 
     internal static void Initialise(DalamudServices dalamudServices)

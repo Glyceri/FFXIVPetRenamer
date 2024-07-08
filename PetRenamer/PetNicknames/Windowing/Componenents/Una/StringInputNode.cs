@@ -63,8 +63,8 @@ internal class StringInputNode : Node
 
         ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(8, 4));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(8, 4));
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
-        ImGui.PushStyleVar(ImGuiStyleVar.PopupRounding, 0);
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 2);
+        ImGui.PushStyleVar(ImGuiStyleVar.PopupRounding, 2);
 
         ImGui.PushStyleColor(ImGuiCol.Text, new Color("Input.Text").ToUInt());
         ImGui.PushStyleColor(ImGuiCol.PopupBg, new Color("Input.Background").ToUInt());
