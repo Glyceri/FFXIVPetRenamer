@@ -17,9 +17,9 @@ internal partial class PetRenameWindow : PetWindow
     readonly IPettableDatabase Database;
     readonly IPetServices PetServices;
 
-    protected override Vector2 MinSize { get; } = new Vector2(550, 190);
-    protected override Vector2 MaxSize { get; } = new Vector2(1500, 190);
-    protected override Vector2 DefaultSize { get; } = new Vector2(550, 190);
+    protected override Vector2 MinSize { get; } = new Vector2(550, 250);
+    protected override Vector2 MaxSize { get; } = new Vector2(550, 250);
+    protected override Vector2 DefaultSize { get; } = new Vector2(550, 250);
     protected override bool HasModeToggle { get; } = true;
 
     protected override string Title { get; } = "Pet Nicknames";
@@ -28,6 +28,7 @@ internal partial class PetRenameWindow : PetWindow
     PetRenameNode? petRenameNode;
 
     IPettableUser? ActiveUser;
+    IPettableUser? lastActiveUser;
     int activeSkeleton = 0;
     string? lastCustomName = null!;
 
@@ -41,14 +42,15 @@ internal partial class PetRenameWindow : PetWindow
     public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
-        if (ActiveUser == null || activeSkeleton == -1) 
-        { 
+        if (ActiveUser == null || activeSkeleton == -1)
+        {
             CleanOldNode();
         }
         if (ActiveUser != null)
         {
-            if (ActiveUser.IsDirty)
+            if (ActiveUser.IsDirty || lastActiveUser != ActiveUser)
             {
+                lastActiveUser = ActiveUser;
                 GetActiveSkeleton();
             }
         }
@@ -104,7 +106,7 @@ internal partial class PetRenameWindow : PetWindow
             AddNode(Node, petRenameNode = new PetRenameNode(customName, in data, in DalamudServices));
             petRenameNode.OnSave += OnSave;
         }
-        else 
+        else
         {
             petRenameNode.Setup(customName, in data);
         }
@@ -120,6 +122,4 @@ internal partial class PetRenameWindow : PetWindow
     }
 
     void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
-
-    protected sealed override Node Node { get; } = new() { };
 }

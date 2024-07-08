@@ -6,7 +6,7 @@ public static class PluginConstants
 {
     public const string pluginName = "Pet Nicknames";
 
-    public const int ffxivNameSize = 64;
+    public const int ffxivNameSize = 16;
     public const char forbiddenCharacter = '^';
 
     public const int Eos = -407;

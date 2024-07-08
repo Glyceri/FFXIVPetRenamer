@@ -64,16 +64,16 @@ internal static class WindowStyles
                 {
                     Anchor = Anchor.MiddleRight,
                     Size = new(25, 25),
-                    BackgroundColor = new("Window.TitlebarCloseButton"),
-                    StrokeColor = new("Window.TitlebarCloseButtonBorder"),
+                    BackgroundColor = new("Window.BackgroundLight"),
+                    StrokeColor = new("Window.TitlebarBorder"),
                     StrokeWidth = 1,
                     StrokeInset = 0,
                     BorderRadius = 3,
                     TextAlign = Anchor.MiddleCenter,
                     Font = 2,
                     FontSize = 14,
-                    Color = new("Window.TitlebarCloseButtonX"),
-                    OutlineColor = new("Window.TitlebarCloseButtonXOutline"),
+                    Color = new("Window.TextLight"),
+                    OutlineColor = new("Window.TextOutline"),
                     TextOverflow = true,
                     Margin = new() { Top = 3, Right = 4 },
                     IsAntialiased = false,
@@ -83,8 +83,8 @@ internal static class WindowStyles
                 ".window--close-button:hover",
                 new()
                 {
-                    BackgroundColor = new("Window.TitlebarCloseButtonHover"),
-                    Color = new("Window.TitlebarCloseButtonXHover"),
+                    BackgroundColor = new("Window.Background"),
+                    //Color = new("Window.TitlebarCloseButtonXHover"),
                     StrokeWidth = 2,
                 }
             ),
@@ -115,20 +115,38 @@ internal static class WindowStyles
         Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37).ToUInt());
         Color.AssignByName("Titlebar.BattlePet:Dark", new Color(26, 84, 26).ToUInt());
         Color.AssignByName("Titlebar.Base", new Color(255, 255, 255).ToUInt());
-        Color.AssignByName("Window.Border:Active", new Color(45, 89, 83).ToUInt());
+        Color.AssignByName("Window.Border:Active", new Color(224, 183, 18).ToUInt());
 
-        Color.AssignByName("PetNicknamesButton", new Color(0, 51, 0).ToUInt());
-        Color.AssignByName("PetNicknamesButton:Hover", new Color(0, 80, 0).ToUInt());
+        Color.AssignByName("Window.Background", new Color(26, 20, 0, 200).ToUInt());
+        Color.AssignByName("Window.BackgroundLight", new Color(161, 155, 138, 110).ToUInt());
+
+        Color.AssignByName("ModeToggleInactive", new Color(15, 15, 15).ToUInt());
+
+        Color.AssignByName("Window.TextOutline", new Color(189, 141, 6, 190).ToUInt());
+
+        Color.AssignByName("PetNicknamesButton", new Color(91, 120, 83, 150).ToUInt());
+        Color.AssignByName("PetNicknamesButton:Hover", new Color(47, 69, 41, 150).ToUInt());
+
 
         Color.AssignByName("Window.Border:Inactive", 0xFF404040);
         Color.AssignByName("ModeToggleButton.Border:Active", 0xFF484848);
+
         Color.AssignByName("ModeToggleButton.Border:Hover", new Color(50, 50, 50).ToUInt());
 
-        Color.AssignByName("Window.Background", 0xFF212021);
-        Color.AssignByName("Window.BackgroundLight", 0xFF292829);
+        Color.AssignByName("Widget.PopupBackground", 0xFF101010);
+        Color.AssignByName("Widget.PopupBackground.Gradient1", 0xFF2F2E2F);
+        Color.AssignByName("Widget.PopupBackground.Gradient2", 0xFF1A1A1A);
+
+        Color.AssignByName("Window.TitlebarBorder", new Color(176, 169, 120).ToUInt()); //0xFF404040
 
         Color.AssignByName("Window.TitlebarBackground", 0xFF101010);
-        Color.AssignByName("Window.TitlebarBorder", 0xFF404040);
+        Color.AssignByName("Window.Text", 0xFFD0D0D0);
+        Color.AssignByName("Window.TextLight", 0xFFFFFFFF);
+        Color.AssignByName("Window.TextMuted", 0xB0C0C0C0);
+        
+        Color.AssignByName("Window.TextDisabled", 0xA0A0A0A0);
+
+
         Color.AssignByName("Window.TitlebarGradient1", 0xFF2F2E2F);
         Color.AssignByName("Window.TitlebarGradient2", 0xFF1A1A1A);
         Color.AssignByName("Window.TitlebarText", 0xFFD0D0D0);
@@ -143,11 +161,7 @@ internal static class WindowStyles
         Color.AssignByName("Window.ScrollbarThumb", 0xFF484848);
         Color.AssignByName("Window.ScrollbarThumbHover", 0xFF808080);
         Color.AssignByName("Window.ScrollbarThumbActive", 0xFF909090);
-        Color.AssignByName("Window.Text", 0xFFD0D0D0);
-        Color.AssignByName("Window.TextLight", 0xFFFFFFFF);
-        Color.AssignByName("Window.TextMuted", 0xB0C0C0C0);
-        Color.AssignByName("Window.TextOutline", 0xC0000000);
-        Color.AssignByName("Window.TextDisabled", 0xA0A0A0A0);
+
         Color.AssignByName("Window.AccentColor", 0xFF4c8eb9);
         Color.AssignByName("Input.Background", 0xFF151515);
         Color.AssignByName("Input.Border", 0xFF404040);
@@ -179,9 +193,7 @@ internal static class WindowStyles
         Color.AssignByName("Widget.TextHover", 0xFFFFFFFF);
         Color.AssignByName("Widget.TextMuted", 0xFF909090);
         Color.AssignByName("Widget.TextOutline", 0x80000000);
-        Color.AssignByName("Widget.PopupBackground", 0xFF101010);
-        Color.AssignByName("Widget.PopupBackground.Gradient1", 0xFF2F2E2F);
-        Color.AssignByName("Widget.PopupBackground.Gradient2", 0xFF1A1A1A);
+
         Color.AssignByName("Widget.PopupBorder", 0xFF484848);
         Color.AssignByName("Widget.PopupMenuText", 0xFFD0D0D0);
         Color.AssignByName("Widget.PopupMenuTextMuted", 0xFFB0B0B0);

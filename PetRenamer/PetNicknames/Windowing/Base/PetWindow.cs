@@ -1,6 +1,8 @@
-﻿using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface.Utility;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System;
@@ -25,14 +27,15 @@ internal abstract partial class PetWindow : Window, IPetWindow
     public new bool IsFocused { get; private set; }
     public bool IsHovered { get; private set; }
 
-    protected abstract Node Node { get; }
-
     protected abstract string Title { get; }
+
+    protected readonly BackgroundNode Node;
 
     protected readonly DalamudServices DalamudServices;
 
     protected PetWindow(DalamudServices dalamudServices, string name) : base(name, ImGuiWindowFlags, true)
     {
+        Node = new BackgroundNode(in dalamudServices, 194019);
         DalamudServices = dalamudServices;
         CloseButton.OnClick += _ => Close();
 
@@ -47,7 +50,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
     public sealed override void Draw()
     {
         ImGui.SetNextWindowViewport(ImGui.GetMainViewport().ID);
-        ImGui.SetNextWindowSizeConstraints(MinSize * Node.ScaleFactor, MaxSize * Node.ScaleFactor);
+        ImGui.SetNextWindowSizeConstraints(MinSize * Una.Drawing.Node.ScaleFactor, MaxSize * Una.Drawing.Node.ScaleFactor);
         ImGui.SetNextWindowSize(DefaultSize, ImGuiCond.FirstUseEver);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
@@ -61,7 +64,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
             IsFocused = ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows);
             IsHovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows);
 
-            Vector2 size = ImGui.GetWindowSize() * (1.0f / Node.ScaleFactor);
+            Vector2 size = ImGui.GetWindowSize() * (1.0f / Una.Drawing.Node.ScaleFactor);
             size.X = (float)Math.Floor(size.X);
             size.Y = (float)Math.Floor(size.Y);
 
@@ -71,7 +74,6 @@ internal abstract partial class PetWindow : Window, IPetWindow
             TitlebarTextNode.Style.Size = new((int)size.X - 64, 32);
 
             ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
-            Node.Style.Margin = new(1);
             ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
             Node.Style.Size = ContentSize;
 
@@ -103,7 +105,11 @@ internal abstract partial class PetWindow : Window, IPetWindow
         Point pt = new((int)ps.X + 2, (int)ps.Y + 2);
 
         // Here to ensure stylevars get popped
-        try { _windowNode.Render(drawList, pt); } catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
+        try 
+        {
+            _windowNode.Render(drawList, pt); 
+        } 
+        catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
 
         ImGui.EndChild();
     }

@@ -20,6 +20,7 @@ internal class IconNode : Node
             {
                 Style = new Style()
                 {
+                    BackgroundColor = new Color(0, 0, 0, 0),
                     IconId = iconId,
                     Opacity = 0.8f,
                     Anchor = Anchor.MiddleCenter,

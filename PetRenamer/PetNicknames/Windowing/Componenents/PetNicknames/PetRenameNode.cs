@@ -13,6 +13,7 @@ internal class PetRenameNode : Node
     readonly Node RenameNode;
     readonly Node ImageNode;
     readonly IconNode IconNode;
+    readonly CircleImageNode CircleImageNode;
 
     readonly Node HeaderNode;
 
@@ -65,18 +66,19 @@ internal class PetRenameNode : Node
                     },
                     new Node()
                     {
+
                         ChildNodes =
                       [
                           SaveButton = new Node()
                           {
                               Stylesheet = PetRenameStyleSheet,
-                              ClassList = ["RenameElementStyle", "RenameElementMargin", "RenameElementButton"],
+                              ClassList = ["RenameElementButton"],
                               NodeValue = Translator.GetLine("PetRenameNode.SaveNickname"),
                           },
                           ClearButton = new Node()
                           {
                               Stylesheet = PetRenameStyleSheet,
-                              ClassList = ["RenameElementStyle", "RenameElementMargin", "RenameElementButton"],
+                              ClassList = ["RenameElementButton"],
                               NodeValue = Translator.GetLine("PetRenameNode.ClearNickname"),
                           }
                       ]
@@ -87,8 +89,18 @@ internal class PetRenameNode : Node
             {
                 Stylesheet = PetRenameStyleSheet,
                 ClassList = ["ImageNode"],
-                ChildNodes = [IconNode = new IconNode(in DalamudServices, activePet.Icon)],
-            }
+                ChildNodes = [
+                    IconNode = new IconNode(in DalamudServices, activePet.Icon),
+                    CircleImageNode = new CircleImageNode(in DalamudServices)
+                    {
+                       Style = new Style()
+                        {
+                           Anchor = Anchor.MiddleLeft
+                        }
+                    }
+                    ],
+            },
+            
         ];
 
         InputField.OnValueChanged += (str) => CurrentValue = str;
@@ -113,6 +125,7 @@ internal class PetRenameNode : Node
         RenameNode.Style.Size = (Style.Size - RenameNode.ComputedStyle.Margin.Size - RenameNode.ComputedStyle.Padding.Size) - new Size(height, 0);
         ImageNode.Style.Size = new Size(height, height);
         IconNode.Style.Size = new Size(height, height);
+        CircleImageNode.Style.Size = new Size(height, height);
 
         HeaderNode.Style.Size = new Size(RenameNode.Style.Size.Width - Margin * 2, 30);
         TextNode.Style.Size = new Size(RenameNode.Style.Size.Width - Margin * 2, 30);
@@ -130,6 +143,7 @@ internal class PetRenameNode : Node
                 BorderRadius = 6,
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.BottomLeft,
+                Padding = new EdgeSize(4, 0, 0, 0),
                 StrokeRadius = 6,
                 Flow = Flow.Vertical,
             }),
@@ -137,6 +151,7 @@ internal class PetRenameNode : Node
             {
                 BorderColor = new(new("Window.TitlebarBorder")),
                 BorderWidth = new EdgeSize(0, 0, 0, 2),
+                Padding = new EdgeSize(0),
                 BorderRadius = 6,
                 StrokeRadius = 6,
                 IsAntialiased = false,
@@ -144,13 +159,13 @@ internal class PetRenameNode : Node
             }),
             new(".RenameElementStyle", new Style()
             {
-                BackgroundColor = new Color("Window.Background"),
+                BackgroundColor = new Color("Window.BackgroundLight"),
                 BorderColor = new(new("Window.TitlebarBorder")),
-                BorderWidth = new EdgeSize(2, 2, 2, 2),
+                BorderWidth = new EdgeSize(2, 2, 2, 0),
                 BorderRadius = 8,
                 StrokeRadius = 8,
                 IsAntialiased = false,
-                RoundedCorners = RoundedCorners.All,
+                RoundedCorners = RoundedCorners.BottomRight | RoundedCorners.TopRight,
             }),
             new(".RenamePortion", new Style()
             {
@@ -158,30 +173,41 @@ internal class PetRenameNode : Node
             }),
             new(".RenameElementMargin", new Style()
             {
-                Margin = new EdgeSize(Margin),
+                Margin = new EdgeSize(Margin, Margin, Margin, 0),
             }),
             new(".RenameElementTopText", new Style()
             {
                 IsAntialiased = false,
                 TextShadowSize = 2,
-                TextShadowColor = new Color("Window.TitlebarTextOutline"),
+                Color = new Color("Window.TextLight"),
+                TextShadowColor = new Color("Window.TextOutline"),
                 FontSize = 15,
                 TextOffset = new Vector2(0, 4f),
                 Padding = new EdgeSize(Margin),
             }),
             new(".RenameElementButton", new Style()
             {
-                BackgroundColor = new Color("Window.BackgroundLight"),
+                BackgroundColor = new Color("PetNicknamesButton"),
                 TextShadowSize = 2,
-                TextShadowColor = new Color("Window.TitlebarTextOutline"),
-                FontSize = 15,
+                TextShadowColor = new Color("Window.TextOutline"),
+                FontSize = 10,
                 TextAlign = Anchor.MiddleCenter,
                 TextOffset = new Vector2(0, 2),
-                Padding = new EdgeSize(Margin),
+                Margin = new EdgeSize(3, Margin, 0, Margin),
+                Padding = new EdgeSize(Margin, Margin, Margin, Margin),
+                Color = new Color("Window.TextLight"),
+                BorderColor = new(new("Window.TitlebarBorder")),
+                BorderWidth = new EdgeSize(2, 2, 0, 2),
+                BorderRadius = 8,
+                StrokeRadius = 8,
+                IsAntialiased = false,
+                RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
             }),
             new(".RenameElementButton:hover", new Style()
             {
-                BackgroundColor = new Color("Window.Background"),
+                BackgroundColor = new Color("PetNicknamesButton:Hover"),
+                FontSize = 12,
+                TextAlign = Anchor.MiddleCenter,
             }),
         ]
     );
