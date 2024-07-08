@@ -22,6 +22,18 @@ internal struct PetSheetData : IPetSheetData
 
     public int LegacyModelID { get; private set; }
 
+    public string? RaceName { get; private set; } = null;
+    public string? BehaviourName { get; private set; } = null;
+    public uint FootstepIcon { get; private set; } = 0;
+
+    public PetSheetData(int Model, int legacyModelID, uint Icon, string? raceName, string? behaviourName, uint footstepIcon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
+        :this(Model, legacyModelID, Icon, Pronoun, Singular, Plural, actionName, actionID, in services)
+    {
+        this.RaceName = raceName;
+        this.BehaviourName = behaviourName;
+        this.FootstepIcon = footstepIcon;
+    }
+
     public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, in DalamudServices services) 
         :this(Model, Icon, Pronoun, Singular, Plural, in services)
     {

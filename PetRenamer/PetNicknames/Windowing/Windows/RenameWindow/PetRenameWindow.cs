@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
+using System.Security.AccessControl;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
@@ -37,6 +38,7 @@ internal partial class PetRenameWindow : PetWindow
         UserList = userList;
         Database = database;
         PetServices = petServices;
+        AddNode(Node, petRenameNode = new PetRenameNode(null, null, in DalamudServices));
     }
 
     public unsafe override void OnDraw()
@@ -101,24 +103,13 @@ internal partial class PetRenameWindow : PetWindow
         string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
         lastCustomName = customName;
 
-        if (petRenameNode == null)
-        {
-            AddNode(Node, petRenameNode = new PetRenameNode(customName, in data, in DalamudServices));
-            petRenameNode.OnSave += OnSave;
-        }
-        else
-        {
-            petRenameNode.Setup(customName, in data);
-        }
+        petRenameNode?.Setup(customName, in data);
+        
     }
 
     void CleanOldNode()
     {
-        if (petRenameNode == null) return;
-        RemoveNode(Node, petRenameNode);
-        petRenameNode.OnSave -= OnSave;
-        petRenameNode?.Dispose();
-        petRenameNode = null;
+        petRenameNode?.Setup(null, null);
     }
 
     void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");

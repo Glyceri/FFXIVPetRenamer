@@ -18,16 +18,28 @@ internal class CircleImageNode : Node
     const float botRightX = 0.328f;
     const float botRightY = 0.937f;
 
-    public float Rotation { get; set; } = 0;
+    float Rotation { get; set; } = 0;
+
+
+    public float RoationSpeed { get; set; } = 0;
+    public float Opacity { get; set; } = 1;
+
+    DateTime StartTime;
 
     public CircleImageNode(in DalamudServices dalamudServices)
     {
         Texture = dalamudServices.TextureProvider.GetFromGameIcon(195007);
+        StartTime = DateTime.Now;
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        Rotation++;
+        DateTime now = DateTime.Now;
+        TimeSpan time = StartTime - now;
+        StartTime = now;
+        float elapsed = (float)time.TotalSeconds;
+
+        Rotation += RoationSpeed * elapsed;
         base.OnDraw(drawList);
         IDalamudTextureWrap wrap = Texture.GetWrapOrEmpty();
 
@@ -49,7 +61,7 @@ internal class CircleImageNode : Node
         uv3 = RotateAroundPoint(uv3, centre) / vectorResolution;
         uv4 = RotateAroundPoint(uv4, centre) / vectorResolution;
 
-        drawList.AddImageQuad(wrap.ImGuiHandle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft, uv, uv2, uv3, uv4, new Color(255, 255, 0, 255).ToUInt());
+        drawList.AddImageQuad(wrap.ImGuiHandle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft, uv, uv2, uv3, uv4, new Color(255, 255, 0, Opacity).ToUInt());
     }
 
     Vector2 RotateAroundPoint(Vector2 point, Vector2 centre)

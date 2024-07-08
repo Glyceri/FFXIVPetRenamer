@@ -1,7 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.Utility;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.GeneratedSheets2;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -65,10 +65,15 @@ internal class SheetsWrapper : IPetSheets
                 int legacyModelID = (int)model.Model;
                 string singular = companion.Singular.ToDalamudString().TextValue;
                 string plural = companion.Plural.ToDalamudString().TextValue;
-                ushort icon = companion.Icon;
+                uint icon = companion.Icon;
+                uint betterIcon = companion.Icon + (uint)64000; // Thats the cuter icon
+                uint footstepIcon = companion.Icon + (uint)65000;
                 sbyte pronoun = companion.Pronoun;
+                ushort HP = companion.HP;
+                string raceName = companion.MinionRace?.Value?.Name ?? "...";
 
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, pronoun, singular, plural, string.Empty, uint.MaxValue, in DalamudServices));
+                string behaviourName = companion.Behavior.Value?.Name ?? "...";
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, footstepIcon, pronoun, singular, plural, string.Empty, uint.MaxValue, in DalamudServices));
             }
         }
         if (battlePetSheet == null) return;

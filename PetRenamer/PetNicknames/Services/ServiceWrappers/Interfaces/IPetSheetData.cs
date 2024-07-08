@@ -12,6 +12,10 @@ internal interface IPetSheetData
     string BaseSingular { get; }
     string BasePlural { get;  }
 
+    public string? RaceName { get; }
+    public string? BehaviourName { get; }
+    public uint FootstepIcon { get; }
+
     string ActionName { get;  }
     uint ActionID { get; }
 

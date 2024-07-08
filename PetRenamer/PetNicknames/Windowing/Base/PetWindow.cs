@@ -35,7 +35,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected PetWindow(DalamudServices dalamudServices, string name) : base(name, ImGuiWindowFlags, true)
     {
-        Node = new BackgroundNode(in dalamudServices, 194019);
+        Node = new BackgroundNode(194019u);
         DalamudServices = dalamudServices;
         CloseButton.OnClick += _ => Close();
 
