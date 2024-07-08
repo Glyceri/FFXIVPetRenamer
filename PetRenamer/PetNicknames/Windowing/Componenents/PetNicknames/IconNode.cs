@@ -24,16 +24,14 @@ internal class IconNode : Node
                     IconId = iconId,
                     Opacity = 0.8f,
                     Anchor = Anchor.MiddleCenter,
-                    Margin = new(16),
+                    Margin = new(12),
                 }
             }
         ];
 
         BeforeReflow += _ => 
         {
-            EdgeSize SelfPaddingSize = INode.ComputedStyle.Padding;
-            EdgeSize SelfMarginSize = INode.ComputedStyle.Margin;
-            INode.Style.Size = (ParentNode!.ComputedStyle.Size - SelfPaddingSize.Size - SelfMarginSize.Size) / ScaleFactor;
+            INode.Style.Size = Style.Size - INode.Style.Margin.Value.Size;
             return true;
         };
     }

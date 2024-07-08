@@ -38,10 +38,6 @@
      <PackageReference Include="DalamudPackager" Version="2.1.13" />
      <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
    </ItemGroup>
-  
-   <ItemGroup>
-     <ProjectReference Include="..\..\drawing\Una.Drawing\Una.Drawing.csproj" />
-   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="FFXIVClientStructs">
@@ -76,5 +72,9 @@
 
   <ItemGroup>
     <Folder Include="PetNicknames\Hooking\Structs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\drawing\Una.Drawing\Una.Drawing.csproj" />
   </ItemGroup>
 </Project>

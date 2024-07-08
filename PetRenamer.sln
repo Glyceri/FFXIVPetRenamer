@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetRenamer", "PetRenamer\Pe
 		{D3B86C23-A845-44A3-A88E-DEDE42653753} = {D3B86C23-A845-44A3-A88E-DEDE42653753}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Una.Drawing", "..\drawing\Una.Drawing\Una.Drawing.csproj", "{D3B86C23-A845-44A3-A88E-DEDE42653753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Una.Drawing", "drawing\Una.Drawing\Una.Drawing.csproj", "{D3B86C23-A845-44A3-A88E-DEDE42653753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
