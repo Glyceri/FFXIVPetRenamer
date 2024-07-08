@@ -8,5 +8,7 @@ internal interface IPetLog
     void LogInfo(object? obj);
     void LogWarning(object? obj);
     void LogFatal(object? obj);
+    void LogVerbose(object? obj);
     void LogError(Exception e, object? obj);
+    void LogException(Exception e);
 }

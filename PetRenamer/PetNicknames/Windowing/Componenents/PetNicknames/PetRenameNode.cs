@@ -83,17 +83,11 @@ internal class PetRenameNode : Node
                     }
                 ]
             },
-            ImageNode = new Node()
+        ImageNode = new Node()
             {
                 Stylesheet = PetRenameStyleSheet,
                 ClassList = ["ImageNode"],
-                ChildNodes =
-                      [
-                          IconNode = new IconNode(in DalamudServices, activePet.Icon)
-                          {
-                              ClassList = ["IconElement"],
-                          }
-                      ],
+                ChildNodes = [IconNode = new IconNode(in DalamudServices, activePet.Icon)],
             }
         ];
 
@@ -137,8 +131,6 @@ internal class PetRenameNode : Node
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.BottomLeft,
                 StrokeRadius = 6,
-                //BorderColor = new(new("Window.TitlebarBorder")),
-                //BorderWidth = new EdgeSize(1),
                 Flow = Flow.Vertical,
             }),
             new(".ImageNode", new Style()
@@ -149,7 +141,6 @@ internal class PetRenameNode : Node
                 StrokeRadius = 6,
                 IsAntialiased = false,
                 RoundedCorners = RoundedCorners.BottomRight,
-                //ShadowSize = new EdgeSize(0, 0, 0, 32),
             }),
             new(".RenameElementStyle", new Style()
             {
@@ -192,10 +183,6 @@ internal class PetRenameNode : Node
             {
                 BackgroundColor = new Color("Window.Background"),
             }),
-            new(".IconElement", new Style()
-            {
-                Margin = new(0),
-            })
         ]
     );
 }

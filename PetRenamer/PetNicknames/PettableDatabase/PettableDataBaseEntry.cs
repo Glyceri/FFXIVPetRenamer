@@ -1,6 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -20,6 +19,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     bool _dirty;
     public bool Dirty { get => _dirty || ActiveDatabase.IsDirty; }
     public string HomeworldName { get; private set; }
+    public bool Destroyed { get; private set; } = false;
 
     readonly IPetServices PetServices;
 
@@ -54,6 +54,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.ContentID = this.ContentID;
         pEntry.IsActive = true;
         pEntry.SoftSkeletons = this.SoftSkeletons;
+        pEntry._dirty = true;
         return true;
     }
 
@@ -78,4 +79,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         if (softIndex < 0 || softIndex >= SoftSkeletons.Length) return null;
         return SoftSkeletons[softIndex];
     }
+
+    public void Destroy() => Destroyed = true;
 }

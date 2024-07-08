@@ -55,6 +55,7 @@ internal unsafe class TooltipTextHook : SimpleTextHook
     {
         base.SetText(textNode, text, customName, pPet);
         if (bgNode == null) return;
+        if (textNode == null) return;
         textNode->ResizeNodeForCurrentText();
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }

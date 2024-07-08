@@ -1,4 +1,6 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+using PetRenamer.PetNicknames.Lodestone.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -16,12 +18,14 @@ internal class PetListWindow : PetWindow
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
     readonly IPetServices PetServices;
+    readonly IImageDatabase ImageDatabase;
 
-    public PetListWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet List")
+    public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
     {
         UserList = userList;
         Database = database;
         PetServices = petServices;
+        ImageDatabase = imageDatabase;
 
         Node.ChildNodes = [
             new Node()
@@ -36,7 +40,7 @@ internal class PetListWindow : PetWindow
                 },
                 ChildNodes = [
 
-                    UserNode = new UserNode()
+                    UserNode = new UserNode(in ImageDatabase)
                      {
 
                      },

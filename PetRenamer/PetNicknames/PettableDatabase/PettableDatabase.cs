@@ -5,19 +5,14 @@ using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
-internal class PettableDatabase : IPettableDatabase
+internal class PettableDatabase(in IPetServices petSerivces) : IPettableDatabase
 {
     protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
 
-    readonly IPetServices PetServices;
-
-    public PettableDatabase(in IPetServices petSerivces)
-    {
-        PetServices = petSerivces;
-    }
+    readonly IPetServices PetServices = petSerivces;
 
     public IPettableDatabaseEntry? GetEntry(string name)
     {

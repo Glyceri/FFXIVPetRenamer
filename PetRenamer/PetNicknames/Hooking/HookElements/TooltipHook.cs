@@ -54,9 +54,7 @@ internal unsafe class TooltipHook : QuickHookableElement
 
     public TooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, petServices, userList)
     {
-        IPettableUser? user = userList.LocalPlayer;
-        if (user == null) return;
-        OverrideUser(user);
+        
     }
 
     public override void Init()
@@ -66,6 +64,10 @@ internal unsafe class TooltipHook : QuickHookableElement
         Hook<SimpleTextHook>("ActionDetail", [5], Allowed, true);
 
         showTooltip?.Enable();
+
+        IPettableUser? user = UserList.LocalPlayer;
+        if (user == null) return;
+        OverrideUser(user);
     }
 
     bool Allowed(int id) => true;

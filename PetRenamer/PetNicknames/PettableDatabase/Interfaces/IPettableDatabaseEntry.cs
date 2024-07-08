@@ -11,11 +11,12 @@ internal interface IPettableDatabaseEntry
 
     bool Dirty { get; }
     bool IsActive { get; }
+    bool Destroyed { get; }
 
     int[] SoftSkeletons { get; }
 
-    public INamesDatabase ActiveDatabase { get; }
-    public INamesDatabase[] AllDatabases { get; }
+    INamesDatabase ActiveDatabase { get; }
+    INamesDatabase[] AllDatabases { get; }
 
     int Length();
     void UpdateContentID(ulong contentID);
@@ -31,4 +32,5 @@ internal interface IPettableDatabaseEntry
     int? GetSoftSkeleton(int softIndex);
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
+    void Destroy();
 }

@@ -1,6 +1,7 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-
+﻿using Dalamud.Interface.Textures.TextureWraps;
+using ImGuiNET;
+using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -11,9 +12,15 @@ internal class UserNode : Node
     readonly Node UserNameRect;
     readonly Node HomeWorldRect;
     readonly Node PetcountNode;
+    readonly IImageDatabase ImageDatabase;
 
-    public UserNode()
+    IDalamudTextureWrap? _userTexture = null;
+    IPettableDatabaseEntry? currentEntry = null;
+
+    public UserNode(in IImageDatabase imageDatabase)
     {
+        ImageDatabase = imageDatabase;
+
         Stylesheet = stylesheet;
         ClassList = ["HeaderBar"];
 
@@ -23,7 +30,6 @@ internal class UserNode : Node
            {
                Style = new Style()
                {
-                   IconId = 1,
                    Margin = new EdgeSize(5),
                    Size = new Size(90, 90)
                }
@@ -57,12 +63,30 @@ internal class UserNode : Node
                ]
             }
         ];
+
+        PetcountNode.OnMouseUp += _ =>
+        {
+            if (currentEntry == null) return;
+            ImageDatabase.Redownload(currentEntry);
+        };
     }
 
     public void SetUser(IPettableDatabaseEntry user)
     {
         UserNameRect.NodeValue = user.Name;
         HomeWorldRect.NodeValue = user.HomeworldName;
+        currentEntry = user;
+        _userTexture = ImageDatabase.GetWrapFor(user);
+    }
+
+    protected override void OnDraw(ImDrawListPtr drawList)
+    {
+        base.OnDraw(drawList);
+        if (_userTexture == null) return;
+        nint handle = _userTexture.ImGuiHandle;
+        Rect contentRect = ProfilePictureRect.Bounds.ContentRect;
+        drawList.AddImageQuad(handle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft);
+        base.OnDraw(drawList);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet(

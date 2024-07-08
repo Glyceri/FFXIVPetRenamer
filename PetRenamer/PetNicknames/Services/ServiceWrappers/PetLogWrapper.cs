@@ -19,7 +19,12 @@ internal class PetLogWrapper : IPetLog
     public void LogError(Exception e, object? message)
     {
         if (message == null) return;
-        PluginLog.Error($"{message}");
+        PluginLog.Error($"{e} : {message}");
+    }
+
+    public void LogException(Exception e)
+    {
+        PluginLog.Error($"{e}");
     }
 
     public void LogFatal(object? message)
@@ -32,6 +37,12 @@ internal class PetLogWrapper : IPetLog
     {
         if (message == null) return;
         PluginLog.Info($"{message}");
+    }
+
+    public void LogVerbose(object? message)
+    {
+        if (message == null) return;
+        PluginLog.Verbose($"{message}");
     }
 
     public void LogWarning(object? message)
