@@ -60,7 +60,7 @@ internal class ImageDatabase : IImageDatabase
 
     public void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null)
     {
-        if (!entry.IsActive) return;
+        DalamudServices.PluginLog.Debug("REDOWNLOAD FOR: " + entry.Name);
 
         lock (_imageDatabase)
         {

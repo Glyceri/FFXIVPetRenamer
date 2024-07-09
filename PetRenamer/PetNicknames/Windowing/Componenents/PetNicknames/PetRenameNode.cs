@@ -96,7 +96,7 @@ internal class PetRenameNode : Node
                 //Overflow = false,
                 Style = new Style()
                 {
-                    Margin = new EdgeSize(19, 10, 0, 0),
+                    Margin = new EdgeSize(19, 0, 0, 30),
                 },
                 ChildNodes = [
                     IconNode = new IconNode()
@@ -104,6 +104,7 @@ internal class PetRenameNode : Node
                         Style = new Style()
                         {
                             Size = new Size(90, 90),
+                            
                             IconId = ActivePet?.Icon ?? 66310,
                             BorderColor = new BorderColor(new Color(255, 255, 255)),
                             BorderWidth = new EdgeSize(4),

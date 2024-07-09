@@ -42,7 +42,6 @@ internal class ProfilePictureNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        
         _userTexture = ImageDatabase.GetWrapFor(activeUser);
         bool isBeingDownloaded = ImageDatabase.IsBeingDownloaded(activeUser);
         RedownloadNode.Style.IsVisible = !isBeingDownloaded;
@@ -58,13 +57,12 @@ internal class ProfilePictureNode : Node
     Stylesheet styleSheet = new Stylesheet([
         new(".RedownloadButton", new Style()
         {
-            Size = new Size(25, 25),
             Anchor = Anchor.BottomRight,
-            TextAlign = Anchor.MiddleCenter,
-            FontSize = 18,
+            TextAlign = Anchor.MiddleCenter, 
             Color = new Color("Window.TextLight"),
             OutlineColor = new("Window.TextOutline"),
             OutlineSize = 1,
+            Size = new Size(32, 32)
         }),
         new(".RedownloadButton:hover", new Style()
         {

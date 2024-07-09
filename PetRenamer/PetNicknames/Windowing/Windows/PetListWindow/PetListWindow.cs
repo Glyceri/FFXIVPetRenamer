@@ -28,9 +28,11 @@ internal class PetListWindow : PetWindow
 
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
+    readonly IPettableDatabase LegacyDatabase;
     readonly IPetServices PetServices;
     readonly IImageDatabase ImageDatabase;
 
+    bool inUserMode = false;
     IPettableDatabaseEntry? ActiveEntry;
     IPettableUser? lastUser = null;
 
@@ -39,12 +41,17 @@ internal class PetListWindow : PetWindow
     readonly Node ScrolllistContentNode;
     readonly Node BottomPortion;
 
+    readonly QuickButton UserListButton;
+    readonly QuickButton SharingButton;
+
     readonly SmallHeaderNode SmallHeaderNode;
 
-    public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
+    public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
     {
+        //Una.Drawing.Node.DrawDebugInfo = true;
         UserList = userList;
         Database = database;
+        LegacyDatabase = legacyDatabase;
         PetServices = petServices;
         ImageDatabase = imageDatabase;
         Node.Style.Flow = Flow.Vertical;
@@ -106,7 +113,7 @@ internal class PetListWindow : PetWindow
                                     Flow = Flow.Vertical,
                                 },
                                 ChildNodes = [
-                            new QuickButton("User List")
+                            UserListButton = new QuickButton("User List")
                             {
                                 Style = new Style()
                                 {
@@ -115,7 +122,7 @@ internal class PetListWindow : PetWindow
                                     Anchor = Anchor.TopCenter,
                                 },
                             },
-                                    new QuickButton("Sharing")
+                                  SharingButton = new QuickButton("Sharing")
                                     {
                                         Style = new Style()
                                         {
@@ -203,11 +210,7 @@ internal class PetListWindow : PetWindow
             },
         ];
 
-        Node.BeforeReflow += _ =>
-        {
-
-            return true;
-        };
+        UserListButton.Clicked += ToggleUserMode;
     }
 
     public override void OnDraw()
@@ -220,11 +223,36 @@ internal class PetListWindow : PetWindow
             lastUser = UserList.LocalPlayer;
             SetUser(lastUser?.DataBaseEntry);
         }
+
+        if (inUserMode)
+        {
+            bool dirty = false;
+            foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
+            {
+                if (!e.IsActive) continue;
+                if (e.Dirty)
+                {
+                    dirty = true;
+                    break;
+                }
+            }
+            if (dirty)
+            {
+                SetUser(ActiveEntry);
+            }
+        }
     }
 
     protected override void OnPetModeChanged(PetWindowMode mode)
     {
-        SetUser(lastUser?.DataBaseEntry);
+        if (inUserMode) return;
+        SetUser(ActiveEntry);
+    }
+
+    void ToggleUserMode()
+    {
+        inUserMode = !inUserMode;
+        SetUser(ActiveEntry);
     }
 
     public void SetUser(IPettableDatabaseEntry? entry)
@@ -235,15 +263,27 @@ internal class PetListWindow : PetWindow
 
         SmallHeaderNode.NodeValue = "...";
 
-        if (entry == null) return;
+        if (inUserMode)
+        {
+            foreach(IPettableDatabaseEntry e in Database.DatabaseEntries)
+            {
+                if (!e.IsActive) continue;
+                ScrolllistContentNode.AppendChild(new UserListNode(in ImageDatabase, in e));
+            }
+        }
+        else HandlePetMode();
+    }
 
-        INamesDatabase names = entry.ActiveDatabase;
+    void HandlePetMode()
+    {
+        if (ActiveEntry == null) return;
+        INamesDatabase names = ActiveEntry.ActiveDatabase;
 
-        for(int i = 0; i < names.IDs.Length; i++)
+        for (int i = 0; i < names.IDs.Length; i++)
         {
             int id = names.IDs[i];
-            if (CurrentMode == Enums.PetWindowMode.Minion && id <= -1) continue;
-            if (CurrentMode == Enums.PetWindowMode.BattlePet && id >= -1) continue;
+            if (CurrentMode == PetWindowMode.Minion && id <= -1) continue;
+            if (CurrentMode == PetWindowMode.BattlePet && id >= -1) continue;
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) continue;
             ScrolllistContentNode.AppendChild(new PetListNode(petData, names.Names[i]));
@@ -251,7 +291,7 @@ internal class PetListWindow : PetWindow
 
         if (ActiveEntry == null) return;
 
-        if (entry.ContentID == UserList.LocalPlayer?.ContentID)
+        if (ActiveEntry.ContentID == UserList.LocalPlayer?.ContentID)
         {
             if (CurrentMode == PetWindowMode.Minion)
             {

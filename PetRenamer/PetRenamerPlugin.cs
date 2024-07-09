@@ -57,7 +57,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
-        WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, ImageDatabase));
+        WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
         WindowHandler.Open<PetRenameWindow>();
         WindowHandler.Open<PetListWindow>();
 
