@@ -81,7 +81,7 @@ internal class PetRenameNode : Node
                         Style = new Style()
                         {
                             Flow = Flow.Horizontal,
-                            Margin = new EdgeSize(7, 0, 0, 200),
+                            Margin = new EdgeSize(0, 0, 0, 200),
                         },
                         ChildNodes = [
                         EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}:"),
@@ -96,14 +96,14 @@ internal class PetRenameNode : Node
                 //Overflow = false,
                 Style = new Style()
                 {
-                    Margin = new EdgeSize(45, 60, 0, 0),
+                    Margin = new EdgeSize(19, 10, 0, 0),
                 },
                 ChildNodes = [
                     IconNode = new IconNode()
                     {
                         Style = new Style()
                         {
-                            Size = new Size(120, 120),
+                            Size = new Size(90, 90),
                             IconId = ActivePet?.Icon ?? 66310,
                             BorderColor = new BorderColor(new Color(255, 255, 255)),
                             BorderWidth = new EdgeSize(4),
@@ -117,7 +117,7 @@ internal class PetRenameNode : Node
                                  Style = new Style()
                                  {
                                      Anchor = Anchor.MiddleCenter,
-                                     Size = new Size(190, 190)
+                                     Size = new Size(130, 130)
                                  }
                              }
                         ]
@@ -201,7 +201,7 @@ internal class PetRenameNode : Node
 
         if (editMode)
         {
-            ImGui.SetCursorPos(new Vector2(89 * Node.ScaleFactor, 168.5f * Node.ScaleFactor));
+            ImGui.SetCursorPos(new Vector2(89 * Node.ScaleFactor, 115 * Node.ScaleFactor));
             ImGui.SetNextItemWidth(NicknameNode.TextNode.Bounds.ContentRect.Width - NicknameNode.LabelNode.Bounds.ContentRect.Width);
             if (ImGui.InputText($"##RenameField", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
             {

@@ -20,7 +20,11 @@ internal static class Translator
         { "PetRenameNode.Clear", "Clear" },
         { "PetRenameNode.Save", "Save" },
         { "PetRenameNode.Cancel", "Cancel" },
-        { "PetRenameWindow.Title", "Pet Passport" }
+        { "PetRenameWindow.Title", "Pet Passport" },
+        { "PetListWindow.ListHeaderPersonalMinion", "Your Minions" },
+        { "PetListWindow.ListHeaderPersonalBattlePet", "Your Battle Pets" },
+        { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
+        { "PetListWindow.ListHeaderOtherBattlePet", "{0}'s Battle Pets" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -33,7 +37,11 @@ internal static class Translator
         { "PetRenameNode.Clear", "Löschen" },
         { "PetRenameNode.Save", "Speichern" },
         { "PetRenameNode.Cancel", "Abbrechen" },
-        { "PetRenameWindow.Title", "Heimtierausweis" }
+        { "PetRenameWindow.Title", "Heimtierausweis" },
+        { "PetListWindow.ListHeaderPersonalMinion", "Ihre Begleiter" },
+        { "PetListWindow.ListHeaderPersonalBattlePet", "Ihre Kampftiere" },
+        { "PetListWindow.ListHeaderOtherMinion", "Begleiter von {0}" },
+        { "PetListWindow.ListHeaderOtherBattlePet", "Kampftiere von {0}" },
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()

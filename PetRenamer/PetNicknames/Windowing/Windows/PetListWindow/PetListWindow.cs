@@ -4,8 +4,11 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
 using Una.Drawing;
 
@@ -28,12 +31,15 @@ internal class PetListWindow : PetWindow
     readonly IPetServices PetServices;
     readonly IImageDatabase ImageDatabase;
 
+    IPettableDatabaseEntry? ActiveEntry;
     IPettableUser? lastUser = null;
 
     readonly Node HeaderNode;
     readonly Node ScrollListBaseNode;
     readonly Node ScrolllistContentNode;
     readonly Node BottomPortion;
+
+    readonly SmallHeaderNode SmallHeaderNode;
 
     public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
     {
@@ -52,21 +58,21 @@ internal class PetListWindow : PetWindow
                 },
                 ChildNodes = [
                     new Node()
-            {
-                Style = new Style()
-                {
-                    Size = new Size(410, 100),
-                    BorderColor = new(new("Window.TitlebarBorder")),
-                    BorderWidth = new EdgeSize(0, 1, 1, 1),
-                    RoundedCorners = RoundedCorners.BottomLeft,
-                    BorderRadius = 6,
-                    StrokeRadius = 6,
-                    IsAntialiased = false,
-                },
-                ChildNodes = [
+                    {
+                        Style = new Style()
+                        {
+                            Size = new Size(410, 100),
+                            BorderColor = new(new("Window.TitlebarBorder")),
+                            BorderWidth = new EdgeSize(0, 1, 1, 1),
+                            RoundedCorners = RoundedCorners.BottomLeft,
+                            BorderRadius = 6,
+                            StrokeRadius = 6,
+                            IsAntialiased = false,
+                        },
+                        ChildNodes = [
                     UserNode = new UserNode(in ImageDatabase),
-                ]
-            },
+                        ]
+                    },
                     new Node()
                     {
                         Style = new Style()
@@ -127,6 +133,16 @@ internal class PetListWindow : PetWindow
             BottomPortion = new Node()
             {
                 ChildNodes = [
+                    SmallHeaderNode = new SmallHeaderNode(Translator.GetLine("PetListWindow.ListHeaderPersonalMinion"))
+                    {
+                        Style = new Style()
+                        {
+                            Anchor = Anchor.TopCenter,
+                            Margin = new EdgeSize(5, 0, 0, 0),
+                            Size = new Size(300, 20),
+                            FontSize = 16,
+                        }
+                    },
                     ScrollListBaseNode = new Node()
                     {
                         Overflow = false,
@@ -150,62 +166,11 @@ internal class PetListWindow : PetWindow
                             Gap = 10,
                         },
                         ChildNodes = [
-                            // This is the content node!
-                            new Node()
-                            {
-                                Style = new Style()
-                                {
-                                    Flow = Flow.Vertical,
-                                    Padding = new EdgeSize(10),
-                                    BackgroundColor = new Color(0, 0, 0),
-                                    Size = new Size(412, 70),
-                                },
-                            },
-                            new Node()
-                            {
-                                Style = new Style()
-                                {
-                                    Flow = Flow.Vertical,
-                                    Padding = new EdgeSize(10),
-                                    BackgroundColor = new Color(0, 0, 0),
-                                    Size = new Size(412, 70),
-                                },
-                            },
-                            new Node()
-                            {
-                                Style = new Style()
-                                {
-                                    Flow = Flow.Vertical,
-                                    Padding = new EdgeSize(10),
-                                    BackgroundColor = new Color(0, 0, 0),
-                                    Size = new Size(412, 70),
-                                },
-                            },
-                            new Node()
-                            {
-                                Style = new Style()
-                                {
-                                    Flow = Flow.Vertical,
-                                    Padding = new EdgeSize(10),
-                                    BackgroundColor = new Color(0, 0, 0),
-                                    Size = new Size(412, 70),
-                                },
-                            },
-                            new Node()
-                            {
-                                Style = new Style()
-                                {
-                                    Flow = Flow.Vertical,
-                                    Padding = new EdgeSize(10),
-                                    BackgroundColor = new Color(0, 0, 0),
-                                    Size = new Size(412, 70),
-                                },
-                            },
 
                         ]
                     }
                 ]
-                    } 
+                    }
                 ]
             },
             new Node()
@@ -219,8 +184,8 @@ internal class PetListWindow : PetWindow
                     BorderRadius = 6,
                     //StrokeRadius = 6,
                     //ShadowSize = new EdgeSize(64, 0, 0, 0),
-                    Margin = new(125, 0, 0, 0),
-                    Size = new Size(422, 8),
+                    Margin = new(129, 0, 0, 0),
+                    Size = new Size(422, 4),
                     Anchor = Anchor.TopCenter,
                 }
             },
@@ -231,8 +196,8 @@ internal class PetListWindow : PetWindow
                     BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), new Color("Window.Border:Active")),
                     RoundedCorners = RoundedCorners.BottomRight | RoundedCorners.BottomLeft,
                     BorderRadius = 6,
-                    Margin = new(0, 0, 25, 0),
-                    Size = new Size(422, 8),
+                    Margin = new(0, 0, 29, 0),
+                    Size = new Size(422, 4),
                     Anchor = Anchor.BottomCenter,
                 }
             },
@@ -253,7 +218,60 @@ internal class PetListWindow : PetWindow
         if (lastUser != UserList.LocalPlayer)
         {
             lastUser = UserList.LocalPlayer;
-            UserNode.SetUser(UserList.LocalPlayer?.DataBaseEntry);
+            SetUser(lastUser?.DataBaseEntry);
+        }
+    }
+
+    protected override void OnPetModeChanged(PetWindowMode mode)
+    {
+        SetUser(lastUser?.DataBaseEntry);
+    }
+
+    public void SetUser(IPettableDatabaseEntry? entry)
+    {
+        ActiveEntry = entry;
+        UserNode.SetUser(entry);
+        ScrolllistContentNode.ChildNodes.Clear();
+
+        SmallHeaderNode.NodeValue = "...";
+
+        if (entry == null) return;
+
+        INamesDatabase names = entry.ActiveDatabase;
+
+        for(int i = 0; i < names.IDs.Length; i++)
+        {
+            int id = names.IDs[i];
+            if (CurrentMode == Enums.PetWindowMode.Minion && id <= -1) continue;
+            if (CurrentMode == Enums.PetWindowMode.BattlePet && id >= -1) continue;
+            IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
+            if (petData == null) continue;
+            ScrolllistContentNode.AppendChild(new PetListNode(petData, names.Names[i]));
+        }
+
+        if (ActiveEntry == null) return;
+
+        if (entry.ContentID == UserList.LocalPlayer?.ContentID)
+        {
+            if (CurrentMode == PetWindowMode.Minion)
+            {
+                SmallHeaderNode.NodeValue = Translator.GetLine("PetListWindow.ListHeaderPersonalMinion");
+            }
+            else
+            {
+                SmallHeaderNode.NodeValue = Translator.GetLine("PetListWindow.ListHeaderPersonalBattlePet");
+            }
+        }
+        else
+        {
+            if (CurrentMode == PetWindowMode.Minion)
+            {
+                SmallHeaderNode.NodeValue = string.Format(Translator.GetLine("PetListWindow.ListHeaderOtherMinion"), ActiveEntry.Name);
+            }
+            else
+            {
+                SmallHeaderNode.NodeValue = string.Format(Translator.GetLine("PetListWindow.ListHeaderOtherBattlePet"), ActiveEntry.Name);
+            }
         }
     }
 

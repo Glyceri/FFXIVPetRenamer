@@ -34,7 +34,8 @@ internal class UserNode : Node
                 {
                     Flow = Flow.Vertical,
                     Size = new Size(300, 100),
-                    Margin = new EdgeSize(3, 0, 0, 10),
+                    Margin = new EdgeSize(23, 0, 0, 10),
+                    Gap = 3,
                 },
                 ChildNodes = [
                     UserNameRect = new RenameTitleNode("Name:", "..."),

@@ -18,7 +18,7 @@ internal class RenameTitleNode : Node
     {
         Label = label;
 
-        Style.Size = new Size(370, 25);
+        Style.Size = new Size(370, 15);
         ChildNodes = [
             LabelNode = new Node()
             {
@@ -68,10 +68,10 @@ internal class RenameTitleNode : Node
     Stylesheet stylesheet = new Stylesheet([
         new(".LabelNode", new Style()
         {
-            Margin = new EdgeSize(5, 0, 0, 0),
-            Size = new Size(70, 25),
+            //Margin = new EdgeSize(5, 0, 0, 0),
+            Size = new Size(70, 15),
             TextAlign = Anchor.TopLeft,
-            TextOffset = new System.Numerics.Vector2(0, 12),
+            TextOffset = new System.Numerics.Vector2(0, 3),
             Flow = Flow.Vertical,
             FontSize = 10,
             TextOverflow = false,
@@ -81,8 +81,8 @@ internal class RenameTitleNode : Node
         }),
         new(".TextNode", new Style()
         {
-            Margin = new EdgeSize(5, 0, 0, 0),
-            Size = new Size(300, 20),
+            //Margin = new EdgeSize(5, 0, 0, 0),
+            Size = new Size(300, 15),
             BorderColor = new BorderColor(new Color(255, 255, 255)),
             TextAlign = Anchor.MiddleRight,
             FontSize = 14,

@@ -19,9 +19,9 @@ internal partial class PetRenameWindow : PetWindow
     readonly IPettableDatabase Database;
     readonly IPetServices PetServices;
 
-    protected override Vector2 MinSize { get; } = new Vector2(550, 250);
-    protected override Vector2 MaxSize { get; } = new Vector2(550, 250);
-    protected override Vector2 DefaultSize { get; } = new Vector2(550, 250);
+    protected override Vector2 MinSize { get; } = new Vector2(520, 170);
+    protected override Vector2 MaxSize { get; } = new Vector2(520, 170);
+    protected override Vector2 DefaultSize { get; } = new Vector2(520, 170);
     protected override bool HasModeToggle { get; } = true;
 
     protected override string Title { get; } = Translator.GetLine("PetRenameWindow.Title");
