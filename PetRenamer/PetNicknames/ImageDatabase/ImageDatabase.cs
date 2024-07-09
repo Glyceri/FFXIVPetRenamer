@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ImageDatabase;
@@ -32,8 +33,10 @@ internal class ImageDatabase : IImageDatabase
         SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(66310).RentAsync().Result;
     }
 
-    public IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry databaseEntry)
+    public IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry)
     {
+        if (databaseEntry == null) return SearchTexture;
+
         lock (_imageDatabase)
         {
             if (!databaseEntry.IsActive) return SearchTexture;
@@ -55,7 +58,7 @@ internal class ImageDatabase : IImageDatabase
         }
     }
 
-    public void Redownload(IPettableDatabaseEntry entry)
+    public void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null)
     {
         if (!entry.IsActive) return;
 
@@ -72,7 +75,7 @@ internal class ImageDatabase : IImageDatabase
                 return;
             } 
         }
-        ImageDownloader.RedownloadImage(entry, OnSuccess, (e) => PetServices.PetLog.LogException(e));
+        ImageDownloader.RedownloadImage(entry, (entry,  wrap) => { OnSuccess(entry, wrap); callback?.Invoke(true); }, (e) => { callback?.Invoke(true); PetServices.PetLog.LogException(e); });
     }
 
     public void OnSuccess(IPettableDatabaseEntry entry, IDalamudTextureWrap textureWrap)
@@ -100,5 +103,11 @@ internal class ImageDatabase : IImageDatabase
             if (tWrap == null) continue;
             tWrap?.Dispose();   
         }
+    }
+
+    public bool IsBeingDownloaded(IPettableDatabaseEntry? databaseEntry)
+    {
+        if (databaseEntry == null) return true;
+        return ImageDownloader.IsBeingDownloaded(databaseEntry);
     }
 }

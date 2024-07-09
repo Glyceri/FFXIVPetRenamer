@@ -49,6 +49,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     public sealed override void Draw()
     {
+        //Una.Drawing.Node.DrawDebugInfo = true;
         ImGui.SetNextWindowViewport(ImGui.GetMainViewport().ID);
         ImGui.SetNextWindowSizeConstraints(MinSize * Una.Drawing.Node.ScaleFactor, MaxSize * Una.Drawing.Node.ScaleFactor);
         ImGui.SetNextWindowSize(DefaultSize, ImGuiCond.FirstUseEver);

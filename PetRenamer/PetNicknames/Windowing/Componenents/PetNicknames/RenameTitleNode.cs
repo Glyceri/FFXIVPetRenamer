@@ -17,7 +17,7 @@ internal class RenameTitleNode : Node
     public RenameTitleNode(string label, string text)
     {
         Label = label;
-        
+
         Style.Size = new Size(370, 25);
         ChildNodes = [
             LabelNode = new Node()

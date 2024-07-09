@@ -35,6 +35,8 @@ internal class ImageDownloader : IImageDownloader
 
     public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
+        if (IsBeingDownloaded(entry)) return;
+
         if (FindFileLocally(entry, success, failure))
         {
             return;
@@ -153,6 +155,7 @@ internal class ImageDownloader : IImageDownloader
 
     public void RedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
+        if (IsBeingDownloaded(entry)) return;
         DoRedownloadImage(entry, success, failure);
     }
 
@@ -176,19 +179,31 @@ internal class ImageDownloader : IImageDownloader
 
     public void Dispose()
     {
-        foreach(ulong id in cancellationTokes.Keys)
+        foreach (ulong id in cancellationTokes.Keys)
         {
             CancellationTokenSource source = cancellationTokes[id];
             try
             {
                 source.Cancel();
                 source.Dispose();
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
 
             }
         }
 
         cancellationTokes.Clear();
+    }
+
+    public bool IsBeingDownloaded(IPettableDatabaseEntry entry)
+    {
+        if (Networker.IsBeingDownloaded(entry)) return true;
+        foreach (ulong id in cancellationTokes.Keys)
+        {
+            if (id != entry.ContentID) continue;
+            return true;
+        }
+        return false;
     }
 }

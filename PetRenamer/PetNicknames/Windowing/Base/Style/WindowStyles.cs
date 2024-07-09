@@ -29,7 +29,6 @@ internal static class WindowStyles
                 {
                     Flow = Flow.Horizontal,
                     Size = new(0, 32),
-                    Color = new("Window.TitlebarText"),
                     BackgroundColor = new("Window.TitlebarBackground"),
                     BackgroundGradient = GradientColor.Vertical(
                         new("Window.TitlebarGradient1"),
@@ -48,9 +47,10 @@ internal static class WindowStyles
                 new()
                 {
                     FontSize = 16,
-                    Color = new("Window.TitlebarText"),
-                    OutlineColor = new("Window.TitlebarTextOutline"),
+                    Color = new Color("Window.TextLight"),
+                    OutlineColor = new("Window.TextOutline"),
                     OutlineSize = 1,
+                    TextOffset = new System.Numerics.Vector2(0, 1),
                     TextAlign = Anchor.MiddleCenter,
                     TextOverflow = false,
                     WordWrap = false,
@@ -123,6 +123,7 @@ internal static class WindowStyles
         Color.AssignByName("ModeToggleInactive", new Color(15, 15, 15).ToUInt());
 
         Color.AssignByName("Window.TextOutline", new Color(189, 141, 6, 190).ToUInt());
+        Color.AssignByName("Window.TextOutlineButton", new Color(194, 82, 17, 190).ToUInt());
 
         Color.AssignByName("PetNicknamesButton", new Color(91, 120, 83, 150).ToUInt());
         Color.AssignByName("PetNicknamesButton:Hover", new Color(47, 69, 41, 150).ToUInt());

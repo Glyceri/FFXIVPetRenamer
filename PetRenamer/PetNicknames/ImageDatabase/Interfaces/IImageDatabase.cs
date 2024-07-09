@@ -8,7 +8,8 @@ internal interface IImageDatabase : IDisposable
 {
     bool IsDirty { get; }
 
-    void Redownload(IPettableDatabaseEntry entry);
-    IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry databaseEntry);
+    void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null);
+    IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry);
+    bool IsBeingDownloaded(IPettableDatabaseEntry? databaseEntry);
     void OnSuccess(IPettableDatabaseEntry entry, IDalamudTextureWrap textureWrap);
 }

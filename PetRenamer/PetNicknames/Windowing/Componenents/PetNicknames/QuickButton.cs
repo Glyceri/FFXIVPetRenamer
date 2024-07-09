@@ -32,7 +32,7 @@ internal class QuickButton : Node
             TextOverflow = true,
             Color = new Color("Window.TextLight"),
             TextAlign = Anchor.MiddleCenter,
-            OutlineColor = new("Window.TextOutline"),
+            OutlineColor = new("Window.TextOutlineButton"),
             OutlineSize = 1,
             BorderInset = new EdgeSize(7, 15, 3, 15),
             

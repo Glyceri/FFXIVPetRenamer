@@ -12,6 +12,6 @@ internal class BackgroundNode : Node
         Style.BackgroundImageInset = new EdgeSize(4);
         Style.BackgroundImageRotation = 90;
         Style.BackgroundImageBlendMode = BlendMode.Modulate;
-        Style.BackgroundColor = new(100, 0, 0, 2);
+        Style.BackgroundImageColor = new Color(255, 255, 255, 200);
     }
 }

@@ -172,6 +172,7 @@ internal class PetRenameNode : Node
 
         ClearButton.Style.IsVisible = activePet != null;
         EditButton.Style.IsVisible = activePet != null;
+        CircleImageNode.Style.IsVisible = activePet != null;
 
         StopEditMode();
     }

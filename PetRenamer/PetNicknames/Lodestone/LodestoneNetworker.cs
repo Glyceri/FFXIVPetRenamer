@@ -224,4 +224,16 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         }
         _queueElements.Clear();
     }
+
+    public bool IsBeingDownloaded(IPettableDatabaseEntry entry)
+    {
+        for (int i = 0; i < _queueElements.Count; i++)
+        {
+            LodestoneQueueElement element = _queueElements[i];
+            if (element.Entry.ContentID != entry.ContentID) continue;
+
+            return true;
+        }
+        return false;
+    }
 }

@@ -9,10 +9,11 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class UserNode : Node
 {
-    readonly Node ProfilePictureRect;
-    readonly Node UserNameRect;
-    readonly Node HomeWorldRect;
-    readonly Node PetcountNode;
+    readonly ProfilePictureNode ProfilePictureRect;
+    readonly Node PlateRect;
+    readonly RenameTitleNode UserNameRect;
+    readonly RenameTitleNode HomeWorldRect;
+    readonly RenameTitleNode PetcountNode;
     readonly IImageDatabase ImageDatabase;
 
     IDalamudTextureWrap? _userTexture = null;
@@ -27,66 +28,38 @@ internal class UserNode : Node
 
         ChildNodes =
         [
-           ProfilePictureRect = new Node()
-           {
-               Stylesheet = stylesheet,
-               ClassList = ["NamePlateElement"],
-               Style = new Style()
-               {
-                   Margin = new EdgeSize(5),
-                   BorderWidth = new EdgeSize(5),
-                   Size = new Size(90, 90),
-                   BackgroundColor = new Color(0, 0, 0, 0),
-               }
-           },
-            new Node()
+            PlateRect = new Node()
             {
                 Style = new Style()
                 {
                     Flow = Flow.Vertical,
-                    Size = new Size(100, 100)
+                    Size = new Size(300, 100),
+                    Margin = new EdgeSize(3, 0, 0, 10),
                 },
                 ChildNodes = [
-                   UserNameRect = new Node()
-                   {
-                       Overflow = false,
-                       Stylesheet = stylesheet,
-                       ClassList = ["NamePlateElement"],
-                   },
-                    HomeWorldRect = new Node()
-                    {
-                        Overflow = false,
-                        Stylesheet = stylesheet,
-                        ClassList = ["NamePlateElement"],
-                    },
-                    PetcountNode = new Node()
-                    {
-                        Overflow = false,
-                        Stylesheet = stylesheet,
-                        ClassList = ["NamePlateElement"],
-                    }
-               ]
-            }
+                    UserNameRect = new RenameTitleNode("Name:", "..."),
+                    HomeWorldRect = new RenameTitleNode("Homeworld:", "..."),
+                    PetcountNode = new RenameTitleNode("Petcount:", "..."),
+                ]
+            },
+            ProfilePictureRect = new ProfilePictureNode(in imageDatabase)
+            {
+                Style = new Style()
+                {
+                    Margin = new EdgeSize(5),
+                    Size = new Size(90, 90),
+                }
+            },
         ];
     }
 
-    public void SetUser(IPettableDatabaseEntry user)
+    public void SetUser(IPettableDatabaseEntry? user)
     {
-        UserNameRect.NodeValue = user.Name;
-        HomeWorldRect.NodeValue = user.HomeworldName;
-        PetcountNode.NodeValue = $"Nickname count: {user.ActiveDatabase.IDs.Count()}";
+        UserNameRect.SetText(user?.Name ?? "...");
+        HomeWorldRect.SetText(user?.HomeworldName ?? "...");
+        PetcountNode.SetText(user?.ActiveDatabase.IDs.Count().ToString() ?? "...");
         currentEntry = user;
-        _userTexture = ImageDatabase.GetWrapFor(user);
-    }
-
-    protected override void OnDraw(ImDrawListPtr drawList)
-    {
-        base.OnDraw(drawList);
-        if (_userTexture == null) return;
-        nint handle = _userTexture.ImGuiHandle;
-        Rect contentRect = ProfilePictureRect.Bounds.ContentRect;
-        drawList.AddImageQuad(handle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft);
-        base.OnDraw(drawList);
+        ProfilePictureRect.SetUser(user);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet(
@@ -100,7 +73,7 @@ internal class UserNode : Node
                 RoundedCorners = RoundedCorners.All,
                 BorderRadius = 6,
                 StrokeRadius = 6,
-                Size = new Size(135, 25),
+                Size = new Size(235, 25),
                 TextOffset = new System.Numerics.Vector2(5, 7),
                 FontSize = 10,
                 TextOverflow = false,
@@ -110,15 +83,8 @@ internal class UserNode : Node
             }),
             new (".HeaderBar", new Style()
             {
-                Size = new Size(240, 100),
-                BorderColor = new(new("Window.TitlebarBorder")),
-                BorderWidth = new EdgeSize(0, 1, 1, 1),
-                RoundedCorners = RoundedCorners.BottomLeft,
-                BorderRadius = 6,
-                ShadowSize = new EdgeSize(0, 64, 0, 0),
+                Size = new Size(410, 100),
                 Flow = Flow.Horizontal,
-                StrokeRadius = 6,
-                IsAntialiased = false,
             }),
         ]
     );
