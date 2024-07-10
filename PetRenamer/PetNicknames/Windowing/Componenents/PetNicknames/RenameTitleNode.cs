@@ -11,6 +11,8 @@ internal class RenameTitleNode : Node
     public readonly Node TextNode;
     public readonly Node LabelNode;
 
+    public readonly Node HolderNode;
+
     public Action? Hovered;
     public Action? HoveredExit;
 
@@ -18,27 +20,31 @@ internal class RenameTitleNode : Node
     {
         Label = label;
 
-        Style.Size = new Size(300, 15);
+        Style.Size = new Size(300, 17);
+        Style.Flow = Flow.Vertical;
         ChildNodes = [
-            LabelNode = new Node()
+            HolderNode = new Node()
             {
-                Stylesheet = stylesheet,
-                ClassList = ["LabelNode"],
-                NodeValue = Label,
                 ChildNodes = [
-                     TextNode = new Node()
-                     {
-                         Stylesheet = stylesheet,
-                         ClassList = ["TextNode"],
-                         NodeValue = text,
-                     },
-                    UnderlineNode = new Node()
+                    LabelNode = new Node()
                     {
                         Stylesheet = stylesheet,
-                        ClassList = ["UnderlineNode"],
+                        ClassList = ["LabelNode"],
+                        NodeValue = Label,
+                    },
+                    TextNode = new Node()
+                    {
+                        Stylesheet = stylesheet,
+                        ClassList = ["TextNode"],
+                        NodeValue = text,
                     },
                 ]
-            }
+            },
+            UnderlineNode = new Node()
+            {
+                Stylesheet = stylesheet,
+                ClassList = ["UnderlineNode"],
+            },
         ];
 
         if (text != string.Empty)
@@ -72,17 +78,21 @@ internal class RenameTitleNode : Node
             Size = new Size(70, 15),
             TextAlign = Anchor.TopLeft,
             TextOffset = new System.Numerics.Vector2(0, 3),
-            Flow = Flow.Vertical,
             FontSize = 10,
             TextOverflow = false,
             Color = new Color("Window.TextLight"),
             OutlineColor = new("Window.TextOutline"),
             OutlineSize = 1,
         }),
+        new(".HolderNode", new Style()
+        {
+            Size = new Size(300, 15),
+            Flow = Flow.Horizontal,
+        }),
         new(".TextNode", new Style()
         {
             //Margin = new EdgeSize(5, 0, 0, 0),
-            Size = new Size(300, 15),
+            Size = new Size(230, 15),
             BorderColor = new BorderColor(new Color(255, 255, 255)),
             TextAlign = Anchor.MiddleRight,
             FontSize = 14,

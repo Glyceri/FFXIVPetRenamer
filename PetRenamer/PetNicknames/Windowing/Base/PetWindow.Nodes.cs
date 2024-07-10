@@ -45,6 +45,12 @@ internal abstract partial class PetWindow
                                 ClassList = ["window--close-button"],
                                 NodeValue = FontAwesomeIcon.Times.ToIconString(),
                             },
+                            new Node()
+                            {
+                                Id = "CloseButton2",
+                                ClassList = ["window--close-button"],
+                                NodeValue = FontAwesomeIcon.Times.ToIconString(),
+                            },
                         ]
                     },
                 ]

@@ -1,6 +1,5 @@
 ﻿using Dalamud.Interface;
 using ImGuiNET;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
@@ -13,12 +12,9 @@ internal class PetListNode : Node
     readonly IconNode IconNode;
     readonly Node ClearButtonNode;
 
-    readonly QuickButton EditButton;
-    readonly QuickButton ClearButton;
-
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode IDNode;
-    readonly RenameTitleNode NicknameNode;
+    readonly NicknameEditNode NicknameNode;
 
     public PetListNode(in IPetSheetData data, string? customName)
     {
@@ -46,42 +42,16 @@ internal class PetListNode : Node
                 ChildNodes = [
                     SpeciesNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Species")}:", data.BaseSingular),
                     IDNode = new RenameTitleNode($"ID:", data.Model.ToString()),
-                    NicknameNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? "..."),
-                    new Node()
-                    {
-                        Style = new Style()
-                        {
-                            Flow = Flow.Horizontal,
-                            Margin = new (0, 0, 0, 220),
-                        },
-                        ChildNodes = [
-                            EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}")
-                            {
-                                Style = new Style()
-                                {
-                                    FontSize = 7,
-                                    Size = new Size(40, 12),
-                                }
-                            },
-                            ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}")
-                            {
-                                Style = new Style()
-                                {
-                                    FontSize = 7,
-                                    Size = new Size(40, 12),
-                                }
-                            },
-                        ]
-                    }
+                    NicknameNode = new NicknameEditNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? "..."),
                 ]
             },
             IconNode = new IconNode()
             {
                 Style = new Style()
                 {
-                    Size = new Size(50, 50),
+                    Size = new Size(60, 60),
                     Anchor = Anchor.MiddleRight,
-                    Margin = new EdgeSize(0, 33, 0, 0),
+                    Margin = new EdgeSize(0, 26, 0, 0),
                     BorderColor = new BorderColor(new Color(255, 255, 255)),
                     BorderWidth = new EdgeSize(4),
                     BorderRadius = 6,
@@ -95,6 +65,7 @@ internal class PetListNode : Node
             }
         ];
 
+        NicknameNode.SetPet(customName, data);
         ClearButtonNode.OnClick += _ => { };
 
         IconNode.IconID = data.Icon;

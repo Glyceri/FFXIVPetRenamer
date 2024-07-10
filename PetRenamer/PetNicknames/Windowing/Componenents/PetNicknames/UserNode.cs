@@ -33,7 +33,6 @@ internal class UserNode : Node
                 Style = new Style()
                 {
                     Flow = Flow.Vertical,
-                    Size = new Size(300, 100),
                     Margin = new EdgeSize(23, 0, 0, 10),
                     Gap = 3,
                 },

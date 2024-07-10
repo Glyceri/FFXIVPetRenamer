@@ -16,8 +16,6 @@ internal class PetRenameNode : Node
 
     IPetSheetData? ActivePet;
     string? CurrentValue = null;
-    string inputFieldvalue = "";
-
 
     public Action<string?>? OnSave;
 
@@ -26,15 +24,10 @@ internal class PetRenameNode : Node
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode RaceNode;
     readonly RenameTitleNode BehaviourNode;
-    readonly RenameTitleNode NicknameNode;
+    readonly NicknameEditNode NicknameNode;
     readonly RenameTitleNode IDNode;
 
     Node? activeHoverNode;
-
-    readonly QuickButton EditButton;
-    readonly QuickButton ClearButton;
-
-    bool editMode = false;
 
     public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services)
     {
@@ -71,22 +64,10 @@ internal class PetRenameNode : Node
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
                     },
-                    NicknameNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
+                    NicknameNode = new NicknameEditNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
-                    },
-                    new Node()
-                    {
-                        Style = new Style()
-                        {
-                            Flow = Flow.Horizontal,
-                            Margin = new EdgeSize(0, 0, 0, 200),
-                        },
-                        ChildNodes = [
-                            EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}:"),
-                            ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}:"),
-                        ]
                     },
                 ]
             },
@@ -141,24 +122,7 @@ internal class PetRenameNode : Node
         IconNode.OnMouseLeave += _ => activeHoverNode = null;
         IDNode.HoveredExit += () => activeHoverNode = null;
 
-        ClearButton.Clicked += ClearClicked;
-        EditButton.Clicked += EditClicked;
-    }
-
-    void ClearClicked()
-    {
-        if (editMode) StopEditMode();
-        else OnSave?.Invoke(null);
-    }
-
-    void EditClicked()
-    {
-        if (editMode) 
-        { 
-            OnSave?.Invoke(inputFieldvalue); 
-            StopEditMode(); 
-        }
-        else StartEditMode();
+        NicknameNode.OnSave += (value) => OnSave?.Invoke(value);
     }
 
     public void Setup(string? customName, in IPetSheetData? activePet)
@@ -170,45 +134,14 @@ internal class PetRenameNode : Node
         RaceNode.SetText(activePet?.RaceName ?? "...");
         BehaviourNode.SetText(activePet?.BehaviourName ?? "...");
         IDNode.SetText(ActivePet?.Model.ToString() ?? "...");
+        NicknameNode.SetPet(customName, activePet);
 
-        ClearButton.Style.IsVisible = activePet != null;
-        EditButton.Style.IsVisible = activePet != null;
         CircleImageNode.Style.IsVisible = activePet != null;
-
-        StopEditMode();
-    }
-
-    void StartEditMode()
-    {
-        EditButton.SetText($"{Translator.GetLine("PetRenameNode.Save")}");
-        ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Cancel")}");
-        NicknameNode.SetText("");
-        editMode = true;
-    }
-
-    void StopEditMode()
-    {
-        editMode = false;
-        ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Clear")}");
-        EditButton.SetText($"{Translator.GetLine("PetRenameNode.Edit")}");
-        NicknameNode.SetText(CurrentValue ?? "...");
-        inputFieldvalue = CurrentValue ?? string.Empty;
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
         base.OnDraw(drawList);
-
-
-        if (editMode)
-        {
-            ImGui.SetCursorPos(new Vector2(89 * Node.ScaleFactor, 115 * Node.ScaleFactor));
-            ImGui.SetNextItemWidth(NicknameNode.TextNode.Bounds.ContentRect.Width - NicknameNode.LabelNode.Bounds.ContentRect.Width);
-            if (ImGui.InputText($"##RenameField", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
-            {
-                EditButton.Clicked?.Invoke();
-            }
-        }
 
         if (activeHoverNode != null)
         {
@@ -235,7 +168,7 @@ internal class PetRenameNode : Node
     Stylesheet stylesheet = new Stylesheet([
         new(".MarginSheet", new Style()
         {
-            Margin = new EdgeSize(4, 0, 0, 15),
+            Margin = new EdgeSize(2, 0, 0, 15),
         }),
     ]);
 }

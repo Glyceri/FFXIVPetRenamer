@@ -37,6 +37,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
         Node = new BackgroundNode(194019u);
         DalamudServices = dalamudServices;
         CloseButton.OnClick += _ => Close();
+        CloseButton2.OnClick += _ => Una.Drawing.Node.DrawDebugInfo ^= true; ;
 
         ContentNode.AppendChild(Node);
 
@@ -136,7 +137,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
     Node MiddleAnchor => TitlebarNode.QuerySelector("#TitleMiddleAnchor")!;
     Node TopRightAnchor => TitlebarNode.QuerySelector("#TitleRightAnchor")!;
 
-    protected Node CloseButton => _windowNode.QuerySelector("CloseButton")!;
+    Node CloseButton => _windowNode.QuerySelector("CloseButton")!;
+    Node CloseButton2 => _windowNode.QuerySelector("CloseButton2")!;
 
     public abstract void OnDraw();
 

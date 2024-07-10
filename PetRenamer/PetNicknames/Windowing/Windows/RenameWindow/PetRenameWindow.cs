@@ -8,8 +8,6 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
-using System.Security.AccessControl;
-using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 

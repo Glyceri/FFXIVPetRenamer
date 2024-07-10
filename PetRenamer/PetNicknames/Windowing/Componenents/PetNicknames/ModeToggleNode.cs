@@ -7,8 +7,8 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class ModeToggleNode : Node
 {
-    Node CompanionNode => QuerySelector("MinionMode")!;
-    Node BattlePetNode => QuerySelector("BattlePetMode")!;
+    readonly Node CompanionNode;
+    readonly Node BattlePetNode;
 
     public event Action<PetWindowMode>? OnModeChange;
 
@@ -19,14 +19,14 @@ internal class ModeToggleNode : Node
         ClassList = ["ModeToggleBase"];
 
         ChildNodes = [
-            new()
+            CompanionNode = new()
             {
                 Id = "MinionMode",
                 Stylesheet = ModeToggleStylesheet,
                 ClassList = ["ModeToggleUnavailableMinion"],
                 Tooltip = "Switch to Minion Mode"
             },
-            new()
+            BattlePetNode = new()
             {
                 Id = "BattlePetMode",
                 Stylesheet = ModeToggleStylesheet,

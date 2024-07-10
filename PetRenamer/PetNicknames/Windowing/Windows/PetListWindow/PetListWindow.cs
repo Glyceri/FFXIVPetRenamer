@@ -1,5 +1,4 @@
 ﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -48,7 +47,6 @@ internal class PetListWindow : PetWindow
 
     public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
     {
-        //Una.Drawing.Node.DrawDebugInfo = true;
         UserList = userList;
         Database = database;
         LegacyDatabase = legacyDatabase;
@@ -61,7 +59,7 @@ internal class PetListWindow : PetWindow
             {
                 Style = new Style()
                 {
-                    Size = new Size(550, 100),
+                    Size = new Size(540, 100),
                 },
                 ChildNodes = [
                     new Node()
@@ -76,8 +74,9 @@ internal class PetListWindow : PetWindow
                             StrokeRadius = 6,
                             IsAntialiased = false,
                         },
-                        ChildNodes = [
-                    UserNode = new UserNode(in ImageDatabase),
+                        ChildNodes =
+                        [
+                            UserNode = new UserNode(in ImageDatabase),
                         ]
                     },
                     new Node()
@@ -112,16 +111,17 @@ internal class PetListWindow : PetWindow
                                     Anchor = Anchor.BottomCenter,
                                     Flow = Flow.Vertical,
                                 },
-                                ChildNodes = [
-                            UserListButton = new QuickButton("User List")
-                            {
-                                Style = new Style()
-                                {
-                                    Size = new Size(60, 15),
-                                    Margin = new EdgeSize(18, 1, 1, 1),
-                                    Anchor = Anchor.TopCenter,
-                                },
-                            },
+                                ChildNodes =
+                                [
+                                    UserListButton = new QuickButton("User List")
+                                    {
+                                        Style = new Style()
+                                        {
+                                            Size = new Size(60, 15),
+                                            Margin = new EdgeSize(18, 1, 1, 1),
+                                            Anchor = Anchor.TopCenter,
+                                        },
+                                    },
                                     SharingButton = new QuickButton("Sharing")
                                     {
                                         Style = new Style()
@@ -133,7 +133,7 @@ internal class PetListWindow : PetWindow
                                     },
                                 ]
                             }
-                ],
+                        ],
                     }
                 ]
             },
@@ -163,20 +163,18 @@ internal class PetListWindow : PetWindow
                             ScrollbarRounding = 15,
                             ScrollbarWidth = 11,
                         },
-                        ChildNodes = [
-                    ScrolllistContentNode = new Node()
-                    {
-                        Style = new Style()
-                        {
-                            Flow = Flow.Vertical,
-                            Padding = new EdgeSize(3),
-                            Gap = 10,
-                        },
-                        ChildNodes = [
-
+                        ChildNodes = 
+                        [
+                            ScrolllistContentNode = new Node()
+                            {
+                                Style = new Style()
+                                {
+                                    Flow = Flow.Vertical,
+                                    Padding = new EdgeSize(3),
+                                    Gap = 10,
+                                }
+                            }
                         ]
-                    }
-                ]
                     }
                 ]
             },
@@ -185,12 +183,8 @@ internal class PetListWindow : PetWindow
                 Style = new Style()
                 {
                     BackgroundGradient = GradientColor.Vertical(new Color("Window.Border:Active"), new Color(224, 183, 18, 0)),
-                    //StrokeColor = new Color("Window.TextOutline"),
-                    //StrokeWidth = 1,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
                     BorderRadius = 6,
-                    //StrokeRadius = 6,
-                    //ShadowSize = new EdgeSize(64, 0, 0, 0),
                     Margin = new(129, 0, 0, 0),
                     Size = new Size(422, 4),
                     Anchor = Anchor.TopCenter,
