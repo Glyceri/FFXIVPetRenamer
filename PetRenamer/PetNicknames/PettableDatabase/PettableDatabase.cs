@@ -1,18 +1,34 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
-internal class PettableDatabase(in IPetServices petSerivces) : IPettableDatabase
+internal class PettableDatabase : IPettableDatabase
 {
     protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
 
-    readonly IPetServices PetServices = petSerivces;
+    readonly IPetServices PetServices;
+
+    public PettableDatabase(in IPetServices petServices)
+    {
+        PetServices = petServices;
+
+        List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
+        SerializableUserV4[]? users = petServices.Configuration.SerializableUsersV4;
+        if (users == null) return;
+        foreach(SerializableUserV4 user in users)
+        {
+            SerializableNameData[] datas = user.SerializableNameDatas;
+            if (datas.Length == 0) continue;
+            newEntries.Add(new PettableDataBaseEntry(in PetServices, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
+        }
+        _entries = newEntries;
+    }
 
     public IPettableDatabaseEntry? GetEntry(string name)
     {
@@ -64,5 +80,18 @@ internal class PettableDatabase(in IPetServices petSerivces) : IPettableDatabase
             hasRemoved = true;
         }
         return hasRemoved;
+    }
+
+    public SerializableUserV4[] SerializeDatabase()
+    {
+        List<SerializableUserV4> users = new List<SerializableUserV4>();
+        int entryCount = _entries.Count;
+        for (int i = 0; i < entryCount; i++)
+        {
+            IPettableDatabaseEntry entry = _entries[i];
+            if (!entry.IsActive) continue;
+            users.Add(entry.SerializeEntry());
+        }
+        return users.ToArray();
     }
 }

@@ -17,7 +17,6 @@ internal class PetServices : IPetServices
     {
         PetLog = new PetLogWrapper(services.PluginLog);
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
-        Configuration.Initialise(services.PetNicknamesPlugin);
         StringHelper = new StringHelperWrapper();
         PetSheets = new SheetsWrapper(ref services, StringHelper);
         PetCastHelper = new PetCastWrapper();

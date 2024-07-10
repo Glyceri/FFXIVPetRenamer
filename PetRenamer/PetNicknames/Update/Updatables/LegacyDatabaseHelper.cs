@@ -5,7 +5,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Update.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.Interface;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -51,8 +50,10 @@ internal class LegacyDatabaseHelper : IUpdatable
         for (int i = entries.Length - 1; i >= 0; i--)
         {
             IPettableDatabaseEntry entry = entries[i];
+
             BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
             if (character == null) continue;
+            DalamudServices.PluginLog.Debug("Found");
             entry.UpdateContentID(character->ContentId);
             LegacyPettableDatabase.RemoveEntry(entry);
             entry.MoveToDataBase(PettableDatabase);

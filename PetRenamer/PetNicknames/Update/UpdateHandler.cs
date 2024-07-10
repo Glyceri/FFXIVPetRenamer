@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using System;
+using System.Collections.Generic;
 using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.Lodestone;
-using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -9,27 +9,25 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Update.Interfaces;
 using PetRenamer.PetNicknames.Update.Updatables;
-using System;
-using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Update;
 
 internal class UpdateHandler : IDisposable
 {
-    DalamudServices DalamudServices { get; init; }
-    IPetServices PetServices { get; init; }
-    IPettableUserList PettableUserList { get; init; }
-    IPettableDatabase PettableDatabase { get; init; }
-    IPettableDatabase LegacyPettableDatabase { get; init; }
-    IPetLog PetLog { get; init; }
-
+    readonly DalamudServices DalamudServices;
+    readonly Configuration Configuration;
+    readonly IPetServices PetServices;
+    readonly IPettableUserList PettableUserList;
+    readonly IPettableDatabase PettableDatabase;
+    readonly IPettableDatabase LegacyPettableDatabase;
+    readonly IPetLog PetLog;
     readonly LodestoneNetworker LodestoneNetworker;
+    readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    List<IUpdatable> _updatables = new List<IUpdatable>();
-
-    public UpdateHandler(DalamudServices dalamudServices, IPettableUserList pettableUserList, IPettableDatabase legacyDatabase, IPettableDatabase pettableDatabase, IPetServices petServices, LodestoneNetworker lodestoneNetworker)
+    public UpdateHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker)
     {
         DalamudServices = dalamudServices;
+        Configuration = configuration;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
@@ -44,6 +42,7 @@ internal class UpdateHandler : IDisposable
     void Setup()
     {
         _updatables.Add(new LegacyDatabaseHelper(DalamudServices, LegacyPettableDatabase, PettableDatabase, PetServices));
+        _updatables.Add(new SaveHelper(Configuration, PettableDatabase));
         _updatables.Add(new PettableUserHandler(DalamudServices, PettableUserList, PettableDatabase, PetServices));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker));
     }

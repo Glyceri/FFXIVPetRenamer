@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.Serialization;
+
+namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface INamesDatabase
 {
@@ -9,4 +11,6 @@ internal interface INamesDatabase
     bool IsDirty { get; }
 
     void MarkDirtyAsNoticed();
+
+    SerializableNameData SerializeData();
 }

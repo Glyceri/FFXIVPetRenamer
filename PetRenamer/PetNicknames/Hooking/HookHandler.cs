@@ -1,30 +1,23 @@
 ﻿using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking;
 internal class HookHandler : IDisposable
 {
-    IPetLog PetLog { get; init; }
-    DalamudServices DalamudServices { get; init; }
-    IPetServices PetServices { get; init; }
-    IPettableUserList PettableUserList { get; init; }
-    IPettableDatabase PettableDatabase { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPetServices PetServices;
+    readonly IPettableUserList PettableUserList;
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDatabase pettableDatabase)
+    public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
-        PettableDatabase = pettableDatabase;
-        PetLog = PetServices.PetLog;
 
         _Register();
     }

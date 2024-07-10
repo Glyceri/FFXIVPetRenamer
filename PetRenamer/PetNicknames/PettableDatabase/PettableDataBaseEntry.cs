@@ -1,25 +1,29 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
+    public bool IsActive { get; private set; }
+
     public ulong ContentID { get; private set; }
     public string Name { get; private set; } = "";
-
-    public bool IsActive { get; private set; }
     public ushort Homeworld { get; private set; }
+    public string HomeworldName { get; private set; }
 
     public int[] SoftSkeletons { get; private set; }
 
     public INamesDatabase ActiveDatabase { get; private set; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
-    bool _dirty;
-    public bool Dirty { get => _dirty || ActiveDatabase.IsDirty; }
-    public string HomeworldName { get; private set; }
+
+    bool _IsDirty;
+    public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty; }
+    
     public bool Destroyed { get; private set; } = false;
+    public bool OldUser { get; private set; } = false;
 
     readonly IPetServices PetServices;
 
@@ -39,6 +43,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         Homeworld = pettableUser.Homeworld;
         Name = pettableUser.Name;
+        HomeworldName = pettableUser.HomeworldName;
+
+        if (IsActive) return;
+        if (!pettableUser.IsLocalPlayer) return;
+        _IsDirty = true;
     }
 
     public int Length() => ActiveDatabase.IDs.Length;
@@ -54,7 +63,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.ContentID = this.ContentID;
         pEntry.IsActive = true;
         pEntry.SoftSkeletons = this.SoftSkeletons;
-        pEntry._dirty = true;
+        pEntry._IsDirty = true;
+        pEntry.OldUser = true;
         return true;
     }
 
@@ -69,7 +79,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public void NotifySeenDirty()
     {
-        _dirty = false;
+        _IsDirty = false;
         ActiveDatabase.MarkDirtyAsNoticed();
     }
 
@@ -81,4 +91,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     }
 
     public void Destroy() => Destroyed = true;
+
+    public SerializableUserV4 SerializeEntry() => new SerializableUserV4(this);
 }

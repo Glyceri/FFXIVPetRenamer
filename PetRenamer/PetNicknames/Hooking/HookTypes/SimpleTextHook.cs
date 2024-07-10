@@ -57,7 +57,7 @@ internal unsafe class SimpleTextHook : ITextHook
 
         // Make sure it only runs once
         string tNodeText = tNode->NodeText.ToString();
-        if ((tNodeText == string.Empty || tNodeText == LastAnswer) && (lastPettableUser != null && !lastPettableUser.DataBaseEntry.Dirty)) return;
+        if ((tNodeText == string.Empty || tNodeText == LastAnswer) && (lastPettableUser != null && !lastPettableUser.DataBaseEntry.IsDirty)) return;
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
     }

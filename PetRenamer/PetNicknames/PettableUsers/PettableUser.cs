@@ -112,7 +112,7 @@ internal unsafe class PettableUser : IPettableUser
 
     void Reset()
     {
-        if (DataBaseEntry.Dirty)
+        if (DataBaseEntry.IsDirty)
         {
             DataBaseEntry.NotifySeenDirty();
             for (int i = PettablePets.Count - 1; i >= 0; i--)

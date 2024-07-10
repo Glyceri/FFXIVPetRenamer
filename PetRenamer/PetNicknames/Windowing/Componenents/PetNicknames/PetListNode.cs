@@ -1,7 +1,9 @@
 ﻿using Dalamud.Interface;
+using ImGuiNET;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using System.Numerics;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -80,6 +82,9 @@ internal class PetListNode : Node
                     Size = new Size(50, 50),
                     Anchor = Anchor.MiddleRight,
                     Margin = new EdgeSize(0, 33, 0, 0),
+                    BorderColor = new BorderColor(new Color(255, 255, 255)),
+                    BorderWidth = new EdgeSize(4),
+                    BorderRadius = 6,
                 }
             },
             ClearButtonNode = new Node()
@@ -93,6 +98,21 @@ internal class PetListNode : Node
         ClearButtonNode.OnClick += _ => { };
 
         IconNode.IconID = data.Icon;
+    }
+
+    protected override void OnDraw(ImDrawListPtr drawList)
+    {
+        base.OnDraw(drawList);
+
+        Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
+        Rect iconRect = IconNode.Bounds.ContentRect;
+
+        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
+        Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
+        Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * Node.ScaleFactor;
+
+        drawList.AddLine(activePos, earlyiconPos + new Vector2(Node.ScaleFactor * 0.5f, 0), new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
     }
 
     Stylesheet stylesheet = new Stylesheet([

@@ -23,11 +23,11 @@ namespace PetRenamer;
 
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
-    DalamudServices _DalamudServices { get; init; }
+    readonly DalamudServices _DalamudServices;
     readonly IPetServices _PetServices;
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
-    readonly IPettableDatabase LegacyDatabase;
+    readonly ILegacyDatabase LegacyDatabase;
     readonly IImageDatabase ImageDatabase;
     readonly IWindowHandler WindowHandler;
 
@@ -48,10 +48,10 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker(); // Ha ha
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(in _PetServices);
-        LegacyDatabase = new LegacyPettableDatabase(_PetServices.Configuration, in _PetServices);
-        ImageDatabase = new ImageDatabase(_DalamudServices, in _PetServices, in PettableDatabase, in LodestoneNetworkerInterface);
-        UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LegacyDatabase, PettableDatabase, _PetServices, LodestoneNetworker);
-        HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
+        LegacyDatabase = new LegacyPettableDatabase(in _PetServices);
+        ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in PettableDatabase, in LodestoneNetworkerInterface);
+        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker);
+        HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
@@ -72,6 +72,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
             HelpMessage = "Temporary",
             ShowInHelp = true
         });
+
+        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
     }
 
     public void Dispose()

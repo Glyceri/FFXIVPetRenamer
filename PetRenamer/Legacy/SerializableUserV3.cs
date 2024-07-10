@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PetRenamer.PetNicknames;
 using System;
 
 namespace PetRenamer.Core.Serialization;
@@ -15,7 +16,7 @@ public class SerializableUserV3
 
     public SerializableUserV3(string username, ushort homeworld)
     {
-        this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
+        this.username = username.Replace(((char)0).ToString(), "").Replace(PluginConstants.HalfWidthSpace, " ");
         this.homeworld = homeworld;
     }
 

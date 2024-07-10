@@ -1,19 +1,29 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using PetRenamer.Core.Serialization;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Serialization;
 using System;
 using System.Text.Json.Serialization;
 
 namespace PetRenamer;
 
 [Serializable]
-public class Configuration : IPluginConfiguration
+internal class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
     IDalamudPluginInterface? PetNicknamesPlugin;
     [JsonIgnore]
+    IPettableDatabase? Database = null;
+    [JsonIgnore]
+    ILegacyDatabase? LegacyDatabase = null;
+    [JsonIgnore]
+    bool isSetup = false;
+    [JsonIgnore]
     public const int currentSaveFileVersion = 9;
     public int Version { get; set; } = currentSaveFileVersion;
+
+    public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
 
     // ------------------------ Unrelated Settings -----------------------
     public bool limitLocalSearch = false;
@@ -53,23 +63,28 @@ public class Configuration : IPluginConfiguration
     public bool autoOpenDebug = true;
     public bool showChatID = false;
 
-
-
-    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin)
+    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;
+        Database = database;
+        LegacyDatabase = legacyDatabase;
         LegacyInitialise();
         CurrentInitialise();
+        isSetup = true;
     }
 
     void CurrentInitialise()
     {
-        
+        SerializableUsersV4 ??= Array.Empty<SerializableUserV4>();
     }
 
     public void Save() 
     {
-        if (currentSaveFileVersion < Version) return;
+        if (currentSaveFileVersion < Version || !isSetup || Database == null || LegacyDatabase == null) return;
+        SerializableUsersV4 = Database.SerializeDatabase();
+#pragma warning disable CS0618
+        serializableUsersV3 = LegacyDatabase.SerializeLegacyDatabase();
+#pragma warning restore CS0618
         PetNicknamesPlugin?.SavePluginConfig(this); 
     }
 

@@ -84,7 +84,7 @@ internal class PetRenameNode : Node
                             Margin = new EdgeSize(0, 0, 0, 200),
                         },
                         ChildNodes = [
-                        EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}:"),
+                            EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}:"),
                             ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}:"),
                         ]
                     },
@@ -108,7 +108,7 @@ internal class PetRenameNode : Node
                             IconId = ActivePet?.Icon ?? 66310,
                             BorderColor = new BorderColor(new Color(255, 255, 255)),
                             BorderWidth = new EdgeSize(4),
-                            BorderRadius = 18,
+                            BorderRadius = 8,
                         },
                         ChildNodes = [
                              CircleImageNode = new CircleImageNode(in services)
@@ -226,7 +226,7 @@ internal class PetRenameNode : Node
 
         Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
-        Vector2 earlyiconPos = iconPos - new Vector2(45, 0);
+        Vector2 earlyiconPos = iconPos - new Vector2(20.5f, 0) * Node.ScaleFactor;
 
         drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
         drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);

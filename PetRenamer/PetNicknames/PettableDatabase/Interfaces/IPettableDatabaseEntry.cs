@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Serialization;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
@@ -9,9 +10,10 @@ internal interface IPettableDatabaseEntry
     ushort Homeworld { get; }
     string HomeworldName { get; }
 
-    bool Dirty { get; }
+    bool IsDirty { get; }
     bool IsActive { get; }
     bool Destroyed { get; }
+    bool OldUser { get; }
 
     int[] SoftSkeletons { get; }
 
@@ -33,4 +35,6 @@ internal interface IPettableDatabaseEntry
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
     void Destroy();
+
+    SerializableUserV4 SerializeEntry();
 }

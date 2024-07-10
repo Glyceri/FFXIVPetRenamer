@@ -40,7 +40,7 @@ internal class UserListNode : Node
                 ChildNodes = [
                     SpeciesNode = new RenameTitleNode("Name:", entry.Name),
                     IDNode = new RenameTitleNode("Homeworld:", entry.HomeworldName),
-                    NicknameNode = new RenameTitleNode("ContentID:", entry.ContentID.ToString()),
+                    NicknameNode = new RenameTitleNode("Petcount:", entry.Length().ToString()),
                     new Node()
                     {
                         Style = new Style()

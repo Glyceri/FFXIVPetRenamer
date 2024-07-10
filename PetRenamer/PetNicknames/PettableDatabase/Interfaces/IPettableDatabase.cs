@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.Serialization;
+
+namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDatabase
 {
@@ -28,4 +30,6 @@ internal interface IPettableDatabase
     /// <param name="entry">Entry to remove.</param>
     /// <returns>Whether the remove succeeded.</returns>
     bool RemoveEntry(IPettableDatabaseEntry entry);
+
+    SerializableUserV4[] SerializeDatabase();
 }

@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,8 +32,8 @@ internal class PettableNameDatabase : INamesDatabase
     public void SetName(int ID, string? name)
     {
         if (ID == -1) return;
-        if (name == string.Empty) name = null;
         IsDirty = true;
+        if (name == string.Empty) name = null;
         int index = IndexOf(ID);
         if (index != -1)
         {
@@ -73,4 +74,6 @@ internal class PettableNameDatabase : INamesDatabase
     }
 
     public void MarkDirtyAsNoticed() => IsDirty = false;
+
+    public SerializableNameData SerializeData() => new SerializableNameData(this);
 }

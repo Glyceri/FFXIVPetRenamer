@@ -122,7 +122,7 @@ internal class PetListWindow : PetWindow
                                     Anchor = Anchor.TopCenter,
                                 },
                             },
-                                  SharingButton = new QuickButton("Sharing")
+                                    SharingButton = new QuickButton("Sharing")
                                     {
                                         Style = new Style()
                                         {
@@ -224,22 +224,19 @@ internal class PetListWindow : PetWindow
             SetUser(lastUser?.DataBaseEntry);
         }
 
-        if (inUserMode)
+        bool dirty = false;
+        foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
         {
-            bool dirty = false;
-            foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
+            if (!e.IsActive) continue;
+            if (e.IsDirty)
             {
-                if (!e.IsActive) continue;
-                if (e.Dirty)
-                {
-                    dirty = true;
-                    break;
-                }
+                dirty = true;
+                break;
             }
-            if (dirty)
-            {
-                SetUser(ActiveEntry);
-            }
+        }
+        if (dirty)
+        {
+            SetUser(ActiveEntry);
         }
     }
 
@@ -265,7 +262,7 @@ internal class PetListWindow : PetWindow
 
         if (inUserMode)
         {
-            foreach(IPettableDatabaseEntry e in Database.DatabaseEntries)
+            foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
             {
                 if (!e.IsActive) continue;
                 ScrolllistContentNode.AppendChild(new UserListNode(in ImageDatabase, in e));

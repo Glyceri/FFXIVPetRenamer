@@ -60,8 +60,6 @@ internal class ImageDatabase : IImageDatabase
 
     public void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null)
     {
-        DalamudServices.PluginLog.Debug("REDOWNLOAD FOR: " + entry.Name);
-
         lock (_imageDatabase)
         {
             if(_imageDatabase.TryGetValue(entry.ContentID, out IDalamudTextureWrap? textureWrap))
