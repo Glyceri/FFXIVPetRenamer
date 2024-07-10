@@ -42,7 +42,7 @@ internal class WindowHandler : IWindowHandler
     public void AddWindow(PetWindow window)
     {        
         WindowSystem.AddWindow(window);
-        window.SetPetMode(_windowMode);
+        DalamudServices.Framework.Run(() => window.SetPetMode(_windowMode));
     }
 
     public void RemoveWindow(PetWindow window)
@@ -96,7 +96,7 @@ internal class WindowHandler : IWindowHandler
         foreach (IPetWindow window in WindowSystem.Windows)
         {
             if (!window.RequestsModeChange) continue;
-            SetWindowMode(window.NewMode);
+            DalamudServices.Framework.Run(() => SetWindowMode(window.NewMode));
             window.DeclareModeChangedSeen();
             break;
         }

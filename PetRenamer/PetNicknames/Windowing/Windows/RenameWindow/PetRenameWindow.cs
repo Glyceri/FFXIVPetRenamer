@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using ImGuiNET;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -32,29 +33,23 @@ internal partial class PetRenameWindow : PetWindow
     int activeSkeleton = 0;
     string? lastCustomName = null!;
 
-    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window")
+    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window", ImGuiWindowFlags.NoResize)
     {
         UserList = userList;
         Database = database;
         PetServices = petServices;
-        AddNode(Node, petRenameNode = new PetRenameNode(null, null, in DalamudServices));
+        petRenameNode = new PetRenameNode(null, null, in DalamudServices);
+        AddNode(ContentNode, petRenameNode);
         petRenameNode.OnSave += OnSave;
     }
 
     public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
-        if (ActiveUser == null || activeSkeleton == -1)
+        if (ActiveUser?.IsDirty ?? false || lastActiveUser != ActiveUser)
         {
-            CleanOldNode();
-        }
-        if (ActiveUser != null)
-        {
-            if (ActiveUser.IsDirty || lastActiveUser != ActiveUser)
-            {
-                lastActiveUser = ActiveUser;
-                GetActiveSkeleton();
-            }
+            lastActiveUser = ActiveUser;
+            GetActiveSkeleton();
         }
     }
 
@@ -72,11 +67,16 @@ internal partial class PetRenameWindow : PetWindow
 
     void GetActiveSkeleton()
     {
-        if (ActiveUser == null) return;
+        if (ActiveUser == null)
+        {
+            CleanOldNode();
+            return;
+        }
         IPettablePet? pet = ActiveUser.GetYoungestPet(CurrentMode == PetWindowMode.Minion ? IPettableUser.PetFilter.Minion : IPettableUser.PetFilter.BattlePet);
         if (pet == null)
         {
             activeSkeleton = -1;
+            CleanOldNode();
             return;
         }
         bool dirty = activeSkeleton != pet.SkeletonID;
@@ -104,7 +104,7 @@ internal partial class PetRenameWindow : PetWindow
         lastCustomName = customName;
 
         petRenameNode?.Setup(customName, in data);
-        
+
     }
 
     void CleanOldNode()

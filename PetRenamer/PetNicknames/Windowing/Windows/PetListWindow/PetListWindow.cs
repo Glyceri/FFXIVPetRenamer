@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+﻿using ImGuiNET;
+using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -38,7 +39,7 @@ internal class PetListWindow : PetWindow
 
     readonly Node HeaderNode;
     readonly Node ScrollListBaseNode;
-    readonly Node ScrolllistContentNode;
+    readonly Node ScrollistContentNode;
     readonly Node BottomPortion;
 
     readonly QuickButton UserListButton;
@@ -53,9 +54,9 @@ internal class PetListWindow : PetWindow
         LegacyDatabase = legacyDatabase;
         PetServices = petServices;
         ImageDatabase = imageDatabase;
-        Node.Style.Flow = Flow.Vertical;
+        ContentNode.Style.Flow = Flow.Vertical;
 
-        Node.ChildNodes = [
+        ContentNode.ChildNodes = [
             HeaderNode = new Node()
             {
                 Style = new Style()
@@ -77,7 +78,7 @@ internal class PetListWindow : PetWindow
                         },
                         ChildNodes =
                         [
-                            UserNode = new UserNode(in ImageDatabase),
+                            UserNode = new UserNode(in DalamudServices, in ImageDatabase),
                         ]
                     },
                     new Node()
@@ -114,7 +115,7 @@ internal class PetListWindow : PetWindow
                                 },
                                 ChildNodes =
                                 [
-                                    UserListButton = new QuickButton("User List")
+                                    UserListButton = new QuickButton(in DalamudServices, "User List")
                                     {
                                         Style = new Style()
                                         {
@@ -123,7 +124,7 @@ internal class PetListWindow : PetWindow
                                             Anchor = Anchor.TopCenter,
                                         },
                                     },
-                                    SharingButton = new QuickButton("Sharing")
+                                    SharingButton = new QuickButton(in DalamudServices, "Sharing")
                                     {
                                         Style = new Style()
                                         {
@@ -166,7 +167,7 @@ internal class PetListWindow : PetWindow
                         },
                         ChildNodes = 
                         [
-                            ScrolllistContentNode = new Node()
+                            ScrollistContentNode = new Node()
                             {
                                 Style = new Style()
                                 {
@@ -218,7 +219,8 @@ internal class PetListWindow : PetWindow
             lastUser = UserList.LocalPlayer;
             SetUser(lastUser?.DataBaseEntry);
         }
-    }
+
+        }
 
     public override void OnLateDraw()
     {
@@ -254,7 +256,7 @@ internal class PetListWindow : PetWindow
     {
         ActiveEntry = entry;
         UserNode.SetUser(entry);
-        ScrolllistContentNode.ChildNodes.Clear();
+        ScrollistContentNode.ChildNodes.Clear();
 
         SmallHeaderNode.NodeValue = "...";
 
@@ -263,7 +265,7 @@ internal class PetListWindow : PetWindow
             foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
             {
                 if (!e.IsActive) continue;
-                ScrolllistContentNode.AppendChild(new UserListNode(in ImageDatabase, in e));
+                ScrollistContentNode.AppendChild(new UserListNode(in DalamudServices, in ImageDatabase, in e));
             }
         }
         else HandlePetMode();
@@ -281,8 +283,8 @@ internal class PetListWindow : PetWindow
             if (CurrentMode == PetWindowMode.BattlePet && id >= -1) continue;
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) continue;
-            PetListNode newPetListNode = new PetListNode(petData, names.Names[i]);
-            ScrolllistContentNode.AppendChild(newPetListNode);
+            PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, names.Names[i]);
+            ScrollistContentNode.AppendChild(newPetListNode);
             
             newPetListNode.OnSave += (value) => OnSave(value, petData.Model);
         }
@@ -312,33 +314,6 @@ internal class PetListWindow : PetWindow
             }
         }
     }
-
-    Stylesheet stylesheet = new Stylesheet([
-        new(".TakeMeButton", new Style()
-        {
-            Size = new Size(100, 25),
-            Anchor = Anchor.MiddleCenter,
-            Margin = new EdgeSize(20, 0, 0, 0),
-            BackgroundColor = new Color("PetNicknamesButton"),
-            TextShadowSize = 2,
-            TextShadowColor = new Color("Window.TextOutline"),
-            FontSize = 10,
-            TextAlign = Anchor.MiddleCenter,
-            TextOffset = new Vector2(0, 0),
-            Color = new Color("Window.TextLight"),
-            BorderColor = new(new("Window.TitlebarBorder")),
-            BorderWidth = new EdgeSize(2, 2, 2, 2),
-            BorderRadius = 8,
-            StrokeRadius = 8,
-            IsAntialiased = false,
-            RoundedCorners = RoundedCorners.All,
-        }),
-        new(".TakeMeButton:hover", new Style()
-        {
-            BackgroundColor = new Color("PetNicknamesButton:Hover"),
-            FontSize = 12,
-        }),
-    ]);
 
     void OnSave(string? newName, int skeleton) => ActiveEntry?.SetName(skeleton, newName ?? "");
 }

@@ -15,7 +15,7 @@ internal partial class PetWindow
     {
         activeModeToggleNode = new ModeToggleNode(in DalamudServices);
         activeModeToggleNode.OnModeChange += _InternalSetPetWindowMode;
-        PrepependNode(TopLeftAnchor, activeModeToggleNode);
+        PrepependNode(TitlebarNode, activeModeToggleNode);
     }
 
     public void DeclareModeChangedSeen()
@@ -31,8 +31,8 @@ internal partial class PetWindow
 
     public void SetPetMode(PetWindowMode mode)
     {
-        activeModeToggleNode?.SetActivePetMode(mode);
         CurrentMode = mode;
+        activeModeToggleNode?.SetActivePetMode(mode);
 
         if (HasModeToggle)
         {

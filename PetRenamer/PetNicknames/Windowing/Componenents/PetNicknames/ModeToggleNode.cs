@@ -12,31 +12,27 @@ internal class ModeToggleNode : Node
 
     public event Action<PetWindowMode>? OnModeChange;
 
+    readonly DalamudServices DalamudServices;
+
     public ModeToggleNode(in DalamudServices dalamudServices)
     {
-        Id = "BaseModeToggleNode";
+        DalamudServices = dalamudServices;
         Stylesheet = ModeToggleStylesheet;
         ClassList = ["ModeToggleBase"];
 
         ChildNodes = [
-            CompanionNode = new()
+           CompanionNode = new()
             {
-                Id = "MinionMode",
-                Stylesheet = ModeToggleStylesheet,
-                ClassList = ["ModeToggleUnavailableMinion"],
-                Tooltip = "Switch to Minion Mode"
+                ClassList = ["ModeToggleUnavailableMinion"]
             },
             BattlePetNode = new()
             {
-                Id = "BattlePetMode",
-                Stylesheet = ModeToggleStylesheet,
-                ClassList = ["BattlePetModeActive"],
-                Tooltip = "Switch to Battle Pet Mode"
+                ClassList = ["BattlePetModeActive"]
             },
         ];
 
-        CompanionNode.OnClick += _ => OnModeChange?.Invoke(PetWindowMode.Minion);
-        BattlePetNode.OnClick += _ => OnModeChange?.Invoke(PetWindowMode.BattlePet);
+        CompanionNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => OnModeChange?.Invoke(PetWindowMode.Minion));
+        BattlePetNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => OnModeChange?.Invoke(PetWindowMode.BattlePet));
     }
 
     public void SetActivePetMode(PetWindowMode mode)
@@ -59,55 +55,38 @@ internal class ModeToggleNode : Node
                 ".ModeToggleBase",
                 new()
                 {
-                    Anchor = Anchor.TopLeft,
-                    Flow = Flow.Horizontal,
-                    Size = new Size(70, 28),
-                    Padding = new(2),
+                    Anchor = Anchor.MiddleLeft,
+                    Size = new Size(64, 15),
                     BackgroundColor = new Color("Window"),
-                    Margin = new(2, 5),
+                    Margin = new EdgeSize(0, 5),
                 }
             ),
             new(".ModeToggleUnavailableMinion",
                 new()
                 {
                     Anchor = Anchor.MiddleLeft,
-                    Flow = Flow.Vertical,
                     Size = new Size(32, 15),
                     BackgroundColor = new("ModeToggleInactive"),
                     BorderRadius = 6,
-                    IsAntialiased = false,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.BottomLeft,
-                    ShadowSize = new(5),
-                    ShadowInset = 8,
-                    Padding = new(2),
                 }),
             new(".ModeToggleUnavailableBattlePet",
                 new()
                 {
                     Anchor = Anchor.MiddleLeft,
-                    Flow = Flow.Vertical,
                     Size = new Size(32, 15),
                     BackgroundColor = new("ModeToggleInactive"),
                     BorderRadius = 6,
-                    IsAntialiased = false,
                     RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
-                    ShadowSize = new(5),
-                    ShadowInset = 8,
-                    Padding = new(2),
                 }),
             new(".BattlePetModeActive",
                 new()
                 {
                     Anchor = Anchor.MiddleLeft,
-                    Flow = Flow.Vertical,
                     Size = new Size(32, 15),
                     BackgroundColor = new("Titlebar.BattlePet"),
                     BorderRadius = 6,
-                    IsAntialiased = true,
                     RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
-                    ShadowSize = new(5),
-                    ShadowInset = 8,
-                    Padding = new(2),
                 }),
             new(".BattlePetModeActive:hover",
                 new()
@@ -122,16 +101,14 @@ internal class ModeToggleNode : Node
                     Size = new Size(32, 15),
                     BackgroundColor = new("Titlebar.Minion"),
                     BorderRadius = 6,
-                    IsAntialiased = true,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.BottomLeft,
-                    ShadowSize = new(5),
-                    ShadowInset = 8,
-                    Padding = new(2),
                 }),
             new(".MinionModeActive:hover",
                 new()
                 {
                     BackgroundColor = new("Titlebar.Minion:Dark"),
-                }),
-        ]);
+                }
+            ),
+        ]
+    );
 }

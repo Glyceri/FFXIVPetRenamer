@@ -3,6 +3,7 @@ using Dalamud.Interface.Textures.TextureWraps;
 using ImGuiNET;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -17,8 +18,11 @@ internal class ProfilePictureNode : Node
 
     IPettableDatabaseEntry? activeUser;
 
-    public ProfilePictureNode(in IImageDatabase imageDatabase)
+    readonly DalamudServices DalamudServices;
+
+    public ProfilePictureNode(in DalamudServices services, in IImageDatabase imageDatabase)
     {
+        DalamudServices = services;
         ImageDatabase = imageDatabase;
 
         ChildNodes = [
@@ -31,7 +35,7 @@ internal class ProfilePictureNode : Node
             }
         ];
 
-        RedownloadNode.OnMouseUp += _ => ImageDatabase.Redownload(activeUser!);
+        RedownloadNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => ImageDatabase.Redownload(activeUser!));
     }
 
     public void SetUser(IPettableDatabaseEntry? user)

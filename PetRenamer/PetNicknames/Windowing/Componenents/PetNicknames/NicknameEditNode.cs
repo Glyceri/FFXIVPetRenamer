@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System;
@@ -22,7 +23,7 @@ internal class NicknameEditNode : RenameTitleNode
 
     public Action<string?>? OnSave;
 
-    public NicknameEditNode(string label, string text) : base(label, text)
+    public NicknameEditNode(in DalamudServices services, string label, string text) : base(in services, label, text)
     {
         ButtonHolder = new Node()
         {
@@ -33,7 +34,7 @@ internal class NicknameEditNode : RenameTitleNode
             },
             ChildNodes = 
             [
-                EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}")
+                EditButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Edit")}")
                 {
                     Style = new Style()
                     {
@@ -41,7 +42,7 @@ internal class NicknameEditNode : RenameTitleNode
                         Size = new Size(40, 14),
                     }
                 },
-                ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}")
+                ClearButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Clear")}")
                 {
                     Style = new Style()
                     {
@@ -63,7 +64,6 @@ internal class NicknameEditNode : RenameTitleNode
         ActivePet = activePet;
         CurrentValue = customName;
         shouldBeVisible = activePet != null;
-
 
         StopEditMode();
     }
@@ -103,14 +103,11 @@ internal class NicknameEditNode : RenameTitleNode
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        base.OnDraw(drawList);
-
         ButtonHolder.Style.IsVisible = shouldBeVisible;
-        
 
-       if (editMode)
+        if (editMode)
         {
-            ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft);
+            ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft - new System.Numerics.Vector2(0, Node.ScaleFactor));
             ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
             if (ImGui.InputText($"##RenameField_{ActivePet?.Model}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
             {

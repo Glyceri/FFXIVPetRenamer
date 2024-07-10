@@ -32,7 +32,7 @@ internal class SmallHeaderNode : Node
         {
             UnderlineNodeLeft.Style.Size = new Size((int)(ComputedStyle.Size.Width * 0.5f / Node.ScaleFactor), 2);
             UnderlineNodeRight.Style.Size = new Size((int)(ComputedStyle.Size.Width * 0.5f / Node.ScaleFactor), 2);
-            return true;
+            return false;
         };
     }
 

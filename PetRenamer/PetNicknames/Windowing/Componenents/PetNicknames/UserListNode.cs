@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -14,8 +15,11 @@ internal class UserListNode : Node
     readonly RenameTitleNode IDNode;
     readonly RenameTitleNode NicknameNode;
 
-    public UserListNode(in IImageDatabase imageDatabase, in IPettableDatabaseEntry entry)
+    readonly DalamudServices DalamudServices;
+
+    public UserListNode(in DalamudServices services, in IImageDatabase imageDatabase, in IPettableDatabaseEntry entry)
     {
+        DalamudServices = services;
         Style = new Style()
         {
             Flow = Flow.Horizontal,
@@ -38,9 +42,9 @@ internal class UserListNode : Node
                     Margin = new EdgeSize(11, 0, 0, 8),
                 },
                 ChildNodes = [
-                    SpeciesNode = new RenameTitleNode("Name:", entry.Name),
-                    IDNode = new RenameTitleNode("Homeworld:", entry.HomeworldName),
-                    NicknameNode = new RenameTitleNode("Petcount:", entry.Length().ToString()),
+                    SpeciesNode = new RenameTitleNode(in DalamudServices, "Name:", entry.Name),
+                    IDNode = new RenameTitleNode(in DalamudServices, "Homeworld:", entry.HomeworldName),
+                    NicknameNode = new RenameTitleNode(in DalamudServices, "Petcount:", entry.Length().ToString()),
                     new Node()
                     {
                         Style = new Style()
@@ -54,7 +58,7 @@ internal class UserListNode : Node
                     }
                 ]
             },
-            IconNode = new ProfilePictureNode(in imageDatabase)
+            IconNode = new ProfilePictureNode(in DalamudServices, in imageDatabase)
             {
                 Style = new Style()
                 {
@@ -77,7 +81,7 @@ internal class UserListNode : Node
         ClearButtonNode.OnClick += _ => { };
     }
 
-    Stylesheet stylesheet = new Stylesheet([
+    readonly Stylesheet stylesheet = new Stylesheet([
         new(".ClearButton", new Style()
         {
             Anchor = Anchor.TopRight,

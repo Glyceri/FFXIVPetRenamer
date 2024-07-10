@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using ImGuiNET;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System;
@@ -19,8 +20,11 @@ internal class PetListNode : Node
 
     public Action<string?>? OnSave;
 
-    public PetListNode(in IPetSheetData data, string? customName)
+    readonly DalamudServices DalamudServices;
+
+    public PetListNode(in DalamudServices services, in IPetSheetData data, string? customName)
     {
+        DalamudServices = services;
         Style = new Style()
         {
             Flow = Flow.Horizontal,
@@ -43,9 +47,9 @@ internal class PetListNode : Node
                     Margin = new EdgeSize(6, 0, 0, 8),
                 },
                 ChildNodes = [
-                    SpeciesNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Species")}:", data.BaseSingular),
-                    IDNode = new RenameTitleNode($"ID:", data.Model.ToString()),
-                    NicknameNode = new NicknameEditNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? "..."),
+                    SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", data.BaseSingular),
+                    IDNode = new RenameTitleNode(in DalamudServices, $"ID:", data.Model.ToString()),
+                    NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? "..."),
                 ]
             },
             IconNode = new IconNode()
@@ -90,7 +94,7 @@ internal class PetListNode : Node
         drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
     }
 
-    Stylesheet stylesheet = new Stylesheet([
+    readonly Stylesheet stylesheet = new Stylesheet([
         new (".ClearButton", new Style()
         {
             Anchor = Anchor.TopRight,

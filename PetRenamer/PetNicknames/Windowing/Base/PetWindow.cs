@@ -1,10 +1,11 @@
-﻿using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using System;
 using System.Numerics;
 using Una.Drawing;
 
@@ -23,23 +24,60 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected Size ContentSize { get; private set; } = new Size();
 
-    public new bool IsFocused { get; private set; }
-    public bool IsHovered { get; private set; }
-
     protected abstract string Title { get; }
-
-    protected readonly BackgroundNode Node;
 
     protected readonly DalamudServices DalamudServices;
 
-    protected PetWindow(DalamudServices dalamudServices, string name) : base(name, ImGuiWindowFlags, true)
-    {
-        Node = new BackgroundNode(194019u);
-        DalamudServices = dalamudServices;
-        CloseButton.OnClick += _ => Close();
-        CloseButton2.OnClick += _ => Una.Drawing.Node.DrawDebugInfo ^= true; ;
+    readonly BackgroundNode _windowNode;
 
-        ContentNode.AppendChild(Node);
+    readonly Node TitlebarNode;
+    readonly Node TitlebarTextNode;
+    protected readonly Node ContentNode;
+    readonly Node CloseButton;
+
+    Vector2 lastSize = Vector2.Zero;
+
+    protected PetWindow(DalamudServices dalamudServices, string name, ImGuiWindowFlags additionalFlags = ImGuiWindowFlags.None) : base(name, ImGuiWindowFlags | additionalFlags, true)
+    {
+        DalamudServices = dalamudServices;
+
+        _windowNode = new BackgroundNode(194019u)
+        {
+            Stylesheet = WindowStyles.WindowStylesheet,
+            ClassList = ["window"],
+            ChildNodes =
+            [
+                TitlebarNode = new Node()
+                {
+                    ClassList = ["window--titlebar"],
+                },
+                TitlebarTextNode = new Node()
+                {
+                    ClassList = ["window--titlebar-text"],
+                    NodeValue = Title,
+                },
+                CloseButton = new Node()
+                {
+                    Id = "CloseButton",
+                    ClassList = ["window--close-button"],
+                    NodeValue = FontAwesomeIcon.Times.ToIconString(),
+                },
+                ContentNode = new Node()
+                {
+                    ClassList = ["window--content"],
+                },
+            ]
+        };
+
+        SizeConstraints = new WindowSizeConstraints()
+        {
+            MinimumSize = MinSize,
+            MaximumSize = MaxSize,
+        };
+        Size = DefaultSize;
+        SizeCondition = ImGuiCond.FirstUseEver;
+
+        CloseButton.OnClick += _ => DalamudServices.Framework.Run(Close);
 
         if (HasModeToggle) PetModeConstructor();
     }
@@ -47,85 +85,66 @@ internal abstract partial class PetWindow : Window, IPetWindow
     public void Close() => IsOpen = false;
     public void Open() => IsOpen = true;
 
-    public sealed override void Draw()
+    public sealed override void PreDraw()
     {
-        //Una.Drawing.Node.DrawDebugInfo = true;
-        ImGui.SetNextWindowViewport(ImGui.GetMainViewport().ID);
-        ImGui.SetNextWindowSizeConstraints(MinSize * Una.Drawing.Node.ScaleFactor, MaxSize * Una.Drawing.Node.ScaleFactor);
-        ImGui.SetNextWindowSize(DefaultSize, ImGuiCond.FirstUseEver);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
         ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
         ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0);
+    }
 
-        if (ImGui.Begin($"{ID}", ImGuiWindowFlags))
+    public sealed override void PostDraw()
+    {
+        ImGui.PopStyleVar(6);
+    }
+
+    public sealed override void Draw()
+    {
+        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Right))
         {
-            IsFocused = ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows);
-            IsHovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows);
+            Node.DrawDebugInfo ^= true;
+        }
 
-            Vector2 size = ImGui.GetWindowSize() * (1.0f / Una.Drawing.Node.ScaleFactor);
-            size.X = (float)Math.Floor(size.X);
-            size.Y = (float)Math.Floor(size.Y);
+        Vector2 size = ImGui.GetWindowSize() * (1.0f / Node.ScaleFactor);
+        if (lastSize != size)
+        {
+            lastSize = size;
 
             _windowNode.Style.Size = new Size((int)size.X - 3, (int)size.Y - 3);
 
             TitlebarNode.Style.Size = new((int)size.X - 9, 32);
-            TitlebarTextNode.Style.Size = new((int)size.X - 64, 32);
+            TitlebarTextNode.Style.Size = new((int)size.X - 9, 32);
 
             ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
             ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
-            Node.Style.Size = ContentSize;
-
-            // Only enable shadow if the window has focus.
-            _windowNode.Style.ShadowSize = IsFocused ? new(64) : new(0);
-            _windowNode.Style.StrokeColor = IsFocused ? new Color("Window.Border:Active") : new Color("Window.Border:Inactive");
-
-            TitlebarNode.QuerySelector("TitleText")!.NodeValue = Title;
-
-            RenderWindowInstance(ID);
-
-            ImGui.End();
         }
+        _windowNode.Style.StrokeColor = IsFocused ? WindowStyles.WindowBorderActive : WindowStyles.WindowBorderInactive;
 
-        ImGui.PopStyleVar(6);
+        RenderWindowInstance();
     }
 
-    void RenderWindowInstance(string id, int instanceId = 0)
+    void RenderWindowInstance()
     {
         ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
         ImGui.SetCursorPos(new(0, 0));
-        ImGui.BeginChild($"PetWindow_{id}##{instanceId}", ImGui.GetWindowSize(), false);
 
-        // Here to ensure stylevars get popped
-        try { OnDraw(); } catch (Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
+        OnDraw();
 
         Vector2 ps = ImGui.GetWindowPos();
         Point pt = new((int)ps.X + 2, (int)ps.Y + 2);
+        _windowNode.Render(drawList, pt);
 
-        // Here to ensure stylevars get popped
-        try 
-        {
-            _windowNode.Render(drawList, pt); 
-        } 
-        catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
-
-        try
-        {
-            OnLateDraw();
-        }
-        catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
-
-        ImGui.EndChild();
+        OnLateDraw();
     }
 
     protected void AddNode(Node parentNode, Node newNode)
     {
         DalamudServices.Framework.Run(() => parentNode.AppendChild(newNode));
     }
-    
+
     protected void PrepependNode(Node parentNode, Node newNode)
     {
         DalamudServices.Framework.Run(() => parentNode.ChildNodes.Insert(0, newNode));
@@ -136,26 +155,15 @@ internal abstract partial class PetWindow : Window, IPetWindow
         DalamudServices.Framework.Run(() => parentNode.RemoveChild(oldNode));
     }
 
-    Node TitlebarNode => _windowNode.QuerySelector(".window--titlebar")!;
-    Node TitlebarTextNode => _windowNode.QuerySelector(".window--titlebar-text")!;
-    Node ContentNode => _windowNode.QuerySelector(".window--content")!;
-    Node TopLeftAnchor => TitlebarNode.QuerySelector("#TitleLeftAnchor")!;
-    Node MiddleAnchor => TitlebarNode.QuerySelector("#TitleMiddleAnchor")!;
-    Node TopRightAnchor => TitlebarNode.QuerySelector("#TitleRightAnchor")!;
-
-    Node CloseButton => _windowNode.QuerySelector("CloseButton")!;
-    Node CloseButton2 => _windowNode.QuerySelector("CloseButton2")!;
-
     public abstract void OnDraw();
     public virtual void OnLateDraw() { }
 
     static ImGuiWindowFlags ImGuiWindowFlags =>
-        ImGuiWindowFlags.NoTitleBar
-        | ImGuiWindowFlags.NoCollapse
-        | ImGuiWindowFlags.NoDocking
-        | ImGuiWindowFlags.NoScrollbar
-        | ImGuiWindowFlags.NoScrollWithMouse
-        | ImGuiWindowFlags.NoBackground;
-
-
+         ImGuiWindowFlags.NoTitleBar |
+         ImGuiWindowFlags.NoCollapse |
+         ImGuiWindowFlags.NoDocking |
+         ImGuiWindowFlags.NoScrollbar |
+         ImGuiWindowFlags.NoScrollWithMouse |
+         ImGuiWindowFlags.NoBackground |
+        ImGuiWindowFlags.None;
 }

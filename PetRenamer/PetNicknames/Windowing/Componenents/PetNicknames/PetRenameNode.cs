@@ -34,73 +34,65 @@ internal class PetRenameNode : Node
         DalamudServices = services;
         CurrentValue = customName;
         ActivePet = activePet;
-
-        ChildNodes = [
-            // Rename Node part
-            new Node()
-            {
-                Style = new Style()
+        ChildNodes =
+            [
+           // Rename Node part
+           new Node()
+           {
+               Style = new Style()
+               {
+                   Flow = Flow.Vertical,
+                   Margin = new EdgeSize(10, 0, 0, 0),
+               },
+               ChildNodes = [
+                    SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? "...")
+                    {
+                        Stylesheet = stylesheet,
+                        ClassList = ["MarginSheet"],
+                        Interactable = true,
+                    },
+                   IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? "...")
+                   {
+                       Stylesheet = stylesheet,
+                       ClassList = ["MarginSheet"],
+                       Interactable = true,
+                   },
+                   RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? "...")
+                   {
+                       Stylesheet = stylesheet,
+                       ClassList = ["MarginSheet"],
+                       Interactable = true,
+                   },
+                   BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? "...")
+                   {
+                       Stylesheet = stylesheet,
+                       ClassList = ["MarginSheet"],
+                       Interactable = true,
+                   },
+                   NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
+                   {
+                       Stylesheet = stylesheet,
+                       ClassList = ["MarginSheet"],
+                       Interactable = true,
+                   },
+               ]
+           },
+                // This is the node that holds the image together
+                IconNode = new IconNode()
                 {
-                    Flow = Flow.Vertical,
-                },
-                ChildNodes = [
-                    SpeciesNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? "...")
+                    Style = new Style()
                     {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
+                        Size = new Size(90, 90),
+                        Margin = new EdgeSize(20, 30),
+                        IconId = ActivePet?.Icon ?? 66310,
+                        BorderColor = new BorderColor(new Color(255, 255, 255)),
+                        BorderWidth = new EdgeSize(4),
+                        BorderRadius = 8,
                     },
-                    IDNode = new RenameTitleNode("ID:", ActivePet?.Model.ToString() ?? "...")
-                    {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
-                    },
-                    RaceNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? "...")
-                    {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
-                    },
-                    BehaviourNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? "...")
-                    {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
-                    },
-                    NicknameNode = new NicknameEditNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
-                    {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
-                    },
-                ]
-            },
-            // This is the node that holds the image together
-            new Node()
-            {
-                //Overflow = false,
-                Style = new Style()
-                {
-                    Margin = new EdgeSize(19, 0, 0, 30),
-                },
-                ChildNodes = [
-                    IconNode = new IconNode()
-                    {
-                        Style = new Style()
-                        {
-                            Size = new Size(90, 90),
-                            
-                            IconId = ActivePet?.Icon ?? 66310,
-                            BorderColor = new BorderColor(new Color(255, 255, 255)),
-                            BorderWidth = new EdgeSize(4),
-                            BorderRadius = 8,
-                        },
-                        ChildNodes = [
+                    ChildNodes =
+                        [
                              CircleImageNode = new CircleImageNode(in services)
                              {
-                                 Opacity = 0.3f,
-                                 RoationSpeed = 12,
                                  Style = new Style()
                                  {
                                      Anchor = Anchor.MiddleCenter,
@@ -108,10 +100,9 @@ internal class PetRenameNode : Node
                                  }
                              }
                         ]
-                    },
-                ]
-            }
-        ];
+                },
+            ];
+
 
         SpeciesNode.Hovered += () => activeHoverNode = SpeciesNode;
         RaceNode.Hovered += () => activeHoverNode = RaceNode;
@@ -146,8 +137,6 @@ internal class PetRenameNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        base.OnDraw(drawList);
-
         if (activeHoverNode != null)
         {
             CircleImageNode.Opacity = 0.8f;
@@ -164,13 +153,13 @@ internal class PetRenameNode : Node
 
         Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
-        Vector2 earlyiconPos = iconPos - new Vector2(20.5f, 0) * Node.ScaleFactor;
+        Vector2 earlyiconPos = iconPos - new Vector2(14f, 0) * Node.ScaleFactor;
 
         drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
         drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
     }
 
-    Stylesheet stylesheet = new Stylesheet([
+    readonly Stylesheet stylesheet = new Stylesheet([
         new(".MarginSheet", new Style()
         {
             Margin = new EdgeSize(2, 0, 0, 15),

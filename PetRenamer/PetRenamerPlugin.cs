@@ -18,6 +18,7 @@ using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 
 namespace PetRenamer;
 
@@ -58,9 +59,10 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
-        WindowHandler.Open<PetListWindow>();
+        //WindowHandler.AddWindow(new EmptyWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
+        //WindowHandler.Open<PetListWindow>();
         WindowHandler.Open<PetRenameWindow>();
-        
+        //WindowHandler.Open<EmptyWindow>();
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {

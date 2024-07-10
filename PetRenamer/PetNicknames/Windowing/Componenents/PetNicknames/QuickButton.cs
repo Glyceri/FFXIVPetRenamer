@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PetRenamer.PetNicknames.Services;
+using System;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -7,15 +8,18 @@ internal class QuickButton : Node
 {
     public Action? Clicked;
 
-    public QuickButton(string text)
+    readonly DalamudServices DalamudServices;
+
+    public QuickButton(in DalamudServices services, string text)
     {
+        DalamudServices = services;
         Stylesheet = stylesheet;
         ClassList = ["Button"];
         NodeValue = text;
 
         OnMouseUp += _ =>
         {
-            Clicked?.Invoke();
+            DalamudServices.Framework.Run(() => Clicked?.Invoke());
         };
     }
 
@@ -24,7 +28,7 @@ internal class QuickButton : Node
         NodeValue = text;
     }
 
-    Stylesheet stylesheet = new Stylesheet([
+    readonly Stylesheet stylesheet = new Stylesheet([
         new(".Button", new Style()
         {
             Size = new Size(60, 20),

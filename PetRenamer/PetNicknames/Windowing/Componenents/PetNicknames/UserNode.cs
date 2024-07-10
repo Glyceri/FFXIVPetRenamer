@@ -2,6 +2,7 @@
 using ImGuiNET;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using System.Linq;
 using Una.Drawing;
 
@@ -16,11 +17,14 @@ internal class UserNode : Node
     readonly RenameTitleNode PetcountNode;
     readonly IImageDatabase ImageDatabase;
 
-    IDalamudTextureWrap? _userTexture = null;
+    readonly IDalamudTextureWrap? _userTexture = null;
     IPettableDatabaseEntry? currentEntry = null;
 
-    public UserNode(in IImageDatabase imageDatabase)
+    readonly DalamudServices DalamudServices;
+
+    public UserNode(in DalamudServices services, in IImageDatabase imageDatabase)
     {
+        DalamudServices = services;
         ImageDatabase = imageDatabase;
 
         Stylesheet = stylesheet;
@@ -37,12 +41,12 @@ internal class UserNode : Node
                     Gap = 3,
                 },
                 ChildNodes = [
-                    UserNameRect = new RenameTitleNode("Name:", "..."),
-                    HomeWorldRect = new RenameTitleNode("Homeworld:", "..."),
-                    PetcountNode = new RenameTitleNode("Petcount:", "..."),
+                    UserNameRect = new RenameTitleNode(in DalamudServices, "Name:", "..."),
+                    HomeWorldRect = new RenameTitleNode(in DalamudServices, "Homeworld:", "..."),
+                    PetcountNode = new RenameTitleNode(in DalamudServices, "Petcount:", "..."),
                 ]
             },
-            ProfilePictureRect = new ProfilePictureNode(in imageDatabase)
+            ProfilePictureRect = new ProfilePictureNode(in DalamudServices, in imageDatabase)
             {
                 Style = new Style()
                 {

@@ -13,13 +13,11 @@ internal static class WindowStyles
                     Anchor = Anchor.TopLeft,
                     Flow = Flow.Vertical,
                     BackgroundColor = new("Window.Background"),
-                    StrokeColor = new("Window.Border"),
+                    StrokeColor = new Color("Window.Border:Active"),
                     StrokeWidth = 1,
                     BorderRadius = 6,
                     IsAntialiased = false,
                     RoundedCorners = RoundedCorners.All,
-                    ShadowSize = new(64),
-                    ShadowInset = 8,
                     Padding = new(3),
                 }
             ),
@@ -27,8 +25,6 @@ internal static class WindowStyles
                 ".window--titlebar",
                 new()
                 {
-                    Flow = Flow.Horizontal,
-                    Size = new(0, 32),
                     BackgroundColor = new("Window.TitlebarBackground"),
                     BackgroundGradient = GradientColor.Vertical(
                         new("Window.TitlebarGradient1"),
@@ -37,9 +33,7 @@ internal static class WindowStyles
                     BorderColor = new(new("Window.TitlebarBorder")),
                     BorderWidth = new(1),
                     BorderRadius = 6,
-                    IsAntialiased = false,
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
-                    //Margin = new(1) { Right = -1, Bottom = -1 },
                 }
             ),
             new(
@@ -50,33 +44,26 @@ internal static class WindowStyles
                     Color = new Color("Window.TextLight"),
                     OutlineColor = new("Window.TextOutline"),
                     OutlineSize = 1,
-                    TextOffset = new System.Numerics.Vector2(0, 1),
+                    Anchor = Anchor.TopCenter,
                     TextAlign = Anchor.MiddleCenter,
-                    TextOverflow = false,
-                    WordWrap = false,
-                    Size = new(0, 32),
-                    Padding = new(0, 6)
                 }
             ),
             new(
                 ".window--close-button",
                 new()
                 {
-                    Anchor = Anchor.MiddleRight,
+                    Anchor = Anchor.TopRight,
                     Size = new(25, 25),
                     BackgroundColor = new("Window.BackgroundLight"),
                     StrokeColor = new("Window.TitlebarBorder"),
                     StrokeWidth = 1,
-                    StrokeInset = 0,
                     BorderRadius = 3,
                     TextAlign = Anchor.MiddleCenter,
                     Font = 2,
                     FontSize = 14,
                     Color = new("Window.TextLight"),
                     OutlineColor = new("Window.TextOutline"),
-                    TextOverflow = true,
                     Margin = new() { Top = 3, Right = 4 },
-                    IsAntialiased = false,
                 }
             ),
             new(
@@ -84,7 +71,6 @@ internal static class WindowStyles
                 new()
                 {
                     BackgroundColor = new("Window.Background"),
-                    //Color = new("Window.TitlebarCloseButtonXHover"),
                     StrokeWidth = 2,
                 }
             ),
@@ -99,15 +85,14 @@ internal static class WindowStyles
                     Flow = Flow.Vertical,
                     BorderRadius = 6,
                     RoundedCorners = RoundedCorners.BottomLeft | RoundedCorners.BottomRight,
-                    ScrollbarTrackColor = new("Window.ScrollbarTrack"),
-                    ScrollbarThumbColor = new("Window.ScrollbarThumb"),
-                    ScrollbarThumbHoverColor = new("Window.ScrollbarThumbHover"),
-                    ScrollbarThumbActiveColor = new("Window.ScrollbarThumbActive"),
                 }
             )
         ]
     );
 
+    public static Color WindowBorderActive = new Color(224, 183, 18);
+    public static Color WindowBorderInactive = new Color(0xFF404040);
+    
     public static void RegisterDefaultColors()
     {
         Color.AssignByName("Titlebar.Minion", new Color(255, 194, 63).ToUInt());
@@ -115,7 +100,6 @@ internal static class WindowStyles
         Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37).ToUInt());
         Color.AssignByName("Titlebar.BattlePet:Dark", new Color(26, 84, 26).ToUInt());
         Color.AssignByName("Titlebar.Base", new Color(255, 255, 255).ToUInt());
-        Color.AssignByName("Window.Border:Active", new Color(224, 183, 18).ToUInt());
 
         Color.AssignByName("Window.Background", new Color(26, 20, 0, 200).ToUInt());
         Color.AssignByName("Window.BackgroundLight", new Color(161, 155, 138, 110).ToUInt());
@@ -129,7 +113,7 @@ internal static class WindowStyles
         Color.AssignByName("PetNicknamesButton:Hover", new Color(47, 69, 41, 150).ToUInt());
 
 
-        Color.AssignByName("Window.Border:Inactive", 0xFF404040);
+        
         Color.AssignByName("ModeToggleButton.Border:Active", 0xFF484848);
 
         Color.AssignByName("ModeToggleButton.Border:Hover", new Color(50, 50, 50).ToUInt());
