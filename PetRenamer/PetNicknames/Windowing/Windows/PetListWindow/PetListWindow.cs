@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
+using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
@@ -185,7 +186,7 @@ internal class PetListWindow : PetWindow
             {
                 Style = new Style()
                 {
-                    BackgroundGradient = GradientColor.Vertical(new Color("Window.Border:Active"), new Color(224, 183, 18, 0)),
+                    BackgroundGradient = GradientColor.Vertical(WindowStyles.WindowBorderActive, new Color(224, 183, 18, 0)),
                     RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
                     BorderRadius = 6,
                     Margin = new(129, 0, 0, 0),
@@ -197,7 +198,7 @@ internal class PetListWindow : PetWindow
             {
                 Style = new Style()
                 {
-                    BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), new Color("Window.Border:Active")),
+                    BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), WindowStyles.WindowBorderActive),
                     RoundedCorners = RoundedCorners.BottomRight | RoundedCorners.BottomLeft,
                     BorderRadius = 6,
                     Margin = new(0, 0, 29, 0),

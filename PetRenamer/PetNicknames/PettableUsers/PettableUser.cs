@@ -42,7 +42,7 @@ internal unsafe class PettableUser : IPettableUser
         Name = BattleChara->NameString;
         ContentID = BattleChara->ContentId;
         Homeworld = BattleChara->HomeWorld;
-        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld)?? "[No Homeworld Found]";
+        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld)?? "...";
         ObjectID = BattleChara->GetGameObjectId();
         ShortObjectID = BattleChara->GetGameObjectId().ObjectId;
         Touched = true;
