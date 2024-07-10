@@ -72,6 +72,8 @@ internal unsafe class SimpleTextHook : ITextHook
         IPetSheetData? pet = GetPetData(text, ref user);
         if (pet == null) return false;
 
+        PetServices.PetLog.LogVerbose(pet.Model + " : " + pet.BaseSingular);
+
         string? customName = user.DataBaseEntry.GetName(pet.Model);
         if (customName == null) return false;
 

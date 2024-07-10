@@ -215,11 +215,9 @@ internal class SheetsWrapper : IPetSheets
                 return list;
             }
 
-            if (pet.BaseSingular == string.Empty || pet.BasePlural == string.Empty || pet.ActionName == string.Empty) continue;
-
-            if (!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) &&
-                !line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) &&
-                !line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            if ((!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) || pet.BaseSingular == string.Empty) &&
+                (!line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) || pet.BasePlural == string.Empty) &&
+                (!line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase) || pet.ActionName == string.Empty)) continue;
 
             list.Add(pet);
         }    
@@ -237,6 +235,8 @@ internal class SheetsWrapper : IPetSheets
         data.Reverse();
 
         IPetSheetData normalPetData = data[0];
+
+        if (normalPetData.Model > -1) return normalPetData;
 
         if (!soft) return normalPetData;
 
