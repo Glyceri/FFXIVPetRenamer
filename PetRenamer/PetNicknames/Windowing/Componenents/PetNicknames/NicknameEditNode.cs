@@ -10,8 +10,8 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class NicknameEditNode : RenameTitleNode
 {
-    readonly QuickButton EditButton;
-    readonly QuickButton ClearButton;
+    public readonly QuickButton EditButton;
+    public readonly QuickButton ClearButton;
 
     bool editMode = false;
 

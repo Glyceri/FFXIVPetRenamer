@@ -10,6 +10,7 @@ internal class PettableNameDatabase : INamesDatabase
     public int[] IDs { get; private set; } = new int[0];
     public string[] Names { get; private set; } = new string[0];
     public bool IsDirty { get; private set; } = false;
+    public bool IsDirtyForUI { get; private set; } = false;
 
     public PettableNameDatabase(int[] ids, string[] names)
     {
@@ -33,6 +34,7 @@ internal class PettableNameDatabase : INamesDatabase
     {
         if (ID == -1) return;
         IsDirty = true;
+        IsDirtyForUI = true;
         if (name == string.Empty) name = null;
         int index = IndexOf(ID);
         if (index != -1)
@@ -74,6 +76,7 @@ internal class PettableNameDatabase : INamesDatabase
     }
 
     public void MarkDirtyAsNoticed() => IsDirty = false;
+    public void MarkDirtyUIAsNotified() => IsDirtyForUI = false;
 
     public SerializableNameData SerializeData() => new SerializableNameData(this);
 }

@@ -1,5 +1,4 @@
-﻿using ImGuiNET;
-using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -16,8 +15,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 
 internal class PetListWindow : PetWindow
 {
-    UserNode UserNode;
-
     protected override string Title { get; } = "Pet List";
     protected override string ID { get; } = "Pet List Window";
 
@@ -37,6 +34,8 @@ internal class PetListWindow : PetWindow
     int? ActiveSkeleton = null;
     IPettableUser? lastUser = null;
 
+    readonly UserNode UserNode;
+
     readonly Node HeaderNode;
     readonly Node ScrollListBaseNode;
     readonly Node ScrollistContentNode;
@@ -46,6 +45,8 @@ internal class PetListWindow : PetWindow
     readonly QuickButton SharingButton;
 
     readonly SmallHeaderNode SmallHeaderNode;
+
+    bool isLocalEntry = false;
 
     public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
     {
@@ -220,15 +221,11 @@ internal class PetListWindow : PetWindow
             SetUser(lastUser?.DataBaseEntry);
         }
 
-        }
-
-    public override void OnLateDraw()
-    {
         bool dirty = false;
         foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
         {
             if (!e.IsActive) continue;
-            if (e.IsDirty)
+            if (e.IsDirtyForUI)
             {
                 dirty = true;
                 break;
@@ -254,6 +251,15 @@ internal class PetListWindow : PetWindow
 
     public void SetUser(IPettableDatabaseEntry? entry)
     {
+        if (UserList.LocalPlayer != null && entry != null)
+        {
+            isLocalEntry = UserList.LocalPlayer.ContentID == entry.ContentID;
+        }
+        else
+        {
+            isLocalEntry = false;
+        }
+
         ActiveEntry = entry;
         UserNode.SetUser(entry);
         ScrollistContentNode.ChildNodes.Clear();
@@ -265,7 +271,13 @@ internal class PetListWindow : PetWindow
             foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
             {
                 if (!e.IsActive) continue;
-                ScrollistContentNode.AppendChild(new UserListNode(in DalamudServices, in ImageDatabase, in e));
+                UserListNode userNode = new UserListNode(in DalamudServices, in ImageDatabase, in e, true);
+                ScrollistContentNode.AppendChild(userNode);
+                userNode.OnView += (user) => 
+                {
+                    inUserMode = false;
+                    SetUser(user);
+                };
             }
         }
         else HandlePetMode();
@@ -283,10 +295,9 @@ internal class PetListWindow : PetWindow
             if (CurrentMode == PetWindowMode.BattlePet && id >= -1) continue;
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) continue;
-            PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, names.Names[i]);
+            PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, names.Names[i], isLocalEntry);
+            newPetListNode.OnSave += (value) => DalamudServices.Framework.Run(() => OnSave(value, petData.Model));
             ScrollistContentNode.AppendChild(newPetListNode);
-            
-            newPetListNode.OnSave += (value) => OnSave(value, petData.Model);
         }
 
         if (ActiveEntry == null) return;

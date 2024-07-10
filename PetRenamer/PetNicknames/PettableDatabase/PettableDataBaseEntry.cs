@@ -19,11 +19,13 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public INamesDatabase ActiveDatabase { get; private set; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
 
+    bool _IsDirtyForUI;
     bool _IsDirty;
-    public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty; }
-    
+    public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty;  }
+    public bool IsDirtyForUI { get => _IsDirtyForUI || ActiveDatabase.IsDirtyForUI; }
+
     public bool Destroyed { get; private set; } = false;
-    public bool OldUser { get; private set; } = false;
+    public bool OldUser { get; private set; } = false; 
 
     readonly IPetServices PetServices;
 
@@ -48,6 +50,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         if (IsActive) return;
         if (!pettableUser.IsLocalPlayer) return;
         _IsDirty = true;
+        _IsDirtyForUI = true;
     }
 
     public int Length() => ActiveDatabase.IDs.Length;
@@ -56,21 +59,22 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         IPettableDatabaseEntry entry = database.GetEntry(ContentID);
         if (entry is not PettableDataBaseEntry pEntry) return false;
-        pEntry.ActiveDatabase = this.ActiveDatabase;
-        pEntry.Name = this.Name;
-        pEntry.Homeworld = this.Homeworld;
+        pEntry.ActiveDatabase = ActiveDatabase;
+        pEntry.Name = Name;
+        pEntry.Homeworld = Homeworld;
         pEntry.HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
-        pEntry.ContentID = this.ContentID;
+        pEntry.ContentID = ContentID;
         pEntry.IsActive = true;
-        pEntry.SoftSkeletons = this.SoftSkeletons;
+        pEntry.SoftSkeletons = SoftSkeletons;
         pEntry._IsDirty = true;
+        pEntry._IsDirtyForUI = true;
         pEntry.OldUser = true;
         return true;
     }
 
     public void UpdateContentID(ulong contentID)
     {
-        this.ContentID = contentID;
+        ContentID = contentID;
         IsActive = true;
     }
 
@@ -81,6 +85,12 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         _IsDirty = false;
         ActiveDatabase.MarkDirtyAsNoticed();
+    }
+
+    public void MarkDirtyUIAsNotified()
+    {
+        _IsDirtyForUI = false;
+        ActiveDatabase.MarkDirtyUIAsNotified();
     }
 
     public string? GetSoftName(int softIndex) => GetName(GetSoftSkeleton(softIndex) ?? 0);

@@ -9,8 +9,10 @@ internal interface INamesDatabase
     string? GetName(int ID);
     void SetName(int ID, string? name);
     bool IsDirty { get; }
+    bool IsDirtyForUI { get; }
 
     void MarkDirtyAsNoticed();
+    void MarkDirtyUIAsNotified();
 
     SerializableNameData SerializeData();
 }

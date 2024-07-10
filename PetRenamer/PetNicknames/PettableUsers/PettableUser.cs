@@ -97,7 +97,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (!IsLocalPlayer) return;
 
-        PetLog.Log("SHOULD!!! save the database");
+        PetServices.Configuration.Save();
     }
 
     IPettablePet? FindPet(ref Character character)

@@ -21,13 +21,12 @@ internal unsafe class TooltipHook : QuickHookableElement
 
     // This one gets set in the 2nd constructor
     TooltipTextHook tooltipHook = null!;
+    TooltipTextHook tooltipHookMap = null!;
 
     // Going by addon name and not ID (I know I hate it too)
     // Because addons can share the same ID. I dont want potential issues
     readonly string[] allowedTooltipAddons =
             [
-                "AreaMap",
-                "_NaviMap",
                 "_ActionBar",
                 "_ActionBar01",
                 "_ActionBar02",
@@ -46,6 +45,11 @@ internal unsafe class TooltipHook : QuickHookableElement
                 "LovmPaletteEdit",
             ];
 
+    readonly string[] allowedTooltipAddonsMap = [
+        "AreaMap",
+        "_NaviMap"
+    ];
+
     // The dalamud TooltipType enum is NOT accurate it seems
     public delegate int AccurateShowTooltip(AtkUnitBase* tooltip, byte tooltipType, ushort addonID, AtkUnitBase* a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8);
 
@@ -61,6 +65,9 @@ internal unsafe class TooltipHook : QuickHookableElement
     {
         tooltipHook = Hook<TooltipTextHook>("Tooltip", [2], Allowed, true);
         tooltipHook.Register(3);
+
+        tooltipHookMap = Hook<TooltipTextHook>("Tooltip", [2], Allowed, false);
+        tooltipHookMap.Register(3);
         Hook<SimpleTextHook>("ActionDetail", [5], Allowed, true);
 
         showTooltip?.Enable();
@@ -80,6 +87,7 @@ internal unsafe class TooltipHook : QuickHookableElement
         lastId = addonID;
 
         tooltipHook.SetUser(overridenUser);
+        tooltipHookMap.SetUser(overridenUser);
 
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(addonID);
         if (hoveredOverAddon == null) return showTooltip!.Original(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
@@ -88,6 +96,10 @@ internal unsafe class TooltipHook : QuickHookableElement
         bool validAddon = allowedTooltipAddons.Contains(addonName);
 
         tooltipHook.SetBlockedState(!validAddon);
+
+        bool validAddonMap = allowedTooltipAddonsMap.Contains(addonName);
+
+        tooltipHookMap.SetBlockedState(!validAddonMap);
 
         overridenUser = UserList.LocalPlayer;
         lastUser = overridenUser;
@@ -116,5 +128,6 @@ internal unsafe class TooltipHook : QuickHookableElement
     {
         overridenUser = user;
         tooltipHook.SetUser(user);
+        tooltipHookMap.SetUser(user);
     }
 }

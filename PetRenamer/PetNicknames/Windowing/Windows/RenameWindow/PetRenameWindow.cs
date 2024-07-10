@@ -15,7 +15,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 internal partial class PetRenameWindow : PetWindow
 {
     readonly IPettableUserList UserList;
-    readonly IPettableDatabase Database;
     readonly IPetServices PetServices;
 
     protected override Vector2 MinSize { get; } = new Vector2(475, 170);
@@ -33,10 +32,9 @@ internal partial class PetRenameWindow : PetWindow
     int activeSkeleton = 0;
     string? lastCustomName = null!;
 
-    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, "Pet Rename Window", ImGuiWindowFlags.NoResize)
+    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) : base(dalamudServices, "Pet Rename Window", ImGuiWindowFlags.NoResize)
     {
         UserList = userList;
-        Database = database;
         PetServices = petServices;
         petRenameNode = new PetRenameNode(null, null, in DalamudServices);
         AddNode(ContentNode, petRenameNode);
@@ -53,7 +51,11 @@ internal partial class PetRenameWindow : PetWindow
         }
     }
 
-    public override void OnOpen() => GetActiveSkeleton();
+    public override void OnOpen()
+    {
+        OnDraw();
+        GetActiveSkeleton();
+    }
 
     public void SetRenameWindow(int newSkeleton, bool openWindow = false)
     {

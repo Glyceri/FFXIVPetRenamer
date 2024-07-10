@@ -14,6 +14,8 @@ internal class PetListNode : Node
     readonly IconNode IconNode;
     readonly Node ClearButtonNode;
 
+    readonly Node HolderNode;
+
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode IDNode;
     readonly NicknameEditNode NicknameNode;
@@ -22,7 +24,7 @@ internal class PetListNode : Node
 
     readonly DalamudServices DalamudServices;
 
-    public PetListNode(in DalamudServices services, in IPetSheetData data, string? customName)
+    public PetListNode(in DalamudServices services, in IPetSheetData data, string? customName, bool asLocalEntry)
     {
         DalamudServices = services;
         Style = new Style()
@@ -39,7 +41,7 @@ internal class PetListNode : Node
         };
 
         ChildNodes = [
-            new Node()
+            HolderNode = new Node()
             {
                 Style = new Style()
                 {
@@ -77,6 +79,13 @@ internal class PetListNode : Node
         ClearButtonNode.OnClick += _ => { };
 
         IconNode.IconID = data.Icon;
+
+        if (!asLocalEntry)
+        {
+            RemoveChild(ClearButtonNode);
+            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.EditButton);
+            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.ClearButton);
+        }
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)

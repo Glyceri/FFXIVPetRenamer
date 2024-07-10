@@ -93,6 +93,12 @@ internal class WindowHandler : IWindowHandler
         Node.ScaleFactor = ImGuiHelpers.GlobalScale;
         WindowSystem.Draw();
 
+        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
+        {
+            if (!entry.IsActive) continue;
+            entry.MarkDirtyUIAsNotified();
+        }
+
         foreach (IPetWindow window in WindowSystem.Windows)
         {
             if (!window.RequestsModeChange) continue;

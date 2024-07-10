@@ -189,7 +189,7 @@ internal class PetGlamourChat : RestrictedChatElement
     {
         bool changed = user.DataBaseEntry.SoftSkeletons[classJobIndex] != newSkeleton;
         user.DataBaseEntry.SoftSkeletons[classJobIndex] = newSkeleton;
-        if (changed) PetServices.PetLog.Log("Should save the database!");
+        if (changed) PetServices.Configuration.Save();
     }
 
     int? GetClassJob(string basePetName) => PetServices.PetSheets.NameToSoftSkeletonIndex(basePetName);

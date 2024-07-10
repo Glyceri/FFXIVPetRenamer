@@ -10,12 +10,14 @@ internal interface IPettableDatabaseEntry
     ushort Homeworld { get; }
     string HomeworldName { get; }
 
-    bool IsDirty { get; }
     bool IsActive { get; }
     bool Destroyed { get; }
     bool OldUser { get; }
 
     int[] SoftSkeletons { get; }
+
+    bool IsDirty { get; }
+    bool IsDirtyForUI { get; }
 
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
@@ -34,6 +36,7 @@ internal interface IPettableDatabaseEntry
     int? GetSoftSkeleton(int softIndex);
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
+    void MarkDirtyUIAsNotified();
     void Destroy();
 
     SerializableUserV4 SerializeEntry();
