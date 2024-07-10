@@ -12,7 +12,7 @@ internal static class Translator
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.Species", "Species" },
+        { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Race", "Race" },
         { "PetRenameNode.Behaviour", "Behaviour" },
         { "PetRenameNode.Nickname", "Nickname" },
@@ -29,7 +29,7 @@ internal static class Translator
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
-        { "PetRenameNode.Species", "Spezies" },
+        { "PetRenameNode.Species", "Begleiter" },
         { "PetRenameNode.Race", "Rasse" },
         { "PetRenameNode.Behaviour", "Verhalten" },
         { "PetRenameNode.Nickname", "Spitzname" },

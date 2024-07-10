@@ -27,6 +27,8 @@ internal class PetRenameNode : Node
     readonly NicknameEditNode NicknameNode;
     readonly RenameTitleNode IDNode;
 
+    readonly Node HolderNode;
+
     Node? activeHoverNode;
 
     public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services)
@@ -36,47 +38,48 @@ internal class PetRenameNode : Node
         ActivePet = activePet;
         ChildNodes =
             [
-           // Rename Node part
-           new Node()
-           {
-               Style = new Style()
-               {
-                   Flow = Flow.Vertical,
-                   Margin = new EdgeSize(10, 0, 0, 0),
-               },
-               ChildNodes = [
-                    SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? "...")
+                // Rename Node part
+                HolderNode = new Node()
+                {    
+                    Style = new Style()
                     {
-                        Stylesheet = stylesheet,
-                        ClassList = ["MarginSheet"],
-                        Interactable = true,
+                        Flow = Flow.Vertical,
+                        Margin = new EdgeSize(10, 0, 0, 0),
                     },
-                   IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? "...")
-                   {
-                       Stylesheet = stylesheet,
-                       ClassList = ["MarginSheet"],
-                       Interactable = true,
-                   },
-                   RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? "...")
-                   {
-                       Stylesheet = stylesheet,
-                       ClassList = ["MarginSheet"],
-                       Interactable = true,
-                   },
-                   BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? "...")
-                   {
-                       Stylesheet = stylesheet,
-                       ClassList = ["MarginSheet"],
-                       Interactable = true,
-                   },
-                   NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
-                   {
-                       Stylesheet = stylesheet,
-                       ClassList = ["MarginSheet"],
-                       Interactable = true,
-                   },
-               ]
-           },
+                    ChildNodes = 
+                    [
+                        SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? "...")
+                        {
+                            Stylesheet = stylesheet,
+                            ClassList = ["MarginSheet"],
+                            Interactable = true,
+                        },
+                        IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? "...")
+                        {
+                            Stylesheet = stylesheet,
+                            ClassList = ["MarginSheet"],
+                            Interactable = true,
+                        },
+                        RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? "...")
+                        {
+                            Stylesheet = stylesheet,
+                            ClassList = ["MarginSheet"],
+                            Interactable = true,
+                        },
+                        BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? "...")
+                        {
+                            Stylesheet = stylesheet,
+                            ClassList = ["MarginSheet"],
+                            Interactable = true,
+                        },
+                        NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
+                        {
+                            Stylesheet = stylesheet,
+                            ClassList = ["MarginSheet"],
+                            Interactable = true,
+                        },
+                    ]
+                },
                 // This is the node that holds the image together
                 IconNode = new IconNode()
                 {
@@ -90,16 +93,16 @@ internal class PetRenameNode : Node
                         BorderRadius = 8,
                     },
                     ChildNodes =
-                        [
-                             CircleImageNode = new CircleImageNode(in services)
-                             {
-                                 Style = new Style()
-                                 {
-                                     Anchor = Anchor.MiddleCenter,
-                                     Size = new Size(130, 130)
-                                 }
-                             }
-                        ]
+                    [
+                        CircleImageNode = new CircleImageNode(in services)
+                        {
+                            Style = new Style()
+                            {
+                                 Anchor = Anchor.MiddleCenter,
+                                 Size = new Size(130, 130)
+                            }
+                        }
+                    ]
                 },
             ];
 
