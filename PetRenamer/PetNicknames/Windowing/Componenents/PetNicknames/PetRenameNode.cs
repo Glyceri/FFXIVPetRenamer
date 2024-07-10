@@ -48,26 +48,31 @@ internal class PetRenameNode : Node
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
+                        Interactable = true,
                     },
                     IDNode = new RenameTitleNode("ID:", ActivePet?.Model.ToString() ?? "...")
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
+                        Interactable = true,
                     },
                     RaceNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? "...")
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
+                        Interactable = true,
                     },
                     BehaviourNode = new RenameTitleNode($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? "...")
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
+                        Interactable = true,
                     },
                     NicknameNode = new NicknameEditNode($"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["MarginSheet"],
+                        Interactable = true,
                     },
                 ]
             },

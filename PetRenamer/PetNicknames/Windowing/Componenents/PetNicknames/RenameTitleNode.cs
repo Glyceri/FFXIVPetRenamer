@@ -16,6 +16,8 @@ internal class RenameTitleNode : Node
     public Action? Hovered;
     public Action? HoveredExit;
 
+    public bool Interactable { get; set; } = false;
+
     public RenameTitleNode(string label, string text)
     {
         Label = label;
@@ -47,6 +49,7 @@ internal class RenameTitleNode : Node
             },
         ];
 
+        if (!Interactable) return;
         if (text != string.Empty)
         {
             TextNode.OnMouseEnter += HoverInvoke;
@@ -60,6 +63,8 @@ internal class RenameTitleNode : Node
     public void SetText(string text)
     {
         TextNode.NodeValue = text;
+
+        if (!Interactable) return;
 
         TextNode.OnMouseEnter -= HoverInvoke;
         TextNode.OnMouseLeave -= HoverExitInvoke;

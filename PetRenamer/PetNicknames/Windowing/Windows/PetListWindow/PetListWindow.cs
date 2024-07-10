@@ -33,6 +33,7 @@ internal class PetListWindow : PetWindow
 
     bool inUserMode = false;
     IPettableDatabaseEntry? ActiveEntry;
+    int? ActiveSkeleton = null;
     IPettableUser? lastUser = null;
 
     readonly Node HeaderNode;
@@ -217,7 +218,10 @@ internal class PetListWindow : PetWindow
             lastUser = UserList.LocalPlayer;
             SetUser(lastUser?.DataBaseEntry);
         }
+    }
 
+    public override void OnLateDraw()
+    {
         bool dirty = false;
         foreach (IPettableDatabaseEntry e in Database.DatabaseEntries)
         {
@@ -277,7 +281,10 @@ internal class PetListWindow : PetWindow
             if (CurrentMode == PetWindowMode.BattlePet && id >= -1) continue;
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) continue;
-            ScrolllistContentNode.AppendChild(new PetListNode(petData, names.Names[i]));
+            PetListNode newPetListNode = new PetListNode(petData, names.Names[i]);
+            ScrolllistContentNode.AppendChild(newPetListNode);
+            
+            newPetListNode.OnSave += (value) => OnSave(value, petData.Model);
         }
 
         if (ActiveEntry == null) return;
@@ -332,4 +339,6 @@ internal class PetListWindow : PetWindow
             FontSize = 12,
         }),
     ]);
+
+    void OnSave(string? newName, int skeleton) => ActiveEntry?.SetName(skeleton, newName ?? "");
 }

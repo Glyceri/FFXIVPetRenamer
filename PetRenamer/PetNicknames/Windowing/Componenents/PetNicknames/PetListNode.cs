@@ -2,6 +2,7 @@
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using System;
 using System.Numerics;
 using Una.Drawing;
 
@@ -15,6 +16,8 @@ internal class PetListNode : Node
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode IDNode;
     readonly NicknameEditNode NicknameNode;
+
+    public Action<string?>? OnSave;
 
     public PetListNode(in IPetSheetData data, string? customName)
     {
@@ -66,6 +69,7 @@ internal class PetListNode : Node
         ];
 
         NicknameNode.SetPet(customName, data);
+        NicknameNode.OnSave += (value) => OnSave?.Invoke(value);
         ClearButtonNode.OnClick += _ => { };
 
         IconNode.IconID = data.Icon;

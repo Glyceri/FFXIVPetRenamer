@@ -33,8 +33,22 @@ internal class NicknameEditNode : RenameTitleNode
             },
             ChildNodes = 
             [
-                EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}"),
-                ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}"),
+                EditButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Edit")}")
+                {
+                    Style = new Style()
+                    {
+                        FontSize = 7,
+                        Size = new Size(40, 14),
+                    }
+                },
+                ClearButton = new QuickButton($"{Translator.GetLine("PetRenameNode.Clear")}")
+                {
+                    Style = new Style()
+                    {
+                        FontSize = 7,
+                        Size = new Size(40, 14),
+                    }
+                },
             ]
         };
 

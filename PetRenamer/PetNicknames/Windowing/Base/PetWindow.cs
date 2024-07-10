@@ -112,6 +112,12 @@ internal abstract partial class PetWindow : Window, IPetWindow
         } 
         catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
 
+        try
+        {
+            OnLateDraw();
+        }
+        catch(Exception ex) { DalamudServices.PluginLog.Error(ex.Message); }
+
         ImGui.EndChild();
     }
 
@@ -141,6 +147,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
     Node CloseButton2 => _windowNode.QuerySelector("CloseButton2")!;
 
     public abstract void OnDraw();
+    public virtual void OnLateDraw() { }
 
     static ImGuiWindowFlags ImGuiWindowFlags =>
         ImGuiWindowFlags.NoTitleBar
