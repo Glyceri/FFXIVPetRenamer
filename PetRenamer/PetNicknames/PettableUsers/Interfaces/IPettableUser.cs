@@ -31,6 +31,7 @@ internal interface IPettableUser : IBattleUser
     void Set(Pointer<BattleChara> pointer);
     void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
     void NotifyOfDirty();
+    void RefreshCast();
 
     void Destroy();
 

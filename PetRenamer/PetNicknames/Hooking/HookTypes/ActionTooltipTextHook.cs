@@ -29,13 +29,13 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
         SetUnfaulty();
     }
 
-    protected override unsafe AtkTextNode* GetTextNode(ref BaseNode bNode)
+    protected override unsafe AtkTextNode* GetTextNode(in BaseNode bNode)
     {
         if (backgroundNodePos != uint.MaxValue)
         {
             bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
         }
-        return base.GetTextNode(ref bNode);
+        return base.GetTextNode(in bNode);
     }
 
     protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
@@ -49,8 +49,5 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
 
     public void SetPetSheetData(IPetSheetData? petSheetData) => currentData = petSheetData;
 
-    protected override IPetSheetData? GetPetData(string text, ref IPettableUser user)
-    {
-     return   currentData;
-    }
+    protected override IPetSheetData? GetPetData(string text, in IPettableUser user) => currentData;
 }

@@ -213,4 +213,10 @@ internal unsafe class PettableUser : IPettableUser
     }
 
     public string? GetCustomName(IPetSheetData sheetData) => DataBaseEntry.GetName(sheetData.Model);
+
+    public void RefreshCast()
+    {
+        if (BattleChara == null) return;
+        CurrentCastID = BattleChara->CastInfo.ActionId;
+    }
 }

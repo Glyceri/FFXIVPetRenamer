@@ -40,6 +40,7 @@ internal unsafe class SimpleTextHook : ITextHook
     }
 
     public void SetUnfaulty() => Faulty = false;
+    public void SetFaulty() => Faulty = true;
 
     protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
     
@@ -51,7 +52,7 @@ internal unsafe class SimpleTextHook : ITextHook
         if (!baseElement->IsVisible) return;
        
         BaseNode bNode = new BaseNode(baseElement);
-        AtkTextNode* tNode = GetTextNode(ref bNode);
+        AtkTextNode* tNode = GetTextNode(in bNode);
         if (tNode == null) return;
 
         // Make sure it only runs once
@@ -68,7 +69,7 @@ internal unsafe class SimpleTextHook : ITextHook
         IPettableUser? user = lastPettableUser = GetUser();
         if (user == null) return false;
 
-        IPetSheetData? pet = GetPetData(text, ref user);
+        IPetSheetData? pet = GetPetData(text, in user);
         if (pet == null) return false;
 
         string? customName = user.DataBaseEntry.GetName(pet.Model);
@@ -92,11 +93,11 @@ internal unsafe class SimpleTextHook : ITextHook
         return false;
     }
 
-    protected virtual IPetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, in user, IsSoft);
+    protected virtual IPetSheetData? GetPetData(string text, in IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, in user, IsSoft);
 
     protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
 
-    protected virtual AtkTextNode* GetTextNode(ref BaseNode bNode)
+    protected virtual AtkTextNode* GetTextNode(in BaseNode bNode)
     {
         if (TextPos.Length > 1)
         {

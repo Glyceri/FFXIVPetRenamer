@@ -41,13 +41,13 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
 
     protected override bool BlockedCheck() => blocked || base.BlockedCheck();
 
-    protected override unsafe AtkTextNode* GetTextNode(ref BaseNode bNode)
+    protected override unsafe AtkTextNode* GetTextNode(in BaseNode bNode)
     {
         if (backgroundNodePos != uint.MaxValue)
         {
             bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
         }
-        return base.GetTextNode(ref bNode);
+        return base.GetTextNode(in bNode);
     }
 
     protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
