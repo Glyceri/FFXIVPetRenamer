@@ -31,7 +31,13 @@ internal unsafe class BattleChatElement : RestrictedChatElement
         if (user == null) return;
         if (!user.IsActive) return;
 
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)lastCastID, in user, true);
+        IPetSheetData? petData;
+
+        IPettablePet ? battlePet = UserList.GetPet((nint)dealer);
+
+        if (battlePet == null) petData = PetServices.PetSheets.GetPetFromAction((uint)lastCastID, in user, true);
+        else petData = battlePet.PetData;
+        
         if (petData == null) return;
 
         string? customName = user.GetCustomName(petData);
