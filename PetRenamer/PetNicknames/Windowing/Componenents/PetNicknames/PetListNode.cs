@@ -76,7 +76,7 @@ internal class PetListNode : Node
 
         NicknameNode.SetPet(customName, data);
         NicknameNode.OnSave += (value) => OnSave?.Invoke(value);
-        ClearButtonNode.OnClick += _ => { };
+        ClearButtonNode.OnClick += _ => OnSave?.Invoke(null);
 
         IconNode.IconID = data.Icon;
 

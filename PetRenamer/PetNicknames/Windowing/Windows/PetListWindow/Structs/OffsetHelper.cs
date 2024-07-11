@@ -19,9 +19,10 @@ internal struct OffsetHelper
     public OffsetResult OffsetResult()
     {
         bool isEarly = currentValidOffset < Offset;
-        bool isLate = currentValidOffset >= OffsetPlusOne;
+        bool isTechnicallyLate = currentValidOffset == OffsetPlusOne;
+        bool isLate = currentValidOffset > OffsetPlusOne;
 
-        if (isEarly)
+        if (isEarly || isTechnicallyLate)
         {
             IncrementValidOffset();
             return Enum.OffsetResult.Early;
