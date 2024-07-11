@@ -80,7 +80,7 @@ internal class Configuration : IPluginConfiguration
 
     public void Save() 
     {
-        if (currentSaveFileVersion < Version || !isSetup || Database == null || LegacyDatabase == null) return;
+        if (currentSaveFileVersion != Version || !isSetup || Database == null || LegacyDatabase == null) return;
         SerializableUsersV4 = Database.SerializeDatabase();
 #pragma warning disable CS0618
         serializableUsersV3 = LegacyDatabase.SerializeLegacyDatabase();

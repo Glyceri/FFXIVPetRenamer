@@ -42,7 +42,7 @@ internal class UpdateHandler : IDisposable
     void Setup()
     {
         _updatables.Add(new LegacyDatabaseHelper(DalamudServices, LegacyPettableDatabase, PettableDatabase, PetServices));
-        _updatables.Add(new SaveHelper(Configuration, PettableDatabase));
+        _updatables.Add(new SaveHelper(in PetServices, in Configuration, in PettableDatabase, in PettableUserList));
         _updatables.Add(new PettableUserHandler(DalamudServices, PettableUserList, PettableDatabase, PetServices));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker));
     }

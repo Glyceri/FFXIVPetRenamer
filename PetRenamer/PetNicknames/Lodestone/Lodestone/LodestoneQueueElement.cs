@@ -33,10 +33,7 @@ internal class LodestoneQueueElement : ILodestoneQueueElement, IDisposable
         {
             CancellationTokenSource.Cancel();
         }
-        catch (Exception ex)
-        {
-
-        }
+        catch { }
     }
     
     public void Dispose() {

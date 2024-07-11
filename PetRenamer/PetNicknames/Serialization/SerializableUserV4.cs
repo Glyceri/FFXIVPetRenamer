@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.Serialization;
 
@@ -34,7 +35,7 @@ internal class SerializableUserV4
         Name = entry.Name;
         Homeworld = entry.Homeworld;
         OldUser = entry.OldUser;
-        SoftSkeletonData = entry.SoftSkeletons;
+        SoftSkeletonData = entry.SoftSkeletons.ToArray();
 
         List<SerializableNameData> list = new List<SerializableNameData>();
         foreach(INamesDatabase database in entry.AllDatabases)

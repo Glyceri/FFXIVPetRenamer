@@ -86,18 +86,7 @@ internal unsafe class PettableUser : IPettableUser
         IPettablePet? youngestPet = GetYoungestPet(PetFilter.BattlePet);
         if (youngestPet == null) return;
 
-        if (sIndex < 0 || sIndex >= DataBaseEntry.SoftSkeletons.Length) return;
-
-        int oldSkeleton = DataBaseEntry.SoftSkeletons[sIndex];
-        int newSkeleton = youngestPet.SkeletonID;
-
-        if (oldSkeleton == newSkeleton) return;
-
-        DataBaseEntry.SoftSkeletons[sIndex] = newSkeleton;
-
-        if (!IsLocalPlayer) return;
-
-        PetServices.Configuration.Save();
+        DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonID);
     }
 
     IPettablePet? FindPet(ref Character character)

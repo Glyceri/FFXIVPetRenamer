@@ -70,7 +70,7 @@ internal unsafe class PartyHook : HookableElement
             if (castString == string.Empty) continue;
 
             IPettableUser? user = UserList.GetUser(memberName);
-            if (user == null) { PetServices.PetLog.Log("User not found: " + memberName); continue; }
+            if (user == null) continue;
 
             IPetSheetData? data = PetServices.PetSheets.GetPetFromString(castString, ref user, true);
             if (data == null) continue;

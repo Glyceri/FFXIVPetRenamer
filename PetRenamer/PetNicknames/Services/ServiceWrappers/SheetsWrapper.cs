@@ -66,10 +66,13 @@ internal class SheetsWrapper : IPetSheets
                 string singular = companion.Singular.ToDalamudString().TextValue;
                 string plural = companion.Plural.ToDalamudString().TextValue;
                 uint icon = companion.Icon;
-                uint betterIcon = companion.Icon + (uint)64000; // Thats the cuter icon
+
+                //uint betterIcon = companion.Icon + (uint)64000; // Thats the cuter icon
+
+                DalamudServices.PluginLog.Debug("Name: " + singular + ", RowID: " + companion.RowId);
+
                 uint footstepIcon = companion.Icon + (uint)65000;
                 sbyte pronoun = companion.Pronoun;
-                ushort HP = companion.HP;
                 string raceName = companion.MinionRace?.Value?.Name ?? "...";
 
                 string behaviourName = companion.Behavior.Value?.Name ?? "...";

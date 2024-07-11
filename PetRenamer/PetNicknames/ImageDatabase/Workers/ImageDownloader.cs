@@ -146,7 +146,7 @@ internal class ImageDownloader : IImageDownloader
         }
         catch (Exception e)
         {
-            failure.Invoke(new Exception("Texture couldnt load"));
+            failure.Invoke(e);
             return;
         }
     }
@@ -187,10 +187,7 @@ internal class ImageDownloader : IImageDownloader
                 source.Cancel();
                 source.Dispose();
             }
-            catch (Exception e)
-            {
-
-            }
+            catch { }
         }
 
         cancellationTokes.Clear();

@@ -18,7 +18,6 @@ using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 
 namespace PetRenamer;
 

@@ -6,7 +6,6 @@ using System;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
@@ -71,8 +70,6 @@ internal unsafe class SimpleTextHook : ITextHook
 
         IPetSheetData? pet = GetPetData(text, ref user);
         if (pet == null) return false;
-
-        PetServices.PetLog.LogVerbose(pet.Model + " : " + pet.BaseSingular);
 
         string? customName = user.DataBaseEntry.GetName(pet.Model);
         if (customName == null) return false;

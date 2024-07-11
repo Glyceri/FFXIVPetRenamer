@@ -1,5 +1,6 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
+using System.Collections.Immutable;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
@@ -14,7 +15,7 @@ internal interface IPettableDatabaseEntry
     bool Destroyed { get; }
     bool OldUser { get; }
 
-    int[] SoftSkeletons { get; }
+    ImmutableArray<int> SoftSkeletons { get; }
 
     bool IsDirty { get; }
     bool IsDirtyForUI { get; }
@@ -34,6 +35,7 @@ internal interface IPettableDatabaseEntry
     string? GetName(int skeletonID);
     string? GetSoftName(int softIndex);
     int? GetSoftSkeleton(int softIndex);
+    void SetSoftSkeleton(int index, int softSkeleton);
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
     void MarkDirtyUIAsNotified();

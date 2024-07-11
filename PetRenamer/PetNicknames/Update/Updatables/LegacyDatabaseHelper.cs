@@ -53,7 +53,7 @@ internal class LegacyDatabaseHelper : IUpdatable
 
             BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
             if (character == null) continue;
-            DalamudServices.PluginLog.Debug("Found");
+
             entry.UpdateContentID(character->ContentId);
             LegacyPettableDatabase.RemoveEntry(entry);
             entry.MoveToDataBase(PettableDatabase);

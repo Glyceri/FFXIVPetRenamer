@@ -2,6 +2,8 @@
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -14,7 +16,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public ushort Homeworld { get; private set; }
     public string HomeworldName { get; private set; }
 
-    public int[] SoftSkeletons { get; private set; }
+    public ImmutableArray<int> SoftSkeletons { get; private set; }
 
     public INamesDatabase ActiveDatabase { get; private set; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
@@ -37,7 +39,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         ActiveDatabase = new PettableNameDatabase(ids, names);
         IsActive = isActive;
         Homeworld = homeworld;
-        SoftSkeletons = softSkeletons;
+        SoftSkeletons = ImmutableArray.Create(softSkeletons);
         HomeworldName = petServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
     }
 
@@ -98,6 +100,22 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         if (softIndex < 0 || softIndex >= SoftSkeletons.Length) return null;
         return SoftSkeletons[softIndex];
+    }
+
+    public void SetSoftSkeleton(int index, int softSkeleton)
+    {
+        if (index < 0 || index >= SoftSkeletons.Length) return;
+
+        _IsDirty = true;
+        _IsDirtyForUI = true;
+
+        int[] temporaryArray = SoftSkeletons.ToArray();
+        int oldSkeleton = temporaryArray[index];
+
+        if (oldSkeleton == softSkeleton) return;
+
+        temporaryArray[index] = softSkeleton;
+        SoftSkeletons = ImmutableArray.Create(temporaryArray);
     }
 
     public void Destroy() => Destroyed = true;

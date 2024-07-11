@@ -17,7 +17,6 @@ internal class UserNode : Node
     readonly RenameTitleNode PetcountNode;
     readonly IImageDatabase ImageDatabase;
 
-    readonly IDalamudTextureWrap? _userTexture = null;
     IPettableDatabaseEntry? currentEntry = null;
 
     readonly DalamudServices DalamudServices;

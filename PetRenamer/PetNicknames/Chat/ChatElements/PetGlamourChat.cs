@@ -168,7 +168,7 @@ internal class PetGlamourChat : RestrictedChatElement
 
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
-        SetDatabaseEntry(localUser, classJob.Value, sheetData.Model);
+        localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, sheetData.Model);
     }
 
     void MatchReset(Match match)
@@ -182,14 +182,7 @@ internal class PetGlamourChat : RestrictedChatElement
         if (localUser == null) return;
 
         int baseSkeleton = PluginConstants.BaseSkeletons[classJob.Value];
-        SetDatabaseEntry(localUser, classJob.Value, baseSkeleton);
-    }
-
-    void SetDatabaseEntry(IPettableUser user, int classJobIndex, int newSkeleton)
-    {
-        bool changed = user.DataBaseEntry.SoftSkeletons[classJobIndex] != newSkeleton;
-        user.DataBaseEntry.SoftSkeletons[classJobIndex] = newSkeleton;
-        if (changed) PetServices.Configuration.Save();
+        localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, baseSkeleton);
     }
 
     int? GetClassJob(string basePetName) => PetServices.PetSheets.NameToSoftSkeletonIndex(basePetName);

@@ -1,9 +1,5 @@
-﻿using Dalamud.Game.Addon.Lifecycle;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
