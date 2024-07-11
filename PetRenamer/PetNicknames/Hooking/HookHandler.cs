@@ -37,7 +37,7 @@ internal class HookHandler : IDisposable
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList));
     }
 
-    List<IHookableElement> hookableElements = new List<IHookableElement>();
+    readonly List<IHookableElement> hookableElements = new List<IHookableElement>();
 
     void Register(IHookableElement element)
     {

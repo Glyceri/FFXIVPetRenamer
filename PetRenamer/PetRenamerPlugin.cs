@@ -49,7 +49,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(in _PetServices);
         LegacyDatabase = new LegacyPettableDatabase(in _PetServices);
-        ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in PettableDatabase, in LodestoneNetworkerInterface);
+        ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in LodestoneNetworkerInterface);
         UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);

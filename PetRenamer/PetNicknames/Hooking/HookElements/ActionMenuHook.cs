@@ -18,6 +18,7 @@ internal unsafe class ActionMenuHook : HookableElement
     {
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenu", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "ActionMenu", LifeCycleUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenu", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenuActionSetting", LifeCycleUpdate3);
     }
@@ -159,7 +160,6 @@ internal unsafe class ActionMenuHook : HookableElement
 
     bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
-
         AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
         if (tNode == null) return false;
         if (!tNode->IsVisible()) return false;

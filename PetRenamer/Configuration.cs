@@ -90,6 +90,7 @@ internal class Configuration : IPluginConfiguration
 
     #region OBSOLETE
 
+#pragma warning disable IDE1006
     //---------------------------Legacy Variables---------------------------
     // Will be kept for backwards compatibility
     //---------------------------Legacy Variables---------------------------
@@ -112,6 +113,8 @@ internal class Configuration : IPluginConfiguration
     [Obsolete("Use the type specific variable instead.")] public bool useCustomNamesInChat { get; set; } = true;
     [Obsolete("Use the type specific variable instead.")] public bool useCustomFlyoutInChat { get; set; } = true;
     [Obsolete("Use the type specific variable instead.")] public bool allowCastBar { get; set; } = true;
+
+#pragma warning restore IDE1006
 
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialise()

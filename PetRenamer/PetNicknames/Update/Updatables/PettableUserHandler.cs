@@ -46,7 +46,7 @@ internal unsafe class PettableUserHandler : IUpdatable
         for (int i = 0; i < charaSpanLength; i++)
         {
             Pointer<BattleChara> battleChara = charaSpan[i];
-            IPettableUser? pettableUser = PettableUserList.pettableUsers[i];
+            IPettableUser? pettableUser = PettableUserList.PettableUsers[i];
 
             ObjectKind currentObjectKind = ObjectKind.None;
             ulong pettableContentID = ulong.MaxValue;
@@ -61,13 +61,13 @@ internal unsafe class PettableUserHandler : IUpdatable
             if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
             {
                 pettableUser?.Destroy();
-                PettableUserList.pettableUsers[i] = null;
+                PettableUserList.PettableUsers[i] = null;
             }
 
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
                 IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, PetServices, battleChara);
-                PettableUserList.pettableUsers[i] = newUser;
+                PettableUserList.PettableUsers[i] = newUser;
                 continue;
             }
 
@@ -76,7 +76,7 @@ internal unsafe class PettableUserHandler : IUpdatable
             pettableUser?.Set(battleChara);
         }
 
-        IPettableUser?[] users = PettableUserList.pettableUsers;
+        IPettableUser?[] users = PettableUserList.PettableUsers;
         int size = users.Length;
         for (int i = 0; i < size; i++)
         {

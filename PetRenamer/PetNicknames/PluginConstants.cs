@@ -8,7 +8,6 @@ public static class PluginConstants
 
     public const int ffxivNameSize = 24;
     public const char forbiddenCharacter = '^';
-    public const string HalfWidthSpace = " ";
 
     public const int Eos = -407;
     public const int Selene = -408;

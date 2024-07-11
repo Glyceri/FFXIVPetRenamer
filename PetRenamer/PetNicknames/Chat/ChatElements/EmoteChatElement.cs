@@ -7,7 +7,6 @@ using Dalamud.Game;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
@@ -37,7 +36,7 @@ internal unsafe class EmoteChatElement : IChatElement
         GameObjectId emoteTarget = bChara->Character.EmoteController.Target;
         if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return;
 
-        foreach(IPettableUser? user in UserList.pettableUsers)
+        foreach(IPettableUser? user in UserList.PettableUsers)
         {
             if (user == null) continue;
             if (!user.IsActive) continue;

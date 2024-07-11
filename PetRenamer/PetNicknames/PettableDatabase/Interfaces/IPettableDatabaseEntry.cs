@@ -13,7 +13,6 @@ internal interface IPettableDatabaseEntry
 
     bool IsActive { get; }
     bool Destroyed { get; }
-    bool OldUser { get; }
 
     ImmutableArray<int> SoftSkeletons { get; }
 

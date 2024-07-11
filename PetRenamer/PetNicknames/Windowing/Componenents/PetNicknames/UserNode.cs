@@ -60,7 +60,7 @@ internal class UserNode : Node
     {
         UserNameRect.SetText(user?.Name ?? "...");
         HomeWorldRect.SetText(user?.HomeworldName ?? "...");
-        PetcountNode.SetText(user?.ActiveDatabase.IDs.Count().ToString() ?? "...");
+        PetcountNode.SetText(user?.ActiveDatabase.IDs.Length.ToString() ?? "...");
         currentEntry = user;
         ProfilePictureRect.SetUser(user);
     }

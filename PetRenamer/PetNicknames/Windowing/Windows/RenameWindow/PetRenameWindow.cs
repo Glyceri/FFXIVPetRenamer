@@ -25,7 +25,7 @@ internal partial class PetRenameWindow : PetWindow
     protected override string Title { get; } = Translator.GetLine("PetRenameWindow.Title");
     protected override string ID { get; } = "PetRenameWindow";
 
-    PetRenameNode? petRenameNode;
+    readonly PetRenameNode? petRenameNode;
 
     IPettableUser? ActiveUser;
     IPettableUser? lastActiveUser;
@@ -106,7 +106,6 @@ internal partial class PetRenameWindow : PetWindow
         lastCustomName = customName;
 
         petRenameNode?.Setup(customName, in data);
-
     }
 
     void CleanOldNode()

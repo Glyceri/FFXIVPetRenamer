@@ -30,7 +30,7 @@ internal class ChatHandler : IDisposable
         Register(new BattleChatElement(PetServices, PettableUserList));
     }
 
-    List<IChatElement> _chatElements = new List<IChatElement>(); 
+    readonly List<IChatElement> _chatElements = new List<IChatElement>(); 
 
     void Register(IChatElement chatElement)
     {

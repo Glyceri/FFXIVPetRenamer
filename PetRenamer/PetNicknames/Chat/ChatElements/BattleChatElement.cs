@@ -4,7 +4,6 @@ using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using System.Collections.Generic;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;

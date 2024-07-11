@@ -6,15 +6,15 @@ internal class PettableUserList : IPettableUserList
 {
     const int PettableUserArraySize = 100;
 
-    public IPettableUser?[] pettableUsers { get; set; } = new IPettableUser[PettableUserArraySize];
-    public IPettableUser? LocalPlayer { get => pettableUsers[0]; }
+    public IPettableUser?[] PettableUsers { get; set; } = new IPettableUser[PettableUserArraySize];
+    public IPettableUser? LocalPlayer { get => PettableUsers[0]; }
 
     public IPettablePet? GetPet(nint pet)
     {
         if (pet == nint.Zero) return null;
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? user = pettableUsers[i];
+            IPettableUser? user = PettableUsers[i];
             if(user == null) continue;
             if (!user.IsActive) continue;
             IPettablePet? pPet = user.GetPet(pet);
@@ -29,7 +29,7 @@ internal class PettableUserList : IPettableUserList
         if (petId == 0) return null;
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = pettableUsers[i];
+            IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
             IPettablePet? pPet = pUser.GetPet(petId);
@@ -44,7 +44,7 @@ internal class PettableUserList : IPettableUserList
         if (user == nint.Zero) return null;
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = pettableUsers[i];
+            IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
             if (pUser.User == user) return pUser;
@@ -59,7 +59,7 @@ internal class PettableUserList : IPettableUserList
         if (userId == 0) return null;
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = pettableUsers[i];
+            IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
             if (pUser.ObjectID == userId) return pUser;
@@ -75,7 +75,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = pettableUsers[i];
+            IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
             if (!string.Equals(pUser.Name, username, System.StringComparison.InvariantCultureIgnoreCase)) continue;

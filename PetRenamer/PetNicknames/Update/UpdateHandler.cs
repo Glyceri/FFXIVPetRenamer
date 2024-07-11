@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Update.Interfaces;
 using PetRenamer.PetNicknames.Update.Updatables;
 
@@ -20,7 +19,6 @@ internal class UpdateHandler : IDisposable
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
     readonly IPettableDatabase LegacyPettableDatabase;
-    readonly IPetLog PetLog;
     readonly LodestoneNetworker LodestoneNetworker;
     readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
@@ -30,7 +28,6 @@ internal class UpdateHandler : IDisposable
         Configuration = configuration;
         PetServices = petServices;
         PettableUserList = pettableUserList;
-        PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
         LegacyPettableDatabase = legacyDatabase;
         LodestoneNetworker = lodestoneNetworker;

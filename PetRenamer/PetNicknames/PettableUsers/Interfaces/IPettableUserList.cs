@@ -2,7 +2,7 @@
 
 internal interface IPettableUserList
 {
-    IPettableUser?[] pettableUsers { get; set; }
+    IPettableUser?[] PettableUsers { get; set; }
     IPettableUser? LocalPlayer { get; }
 
     IPettablePet? GetPet(nint pet);

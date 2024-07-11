@@ -1,9 +1,7 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
@@ -20,7 +18,7 @@ internal class WindowHandler : IWindowHandler
     readonly DalamudServices DalamudServices;
     readonly IPettableDatabase Database;
 
-    WindowSystem WindowSystem;
+    readonly WindowSystem WindowSystem;
 
     public WindowHandler(in DalamudServices dalamudServices, in IPettableDatabase pettableDatabase)
     {

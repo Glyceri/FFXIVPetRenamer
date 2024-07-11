@@ -18,7 +18,6 @@ internal interface IPetSheets
     IPetSheetData? GetPetFromAction(uint actionID, in IPettableUser user, bool IsSoft = true);
     IPetSheetData? GetPetFromString(string text, in IPettableUser user, bool IsSoft = false);
     IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData);
-    List<IPetSheetData> GetListFromLine(string line);
     int? NameToSoftSkeletonIndex(string name);
     int? CastToSoftIndex(uint castId);
     bool IsValidBattlePet(int skeleton);

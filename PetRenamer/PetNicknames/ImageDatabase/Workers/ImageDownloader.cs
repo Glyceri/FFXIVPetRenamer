@@ -21,16 +21,14 @@ internal class ImageDownloader : IImageDownloader
     readonly DalamudServices DalamudServices;
     readonly ILodestoneNetworker Networker;
     readonly IPetServices PetServices;
-    readonly IImageDatabase Database;
 
     readonly Dictionary<ulong, CancellationTokenSource> cancellationTokes = new Dictionary<ulong, CancellationTokenSource>();
 
-    public ImageDownloader(DalamudServices dalamudServices, IPetServices petServices, ILodestoneNetworker networker, IImageDatabase database)
+    public ImageDownloader(DalamudServices dalamudServices, IPetServices petServices, ILodestoneNetworker networker)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         Networker = networker;
-        Database = database;
     }
 
     public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)

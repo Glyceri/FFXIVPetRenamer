@@ -21,7 +21,7 @@ internal unsafe class SimpleTextHook : ITextHook
     protected IPettableUserList PettableUserList { get; set; } = null!;
     protected IPetServices PetServices { get; set; } = null!;
 
-    protected uint[] TextPos { get; set; } = new uint[0];
+    protected uint[] TextPos { get; set; } = Array.Empty<uint>();
     protected Func<int, bool> AllowedToFunction = _ => false;
 
     protected bool IsSoft;

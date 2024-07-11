@@ -296,6 +296,7 @@ internal partial class PetListWindow : PetWindow
     {
         currentIndex = amount;
         PreviousListNode.IsDisabled = currentIndex == 0;
+        NextListNode.IsDisabled = true;
         SetUser(ActiveEntry);
     }
 

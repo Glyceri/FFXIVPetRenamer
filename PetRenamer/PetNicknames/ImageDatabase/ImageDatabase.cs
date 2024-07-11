@@ -18,18 +18,16 @@ internal class ImageDatabase : IImageDatabase
 
     readonly DalamudServices DalamudServices;
     readonly IPetServices PetServices;
-    readonly IPettableDatabase PettableDatabase;
     readonly IDalamudTextureWrap SearchTexture;
     readonly ILodestoneNetworker Networker;
     readonly IImageDownloader ImageDownloader;
 
-    public ImageDatabase(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableDatabase pettableDatabase, in ILodestoneNetworker networker)
+    public ImageDatabase(in DalamudServices dalamudServices, in IPetServices petServices, in ILodestoneNetworker networker)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
-        PettableDatabase = pettableDatabase;
         Networker = networker;
-        ImageDownloader = new ImageDownloader(DalamudServices, PetServices, Networker, this);
+        ImageDownloader = new ImageDownloader(DalamudServices, PetServices, Networker);
         SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(66310).RentAsync().Result;
     }
 

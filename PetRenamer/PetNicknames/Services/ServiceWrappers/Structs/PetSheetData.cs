@@ -156,5 +156,5 @@ internal struct PetSheetData : IPetSheetData
         return curIdentifier;
     }
 
-    public bool IsAction(uint action) => ActionID == action;
+    public readonly bool IsAction(uint action) => ActionID == action;
 }
