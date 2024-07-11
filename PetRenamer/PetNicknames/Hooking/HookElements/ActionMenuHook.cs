@@ -121,33 +121,63 @@ internal unsafe class ActionMenuHook : HookableElement
             AtkComponentBase* atkNode = node->Component;
             if (atkNode == null) continue;
 
-            AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
-            if (tNode == null) continue;
-            if (!tNode->IsVisible()) continue;
-
-            ushort count = atkNode->UldManager.NodeListCount;
-            if (count < 7) continue;
-
-            AtkComponentNode* dragDropNode = atkNode->UldManager.NodeList[6]->GetAsAtkComponentNode();
-            if (dragDropNode == null) continue;
-
-            AtkComponentBase* dragDropBase = dragDropNode->Component;
-            if (dragDropBase == null) continue;
-
-            ushort count2 = dragDropBase->UldManager.NodeListCount;
-            if (count2 < 2) continue;
-
-            AtkComponentNode* iconBaseNode = (AtkComponentNode*)dragDropBase->UldManager.NodeList[2]->GetAsAtkComponentNode();
-            if (iconBaseNode == null) continue;
-
-            AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
-            if (iconNode == null) continue;
-
-            long iconID = iconNode->IconId;
-            if (iconID == 0) continue;
-
-            Rename(tNode, in user, iconID);
+            if (TryAsDragAndDropNode(atkNode, in user)) continue;
+            if (TryAsFlatNode(atkNode, in user)) continue;
         }
+    }
+
+    bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
+    {
+        AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
+        if (tNode == null) return false;
+        if (!tNode->IsVisible()) return false;
+
+        ushort count = atkNode->UldManager.NodeListCount;
+        if (count < 7) return false;
+
+        AtkComponentNode* dragDropNode = atkNode->UldManager.NodeList[6]->GetAsAtkComponentNode();
+        if (dragDropNode == null) return false;
+
+        AtkComponentBase* dragDropBase = dragDropNode->Component;
+        if (dragDropBase == null) return false;
+
+        ushort count2 = dragDropBase->UldManager.NodeListCount;
+        if (count2 < 2) return false;
+
+        AtkComponentNode* iconBaseNode = (AtkComponentNode*)dragDropBase->UldManager.NodeList[2]->GetAsAtkComponentNode();
+        if (iconBaseNode == null) return false;
+
+        AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
+        if (iconNode == null) return false;
+
+        long iconID = iconNode->IconId;
+        if (iconID <= 0 || iconID > 50000) return false;
+
+        Rename(tNode, in user, iconID);
+        return true;
+    }
+
+    bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
+    {
+
+        AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
+        if (tNode == null) return false;
+        if (!tNode->IsVisible()) return false;
+
+        ushort count = atkNode->UldManager.NodeListCount;
+        if (count < 6) return false;
+
+        AtkComponentNode* iconBaseNode = (AtkComponentNode*)atkNode->UldManager.NodeList[5]->GetAsAtkComponentNode();
+        if (iconBaseNode == null) return false;
+
+        AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
+        if (iconNode == null) return false;
+
+        long iconID = iconNode->IconId;
+        if (iconID == 0) return false;
+
+        Rename(tNode, in user, iconID);
+        return true;
     }
 
     void Rename(AtkTextNode* textNode, in IPettableUser user, long iconID)
@@ -170,5 +200,6 @@ internal unsafe class ActionMenuHook : HookableElement
     {
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate2);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate3);
     }
 }
