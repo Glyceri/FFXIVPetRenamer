@@ -200,10 +200,10 @@ internal unsafe class MapHook : HookableElement
         if (index < 0) return;
         if (index >= pets.Count) return;
 
-        IPettableUser? hoveredUser = UserList.GetUser(pets[index]);
-        if (hoveredUser == null) return;
+        nint pet = pets[index];
 
-        TooltipHook.OverrideUser(hoveredUser);
+        IPettablePet? pettablePet = UserList.GetPet(pet);
+        TooltipHook.OverridePet(pettablePet);
     }
 
     public override void Dispose()

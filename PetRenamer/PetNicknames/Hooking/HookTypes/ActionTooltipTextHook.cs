@@ -11,7 +11,6 @@ namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 internal unsafe class ActionTooltipTextHook : SimpleTextHook
 {
     uint backgroundNodePos;
-    bool blocked = false;
     AtkNineGridNode* bgNode;
 
     IPetSheetData? currentData = null;

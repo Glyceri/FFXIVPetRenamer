@@ -1,11 +1,12 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal interface IPettablePet
 {
+    IPettableUser? Owner { get; }
+
     public bool Touched { get; set; }
 
     public nint PetPointer { get; }

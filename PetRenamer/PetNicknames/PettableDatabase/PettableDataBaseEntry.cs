@@ -40,7 +40,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         IsActive = isActive;
         Homeworld = homeworld;
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
-        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
+        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld) ?? "...";
     }
 
     public void UpdateEntry(IPettableUser pettableUser)
@@ -64,7 +64,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.ActiveDatabase = ActiveDatabase;
         pEntry.Name = Name;
         pEntry.Homeworld = Homeworld;
-        pEntry.HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? "[No Homeworld Found]";
+        pEntry.HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? "...";
         pEntry.ContentID = ContentID;
         pEntry.IsActive = true;
         pEntry.SoftSkeletons = SoftSkeletons;

@@ -62,8 +62,8 @@ internal unsafe class MapTooltipHook : QuickHookableElement
         showTooltip?.Dispose();
     }
 
-    public void OverrideUser(IPettableUser user)
+    public void OverridePet(IPettablePet? pet)
     {
-        tooltipHookMap.SetUser(user);
+        tooltipHookMap.SetPet(pet);
     }
 }

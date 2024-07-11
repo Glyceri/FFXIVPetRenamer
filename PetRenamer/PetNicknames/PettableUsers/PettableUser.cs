@@ -68,7 +68,7 @@ internal unsafe class PettableUser : IPettableUser
 
         IPettablePet? storedPet = FindPet(ref c->Character);
         if (storedPet != null) storedPet.Update((nint)c);
-        else CreateNewPet(new PettableCompanion(c, DataBaseEntry, PetServices));
+        else CreateNewPet(new PettableCompanion(c, this, DataBaseEntry, PetServices));
     }
 
     public void OnLastCastChanged(uint cast)
@@ -144,7 +144,7 @@ internal unsafe class PettableUser : IPettableUser
 
             IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
             if (storedPet != null) storedPet.Update((nint)bChara.Value);
-            else CreateNewPet(new PettableBattlePet(bChara.Value, DataBaseEntry, PetServices));
+            else CreateNewPet(new PettableBattlePet(bChara.Value, this, DataBaseEntry, PetServices));
         }
     }
 

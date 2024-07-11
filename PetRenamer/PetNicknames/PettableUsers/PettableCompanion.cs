@@ -23,13 +23,14 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public IPetSheetData? PetData { get; private set; }
     public byte PetType { get; private set; }
     public ulong Lifetime { get; private set; }
+    public IPettableUser? Owner { get; private set; }
 
-    public PettableCompanion(Companion* c, IPettableDatabaseEntry entry, IPetServices petServices)
+    public PettableCompanion(Companion* c, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices)
     {
         if (c == null) return;
         Touched = true;
         Companion = c;
-
+        Owner = owner;
         SkeletonID = c->Character.CharacterData.ModelCharaId;
         Index = c->Character.GameObject.ObjectIndex;
         Name = c->Character.GameObject.NameString;

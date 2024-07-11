@@ -14,7 +14,7 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
     bool blocked = false;
     AtkNineGridNode* bgNode;
 
-    IPettableUser? currentUser = null;
+    IPettablePet? currentPet = null;
 
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
@@ -34,9 +34,9 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         blocked = isBlocked;
     }
 
-    public void SetUser(IPettableUser? pettableUser)
+    public void SetPet(IPettablePet? pettablePet)
     {
-        currentUser = pettableUser;
+        currentPet = pettablePet;
     }
 
     protected override bool BlockedCheck() => blocked || base.BlockedCheck();
@@ -50,6 +50,12 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         return base.GetTextNode(in bNode);
     }
 
+    protected override IPetSheetData? GetPetData(string text, in IPettableUser user)
+    {
+        if (currentPet?.Owner != user) return null;
+        return currentPet?.PetData;
+    }
+
     protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
         base.SetText(textNode, text, customName, pPet);
@@ -59,5 +65,5 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    protected override IPettableUser? GetUser() => currentUser;
+    protected override IPettableUser? GetUser() => currentPet?.Owner;
 }
