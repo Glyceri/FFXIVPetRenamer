@@ -61,22 +61,28 @@ internal class SheetsWrapper : IPetSheets
                 ModelChara? model = companion.Model.Value;
                 if (model == null) continue;
 
+                uint companionIndex = companion.RowId;
                 int modelID = (int)model.RowId;
                 int legacyModelID = (int)model.Model;
+
+                if (legacyModelID == 0) continue;
+
                 string singular = companion.Singular.ToDalamudString().TextValue;
+
+                if (singular.IsNullOrWhitespace()) continue;
+
+
                 string plural = companion.Plural.ToDalamudString().TextValue;
                 uint icon = companion.Icon;
 
                 //uint betterIcon = companion.Icon + (uint)64000; // Thats the cuter icon
-
-                DalamudServices.PluginLog.Debug("Name: " + singular + ", RowID: " + companion.RowId);
 
                 uint footstepIcon = companion.Icon + (uint)65000;
                 sbyte pronoun = companion.Pronoun;
                 string raceName = companion.MinionRace?.Value?.Name ?? "...";
 
                 string behaviourName = companion.Behavior.Value?.Name ?? "...";
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, footstepIcon, pronoun, singular, plural, string.Empty, uint.MaxValue, in DalamudServices));
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, footstepIcon, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
             }
         }
         if (battlePetSheet == null) return;
@@ -166,11 +172,27 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? GetPetFromActionName(string actionName)
     {
+        if (actionName.IsNullOrWhitespace()) return null;
+
         int sheetCount = petSheetCache.Count;
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
             if (!pet.IsAction(actionName)) continue;
+            return pet;
+        }
+        return null;
+    }
+
+    public IPetSheetData? GetPetFromAction(uint actionID)
+    {
+        if (actionID == 0 || actionID == uint.MaxValue) return null;
+
+        int sheetCount = petSheetCache.Count;
+        for (int i = 0; i < sheetCount; i++)
+        {
+            IPetSheetData pet = petSheetCache[i];
+            if (!pet.IsAction(actionID)) continue;
             return pet;
         }
         return null;
@@ -228,7 +250,7 @@ internal class SheetsWrapper : IPetSheets
         return list;
     }
 
-    public IPetSheetData? GetPetFromString(string baseString, ref IPettableUser user, bool soft)
+    public IPetSheetData? GetPetFromString(string baseString, in IPettableUser user, bool soft)
     {
         List<IPetSheetData> data = GetListFromLine(baseString);
 
@@ -246,13 +268,18 @@ internal class SheetsWrapper : IPetSheets
         int? softIndex = NameToSoftSkeletonIndex(normalPetData.BasePlural);
         if (softIndex == null) return normalPetData;
 
-        int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex.Value);
-        if (softSkeleton == null) return normalPetData;
+        return GetFromSoftIndex(in user, in normalPetData, softIndex.Value);
+    }
+
+    public IPetSheetData? GetFromSoftIndex(in IPettableUser user, in IPetSheetData oldData, int softIndex)
+    {
+        int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex);
+        if (softSkeleton == null) return oldData;
 
         IPetSheetData? softPetData = GetPet(softSkeleton.Value);
-        if (softPetData == null) return normalPetData;
+        if (softPetData == null) return oldData;
 
-        return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, normalPetData.BaseSingular, normalPetData.BasePlural, in DalamudServices);
+        return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, oldData.BaseSingular, oldData.BasePlural, in DalamudServices);
     }
 
     public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);

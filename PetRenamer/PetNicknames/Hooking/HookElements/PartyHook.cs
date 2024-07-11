@@ -72,7 +72,7 @@ internal unsafe class PartyHook : HookableElement
             IPettableUser? user = UserList.GetUser(memberName);
             if (user == null) continue;
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromString(castString, ref user, true);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromString(castString, in user, true);
             if (data == null) continue;
 
             string? customName = user.DataBaseEntry.GetName(data.Model);

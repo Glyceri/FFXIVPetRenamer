@@ -154,4 +154,6 @@ internal struct PetSheetData : IPetSheetData
         if (curIdentifier.Length < ActionName.Length) curIdentifier = ActionName;
         return curIdentifier;
     }
+
+    public bool IsAction(uint action) => ActionID == action;
 }

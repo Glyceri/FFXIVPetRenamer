@@ -25,9 +25,12 @@ internal class HookHandler : IDisposable
     void _Register()
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
-        TooltipHook tooltipHook = new TooltipHook(DalamudServices, PetServices, PettableUserList);
-        Register(tooltipHook);
-        Register(new MapHook(DalamudServices, PetServices, PettableUserList, tooltipHook));
+        Register(new ActionTooltipHook(DalamudServices, PetServices, PettableUserList));
+
+        MapTooltipHook mapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
+        Register(mapTooltipHook);
+
+        Register(new MapHook(DalamudServices, PetServices, PettableUserList, mapTooltipHook));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList));

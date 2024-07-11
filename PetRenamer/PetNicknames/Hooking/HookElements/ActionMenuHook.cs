@@ -46,8 +46,8 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkTextNode* textNode2 = resNode2->GetTextNodeById(10)->GetAsAtkTextNode();
         if (textNode2 == null) return;
 
-        Rename(textNode, ref user);
-        Rename(textNode2, ref user);
+        Rename(textNode, in user);
+        Rename(textNode2, in user);
     }
 
     void Update2(AtkUnitBase* baseD)
@@ -70,7 +70,7 @@ internal unsafe class ActionMenuHook : HookableElement
             AtkComponentBase cBase = button.AtkComponentBase;
             AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
             if (tNode == null) continue;
-            Rename(tNode, ref user);
+            Rename(tNode, in user);
         }
     }
 
@@ -90,16 +90,16 @@ internal unsafe class ActionMenuHook : HookableElement
             if (node->Component->UldManager.NodeListCount != 11) continue;
             AtkTextNode* tNode = (AtkTextNode*)node->Component->GetTextNodeById(10);
             if (tNode == null) continue;
-            Rename(tNode, ref user);
+            Rename(tNode, in user);
         }
     }
 
-    void Rename(AtkTextNode* textNode, ref IPettableUser user)
+    void Rename(AtkTextNode* textNode, in IPettableUser user)
     {
         string textNodeText = textNode->NodeText.ToString();
         string baseString = textNodeText.Split('\r')[0];
 
-        IPetSheetData? petSheet = PetServices.PetSheets.GetPetFromString(baseString, ref user, true);
+        IPetSheetData? petSheet = PetServices.PetSheets.GetPetFromString(baseString, in user, true);
         if (petSheet == null) return;
 
         string? customName = user.DataBaseEntry.GetName(petSheet.Model);

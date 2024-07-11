@@ -2,20 +2,19 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using System;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
-internal unsafe class TooltipTextHook : SimpleTextHook
+internal unsafe class ActionTooltipTextHook : SimpleTextHook
 {
     uint backgroundNodePos;
     bool blocked = false;
     AtkNineGridNode* bgNode;
 
-    IPettableUser? currentUser = null;
+    IPetSheetData? currentData = null;
 
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
@@ -24,23 +23,11 @@ internal unsafe class TooltipTextHook : SimpleTextHook
         services.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, AddonName, HandleUpdate);
     }
 
-    public void Register(uint backgroundNodePos)
+    public void Register(uint backgroundNodePos = uint.MaxValue)
     {
         this.backgroundNodePos = backgroundNodePos;
         SetUnfaulty();
     }
-
-    public void SetBlockedState(bool isBlocked)
-    {
-        blocked = isBlocked;
-    }
-
-    public void SetUser(IPettableUser? pettableUser)
-    {
-        currentUser = pettableUser;
-    }
-
-    protected override bool BlockedCheck() => blocked || base.BlockedCheck();
 
     protected override unsafe AtkTextNode* GetTextNode(ref BaseNode bNode)
     {
@@ -60,5 +47,10 @@ internal unsafe class TooltipTextHook : SimpleTextHook
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    protected override IPettableUser? GetUser() => currentUser;
+    public void SetPetSheetData(IPetSheetData? petSheetData) => currentData = petSheetData;
+
+    protected override IPetSheetData? GetPetData(string text, ref IPettableUser user)
+    {
+     return   currentData;
+    }
 }

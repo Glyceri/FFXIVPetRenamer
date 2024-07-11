@@ -35,11 +35,11 @@ internal unsafe class MapHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00 ", DetourName = nameof(MapDetour))]
     readonly Hook<NewMapDelegate> mapTooltipHook = null!;
 
-    readonly TooltipHook TooltipHook;
+    readonly MapTooltipHook TooltipHook;
 
-    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, TooltipHook tooltipHook) : base(services, userList, petServices) 
+    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, MapTooltipHook tooltipHook) : base(services, userList, petServices) 
     { 
-        this.TooltipHook = tooltipHook;
+        TooltipHook = tooltipHook;
     }
 
     public override void Init()

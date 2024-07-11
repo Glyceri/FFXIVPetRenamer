@@ -106,13 +106,13 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         if (index < 0 || index >= SoftSkeletons.Length) return;
 
-        _IsDirty = true;
-        _IsDirtyForUI = true;
-
         int[] temporaryArray = SoftSkeletons.ToArray();
         int oldSkeleton = temporaryArray[index];
 
         if (oldSkeleton == softSkeleton) return;
+
+        _IsDirty = true;
+        _IsDirtyForUI = true;
 
         temporaryArray[index] = softSkeleton;
         SoftSkeletons = ImmutableArray.Create(temporaryArray);

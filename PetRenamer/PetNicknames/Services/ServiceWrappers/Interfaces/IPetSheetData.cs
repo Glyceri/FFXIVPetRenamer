@@ -23,6 +23,7 @@ internal interface IPetSheetData
 
     bool IsPet(string name);
     bool IsAction(string action);
+    bool IsAction(uint action);
     bool Contains(string line);
 
     string LongestIdentifier();

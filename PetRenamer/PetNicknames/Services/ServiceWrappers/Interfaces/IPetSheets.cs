@@ -15,7 +15,9 @@ internal interface IPetSheets
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
     IPetSheetData? GetPetFromName(string name);
     IPetSheetData? GetPetFromActionName(string actionName);
-    IPetSheetData? GetPetFromString(string text, ref IPettableUser user, bool IsSoft);
+    IPetSheetData? GetPetFromAction(uint actionID);
+    IPetSheetData? GetPetFromString(string text, in IPettableUser user, bool IsSoft);
+    IPetSheetData? GetFromSoftIndex(in IPettableUser user, in IPetSheetData oldData, int softIndex);
     List<IPetSheetData> GetListFromLine(string line);
     int? NameToSoftSkeletonIndex(string name);
     int? CastToSoftIndex(uint castId);

@@ -18,21 +18,16 @@ internal class WindowHandler : IWindowHandler
     public PetWindowMode PetWindowMode { get => _windowMode; set => SetWindowMode(value); }
 
     readonly DalamudServices DalamudServices;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
 
     WindowSystem WindowSystem;
 
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDatabase pettableDatabase)
+    public WindowHandler(in DalamudServices dalamudServices, in IPettableDatabase pettableDatabase)
     {
-        //Node.UseThreadedStyleComputation = true;
         DrawingLib.Setup(dalamudServices.PetNicknamesPlugin);
         WindowStyles.RegisterDefaultColors();
 
         DalamudServices = dalamudServices;
-        PetServices = petServices;
-        UserList = pettableUserList;
         Database = pettableDatabase;
 
         WindowSystem = new WindowSystem(PluginConstants.pluginName);

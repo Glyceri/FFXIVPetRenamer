@@ -92,7 +92,7 @@ internal unsafe class SimpleTextHook : ITextHook
         return false;
     }
 
-    protected virtual IPetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, ref user, IsSoft);
+    protected virtual IPetSheetData? GetPetData(string text, ref IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, in user, IsSoft);
 
     protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
 

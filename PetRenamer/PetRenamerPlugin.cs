@@ -54,7 +54,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
-        WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase);
+        WindowHandler = new WindowHandler(in _DalamudServices, in PettableDatabase);
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
