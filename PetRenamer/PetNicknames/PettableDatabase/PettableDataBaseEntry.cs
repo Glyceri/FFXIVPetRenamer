@@ -95,7 +95,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         ActiveDatabase.MarkDirtyUIAsNotified();
     }
 
-    public string? GetSoftName(int softIndex) => GetName(GetSoftSkeleton(softIndex) ?? 0);
     public int? GetSoftSkeleton(int softIndex)
     {
         if (softIndex < 0 || softIndex >= SoftSkeletons.Length) return null;

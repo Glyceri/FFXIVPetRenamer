@@ -33,26 +33,13 @@ internal class ActionTooltipHook : QuickHookableElement
 
     void OnHoveredActionChanged(object? sender, HoveredAction e)
     {
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(e.ActionID);
-        IPetSheetData? softPetSheetData = MakeSoft(petData);
-
-        tooltipHook.SetPetSheetData(softPetSheetData);
-        actionTooltipHook.SetPetSheetData(softPetSheetData);
-    }
-
-    IPetSheetData? MakeSoft(IPetSheetData? petData)
-    {
-        if (petData == null) return null;
-
-        if (petData.Model >= -1) return petData;
-
         IPettableUser? localUser = UserList.LocalPlayer;
-        if (localUser == null) return petData;
+        if (localUser == null) return;
 
-        int index = Array.IndexOf(PluginConstants.BaseSkeletons, petData.Model);
-        if (index == -1) return petData;
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(e.ActionID, in localUser, true);
 
-        return PetServices.PetSheets.GetFromSoftIndex(in localUser, in petData, index);
+        tooltipHook.SetPetSheetData(petData);
+        actionTooltipHook.SetPetSheetData(petData);
     }
 
     public override void Dispose()

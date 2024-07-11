@@ -12,7 +12,7 @@ internal struct PetSheetData : IPetSheetData
     public sbyte Pronoun { get; private set; }
 
     public string[] Singular { get; private set; }
-    public string[] Plural   { get; private set; }
+    public string[] Plural { get; private set; }
 
     public string BaseSingular { get; private set; }
     public string BasePlural { get; private set; }
@@ -27,15 +27,15 @@ internal struct PetSheetData : IPetSheetData
     public uint FootstepIcon { get; private set; } = 0;
 
     public PetSheetData(int Model, int legacyModelID, uint Icon, string? raceName, string? behaviourName, uint footstepIcon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
-        :this(Model, legacyModelID, Icon, Pronoun, Singular, Plural, actionName, actionID, in services)
+        : this(Model, legacyModelID, Icon, Pronoun, Singular, Plural, actionName, actionID, in services)
     {
         this.RaceName = raceName;
         this.BehaviourName = behaviourName;
         this.FootstepIcon = footstepIcon;
     }
 
-    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint  actionID, in DalamudServices services) 
-        :this(Model, Icon, Pronoun, Singular, Plural, in services)
+    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
+        : this(Model, Icon, Pronoun, Singular, Plural, in services)
     {
         ActionID = actionID;
         ActionName = actionName;
@@ -87,7 +87,7 @@ internal struct PetSheetData : IPetSheetData
     readonly string[] AddSuffixToArray(string[] baseArray, string suffix)
     {
         string[] newBaseArray = baseArray.ToArray();
-        for(int i = 0; i < newBaseArray.Length; i++)
+        for (int i = 0; i < newBaseArray.Length; i++)
         {
             newBaseArray[i] = newBaseArray[i] + suffix;
         }
@@ -144,6 +144,7 @@ internal struct PetSheetData : IPetSheetData
         for (int i = 0; i < Plural.Length; i++)
             if (line.Contains(Plural[i], System.StringComparison.InvariantCultureIgnoreCase))
                 return true;
+
         return false;
     }
 

@@ -211,4 +211,6 @@ internal unsafe class PettableUser : IPettableUser
         IsDirty = false;
         DataBaseEntry.NotifySeenDirty();
     }
+
+    public string? GetCustomName(IPetSheetData sheetData) => DataBaseEntry.GetName(sheetData.Model);
 }

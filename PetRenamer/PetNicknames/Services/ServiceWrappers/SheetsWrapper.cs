@@ -170,34 +170,6 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public IPetSheetData? GetPetFromActionName(string actionName)
-    {
-        if (actionName.IsNullOrWhitespace()) return null;
-
-        int sheetCount = petSheetCache.Count;
-        for (int i = 0; i < sheetCount; i++)
-        {
-            IPetSheetData pet = petSheetCache[i];
-            if (!pet.IsAction(actionName)) continue;
-            return pet;
-        }
-        return null;
-    }
-
-    public IPetSheetData? GetPetFromAction(uint actionID)
-    {
-        if (actionID == 0 || actionID == uint.MaxValue) return null;
-
-        int sheetCount = petSheetCache.Count;
-        for (int i = 0; i < sheetCount; i++)
-        {
-            IPetSheetData pet = petSheetCache[i];
-            if (!pet.IsAction(actionID)) continue;
-            return pet;
-        }
-        return null;
-    }
-
     public int? NameToSoftSkeletonIndex(string name)
     {
         name = name.Trim();
@@ -245,7 +217,12 @@ internal class SheetsWrapper : IPetSheets
                 (!line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase) || pet.ActionName == string.Empty)) continue;
 
             list.Add(pet);
-        }    
+        }
+
+        if (list.Count == 0) return list;
+
+        list.Sort((i1, i2) => i1.LongestIdentifier().CompareTo(i2.LongestIdentifier()));
+        list.Reverse();
 
         return list;
     }
@@ -253,22 +230,45 @@ internal class SheetsWrapper : IPetSheets
     public IPetSheetData? GetPetFromString(string baseString, in IPettableUser user, bool soft)
     {
         List<IPetSheetData> data = GetListFromLine(baseString);
-
         if (data.Count == 0) return null;
 
-        data.Sort((i1, i2) => i1.LongestIdentifier().CompareTo(i2.LongestIdentifier()));
-        data.Reverse();
-
         IPetSheetData normalPetData = data[0];
-
         if (normalPetData.Model > -1) return normalPetData;
 
         if (!soft) return normalPetData;
 
-        int? softIndex = NameToSoftSkeletonIndex(normalPetData.BasePlural);
-        if (softIndex == null) return normalPetData;
+        return MakeSoft(in user, in normalPetData);
+    }
 
-        return GetFromSoftIndex(in user, in normalPetData, softIndex.Value);
+    public IPetSheetData? GetPetFromAction(uint actionID, in IPettableUser user, bool IsSoft)
+    {
+        if (actionID == 0 || actionID == uint.MaxValue) return null;
+
+        IPetSheetData? activePet = null;
+
+        int sheetCount = petSheetCache.Count;
+        for (int i = 0; i < sheetCount; i++)
+        {
+            IPetSheetData pet = petSheetCache[i];
+            if (!pet.IsAction(actionID)) continue;
+            activePet = pet;
+            break;
+        }
+        if (activePet == null) return null;
+
+        if (!IsSoft) return activePet;
+
+        return MakeSoft(in user, in activePet);
+    }
+
+    public IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData)
+    {
+        if (oldData.Model >= -1) return oldData;
+
+        int? softIndex = NameToSoftSkeletonIndex(oldData.BasePlural);
+        if (softIndex == null) return oldData;
+
+        return GetFromSoftIndex(in user, in oldData, softIndex.Value);
     }
 
     public IPetSheetData? GetFromSoftIndex(in IPettableUser user, in IPetSheetData oldData, int softIndex)

@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -23,6 +24,8 @@ internal interface IPettableUser : IBattleUser
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);
     IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
+    
+    string? GetCustomName(IPetSheetData sheetData);
 
     void OnLastCastChanged(uint cast);
     void Set(Pointer<BattleChara> pointer);

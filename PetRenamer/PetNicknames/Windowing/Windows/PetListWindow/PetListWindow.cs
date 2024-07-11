@@ -374,6 +374,7 @@ internal partial class PetListWindow : PetWindow
     void HandlePetMode()
     {
         if (ActiveEntry == null) return;
+
         INamesDatabase names = ActiveEntry.ActiveDatabase;
         List<int> validIDS = new List<int>();
         List<string> validNames = new List<string>();
@@ -397,8 +398,6 @@ internal partial class PetListWindow : PetWindow
         Looper(newLength, (index) =>
         {
             int id = validIDS[index];
-            if (CurrentMode == PetWindowMode.Minion && id <= -1) return false;
-            if (CurrentMode == PetWindowMode.BattlePet && id >= -1) return false;
 
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) return false;
