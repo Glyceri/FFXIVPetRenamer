@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Lodestone;
+using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -41,9 +43,9 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
-        _updatables.Add(new LegacyDatabaseHelper(DalamudServices, LegacyPettableDatabase, PettableDatabase, PetServices));
+        _updatables.Add(new LegacyDatabaseHelper(in DalamudServices, in LegacyPettableDatabase, in PettableDatabase, in PetServices, in PettableUserList));
         _updatables.Add(new SaveHelper(in Configuration, in PettableDatabase, in PettableUserList, in IpcProvider));
-        _updatables.Add(new PettableUserHandler(DalamudServices, PettableUserList, PettableDatabase, PetServices));
+        _updatables.Add(new PettableUserHandler(in DalamudServices, in PettableUserList, in PettableDatabase, in PetServices));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker));
     }
 

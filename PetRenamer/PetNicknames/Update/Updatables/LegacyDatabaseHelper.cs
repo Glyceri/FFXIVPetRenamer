@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Update.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -14,21 +15,25 @@ internal class LegacyDatabaseHelper : IUpdatable
 
     public bool Enabled { get; set; } = true;
 
-    DalamudServices DalamudServices { get; init; }
-    IPetServices PetServices { get; init; }
-    IPetLog PetLog { get; init; }
-    IPettableDatabase PettableDatabase { get; init; }
-    IPettableDatabase LegacyPettableDatabase { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPetServices PetServices;
+    readonly IPetLog PetLog;
+    readonly IPettableDatabase PettableDatabase;
+    readonly IPettableDatabase LegacyPettableDatabase;
+    readonly IPettableUserList UserList;
 
     int offset = 0;
 
-    public LegacyDatabaseHelper(DalamudServices dalamudServices, IPettableDatabase legacyPettableDatabase, IPettableDatabase pettableDatabase, IPetServices petServices)
+    IPettableUser? lastUser;
+
+    public LegacyDatabaseHelper(in DalamudServices dalamudServices, in IPettableDatabase legacyPettableDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in IPettableUserList userList)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
         LegacyPettableDatabase = legacyPettableDatabase;
+        UserList = userList;
 
         offset = LegacyPettableDatabase.DatabaseEntries.Length - 1;
     }
@@ -48,13 +53,26 @@ internal class LegacyDatabaseHelper : IUpdatable
         }
     }
 
-    unsafe void HandleLegacyDatabase()
+    void HandleLegacyDatabase()
     {
+        IPettableUser? localPlayer = UserList.LocalPlayer;
+        if (localPlayer == null)
+        {
+            lastUser = null;
+            return;
+        }
+
         IPettableDatabaseEntry[] entries = LegacyPettableDatabase.DatabaseEntries;
 
         int entriesLength = entries.Length;
-
         if (entriesLength == 0) return;
+
+        if (lastUser == null)
+        {
+            lastUser = localPlayer;
+            HandleAsNull(in localPlayer, in entries, entriesLength);
+            return;
+        }
 
         int max = entriesLength - 1;
 
@@ -62,7 +80,25 @@ internal class LegacyDatabaseHelper : IUpdatable
         if (offset < 0) offset = max;
 
         IPettableDatabaseEntry entry = entries[offset];
+        FindCharacter(entry);
+        offset--;
+    }
 
+    void HandleAsNull(in IPettableUser localPlayer, in IPettableDatabaseEntry[] entries, int entriesLength)
+    {
+        for (int i = 0; i < entriesLength; i++)
+        {
+            IPettableDatabaseEntry currentEntry = entries[i];
+            if (currentEntry.Homeworld != localPlayer.Homeworld) continue;
+            if (currentEntry.Name != localPlayer.Name) continue;
+            
+            FindCharacter(currentEntry);
+            break;
+        }
+    }
+
+    unsafe void FindCharacter(IPettableDatabaseEntry entry)
+    {
         BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
         if (character != null)
         {
@@ -70,7 +106,5 @@ internal class LegacyDatabaseHelper : IUpdatable
             LegacyPettableDatabase.RemoveEntry(entry);
             entry.MoveToDataBase(PettableDatabase);
         }
-
-        offset--;
     }
 }

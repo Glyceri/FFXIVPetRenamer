@@ -18,13 +18,13 @@ internal unsafe class PettableUserHandler : IUpdatable
 {
     public bool Enabled { get; set; } = true;
 
-    DalamudServices DalamudServices { get; init; }
-    IPetServices PetServices { get; init; }
-    IPettableUserList PettableUserList { get; init; }
-    IPetLog PetLog { get; init; }
-    IPettableDatabase PettableDatabase { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPetServices PetServices;
+    readonly IPettableUserList PettableUserList;
+    readonly IPetLog PetLog;
+    readonly IPettableDatabase PettableDatabase;
 
-    public PettableUserHandler(DalamudServices dalamudServices, IPettableUserList pettableUserList, IPettableDatabase pettableDatabase, IPetServices petServices)
+    public PettableUserHandler(in DalamudServices dalamudServices, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
