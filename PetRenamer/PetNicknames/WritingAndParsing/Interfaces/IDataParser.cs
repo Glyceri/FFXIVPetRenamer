@@ -1,5 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 namespace PetRenamer.PetNicknames.Parsing.Interfaces;
 

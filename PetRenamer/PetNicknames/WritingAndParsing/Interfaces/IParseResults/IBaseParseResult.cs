@@ -1,5 +1,4 @@
-﻿
-namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+﻿namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 internal interface IBaseParseResult : IDataParseResult
 {

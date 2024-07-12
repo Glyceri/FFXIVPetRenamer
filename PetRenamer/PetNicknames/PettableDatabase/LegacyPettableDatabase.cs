@@ -3,7 +3,7 @@
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 using System.Linq;
 

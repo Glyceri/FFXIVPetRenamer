@@ -51,7 +51,7 @@ internal class UserListNode : Node
                 ChildNodes = [
                     SpeciesNode = new RenameTitleNode(in DalamudServices, "Name:", entry.Name),
                     IDNode = new RenameTitleNode(in DalamudServices, "Homeworld:", entry.HomeworldName),
-                    NicknameNode = new RenameTitleNode(in DalamudServices, "Petcount:", entry.Length().ToString()),
+                    NicknameNode = new RenameTitleNode(in DalamudServices, "Petcount:", entry.ActiveDatabase.Length.ToString()),
                 ]
             },
             IconNode = new ProfilePictureNode(in DalamudServices, in imageDatabase)

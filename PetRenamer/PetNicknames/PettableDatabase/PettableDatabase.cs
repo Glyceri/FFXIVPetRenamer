@@ -1,7 +1,7 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -69,9 +69,9 @@ internal class PettableDatabase : IPettableDatabase
             IPettableDatabaseEntry entry = _entries[i];
             if (entry.ContentID != contentID) continue;
 
-            entry.Destroy();
-            _entries.RemoveAt(i);
+            entry.Clear();
             hasRemoved = true;
+            break;
         }
         return hasRemoved;
     }
@@ -83,9 +83,9 @@ internal class PettableDatabase : IPettableDatabase
         {
             if (_entries[i].ContentID != entry.ContentID) continue;
 
-            entry.Destroy();
-            _entries.RemoveAt(i);
+            entry.Clear();
             hasRemoved = true;
+            break;
         }
         return hasRemoved;
     }

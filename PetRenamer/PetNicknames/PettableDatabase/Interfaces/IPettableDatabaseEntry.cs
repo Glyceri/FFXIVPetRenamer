@@ -1,6 +1,6 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -13,7 +13,6 @@ internal interface IPettableDatabaseEntry
     string HomeworldName { get; }
 
     bool IsActive { get; }
-    bool Destroyed { get; }
     bool IsIPC { get; }
 
     ImmutableArray<int> SoftSkeletons { get; }
@@ -24,7 +23,6 @@ internal interface IPettableDatabaseEntry
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
 
-    int Length();
     void UpdateContentID(ulong contentID);
     void UpdateEntry(IPettableUser pettableUser);
     /// <summary>
@@ -39,10 +37,10 @@ internal interface IPettableDatabaseEntry
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
     void MarkDirtyUIAsNotified();
-    void Destroy();
+    void Clear();
 
     void UpdateEntry(IModernParseResult parseResult, bool asIPC);
-    void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC)
+    void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC);
 
     SerializableUserV4 SerializeEntry();
 }

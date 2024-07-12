@@ -11,6 +11,7 @@ internal class PettableNameDatabase : INamesDatabase
     public string[] Names { get; private set; } = new string[0];
     public bool IsDirty { get; private set; } = false;
     public bool IsDirtyForUI { get; private set; } = false;
+    public int Length { get => IDs.Length; }
 
     public PettableNameDatabase(int[] ids, string[] names)
     {
@@ -20,7 +21,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     public string? GetName(int ID)
     {
-        for (int i = 0; i < IDs.Length; i++)
+        for (int i = 0; i < Length; i++)
         {
             if (IDs[i] != ID) continue;
             string customName = Names[i];
@@ -48,7 +49,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     int IndexOf(int ID)
     {
-        for (int i = 0; i < IDs.Length;i++)
+        for (int i = 0; i < Length; i++)
         {
             if (IDs[i] == ID) return i;
         }

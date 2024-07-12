@@ -72,7 +72,6 @@
 
   <ItemGroup>
     <Folder Include="PetNicknames\Hooking\Structs\" />
-    <Folder Include="PetNicknames\IPC\Interfaces\" />
   </ItemGroup>
 
   <ItemGroup>

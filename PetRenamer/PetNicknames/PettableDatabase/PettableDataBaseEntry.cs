@@ -2,7 +2,7 @@
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -27,7 +27,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty;  }
     public bool IsDirtyForUI { get => _IsDirtyForUI || ActiveDatabase.IsDirtyForUI; }
 
-    public bool Destroyed { get; private set; } = false;
     public bool IsIPC { get; private set; } = false;
 
     readonly IPetServices PetServices;
@@ -55,8 +54,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         _IsDirty = true;
         _IsDirtyForUI = true;
     }
-
-    public int Length() => ActiveDatabase.IDs.Length;
 
     public bool MoveToDataBase(IPettableDatabase database)
     {
@@ -136,8 +133,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(temporaryArray);
     }
 
-    public void Destroy() => Destroyed = true;
-
     public SerializableUserV4 SerializeEntry() => new SerializableUserV4(this);
 
     public void UpdateEntry(IModernParseResult parseResult, bool asIPC)
@@ -159,5 +154,14 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         if (!IsIPC) return;
         IsIPC = asIPC;
+    }
+
+    public void Clear()
+    {
+        SetActiveDatabase([], []);
+        IsIPC = true;
+        IsActive = false;
+        _IsDirty = true;
+        _IsDirtyForUI = true;
     }
 }

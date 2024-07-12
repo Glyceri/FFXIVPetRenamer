@@ -1,5 +1,6 @@
 ﻿using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using System.Collections.Generic;
 

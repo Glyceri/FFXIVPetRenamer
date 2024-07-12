@@ -1,4 +1,4 @@
-﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;

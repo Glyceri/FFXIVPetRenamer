@@ -380,7 +380,7 @@ internal partial class PetListWindow : PetWindow
         List<int> validIDS = new List<int>();
         List<string> validNames = new List<string>();
 
-        int length = names.IDs.Length;
+        int length = names.Length;
 
         for (int i = 0; i < length; i++)
         {

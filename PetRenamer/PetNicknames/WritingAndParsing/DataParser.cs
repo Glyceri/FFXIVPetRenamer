@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -37,7 +38,7 @@ internal class DataParser : IDataParser
     {
         ulong activeContentID = UserList.LocalPlayer?.ContentID ?? 0;
 
-        if (player.GameObjectId == activeContentID)
+        if (player.GameObjectId == activeContentID && isFromIPC)
         {
             return;
         }
@@ -57,6 +58,12 @@ internal class DataParser : IDataParser
         if (result is IModernParseResult version2ParseResult)
         {
             Database.ApplyParseResult(version2ParseResult, isFromIPC);
+            return;
+        }
+
+        if (result is IClearParseResult clearParseResult)
+        {
+            Database.RemoveEntry(clearParseResult.ContentID);
             return;
         }
     }

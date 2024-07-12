@@ -20,6 +20,9 @@ using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.Parsing;
+using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.ReadingAndParsing;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 
 namespace PetRenamer;
 
@@ -33,6 +36,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly IImageDatabase ImageDatabase;
     readonly IWindowHandler WindowHandler;
     readonly IDataParser DataParser;
+    readonly IDataWriter DataWriter;
+    readonly IIpcProvider IpcProvider;
 
     // As long as no other module needs one, they won't be interfaced
     readonly UpdateHandler UpdateHandler;
@@ -58,6 +63,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, in PettableDatabase);
+        DataWriter = new DataWriter(in PettableUserList);
         DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
@@ -80,10 +86,14 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         });
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
+
+        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+        IpcProvider.Prepare();
     }
 
     public void Dispose()
     {
+        IpcProvider?.Dispose();
         LodestoneNetworker?.Dispose();
         ImageDatabase?.Dispose();
         UpdateHandler?.Dispose();

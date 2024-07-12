@@ -2,12 +2,12 @@
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 
-internal class InvalidParseResult : IDataParseResult
+internal class ClearParseResult : IClearParseResult
 {
-    public readonly string Reason;
+    public ulong ContentID { get; }
 
-    public InvalidParseResult(string reason) 
+    public ClearParseResult(ulong contentID)
     {
-        Reason = reason;
+        ContentID = contentID;
     }
 }

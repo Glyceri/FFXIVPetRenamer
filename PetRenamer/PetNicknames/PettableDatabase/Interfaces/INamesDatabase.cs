@@ -6,6 +6,7 @@ internal interface INamesDatabase
 {
     public int[] IDs { get; }
     public string[] Names { get; }
+    public int Length { get; }
     string? GetName(int ID);
     void SetName(int ID, string? name);
     bool IsDirty { get; }

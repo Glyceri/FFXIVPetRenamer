@@ -1,26 +1,34 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
-using System;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 
 namespace PetRenamer;
 
-internal class IpcProvider : IDisposable
+internal class IpcProvider : IIpcProvider
 {
     const string ApiNamespace = "PetRenamer.";
     const uint MajorVersion = 3;
     const uint MinorVersion = 0;
 
     bool ready = false;
+    string lastData = string.Empty;
 
     readonly IDalamudPluginInterface PetNicknamesPlugin;
-    
+    readonly IDataWriter DataWriter;
+    readonly IDataParser DataReader;
+
 
     // Notifications
     readonly ICallGateProvider<object> Ready;
     readonly ICallGateProvider<object> Disposing;
-    readonly ICallGateProvider<string> PlayerDataChanged;
+    readonly ICallGateProvider<string, object> PlayerDataChanged;
 
     // Functions
     readonly ICallGateProvider<bool> Enabled;
@@ -65,57 +73,85 @@ internal class IpcProvider : IDisposable
      *          (This is not an expensive function, but please use it sparingly.)
      *          
      * Actions:
-     *      - SetPlayerData <IPlayerCharacter, string, _>:
+     *      - SetPlayerData <IPlayerCharacter, string>:
      *          If you have an IPlayerCharacter object and their respective data in the form of a string. Calling this action will overwrite their data with the new data.
      *          (You can never set the data of the current active local player.)
      *          
-     *      - ClearPlayerIPCData <IPlayerCharacter, _>:
+     *      - ClearPlayerIPCData <IPlayerCharacter>:
      *          Call this action to clear the IPC data of the given IPlayerCharacter.
      *          
      * ----------------------END READ ME -----------------------
      */
 
-    public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin)
+    public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
     {
         PetNicknamesPlugin = petNicknamesPlugin;
+        DataReader = dataReader;
+        DataWriter = dataWriter;
 
         // Notifiers
-        Ready                       = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Ready");
-        Disposing                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Disposing");
-        PlayerDataChanged           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}PlayerDataChanged");
+        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Ready");
+        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Disposing");
+        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}PlayerDataChanged");
 
         // Functions
-        ApiVersion                  = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersion");
-        Enabled                     = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}Enabled");
-        GetPlayerData               = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
+        ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersion");
+        Enabled                 = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}Enabled");
+        GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData               = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, string, object>       ($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData          = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, object>               ($"{ApiNamespace}ClearPlayerData");
+        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, string, object>       ($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, object>               ($"{ApiNamespace}ClearPlayerData");
 
         // Data sharing
-        PetNicknameDict             = petNicknamesPlugin.GetOrCreateData($"{ApiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
+        PetNicknameDict         = petNicknamesPlugin.GetOrCreateData($"{ApiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
     }
 
     public void Prepare()
     {
+        if (ready) return;
+
         RegsterActions();
         RegisterFunctions();
 
         ready = true;
+        NotifyReady();
     }
 
     void RegsterActions()
     {
-
+        SetPlayerData!.RegisterAction(SetPlayerDataDetour);
+        ClearPlayerIPCData!.RegisterAction(ClearIPCDataDetour);
     }
 
     void RegisterFunctions()
     {
-
+        ApiVersion!.RegisterFunc(VersionDetour);
+        Enabled!.RegisterFunc(EnabledDetour);
+        GetPlayerData!.RegisterFunc(GetPlayerDataDetour);
     }
 
-    public void NotifyReady()
+    // Actions
+    void SetPlayerDataDetour(IPlayerCharacter character, string data)
+    {
+        IDataParseResult result = DataReader.ParseData(data);
+        DataReader.ApplyParseData(character, result, true);
+    }
+
+    unsafe void ClearIPCDataDetour(IPlayerCharacter character)
+    {
+        BattleChara* battleChara = (BattleChara*)character.Address;
+        if (battleChara == null) return;
+        DataReader.ApplyParseData(character, new ClearParseResult(battleChara->ContentId), true);
+    }
+
+    // Functions
+    (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
+    bool EnabledDetour() => ready;
+    string GetPlayerDataDetour() => lastData;
+
+    // Notifications
+    void NotifyReady()
     {
         try
         {
@@ -133,11 +169,36 @@ internal class IpcProvider : IDisposable
         catch { }
     }
 
+    void OnDataChanged()
+    {
+        try
+        {
+            PlayerDataChanged?.SendMessage(lastData);
+        }
+        catch { }
+    }
+
+    // Interface Functions
+
+    public void NotifyDataChanged()
+    {
+        lastData = DataWriter.WriteData();
+        OnDataChanged();
+    }
+
     public void Dispose()
     {
         NotifyDisposing();
         PetNicknameDict.Clear();
         PetNicknamesPlugin.RelinquishData($"{ApiNamespace}GameObjectRenameDict");
 
+        // Actions
+        SetPlayerData.UnregisterAction();
+        ClearPlayerIPCData?.UnregisterAction();
+
+        // Functions
+        ApiVersion?.UnregisterFunc();
+        Enabled?.UnregisterFunc();
+        GetPlayerData?.UnregisterFunc();
     }
 }
