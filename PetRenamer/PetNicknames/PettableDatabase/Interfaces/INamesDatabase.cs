@@ -14,5 +14,7 @@ internal interface INamesDatabase
     void MarkDirtyAsNoticed();
     void MarkDirtyUIAsNotified();
 
+    void Update(int[] IDs, string[] names);
+
     SerializableNameData SerializeData();
 }

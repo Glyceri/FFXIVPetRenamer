@@ -1,5 +1,6 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using System.Collections.Immutable;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -13,6 +14,7 @@ internal interface IPettableDatabaseEntry
 
     bool IsActive { get; }
     bool Destroyed { get; }
+    bool IsIPC { get; }
 
     ImmutableArray<int> SoftSkeletons { get; }
 
@@ -38,6 +40,9 @@ internal interface IPettableDatabaseEntry
     void NotifySeenDirty();
     void MarkDirtyUIAsNotified();
     void Destroy();
+
+    void UpdateEntry(IModernParseResult parseResult, bool asIPC);
+    void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC)
 
     SerializableUserV4 SerializeEntry();
 }

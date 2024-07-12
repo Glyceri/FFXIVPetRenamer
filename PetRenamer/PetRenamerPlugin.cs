@@ -1,3 +1,4 @@
+using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -7,7 +8,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update;
 using PetRenamer.PetNicknames.Windowing;
-using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Chat;
 using PetRenamer.PetNicknames.Commands;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
@@ -18,6 +18,8 @@ using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
+using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.Parsing;
 
 namespace PetRenamer;
 
@@ -30,6 +32,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly ILegacyDatabase LegacyDatabase;
     readonly IImageDatabase ImageDatabase;
     readonly IWindowHandler WindowHandler;
+    readonly IDataParser DataParser;
 
     // As long as no other module needs one, they won't be interfaced
     readonly UpdateHandler UpdateHandler;
@@ -55,6 +58,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, in PettableDatabase);
+        DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));

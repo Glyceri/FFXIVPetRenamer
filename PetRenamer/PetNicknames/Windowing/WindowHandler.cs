@@ -22,6 +22,7 @@ internal class WindowHandler : IWindowHandler
 
     public WindowHandler(in DalamudServices dalamudServices, in IPettableDatabase pettableDatabase)
     {
+        Node.UseThreadedStyleComputation = true;
         DrawingLib.Setup(dalamudServices.PetNicknamesPlugin);
         WindowStyles.RegisterDefaultColors();
 

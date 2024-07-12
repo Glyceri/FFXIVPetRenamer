@@ -9,7 +9,6 @@ using FFXIVClientStructs.Interop;
 using System;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using System.Collections.Generic;
 

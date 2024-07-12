@@ -3,6 +3,7 @@
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,9 +20,15 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, ulong.MaxValue, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons);
             _entries.Add(newEntry);
         }
+    }
+
+    public void ApplyParseResult(IBaseParseResult parseResult, bool isFromIPC)
+    {
+        IPettableDatabaseEntry entry = GetEntry(parseResult.UserName, parseResult.Homeworld);
+        entry.UpdateEntryBase(parseResult, isFromIPC);
     }
 
     public SerializableUserV3[] SerializeLegacyDatabase()

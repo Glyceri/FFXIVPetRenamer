@@ -79,4 +79,15 @@ internal class PettableNameDatabase : INamesDatabase
     public void MarkDirtyUIAsNotified() => IsDirtyForUI = false;
 
     public SerializableNameData SerializeData() => new SerializableNameData(this);
+
+    public void Update(int[] IDs, string[] names)
+    {
+        if (IDs.Length != names.Length)
+        {
+            return;
+        }
+
+        this.IDs = IDs;
+        this.Names = names;
+    }
 }

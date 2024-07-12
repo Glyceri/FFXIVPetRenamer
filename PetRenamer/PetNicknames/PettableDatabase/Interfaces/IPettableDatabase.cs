@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Serialization;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
@@ -11,7 +12,7 @@ internal interface IPettableDatabase
     /// </summary>
     /// <param name="name">Player Name</param>
     /// <returns>The Data Base Entry</returns>
-    IPettableDatabaseEntry? GetEntry(string name);
+    IPettableDatabaseEntry GetEntry(string name, ushort homeworld);
     /// <summary>
     /// Get's the database entry if it exists. In the case it doesn't it creates a new one!
     /// </summary>
@@ -32,4 +33,6 @@ internal interface IPettableDatabase
     bool RemoveEntry(IPettableDatabaseEntry entry);
 
     SerializableUserV4[] SerializeDatabase();
+
+    void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC);
 }

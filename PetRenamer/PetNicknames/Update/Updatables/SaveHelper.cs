@@ -25,7 +25,7 @@ internal class SaveHelper : IUpdatable
         UserList = userList;
     }
 
-    public void OnUpdate(IFramework framework)
+    public unsafe void OnUpdate(IFramework framework)
     {
         IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
         int length = entries.Length;
