@@ -190,6 +190,11 @@ internal class IpcProvider : IIpcProvider
         OnDataChanged();
     }
 
+    public void ClearCachedData()
+    {
+        lastData = "";
+    }
+
     public void Dispose()
     {
         NotifyDisposing();

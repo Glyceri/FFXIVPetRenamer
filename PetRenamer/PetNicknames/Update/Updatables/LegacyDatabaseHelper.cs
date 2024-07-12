@@ -10,7 +10,7 @@ namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class LegacyDatabaseHelper : IUpdatable
 {
-    const double secondsPerCheck = 20;
+    const double secondsPerCheck = 1;
 
     public bool Enabled { get; set; } = true;
 
@@ -20,6 +20,8 @@ internal class LegacyDatabaseHelper : IUpdatable
     IPettableDatabase PettableDatabase { get; init; }
     IPettableDatabase LegacyPettableDatabase { get; init; }
 
+    int offset = 0;
+
     public LegacyDatabaseHelper(DalamudServices dalamudServices, IPettableDatabase legacyPettableDatabase, IPettableDatabase pettableDatabase, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
@@ -27,9 +29,11 @@ internal class LegacyDatabaseHelper : IUpdatable
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
         LegacyPettableDatabase = legacyPettableDatabase;
+
+        offset = LegacyPettableDatabase.DatabaseEntries.Length - 1;
     }
 
-    
+
     double timer = secondsPerCheck;
 
     public void OnUpdate(IFramework framework)
@@ -47,16 +51,26 @@ internal class LegacyDatabaseHelper : IUpdatable
     unsafe void HandleLegacyDatabase()
     {
         IPettableDatabaseEntry[] entries = LegacyPettableDatabase.DatabaseEntries;
-        for (int i = entries.Length - 1; i >= 0; i--)
+
+        int entriesLength = entries.Length;
+
+        if (entriesLength == 0) return;
+
+        int max = entriesLength - 1;
+
+        if (offset > max) offset = max;
+        if (offset < 0) offset = max;
+
+        IPettableDatabaseEntry entry = entries[offset];
+
+        BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
+        if (character != null)
         {
-            IPettableDatabaseEntry entry = entries[i];
-
-            BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
-            if (character == null) continue;
-
             entry.UpdateContentID(character->ContentId, true);
             LegacyPettableDatabase.RemoveEntry(entry);
             entry.MoveToDataBase(PettableDatabase);
         }
+
+        offset--;
     }
 }

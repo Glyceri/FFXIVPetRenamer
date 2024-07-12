@@ -58,7 +58,7 @@ internal partial class PetListWindow : PetWindow
 
     bool isLocalEntry = false;
 
-    public const int ElementsPerList = 50;
+    public const int ElementsPerList = 10;
     int currentIndex = 0;
 
 
@@ -258,6 +258,11 @@ internal partial class PetListWindow : PetWindow
 
         NextListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(1));
         PreviousListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(-1));
+    }
+
+    public override void OnOpen()
+    {
+        SetUser(UserList.LocalPlayer?.DataBaseEntry);
     }
 
     public override void OnDraw()

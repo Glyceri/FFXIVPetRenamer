@@ -15,6 +15,8 @@ internal class SaveHelper : IUpdatable
 
     public bool Enabled { get; set; } = true;
 
+    IPettableUser? lastLocalUser;
+
     public SaveHelper(in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList, in IIpcProvider ipcProvider)
     {
         Configuration = configuration;
@@ -33,6 +35,20 @@ internal class SaveHelper : IUpdatable
 
         IPettableUser? localUser = UserList.LocalPlayer;
 
+        bool hasLocalUser = true;
+
+        if (localUser != null && lastLocalUser != localUser)
+        {
+            lastLocalUser = localUser;
+            IpcProvider.NotifyDataChanged();
+        }
+
+        if (localUser == null)
+        {
+            hasLocalUser = false;
+            IpcProvider.ClearCachedData();
+        }
+
         for (int i = 0; i < length; i++)
         {
             IPettableDatabaseEntry entry = entries[i];
@@ -40,9 +56,9 @@ internal class SaveHelper : IUpdatable
             if (!entry.IsDirty) continue;
             hasDirty = true;
 
-            if (localUser == null) break;
+            if (!hasLocalUser) break;
 
-            if (localUser.ContentID != entry.ContentID) continue;
+            if (localUser!.ContentID != entry.ContentID) continue;
 
             dirtyIsLocal = true;
             break;

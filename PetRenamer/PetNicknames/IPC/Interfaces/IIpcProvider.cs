@@ -6,4 +6,5 @@ internal interface IIpcProvider : IDisposable
 {
     void Prepare();
     void NotifyDataChanged();
+    void ClearCachedData();
 }
