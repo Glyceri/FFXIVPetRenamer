@@ -50,7 +50,7 @@ internal unsafe class PettableUser : IPettableUser
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;
         User = (nint)BattleChara;
-        if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID);
+        if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID, true);
     }
 
     public void Destroy() => Destroyed = true;

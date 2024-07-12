@@ -1,5 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -34,11 +36,17 @@ internal class DataParser : IDataParser
         LegacyDatabase = legacyDatabase;
     }
 
-    public void ApplyParseData(IPlayerCharacter player, IDataParseResult result, bool isFromIPC)
+    public unsafe void ApplyParseData(IPlayerCharacter player, IDataParseResult result, bool isFromIPC)
     {
         ulong activeContentID = UserList.LocalPlayer?.ContentID ?? 0;
 
-        if (player.GameObjectId == activeContentID && isFromIPC)
+        BattleChara* battleChara = (BattleChara*)player.Address;
+        if (battleChara == null)
+        {
+            return;
+        }
+
+        if (battleChara->ContentId == activeContentID && isFromIPC)
         {
             return;
         }
@@ -49,9 +57,9 @@ internal class DataParser : IDataParser
             return;
         }
 
-        if (result is IBaseParseResult version1ParseResult)
+        if (result is IClearParseResult clearParseResult)
         {
-            LegacyDatabase.ApplyParseResult(version1ParseResult, isFromIPC);
+            Database.GetEntry(clearParseResult.ContentID).Clear();
             return;
         }
 
@@ -61,9 +69,9 @@ internal class DataParser : IDataParser
             return;
         }
 
-        if (result is IClearParseResult clearParseResult)
+        if (result is IBaseParseResult version1ParseResult)
         {
-            Database.RemoveEntry(clearParseResult.ContentID);
+            LegacyDatabase.ApplyParseResult(version1ParseResult, isFromIPC);
             return;
         }
     }
@@ -72,31 +80,31 @@ internal class DataParser : IDataParser
 
     static IDataParseResult InternalParseData(string data)
     {
-        if(!TryFromBase64(data, out byte[]? stringData))
+        string incomingData = data;
+
+        if(TryFromBase64(data, out byte[]? stringData))
         {
-            return new InvalidParseResult("Incoming data could not become decoded Base64 data.");
+            if (TryGetString(stringData, out string? value))
+            {
+                incomingData = value;
+            }
         }
 
-        if (!TryGetString(stringData, out string? value))
-        {
-            return new InvalidParseResult("Incoming parse data failed to become a string.");
-        }
-
-        if (value.IsNullOrWhitespace())
+        if (incomingData.IsNullOrWhitespace())
         {
             return new InvalidParseResult("Incoming parse data is empty.");
         }
 
 
-        ParseVersion parseVersion = GetParseVersion(data);
+        ParseVersion parseVersion = GetParseVersion(incomingData);
         switch (parseVersion)
         {
             case ParseVersion.Invalid:
                 return new InvalidParseResult("Invalid Parse Version.");
             case ParseVersion.Version1:
-                return DataParserVersion1.Parse(data);
+                return DataParserVersion1.Parse(incomingData);
             case ParseVersion.Version2:
-                return DataParserVersion2.Parse(data);
+                return DataParserVersion2.Parse(incomingData);
             default:
                 return new InvalidParseResult("Invalid Parse Version.");
         }

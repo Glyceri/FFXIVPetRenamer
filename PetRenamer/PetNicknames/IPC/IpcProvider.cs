@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ internal class IpcProvider : IIpcProvider
     bool ready = false;
     string lastData = string.Empty;
 
+    readonly IPetServices PetServices;
     readonly IDalamudPluginInterface PetNicknamesPlugin;
     readonly IDataWriter DataWriter;
     readonly IDataParser DataReader;
@@ -83,8 +85,9 @@ internal class IpcProvider : IIpcProvider
      * ----------------------END READ ME -----------------------
      */
 
-    public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
+    public IpcProvider(in IPetServices petServices, in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
     {
+        PetServices = petServices;
         PetNicknamesPlugin = petNicknamesPlugin;
         DataReader = dataReader;
         DataWriter = dataWriter;
@@ -132,23 +135,25 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Actions
-    void SetPlayerDataDetour(IPlayerCharacter character, string data)
+    public void SetPlayerDataDetour(IPlayerCharacter character, string data)
     {
-        IDataParseResult result = DataReader.ParseData(data);
-        DataReader.ApplyParseData(character, result, true);
+            PetServices.PetLog.Log("SET ALL DATA!" + data);
+            IDataParseResult result = DataReader.ParseData(data);
+            DataReader.ApplyParseData(character, result, true);
     }
 
-    unsafe void ClearIPCDataDetour(IPlayerCharacter character)
+    public unsafe void ClearIPCDataDetour(IPlayerCharacter character)
     {
+        PetServices.PetLog.Log("Clear!");
         BattleChara* battleChara = (BattleChara*)character.Address;
         if (battleChara == null) return;
         DataReader.ApplyParseData(character, new ClearParseResult(battleChara->ContentId), true);
     }
 
     // Functions
-    (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
-    bool EnabledDetour() => ready;
-    string GetPlayerDataDetour() => lastData;
+    public (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
+    public bool EnabledDetour() => ready;
+    public string GetPlayerDataDetour() => lastData;
 
     // Notifications
     void NotifyReady()

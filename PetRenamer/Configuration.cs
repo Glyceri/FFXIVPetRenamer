@@ -78,14 +78,15 @@ internal class Configuration : IPluginConfiguration
         SerializableUsersV4 ??= Array.Empty<SerializableUserV4>();
     }
 
-    public void Save() 
+    public void Save()
     {
         if (currentSaveFileVersion != Version || !isSetup || Database == null || LegacyDatabase == null) return;
         SerializableUsersV4 = Database.SerializeDatabase();
 #pragma warning disable CS0618
         serializableUsersV3 = LegacyDatabase.SerializeLegacyDatabase();
 #pragma warning restore CS0618
-        PetNicknamesPlugin?.SavePluginConfig(this); 
+        PetNicknamesPlugin?.SavePluginConfig(this);
+
     }
 
     #region OBSOLETE

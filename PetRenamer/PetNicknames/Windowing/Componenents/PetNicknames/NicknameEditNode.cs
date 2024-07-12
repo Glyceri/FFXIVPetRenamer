@@ -23,7 +23,7 @@ internal class NicknameEditNode : RenameTitleNode
 
     public Action<string?>? OnSave;
 
-    public NicknameEditNode(in DalamudServices services, string label, string text) : base(in services, label, text)
+    public NicknameEditNode(in DalamudServices services, string label, string? text) : base(in services, label, text ?? "...")
     {
         EditButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Edit")}")
         {
@@ -49,6 +49,11 @@ internal class NicknameEditNode : RenameTitleNode
 
         UnderlineNode.AppendChild(ClearButton);
         UnderlineNode.AppendChild(EditButton);
+
+        if (text == null)
+        {
+            StartEditMode();
+        }
     }
 
     public void SetPet(string? customName, in IPetSheetData? activePet)
@@ -58,6 +63,11 @@ internal class NicknameEditNode : RenameTitleNode
         shouldBeVisible = activePet != null;
 
         StopEditMode();
+
+        if (customName == null && activePet != null)
+        {
+            StartEditMode();
+        }
     }
 
     void ClearClicked()

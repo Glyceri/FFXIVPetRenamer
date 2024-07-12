@@ -72,7 +72,7 @@ internal class PetRenameNode : Node
                             ClassList = ["MarginSheet"],
                             Interactable = true,
                         },
-                        NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue ?? "...")
+                        NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue)
                         {
                             Stylesheet = stylesheet,
                             ClassList = ["MarginSheet"],

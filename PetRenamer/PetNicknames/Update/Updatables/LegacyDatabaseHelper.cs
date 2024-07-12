@@ -54,7 +54,7 @@ internal class LegacyDatabaseHelper : IUpdatable
             BattleChara* character = CharacterManager.Instance()->LookupBattleCharaByName(entry.Name, true, (short)entry.Homeworld);
             if (character == null) continue;
 
-            entry.UpdateContentID(character->ContentId);
+            entry.UpdateContentID(character->ContentId, true);
             LegacyPettableDatabase.RemoveEntry(entry);
             entry.MoveToDataBase(PettableDatabase);
         }

@@ -26,7 +26,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             SerializableNameData[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;
-            newEntries.Add(new PettableDataBaseEntry(in PetServices, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData));
+            newEntries.Add(new PettableDataBaseEntry(in PetServices, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
         }
         _entries = newEntries;
     }
@@ -41,7 +41,7 @@ internal class PettableDatabase : IPettableDatabase
             return entry;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -56,24 +56,9 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
-    }
-
-    public bool RemoveEntry(ulong contentID)
-    {
-        bool hasRemoved = false;
-        for (int i = _entries.Count - 1; i >= 0; i--)
-        {
-            IPettableDatabaseEntry entry = _entries[i];
-            if (entry.ContentID != contentID) continue;
-
-            entry.Clear();
-            hasRemoved = true;
-            break;
-        }
-        return hasRemoved;
     }
 
     public bool RemoveEntry(IPettableDatabaseEntry entry)
@@ -83,9 +68,8 @@ internal class PettableDatabase : IPettableDatabase
         {
             if (_entries[i].ContentID != entry.ContentID) continue;
 
-            entry.Clear();
+            _entries.RemoveAt(i);
             hasRemoved = true;
-            break;
         }
         return hasRemoved;
     }

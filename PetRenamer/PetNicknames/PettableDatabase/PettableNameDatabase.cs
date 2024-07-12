@@ -34,8 +34,7 @@ internal class PettableNameDatabase : INamesDatabase
     public void SetName(int ID, string? name)
     {
         if (ID == -1) return;
-        IsDirty = true;
-        IsDirtyForUI = true;
+        SetDirty();
         if (name == string.Empty) name = null;
         int index = IndexOf(ID);
         if (index != -1)
@@ -90,5 +89,11 @@ internal class PettableNameDatabase : INamesDatabase
 
         this.IDs = IDs;
         this.Names = names;
+    }
+
+    void SetDirty()
+    {
+        IsDirty = true;
+        IsDirtyForUI = true;
     }
 }

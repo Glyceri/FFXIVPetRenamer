@@ -22,12 +22,6 @@ internal interface IPettableDatabase
     /// <summary>
     /// Removes the entry from the database.
     /// </summary>
-    /// <param name="contentID">contentID of the entry to remove.</param>
-    /// <returns>Whether the remove succeeded.</returns>
-    bool RemoveEntry(ulong contentID);
-    /// <summary>
-    /// Removes the entry from the database.
-    /// </summary>
     /// <param name="entry">Entry to remove.</param>
     /// <returns>Whether the remove succeeded.</returns>
     bool RemoveEntry(IPettableDatabaseEntry entry);

@@ -31,7 +31,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     readonly IPetServices PetServices;
 
-    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons)
+    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active)
     {
         PetServices = petServices;
         SetName(name);
@@ -39,7 +39,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetSoftSkeletons(softSkeletons);
         SetHomeworld(homeworld);
         ContentID = contentID;
-        IsActive = contentID != 0;
+        IsActive = active;
         IsIPC = !IsActive;
     }
 
@@ -63,7 +63,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
         pEntry.MarkDirty();
-        pEntry.UpdateContentID(ContentID);
+        pEntry.UpdateContentID(ContentID, !IsIPC);
         return true;
     }
 
@@ -88,10 +88,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
     }
 
-    public void UpdateContentID(ulong contentID)
+    public void UpdateContentID(ulong contentID, bool removeIPCStatus = false)
     {
         ContentID = contentID;
         IsActive = true;
+        if (removeIPCStatus) IsIPC = false;
     }
 
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
@@ -156,6 +157,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         SetActiveDatabase([], []);
         IsIPC = true;
+        IsActive = false;
         MarkDirty();
     }
 

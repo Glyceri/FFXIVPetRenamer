@@ -168,15 +168,18 @@ internal unsafe class MapHook : HookableElement
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
 
-        List<nint> pets = new List<nint>();
         BattleChara* pChara = localUser.BattleChara;
         if (pChara == null) return;
+
         Vector3 playerPos = pChara->Character.GameObject.Position;
+
+        List<nint> pets = new List<nint>();
 
         foreach (PartyMember member in gManager->MainGroup.PartyMembers)
         {
             BattleChara* player = CharacterManager.Instance()->LookupBattleCharaByEntityId(member.EntityId);
             if (player == null) continue;
+
             BattleChara* chocobo = CharacterManager.Instance()->LookupBuddyByOwnerObject(player);
             BattleChara* battlePet = CharacterManager.Instance()->LookupPetByOwnerObject(player);
             if (battlePet != null) pets.Add((nint)battlePet);

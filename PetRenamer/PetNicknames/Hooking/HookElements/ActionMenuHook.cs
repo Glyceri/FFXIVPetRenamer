@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 

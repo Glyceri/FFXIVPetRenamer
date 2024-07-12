@@ -23,7 +23,7 @@ internal interface IPettableDatabaseEntry
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
 
-    void UpdateContentID(ulong contentID);
+    void UpdateContentID(ulong contentID, bool removeIPCStatus = false);
     void UpdateEntry(IPettableUser pettableUser);
     /// <summary>
     /// Moves this entry into the new database.

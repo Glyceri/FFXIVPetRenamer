@@ -23,6 +23,7 @@ using PetRenamer.PetNicknames.Parsing;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
 using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.PetDev;
 
 namespace PetRenamer;
 
@@ -37,7 +38,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly IWindowHandler WindowHandler;
     readonly IDataParser DataParser;
     readonly IDataWriter DataWriter;
-    readonly IIpcProvider IpcProvider;
+    readonly IpcProvider IpcProvider;
 
     // As long as no other module needs one, they won't be interfaced
     readonly UpdateHandler UpdateHandler;
@@ -65,9 +66,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         DataWriter = new DataWriter(in PettableUserList);
         DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
-        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+        IpcProvider = new IpcProvider(in _PetServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
-        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in IpcProvider);
+        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, IpcProvider);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
@@ -76,10 +77,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
+        WindowHandler.AddWindow(new PetDevWindow(_DalamudServices,  IpcProvider));
         //WindowHandler.AddWindow(new EmptyWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
-        WindowHandler.Open<PetListWindow>();
+        //WindowHandler.Open<PetListWindow>();
         //WindowHandler.Open<PetRenameWindow>();
         //WindowHandler.Open<EmptyWindow>();
+        WindowHandler.Open<PetDevWindow>();
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {
@@ -88,6 +91,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         });
 
         _DalamudServices.CommandManager.AddHandler("/petlist", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetListWindow>())
+        {
+            HelpMessage = "Temporary",
+            ShowInHelp = true
+        });
+
+        _DalamudServices.CommandManager.AddHandler("/petdev", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetDevWindow>())
         {
             HelpMessage = "Temporary",
             ShowInHelp = true

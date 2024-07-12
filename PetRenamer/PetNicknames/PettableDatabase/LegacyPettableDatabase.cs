@@ -20,7 +20,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false);
             _entries.Add(newEntry);
         }
     }
