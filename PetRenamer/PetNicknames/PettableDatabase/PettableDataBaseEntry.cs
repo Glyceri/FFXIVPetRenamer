@@ -51,8 +51,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         if (IsActive) return;
         if (!pettableUser.IsLocalPlayer) return;
-        _IsDirty = true;
-        _IsDirtyForUI = true;
+        MarkDirty();
     }
 
     public bool MoveToDataBase(IPettableDatabase database)
@@ -63,8 +62,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
-        pEntry._IsDirty = true;
-        pEntry._IsDirtyForUI = true;
+        pEntry.MarkDirty();
         pEntry.UpdateContentID(ContentID);
         return true;
     }
@@ -126,8 +124,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         if (oldSkeleton == softSkeleton) return;
 
-        _IsDirty = true;
-        _IsDirtyForUI = true;
+        MarkDirty();
 
         temporaryArray[index] = softSkeleton;
         SoftSkeletons = ImmutableArray.Create(temporaryArray);
@@ -148,9 +145,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetActiveDatabase(parseResult.IDs, parseResult.Names);
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
-        
-        _IsDirty = true;
-        _IsDirtyForUI = true;
+
+        MarkDirty();
 
         if (!IsIPC) return;
         IsIPC = asIPC;
@@ -160,7 +156,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         SetActiveDatabase([], []);
         IsIPC = true;
-        IsActive = false;
+        MarkDirty();
+    }
+
+    void MarkDirty()
+    {
         _IsDirty = true;
         _IsDirtyForUI = true;
     }

@@ -51,20 +51,28 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
-        Translator.Initialise(_DalamudServices);
         _PetServices = new PetServices(_DalamudServices);
-        LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker(); // Ha ha
+        Translator.Initialise(_DalamudServices);
+
+        LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
+
         PettableUserList = new PettableUserList();
+
         PettableDatabase = new PettableDatabase(in _PetServices);
+
         LegacyDatabase = new LegacyPettableDatabase(in _PetServices);
         ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in LodestoneNetworkerInterface);
-        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker);
+
+        DataWriter = new DataWriter(in PettableUserList);
+        DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
+        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+
+        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in IpcProvider);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, in PettableDatabase);
-        DataWriter = new DataWriter(in PettableUserList);
-        DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
+
 
         WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
         WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
@@ -86,8 +94,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         });
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
-
-        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
         IpcProvider.Prepare();
     }
 

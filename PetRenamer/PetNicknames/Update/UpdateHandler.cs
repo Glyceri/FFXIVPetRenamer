@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -19,10 +20,11 @@ internal class UpdateHandler : IDisposable
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
     readonly IPettableDatabase LegacyPettableDatabase;
+    readonly IIpcProvider IpcProvider;
     readonly LodestoneNetworker LodestoneNetworker;
     readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker)
+    public UpdateHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IIpcProvider ipcProvider)
     {
         DalamudServices = dalamudServices;
         Configuration = configuration;
@@ -31,6 +33,7 @@ internal class UpdateHandler : IDisposable
         PettableDatabase = pettableDatabase;
         LegacyPettableDatabase = legacyDatabase;
         LodestoneNetworker = lodestoneNetworker;
+        IpcProvider = ipcProvider;
 
         DalamudServices.Framework.Update += OnUpdate;
         Setup();
@@ -39,7 +42,7 @@ internal class UpdateHandler : IDisposable
     void Setup()
     {
         _updatables.Add(new LegacyDatabaseHelper(DalamudServices, LegacyPettableDatabase, PettableDatabase, PetServices));
-        _updatables.Add(new SaveHelper(in PetServices, in Configuration, in PettableDatabase, in PettableUserList));
+        _updatables.Add(new SaveHelper(in Configuration, in PettableDatabase, in PettableUserList, in IpcProvider));
         _updatables.Add(new PettableUserHandler(DalamudServices, PettableUserList, PettableDatabase, PetServices));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker));
     }

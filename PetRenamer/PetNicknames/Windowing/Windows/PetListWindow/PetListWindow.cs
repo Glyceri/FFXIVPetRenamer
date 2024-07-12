@@ -14,6 +14,7 @@ using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Enum;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Structs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Una.Drawing;
 
@@ -356,6 +357,7 @@ internal partial class PetListWindow : PetWindow
         {
             IPettableDatabaseEntry entry = entries[index];
             if (!entry.IsActive) return false;
+            if (entry.IsIPC) return false;
 
             bool isLocal = HandleIfLocalEntry(entry);
 

@@ -80,7 +80,7 @@ internal class UserListNode : Node
         IconNode.RedownloadNode.Style.FontSize = 8;
         IconNode.RedownloadNode.Style.Size = new Size(24, 24);
 
-        ClearButtonNode.OnClick += _ => { };
+        ClearButtonNode.OnClick += _ => DalamudServices.Framework.Run(() => ActiveEntry.Clear());
         EyeButtonNode.OnClick += _ => DalamudServices.Framework.Run(() => OnView?.Invoke(ActiveEntry));
     }
 

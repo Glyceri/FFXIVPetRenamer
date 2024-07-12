@@ -1,9 +1,7 @@
 ﻿using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
@@ -13,16 +11,16 @@ internal class SaveHelper : IUpdatable
     readonly IPettableDatabase Database;
     readonly Configuration Configuration;
     readonly IPettableUserList UserList;
-    readonly IPetServices PetServices;
+    readonly IIpcProvider IpcProvider;
 
     public bool Enabled { get; set; } = true;
 
-    public SaveHelper(in IPetServices petServices, in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList)
+    public SaveHelper(in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList, in IIpcProvider ipcProvider)
     {
-        PetServices = petServices;
         Configuration = configuration;
         Database = database;
         UserList = userList;
+        IpcProvider = ipcProvider;
     }
 
     public unsafe void OnUpdate(IFramework framework)
@@ -51,12 +49,9 @@ internal class SaveHelper : IUpdatable
         }
 
         if (!hasDirty) return;
-
-        
-
         Configuration.Save();
 
-        //TODO: Add IPC notify
-        PetServices.PetLog.Log($"Dirty changes saved. [Was local: {dirtyIsLocal}]");
+        if (!dirtyIsLocal) return;
+        IpcProvider.NotifyDataChanged();
     }
 }

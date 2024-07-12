@@ -179,7 +179,6 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Interface Functions
-
     public void NotifyDataChanged()
     {
         lastData = DataWriter.WriteData();
