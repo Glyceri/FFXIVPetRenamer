@@ -25,11 +25,7 @@ internal static class WindowStyles
                 ".window--titlebar",
                 new()
                 {
-                    BackgroundColor = new("Window.TitlebarBackground"),
-                    BackgroundGradient = GradientColor.Vertical(
-                        new("Window.TitlebarGradient1"),
-                        new("Window.TitlebarGradient2")
-                    ),
+                    BackgroundColor = new Color(0, 0, 0, 0),
                     BorderColor = new(new("Window.TitlebarBorder")),
                     BorderWidth = new(1),
                     BorderRadius = 6,
@@ -69,13 +65,14 @@ internal static class WindowStyles
     
     public static void RegisterDefaultColors()
     {
-        Color.AssignByName("Titlebar.Minion", new Color(255, 194, 63).ToUInt());
+        Color.AssignByName("Titlebar.Minion", new Color(255, 194, 63, 150).ToUInt());
         Color.AssignByName("Titlebar.Minion:Dark", new Color(110, 78, 10).ToUInt());
-        Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37).ToUInt());
+        Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37, 150).ToUInt());
         Color.AssignByName("Titlebar.BattlePet:Dark", new Color(26, 84, 26).ToUInt());
         Color.AssignByName("Titlebar.Base", new Color(255, 255, 255).ToUInt());
 
         Color.AssignByName("Window.Background", new Color(26, 20, 0, 200).ToUInt());
+        Color.AssignByName("Window.Background:active", new Color(26, 20, 0, 255).ToUInt());
         Color.AssignByName("Window.BackgroundLight", new Color(161, 155, 138, 110).ToUInt());
 
         Color.AssignByName("ModeToggleInactive", new Color(15, 15, 15).ToUInt());
@@ -87,7 +84,11 @@ internal static class WindowStyles
         Color.AssignByName("PetNicknamesButton:Hover", new Color(47, 69, 41, 150).ToUInt());
 
 
-        
+        Color.AssignByName("Window.Text", 0xFFD0D0D0);
+        Color.AssignByName("Window.TextLight", 0xFFFFFFFF);
+        Color.AssignByName("Window.TextMuted", 0xB0C0C0C0);
+
+
         Color.AssignByName("ModeToggleButton.Border:Active", 0xFF484848);
 
         Color.AssignByName("ModeToggleButton.Border:Hover", new Color(50, 50, 50).ToUInt());
@@ -99,9 +100,7 @@ internal static class WindowStyles
         Color.AssignByName("Window.TitlebarBorder", new Color(176, 169, 120).ToUInt()); //0xFF404040
 
         Color.AssignByName("Window.TitlebarBackground", 0xFF101010);
-        Color.AssignByName("Window.Text", 0xFFD0D0D0);
-        Color.AssignByName("Window.TextLight", 0xFFFFFFFF);
-        Color.AssignByName("Window.TextMuted", 0xB0C0C0C0);
+
         
         Color.AssignByName("Window.TextDisabled", 0xA0A0A0A0);
 

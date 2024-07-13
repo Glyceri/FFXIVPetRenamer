@@ -22,7 +22,6 @@ using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.Parsing;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
-using PetRenamer.PetNicknames.Windowing.Windows.PetDev;
 
 namespace PetRenamer;
 
@@ -71,17 +70,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
-        WindowHandler = new WindowHandler(in _DalamudServices, in PettableDatabase);
-
-
-        WindowHandler.AddWindow(new PetRenameWindow(_DalamudServices, _PetServices, PettableUserList));
-        WindowHandler.AddWindow(new PetListWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
-        WindowHandler.AddWindow(new PetDevWindow(_DalamudServices,  IpcProvider));
-        //WindowHandler.AddWindow(new EmptyWindow(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase));
-        //WindowHandler.Open<PetListWindow>();
-        WindowHandler.Open<PetRenameWindow>();
-        //WindowHandler.Open<EmptyWindow>();
-        //WindowHandler.Open<PetDevWindow>();
+        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase);
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {
@@ -95,7 +84,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
             ShowInHelp = true
         });
 
-        _DalamudServices.CommandManager.AddHandler("/petdev", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetDevWindow>())
+        _DalamudServices.CommandManager.AddHandler("/petrestart", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Rebuild())
         {
             HelpMessage = "Temporary",
             ShowInHelp = true

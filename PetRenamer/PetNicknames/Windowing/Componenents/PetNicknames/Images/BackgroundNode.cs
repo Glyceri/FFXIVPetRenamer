@@ -5,13 +5,18 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 
 internal class BackgroundNode : Node
 {
-    public BackgroundNode(uint iconID)
+    public BackgroundNode()
     {
-        Style.BackgroundImage = iconID;
+        SetStyle1();
+    }
+
+    public void SetStyle1()
+    {
+        Style.BackgroundImage = 194019u;
         Style.BackgroundImageScale = new Vector2(1, 0.75f);
         Style.BackgroundImageInset = new EdgeSize(4);
         Style.BackgroundImageRotation = 90;
         Style.BackgroundImageBlendMode = BlendMode.Modulate;
-        Style.BackgroundImageColor = new Color(255, 255, 0, 200);
+        Style.BackgroundImageColor = new Color(40, 40, 0, 230);
     }
 }

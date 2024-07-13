@@ -3,10 +3,11 @@ using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
-using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 using System.Numerics;
 using Una.Drawing;
 
@@ -28,21 +29,22 @@ internal abstract partial class PetWindow : Window, IPetWindow
     protected abstract string Title { get; }
 
     protected readonly DalamudServices DalamudServices;
+    protected readonly WindowHandler WindowHandler;
 
     readonly BackgroundNode _windowNode;
 
     readonly Node TitlebarNode;
     readonly Node TitlebarTextNode;
     protected readonly Node ContentNode;
-    readonly QuickSquareButton CloseButton;
 
     Vector2 lastSize = Vector2.Zero;
 
-    protected PetWindow(DalamudServices dalamudServices, string name, ImGuiWindowFlags additionalFlags = ImGuiWindowFlags.None) : base(name, ImGuiWindowFlags | additionalFlags, true)
+    protected PetWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, string name, ImGuiWindowFlags additionalFlags = ImGuiWindowFlags.None) : base(name, ImGuiWindowFlags | additionalFlags, true)
     {
+        WindowHandler = windowHandler;
         DalamudServices = dalamudServices;
 
-        _windowNode = new BackgroundNode(194019u)
+        _windowNode = new BackgroundNode()
         {
             Stylesheet = WindowStyles.WindowStylesheet,
             ClassList = ["window"],
@@ -57,17 +59,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
                     ClassList = ["window--titlebar-text"],
                     NodeValue = Title,
                 },
-                CloseButton = new QuickSquareButton()
-                {
-                    NodeValue = FontAwesomeIcon.Times.ToIconString(),
-                    Style = new Una.Drawing.Style()
-                    {
-                        Anchor = Anchor.TopRight,
-                        Size = new Size(20, 20),
-                        FontSize = 12,
-                        Margin = new EdgeSize(6),
-                    }
-                },
+                new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler),
                 ContentNode = new Node()
                 {
                     ClassList = ["window--content"],
@@ -82,8 +74,6 @@ internal abstract partial class PetWindow : Window, IPetWindow
         };
         Size = DefaultSize;
         SizeCondition = ImGuiCond.FirstUseEver;
-
-        CloseButton.OnClick += () => DalamudServices.Framework.Run(Close);
 
         if (HasModeToggle) PetModeConstructor();
     }
@@ -126,6 +116,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
             ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
             ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
         }
+        _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background:active") : new Color("Window.Background");
+
         _windowNode.Style.StrokeColor = IsFocused ? WindowStyles.WindowBorderActive : WindowStyles.WindowBorderInactive;
 
         RenderWindowInstance();

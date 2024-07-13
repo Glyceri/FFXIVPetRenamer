@@ -7,21 +7,25 @@ internal class QuickClearButton : QuickSquareButton
 {
     bool lastState = false;
 
+    public bool Locked { get; set; } = false;
+
     public QuickClearButton()
     {
         Tooltip = "Hold Left Ctrl + Left Shift to delete an entry";
         NodeValue = FontAwesomeIcon.Times.ToIconString();
+        TagsList.Add("fakeDisabled");
     }
 
     protected override void ButtonClicked()
     {
+        if (Locked) return;
         if (lastState) return;
         base.ButtonClicked();
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        if (!ImGui.IsKeyDown(ImGuiKey.LeftCtrl) || !ImGui.IsKeyDown(ImGuiKey.LeftShift))
+        if (!ImGui.IsKeyDown(ImGuiKey.LeftCtrl) || !ImGui.IsKeyDown(ImGuiKey.LeftShift) || Locked)
         {
             if (lastState == false)
             {

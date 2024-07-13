@@ -12,6 +12,7 @@ internal interface IPetSheets
     string? GetWorldName(ushort worldID);
     IPetSheetData? GetPet(int skeletonID);
     List<IPetSheetData> GetLegacyPets(int legacyModelID);
+    List<IPetSheetData> GetMissingPets(List<int> battlePetSkeletons);
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
     IPetSheetData? GetPetFromName(string name);
     IPetSheetData? GetPetFromIcon(long iconID);

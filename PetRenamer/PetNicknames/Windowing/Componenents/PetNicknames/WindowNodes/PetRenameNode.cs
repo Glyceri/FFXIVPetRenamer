@@ -20,7 +20,7 @@ internal class PetRenameNode : Node
 
     public Action<string?>? OnSave;
 
-    readonly GoldenCircleImageNode CircleImageNode;
+    readonly TechnoCircleImageNode CircleImageNode;
 
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode RaceNode;
@@ -95,7 +95,7 @@ internal class PetRenameNode : Node
                     },
                     ChildNodes =
                     [
-                        CircleImageNode = new GoldenCircleImageNode(in services)
+                        CircleImageNode = new TechnoCircleImageNode(in services)
                         {
                             Style = new Style()
                             {

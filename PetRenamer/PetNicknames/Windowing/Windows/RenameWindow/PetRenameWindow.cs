@@ -31,8 +31,10 @@ internal partial class PetRenameWindow : PetWindow
     int activeSkeleton = 0;
     string? lastCustomName = null!;
 
-    public PetRenameWindow(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) : base(dalamudServices, "Pet Rename Window", ImGuiWindowFlags.NoResize)
+    public PetRenameWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Rename Window", ImGuiWindowFlags.NoResize)
     {
+        IsOpen = true;
+
         UserList = userList;
         PetServices = petServices;
         petRenameNode = new PetRenameNode(null, null, in DalamudServices);

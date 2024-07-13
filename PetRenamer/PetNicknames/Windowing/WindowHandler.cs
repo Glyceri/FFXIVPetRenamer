@@ -1,15 +1,25 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
+using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
+using PetRenamer.PetNicknames.Windowing.Windows.PetSharingWindow;
+using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 using System.Linq;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing;
+
+// Where normal Pet nicknames code is.... f i n e
+// UI code is such a focking mess, I don't want to even look at it anymore
 
 internal class WindowHandler : IWindowHandler
 {
@@ -17,33 +27,47 @@ internal class WindowHandler : IWindowHandler
     public PetWindowMode PetWindowMode { get => _windowMode; set => SetWindowMode(value); }
 
     readonly DalamudServices DalamudServices;
+    readonly Configuration Configuration;
+    readonly IPetServices PetServices;
+    readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
+    readonly ILegacyDatabase LegacyDatabase;
+    readonly IImageDatabase ImageDatabase;
 
     readonly WindowSystem WindowSystem;
 
-    public WindowHandler(in DalamudServices dalamudServices, in IPettableDatabase pettableDatabase)
+    public WindowHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IImageDatabase imageDatabase)
     {
+        DalamudServices = dalamudServices;
+        Configuration = configuration;
+        PetServices = petServices;
+        UserList = userList;
+        Database = pettableDatabase;
+        LegacyDatabase = legacyDatabase;
+        ImageDatabase = imageDatabase;
+
         Node.UseThreadedStyleComputation = true;
         DrawingLib.Setup(dalamudServices.PetNicknamesPlugin);
         WindowStyles.RegisterDefaultColors();
 
-        DalamudServices = dalamudServices;
-        Database = pettableDatabase;
-
         WindowSystem = new WindowSystem(PluginConstants.pluginName);
-
         DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += Draw;
+
+        _Register();
     }
 
-    public void AddWindow(PetWindow window)
+    void _Register()
+    {
+        AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
+        AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
+        AddWindow(new PetSharingWindow(this, in DalamudServices, in Configuration, ImageDatabase));
+        AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
+    }
+
+    void AddWindow(PetWindow window)
     {
         WindowSystem.AddWindow(window);
         DalamudServices.Framework.Run(() => window.SetPetMode(_windowMode));
-    }
-
-    public void RemoveWindow(PetWindow window)
-    {
-        WindowSystem.RemoveWindow(window);
     }
 
     public void Open<T>() where T : IPetWindow
@@ -120,7 +144,7 @@ internal class WindowHandler : IWindowHandler
     {
         foreach (IPetWindow window in WindowSystem.Windows)
         {
-            window.OnDirty();
+            DalamudServices.Framework.Run(window.OnDirty);
         }
     }
 
@@ -140,5 +164,11 @@ internal class WindowHandler : IWindowHandler
         DrawingLib.Dispose();
         DalamudServices.PetNicknamesPlugin.UiBuilder.Draw -= Draw;
         WindowSystem?.RemoveAllWindows();
+    }
+
+    public void Rebuild()
+    {
+        WindowSystem?.RemoveAllWindows();
+        _Register();
     }
 }

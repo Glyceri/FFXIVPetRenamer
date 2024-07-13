@@ -18,7 +18,7 @@ internal class EmptyWindow : PetWindow
     protected override string Title { get; } = "Empty Window";
     protected override string ID { get; } = "EmptyWindow";
 
-    public EmptyWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(dalamudServices, "EmptyWindow") 
+    public EmptyWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "EmptyWindow") 
     {
         
     }

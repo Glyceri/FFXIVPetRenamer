@@ -30,6 +30,8 @@ internal interface IPettableDatabase
 
     void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC);
 
+    bool IsDirty { get; }
     bool IsDirtyUI { get; }
+    void NotifySeenDirty();
     void NotifySeenDirtyUI();
 }

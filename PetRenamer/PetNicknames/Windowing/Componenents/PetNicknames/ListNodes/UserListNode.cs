@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+﻿using ImGuiNET;
+using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
@@ -82,6 +83,12 @@ internal class UserListNode : Node
         IconNode.SetUser(entry);
         IconNode.RedownloadNode.Style.FontSize = 8;
         IconNode.RedownloadNode.Style.Size = new Size(24, 24);
+
+        if (asLocal)
+        {
+            ClearButtonNode.Locked = true;
+            ClearButtonNode.Tooltip = "You cannot clear when online";
+        }
 
         ClearButtonNode.OnClick += () => DalamudServices.Framework.Run(() => ActiveEntry.Clear());
         EyeButtonNode.OnClick += () => DalamudServices.Framework.Run(() => OnView?.Invoke(ActiveEntry));

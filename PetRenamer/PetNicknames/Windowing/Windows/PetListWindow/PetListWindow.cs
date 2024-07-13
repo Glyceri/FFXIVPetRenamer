@@ -45,6 +45,11 @@ internal partial class PetListWindow : PetWindow
 
     public override void OnDirty()
     {
+        if ((!ActiveEntry?.IsActive) ?? true)
+        {
+            ActiveEntry = UserList.LocalPlayer?.DataBaseEntry;
+        }
+
         SetUser(ActiveEntry);
     }
 
@@ -70,6 +75,11 @@ internal partial class PetListWindow : PetWindow
     void ToggleUserMode()
     {
         inUserMode = !inUserMode;
+
+        if (!inUserMode && UserList.LocalPlayer != null)
+        {
+            ActiveEntry = UserList.LocalPlayer?.DataBaseEntry;
+        }
         SetUser(ActiveEntry);
     }
 
@@ -110,6 +120,15 @@ internal partial class PetListWindow : PetWindow
 
     void HandleUserMode()
     {
+        if (UserList.LocalPlayer != null)
+        {
+            UserListButton.SetText("My List");
+        }
+        else
+        {
+            UserListButton.SetText("Pet List");
+        }
+
         IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
         int length = entries.Length;
 
@@ -135,6 +154,8 @@ internal partial class PetListWindow : PetWindow
 
     void HandlePetMode()
     {
+        UserListButton.SetText("User List");
+
         if (ActiveEntry == null) return;
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
@@ -153,6 +174,16 @@ internal partial class PetListWindow : PetWindow
 
             validIDS.Add(id);
             validNames.Add(cusomName);
+        }
+
+        if (PetWindowMode.BattlePet == CurrentMode)
+        {
+            List<IPetSheetData> data =  PetServices.PetSheets.GetMissingPets(validIDS);
+            foreach(IPetSheetData p in data)
+            {
+                validIDS.Add(p.Model);
+                validNames.Add("");
+            }
         }
 
         int newLength = validIDS.Count;

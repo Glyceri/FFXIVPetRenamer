@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -12,6 +13,7 @@ internal class PettableDatabase : IPettableDatabase
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
+    public bool IsDirty { get; private set; } = false;
     public bool IsDirtyUI { get; private set; } = false;
 
     readonly IPetServices PetServices;
@@ -99,6 +101,11 @@ internal class PettableDatabase : IPettableDatabase
         SetDirty();
     }
 
+    public void NotifySeenDirty()
+    {
+        IsDirty = false;
+    }
+
     public void NotifySeenDirtyUI()
     {
         IsDirtyUI = false;
@@ -106,6 +113,7 @@ internal class PettableDatabase : IPettableDatabase
 
     protected void SetDirty()
     {
+        IsDirty = true;
         IsDirtyUI = true;
     }
 }

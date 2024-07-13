@@ -29,8 +29,8 @@ internal unsafe class PettableUser : IPettableUser
     public uint CurrentCastID { get; private set; }
     public bool IsLocalPlayer { get; private set; }
     public bool Destroyed { get; private set; }
-    public bool IsDirty { get; private set; }
     public string HomeworldName { get; private set; }
+    public bool IsDirty { get; private set; }
 
     uint lastCast;
 
@@ -101,9 +101,10 @@ internal unsafe class PettableUser : IPettableUser
 
     void Reset()
     {
+        IsDirty = false;
+
         if (DataBaseEntry.IsDirty)
         {
-            DataBaseEntry.NotifySeenDirty();
             for (int i = PettablePets.Count - 1; i >= 0; i--)
             {
                 PettablePets[i].Destroy();
@@ -112,8 +113,6 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
-        if (IsDirty) NotifyOfDirty();
-
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet pet = PettablePets[i];
@@ -121,8 +120,8 @@ internal unsafe class PettableUser : IPettableUser
             if (!pet.Touched)
             {
                 pet.Destroy();
-                PettablePets.RemoveAt(i);
                 IsDirty = true;
+                PettablePets.RemoveAt(i);
                 continue;
             }
 
@@ -205,12 +204,6 @@ internal unsafe class PettableUser : IPettableUser
     }
 
     bool CastCheck(uint castID) => lastCast == castID && CurrentCastID != castID;
-
-    public void NotifyOfDirty()
-    {
-        IsDirty = false;
-        DataBaseEntry.NotifySeenDirty();
-    }
 
     public string? GetCustomName(IPetSheetData sheetData) => DataBaseEntry.GetName(sheetData.Model);
 

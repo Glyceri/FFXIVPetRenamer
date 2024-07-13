@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface;
-using ImGuiNET;
+﻿using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;

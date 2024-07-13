@@ -26,6 +26,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     bool _IsDirty;
     public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty;  }
     public bool IsDirtyForUI { get => _IsDirtyForUI || ActiveDatabase.IsDirtyForUI; }
+    public bool IsCleared { get; private set; } = false;
 
     public bool IsIPC { get; private set; } = false;
 
@@ -110,6 +111,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         ActiveDatabase.MarkDirtyUIAsNotified();
     }
 
+    public void NotifySeenCleared()
+    {
+        IsCleared = false;
+    }
+
     public int? GetSoftSkeleton(int softIndex)
     {
         if (softIndex < 0 || softIndex >= SoftSkeletons.Length) return null;
@@ -158,7 +164,14 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetActiveDatabase([], []);
         IsIPC = false;
         IsActive = false;
+
+        MarkCleared();
         MarkDirty();
+    }
+
+    void MarkCleared()
+    {
+        IsCleared = true;
     }
 
     void MarkDirty()

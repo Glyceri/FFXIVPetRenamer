@@ -13,6 +13,8 @@ internal interface IWindowHandler : IDisposable
     void Toggle<T>() where T : IPetWindow;
     T? GetWindow<T>() where T : PetWindow;
 
-    void AddWindow(PetWindow window);
-    void RemoveWindow(PetWindow window);
+    void Rebuild();
+
+    //void AddWindow(PetWindow window);
+    //void RemoveWindow(PetWindow window);
 }

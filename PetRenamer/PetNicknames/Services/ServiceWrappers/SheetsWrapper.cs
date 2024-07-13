@@ -319,6 +319,22 @@ internal class SheetsWrapper : IPetSheets
         return System.Array.Empty<int>();  
     }
 
+    public List<IPetSheetData> GetMissingPets(List<int> battlePetSkeletons)
+    {
+        List<IPetSheetData> sheetData = new List<IPetSheetData>();
+
+        foreach(IPetSheetData data in petSheetCache)
+        {
+            int model = data.Model;
+            if (model >= -1) continue;
+            if (battlePetSkeletons.Contains(model)) continue;
+
+            sheetData.Add(data);
+        }
+
+        return sheetData;
+    }
+
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
     {
         { 6,    PluginConstants.Eos                     }, // EOS

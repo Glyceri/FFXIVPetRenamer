@@ -1,4 +1,4 @@
-﻿using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+﻿using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using Una.Drawing;
 

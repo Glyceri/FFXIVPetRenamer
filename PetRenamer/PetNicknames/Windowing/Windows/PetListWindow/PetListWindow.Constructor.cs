@@ -33,12 +33,13 @@ internal partial class PetListWindow
 
     readonly QuickButton UserListButton;
     readonly QuickButton SharingButton;
-    readonly QuickButton ActiveEveryoneButton;
 
     readonly SmallHeaderNode SmallHeaderNode;
 
-    public PetListWindow(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(dalamudServices, "Pet List")
+    public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "Pet List")
     {
+        IsOpen = true;
+
         UserList = userList;
         Database = database;
         LegacyDatabase = legacyDatabase;
@@ -124,15 +125,6 @@ internal partial class PetListWindow
                                             Anchor = Anchor.TopCenter,
                                         },
                                     },
-                                    ActiveEveryoneButton = new QuickButton(in DalamudServices, "Active Everyone")
-                                    {
-                                        Style = new Style()
-                                        {
-                                            Size = new Size(60, 15),
-                                            Margin = new EdgeSize(18, 1, 1, 1),
-                                            Anchor = Anchor.TopCenter,
-                                        },
-                                    },
                                 ]
                             }
                         ],
@@ -185,8 +177,6 @@ internal partial class PetListWindow
                             ScrollbarThumbColor = new Color(224, 183, 18, 50),
                             ScrollbarThumbHoverColor = new Color(224, 183, 18, 200),
                             ScrollbarThumbActiveColor = new Color(237, 197, 33, 255),
-                            //ScrollbarRounding = 15,
-                            //ScrollbarWidth = 11,
                         },
                         ChildNodes =
                         [

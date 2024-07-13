@@ -27,14 +27,20 @@ internal class SaveHelper : IUpdatable
 
     public unsafe void OnUpdate(IFramework framework)
     {
+        if (Database.IsDirty)
+        {
+            Configuration.Save();
+            Database.NotifySeenDirty();
+        }
+
         IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
         int length = entries.Length;
 
         bool hasDirty = false;
-        bool dirtyIsLocal = false;
+        bool hasClear = false;
+        bool dirtyContainsLocal = false;
 
         IPettableUser? localUser = UserList.LocalPlayer;
-
         bool hasLocalUser = true;
 
         if (localUser != null && lastLocalUser != localUser)
@@ -52,22 +58,34 @@ internal class SaveHelper : IUpdatable
         for (int i = 0; i < length; i++)
         {
             IPettableDatabaseEntry entry = entries[i];
-            if (!entry.IsActive) continue;
-            if (!entry.IsDirty) continue;
-            hasDirty = true;
 
-            if (!hasLocalUser) break;
+            if (entry.IsDirty)
+            {
+                entry.NotifySeenDirty();
+                hasDirty = true;
+            }
+
+            if (entry.IsCleared)
+            {
+                entry.NotifySeenCleared();
+
+                if (!entry.IsIPC)
+                {
+                    hasClear = true;
+                }
+            }
+
+            if (!hasLocalUser) continue;
 
             if (localUser!.ContentID != entry.ContentID) continue;
 
-            dirtyIsLocal = true;
-            break;
+            dirtyContainsLocal = true;
         }
 
-        if (!hasDirty) return;
+        if (!hasDirty && !hasClear) return;
         Configuration.Save();
 
-        if (!dirtyIsLocal) return;
+        if (!dirtyContainsLocal) return;
         IpcProvider.NotifyDataChanged();
     }
 }

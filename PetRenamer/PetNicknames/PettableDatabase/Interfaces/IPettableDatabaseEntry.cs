@@ -19,6 +19,7 @@ internal interface IPettableDatabaseEntry
 
     bool IsDirty { get; }
     bool IsDirtyForUI { get; }
+    bool IsCleared { get; }
 
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
@@ -37,6 +38,7 @@ internal interface IPettableDatabaseEntry
     void SetName(int skeletonID, string name);
     void NotifySeenDirty();
     void MarkDirtyUIAsNotified();
+    void NotifySeenCleared();
     void Clear();
 
     void UpdateEntry(IModernParseResult parseResult, bool asIPC);

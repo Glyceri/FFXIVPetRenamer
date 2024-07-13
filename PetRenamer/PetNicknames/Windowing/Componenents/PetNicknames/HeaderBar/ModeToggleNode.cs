@@ -3,7 +3,7 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 using System;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 
 internal class ModeToggleNode : Node
 {
@@ -22,9 +22,9 @@ internal class ModeToggleNode : Node
 
         ChildNodes = [
            CompanionNode = new()
-            {
-                ClassList = ["ModeToggleUnavailableMinion"]
-            },
+           {
+               ClassList = ["ModeToggleUnavailableMinion"]
+           },
             BattlePetNode = new()
             {
                 ClassList = ["BattlePetModeActive"]
