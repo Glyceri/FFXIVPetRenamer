@@ -49,4 +49,9 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
     public void SetPetSheetData(IPetSheetData? petSheetData) => currentData = petSheetData;
 
     protected override IPetSheetData? GetPetData(string text, in IPettableUser user) => currentData;
+
+    public override void OnDispose()
+    {
+        Services.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, HandleUpdate);
+    }
 }

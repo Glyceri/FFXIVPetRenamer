@@ -71,8 +71,8 @@ internal unsafe class PetDevWindow : PetWindow
             mode = 4;
         }
 
-        if (mode == 0) RenderMode0();
-        if (mode == 1) RenderMode1();
+        if (mode == 0) RenderMode1();
+        if (mode == 1) RenderMode0();
         if (mode == 2) RenderMode2();
         if (mode == 3) RenderMode3();
         if (mode == 4) RenderMode4();
@@ -95,8 +95,7 @@ internal unsafe class PetDevWindow : PetWindow
         {
             if (ImGui.Button("Clear IPC for target##clear_for_target"))
             {
-                IPlayerCharacter? playerCharacter = target as IPlayerCharacter;
-                if (playerCharacter != null)
+                if (target is IPlayerCharacter playerCharacter)
                 {
                     ipc.ClearIPCDataDetour(playerCharacter);
                 }

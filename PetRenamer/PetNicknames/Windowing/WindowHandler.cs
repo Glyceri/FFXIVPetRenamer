@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
+using System.Linq;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing;
@@ -35,7 +36,7 @@ internal class WindowHandler : IWindowHandler
     }
 
     public void AddWindow(PetWindow window)
-    {        
+    {
         WindowSystem.AddWindow(window);
         DalamudServices.Framework.Run(() => window.SetPetMode(_windowMode));
     }
@@ -48,30 +49,33 @@ internal class WindowHandler : IWindowHandler
     public void Open<T>() where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows)
-            if (window is T tWindow)
-                tWindow.Open();
+        {
+            if (window is not T tWindow) continue;
+            tWindow.Open();
+        }
     }
 
     public void Close<T>() where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows)
-            if (window is T tWindow)
-                tWindow.Close();
+        {
+            if (window is not T tWindow) continue;
+            tWindow.Close();
+        }
     }
 
     public T? GetWindow<T>() where T : PetWindow
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
-            if (window is T tWindow)
-                return tWindow;
-        return null;
+       return WindowSystem.Windows.OfType<T>().FirstOrDefault();
     }
 
     public void Toggle<T>() where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows)
-            if (window is T tWindow)
-                tWindow.Toggle();
+        {
+            if (window is not T tWindow) continue;
+            tWindow.Toggle();
+        }
     }
 
     public void SetWindowMode(PetWindowMode mode)
@@ -86,14 +90,42 @@ internal class WindowHandler : IWindowHandler
     void Draw()
     {
         Node.ScaleFactor = ImGuiHelpers.GlobalScale;
+
+
         WindowSystem.Draw();
 
-        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
+        if (IsDirty())
         {
-            if (!entry.IsActive) continue;
-            entry.MarkDirtyUIAsNotified();
+            HandleDirty();
         }
 
+        HandleModeChange();
+    }
+
+    bool IsDirty()
+    {
+        bool hasDirty = false;
+        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
+        {
+            if (!entry.IsDirtyForUI) continue;
+            hasDirty = true;
+            entry.MarkDirtyUIAsNotified();
+        }
+        bool ultimatelyIsDirty = hasDirty || Database.IsDirtyUI;
+        Database.NotifySeenDirtyUI();
+        return ultimatelyIsDirty;
+    } 
+
+    void HandleDirty()
+    {
+        foreach (IPetWindow window in WindowSystem.Windows)
+        {
+            window.OnDirty();
+        }
+    }
+
+    void HandleModeChange()
+    {
         foreach (IPetWindow window in WindowSystem.Windows)
         {
             if (!window.RequestsModeChange) continue;

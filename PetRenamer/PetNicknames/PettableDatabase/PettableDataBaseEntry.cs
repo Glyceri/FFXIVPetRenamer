@@ -156,7 +156,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public void Clear()
     {
         SetActiveDatabase([], []);
-        IsIPC = true;
+        IsIPC = false;
         IsActive = false;
         MarkDirty();
     }

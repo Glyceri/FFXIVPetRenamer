@@ -29,4 +29,7 @@ internal interface IPettableDatabase
     SerializableUserV4[] SerializeDatabase();
 
     void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC);
+
+    bool IsDirtyUI { get; }
+    void NotifySeenDirtyUI();
 }

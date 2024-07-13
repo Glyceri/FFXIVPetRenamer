@@ -5,7 +5,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.Hooking.Interfaces;
 
-internal interface ITextHook
+internal interface ITextHook : IDisposable
 {
     bool Faulty { get; }
     void Setup(DalamudServices service, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false);

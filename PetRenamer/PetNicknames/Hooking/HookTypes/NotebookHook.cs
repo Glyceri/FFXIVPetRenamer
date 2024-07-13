@@ -15,4 +15,9 @@ internal class NotebookHook : SimpleTextHook
         services.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, AddonName, HandleUpdate);
         SetUnfaulty();
     }
+
+    public override void OnDispose()
+    {
+        Services.AddonLifecycle.UnregisterListener(AddonEvent.PostRefresh, HandleUpdate);
+    }
 }

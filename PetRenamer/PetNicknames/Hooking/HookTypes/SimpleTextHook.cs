@@ -112,4 +112,12 @@ internal unsafe class SimpleTextHook : ITextHook
         }
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
     }
+
+    public void Dispose()
+    {
+        OnDispose();
+        Services.AddonLifecycle.UnregisterListener(AddonEvent.PostRequestedUpdate, HandleUpdate);
+    }
+
+    public virtual void OnDispose() { }
 }

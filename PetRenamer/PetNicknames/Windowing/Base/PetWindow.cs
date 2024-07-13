@@ -4,6 +4,7 @@ using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System.Numerics;
@@ -33,7 +34,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
     readonly Node TitlebarNode;
     readonly Node TitlebarTextNode;
     protected readonly Node ContentNode;
-    readonly Node CloseButton;
+    readonly QuickSquareButton CloseButton;
 
     Vector2 lastSize = Vector2.Zero;
 
@@ -56,11 +57,16 @@ internal abstract partial class PetWindow : Window, IPetWindow
                     ClassList = ["window--titlebar-text"],
                     NodeValue = Title,
                 },
-                CloseButton = new Node()
+                CloseButton = new QuickSquareButton()
                 {
-                    Id = "CloseButton",
-                    ClassList = ["window--close-button"],
                     NodeValue = FontAwesomeIcon.Times.ToIconString(),
+                    Style = new Una.Drawing.Style()
+                    {
+                        Anchor = Anchor.TopRight,
+                        Size = new Size(20, 20),
+                        FontSize = 12,
+                        Margin = new EdgeSize(6),
+                    }
                 },
                 ContentNode = new Node()
                 {
@@ -77,7 +83,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
         Size = DefaultSize;
         SizeCondition = ImGuiCond.FirstUseEver;
 
-        CloseButton.OnClick += _ => DalamudServices.Framework.Run(Close);
+        CloseButton.OnClick += () => DalamudServices.Framework.Run(Close);
 
         if (HasModeToggle) PetModeConstructor();
     }
@@ -157,6 +163,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     public abstract void OnDraw();
     public virtual void OnLateDraw() { }
+    public virtual void OnDirty() { }
 
     static ImGuiWindowFlags ImGuiWindowFlags =>
          ImGuiWindowFlags.NoTitleBar |

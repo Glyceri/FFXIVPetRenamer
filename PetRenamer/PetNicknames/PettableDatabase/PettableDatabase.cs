@@ -12,6 +12,7 @@ internal class PettableDatabase : IPettableDatabase
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
+    public bool IsDirtyUI { get; private set; } = false;
 
     readonly IPetServices PetServices;
 
@@ -43,6 +44,7 @@ internal class PettableDatabase : IPettableDatabase
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
+        SetDirty();
         return newEntry;
     }
 
@@ -58,6 +60,7 @@ internal class PettableDatabase : IPettableDatabase
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
+        SetDirty();
         return newEntry;
     }
 
@@ -69,6 +72,7 @@ internal class PettableDatabase : IPettableDatabase
             if (_entries[i].ContentID != entry.ContentID) continue;
 
             _entries.RemoveAt(i);
+            SetDirty();
             hasRemoved = true;
         }
         return hasRemoved;
@@ -92,5 +96,16 @@ internal class PettableDatabase : IPettableDatabase
     {
         IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
         entry.UpdateEntry(parseResult, isFromIPC);
+        SetDirty();
+    }
+
+    public void NotifySeenDirtyUI()
+    {
+        IsDirtyUI = false;
+    }
+
+    protected void SetDirty()
+    {
+        IsDirtyUI = true;
     }
 }

@@ -1,12 +1,9 @@
-﻿using Dalamud.Interface.Textures.TextureWraps;
-using ImGuiNET;
-using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using System.Linq;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNodes;
 
 internal class UserNode : Node
 {
@@ -84,7 +81,7 @@ internal class UserNode : Node
                 OutlineColor = new("Window.TextOutline"),
                 OutlineSize = 1,
             }),
-            new (".HeaderBar", new Style()
+            new(".HeaderBar", new Style()
             {
                 Size = new Size(410, 100),
                 Flow = Flow.Horizontal,

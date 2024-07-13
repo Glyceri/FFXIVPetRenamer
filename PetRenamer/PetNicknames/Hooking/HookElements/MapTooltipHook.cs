@@ -1,6 +1,7 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -10,7 +11,7 @@ using System.Linq;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal unsafe class MapTooltipHook : QuickHookableElement
+internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 {
     ushort lastId = ushort.MaxValue;
 
@@ -57,7 +58,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement
         return showTooltip!.Original(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
     }
 
-    public override void Dispose()
+    public override void OnDispose()
     {
         showTooltip?.Dispose();
     }

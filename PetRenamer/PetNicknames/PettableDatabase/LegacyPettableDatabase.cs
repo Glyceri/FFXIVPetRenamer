@@ -29,6 +29,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
     {
         IPettableDatabaseEntry entry = GetEntry(parseResult.UserName, parseResult.Homeworld);
         entry.UpdateEntryBase(parseResult, isFromIPC);
+        SetDirty();
     }
 
     public SerializableUserV3[] SerializeLegacyDatabase()

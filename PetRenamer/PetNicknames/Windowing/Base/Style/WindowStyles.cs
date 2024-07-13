@@ -49,32 +49,6 @@ internal static class WindowStyles
                 }
             ),
             new(
-                ".window--close-button",
-                new()
-                {
-                    Anchor = Anchor.TopRight,
-                    Size = new(25, 25),
-                    BackgroundColor = new("Window.BackgroundLight"),
-                    StrokeColor = new("Window.TitlebarBorder"),
-                    StrokeWidth = 1,
-                    BorderRadius = 3,
-                    TextAlign = Anchor.MiddleCenter,
-                    Font = 2,
-                    FontSize = 14,
-                    Color = new("Window.TextLight"),
-                    OutlineColor = new("Window.TextOutline"),
-                    Margin = new() { Top = 3, Right = 4 },
-                }
-            ),
-            new(
-                ".window--close-button:hover",
-                new()
-                {
-                    BackgroundColor = new("Window.Background"),
-                    StrokeWidth = 2,
-                }
-            ),
-            new(
                 ".window--content",
                 new()
                 {

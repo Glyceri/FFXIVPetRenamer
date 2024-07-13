@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Hooking.HookElements;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -27,7 +28,7 @@ internal class HookHandler : IDisposable
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
         Register(new ActionTooltipHook(DalamudServices, PetServices, PettableUserList));
 
-        MapTooltipHook mapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
+        IMapTooltipHook mapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
         Register(mapTooltipHook);
 
         Register(new MapHook(DalamudServices, PetServices, PettableUserList, mapTooltipHook));

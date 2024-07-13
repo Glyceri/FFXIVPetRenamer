@@ -1,7 +1,6 @@
 ﻿using PetRenamer.PetNicknames.Services;
 using System;
 using Una.Drawing;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 

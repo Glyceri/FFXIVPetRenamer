@@ -3,16 +3,17 @@ using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using System;
 using System.Numerics;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.ListNodes;
 
 internal class PetListNode : Node
 {
     readonly IconNode IconNode;
-    readonly Node ClearButtonNode;
+    readonly QuickClearButton ClearButtonNode;
 
     readonly Node HolderNode;
 
@@ -66,17 +67,19 @@ internal class PetListNode : Node
                     BorderRadius = 6,
                 }
             },
-            ClearButtonNode = new Node()
+            ClearButtonNode = new QuickClearButton()
             {
-                NodeValue = FontAwesomeIcon.Times.ToIconString(),
-                Stylesheet = stylesheet,
-                ClassList = ["ClearButton"],
-            }
+                Style = new Style()
+                {
+                    Anchor = Anchor.TopRight,
+                    Margin = new EdgeSize(5),
+                }
+            },
         ];
 
         NicknameNode.SetPet(customName, data);
         NicknameNode.OnSave += (value) => OnSave?.Invoke(value);
-        ClearButtonNode.OnClick += _ => OnSave?.Invoke(null);
+        ClearButtonNode.OnClick += () => OnSave?.Invoke(null);
 
         IconNode.IconID = data.Icon;
 
@@ -95,16 +98,16 @@ internal class PetListNode : Node
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;
 
-        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
+        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(ScaleFactor, 0);
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
-        Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * Node.ScaleFactor;
+        Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * ScaleFactor;
 
-        drawList.AddLine(activePos, earlyiconPos + new Vector2(Node.ScaleFactor * 0.5f, 0), new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
-        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
+        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet([
-        new (".ClearButton", new Style()
+        new(".ClearButton", new Style()
         {
             Anchor = Anchor.TopRight,
             Size = new(15, 15),

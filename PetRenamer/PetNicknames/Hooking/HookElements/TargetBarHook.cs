@@ -32,11 +32,6 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<NotebookHook>("YKWNote", [28], Allowed);
     }
 
-    public override void Dispose()
-    {
-
-    }
-
     IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.GameObjectId ?? 0);
     IPettablePet? TargetOfTarget() => UserList.GetPet(Target?.TargetObject?.GameObjectId ?? 0);
     IPettablePet? TargetObject() => UserList.GetPet(Target?.GameObjectId ?? 0);

@@ -6,7 +6,7 @@ using System;
 using System.Numerics;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNodes;
 
 internal class PetRenameNode : Node
 {
@@ -40,13 +40,13 @@ internal class PetRenameNode : Node
             [
                 // Rename Node part
                 HolderNode = new Node()
-                {    
+                {
                     Style = new Style()
                     {
                         Flow = Flow.Vertical,
                         Margin = new EdgeSize(10, 0, 0, 0),
                     },
-                    ChildNodes = 
+                    ChildNodes =
                     [
                         SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? "...")
                         {
@@ -98,8 +98,8 @@ internal class PetRenameNode : Node
                         {
                             Style = new Style()
                             {
-                                 Anchor = Anchor.MiddleCenter,
-                                 Size = new Size(130, 130)
+                                Anchor = Anchor.MiddleCenter,
+                                Size = new Size(130, 130)
                             }
                         }
                     ]
@@ -154,12 +154,12 @@ internal class PetRenameNode : Node
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;
 
-        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(Node.ScaleFactor, 0);
+        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(ScaleFactor, 0);
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
-        Vector2 earlyiconPos = iconPos - new Vector2(14f, 0) * Node.ScaleFactor;
+        Vector2 earlyiconPos = iconPos - new Vector2(14f, 0) * ScaleFactor;
 
-        drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
-        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * Node.ScaleFactor);
+        drawList.AddLine(activePos, earlyiconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet([

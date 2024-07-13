@@ -1,12 +1,11 @@
 ﻿using ImGuiNET;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
-using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNodes;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
 
@@ -44,7 +43,7 @@ internal partial class PetRenameWindow : PetWindow
     public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
-        if (ActiveUser?.IsDirty ?? false || lastActiveUser != ActiveUser)
+        if (lastActiveUser != ActiveUser)
         {
             lastActiveUser = ActiveUser;
             GetActiveSkeleton();
@@ -91,6 +90,11 @@ internal partial class PetRenameWindow : PetWindow
 
         activeSkeleton = pet.SkeletonID;
         if (dirty) SetNewNode();
+    }
+
+    public override void OnDirty()
+    {
+        GetActiveSkeleton();
     }
 
     void SetNewNode()

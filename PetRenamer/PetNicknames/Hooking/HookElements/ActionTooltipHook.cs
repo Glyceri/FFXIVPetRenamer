@@ -1,5 +1,4 @@
-﻿using System;
-using Dalamud.Game.Gui;
+﻿using Dalamud.Game.Gui;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -42,7 +41,7 @@ internal class ActionTooltipHook : QuickHookableElement
         actionTooltipHook.SetPetSheetData(petData);
     }
 
-    public override void Dispose()
+    public override void OnDispose()
     {
         DalamudServices.GameGui.HoveredActionChanged -= OnHoveredActionChanged;
     }

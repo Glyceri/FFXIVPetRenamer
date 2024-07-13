@@ -2,7 +2,7 @@
 using System;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 
 internal class QuickButton : Node
 {
@@ -39,7 +39,7 @@ internal class QuickButton : Node
             OutlineColor = new("Window.TextOutlineButton"),
             OutlineSize = 1,
             BorderInset = new EdgeSize(7, 15, 3, 15),
-            
+
         }),
         new(".Button:hover", new Style()
         {

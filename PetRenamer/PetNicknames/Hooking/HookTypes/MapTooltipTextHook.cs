@@ -66,4 +66,9 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
     }
 
     protected override IPettableUser? GetUser() => currentPet?.Owner;
+
+    public override void OnDispose()
+    {
+        Services.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, HandleUpdate);
+    }
 }

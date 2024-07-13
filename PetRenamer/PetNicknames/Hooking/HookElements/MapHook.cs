@@ -3,6 +3,7 @@ using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -35,9 +36,9 @@ internal unsafe class MapHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00 ", DetourName = nameof(MapDetour))]
     readonly Hook<NewMapDelegate> mapTooltipHook = null!;
 
-    readonly MapTooltipHook TooltipHook;
+    readonly IMapTooltipHook TooltipHook;
 
-    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, MapTooltipHook tooltipHook) : base(services, userList, petServices) 
+    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook) : base(services, userList, petServices) 
     { 
         TooltipHook = tooltipHook;
     }

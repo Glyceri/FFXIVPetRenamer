@@ -12,6 +12,7 @@ internal interface IPetWindow
     void OnDraw();
 
     void SetPetMode(PetWindowMode mode);
+    void OnDirty();
     bool RequestsModeChange { get; }
     PetWindowMode NewMode { get; }
     void DeclareModeChangedSeen();

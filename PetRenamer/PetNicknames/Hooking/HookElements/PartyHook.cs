@@ -6,7 +6,6 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
