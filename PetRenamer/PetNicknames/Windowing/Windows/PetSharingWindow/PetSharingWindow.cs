@@ -23,7 +23,7 @@ internal class PetSharingWindow : PetWindow
 
     public PetSharingWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "PetSharing")
     {
-        IsOpen = true;
+        IsOpen = false;
 
         ContentNode.ChildNodes = [
             UserNode = new UserNode(in dalamudServices, in imageDatabase),

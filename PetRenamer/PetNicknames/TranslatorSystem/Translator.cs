@@ -8,7 +8,7 @@ internal static class Translator
 {
     static DalamudServices DalamudServices = null!;
 
-    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.Default;
+    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.English;
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {

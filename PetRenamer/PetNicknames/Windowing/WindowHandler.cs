@@ -9,6 +9,7 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetSharingWindow;
@@ -60,6 +61,7 @@ internal class WindowHandler : IWindowHandler
     {
         AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
         AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
+        AddWindow(new EmptyWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
         AddWindow(new PetSharingWindow(this, in DalamudServices, in Configuration, ImageDatabase));
         AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
     }
