@@ -1,6 +1,6 @@
 ﻿using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 
 internal class IconNode : Node
 {

@@ -6,7 +6,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
+namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 
 internal class ProfilePictureNode : Node
 {
@@ -62,7 +62,7 @@ internal class ProfilePictureNode : Node
         new(".RedownloadButton", new Style()
         {
             Anchor = Anchor.BottomRight,
-            TextAlign = Anchor.MiddleCenter, 
+            TextAlign = Anchor.MiddleCenter,
             Color = new Color("Window.TextLight"),
             OutlineColor = new("Window.TextOutline"),
             OutlineSize = 1,

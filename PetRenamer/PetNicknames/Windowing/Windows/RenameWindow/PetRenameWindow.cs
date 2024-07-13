@@ -43,7 +43,7 @@ internal partial class PetRenameWindow : PetWindow
     public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
-        if (lastActiveUser != ActiveUser)
+        if (ActiveUser?.IsDirty ?? false || lastActiveUser != ActiveUser)
         {
             lastActiveUser = ActiveUser;
             GetActiveSkeleton();

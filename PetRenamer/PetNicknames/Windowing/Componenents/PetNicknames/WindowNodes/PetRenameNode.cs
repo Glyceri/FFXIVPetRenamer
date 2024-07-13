@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using System;
 using System.Numerics;
 using Una.Drawing;
@@ -19,7 +20,7 @@ internal class PetRenameNode : Node
 
     public Action<string?>? OnSave;
 
-    readonly CircleImageNode CircleImageNode;
+    readonly GoldenCircleImageNode CircleImageNode;
 
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode RaceNode;
@@ -94,7 +95,7 @@ internal class PetRenameNode : Node
                     },
                     ChildNodes =
                     [
-                        CircleImageNode = new CircleImageNode(in services)
+                        CircleImageNode = new GoldenCircleImageNode(in services)
                         {
                             Style = new Style()
                             {
