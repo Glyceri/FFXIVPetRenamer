@@ -53,6 +53,8 @@ internal class WindowHandler : IWindowHandler
 
         WindowSystem = new WindowSystem(PluginConstants.pluginName);
         DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += Draw;
+        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
+        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
 
         _Register();
     }

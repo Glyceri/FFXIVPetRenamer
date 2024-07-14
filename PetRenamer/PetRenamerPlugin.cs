@@ -22,7 +22,6 @@ using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.Parsing;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
-using System.Diagnostics;
 
 namespace PetRenamer;
 
@@ -47,92 +46,31 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly LodestoneNetworker LodestoneNetworker;
     readonly ILodestoneNetworker LodestoneNetworkerInterface;
 
-
-    Stopwatch startupTimeChecker = new Stopwatch();
-
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
-        startupTimeChecker = Stopwatch.StartNew();
-
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
-
-        _DalamudServices.PluginLog.Debug("Dalamud Services: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         _PetServices = new PetServices(_DalamudServices);
-
-        _DalamudServices.PluginLog.Debug("PetServices Services: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
 
         Translator.Initialise(_DalamudServices);
 
-        _DalamudServices.PluginLog.Debug("Translater: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 
-        _DalamudServices.PluginLog.Debug("Lodestone Networker: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         PettableUserList = new PettableUserList();
-
-        _DalamudServices.PluginLog.Debug("Pettable User List: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         PettableDatabase = new PettableDatabase(in _PetServices);
-
-        _DalamudServices.PluginLog.Debug("Pettable Database: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         LegacyDatabase = new LegacyPettableDatabase(in _PetServices);
-
-        _DalamudServices.PluginLog.Debug("Legacy Database: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
 
         ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in LodestoneNetworkerInterface);
 
-        _DalamudServices.PluginLog.Debug("Image Database: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         DataWriter = new DataWriter(in PettableUserList);
-
-        _DalamudServices.PluginLog.Debug("Data Writer: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
-
-        _DalamudServices.PluginLog.Debug("Data Parser: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
 
         IpcProvider = new IpcProvider(in _PetServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
-        _DalamudServices.PluginLog.Debug("IPC Provider: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, IpcProvider);
-
-        _DalamudServices.PluginLog.Debug("Update Handler: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
-
-        _DalamudServices.PluginLog.Debug("Hook Handler: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
-
-        _DalamudServices.PluginLog.Debug("Chat Handler: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
-
-        _DalamudServices.PluginLog.Debug("Command Handler: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
-
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase);
-
-        _DalamudServices.PluginLog.Debug("Window Handler: " + startupTimeChecker.Elapsed.TotalSeconds.ToString());
-        startupTimeChecker.Restart();
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {
