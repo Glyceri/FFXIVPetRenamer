@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PN.S;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 

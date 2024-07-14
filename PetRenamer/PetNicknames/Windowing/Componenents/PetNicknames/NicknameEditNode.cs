@@ -24,7 +24,7 @@ internal class NicknameEditNode : RenameTitleNode
 
     public Action<string?>? OnSave;
 
-    public NicknameEditNode(in DalamudServices services, string label, string? text) : base(in services, label, text ?? "...")
+    public NicknameEditNode(in DalamudServices services, string label, string? text) : base(in services, label, text ?? Translator.GetLine("..."))
     {
         EditButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Edit")}")
         {
@@ -100,7 +100,7 @@ internal class NicknameEditNode : RenameTitleNode
         editMode = false;
         ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Clear")}");
         EditButton.SetText($"{Translator.GetLine("PetRenameNode.Edit")}");
-        SetText(CurrentValue ?? "...");
+        SetText(CurrentValue ?? Translator.GetLine("..."));
         inputFieldvalue = CurrentValue ?? string.Empty;
     }
 
@@ -116,7 +116,7 @@ internal class NicknameEditNode : RenameTitleNode
             ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
             if (ImGui.InputText($"##RenameField_{ActivePet?.Model}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
             {
-                EditButton.Clicked?.Invoke();
+                EditClicked();
             }
         }
     }

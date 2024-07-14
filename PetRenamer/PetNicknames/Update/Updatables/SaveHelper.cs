@@ -62,7 +62,7 @@ internal class SaveHelper : IUpdatable
         {
             IPettableDatabaseEntry entry = entries[i];
 
-            if (entry.IsDirty)
+            if (entry.IsDirty || entry.IsDirtyForUI)
             {
                 entry.NotifySeenDirty();
                 hasDirty = true;

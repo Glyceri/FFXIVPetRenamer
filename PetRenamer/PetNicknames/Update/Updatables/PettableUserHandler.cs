@@ -59,19 +59,21 @@ internal unsafe class PettableUserHandler : IUpdatable
 
             if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
             {
-                pettableUser?.Destroy();
+                // Destroy the user
                 PettableUserList.PettableUsers[i] = null;
             }
 
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
-                IPettableUser newUser = new PettableUser(PetLog, PettableDatabase, PetServices, battleChara);
+                // Create a user
+                IPettableUser newUser = new PettableUser(PettableDatabase, PetServices, battleChara);
                 PettableUserList.PettableUsers[i] = newUser;
                 continue;
             }
 
             if (currentObjectKind == ObjectKind.BattleNpc) availablePets.Add(battleChara);
 
+            // Update the user
             pettableUser?.Set(battleChara);
         }
 

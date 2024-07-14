@@ -17,15 +17,19 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public uint OldObjectID { get; init; }
     public string Name { get; init; } = "";
     public ushort Index { get; init; }
-    public string? CustomName { get; }
+    public string? CustomName { get; private set; }
     public bool Dirty { get; private set; } = true;
     public IPetSheetData? PetData { get; private set; }
     public byte PetType { get; private set; }
     public ulong Lifetime { get; private set; }
     public IPettableUser? Owner { get; private set; }
 
+    readonly IPettableDatabaseEntry Entry;
+
     public PettableCompanion(Companion* c, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices)
     {
+        Entry = entry;
+
         if (c == null) return;
         Touched = true;
         Companion = c;
@@ -57,8 +61,8 @@ internal unsafe class PettableCompanion : IPettableCompanion
         return skeletonID == SkeletonID && index == Index && OldObjectID == objectID;
     }
 
-    public void Destroy()
+    public void Recalculate()
     {
-        
+        CustomName = Entry?.GetName(SkeletonID);
     }
 }

@@ -52,7 +52,7 @@ internal class PetListNode : Node
                 ChildNodes = [
                     SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", data.BaseSingular),
                     IDNode = new RenameTitleNode(in DalamudServices, $"ID:", data.Model.ToString()),
-                    NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? "..."),
+                    NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? Translator.GetLine("...")),
                 ]
             },
             IconNode = new IconNode()

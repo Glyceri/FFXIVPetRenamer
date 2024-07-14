@@ -5,8 +5,14 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
+
+// All the [MethodImpl(MethodImplOptions.AggressiveInlining)]
+// used to be inlined. In order for code to stay clearer I made them into methods.
+// This is clarity only, they can be inlined
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
@@ -46,9 +52,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public void UpdateEntry(IPettableUser pettableUser)
     {
-        Homeworld = pettableUser.Homeworld;
-        Name = pettableUser.Name;
-        HomeworldName = pettableUser.HomeworldName;
+        SetName(pettableUser.Name);
+        SetHomeworld(pettableUser.Homeworld);
 
         if (IsActive) return;
         if (!pettableUser.IsLocalPlayer) return;
@@ -71,7 +76,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     void SetHomeworld(ushort homeworld)
     {
         Homeworld = homeworld;
-        HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? "...";
+        HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? Translator.GetLine("...");
     }
 
     void SetName(string name)

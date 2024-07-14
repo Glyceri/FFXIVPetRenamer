@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.TranslatorSystem;
 
+// Trying to stay away from statics, but in this case it just made MUCH more sense.
 internal static class Translator
 {
     static DalamudServices DalamudServices = null!;
@@ -12,6 +13,8 @@ internal static class Translator
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
+        { "...", "..." },
+        { "ContextMenu.Rename", "Rename" },
         { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Race", "Race" },
         { "PetRenameNode.Behaviour", "Behaviour" },
@@ -20,7 +23,7 @@ internal static class Translator
         { "PetRenameNode.Clear", "Clear" },
         { "PetRenameNode.Save", "Save" },
         { "PetRenameNode.Cancel", "Cancel" },
-        { "PetRenameWindow.Title", "Pet Passport" },
+        { "WindowHandler.Title", "Pet Passport" },
         { "PetListWindow.ListHeaderPersonalMinion", "Your Minions" },
         { "PetListWindow.ListHeaderPersonalBattlePet", "Your Battle Pets" },
         { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
@@ -29,6 +32,8 @@ internal static class Translator
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
+        { "...", "..." },
+        { "ContextMenu.Rename", "Umbenennen" },
         { "PetRenameNode.Species", "Begleiter" },
         { "PetRenameNode.Race", "Rasse" },
         { "PetRenameNode.Behaviour", "Verhalten" },
@@ -37,7 +42,7 @@ internal static class Translator
         { "PetRenameNode.Clear", "Löschen" },
         { "PetRenameNode.Save", "Speichern" },
         { "PetRenameNode.Cancel", "Abbrechen" },
-        { "PetRenameWindow.Title", "Heimtierausweis" },
+        { "WindowHandler.Title", "Heimtierausweis" },
         { "PetListWindow.ListHeaderPersonalMinion", "Ihre Begleiter" },
         { "PetListWindow.ListHeaderPersonalBattlePet", "Ihre Kampftiere" },
         { "PetListWindow.ListHeaderOtherMinion", "Begleiter von {0}" },
@@ -46,12 +51,12 @@ internal static class Translator
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()
     {
-        
+
     };
 
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
     {
-        
+        { "...", "。。。" },
     };
 
     internal static void Initialise(DalamudServices dalamudServices)

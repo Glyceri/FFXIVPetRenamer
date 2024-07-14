@@ -21,7 +21,7 @@ internal interface IPettablePet
     public IPetSheetData? PetData { get; }
     public ulong Lifetime { get; }
 
+    void Recalculate();
     void Update(nint pointer);
     bool Compare(ref Character character);
-    void Destroy();
 }

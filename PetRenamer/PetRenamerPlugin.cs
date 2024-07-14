@@ -22,6 +22,7 @@ using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.Parsing;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
+using PetRenamer.PetNicknames.ContextMenus;
 
 namespace PetRenamer;
 
@@ -39,6 +40,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly IpcProvider IpcProvider;
 
     // As long as no other module needs one, they won't be interfaced
+    readonly ContextMenuHandler ContextMenuHandler;
     readonly UpdateHandler UpdateHandler;
     readonly HookHandler HookHandler;
     readonly ChatHandler ChatHandler;
@@ -71,6 +73,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase);
+        ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
         {
@@ -96,6 +99,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
     public void Dispose()
     {
+        ContextMenuHandler?.Dispose();
         IpcProvider?.Dispose();
         LodestoneNetworker?.Dispose();
         ImageDatabase?.Dispose();

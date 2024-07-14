@@ -16,44 +16,39 @@ internal unsafe class PettableUser : IPettableUser
     public ulong ContentID { get; private set; }
     public ushort Homeworld { get; private set; }
     public ulong ObjectID { get; private set; }
-    public bool Touched { get; set; }
     public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
+    public nint Address { get; private set; }
     public BattleChara* BattleChara { get; }
     public bool IsActive => DataBaseEntry.IsActive;
 
     IPetServices PetServices { get; init; }
-    IPetLog PetLog { get; init; }
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
     public nint User { get; private set; }
     public uint ShortObjectID { get; private set; }
     public uint CurrentCastID { get; private set; }
     public bool IsLocalPlayer { get; private set; }
-    public bool Destroyed { get; private set; }
-    public string HomeworldName { get; private set; }
+
     public bool IsDirty { get; private set; }
 
     uint lastCast;
 
-    public PettableUser(IPetLog petLog, IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
+    public PettableUser(IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
     {
-        PetLog = petLog;
         BattleChara = battleChara.Value;
+        Address = (nint)BattleChara;
         IsLocalPlayer = BattleChara->ObjectIndex == 0;
         Name = BattleChara->NameString;
         ContentID = BattleChara->ContentId;
         Homeworld = BattleChara->HomeWorld;
-        HomeworldName = petServices.PetSheets.GetWorldName(Homeworld)?? "...";
+
         ObjectID = BattleChara->GetGameObjectId();
         ShortObjectID = BattleChara->GetGameObjectId().ObjectId;
-        Touched = true;
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;
         User = (nint)BattleChara;
         if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID, true);
     }
-
-    public void Destroy() => Destroyed = true;
 
     public void Set(Pointer<BattleChara> pointer)
     {
@@ -105,12 +100,10 @@ internal unsafe class PettableUser : IPettableUser
 
         if (DataBaseEntry.IsDirty)
         {
-            for (int i = PettablePets.Count - 1; i >= 0; i--)
+            foreach(IPettablePet pet in PettablePets)
             {
-                PettablePets[i].Destroy();
+                pet.Recalculate();
             }
-            PettablePets.Clear();
-            return;
         }
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
@@ -119,7 +112,6 @@ internal unsafe class PettableUser : IPettableUser
 
             if (!pet.Touched)
             {
-                pet.Destroy();
                 IsDirty = true;
                 PettablePets.RemoveAt(i);
                 continue;

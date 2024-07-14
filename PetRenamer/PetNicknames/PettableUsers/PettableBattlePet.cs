@@ -16,7 +16,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public ulong ObjectID { get; init; }
     public ushort Index { get; init; }
     public string Name { get; init; } = "";
-    public string? CustomName { get; }
+    public string? CustomName { get; private set; }
     public bool Dirty { get; private set; } = true;
     public IPetSheetData? PetData { get; private set; }
     public uint OldObjectID { get; init; }
@@ -24,9 +24,11 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public ulong Lifetime { get; private set; }
     public IPettableUser? Owner { get; private set; }
 
+    readonly IPettableDatabaseEntry Entry;
+
     public PettableBattlePet(BattleChara* battlePet, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices)
     {
-        if (battlePet == null) return;
+        Entry = entry;
         Touched = true;
         BattlePet = battlePet;
         Owner = owner;
@@ -57,8 +59,8 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
         return -skeletonID == SkeletonID && index == Index && OldObjectID == objectID;
     }
 
-    public void Destroy()
+    public void Recalculate()
     {
-        
+        CustomName = Entry?.GetName(SkeletonID);
     }
 }

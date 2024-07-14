@@ -21,15 +21,17 @@ internal partial class PetRenameWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(475, 170);
     protected override bool HasModeToggle { get; } = true;
 
-    protected override string Title { get; } = Translator.GetLine("PetRenameWindow.Title");
-    protected override string ID { get; } = "PetRenameWindow";
+    protected override string Title { get; } = Translator.GetLine("WindowHandler.Title");
+    protected override string ID { get; } = "WindowHandler";
 
     readonly PetRenameNode? petRenameNode;
 
     IPettableUser? ActiveUser;
-    IPettableUser? lastActiveUser;
-    int activeSkeleton = 0;
+    ulong lastContentID = 0;
+    int activeSkeleton = -1;
     string? lastCustomName = null!;
+
+    bool isContextOpen = false;
 
     public PetRenameWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Rename Window", ImGuiWindowFlags.NoResize)
     {
@@ -42,18 +44,31 @@ internal partial class PetRenameWindow : PetWindow
         petRenameNode.OnSave += OnSave;
     }
 
+    public override void OnDirty()
+    {
+        if (isContextOpen)
+        {
+            SetNewNode();
+            return;
+        }
+        GetActiveSkeleton();
+    }
+
     public unsafe override void OnDraw()
     {
         ActiveUser = UserList.LocalPlayer;
-        if (ActiveUser?.IsDirty ?? false || lastActiveUser != ActiveUser)
+
+        if (ActiveUser?.IsDirty ?? false || lastContentID != ActiveUser?.ContentID)
         {
-            lastActiveUser = ActiveUser;
+            lastContentID = ActiveUser?.ContentID ?? 0;
+            isContextOpen = false;
             GetActiveSkeleton();
         }
     }
 
     public override void OnOpen()
     {
+        if (isContextOpen) return;
         OnDraw();
         GetActiveSkeleton();
     }
@@ -62,11 +77,18 @@ internal partial class PetRenameWindow : PetWindow
     {
         activeSkeleton = newSkeleton;
         if (openWindow) IsOpen = true;
-        if (activeSkeleton >= -1) SetPetMode(PetWindowMode.Minion);
+        if (newSkeleton >= -1) SetPetMode(PetWindowMode.Minion);
         else SetPetMode(PetWindowMode.BattlePet);
+        isContextOpen = true;
+        activeSkeleton = newSkeleton;
+        ActiveUser = UserList.LocalPlayer;
+        SetNewNode();
     }
 
-    protected override void OnPetModeChanged(PetWindowMode mode) => GetActiveSkeleton();
+    protected override void OnPetModeChanged(PetWindowMode mode)
+    {
+        GetActiveSkeleton();
+    }
 
     void GetActiveSkeleton()
     {
@@ -82,6 +104,13 @@ internal partial class PetRenameWindow : PetWindow
             CleanOldNode();
             return;
         }
+        SetPet(pet);
+    }
+
+    void SetPet(IPettablePet pet)
+    {
+        if (ActiveUser == null) return;
+
         bool dirty = activeSkeleton != pet.SkeletonID;
         string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
         if (lastCustomName != customName)
@@ -92,11 +121,6 @@ internal partial class PetRenameWindow : PetWindow
 
         activeSkeleton = pet.SkeletonID;
         if (dirty) SetNewNode();
-    }
-
-    public override void OnDirty()
-    {
-        GetActiveSkeleton();
     }
 
     void SetNewNode()
@@ -119,5 +143,9 @@ internal partial class PetRenameWindow : PetWindow
         petRenameNode?.Setup(null, null);
     }
 
-    void OnSave(string? newName) => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
+    void OnSave(string? newName)
+    {
+        PetServices.PetLog.Log(activeSkeleton + " : " + newName ?? "");
+        ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
+    }
 }

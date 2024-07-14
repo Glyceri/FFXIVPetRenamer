@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.ListNodes;
@@ -100,7 +101,7 @@ internal partial class PetListWindow : PetWindow
         UserNode.SetUser(entry);
         ScrollistContentNode.ChildNodes.Clear();
 
-        SmallHeaderNode.NodeValue = "...";
+        SmallHeaderNode.NodeValue = Translator.GetLine("...");
 
         if (inUserMode) HandleUserMode();
         else HandlePetMode();

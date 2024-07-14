@@ -23,7 +23,7 @@ internal partial class PetWindow
         RequestsModeChange = false;
     }
 
-    void _InternalSetPetWindowMode(PetWindowMode mode)
+    protected void _InternalSetPetWindowMode(PetWindowMode mode)
     {
         RequestsModeChange = true;
         NewMode = mode;

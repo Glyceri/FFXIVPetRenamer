@@ -5,6 +5,7 @@ using Lumina.Excel.GeneratedSheets2;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
@@ -79,9 +80,9 @@ internal class SheetsWrapper : IPetSheets
 
                 uint footstepIcon = companion.Icon + (uint)65000;
                 sbyte pronoun = companion.Pronoun;
-                string raceName = companion.MinionRace?.Value?.Name ?? "...";
+                string raceName = companion.MinionRace?.Value?.Name ?? Translator.GetLine("...");
 
-                string behaviourName = companion.Behavior.Value?.Name ?? "...";
+                string behaviourName = companion.Behavior.Value?.Name ?? Translator.GetLine("...");
                 petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, footstepIcon, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.Gui;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -7,12 +8,14 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal class ActionTooltipHook : QuickHookableElement
+internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 {
     const int MinionActionKind = 34;
 
     readonly ActionTooltipTextHook tooltipHook = null!;
     readonly ActionTooltipTextHook actionTooltipHook = null!;
+
+    public uint LastActionID { get; private set; } = 0;
 
     public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, petServices, userList)
     {
@@ -35,7 +38,12 @@ internal class ActionTooltipHook : QuickHookableElement
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
 
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(e.ActionID, in localUser, true);
+        uint action = e.ActionID;
+        if (action != 0)
+        {
+            LastActionID = action;
+        }
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(action, in localUser, true);
 
         tooltipHook.SetPetSheetData(petData);
         actionTooltipHook.SetPetSheetData(petData);

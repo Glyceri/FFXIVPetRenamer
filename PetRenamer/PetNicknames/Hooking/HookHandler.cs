@@ -14,6 +14,9 @@ internal class HookHandler : IDisposable
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
 
+    public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
+    public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
+
     public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList)
     {
         DalamudServices = dalamudServices;
@@ -26,12 +29,14 @@ internal class HookHandler : IDisposable
     void _Register()
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
-        Register(new ActionTooltipHook(DalamudServices, PetServices, PettableUserList));
 
-        IMapTooltipHook mapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
-        Register(mapTooltipHook);
+        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList);
+        Register(ActionTooltipHook);
 
-        Register(new MapHook(DalamudServices, PetServices, PettableUserList, mapTooltipHook));
+        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
+        Register(MapTooltipHook);
+
+        Register(new MapHook(DalamudServices, PetServices, PettableUserList, MapTooltipHook));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList));
