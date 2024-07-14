@@ -1,4 +1,4 @@
-﻿using PetRenamer.PetNicknames.Serialization;
+﻿using PN.S;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;

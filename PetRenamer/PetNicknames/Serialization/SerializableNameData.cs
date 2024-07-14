@@ -2,7 +2,8 @@
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 
-namespace PetRenamer.PetNicknames.Serialization;
+// Keep save file size shorter ....
+namespace PN.S;
 
 [Serializable]
 internal class SerializableNameData

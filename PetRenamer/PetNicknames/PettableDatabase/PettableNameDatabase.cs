@@ -1,6 +1,6 @@
 ﻿using Dalamud.Utility;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Serialization;
+using PN.S;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;

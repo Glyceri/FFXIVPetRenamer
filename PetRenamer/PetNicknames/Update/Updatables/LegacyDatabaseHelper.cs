@@ -55,17 +55,17 @@ internal class LegacyDatabaseHelper : IUpdatable
 
     void HandleLegacyDatabase()
     {
+        IPettableDatabaseEntry[] entries = LegacyPettableDatabase.DatabaseEntries;
+
+        int entriesLength = entries.Length;
+        if (entriesLength == 0) return;
+
         IPettableUser? localPlayer = UserList.LocalPlayer;
         if (localPlayer == null)
         {
             lastUser = null;
             return;
         }
-
-        IPettableDatabaseEntry[] entries = LegacyPettableDatabase.DatabaseEntries;
-
-        int entriesLength = entries.Length;
-        if (entriesLength == 0) return;
 
         if (lastUser == null)
         {

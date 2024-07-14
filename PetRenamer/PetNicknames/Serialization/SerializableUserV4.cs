@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PetRenamer.PetNicknames.Serialization;
+// Keep save file size shorter ....
+namespace PN.S;
 
 [Serializable]
 internal class SerializableUserV4
