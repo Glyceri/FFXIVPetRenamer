@@ -2,12 +2,14 @@
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Update.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class SaveHelper : IUpdatable
 {
+    readonly DalamudServices DalamudServices;
     readonly IPettableDatabase Database;
     readonly Configuration Configuration;
     readonly IPettableUserList UserList;
@@ -17,8 +19,9 @@ internal class SaveHelper : IUpdatable
 
     IPettableUser? lastLocalUser;
 
-    public SaveHelper(in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList, in IIpcProvider ipcProvider)
+    public SaveHelper(in DalamudServices dalamudServices, in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList, in IIpcProvider ipcProvider)
     {
+        DalamudServices = dalamudServices;
         Configuration = configuration;
         Database = database;
         UserList = userList;

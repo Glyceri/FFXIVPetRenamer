@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -46,7 +45,6 @@ internal class PettableDatabase : IPettableDatabase
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
-        SetDirty();
         return newEntry;
     }
 
@@ -62,7 +60,6 @@ internal class PettableDatabase : IPettableDatabase
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
-        SetDirty();
         return newEntry;
     }
 
@@ -98,7 +95,7 @@ internal class PettableDatabase : IPettableDatabase
     {
         IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
         entry.UpdateEntry(parseResult, isFromIPC);
-        SetDirty();
+        if (!isFromIPC) SetDirty();
     }
 
     public void NotifySeenDirty()
