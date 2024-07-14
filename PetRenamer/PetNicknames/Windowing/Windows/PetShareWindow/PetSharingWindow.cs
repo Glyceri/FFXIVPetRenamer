@@ -1,13 +1,12 @@
 ﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNodes;
 using System.Numerics;
 using Una.Drawing;
 
-namespace PetRenamer.PetNicknames.Windowing.Windows.PetSharingWindow;
+namespace PetRenamer.PetNicknames.Windowing.Windows.PetShareWindow;
 
 internal class PetSharingWindow : PetWindow
 {

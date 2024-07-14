@@ -33,7 +33,7 @@ internal partial class PetRenameWindow : PetWindow
 
     public PetRenameWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Rename Window", ImGuiWindowFlags.NoResize)
     {
-        IsOpen = false;
+        IsOpen = true;
 
         UserList = userList;
         PetServices = petServices;

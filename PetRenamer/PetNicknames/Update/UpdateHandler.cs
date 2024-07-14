@@ -44,8 +44,8 @@ internal class UpdateHandler : IDisposable
     void Setup()
     {
         _updatables.Add(new LegacyDatabaseHelper(in DalamudServices, in LegacyPettableDatabase, in PettableDatabase, in PetServices, in PettableUserList));
-        _updatables.Add(new SaveHelper(in Configuration, in PettableDatabase, in PettableUserList, in IpcProvider));
         _updatables.Add(new PettableUserHandler(in DalamudServices, in PettableUserList, in PettableDatabase, in PetServices));
+        _updatables.Add(new SaveHelper(in Configuration, in PettableDatabase, in PettableUserList, in IpcProvider));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker));
     }
 

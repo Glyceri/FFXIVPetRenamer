@@ -111,6 +111,7 @@ internal class NicknameEditNode : RenameTitleNode
 
         if (editMode)
         {
+            
             ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft - new Vector2(0, Node.ScaleFactor * 3));
             ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
             if (ImGui.InputText($"##RenameField_{ActivePet?.Model}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))

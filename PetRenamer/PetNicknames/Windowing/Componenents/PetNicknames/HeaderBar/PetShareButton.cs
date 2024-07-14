@@ -1,6 +1,6 @@
 ﻿using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar.Helper;
-using PetRenamer.PetNicknames.Windowing.Windows.PetSharingWindow;
+using PetRenamer.PetNicknames.Windowing.Windows.PetShareWindow;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 

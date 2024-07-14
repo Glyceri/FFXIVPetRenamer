@@ -12,7 +12,7 @@ using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
-using PetRenamer.PetNicknames.Windowing.Windows.PetSharingWindow;
+using PetRenamer.PetNicknames.Windowing.Windows.PetShareWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
 using System.Linq;
 using Una.Drawing;

@@ -71,10 +71,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PetNicknames\Hooking\Structs\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\drawing\Una.Drawing\Una.Drawing.csproj" />
   </ItemGroup>
 </Project>

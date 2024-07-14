@@ -1,7 +1,9 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -34,16 +36,16 @@ internal class PettableNameDatabase : INamesDatabase
     public void SetName(int ID, string? name)
     {
         if (ID == -1) return;
+        string? validName = MakeNameValid(name);
         SetDirty();
-        if (name == string.Empty) name = null;
         int index = IndexOf(ID);
         if (index != -1)
         {
-            if (name != null) Names[index] = name;
+            if (validName != null) Names[index] = validName;
             else RemoveAtIndex(index);
             return;
         }
-        else if(name != null) Add(ID, name);
+        else if(validName != null) Add(ID, validName);
     }
 
     int IndexOf(int ID)
@@ -80,20 +82,42 @@ internal class PettableNameDatabase : INamesDatabase
 
     public SerializableNameData SerializeData() => new SerializableNameData(this);
 
-    public void Update(int[] IDs, string[] names)
+    public void Update(int[] ids, string[] names)
     {
-        if (IDs.Length != names.Length)
+        if (ids.Length != names.Length)
         {
             return;
         }
 
-        this.IDs = IDs;
-        this.Names = names;
+        IDs = [];
+        Names = [];
+
+        for (int i = 0; i < ids.Length; i++)
+        {
+            SetName(ids[i], names[i]);
+        }
     }
 
     void SetDirty()
     {
         IsDirty = true;
         IsDirtyForUI = true;
+    }
+
+    string? MakeNameValid(string? name)
+    {
+        if (name.IsNullOrWhitespace()) return null;
+
+        if (name.Length > PluginConstants.ffxivNameSize)
+        {
+            name = name.Substring(0, PluginConstants.ffxivNameSize);
+        }
+
+        name = name.Replace(PluginConstants.forbiddenCharacter.ToString(), string.Empty);
+
+        name = name.Trim();
+        if (name.IsNullOrWhitespace()) return null;
+
+        return name;
     }
 }
