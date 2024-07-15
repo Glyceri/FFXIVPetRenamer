@@ -1,7 +1,6 @@
 ﻿using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.ImageDatabase.Texture;
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Lodestone.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -32,7 +31,7 @@ internal class ImageDownloader : IImageDownloader
         Networker = networker;
     }
 
-    public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         if (IsBeingDownloaded(entry)) return;
 
@@ -44,7 +43,7 @@ internal class ImageDownloader : IImageDownloader
         Networker.SearchCharacter(entry, (entry, searchData) => OnSuccess(entry, searchData, success, failure), (e) => PetServices.PetLog.LogVerbose(e));
     }
 
-    void OnSuccess(IPettableDatabaseEntry entry, LodestoneSearchData searchData, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    void OnSuccess(IPettableDatabaseEntry entry, LodestoneSearchData searchData, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         cancellationTokes.Add(entry.ContentID, tokenSource);
@@ -60,7 +59,7 @@ internal class ImageDownloader : IImageDownloader
         }, token), token);
     }
 
-    async Task Download(IPettableDatabaseEntry entry, LodestoneSearchData searchData, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure, CancellationToken cancellationToken)
+    async Task Download(IPettableDatabaseEntry entry, LodestoneSearchData searchData, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure, CancellationToken cancellationToken)
     {
         try
         {
@@ -105,7 +104,7 @@ internal class ImageDownloader : IImageDownloader
         }
     }
 
-    bool FindFileLocally(IPettableDatabaseEntry databaseEntry, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    bool FindFileLocally(IPettableDatabaseEntry databaseEntry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         string filepath = GetFilePath(databaseEntry);
 
@@ -125,7 +124,7 @@ internal class ImageDownloader : IImageDownloader
         return false;
     }
 
-    async Task ReadImage(IPettableDatabaseEntry databaseEntry, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    async Task ReadImage(IPettableDatabaseEntry databaseEntry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         try
         {
@@ -141,8 +140,7 @@ internal class ImageDownloader : IImageDownloader
                 failure.Invoke(new Exception("Wrap null"));
                 return;
             }
-            IGlyceriTextureWrap wrap = new GlyceriTextureWrap(in textureWrap);
-            success?.Invoke(databaseEntry, wrap);
+            success?.Invoke(databaseEntry, textureWrap);
         }
         catch (Exception e)
         {
@@ -153,13 +151,13 @@ internal class ImageDownloader : IImageDownloader
 
     string GetFilePath(IPettableDatabaseEntry entry) => Path.Combine(Path.GetTempPath(), $"PetNicknames_{entry.Name}_{entry.Homeworld}.jpg");
 
-    public void RedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    public void RedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         if (IsBeingDownloaded(entry)) return;
         DoRedownloadImage(entry, success, failure);
     }
 
-    void DoRedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IGlyceriTextureWrap> success, Action<Exception> failure)
+    void DoRedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         string filepath = GetFilePath(entry);
         try

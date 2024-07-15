@@ -11,7 +11,7 @@ internal interface IImageDatabase : IDisposable
     void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null);
     IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry);
     bool IsBeingDownloaded(IPettableDatabaseEntry? databaseEntry);
-    void OnSuccess(IPettableDatabaseEntry entry, IGlyceriTextureWrap textureWrap);
+    void OnSuccess(IPettableDatabaseEntry entry, IDalamudTextureWrap textureWrap);
 
     void Update();
 }
