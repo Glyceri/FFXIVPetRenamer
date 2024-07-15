@@ -1,5 +1,7 @@
 ﻿using PetRenamer.PetNicknames.Chat.ChatElements;
 using PetRenamer.PetNicknames.Chat.Interfaces;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -10,24 +12,26 @@ namespace PetRenamer.PetNicknames.Chat;
 
 internal class ChatHandler : IDisposable
 {
-    DalamudServices DalamudServices { get; init; }
-    IPetServices PetServices { get; init; }
-    IPettableUserList PettableUserList { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPetServices PetServices;
+    readonly IPettableUserList PettableUserList;
+    readonly IEmoteHook EmoteHook;
 
-    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList)
+    public ChatHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList, in IEmoteHook emoteHook)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
+        EmoteHook = emoteHook;
 
         _Register();
     }
 
     void _Register()
     {
-        Register(new PetGlamourChat(DalamudServices, PetServices, PettableUserList));
-        Register(new EmoteChatElement(DalamudServices, PetServices, PettableUserList));
-        Register(new BattleChatElement(PetServices, PettableUserList));
+        Register(new PetGlamourChat(in DalamudServices, in PetServices, in PettableUserList));
+        Register(new EmoteChatElement(in DalamudServices, in PetServices, in PettableUserList, in EmoteHook));
+        Register(new BattleChatElement(in PetServices, in PettableUserList));
     }
 
     readonly List<IChatElement> _chatElements = new List<IChatElement>(); 

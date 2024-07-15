@@ -10,10 +10,10 @@ namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal unsafe class BattleChatElement : RestrictedChatElement
 {
-    IPettableUserList UserList { get; init; }
-    IPetServices PetServices { get; init; }
+    readonly IPettableUserList UserList;
+    readonly IPetServices PetServices;
 
-    public BattleChatElement(IPetServices petServices, IPettableUserList userList)
+    public BattleChatElement(in IPetServices petServices, in IPettableUserList userList)
     {
         UserList = userList;
         PetServices = petServices;

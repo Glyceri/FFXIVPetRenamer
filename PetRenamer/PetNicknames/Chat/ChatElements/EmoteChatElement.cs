@@ -8,27 +8,30 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal unsafe class EmoteChatElement : IChatElement
 {
-    DalamudServices DalamudServices { get; init; }
-    IPettableUserList UserList { get; init; }
-    IPetServices PetServices { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPettableUserList UserList;
+    readonly IPetServices PetServices;
+    readonly IEmoteHook EmoteHook;
 
-    public EmoteChatElement(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) 
+    public EmoteChatElement(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IEmoteHook emoteHook) 
     {
         DalamudServices = dalamudServices;
         UserList = userList;
         PetServices = petServices;
+        EmoteHook = emoteHook;
     }
 
     public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (type != XivChatType.StandardEmote) return;
 
-        BattleChara* bChara = CharacterManager.Instance()->LookupBattleCharaByName(sender.ToString(), true);
+        BattleChara* bChara = EmoteHook.LastEmoteUser;
         if (bChara == null) return;
 
         nint value = nint.Zero;

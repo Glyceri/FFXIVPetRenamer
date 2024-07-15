@@ -78,11 +78,11 @@ internal class PetGlamourChat : RestrictedChatElement
 
     int nextRow = 0;
 
-    DalamudServices DalamudServices { get; init; }
-    IPettableUserList UserList { get; init; }
-    IPetServices PetServices { get; init; }
+    readonly DalamudServices DalamudServices;
+    readonly IPettableUserList UserList;
+    readonly IPetServices PetServices;
 
-    public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
+    public PetGlamourChat(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList)
     {
         DalamudServices = dalamudServices;
         UserList = userList;

@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Interface;
+using ImGuiNET;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -14,10 +15,13 @@ internal class UserListNode : Node
     readonly ProfilePictureNode IconNode;
     readonly QuickClearButton ClearButtonNode;
     readonly QuickSquareButton EyeButtonNode;
+    readonly QuickSquareButton IPCIndicatorNode;
 
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode IDNode;
     readonly RenameTitleNode NicknameNode;
+
+    readonly Node HolderNode;
 
     readonly DalamudServices DalamudServices;
 
@@ -64,7 +68,7 @@ internal class UserListNode : Node
                     Margin = new EdgeSize(10, 0, 0, 15),
                 }
             },
-            new Node()
+            HolderNode = new Node()
             {
                 Style = new Style()
                 {
@@ -75,7 +79,11 @@ internal class UserListNode : Node
                 },
                 ChildNodes = [
                     ClearButtonNode = new QuickClearButton(),
-                    EyeButtonNode = new QuickSquareButton()
+                    EyeButtonNode = new QuickSquareButton(),
+                    IPCIndicatorNode = new QuickSquareButton()
+                    {
+                        NodeValue = FontAwesomeIcon.Exclamation.ToIconString(),
+                    }
                 ]
             }
         ];
@@ -89,6 +97,23 @@ internal class UserListNode : Node
             ClearButtonNode.Locked = true;
             ClearButtonNode.Tooltip = "You cannot clear when online";
         }
+
+        if (!entry.IsIPC && !entry.IsLegacy)
+        {
+            HolderNode.RemoveChild(IPCIndicatorNode);
+        }
+
+        if (entry.IsIPC)
+        {
+            IPCIndicatorNode.Tooltip = "This users is temporarily added via an external plugin and will not be saved.";
+        }
+
+        if (entry.IsLegacy)
+        {
+            IPCIndicatorNode.Tooltip = "This users is from your old savefile. Meet them in game so it will update.";
+        }
+
+        IPCIndicatorNode.TagsList.Add("fakeDisabled");
 
         ClearButtonNode.OnClick += () => DalamudServices.Framework.Run(() => ActiveEntry.Clear());
         EyeButtonNode.OnClick += () => DalamudServices.Framework.Run(() => OnView?.Invoke(ActiveEntry));
