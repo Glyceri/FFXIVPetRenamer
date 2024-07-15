@@ -171,6 +171,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetActiveDatabase([], []);
         IsIPC = false;
         IsActive = false;
+        IsLegacy = false;
 
         MarkCleared();
         MarkDirty();

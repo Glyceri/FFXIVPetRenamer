@@ -133,7 +133,8 @@ internal class WindowHandler : IWindowHandler
     bool IsDirty()
     {
         bool hasDirty = false;
-        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
+        IPettableDatabaseEntry[] entries = [.. Database.DatabaseEntries, .. LegacyDatabase.DatabaseEntries];
+        foreach (IPettableDatabaseEntry entry in entries)
         {
             if (!entry.IsDirtyForUI) continue;
             hasDirty = true;

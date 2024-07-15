@@ -30,7 +30,6 @@ internal unsafe class EmoteChatElement : IChatElement
     public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (type != XivChatType.StandardEmote) return;
-
         BattleChara* bChara = EmoteHook.LastEmoteUser;
         if (bChara == null) return;
 

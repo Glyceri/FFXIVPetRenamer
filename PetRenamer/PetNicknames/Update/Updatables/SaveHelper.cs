@@ -11,6 +11,7 @@ internal class SaveHelper : IUpdatable
 {
     readonly DalamudServices DalamudServices;
     readonly IPettableDatabase Database;
+    readonly IPettableDatabase LegacyDatabase;
     readonly Configuration Configuration;
     readonly IPettableUserList UserList;
     readonly IIpcProvider IpcProvider;
@@ -19,11 +20,12 @@ internal class SaveHelper : IUpdatable
 
     IPettableUser? lastLocalUser;
 
-    public SaveHelper(in DalamudServices dalamudServices, in Configuration configuration, in IPettableDatabase database, in IPettableUserList userList, in IIpcProvider ipcProvider)
+    public SaveHelper(in DalamudServices dalamudServices, in Configuration configuration, in IPettableDatabase database, in IPettableDatabase legacyDatabase, in IPettableUserList userList, in IIpcProvider ipcProvider)
     {
         DalamudServices = dalamudServices;
         Configuration = configuration;
         Database = database;
+        LegacyDatabase = legacyDatabase;
         UserList = userList;
         IpcProvider = ipcProvider;
     }
