@@ -130,13 +130,13 @@ internal partial class PetListWindow : PetWindow
             UserListButton.SetText("Pet List");
         }
 
-        IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
+        IPettableDatabaseEntry[] entries = [..Database.DatabaseEntries, ..LegacyDatabase.DatabaseEntries];
         int length = entries.Length;
 
         Looper(length, (index) =>
         {
             IPettableDatabaseEntry entry = entries[index];
-            if (!entry.IsActive) return false;
+            if (!entry.IsActive && !entry.IsLegacy) return false;
 
             bool isLocal = HandleIfLocalEntry(entry);
 
@@ -177,13 +177,16 @@ internal partial class PetListWindow : PetWindow
             validNames.Add(cusomName);
         }
 
-        if (PetWindowMode.BattlePet == CurrentMode)
+        if (isLocalEntry)
         {
-            List<IPetSheetData> data =  PetServices.PetSheets.GetMissingPets(validIDS);
-            foreach(IPetSheetData p in data)
+            if (PetWindowMode.BattlePet == CurrentMode)
             {
-                validIDS.Add(p.Model);
-                validNames.Add("");
+                List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIDS);
+                foreach (IPetSheetData p in data)
+                {
+                    validIDS.Add(p.Model);
+                    validNames.Add("");
+                }
             }
         }
 

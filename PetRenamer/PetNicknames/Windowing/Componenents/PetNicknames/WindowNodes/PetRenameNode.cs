@@ -30,8 +30,6 @@ internal class PetRenameNode : Node
 
     readonly Node HolderNode;
 
-    Node? activeHoverNode;
-
     public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services)
     {
         DalamudServices = services;
@@ -96,31 +94,18 @@ internal class PetRenameNode : Node
                     ChildNodes =
                     [
                         CircleImageNode = new TechnoCircleImageNode(in services)
-                        {
+                        { 
+                            Opacity = 0.3f,
+                            RoationSpeed = 12,
                             Style = new Style()
                             {
                                 Anchor = Anchor.MiddleCenter,
-                                Size = new Size(130, 130)
+                                Size = new Size(130, 130),
                             }
                         }
                     ]
                 },
             ];
-
-
-        SpeciesNode.Hovered += () => activeHoverNode = SpeciesNode;
-        RaceNode.Hovered += () => activeHoverNode = RaceNode;
-        BehaviourNode.Hovered += () => activeHoverNode = BehaviourNode;
-        NicknameNode.Hovered += () => activeHoverNode = NicknameNode;
-        IconNode.OnMouseEnter += _ => activeHoverNode = IconNode;
-        IDNode.Hovered += () => activeHoverNode = IDNode;
-
-        SpeciesNode.HoveredExit += () => activeHoverNode = null;
-        RaceNode.HoveredExit += () => activeHoverNode = null;
-        BehaviourNode.HoveredExit += () => activeHoverNode = null;
-        NicknameNode.HoveredExit += () => activeHoverNode = null;
-        IconNode.OnMouseLeave += _ => activeHoverNode = null;
-        IDNode.HoveredExit += () => activeHoverNode = null;
 
         NicknameNode.OnSave += (value) => DalamudServices.Framework.Run(() => OnSave?.Invoke(value));
     }
@@ -141,17 +126,6 @@ internal class PetRenameNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        if (activeHoverNode != null)
-        {
-            CircleImageNode.Opacity = 0.8f;
-            CircleImageNode.RoationSpeed = 70;
-        }
-        else
-        {
-            CircleImageNode.Opacity = 0.3f;
-            CircleImageNode.RoationSpeed = 12;
-        }
-
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;
 

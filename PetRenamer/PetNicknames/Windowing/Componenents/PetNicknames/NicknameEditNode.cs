@@ -114,10 +114,12 @@ internal class NicknameEditNode : RenameTitleNode
             
             ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft - new Vector2(0, Node.ScaleFactor * 3));
             ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
+            ImGui.PushStyleColor(ImGuiCol.FrameBg, new Color("Window.Background").ToUInt());
             if (ImGui.InputText($"##RenameField_{ActivePet?.Model}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
             {
                 EditClicked();
             }
+            ImGui.PopStyleColor();
         }
     }
 }

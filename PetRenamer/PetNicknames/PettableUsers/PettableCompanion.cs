@@ -18,7 +18,8 @@ internal unsafe class PettableCompanion : IPettableCompanion
     public string Name { get; init; } = "";
     public ushort Index { get; init; }
     public string? CustomName { get; private set; }
-    public bool Dirty { get; private set; } = true;
+    bool _dirty = true;
+    public bool Dirty { get => _dirty || Entry.IsDirtyForUI; }
     public IPetSheetData? PetData { get; private set; }
     public byte PetType { get; private set; }
     public ulong Lifetime { get; private set; }
@@ -49,7 +50,7 @@ internal unsafe class PettableCompanion : IPettableCompanion
         Lifetime++;
         Touched = true; 
         Companion = (Companion*)pointer;
-        Dirty = false;
+        _dirty = false;
     }
 
     public bool Compare(ref Character character)

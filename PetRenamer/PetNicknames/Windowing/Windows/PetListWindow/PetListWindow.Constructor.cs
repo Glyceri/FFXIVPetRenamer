@@ -40,7 +40,7 @@ internal partial class PetListWindow
 
     public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "Pet List")
     {
-        IsOpen = false;
+        IsOpen = true;
 
         UserList = userList;
         Database = database;

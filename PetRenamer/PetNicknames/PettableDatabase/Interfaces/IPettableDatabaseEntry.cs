@@ -14,6 +14,7 @@ internal interface IPettableDatabaseEntry
 
     bool IsActive { get; }
     bool IsIPC { get; }
+    bool IsLegacy { get; }
 
     ImmutableArray<int> SoftSkeletons { get; }
 

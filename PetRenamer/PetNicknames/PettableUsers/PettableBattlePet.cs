@@ -17,7 +17,8 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
     public ushort Index { get; init; }
     public string Name { get; init; } = "";
     public string? CustomName { get; private set; }
-    public bool Dirty { get; private set; } = true;
+    bool _dirty = true;
+    public bool Dirty { get => _dirty || Entry.IsDirtyForUI;  }
     public IPetSheetData? PetData { get; private set; }
     public uint OldObjectID { get; init; }
     public byte PetType { get; init; }
@@ -47,7 +48,7 @@ internal unsafe class PettableBattlePet : IPettableBattlePet
         Lifetime++;
         Touched = true;
         BattlePet = (BattleChara*)pointer;
-        Dirty = false;
+        _dirty = false;
     }
 
     public bool Compare(ref Character character)

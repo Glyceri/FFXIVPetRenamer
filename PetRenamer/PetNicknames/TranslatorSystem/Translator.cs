@@ -9,12 +9,12 @@ internal static class Translator
 {
     static DalamudServices DalamudServices = null!;
 
-    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.English;
+    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.Default;
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
         { "...", "..." },
-        { "ContextMenu.Rename", "Rename" },
+        { "ContextMenu.Rename", "Give Nickname" },
         { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Race", "Race" },
         { "PetRenameNode.Behaviour", "Behaviour" },
@@ -28,12 +28,13 @@ internal static class Translator
         { "PetListWindow.ListHeaderPersonalBattlePet", "Your Battle Pets" },
         { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
         { "PetListWindow.ListHeaderOtherBattlePet", "{0}'s Battle Pets" },
+        { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." }
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
         { "...", "..." },
-        { "ContextMenu.Rename", "Umbenennen" },
+        { "ContextMenu.Rename", "Spitznamen vergeben" },
         { "PetRenameNode.Species", "Begleiter" },
         { "PetRenameNode.Race", "Rasse" },
         { "PetRenameNode.Behaviour", "Verhalten" },
@@ -47,6 +48,7 @@ internal static class Translator
         { "PetListWindow.ListHeaderPersonalBattlePet", "Ihre Kampftiere" },
         { "PetListWindow.ListHeaderOtherMinion", "Begleiter von {0}" },
         { "PetListWindow.ListHeaderOtherBattlePet", "Kampftiere von {0}" },
+        { "PVPWarning", "„Pet Nicknames“ ist in PVP-Zonen mit Ausnahme des Wolfshöhlen-Pier deaktiviert." }
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()

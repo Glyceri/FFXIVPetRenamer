@@ -145,7 +145,6 @@ internal partial class PetRenameWindow : PetWindow
 
     void OnSave(string? newName)
     {
-        PetServices.PetLog.Log(activeSkeleton + " : " + newName ?? "");
         ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
     }
 }

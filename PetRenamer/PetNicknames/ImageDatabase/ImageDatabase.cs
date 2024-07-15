@@ -7,6 +7,8 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using PetUser = (string, ushort);
 
 namespace PetRenamer.PetNicknames.ImageDatabase;
 
@@ -14,7 +16,7 @@ internal class ImageDatabase : IImageDatabase
 {
     public bool IsDirty { get; private set; }
 
-    readonly Dictionary<ulong, IDalamudTextureWrap?> _imageDatabase = new Dictionary<ulong, IDalamudTextureWrap?>();
+    readonly Dictionary<PetUser, IGlyceriTextureWrap?> _imageDatabase = new Dictionary<PetUser, IGlyceriTextureWrap?>();
 
     readonly DalamudServices DalamudServices;
     readonly IPetServices PetServices;
@@ -37,19 +39,21 @@ internal class ImageDatabase : IImageDatabase
 
         lock (_imageDatabase)
         {
-            if (!databaseEntry.IsActive) return SearchTexture;
+            PetUser petUser = (databaseEntry.Name, databaseEntry.Homeworld);
 
-            ulong contentID = databaseEntry.ContentID;
-
-            if (_imageDatabase.TryGetValue(contentID, out IDalamudTextureWrap? textureWrap))
+            if (_imageDatabase.TryGetValue(petUser, out IGlyceriTextureWrap? textureWrap))
             {
-                if (textureWrap == null) return SearchTexture;
-                return textureWrap;
+                if (textureWrap != null)
+                {
+                    textureWrap.Refresh();
+                    return textureWrap.TextureWrap;
+                }
+                return SearchTexture;
             }
 
-            // CHECK HERE IF THE USER WANTS TO AUTOMATICALLY DOWNLOAD PICTURES
+            //TODO: CHECK HERE IF THE USER WANTS TO AUTOMATICALLY DOWNLOAD PICTURES
 
-            _imageDatabase.Add(contentID, null);
+            _imageDatabase.Add(petUser, null);
             ImageDownloader.DownloadImage(databaseEntry, OnSuccess, (e) => PetServices.PetLog.LogException(e));
 
             return SearchTexture;
@@ -60,11 +64,13 @@ internal class ImageDatabase : IImageDatabase
     {
         lock (_imageDatabase)
         {
-            if(_imageDatabase.TryGetValue(entry.ContentID, out IDalamudTextureWrap? textureWrap))
+            PetUser petUser = (entry.Name, entry.Homeworld);
+
+            if (_imageDatabase.TryGetValue(petUser, out IGlyceriTextureWrap? textureWrap))
             {
                 if (textureWrap == null) return;
                 textureWrap.Dispose();
-                _imageDatabase.Remove(entry.ContentID);
+                _imageDatabase.Remove(petUser);
             }
             else
             {
@@ -74,14 +80,15 @@ internal class ImageDatabase : IImageDatabase
         ImageDownloader.RedownloadImage(entry, (entry,  wrap) => { OnSuccess(entry, wrap); callback?.Invoke(true); }, (e) => { callback?.Invoke(true); PetServices.PetLog.LogException(e); });
     }
 
-    public void OnSuccess(IPettableDatabaseEntry entry, IDalamudTextureWrap textureWrap)
+    public void OnSuccess(IPettableDatabaseEntry entry, IGlyceriTextureWrap textureWrap)
     {
         lock (_imageDatabase)
         {
-            foreach (ulong keyEntry in _imageDatabase.Keys)
+            foreach (PetUser keyEntry in _imageDatabase.Keys)
             {
-                if (keyEntry != entry.ContentID) continue;
-                IDalamudTextureWrap? tWrap = _imageDatabase[keyEntry];
+                if (keyEntry.Item2 != entry.Homeworld) continue;
+                if (keyEntry.Item1 != entry.Name) continue;
+                IGlyceriTextureWrap? tWrap = _imageDatabase[keyEntry];
                 if (tWrap != null) tWrap?.Dispose();
                 _imageDatabase[keyEntry] = textureWrap;
                 break;
@@ -93,17 +100,37 @@ internal class ImageDatabase : IImageDatabase
     {
         SearchTexture?.Dispose();
         ImageDownloader?.Dispose();
-        foreach (ulong keyEntry in _imageDatabase.Keys)
+        foreach (IGlyceriTextureWrap? tWrap in _imageDatabase.Values)
         {
-            IDalamudTextureWrap? tWrap = _imageDatabase[keyEntry];
-            if (tWrap == null) continue;
-            tWrap?.Dispose();   
+            tWrap?.Dispose();
         }
+        _imageDatabase.Clear();
     }
 
     public bool IsBeingDownloaded(IPettableDatabaseEntry? databaseEntry)
     {
         if (databaseEntry == null) return true;
         return ImageDownloader.IsBeingDownloaded(databaseEntry);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public void Update()
+    {
+        List<PetUser> oldUsers = new List<PetUser>();
+        foreach (KeyValuePair<PetUser, IGlyceriTextureWrap?> keyValuePair in _imageDatabase)
+        {
+            IGlyceriTextureWrap? tWrap = keyValuePair.Value;
+            if (tWrap == null) continue;
+
+            tWrap.Update();
+            if (!tWrap.IsOld) continue;
+            tWrap?.Dispose();
+            oldUsers.Add(keyValuePair.Key);
+        }
+
+        foreach(PetUser user in oldUsers)
+        {
+            _imageDatabase.Remove(user);
+        }
     }
 }

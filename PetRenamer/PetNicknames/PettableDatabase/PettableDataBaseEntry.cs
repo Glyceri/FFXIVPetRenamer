@@ -35,10 +35,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public bool IsCleared { get; private set; } = false;
 
     public bool IsIPC { get; private set; } = false;
+    public bool IsLegacy { get; private set; } = false;
 
     readonly IPetServices PetServices;
 
-    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active)
+    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices = petServices;
         SetName(name);
@@ -48,6 +49,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         ContentID = contentID;
         IsActive = active;
         IsIPC = !IsActive;
+        IsLegacy = isLegacy;
     }
 
     public void UpdateEntry(IPettableUser pettableUser)

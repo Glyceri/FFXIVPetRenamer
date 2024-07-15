@@ -230,7 +230,8 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         for (int i = 0; i < _queueElements.Count; i++)
         {
             LodestoneQueueElement element = _queueElements[i];
-            if (element.Entry.ContentID != entry.ContentID) continue;
+            if (element.Entry.Homeworld != entry.Homeworld) continue;
+            if (element.Entry.Name != entry.Name) continue;
 
             return true;
         }

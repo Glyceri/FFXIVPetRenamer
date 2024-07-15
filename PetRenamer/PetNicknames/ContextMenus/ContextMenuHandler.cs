@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ internal class ContextMenuHandler : IDisposable
     {
         args.AddMenuItem(new MenuItem()
         {
-            Name = "Rename",
+            Name = Translator.GetLine("ContextMenu.Rename"),
             Prefix = SeIconChar.BoxedLetterP,
             PrefixColor = 0,
             OnClicked = callback
