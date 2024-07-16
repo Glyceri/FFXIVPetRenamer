@@ -38,8 +38,8 @@ internal class IpcProvider : IIpcProvider
     readonly ICallGateProvider<string> GetPlayerData;
 
     // Actions
-    readonly ICallGateProvider<IPlayerCharacter, string, object> SetPlayerData;
-    readonly ICallGateProvider<IPlayerCharacter, object> ClearPlayerIPCData;
+    readonly ICallGateProvider<ulong, string, object> SetPlayerData;
+    readonly ICallGateProvider<ulong, object> ClearPlayerIPCData;
 
     // Data Sharing
     readonly Dictionary<uint, string> PetNicknameDict = new Dictionary<uint, string>();
@@ -75,12 +75,12 @@ internal class IpcProvider : IIpcProvider
      *          (This is not an expensive function, but please use it sparingly.)
      *          
      * Actions:
-     *      - SetPlayerData <IPlayerCharacter, string>:
-     *          If you have an IPlayerCharacter object and their respective data in the form of a string. Calling this action will overwrite their data with the new data.
+     *      - SetPlayerData <ulong, string>:
+     *          If you have a ContentID and their respective data in the form of a string. Calling this action will overwrite their data with the new data.
      *          (You can never set the data of the current active local player.)
      *          
-     *      - ClearPlayerIPCData <IPlayerCharacter>:
-     *          Call this action to clear the IPC data of the given IPlayerCharacter.
+     *      - ClearPlayerIPCData <ulong>:
+     *          Call this action to clear the IPC data of the given ContentID.
      *          
      * ----------------------END READ ME -----------------------
      */
@@ -103,8 +103,8 @@ internal class IpcProvider : IIpcProvider
         GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, string, object>       ($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<IPlayerCharacter, object>               ($"{ApiNamespace}ClearPlayerData");
+        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<ulong, string, object>                  ($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ulong, object>                          ($"{ApiNamespace}ClearPlayerData");
 
         // Data sharing
         PetNicknameDict         = petNicknamesPlugin.GetOrCreateData($"{ApiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
@@ -135,19 +135,16 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Actions
-    public void SetPlayerDataDetour(IPlayerCharacter character, string data)
+    public void SetPlayerDataDetour(ulong contentID, string data)
     {
-            PetServices.PetLog.Log("SET ALL DATA!" + data);
             IDataParseResult result = DataReader.ParseData(data);
-            DataReader.ApplyParseData(character, result, true);
+            DataReader.ApplyParseData(contentID, result, true);
     }
 
-    public unsafe void ClearIPCDataDetour(IPlayerCharacter character)
+    public unsafe void ClearIPCDataDetour(ulong contentID)
     {
-        PetServices.PetLog.Log("Clear!");
-        BattleChara* battleChara = (BattleChara*)character.Address;
-        if (battleChara == null) return;
-        DataReader.ApplyParseData(character, new ClearParseResult(battleChara->ContentId), true);
+        if (contentID == 0) return;
+        DataReader.ApplyParseData(contentID, new ClearParseResult(contentID), true);
     }
 
     // Functions

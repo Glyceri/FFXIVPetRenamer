@@ -36,17 +36,11 @@ internal class DataParser : IDataParser
         LegacyDatabase = legacyDatabase;
     }
 
-    public unsafe void ApplyParseData(IPlayerCharacter player, IDataParseResult result, bool isFromIPC)
+    public unsafe void ApplyParseData(ulong contentID, IDataParseResult result, bool isFromIPC)
     {
         ulong activeContentID = UserList.LocalPlayer?.ContentID ?? 0;
 
-        BattleChara* battleChara = (BattleChara*)player.Address;
-        if (battleChara == null)
-        {
-            return;
-        }
-
-        if (battleChara->ContentId == activeContentID && isFromIPC)
+        if (contentID == activeContentID && isFromIPC)
         {
             return;
         }
