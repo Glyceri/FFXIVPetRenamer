@@ -57,7 +57,6 @@ internal class LegacyNamingVer6 : ILegacyStepperElement
             configuration.serializableUsersV3 = newSerializableUsers.ToArray();
 
             configuration.Version = 7;
-            configuration.Save();
         }
     }
 }

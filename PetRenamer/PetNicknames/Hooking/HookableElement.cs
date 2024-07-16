@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Hooking.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -7,19 +8,41 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal abstract class HookableElement : IHookableElement
 {
-    public DalamudServices DalamudServices { get; private set; }
-    public IPettableUserList UserList { get; private set; }
-    public IPetServices PetServices { get; private set; }
+    public readonly DalamudServices DalamudServices;
+    public readonly IPettableUserList UserList;
+    public readonly IPetServices PetServices;
+    public readonly IPettableDirtyListener DirtyListener;
 
-
-    public HookableElement(DalamudServices services, IPettableUserList userList, IPetServices petServices)
+    public HookableElement(in DalamudServices services, in IPettableUserList userList, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = services;
         UserList = userList;
         PetServices = petServices;
+        DirtyListener = dirtyListener;
+
+        DirtyListener.RegisterOnDirtyDatabase(OnPettableDatabaseChange);
+        DirtyListener.RegisterOnClearEntry(OnPettableEntryClear);
+        DirtyListener.RegisterOnDirtyEntry(OnPettableEntryChange);
+        DirtyListener.RegisterOnDirtyName(OnNameDatabaseChange);
+
         DalamudServices.Hooking.InitializeFromAttributes(this);
     }
 
     public abstract void Init();
-    public abstract void Dispose();
+    protected abstract void OnDispose();
+
+    protected virtual void OnNameDatabaseChange(INamesDatabase nameDatabase) { }
+    protected virtual void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) { }
+    protected virtual void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) { }
+    protected virtual void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) { }
+
+    public void Dispose()
+    {
+        DirtyListener.UnregisterOnDirtyDatabase(OnPettableDatabaseChange);
+        DirtyListener.UnregisterOnClearEntry(OnPettableEntryClear);
+        DirtyListener.UnregisterOnDirtyEntry(OnPettableEntryChange);
+        DirtyListener.UnregisterOnDirtyName(OnNameDatabaseChange);
+
+        OnDispose();
+    }
 }

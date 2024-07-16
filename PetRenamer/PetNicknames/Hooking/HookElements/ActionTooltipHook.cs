@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.Gui;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -17,7 +18,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     public uint LastActionID { get; private set; } = 0;
 
-    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, petServices, userList)
+    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
     {
         tooltipHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, true);
         tooltipHook.Register(3);
@@ -49,9 +50,8 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
         actionTooltipHook.SetPetSheetData(petData);
     }
 
-    public override void OnDispose()
+    protected override void OnQuickDispose()
     {
         DalamudServices.GameGui.HoveredActionChanged -= OnHoveredActionChanged;
     }
-
 }

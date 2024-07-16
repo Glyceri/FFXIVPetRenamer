@@ -6,12 +6,13 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class ActionMenuHook : HookableElement
 {
-    public ActionMenuHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, userList, petServices) { }
+    public ActionMenuHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
     {
@@ -195,7 +196,7 @@ internal unsafe class ActionMenuHook : HookableElement
         PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet);
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate2);

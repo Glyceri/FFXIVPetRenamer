@@ -10,14 +10,15 @@ internal class PettableNameDatabase : INamesDatabase
 {
     public int[] IDs { get; private set; } = new int[0];
     public string[] Names { get; private set; } = new string[0];
-    public bool IsDirty { get; private set; } = false;
-    public bool IsDirtyForUI { get; private set; } = false;
     public int Length { get => IDs.Length; }
 
-    public PettableNameDatabase(int[] ids, string[] names)
+    IPettableDirtyCaller? DirtyCaller = null;
+
+    public PettableNameDatabase(int[] ids, string[] names, in IPettableDirtyCaller dirtyCaller)
     {
         Names = names;
         IDs = ids;
+        DirtyCaller = dirtyCaller;
     }
 
     public string? GetName(int ID)
@@ -25,8 +26,10 @@ internal class PettableNameDatabase : INamesDatabase
         for (int i = 0; i < Length; i++)
         {
             if (IDs[i] != ID) continue;
+
             string customName = Names[i];
             if (customName == string.Empty) return null;
+
             return customName;
         }
         return null;
@@ -35,23 +38,36 @@ internal class PettableNameDatabase : INamesDatabase
     public void SetName(int ID, string? name)
     {
         if (ID == -1) return;
+
         string? validName = MakeNameValid(name);
-        SetDirty();
         int index = IndexOf(ID);
+
         if (index != -1)
         {
-            if (validName != null) Names[index] = validName;
-            else RemoveAtIndex(index);
-            return;
+            if (validName != null)
+            {
+                Names[index] = validName;
+            }
+            else
+            {
+                RemoveAtIndex(index);
+            }
         }
-        else if(validName != null) Add(ID, validName);
+        else if (validName != null)
+        {
+            Add(ID, validName);
+        }
+
+        SetDirty();
     }
 
     int IndexOf(int ID)
     {
         for (int i = 0; i < Length; i++)
         {
-            if (IDs[i] == ID) return i;
+            if (IDs[i] != ID) continue;
+            
+            return i;
         }
         return -1;
     }
@@ -76,12 +92,9 @@ internal class PettableNameDatabase : INamesDatabase
         Names = newNames.ToArray();
     }
 
-    public void MarkDirtyAsNoticed() => IsDirty = false;
-    public void MarkDirtyUIAsNotified() => IsDirtyForUI = false;
-
     public SerializableNameData SerializeData() => new SerializableNameData(this);
 
-    public void Update(int[] ids, string[] names)
+    public void Update(int[] ids, string[] names, IPettableDirtyCaller dirtyCaller)
     {
         if (ids.Length != names.Length)
         {
@@ -99,8 +112,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     void SetDirty()
     {
-        IsDirty = true;
-        IsDirtyForUI = true;
+        DirtyCaller?.DirtyName(this);
     }
 
     string? MakeNameValid(string? name)

@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -17,7 +18,7 @@ internal unsafe class FlyTextHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 
-    public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, userList, petServices) { }
+    public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
     {
@@ -43,7 +44,7 @@ internal unsafe class FlyTextHook : HookableElement
         UserList.GetUser(castDealer)?.OnLastCastChanged((uint)castID);
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         DalamudServices.FlyTextGui.FlyTextCreated -= OnFlyTextCreated;
         addToScreenLogWithLogMessageId?.Dispose();

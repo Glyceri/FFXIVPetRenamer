@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -8,7 +9,7 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class HousekeepingHook : HookableElement, IHousekeepingHook
 {
-    public HousekeepingHook(DalamudServices services, IPettableUserList userList, IPetServices petServices) : base(services, userList, petServices)
+    public HousekeepingHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
     }
 
@@ -22,7 +23,7 @@ internal class HousekeepingHook : HookableElement, IHousekeepingHook
         DalamudServices.ChatGui.PrintError(Translator.GetLine("PVPWarning"));
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         DalamudServices.ClientState.EnterPvP -= OnPVPEnter;
     }

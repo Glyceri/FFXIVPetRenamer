@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -38,7 +39,7 @@ internal unsafe class MapHook : HookableElement
 
     readonly IMapTooltipHook TooltipHook;
 
-    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook) : base(services, userList, petServices) 
+    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) 
     { 
         TooltipHook = tooltipHook;
     }
@@ -210,7 +211,7 @@ internal unsafe class MapHook : HookableElement
         TooltipHook.OverridePet(pettablePet);
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         naviTooltip?.Dispose();
         mapTooltipHook?.Dispose();

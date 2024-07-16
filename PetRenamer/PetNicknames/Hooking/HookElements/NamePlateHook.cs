@@ -4,9 +4,11 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -21,7 +23,7 @@ internal unsafe class NamePlateHook : HookableElement
     [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 4C 89 44 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 74 24 ??", DetourName = nameof(UpdateNameplateNpcDetour))]
     readonly Hook<UpdateNameplateNpcDelegate>? nameplateHookMinion = null;
 
-    public NamePlateHook(DalamudServices services, IPetServices petServices, IPettableUserList pettableUserList) : base(services, pettableUserList, petServices) { }
+    public NamePlateHook(DalamudServices services, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener) : base(services, pettableUserList, petServices, dirtyListener) { }
 
     public override void Init()
     {
@@ -29,7 +31,7 @@ internal unsafe class NamePlateHook : HookableElement
         nameplateHookMinion?.Enable();
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         nameplateHook?.Dispose();
         nameplateHookMinion?.Dispose();
@@ -57,6 +59,6 @@ internal unsafe class NamePlateHook : HookableElement
         if (pPet == null) return;
         string? customPetName = pPet.CustomName;
         if (customPetName != null) namePlateInfo->Name.SetString(customPetName);
-        namePlateInfo->IsDirty = pPet.Dirty;
+        // TODO: mark dirty on name change...
     }
 }

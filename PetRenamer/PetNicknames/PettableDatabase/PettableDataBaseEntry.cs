@@ -5,7 +5,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -25,23 +24,21 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public ImmutableArray<int> SoftSkeletons { get; private set; } = new ImmutableArray<int>();
 
-    public INamesDatabase ActiveDatabase { get; } = new PettableNameDatabase([], []);
+    public INamesDatabase ActiveDatabase { get; }
     public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
-
-    bool _IsDirtyForUI;
-    bool _IsDirty;
-    public bool IsDirty { get => _IsDirty || ActiveDatabase.IsDirty;  }
-    public bool IsDirtyForUI { get => _IsDirtyForUI || ActiveDatabase.IsDirtyForUI; }
-    public bool IsCleared { get; private set; } = false;
 
     public bool IsIPC { get; private set; } = false;
     public bool IsLegacy { get; private set; } = false;
 
     readonly IPetServices PetServices;
+    readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(in IPetServices petServices, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices = petServices;
+        DirtyCaller = dirtyCaller;
+        ActiveDatabase =  new PettableNameDatabase([], [], DirtyCaller);
+
         SetName(name);
         SetActiveDatabase(ids, names);
         SetSoftSkeletons(softSkeletons);
@@ -88,7 +85,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     void SetActiveDatabase(int[] ids, string[] names)
     {
-        ActiveDatabase.Update(ids, names);
+        ActiveDatabase.Update(ids, names, DirtyCaller);
     }
 
     void SetSoftSkeletons(int[] softSkeletons)
@@ -105,23 +102,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
     public void SetName(int skeletonID, string? name) => ActiveDatabase.SetName(skeletonID, name);
-
-    public void NotifySeenDirty()
-    {
-        _IsDirty = false;
-        ActiveDatabase.MarkDirtyAsNoticed();
-    }
-
-    public void MarkDirtyUIAsNotified()
-    {
-        _IsDirtyForUI = false;
-        ActiveDatabase.MarkDirtyUIAsNotified();
-    }
-
-    public void NotifySeenCleared()
-    {
-        IsCleared = false;
-    }
 
     public int? GetSoftSkeleton(int softIndex)
     {
@@ -179,12 +159,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     void MarkCleared()
     {
-        IsCleared = true;
+        DirtyCaller.ClearEntry(this);
     }
 
     void MarkDirty()
     {
-        _IsDirty = true;
-        _IsDirtyForUI = true;
+        DirtyCaller.DirtyEntry(this);
     }
 }

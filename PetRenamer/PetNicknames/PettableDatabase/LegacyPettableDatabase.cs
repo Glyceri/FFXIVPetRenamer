@@ -11,7 +11,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 {
-    public LegacyPettableDatabase(in IPetServices PetServices) : base(in PetServices)
+    public LegacyPettableDatabase(in IPetServices PetServices, in IPettableDirtyCaller DirtyCaller) : base(in PetServices, in DirtyCaller, null)
     {
         SerializableUserV3[]? serializableUsers = PetServices.Configuration.serializableUsersV3;
         _entries.Clear();
@@ -20,7 +20,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
             _entries.Add(newEntry);
         }
     }
@@ -41,8 +41,9 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
         {
             IPettableDatabaseEntry entry = entries[i];
             INamesDatabase nameDatabase = entry.ActiveDatabase;
-            int[] tempSoftSkeletonArray = entry.SoftSkeletons.ToArray();
+            if (nameDatabase.Length == 0) continue;
 
+            int[] tempSoftSkeletonArray = entry.SoftSkeletons.ToArray();
             users.Add(new SerializableUserV3(nameDatabase.IDs, nameDatabase.Names, entry.Name, entry.Homeworld, tempSoftSkeletonArray, tempSoftSkeletonArray));
         }
         return users.ToArray();

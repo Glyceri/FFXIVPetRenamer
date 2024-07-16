@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -13,42 +14,40 @@ internal class HookHandler : IDisposable
     readonly DalamudServices DalamudServices;
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
+    readonly IPettableDirtyListener DirtyListener;
 
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IHousekeepingHook HousekeepingHook { get; private set; } = null!;
-    public IEmoteHook EmoteHook { get; private set; } = null!;
 
-    public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList)
+    public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
+        DirtyListener = dirtyListener;
 
         _Register();
     }
 
     void _Register()
     {
-        Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList));
+        Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
 
-        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList);
+        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
         Register(ActionTooltipHook);
 
-        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList);
+        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
         Register(MapTooltipHook);
 
-        HousekeepingHook = new HousekeepingHook(DalamudServices, PettableUserList, PetServices);
+        HousekeepingHook = new HousekeepingHook(DalamudServices, PettableUserList, PetServices, DirtyListener);
         Register(HousekeepingHook);
 
-        EmoteHook = new EmoteHook(DalamudServices, PettableUserList, PetServices);
-        Register(EmoteHook);
-
-        Register(new MapHook(DalamudServices, PetServices, PettableUserList, MapTooltipHook));
-        Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList));
-        Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList));
-        Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList));
-        Register(new PartyHook(DalamudServices, PetServices, PettableUserList));
+        Register(new MapHook(DalamudServices, PetServices, PettableUserList, MapTooltipHook, DirtyListener));
+        Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
     }
 
     readonly List<IHookableElement> hookableElements = new List<IHookableElement>();

@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using System;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -16,9 +17,9 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
 
     IPettablePet? currentPet = null;
 
-    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
+    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
-        base.Setup(services, userList, petServices, AddonName, textPos, allowedCallback, isSoft);
+        base.Setup(services, userList, petServices, dirtyListener, AddonName, textPos, allowedCallback, isSoft);
         services.AddonLifecycle.UnregisterListener(AddonEvent.PostRequestedUpdate, HandleUpdate);
         services.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, AddonName, HandleUpdate);
     }

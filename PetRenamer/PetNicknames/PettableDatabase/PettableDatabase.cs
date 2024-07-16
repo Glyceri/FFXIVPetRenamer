@@ -12,14 +12,20 @@ internal class PettableDatabase : IPettableDatabase
 
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
-    public bool IsDirty { get; private set; } = false;
-    public bool IsDirtyUI { get; private set; } = false;
 
     readonly IPetServices PetServices;
+    readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDatabase(in IPetServices petServices)
+    public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, object? _)
     {
         PetServices = petServices;
+        DirtyCaller = dirtyCaller;
+    }
+
+    public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller)
+    {
+        PetServices = petServices;
+        DirtyCaller = dirtyCaller;
 
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
         SerializableUserV4[]? users = petServices.Configuration.SerializableUsersV4;
@@ -28,7 +34,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             SerializableNameData[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;
-            newEntries.Add(new PettableDataBaseEntry(in PetServices, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
+            newEntries.Add(new PettableDataBaseEntry(in PetServices, in DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
         }
         _entries = newEntries;
     }
@@ -43,7 +49,7 @@ internal class PettableDatabase : IPettableDatabase
             return entry;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -58,7 +64,7 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -98,19 +104,8 @@ internal class PettableDatabase : IPettableDatabase
         if (!isFromIPC) SetDirty();
     }
 
-    public void NotifySeenDirty()
-    {
-        IsDirty = false;
-    }
-
-    public void NotifySeenDirtyUI()
-    {
-        IsDirtyUI = false;
-    }
-
     protected void SetDirty()
     {
-        IsDirty = true;
-        IsDirtyUI = true;
+        DirtyCaller.DirtyDatabase(this);
     }
 }

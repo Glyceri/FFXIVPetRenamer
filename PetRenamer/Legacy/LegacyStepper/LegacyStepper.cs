@@ -33,13 +33,12 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer4());
         legacyStepperElements.Add(new LegacyNamingVer5());
         legacyStepperElements.Add(new LegacyNamingVer6(PetServices));
+        legacyStepperElements.Add(new LegacyNamingVer7(PetServices));
 
-
-        foreach(ILegacyStepperElement legacyStepperElement in legacyStepperElements)
+        foreach (ILegacyStepperElement legacyStepperElement in legacyStepperElements)
         {
             if (legacyStepperElement.OldVersion != Configuration.Version) continue;
             legacyStepperElement.Upgrade(Configuration);
         }
     }
-
 }

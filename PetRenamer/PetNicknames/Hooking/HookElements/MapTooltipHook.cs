@@ -3,6 +3,7 @@ using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -29,7 +30,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
     [Signature("E8 ?? ?? ?? ?? B8 5E 01 00 00 ", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<AccurateShowTooltip> showTooltip = null!;
 
-    public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, petServices, userList)
+    public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
     {
         tooltipHookMap = Hook<MapTooltipTextHook>("Tooltip", [2], Allowed, false);
         tooltipHookMap.Register(3);
@@ -58,7 +59,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
         return showTooltip!.Original(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
     }
 
-    public override void OnDispose()
+    protected override void OnQuickDispose()
     {
         showTooltip?.Dispose();
     }

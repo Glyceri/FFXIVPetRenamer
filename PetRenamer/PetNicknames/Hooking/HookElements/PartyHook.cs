@@ -7,12 +7,13 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class PartyHook : HookableElement
 {
-    public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, userList, petServices) { }
+    public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
     {
@@ -31,7 +32,7 @@ internal unsafe class PartyHook : HookableElement
         SetCastlist((AddonPartyList*)baseD);
     }
 
-    public override void Dispose()
+    protected override void OnDispose()
     {
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
     }

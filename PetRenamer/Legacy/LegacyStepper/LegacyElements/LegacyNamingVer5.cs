@@ -21,7 +21,6 @@ internal class LegacyNamingVer5 : ILegacyStepperElement
         configuration.replaceEmotesOnMinions = configuration.replaceEmotes;
 
         configuration.Version = 6;
-        configuration.Save();
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete

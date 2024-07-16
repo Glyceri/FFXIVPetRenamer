@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -8,7 +9,7 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class TargetBarHook : QuickHookableElement
 {
-    public TargetBarHook(DalamudServices services, IPetServices petServices, IPettableUserList userList) : base(services, petServices, userList) { }
+    public TargetBarHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener) { }
 
     public override void Init()
     {

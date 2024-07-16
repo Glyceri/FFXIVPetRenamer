@@ -17,20 +17,19 @@ internal unsafe class EmoteChatElement : IChatElement
     readonly DalamudServices DalamudServices;
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
-    readonly IEmoteHook EmoteHook;
 
-    public EmoteChatElement(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IEmoteHook emoteHook) 
+    public EmoteChatElement(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList) 
     {
         DalamudServices = dalamudServices;
         UserList = userList;
         PetServices = petServices;
-        EmoteHook = emoteHook;
     }
 
     public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (type != XivChatType.StandardEmote) return;
-        BattleChara* bChara = EmoteHook.LastEmoteUser;
+
+        BattleChara* bChara = CharacterManager.Instance()->LookupBattleCharaByName(sender.ToString(), true);
         if (bChara == null) return;
 
         nint value = nint.Zero;

@@ -23,14 +23,16 @@ internal unsafe class PettableUserHandler : IUpdatable
     readonly IPettableUserList PettableUserList;
     readonly IPetLog PetLog;
     readonly IPettableDatabase PettableDatabase;
+    readonly IPettableDirtyListener DirtyListener;
 
-    public PettableUserHandler(in DalamudServices dalamudServices, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices)
+    public PettableUserHandler(in DalamudServices dalamudServices, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
+        DirtyListener = dirtyListener;
     }
 
     List<Pointer<BattleChara>> availablePets = new List<Pointer<BattleChara>>();
@@ -60,13 +62,14 @@ internal unsafe class PettableUserHandler : IUpdatable
             if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
             {
                 // Destroy the user
+                PettableUserList.PettableUsers[i]?.Dispose();
                 PettableUserList.PettableUsers[i] = null;
             }
 
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
                 // Create a user
-                IPettableUser newUser = new PettableUser(PettableDatabase, PetServices, battleChara);
+                IPettableUser newUser = new PettableUser(PettableDatabase, PetServices, DirtyListener, battleChara);
                 PettableUserList.PettableUsers[i] = newUser;
                 continue;
             }

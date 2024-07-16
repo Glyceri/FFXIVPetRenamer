@@ -23,6 +23,7 @@ using PetRenamer.PetNicknames.Parsing;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
 using PetRenamer.PetNicknames.ContextMenus;
+using PetRenamer.PetNicknames.Serialization;
 
 namespace PetRenamer;
 
@@ -48,6 +49,10 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly LodestoneNetworker LodestoneNetworker;
     readonly ILodestoneNetworker LodestoneNetworkerInterface;
 
+    readonly PettableDirtyHandler DirtyHandler;
+
+    readonly SaveHandler SaveHandler;
+
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
@@ -57,9 +62,11 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 
+        DirtyHandler = new PettableDirtyHandler(_DalamudServices);
+
         PettableUserList = new PettableUserList();
-        PettableDatabase = new PettableDatabase(in _PetServices);
-        LegacyDatabase = new LegacyPettableDatabase(in _PetServices);
+        PettableDatabase = new PettableDatabase(in _PetServices, DirtyHandler);
+        LegacyDatabase = new LegacyPettableDatabase(in _PetServices, DirtyHandler);
 
         ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in LodestoneNetworkerInterface);
 
@@ -68,11 +75,11 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         IpcProvider = new IpcProvider(in _PetServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
-        UpdateHandler = new UpdateHandler(in _DalamudServices, _PetServices.Configuration, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, IpcProvider, in ImageDatabase);
-        HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList);
-        ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList, HookHandler.EmoteHook);
+        UpdateHandler = new UpdateHandler(in _DalamudServices, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
+        HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
+        ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
-        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase);
+        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
         _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
@@ -95,6 +102,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
         IpcProvider.Prepare();
+
+        SaveHandler = new SaveHandler(_DalamudServices, _PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
     }
 
     public void Dispose()
@@ -108,5 +117,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler?.Dispose();
         CommandHandler?.Dispose();
         WindowHandler?.Dispose();
+        SaveHandler.Dispose();
     }
 }

@@ -9,13 +9,8 @@ internal interface INamesDatabase
     public int Length { get; }
     string? GetName(int ID);
     void SetName(int ID, string? name);
-    bool IsDirty { get; }
-    bool IsDirtyForUI { get; }
 
-    void MarkDirtyAsNoticed();
-    void MarkDirtyUIAsNotified();
-
-    void Update(int[] IDs, string[] names);
+    void Update(int[] IDs, string[] names, IPettableDirtyCaller dirtyCaller);
 
     SerializableNameData SerializeData();
 }

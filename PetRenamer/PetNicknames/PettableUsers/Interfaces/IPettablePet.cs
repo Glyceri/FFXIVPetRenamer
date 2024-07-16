@@ -17,11 +17,10 @@ internal interface IPettablePet
     public ushort Index { get; }
     public string Name { get; }
     public string? CustomName { get; }
-    public bool Dirty { get; }
     public IPetSheetData? PetData { get; }
     public ulong Lifetime { get; }
 
-    void Recalculate();
     void Update(nint pointer);
     bool Compare(ref Character character);
+    void Recalculate();
 }

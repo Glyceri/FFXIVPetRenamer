@@ -1,8 +1,9 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using System;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal unsafe interface IBattleUser
+internal unsafe interface IBattleUser : IDisposable
 {
     string Name { get; }
     ulong ContentID { get; }

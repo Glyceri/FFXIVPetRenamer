@@ -32,8 +32,16 @@ internal unsafe class PettableUser : IPettableUser
 
     uint lastCast;
 
-    public PettableUser(IPettableDatabase dataBase, IPetServices petServices, Pointer<BattleChara> battleChara)
+    readonly IPettableDirtyListener DirtyListener;
+
+    public PettableUser(IPettableDatabase dataBase, IPetServices petServices, IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
     {
+        DirtyListener = dirtyListener;
+
+        DirtyListener.RegisterOnClearEntry(OnDirty);
+        DirtyListener.RegisterOnDirtyEntry(OnDirty);
+        DirtyListener.RegisterOnDirtyName(OnDirty);
+
         BattleChara = battleChara.Value;
         Address = (nint)BattleChara;
         IsLocalPlayer = BattleChara->ObjectIndex == 0;
@@ -94,17 +102,30 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
+    void OnDirty(INamesDatabase database)
+    {
+        if (database != DataBaseEntry.ActiveDatabase) return;
+        Recalculate();
+    }
+
+    void OnDirty(IPettableDatabaseEntry entry)
+    {
+        if (entry != DataBaseEntry) return;
+        Recalculate();
+    }
+
+    void Recalculate()
+    {
+        PetServices.PetLog.Log("Recalculate!");
+        foreach (IPettablePet pet in PettablePets)
+        {
+            pet.Recalculate();
+        }
+    }
+
     void Reset()
     {
         IsDirty = false;
-
-        if (DataBaseEntry.IsDirty)
-        {
-            foreach(IPettablePet pet in PettablePets)
-            {
-                pet.Recalculate();
-            }
-        }
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
@@ -203,5 +224,12 @@ internal unsafe class PettableUser : IPettableUser
     {
         if (BattleChara == null) return;
         CurrentCastID = BattleChara->CastInfo.ActionId;
+    }
+
+    public void Dispose()
+    {
+        DirtyListener.UnregisterOnClearEntry(OnDirty);
+        DirtyListener.UnregisterOnDirtyEntry(OnDirty);
+        DirtyListener.UnregisterOnDirtyName(OnDirty);
     }
 }

@@ -34,10 +34,11 @@ internal class WindowHandler : IWindowHandler
     readonly IPettableDatabase Database;
     readonly ILegacyDatabase LegacyDatabase;
     readonly IImageDatabase ImageDatabase;
+    readonly IPettableDirtyListener DirtyListener;
 
     readonly WindowSystem WindowSystem;
 
-    public WindowHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IImageDatabase imageDatabase)
+    public WindowHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         Configuration = configuration;
@@ -46,6 +47,11 @@ internal class WindowHandler : IWindowHandler
         Database = pettableDatabase;
         LegacyDatabase = legacyDatabase;
         ImageDatabase = imageDatabase;
+        DirtyListener = dirtyListener;
+
+        DirtyListener.RegisterOnClearEntry(HandleDirty);
+        DirtyListener.RegisterOnDirtyEntry(HandleDirty);
+        DirtyListener.RegisterOnDirtyName(HandleDirty);
 
         Node.UseThreadedStyleComputation = true;
         DrawingLib.Setup(dalamudServices.PetNicknamesPlugin);
@@ -115,6 +121,18 @@ internal class WindowHandler : IWindowHandler
         }
     }
 
+    bool isDirty = false;
+
+    void HandleDirty(INamesDatabase namesDatabase)
+    {
+        isDirty = true;
+    }
+
+    void HandleDirty(IPettableDatabaseEntry entry)
+    {
+        isDirty = true;
+    }
+
     void Draw()
     {
         Node.ScaleFactor = ImGuiHelpers.GlobalScale;
@@ -122,28 +140,14 @@ internal class WindowHandler : IWindowHandler
 
         WindowSystem.Draw();
 
-        if (IsDirty())
+        if (isDirty)
         {
             HandleDirty();
+            isDirty = false;
         }
 
         HandleModeChange();
     }
-
-    bool IsDirty()
-    {
-        bool hasDirty = false;
-        IPettableDatabaseEntry[] entries = [.. Database.DatabaseEntries, .. LegacyDatabase.DatabaseEntries];
-        foreach (IPettableDatabaseEntry entry in entries)
-        {
-            if (!entry.IsDirtyForUI) continue;
-            hasDirty = true;
-            entry.MarkDirtyUIAsNotified();
-        }
-        bool ultimatelyIsDirty = hasDirty || Database.IsDirtyUI;
-        Database.NotifySeenDirtyUI();
-        return ultimatelyIsDirty;
-    } 
 
     void HandleDirty()
     {
