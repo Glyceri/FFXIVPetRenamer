@@ -44,7 +44,7 @@ internal class PetSharingWindow : PetWindow
 
         ContentNode.ChildNodes =
                         [
-                            ExportButton = new QuickButton(in DalamudServices, Translator.GetLine("Export to Clipboard"))
+                            ExportButton = new QuickButton(in DalamudServices, Translator.GetLine("ShareWindow.Export"))
                             {
                                 Style = new Style()
                                 {
@@ -53,7 +53,7 @@ internal class PetSharingWindow : PetWindow
                                     Margin = new EdgeSize(12, 1, 1, 1),
                                 },
                             },
-                            ImportButton = new QuickButton(in DalamudServices, Translator.GetLine("Import from Clipboard"))
+                            ImportButton = new QuickButton(in DalamudServices, Translator.GetLine("ShareWindow.Import"))
                             {
                                 Style = new Style()
                                 {
@@ -72,7 +72,7 @@ internal class PetSharingWindow : PetWindow
                 DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
                 {
                     Type = Dalamud.Interface.ImGuiNotification.NotificationType.Warning,
-                    Content = "No Data Available.\nYou need to log in to a character to export your data."
+                    Content = Translator.GetLine("ShareWindow.ExportError"),
                 });
             }
             else
@@ -80,7 +80,7 @@ internal class PetSharingWindow : PetWindow
                 DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
                 {
                     Type = Dalamud.Interface.ImGuiNotification.NotificationType.Success,
-                    Content = "Data succesfully copied"
+                    Content = Translator.GetLine("ShareWindow.ExportSuccess"),
                 });
 
                 ImGui.SetClipboardText(data);
@@ -99,15 +99,18 @@ internal class PetSharingWindow : PetWindow
                 DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
                 {
                     Type = Dalamud.Interface.ImGuiNotification.NotificationType.Warning,
-                    Content = $"Failed to import data: {error}"
+                    Content = string.Format(Translator.GetLine("ShareWindow.ImportError"), error)
                 });
             }
             else
             {
+                string username = string.Empty;
+                if (parseResult is IBaseParseResult baseResult) username = baseResult.UserName;
+
                 DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
                 {
                     Type = Dalamud.Interface.ImGuiNotification.NotificationType.Success,
-                    Content = "Successfully imported data"
+                    Content = string.Format(Translator.GetLine("ShareWindow.ImportSuccess"), username)
                 });
             }
         });

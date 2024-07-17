@@ -43,7 +43,13 @@ internal static class Translator
         { "UserListElement.WarningClear", "You cannot clear yourself." },
         { "UserListElement.WarningIPC", "This user is temporarily added via an\nexternal plugin and will not be saved." },
         { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },
-        { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." }
+        { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." },
+        { "ShareWindow.Export", "Export to Clipboard" },
+        { "ShareWindow.Import", "Import from Clipboard" },
+        { "ShareWindow.ExportError", "No data available.\nYou need to log in to a character to export your data." },
+        { "ShareWindow.ExportSuccess", "Data successfully copied." },
+        { "ShareWindow.ImportError", "Failed to import data:\n{0}" },
+        { "ShareWindow.ImportSuccess", "Successfully imported data from {0}" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -78,12 +84,18 @@ internal static class Translator
         { "UserListElement.WarningClear", "Sie können sich nicht selbst entfernen." },
         { "UserListElement.WarningIPC", "Dieser Benutzer wird über ein externes Plugin\nvorübergehend hinzugefügt und nicht gespeichert." },
         { "UserListElement.WarningOldUser", "Dieser Benutzer stammt aus Ihrer alten Sicherungsdatei.\nTreffen Sie ihn im Spiel, damit es aktualisiert wird." },
-        { "PVPWarning", "„Pet Nicknames“ ist in PVP-Zonen mit Ausnahme des Wolfshöhlen-Pier deaktiviert." }
+        { "PVPWarning", "„Pet Nicknames“ ist in PVP-Zonen mit Ausnahme des Wolfshöhlen-Pier deaktiviert." },
+        { "ShareWindow.Export", "Exportieren" },
+        { "ShareWindow.Import", "Importieren" },
+        { "ShareWindow.ExportError", "Keine Daten verfügbar.\nSie müssen sich mit einem Charakter anmelden, um Ihre Daten zu exportieren." },
+        { "ShareWindow.ExportSuccess", "Daten erfolgreich kopiert." },
+        { "ShareWindow.ImportError", "Fehler beim Importieren der Daten:\n{0}" },
+        { "ShareWindow.ImportSuccess", "Daten erfolgreich importiert von {0}" },
     };
 
     static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()
     {
-
+        { "...", "..." },
     };
 
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
