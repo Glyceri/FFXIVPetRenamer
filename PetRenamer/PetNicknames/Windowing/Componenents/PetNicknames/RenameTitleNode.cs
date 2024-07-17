@@ -75,7 +75,7 @@ internal class RenameTitleNode : Node
         new(".LabelNode", new Style()
         {
             //Margin = new EdgeSize(5, 0, 0, 0),
-            Size = new Size(70, 15),
+            Size = new Size(130, 15),
             TextAlign = Anchor.TopLeft,
             TextOffset = new System.Numerics.Vector2(0, 3),
             FontSize = 10,
@@ -86,7 +86,7 @@ internal class RenameTitleNode : Node
         }),
         new(".TextNode", new Style()
         {
-            Size = new Size(230, 15),
+            Size = new Size(170, 15),
             BorderColor = new BorderColor(new Color(255, 255, 255)),
             TextAlign = Anchor.MiddleRight,
             FontSize = 14,

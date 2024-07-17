@@ -3,6 +3,7 @@ using ImGuiNET;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using System;
@@ -55,9 +56,9 @@ internal class UserListNode : Node
                     Margin = new EdgeSize(11, 0, 0, 8),
                 },
                 ChildNodes = [
-                    SpeciesNode = new RenameTitleNode(in DalamudServices, "Name:", entry.Name),
-                    IDNode = new RenameTitleNode(in DalamudServices, "Homeworld:", entry.HomeworldName),
-                    NicknameNode = new RenameTitleNode(in DalamudServices, "Petcount:", entry.ActiveDatabase.Length.ToString()),
+                    SpeciesNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Name") + ":", entry.Name),
+                    IDNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Homeworld") + ":", entry.HomeworldName),
+                    NicknameNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Petcount") + ":", entry.ActiveDatabase.Length.ToString()),
                 ]
             },
             IconNode = new ProfilePictureNode(in DalamudServices, in imageDatabase)
@@ -95,7 +96,7 @@ internal class UserListNode : Node
         if (asLocal)
         {
             ClearButtonNode.Locked = true;
-            ClearButtonNode.Tooltip = "You cannot clear when online";
+            ClearButtonNode.Tooltip = Translator.GetLine("UserListElement.WarningClear");
         }
 
         if (!entry.IsIPC && !entry.IsLegacy)
@@ -105,12 +106,12 @@ internal class UserListNode : Node
 
         if (entry.IsIPC)
         {
-            IPCIndicatorNode.Tooltip = "This users is temporarily added via an external plugin and will not be saved.";
+            IPCIndicatorNode.Tooltip = Translator.GetLine("UserListElement.WarningIPC");
         }
 
         if (entry.IsLegacy)
         {
-            IPCIndicatorNode.Tooltip = "This users is from your old savefile. Meet them in game so it will update.";
+            IPCIndicatorNode.Tooltip = Translator.GetLine("UserListElement.WarningOldUser");
         }
 
         IPCIndicatorNode.TagsList.Add("fakeDisabled");

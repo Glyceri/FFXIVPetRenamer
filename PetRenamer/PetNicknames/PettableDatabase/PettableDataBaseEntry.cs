@@ -21,6 +21,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public string Name { get; private set; } = "";
     public ushort Homeworld { get; private set; }
     public string HomeworldName { get; private set; } = "";
+    public string AddedOn { get; }
+    public string Version { get; }
 
     public ImmutableArray<int> SoftSkeletons { get; private set; } = new ImmutableArray<int>();
 
@@ -30,10 +32,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public bool IsIPC { get; private set; } = false;
     public bool IsLegacy { get; private set; } = false;
 
+
     readonly IPetServices PetServices;
     readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, string dateAdded, string version, bool active, bool isLegacy = false)
     {
         PetServices = petServices;
         DirtyCaller = dirtyCaller;
@@ -43,6 +46,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetActiveDatabase(ids, names);
         SetSoftSkeletons(softSkeletons);
         SetHomeworld(homeworld);
+        AddedOn = dateAdded;
+        Version = version;
         ContentID = contentID;
         IsActive = active;
         IsIPC = !IsActive;

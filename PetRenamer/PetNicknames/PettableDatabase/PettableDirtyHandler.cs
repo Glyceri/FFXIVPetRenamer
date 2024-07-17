@@ -20,25 +20,21 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {
-        DalamudServices.PluginLog.Debug("Clear entry");
         OnClear?.Invoke(entry);
     }
 
     public void DirtyDatabase(in IPettableDatabase database)
     {
-        DalamudServices.PluginLog.Debug("Database Dirty");
         OnDatabase?.Invoke(database);
     }
 
     public void DirtyEntry(in IPettableDatabaseEntry entry)
     {
-        DalamudServices.PluginLog.Debug("Entry Dirty");
         OnEntry?.Invoke(entry);
     }
 
     public void DirtyName(in INamesDatabase nameDatabase)
     {
-        DalamudServices.PluginLog.Debug("Name Dirty");
         OnName?.Invoke(nameDatabase);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using ImGuiNET;
+using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 
@@ -11,7 +12,7 @@ internal class QuickClearButton : QuickSquareButton
 
     public QuickClearButton()
     {
-        Tooltip = "Hold Left Ctrl + Left Shift to delete an entry";
+        Tooltip = Translator.GetLine("ClearButton.Label");
         NodeValue = FontAwesomeIcon.Times.ToIconString();
         TagsList.Add("fakeDisabled");
     }

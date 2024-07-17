@@ -24,11 +24,16 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
 using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
+using System;
+using System.Reflection;
 
 namespace PetRenamer;
 
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
+    // Quite frankly this can be static
+    public static readonly Version PuginVersion = Assembly.GetAssembly(typeof(PetRenamerPlugin))?.GetName()?.Version ?? new Version("vERROR");
+
     readonly DalamudServices _DalamudServices;
     readonly IPetServices _PetServices;
     readonly IPettableUserList PettableUserList;

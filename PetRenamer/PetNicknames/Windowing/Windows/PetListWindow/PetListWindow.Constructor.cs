@@ -36,6 +36,8 @@ internal partial class PetListWindow
     readonly QuickButton UserListButton;
     readonly QuickButton SharingButton;
 
+    readonly SearchBarNode SearchBarNode;
+
     readonly SmallHeaderNode SmallHeaderNode;
 
     public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "Pet List")
@@ -89,7 +91,7 @@ internal partial class PetListWindow
                             Flow = Flow.Vertical,
                         },
                         ChildNodes = [
-                    new SmallHeaderNode("Navigation")
+                    new SmallHeaderNode(Translator.GetLine("PetList.Navigation"))
                     {
                         Style = new Style()
                         {
@@ -109,7 +111,7 @@ internal partial class PetListWindow
                                 },
                                 ChildNodes =
                                 [
-                                    UserListButton = new QuickButton(in DalamudServices, "User List")
+                                    UserListButton = new QuickButton(in DalamudServices, Translator.GetLine("PetList.UserList"))
                                     {
                                         Style = new Style()
                                         {
@@ -118,7 +120,7 @@ internal partial class PetListWindow
                                             Anchor = Anchor.TopCenter,
                                         },
                                     },
-                                    SharingButton = new QuickButton(in DalamudServices, "Sharing")
+                                    SharingButton = new QuickButton(in DalamudServices, Translator.GetLine("PetList.Sharing"))
                                     {
                                         Style = new Style()
                                         {
@@ -146,6 +148,18 @@ internal partial class PetListWindow
                             FontSize = 16,
                         }
                     },
+                    SearchBarNode = new SearchBarNode(in DalamudServices, Translator.GetLine("Search"), "")
+                    {
+                        Style = new Style()
+                        {
+                            Anchor = Anchor.TopCenter,
+                            Margin = new EdgeSize(10, 0, 0, 0),
+                            ScrollbarTrackColor = new Color(0, 0, 0, 0),
+                            ScrollbarThumbColor = new Color(224, 183, 18, 50),
+                            ScrollbarThumbHoverColor = new Color(224, 183, 18, 200),
+                            ScrollbarThumbActiveColor = new Color(237, 197, 33, 255),
+                        },
+                    },
                     new Node()
                     {
                         Style = new Style()
@@ -153,7 +167,7 @@ internal partial class PetListWindow
                             Flow = Flow.Vertical,
                             Anchor = Anchor.TopRight,
                             Gap = 5,
-                            Margin = new EdgeSize(32, 37, 0, 0),
+                            Margin = new EdgeSize(5, 37, 0, 0),
                         },
                         ChildNodes =
                         [
@@ -229,8 +243,11 @@ internal partial class PetListWindow
         UserListButton.Clicked += ToggleUserMode;
         SharingButton.Clicked += WindowHandler.Open<PetSharingWindow>;
 
+        SearchModeNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => ToggleSearchMode());
         NextListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(1));
         PreviousListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(-1));
-    }
 
+        SearchBarNode.OnSave += _ => DalamudServices.Framework.Run(() => SetUser(ActiveEntry));
+        SearchBarNode.Style.IsVisible = false;
+    }
 }

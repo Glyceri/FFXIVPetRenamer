@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using Una.Drawing;
 
@@ -38,9 +39,9 @@ internal class UserNode : Node
                     Gap = 3,
                 },
                 ChildNodes = [
-                    UserNameRect = new RenameTitleNode(in DalamudServices, "Name:", "..."),
-                    HomeWorldRect = new RenameTitleNode(in DalamudServices, "Homeworld:", "..."),
-                    PetcountNode = new RenameTitleNode(in DalamudServices, "Petcount:", "..."),
+                    UserNameRect = new RenameTitleNode(in DalamudServices, Translator.GetLine("Name") + ":", "..."),
+                    HomeWorldRect = new RenameTitleNode(in DalamudServices, Translator.GetLine("Homeworld") + ":", "..."),
+                    PetcountNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Petcount") + ":", "..."),
                 ]
             },
             ProfilePictureRect = new ProfilePictureNode(in DalamudServices, in imageDatabase)

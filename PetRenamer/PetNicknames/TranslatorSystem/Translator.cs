@@ -14,6 +14,12 @@ internal static class Translator
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
         { "...", "..." },
+        { "Name", "Username" },
+        { "Homeworld", "Homeworld" },
+        { "Petcount", "Nicknames" },
+        { "Search", "Search" },
+        { "DateTime.Unkown", "Date Unknown" },
+        { "Version.Unkown", "Version Unknown" },
         { "ContextMenu.Rename", "Give Nickname" },
         { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Race", "Race" },
@@ -24,16 +30,31 @@ internal static class Translator
         { "PetRenameNode.Save", "Save" },
         { "PetRenameNode.Cancel", "Cancel" },
         { "WindowHandler.Title", "Pet Passport" },
+        { "PetList.Title", "Pet List" },
+        { "PetList.Navigation", "Navigation" },
+        { "PetList.UserList", "User List" },
+        { "PetList.MyList", "My List" },
+        { "PetList.Sharing", "Sharing" },
         { "PetListWindow.ListHeaderPersonalMinion", "Your Minions" },
         { "PetListWindow.ListHeaderPersonalBattlePet", "Your Battle Pets" },
         { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
         { "PetListWindow.ListHeaderOtherBattlePet", "{0}'s Battle Pets" },
+        { "ClearButton.Label", "Hold \"Left Ctrl\" + \"Left Shift\" to delete an entry." },
+        { "UserListElement.WarningClear", "You cannot clear yourself." },
+        { "UserListElement.WarningIPC", "This user is temporarily added via an\nexternal plugin and will not be saved." },
+        { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },
         { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." }
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
     {
         { "...", "..." },
+        { "Name", "Nutzername" },
+        { "Homeworld", "Stammwelt" },
+        { "Petcount", "Spitznamenanzahl" },
+        { "Search", "Durchsuchung" },
+        { "DateTime.Unkown", "Datum unbekannt" },
+        { "Version.Unkown", "Version unbekannt" },
         { "ContextMenu.Rename", "Spitznamen vergeben" },
         { "PetRenameNode.Species", "Begleiter" },
         { "PetRenameNode.Race", "Rasse" },
@@ -44,10 +65,19 @@ internal static class Translator
         { "PetRenameNode.Save", "Speichern" },
         { "PetRenameNode.Cancel", "Abbrechen" },
         { "WindowHandler.Title", "Heimtierausweis" },
+        { "PetList.Title", "Spitznamenliste" },
+        { "PetList.Navigation", "Navigation" },
+        { "PetList.UserList", "Benutzerliste" },
+        { "PetList.MyList", "Meine Liste" },
+        { "PetList.Sharing", "Teilen" },
         { "PetListWindow.ListHeaderPersonalMinion", "Ihre Begleiter" },
         { "PetListWindow.ListHeaderPersonalBattlePet", "Ihre Kampftiere" },
         { "PetListWindow.ListHeaderOtherMinion", "Begleiter von {0}" },
         { "PetListWindow.ListHeaderOtherBattlePet", "Kampftiere von {0}" },
+        { "ClearButton.Label", "Halten Sie die Tasten „Linke Strg“ + „Linke Umschalttaste“ gedrückt,\num einen Eintrag zu löschen." },
+        { "UserListElement.WarningClear", "Sie können sich nicht selbst entfernen." },
+        { "UserListElement.WarningIPC", "Dieser Benutzer wird über ein externes Plugin\nvorübergehend hinzugefügt und nicht gespeichert." },
+        { "UserListElement.WarningOldUser", "Dieser Benutzer stammt aus Ihrer alten Sicherungsdatei.\nTreffen Sie ihn im Spiel, damit es aktualisiert wird." },
         { "PVPWarning", "„Pet Nicknames“ ist in PVP-Zonen mit Ausnahme des Wolfshöhlen-Pier deaktiviert." }
     };
 
@@ -59,6 +89,8 @@ internal static class Translator
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
     {
         { "...", "。。。" },
+        { "DateTime.Unkown", "不明" },
+        { "Version.Unkown", "不明" },
     };
 
     internal static void Initialise(DalamudServices dalamudServices)

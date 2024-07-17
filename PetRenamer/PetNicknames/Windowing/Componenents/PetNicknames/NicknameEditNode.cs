@@ -3,13 +3,11 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
-using System;
-using System.Numerics;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
-internal class NicknameEditNode : RenameTitleNode
+internal class NicknameEditNode : SearchBarNode
 {
     public readonly QuickButton EditButton;
     public readonly QuickButton ClearButton;
@@ -20,9 +18,6 @@ internal class NicknameEditNode : RenameTitleNode
 
     IPetSheetData? ActivePet;
     string? CurrentValue = null;
-    string inputFieldvalue = "";
-
-    public Action<string?>? OnSave;
 
     public NicknameEditNode(in DalamudServices services, string label, string? text) : base(in services, label, text ?? Translator.GetLine("..."))
     {
@@ -101,7 +96,12 @@ internal class NicknameEditNode : RenameTitleNode
         ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Clear")}");
         EditButton.SetText($"{Translator.GetLine("PetRenameNode.Edit")}");
         SetText(CurrentValue ?? Translator.GetLine("..."));
-        inputFieldvalue = CurrentValue ?? string.Empty;
+        SetInputFieldValue(CurrentValue ?? string.Empty);
+    }
+
+    protected override void OnSearch()
+    {
+        EditClicked();
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
@@ -109,17 +109,10 @@ internal class NicknameEditNode : RenameTitleNode
         EditButton.Style.IsVisible = shouldBeVisible;
         ClearButton.Style.IsVisible = shouldBeVisible;
 
-        if (editMode)
+        if (editMode) 
         {
-            
-            ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft - new Vector2(0, Node.ScaleFactor * 3));
-            ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
-            ImGui.PushStyleColor(ImGuiCol.FrameBg, new Color("Window.Background").ToUInt());
-            if (ImGui.InputText($"##RenameField_{ActivePet?.Model}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
-            {
-                EditClicked();
-            }
-            ImGui.PopStyleColor();
+            InternalID = ActivePet?.BaseSingular ?? string.Empty;
+            base.OnDraw(drawList); 
         }
     }
 }

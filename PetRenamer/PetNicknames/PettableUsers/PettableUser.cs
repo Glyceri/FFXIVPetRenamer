@@ -116,7 +116,6 @@ internal unsafe class PettableUser : IPettableUser
 
     void Recalculate()
     {
-        PetServices.PetLog.Log("Recalculate!");
         foreach (IPettablePet pet in PettablePets)
         {
             pet.Recalculate();

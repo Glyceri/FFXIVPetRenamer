@@ -17,6 +17,7 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 
 internal partial class PetListWindow : PetWindow
 {
+    bool inSearchMode = false;
     bool inUserMode = false;
     bool lastInUserMode = false;
     IPettableDatabaseEntry? ActiveEntry;
@@ -29,6 +30,7 @@ internal partial class PetListWindow : PetWindow
 
     public override void OnOpen()
     {
+        SetSearchMode(false);
         SetUser(UserList.LocalPlayer?.DataBaseEntry);
     }
 
@@ -59,6 +61,30 @@ internal partial class PetListWindow : PetWindow
         SetIndex(currentIndex + amount);
     }
 
+    void ToggleSearchMode()
+    {
+        SetSearchMode(!inSearchMode);
+    }
+
+    void SetSearchMode(bool searchModeOn)
+    {
+        inSearchMode = searchModeOn;
+
+        if (inSearchMode)
+        {
+            SmallHeaderNode.Style.IsVisible = false;
+            SearchBarNode.Style.IsVisible = true;
+        }
+        else
+        {
+            SmallHeaderNode.Style.IsVisible = true;
+            SearchBarNode.Style.IsVisible = false;
+        }
+
+        SearchBarNode.ClearSearchbar();
+        SetIndex(0);
+    }
+
     void SetIndex(int amount)
     {
         currentIndex = amount;
@@ -70,11 +96,14 @@ internal partial class PetListWindow : PetWindow
     protected override void OnPetModeChanged(PetWindowMode mode)
     {
         if (inUserMode) return;
+        SetSearchMode(false);
         SetIndex(0);
     }
 
     void ToggleUserMode()
     {
+        SetSearchMode(false);
+
         inUserMode = !inUserMode;
 
         if (!inUserMode && UserList.LocalPlayer != null)
@@ -101,8 +130,6 @@ internal partial class PetListWindow : PetWindow
         UserNode.SetUser(entry);
         ScrollistContentNode.ChildNodes.Clear();
 
-        SmallHeaderNode.NodeValue = Translator.GetLine("...");
-
         if (inUserMode) HandleUserMode();
         else HandlePetMode();
     }
@@ -121,14 +148,7 @@ internal partial class PetListWindow : PetWindow
 
     void HandleUserMode()
     {
-        if (UserList.LocalPlayer != null)
-        {
-            UserListButton.SetText("My List");
-        }
-        else
-        {
-            UserListButton.SetText("Pet List");
-        }
+        HandleHeaderUsermode();
 
         IPettableDatabaseEntry[] entries = [..Database.DatabaseEntries, ..LegacyDatabase.DatabaseEntries];
         int length = entries.Length;
@@ -137,6 +157,14 @@ internal partial class PetListWindow : PetWindow
         {
             IPettableDatabaseEntry entry = entries[index];
             if (!entry.IsActive && !entry.IsLegacy) return false;
+
+            if (inSearchMode)
+            {
+                if (!(SearchBarNode.Valid(entry.Name) 
+                 || SearchBarNode.Valid(entry.HomeworldName)
+                 || SearchBarNode.Valid(entry.Version)
+                 || SearchBarNode.Valid(entry.AddedOn))) return false;
+            }
 
             bool isLocal = HandleIfLocalEntry(entry);
 
@@ -155,7 +183,7 @@ internal partial class PetListWindow : PetWindow
 
     void HandlePetMode()
     {
-        UserListButton.SetText("User List");
+        HandleHeaderPetmode();
 
         if (ActiveEntry == null) return;
 
@@ -201,6 +229,13 @@ internal partial class PetListWindow : PetWindow
 
             string customName = validNames[index];
 
+            if (inSearchMode)
+            {
+                if (!(SearchBarNode.Valid(petData.BaseSingular)
+                 || SearchBarNode.Valid(petData.Model.ToString())
+                 || SearchBarNode.Valid(customName))) return false;
+            }
+
             PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, customName, isLocalEntry);
             ScrollistContentNode.AppendChild(newPetListNode);
             newPetListNode.OnSave += (value) => OnSave(value, id);
@@ -229,6 +264,48 @@ internal partial class PetListWindow : PetWindow
 
             offsetHelper.IncrementValidOffset();
         }
+    }
+
+    void HandleHeaderPetmode()
+    {
+        UserListButton.SetText(Translator.GetLine("PetList.UserList"));
+
+        if (ActiveEntry == UserList.LocalPlayer?.DataBaseEntry)
+        {
+            if (CurrentMode == PetWindowMode.Minion)
+            {
+                SmallHeaderNode.NodeValue = Translator.GetLine("PetListWindow.ListHeaderPersonalMinion");
+            }
+            else
+            {
+                SmallHeaderNode.NodeValue = Translator.GetLine("PetListWindow.ListHeaderPersonalBattlePet");
+            }
+        }
+        else
+        {
+            if (CurrentMode == PetWindowMode.Minion)
+            {
+                SmallHeaderNode.NodeValue = string.Format(Translator.GetLine("PetListWindow.ListHeaderOtherMinion"), ActiveEntry?.Name);
+            }
+            else
+            {
+                SmallHeaderNode.NodeValue = string.Format(Translator.GetLine("PetListWindow.ListHeaderOtherBattlePet"), ActiveEntry?.Name);
+            }
+        }
+    }
+
+    void HandleHeaderUsermode()
+    {
+        if (UserList.LocalPlayer != null)
+        {
+            UserListButton.SetText(Translator.GetLine("PetList.MyList"));
+        }
+        else
+        {
+            UserListButton.SetText(Translator.GetLine("PetList.Title"));
+        }
+
+        SmallHeaderNode.NodeValue = Translator.GetLine("PetList.UserList");
     }
 
     void OnSave(string? newName, int skeleton) => DalamudServices.Framework.Run(() => ActiveEntry?.SetName(skeleton, newName ?? ""));

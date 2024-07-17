@@ -137,7 +137,6 @@ internal class WindowHandler : IWindowHandler
     {
         Node.ScaleFactor = ImGuiHelpers.GlobalScale;
 
-
         WindowSystem.Draw();
 
         if (isDirty)

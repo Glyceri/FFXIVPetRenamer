@@ -1,10 +1,11 @@
-﻿using System.Numerics;
+﻿using PetRenamer.PetNicknames.TranslatorSystem;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 
 internal partial class PetListWindow
 {
-    protected override string Title { get; } = "Pet List";
+    protected override string Title { get; } = Translator.GetLine("PetList.Title");
     protected override string ID { get; } = "Pet List Window";
 
     protected override Vector2 MinSize { get; } = new Vector2(550, 282);
