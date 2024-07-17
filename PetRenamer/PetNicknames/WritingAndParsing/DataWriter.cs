@@ -3,7 +3,9 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PetRenamer.PetNicknames.ReadingAndParsing;
 
@@ -45,6 +47,8 @@ internal class DataWriter : IDataWriter
         }
 
         string outcome = string.Join("\n", petLines);
+
+        outcome = Convert.ToBase64String(Encoding.Unicode.GetBytes(outcome));
 
         return outcome;
     }

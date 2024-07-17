@@ -33,38 +33,45 @@ internal class DataParser : IDataParser
         LegacyDatabase = legacyDatabase;
     }
 
-    public unsafe void ApplyParseData(ulong contentID, IDataParseResult result, bool isFromIPC)
+    public unsafe bool ApplyParseData(IDataParseResult result, bool isFromIPC)
     {
-        ulong activeContentID = UserList.LocalPlayer?.ContentID ?? 0;
-
-        if (contentID == activeContentID && isFromIPC)
-        {
-            return;
-        }
+        IPettableUser? localUser = UserList.LocalPlayer;
 
         if (result is InvalidParseResult invalidParseResult)
         {
             DalamudServices.PluginLog.Verbose(invalidParseResult.Reason);
-            return;
+            return false;
         }
 
         if (result is IClearParseResult clearParseResult)
         {
+            if (clearParseResult.ContentID == 0) return false;
+
             Database.GetEntry(clearParseResult.ContentID).Clear();
-            return;
+            return true;
         }
 
-        if (result is IModernParseResult version2ParseResult)
+        if (result is IBaseParseResult baseParseResult)
         {
-            Database.ApplyParseResult(version2ParseResult, isFromIPC);
-            return;
+            if (localUser != null && isFromIPC)
+            {
+                if (localUser.Name == baseParseResult.UserName && localUser.Homeworld == baseParseResult.Homeworld)
+                {
+                    return false;
+                }
+            }
+
+            if (baseParseResult is IModernParseResult version2ParseResult)
+            {
+                Database.ApplyParseResult(version2ParseResult, isFromIPC);
+                return true;
+            }
+
+            LegacyDatabase.ApplyParseResult(baseParseResult, isFromIPC);
+            return true;
         }
 
-        if (result is IBaseParseResult version1ParseResult)
-        {
-            LegacyDatabase.ApplyParseResult(version1ParseResult, isFromIPC);
-            return;
-        }
+        return true;
     }
 
     public IDataParseResult ParseData(string data) => InternalParseData(data);
@@ -91,7 +98,7 @@ internal class DataParser : IDataParser
         switch (parseVersion)
         {
             case ParseVersion.Invalid:
-                return new InvalidParseResult("Invalid Parse Version.");
+                return new InvalidParseResult("Data is not Pet Nicknames data.");
             case ParseVersion.Version1:
                 return DataParserVersion1.Parse(incomingData);
             case ParseVersion.Version2:

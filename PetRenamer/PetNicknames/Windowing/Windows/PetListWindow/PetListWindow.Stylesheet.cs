@@ -18,7 +18,6 @@ internal partial class PetListWindow
                     BackgroundColor = new("Window.BackgroundLight"),
                     StrokeColor = WindowStyles.WindowBorderActive,
                     StrokeWidth = 1,
-                    BorderRadius = 3,
                     TextAlign = Anchor.MiddleCenter,
                     Font = 2,
                     FontSize = 10,

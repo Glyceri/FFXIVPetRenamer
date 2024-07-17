@@ -23,6 +23,7 @@ internal class DalamudServices
     [PluginService] internal IAddonLifecycle                 AddonLifecycle              { get; private set; } = null!;
     [PluginService] internal IPartyList                      PartyList                   { get; private set; } = null!;
     [PluginService] internal IContextMenu                    ContextMenu                 { get; private set; } = null!;
+    [PluginService] internal INotificationManager            NotificationManager         { get; private set; } = null!;
 
     public static DalamudServices Create(ref IDalamudPluginInterface plugin)
     {

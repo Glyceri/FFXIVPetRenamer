@@ -38,7 +38,7 @@ internal class IpcProvider : IIpcProvider
     readonly ICallGateProvider<string> GetPlayerData;
 
     // Actions
-    readonly ICallGateProvider<ulong, string, object> SetPlayerData;
+    readonly ICallGateProvider<string, object> SetPlayerData;
     readonly ICallGateProvider<ulong, object> ClearPlayerIPCData;
 
     // Data Sharing
@@ -75,8 +75,8 @@ internal class IpcProvider : IIpcProvider
      *          (This is not an expensive function, but please use it sparingly.)
      *          
      * Actions:
-     *      - SetPlayerData <ulong, string>:
-     *          If you have a ContentID and their respective data in the form of a string. Calling this action will overwrite their data with the new data.
+     *      - SetPlayerData <string>:
+     *          Applies the data to the database
      *          (You can never set the data of the current active local player.)
      *          
      *      - ClearPlayerIPCData <ulong>:
@@ -103,7 +103,7 @@ internal class IpcProvider : IIpcProvider
         GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<ulong, string, object>                  ($"{ApiNamespace}SetPlayerData");
+        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerData");
         ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ulong, object>                          ($"{ApiNamespace}ClearPlayerData");
 
         // Data sharing
@@ -135,16 +135,15 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Actions
-    public void SetPlayerDataDetour(ulong contentID, string data)
+    public void SetPlayerDataDetour(string data)
     {
-            IDataParseResult result = DataReader.ParseData(data);
-            DataReader.ApplyParseData(contentID, result, true);
+        IDataParseResult result = DataReader.ParseData(data);
+        DataReader.ApplyParseData(result, true);
     }
 
     public unsafe void ClearIPCDataDetour(ulong contentID)
     {
-        if (contentID == 0) return;
-        DataReader.ApplyParseData(contentID, new ClearParseResult(contentID), true);
+        DataReader.ApplyParseData(new ClearParseResult(contentID), true);
     }
 
     // Functions

@@ -30,7 +30,7 @@ internal class QuickSquareButton : Node
         StrokeColor = new("Window.TitlebarBorder"),
         StrokeWidth = 1,
         StrokeInset = 0,
-        BorderRadius = 3,
+        //BorderRadius = 3,
         TextAlign = Anchor.MiddleCenter,
         Font = 2,
         FontSize = 10,

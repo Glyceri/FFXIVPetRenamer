@@ -101,13 +101,15 @@ internal class PettableNameDatabase : INamesDatabase
             return;
         }
 
-        IDs = [];
-        Names = [];
+        List<string> newNames = new List<string>();
 
-        for (int i = 0; i < ids.Length; i++)
+        for (int i = 0; i < names.Length; i++)
         {
-            SetName(ids[i], names[i]);
+            newNames.Add(MakeNameValid(names[i]) ?? string.Empty);
         }
+
+        IDs = ids;
+        Names = newNames.ToArray();
     }
 
     void SetDirty()

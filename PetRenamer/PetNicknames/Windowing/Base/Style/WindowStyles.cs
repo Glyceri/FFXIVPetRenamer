@@ -15,9 +15,6 @@ internal static class WindowStyles
                     BackgroundColor = new("Window.Background"),
                     StrokeColor = new Color("Window.Border:Active"),
                     StrokeWidth = 1,
-                    BorderRadius = 6,
-                    IsAntialiased = false,
-                    RoundedCorners = RoundedCorners.All,
                     Padding = new(3),
                 }
             ),
@@ -28,8 +25,6 @@ internal static class WindowStyles
                     BackgroundColor = new Color(0, 0, 0, 0),
                     BorderColor = new(new("Window.TitlebarBorder")),
                     BorderWidth = new(1),
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
                 }
             ),
             new(
@@ -53,8 +48,6 @@ internal static class WindowStyles
                     IsAntialiased = false,
                     Anchor = Anchor.TopLeft,
                     Flow = Flow.Vertical,
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.BottomLeft | RoundedCorners.BottomRight,
                 }
             )
         ]
@@ -65,6 +58,9 @@ internal static class WindowStyles
     
     public static void RegisterDefaultColors()
     {
+        Color.AssignByName("UnderlineColour", new Color(255, 255, 255, 255).ToUInt());
+        Color.AssignByName("UnderlineColour:Fade", new Color(255, 255, 255, 100).ToUInt());
+
         Color.AssignByName("Titlebar.Minion", new Color(255, 194, 63, 150).ToUInt());
         Color.AssignByName("Titlebar.Minion:Dark", new Color(110, 78, 10).ToUInt());
         Color.AssignByName("Titlebar.BattlePet", new Color(37, 112, 37, 150).ToUInt());

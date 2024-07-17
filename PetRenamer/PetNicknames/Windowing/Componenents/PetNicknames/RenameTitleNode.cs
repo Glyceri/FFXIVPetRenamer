@@ -75,10 +75,10 @@ internal class RenameTitleNode : Node
         new(".LabelNode", new Style()
         {
             //Margin = new EdgeSize(5, 0, 0, 0),
-            Size = new Size(130, 15),
+            Size = new Size(100, 15),
             TextAlign = Anchor.TopLeft,
             TextOffset = new System.Numerics.Vector2(0, 3),
-            FontSize = 10,
+            FontSize = 8,
             TextOverflow = false,
             Color = new Color("Window.TextLight"),
             OutlineColor = new("Window.TextOutline"),
@@ -86,10 +86,10 @@ internal class RenameTitleNode : Node
         }),
         new(".TextNode", new Style()
         {
-            Size = new Size(170, 15),
-            BorderColor = new BorderColor(new Color(255, 255, 255)),
+            Size = new Size(200, 15),
+            BorderColor = new BorderColor(new Color("UnderlineColour")),
             TextAlign = Anchor.MiddleRight,
-            FontSize = 14,
+            FontSize = 12,
             TextOverflow = false,
             Color = new Color("Window.TextLight"),
             OutlineColor = new("Window.TextOutline"),
@@ -99,7 +99,7 @@ internal class RenameTitleNode : Node
         {
             Size = new Size(300, 2),
             Anchor = Anchor.BottomLeft,
-            BackgroundGradient = GradientColor.Horizontal(new Color(255, 255, 255, 55), new Color(255, 255, 255, 255)),
+            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour:Fade"), new Color("UnderlineColour")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
         }),

@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using System;
+using System.Numerics;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.ListNodes;
@@ -61,13 +62,25 @@ internal class UserListNode : Node
                     NicknameNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Petcount") + ":", entry.ActiveDatabase.Length.ToString()),
                 ]
             },
-            IconNode = new ProfilePictureNode(in DalamudServices, in imageDatabase)
+            new Node()
             {
                 Style = new Style()
                 {
                     Size = new Size(50, 50),
                     Margin = new EdgeSize(10, 0, 0, 15),
-                }
+                    BorderColor = new BorderColor(new Color("UnderlineColour")),
+                    BorderWidth = new EdgeSize(4),
+                },
+                ChildNodes = [
+                    IconNode = new ProfilePictureNode(in DalamudServices, in imageDatabase)
+                    {
+                        Style = new Style()
+                        {
+                            Size = new Size(46, 46),
+                            Anchor = Anchor.MiddleCenter,
+                        }
+                    },
+                ]
             },
             HolderNode = new Node()
             {
@@ -118,5 +131,21 @@ internal class UserListNode : Node
 
         ClearButtonNode.OnClick += () => DalamudServices.Framework.Run(() => ActiveEntry.Clear());
         EyeButtonNode.OnClick += () => DalamudServices.Framework.Run(() => OnView?.Invoke(ActiveEntry));
+    }
+
+
+    protected override void OnDraw(ImDrawListPtr drawList)
+    {
+        base.OnDraw(drawList);
+
+        Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
+        Rect iconRect = IconNode.Bounds.ContentRect;
+
+        Vector2 activePos = activeRect.TopRight + (activeRect.BottomRight - activeRect.TopRight) * 0.5f - new Vector2(ScaleFactor, 0);
+        Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
+        Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * ScaleFactor;
+
+        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
     }
 }

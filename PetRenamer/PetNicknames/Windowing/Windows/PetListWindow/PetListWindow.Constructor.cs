@@ -42,7 +42,7 @@ internal partial class PetListWindow
 
     public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase) : base(windowHandler, dalamudServices, configuration, "Pet List")
     {
-        IsOpen = true;
+        IsOpen = false;
 
         UserList = userList;
         Database = database;
@@ -67,10 +67,6 @@ internal partial class PetListWindow
                             Size = new Size(410, 100),
                             BorderColor = new(new("Window.TitlebarBorder")),
                             BorderWidth = new EdgeSize(0, 1, 1, 1),
-                            RoundedCorners = RoundedCorners.BottomLeft,
-                            BorderRadius = 6,
-                            StrokeRadius = 6,
-                            IsAntialiased = false,
                         },
                         ChildNodes =
                         [
@@ -84,10 +80,6 @@ internal partial class PetListWindow
                             Size = new Size(131, 100),
                             BorderColor = new(new("Window.TitlebarBorder")),
                             BorderWidth = new EdgeSize(0, 1, 1, 1),
-                            RoundedCorners = RoundedCorners.BottomRight,
-                            BorderRadius = 6,
-                            StrokeRadius = 6,
-                            IsAntialiased = false,
                             Flow = Flow.Vertical,
                         },
                         ChildNodes = [
@@ -166,8 +158,8 @@ internal partial class PetListWindow
                         {
                             Flow = Flow.Vertical,
                             Anchor = Anchor.TopRight,
-                            Gap = 5,
-                            Margin = new EdgeSize(5, 37, 0, 0),
+                            Gap = 1,
+                            Margin = new EdgeSize(2, 32, 0, 0),
                         },
                         ChildNodes =
                         [
@@ -219,10 +211,8 @@ internal partial class PetListWindow
                 Style = new Style()
                 {
                     BackgroundGradient = GradientColor.Vertical(WindowStyles.WindowBorderActive, new Color(224, 183, 18, 0)),
-                    RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.TopRight,
-                    BorderRadius = 6,
                     Margin = new(129, 0, 0, 0),
-                    Size = new Size(422, 4),
+                    Size = new Size(422, 2),
                     Anchor = Anchor.TopCenter,
                 }
             },
@@ -231,10 +221,8 @@ internal partial class PetListWindow
                 Style = new Style()
                 {
                     BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), WindowStyles.WindowBorderActive),
-                    RoundedCorners = RoundedCorners.BottomRight | RoundedCorners.BottomLeft,
-                    BorderRadius = 6,
                     Margin = new(0, 0, 29, 0),
-                    Size = new Size(422, 4),
+                    Size = new Size(422, 2),
                     Anchor = Anchor.BottomCenter,
                 }
             },

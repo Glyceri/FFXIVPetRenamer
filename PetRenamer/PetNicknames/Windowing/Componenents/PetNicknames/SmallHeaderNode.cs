@@ -50,7 +50,7 @@ internal class SmallHeaderNode : Node
         }),
         new(".UnderlineNodeLeft", new Style()
         {
-            BackgroundGradient = GradientColor.Horizontal(new Color(255, 255, 255, 55), new Color(255, 255, 255, 255)),
+            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour:Fade"), new Color("UnderlineColour")),
             RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.BottomLeft,
             BorderRadius = 3,
             Anchor = Anchor.BottomCenter,
@@ -59,7 +59,7 @@ internal class SmallHeaderNode : Node
         }),
         new(".UnderlineNodeRight", new Style()
         {
-            BackgroundGradient = GradientColor.Horizontal(new Color(255, 255, 255, 255), new Color(255, 255, 255, 55)),
+            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
             Anchor = Anchor.BottomCenter,

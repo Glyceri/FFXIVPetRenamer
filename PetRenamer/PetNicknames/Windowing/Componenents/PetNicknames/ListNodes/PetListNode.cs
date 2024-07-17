@@ -33,12 +33,8 @@ internal class PetListNode : Node
             Flow = Flow.Horizontal,
             BackgroundColor = new Color(26, 20, 0, 130),
             Size = new Size(412, 70),
-            RoundedCorners = RoundedCorners.All,
-            BorderRadius = 8,
-            StrokeRadius = 8,
             BorderColor = new(new("Window.TitlebarBorder")),
             BorderWidth = new EdgeSize(1),
-            IsAntialiased = false,
         };
 
         ChildNodes = [
@@ -62,9 +58,8 @@ internal class PetListNode : Node
                     Size = new Size(60, 60),
                     Anchor = Anchor.MiddleRight,
                     Margin = new EdgeSize(0, 26, 0, 0),
-                    BorderColor = new BorderColor(new Color(255, 255, 255)),
+                    BorderColor = new BorderColor(new Color("UnderlineColour")),
                     BorderWidth = new EdgeSize(4),
-                    BorderRadius = 6,
                 }
             },
             ClearButtonNode = new QuickClearButton()
@@ -102,8 +97,8 @@ internal class PetListNode : Node
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
         Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * ScaleFactor;
 
-        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
-        drawList.AddLine(earlyiconPos, iconPos, new Color(255, 255, 255, 255).ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet([

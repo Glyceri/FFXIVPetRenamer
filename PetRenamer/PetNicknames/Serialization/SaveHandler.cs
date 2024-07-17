@@ -59,13 +59,11 @@ internal class SaveHandler : IDisposable
 
     void Save()
     {
-        DalamudServices.PluginLog.Debug("Saving!");
         Configuration.Save();
     }
 
     void NotifyIPC()
     {
-        DalamudServices.PluginLog.Debug("NOTIFY IPC!");
         IpcProvider.NotifyDataChanged();
     }
 
