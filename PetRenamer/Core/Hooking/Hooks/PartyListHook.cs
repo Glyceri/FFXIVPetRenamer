@@ -38,7 +38,7 @@ internal unsafe class PartyListHook : HookableElement
         if (!user.BattlePet.Has) return;
         string nickname = user.BattlePet.UsedName;
         if (nickname == string.Empty) return;
-        partyNode->Pet.Name->SetText(nickname);
+        partyNode->Pet.Name->NodeText.SetString(nickname);
     }
 
     void SetCastlist(AddonPartyList* partyNode)
