@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
 using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem.Pet;
+using System.Text;
 
 namespace PetRenamer.Core.Hooking.Hooks;
 
@@ -40,7 +41,12 @@ public unsafe sealed class NamePlateHook : HookableElement
         if (currentPet == null) return;
 
         string nameToUse = currentPet.UsedNameNameplate;
-        if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameToUse);
+
+        nameToUse += '\0';
+
+        byte[] nameplateData = Encoding.UTF8.GetBytes(nameToUse);
+
+        if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameplateData);
         if (currentPet.nameChanged) namePlateInfo->IsDirty = true;
     }
 

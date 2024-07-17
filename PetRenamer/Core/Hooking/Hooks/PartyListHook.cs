@@ -7,6 +7,7 @@ using PetRenamer.Core.Hooking.Attributes;
 using PetRenamer.Core.PettableUserSystem;
 using PetRenamer.Utilization.UtilsModule;
 using System.Collections.Generic;
+using System.Text;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 
 namespace PetRenamer.Core.Hooking.Hooks;
@@ -38,7 +39,12 @@ internal unsafe class PartyListHook : HookableElement
         if (!user.BattlePet.Has) return;
         string nickname = user.BattlePet.UsedName;
         if (nickname == string.Empty) return;
-        partyNode->Pet.Name->NodeText.SetString(nickname);
+
+        nickname += '\0';
+
+        byte[] nameplateData = Encoding.UTF8.GetBytes(nickname);
+
+        partyNode->Pet.Name->NodeText.SetString(nameplateData);
     }
 
     void SetCastlist(AddonPartyList* partyNode)

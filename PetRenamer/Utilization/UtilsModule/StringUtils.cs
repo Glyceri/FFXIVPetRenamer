@@ -2,10 +2,12 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core;
+using PetRenamer.Core.Serialization;
 using PetRenamer.Core.Singleton;
 using PetRenamer.Utilization.Attributes;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.Utilization.UtilsModule;
@@ -97,7 +99,12 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         if (validNames.Length == 0) return;
         string? outcomeText = textNode->NodeText.ToString();
         ReplaceString(ref outcomeText, ref validNames);
-        textNode->NodeText.SetString(outcomeText);
+
+        string newOutcomeText = outcomeText + '\0';
+
+        byte[] nameplateData = Encoding.UTF8.GetBytes(newOutcomeText);
+
+        textNode->NodeText.SetString(nameplateData);
 
         if (nineGridNode == null) return;
 
