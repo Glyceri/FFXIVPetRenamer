@@ -39,8 +39,6 @@ internal unsafe class NamePlateHook : HookableElement
 
     public void* UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
-        PetServices.PetLog.Log(namePlateInfo->Name.ToString() + ": " + numArrayIndex + ": " + stringArrayIndex);
-
         if (battleChara == null) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
         if (battleChara->ObjectKind != ObjectKind.BattleNpc) return nameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
         SetNameplate(namePlateInfo, (nint)battleChara);
@@ -49,8 +47,6 @@ internal unsafe class NamePlateHook : HookableElement
 
     public void* UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
-        PetServices.PetLog.Log(namePlateInfo->Name.ToString() + ": " + numArrayIndex + ": " + stringArrayIndex);
-
         if (gameObject == null) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
         if (gameObject->ObjectKind != ObjectKind.Companion) return nameplateHookMinion!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
         SetNameplate(namePlateInfo, (nint)gameObject);
@@ -65,9 +61,6 @@ internal unsafe class NamePlateHook : HookableElement
         string? customPetName = pPet.CustomName;
         if (customPetName == null) return;
 
-        string newName = customPetName + '\0';
-        byte[] data = Encoding.UTF8.GetBytes(newName);
-
-        namePlateInfo->Name.SetString(data);    
+        PetServices.StringHelper.SetUtf8String(in namePlateInfo->Name, customPetName);
     }
 }

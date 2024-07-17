@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
@@ -20,11 +21,17 @@ internal class StringHelperWrapper : IStringHelper
 
     public unsafe string SetATKString(AtkTextNode* atkNode, string text)
     {
+        return SetUtf8String(in atkNode->NodeText, text);
+    }
+
+    public string SetUtf8String(in Utf8String utf8String, string text) 
+    {
         string newString = text + '\0';
 
         byte[] data = Encoding.UTF8.GetBytes(newString);
 
-        atkNode->NodeText.SetString(data);
+        utf8String.SetString(data);
+
         return text;
     }
 
