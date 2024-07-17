@@ -130,9 +130,7 @@ internal partial class PetListWindow : PetWindow
         UserNode.SetUser(entry);
         for (int i = ScrollistContentNode.ChildNodes.Count - 1; i >= 0; i--)
         {
-            Node disposable = ScrollistContentNode.ChildNodes[i];
-            ScrollistContentNode.RemoveChild(disposable);
-            disposable?.Dispose();
+            ScrollistContentNode.RemoveChild(ScrollistContentNode.ChildNodes[i], true);
         }
         
 
@@ -171,7 +169,6 @@ internal partial class PetListWindow : PetWindow
                  || SearchBarNode.Valid(entry.Version)
                  || SearchBarNode.Valid(entry.AddedOn))) return false;
             }
-
 
             if (!index.Item2)
             {

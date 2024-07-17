@@ -81,8 +81,8 @@ internal class PetListNode : Node
         if (!asLocalEntry)
         {
             RemoveChild(ClearButtonNode);
-            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.EditButton);
-            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.ClearButton);
+            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.EditButton, true);
+            NicknameNode.UnderlineNode.RemoveChild(NicknameNode.ClearButton, true);
         }
     }
 

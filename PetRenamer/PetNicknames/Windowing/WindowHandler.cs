@@ -179,6 +179,12 @@ internal class WindowHandler : IWindowHandler
     {
         DrawingLib.Dispose();
         DalamudServices.PetNicknamesPlugin.UiBuilder.Draw -= Draw;
+
+        foreach (IPetWindow window in WindowSystem.Windows)
+        {
+            window?.Dispose();
+        }
+
         WindowSystem?.RemoveAllWindows();
     }
 

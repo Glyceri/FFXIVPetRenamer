@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface;
-using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
@@ -7,7 +6,6 @@ using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 using System.Numerics;
 using Una.Drawing;
 
@@ -150,12 +148,17 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected void RemoveNode(Node parentNode, Node oldNode)
     {
-        DalamudServices.Framework.Run(() => parentNode.RemoveChild(oldNode));
+        DalamudServices.Framework.Run(() => parentNode.RemoveChild(oldNode, true));
     }
 
     public abstract void OnDraw();
     public virtual void OnLateDraw() { }
     public virtual void OnDirty() { }
+
+    public void Dispose()
+    {
+        _windowNode?.Dispose();
+    }
 
     static ImGuiWindowFlags ImGuiWindowFlags =>
          ImGuiWindowFlags.NoTitleBar |

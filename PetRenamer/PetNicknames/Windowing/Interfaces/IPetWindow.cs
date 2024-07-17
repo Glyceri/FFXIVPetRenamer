@@ -1,8 +1,9 @@
 ﻿using PetRenamer.PetNicknames.Windowing.Enums;
+using System;
 
 namespace PetRenamer.PetNicknames.Windowing.Interfaces;
 
-internal interface IPetWindow
+internal interface IPetWindow : IDisposable
 {
     void Open();
     void Close();

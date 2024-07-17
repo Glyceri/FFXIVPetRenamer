@@ -114,7 +114,7 @@ internal class UserListNode : Node
 
         if (!entry.IsIPC && !entry.IsLegacy)
         {
-            HolderNode.RemoveChild(IPCIndicatorNode);
+            HolderNode.RemoveChild(IPCIndicatorNode, true);
         }
 
         if (entry.IsIPC)
