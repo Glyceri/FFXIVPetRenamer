@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
@@ -14,8 +15,17 @@ internal class StringHelperWrapper : IStringHelper
     {
         if (atkNode == null) return baseString;
         string newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace);
-        atkNode->NodeText.SetString(newString);
-        return newString;
+        return SetATKString(atkNode, newString);
+    }
+
+    public unsafe string SetATKString(AtkTextNode* atkNode, string text)
+    {
+        string newString = text + '\0';
+
+        byte[] data = Encoding.UTF8.GetBytes(newString);
+
+        atkNode->NodeText.SetString(data);
+        return text;
     }
 
     public void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true)
@@ -86,7 +96,6 @@ internal class StringHelperWrapper : IStringHelper
                   .Replace("-Egi", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace(" Carbuncle", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Carbuncle ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-                  .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase);
-                  
+                  .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase);        
     }
 }

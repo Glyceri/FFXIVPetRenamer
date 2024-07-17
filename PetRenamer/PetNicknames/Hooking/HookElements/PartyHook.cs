@@ -47,7 +47,8 @@ internal unsafe class PartyHook : HookableElement
 
         string? lastPetname = pet.CustomName;
         if (lastPetname == string.Empty || lastPetname == null) return;
-        partyNode->Pet.Name->SetText(lastPetname);
+
+        PetServices.StringHelper.SetATKString(partyNode->Pet.Name, lastPetname);
     }
 
     void SetCastlist(AddonPartyList* partyNode)
