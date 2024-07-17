@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -10,7 +11,6 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Enum;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Structs;
 using System;
-using System.Collections.Generic;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
@@ -128,7 +128,13 @@ internal partial class PetListWindow : PetWindow
         }
 
         UserNode.SetUser(entry);
-        ScrollistContentNode.ChildNodes.Clear();
+        for (int i = ScrollistContentNode.ChildNodes.Count - 1; i >= 0; i--)
+        {
+            Node disposable = ScrollistContentNode.ChildNodes[i];
+            ScrollistContentNode.RemoveChild(disposable);
+            disposable?.Dispose();
+        }
+        
 
         if (inUserMode) HandleUserMode();
         else HandlePetMode();
@@ -155,7 +161,7 @@ internal partial class PetListWindow : PetWindow
 
         Looper(length, (index) =>
         {
-            IPettableDatabaseEntry entry = entries[index];
+            IPettableDatabaseEntry entry = entries[index.Item1];
             if (!entry.IsActive && !entry.IsLegacy) return false;
 
             if (inSearchMode)
@@ -164,6 +170,12 @@ internal partial class PetListWindow : PetWindow
                  || SearchBarNode.Valid(entry.HomeworldName)
                  || SearchBarNode.Valid(entry.Version)
                  || SearchBarNode.Valid(entry.AddedOn))) return false;
+            }
+
+
+            if (!index.Item2)
+            {
+                return true;
             }
 
             bool isLocal = HandleIfLocalEntry(entry);
@@ -188,52 +200,32 @@ internal partial class PetListWindow : PetWindow
         if (ActiveEntry == null) return;
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
-        List<int> validIDS = new List<int>();
-        List<string> validNames = new List<string>();
-
-        int length = names.Length;
-
-        for (int i = 0; i < length; i++)
-        {
-            int id = names.IDs[i];
-            if (PetWindowMode.Minion    == CurrentMode && id <= -1) continue;
-            if (PetWindowMode.BattlePet == CurrentMode && id >= -1) continue;
-
-            string cusomName = names.Names[i];
-
-            validIDS.Add(id);
-            validNames.Add(cusomName);
-        }
-
-        if (isLocalEntry)
-        {
-            if (PetWindowMode.BattlePet == CurrentMode)
-            {
-                List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIDS);
-                foreach (IPetSheetData p in data)
-                {
-                    validIDS.Add(p.Model);
-                    validNames.Add("");
-                }
-            }
-        }
-
-        int newLength = validIDS.Count;
+        int[] validIDS = names.IDs;
+        string[] validNames = names.Names;
+        int newLength = names.Length;
 
         Looper(newLength, (index) =>
         {
-            int id = validIDS[index];
+            int id = validIDS[index.Item1];
+
+            if (PetWindowMode.Minion == CurrentMode && id <= -1) return false;
+            if (PetWindowMode.BattlePet == CurrentMode && id >= -1) return false;
 
             IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
             if (petData == null) return false;
 
-            string customName = validNames[index];
+            string customName = validNames[index.Item1];
 
             if (inSearchMode)
             {
                 if (!(SearchBarNode.Valid(petData.BaseSingular)
                  || SearchBarNode.Valid(petData.Model.ToString())
                  || SearchBarNode.Valid(customName))) return false;
+            }
+
+            if (!index.Item2) 
+            {
+                return true; 
             }
 
             PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, customName, isLocalEntry);
@@ -244,7 +236,7 @@ internal partial class PetListWindow : PetWindow
         });
     }
 
-    void Looper(int length, Func<int, bool> onValidCallback)
+    void Looper(int length, Func<(int, bool), bool> onValidCallback)
     {
         OffsetHelper offsetHelper = new OffsetHelper(currentIndex);
 
@@ -252,15 +244,17 @@ internal partial class PetListWindow : PetWindow
 
         for (int i = 0; i < length; i++)
         {
+            bool valid = true;
+
             OffsetResult result = offsetHelper.OffsetResult();
-            if (result == OffsetResult.Early) continue;
+            if (result == OffsetResult.Early) valid = false;
             if (result == OffsetResult.Late)
             {
                 NextListNode.IsDisabled = false;
                 break;
             }
 
-            if (!onValidCallback.Invoke(i)) continue;
+            if (!onValidCallback.Invoke((i, valid))) continue;
 
             offsetHelper.IncrementValidOffset();
         }

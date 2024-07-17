@@ -24,7 +24,6 @@ internal struct OffsetHelper
 
         if (isEarly || isTechnicallyLate)
         {
-            IncrementValidOffset();
             return Enum.OffsetResult.Early;
         }
 

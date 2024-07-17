@@ -45,21 +45,20 @@ internal class ImageDatabase : IImageDatabase
             for (int i = 0; i < length; i++)
             {
                 IGlyceriTextureWrap wrap = _imageDatabase[i];
-                if (wrap.User == petUser) 
+                if (wrap.User == petUser)
                 {
                     wrap.Refresh();
-                    return wrap.TextureWrap ?? SearchTexture; 
+                    return wrap.TextureWrap ?? SearchTexture;
                 }
             }
 
             _imageDatabase.Add(new GlyceriTextureWrap(petUser));
-
-            //TODO: CHECK HERE IF THE USER WANTS TO AUTOMATICALLY DOWNLOAD PICTURES
-
-            ImageDownloader.DownloadImage(databaseEntry, OnSuccess, (e) => PetServices.PetLog.LogException(e));
-
-            return SearchTexture;
         }
+        //TODO: CHECK HERE IF THE USER WANTS TO AUTOMATICALLY DOWNLOAD PICTURES
+
+        ImageDownloader.DownloadImage(databaseEntry, OnSuccess, (e) => PetServices.PetLog.LogException(e));
+
+        return SearchTexture;
     }
 
     public void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null)

@@ -232,8 +232,8 @@ internal partial class PetListWindow
         SharingButton.Clicked += WindowHandler.Open<PetSharingWindow>;
 
         SearchModeNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => ToggleSearchMode());
-        NextListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(1));
-        PreviousListNode.OnMouseUp += _ => DalamudServices.Framework.Run(() => HandleIncrement(-1));
+        NextListNode.OnClick += _ => DalamudServices.Framework.Run(() => HandleIncrement(1));
+        PreviousListNode.OnClick += _ => DalamudServices.Framework.Run(() => HandleIncrement(-1));
 
         SearchBarNode.OnSave += _ => DalamudServices.Framework.Run(() => SetUser(ActiveEntry));
         SearchBarNode.Style.IsVisible = false;
