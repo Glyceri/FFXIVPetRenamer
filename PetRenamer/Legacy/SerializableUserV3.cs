@@ -17,7 +17,7 @@ public class SerializableUserV3
 
     public SerializableUserV3(string username, ushort homeworld)
     {
-        this.username = username.Replace(((char)0).ToString(), "");
+        this.username = username;
         this.homeworld = homeworld;
     }
 

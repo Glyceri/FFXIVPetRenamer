@@ -15,7 +15,7 @@ public class SerializableUser
     public SerializableUser(SerializableNickname[] nicknames, string username, ushort homeworld)
     {
         this.nicknames = nicknames;
-        this.username = username.Replace(((char)0).ToString(), ""); //Dont start about it... literally. If I dont replace (char)0 with an empty string it WILL bitch...
+        this.username = username;
         this.homeworld = homeworld;
     }
 }
