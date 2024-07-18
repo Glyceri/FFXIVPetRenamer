@@ -79,10 +79,10 @@ internal static class Translator
         { "Kofi.Line2", "It will be used to buy dog toys!" },
         { "Kofi.TakeMe", "Take me" },
 
-        { "Command.Petname", "Open the Pet Rename window." },
-        { "Command.Petlist", "Open the Pet List window." },
-        { "Command.PetSettings", "Open the Settings window." },
-        { "Command.PetSharing", "Open the Sharing window." },
+        { "Command.Petname", "Opens the Pet Rename window." },
+        { "Command.Petlist", "Opens the Pet List window." },
+        { "Command.PetSettings", "Opens the Settings window." },
+        { "Command.PetSharing", "Opens the Sharing window." },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()

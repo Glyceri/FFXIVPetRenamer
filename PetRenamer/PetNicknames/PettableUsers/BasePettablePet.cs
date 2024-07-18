@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -23,12 +24,14 @@ internal unsafe abstract class BasePettablePet : IPettablePet
     public IPettableUser? Owner { get; private set; }
 
     readonly IPettableDatabaseEntry Entry;
+    readonly ISharingDictionary SharingDictionary;
     readonly bool AsBattlePet = false;
 
-    public BasePettablePet(Character* pet, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
+    public BasePettablePet(Character* pet, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices, bool asBattlePet = false)
     {
         Entry = entry;
         AsBattlePet = asBattlePet;
+        SharingDictionary = sharingDictionary;
 
         PetPointer = (nint)pet;
 
@@ -47,6 +50,8 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
     public void Update(nint pointer)
     {
+        if (CustomName != null) SharingDictionary.Set(ObjectID, CustomName);
+
         Lifetime++;
         Touched = true;
         PetPointer = pointer;

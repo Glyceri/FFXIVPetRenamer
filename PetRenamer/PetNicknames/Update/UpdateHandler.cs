@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
+using PetRenamer.PetNicknames.IPC;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -15,6 +17,7 @@ namespace PetRenamer.PetNicknames.Update;
 internal class UpdateHandler : IDisposable
 {
     readonly DalamudServices DalamudServices;
+    readonly ISharingDictionary SharingDictionary;
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
@@ -24,9 +27,10 @@ internal class UpdateHandler : IDisposable
     readonly LodestoneNetworker LodestoneNetworker;
     readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(in DalamudServices dalamudServices, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener)
+    public UpdateHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
+        SharingDictionary = sharingDictionary;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         PettableDatabase = pettableDatabase;
@@ -42,7 +46,7 @@ internal class UpdateHandler : IDisposable
     void Setup()
     {
         _updatables.Add(new LegacyDatabaseHelper(in DalamudServices, in LegacyPettableDatabase, in PettableDatabase, in PetServices, in PettableUserList));
-        _updatables.Add(new PettableUserHandler(in DalamudServices, in PettableUserList, in PettableDatabase, in PetServices, in DirtyListener));
+        _updatables.Add(new PettableUserHandler(in DalamudServices, in SharingDictionary, in PettableUserList, in PettableDatabase, in PetServices, in DirtyListener));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker, in ImageDatabase));
     }
 

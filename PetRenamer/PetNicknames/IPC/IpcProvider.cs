@@ -3,10 +3,8 @@ using Dalamud.Plugin.Ipc;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
-using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
-using System.Collections.Generic;
 
 namespace PetRenamer;
 
@@ -37,9 +35,6 @@ internal class IpcProvider : IIpcProvider
     // Actions
     readonly ICallGateProvider<string, object> SetPlayerData;
     readonly ICallGateProvider<ulong, object> ClearPlayerIPCData;
-
-    // Data Sharing
-    readonly Dictionary<uint, string> PetNicknameDict = new Dictionary<uint, string>();
 
 
     /* ------------------------ READ ME ------------------------
@@ -101,9 +96,6 @@ internal class IpcProvider : IIpcProvider
         // Actions
         SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerData");
         ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ulong, object>                          ($"{ApiNamespace}ClearPlayerData");
-
-        // Data sharing
-        PetNicknameDict         = petNicknamesPlugin.GetOrCreateData($"{ApiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
     }
 
     public void Prepare()
@@ -190,8 +182,6 @@ internal class IpcProvider : IIpcProvider
     public void Dispose()
     {
         NotifyDisposing();
-        PetNicknameDict.Clear();
-        PetNicknamesPlugin.RelinquishData($"{ApiNamespace}GameObjectRenameDict");
 
         // Actions
         SetPlayerData.UnregisterAction();

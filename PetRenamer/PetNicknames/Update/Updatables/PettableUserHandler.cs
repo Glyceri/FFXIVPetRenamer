@@ -11,6 +11,8 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using System.Collections.Generic;
+using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.IPC;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -19,15 +21,17 @@ internal unsafe class PettableUserHandler : IUpdatable
     public bool Enabled { get; set; } = true;
 
     readonly DalamudServices DalamudServices;
+    readonly ISharingDictionary SharingDictionary;
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
     readonly IPetLog PetLog;
     readonly IPettableDatabase PettableDatabase;
     readonly IPettableDirtyListener DirtyListener;
 
-    public PettableUserHandler(in DalamudServices dalamudServices, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
+    public PettableUserHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
+        SharingDictionary = sharingDictionary;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
@@ -39,6 +43,8 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     public void OnUpdate(IFramework framework)
     {
+        SharingDictionary.Clear();
+
         Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
         int charaSpanLength = charaSpan.Length;
 
@@ -69,7 +75,7 @@ internal unsafe class PettableUserHandler : IUpdatable
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
                 // Create a user
-                IPettableUser newUser = new PettableUser(PettableDatabase, PetServices, DirtyListener, battleChara);
+                IPettableUser newUser = new PettableUser(in SharingDictionary, in PettableDatabase, in PetServices, in DirtyListener, battleChara);
                 PettableUserList.PettableUsers[i] = newUser;
                 continue;
             }

@@ -26,6 +26,8 @@ using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
 using System;
 using System.Reflection;
+using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.IPC;
 
 namespace PetRenamer;
 
@@ -36,6 +38,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
     readonly DalamudServices _DalamudServices;
     readonly IPetServices _PetServices;
+    readonly ISharingDictionary SharingDictionary;
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
     readonly ILegacyDatabase LegacyDatabase;
@@ -63,6 +66,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         _DalamudServices = DalamudServices.Create(ref dalamud)!;
         _PetServices = new PetServices(_DalamudServices);
 
+        SharingDictionary = new SharingDictionary(_DalamudServices);
+
         Translator.Initialise(_DalamudServices);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
@@ -80,7 +85,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
-        UpdateHandler = new UpdateHandler(in _DalamudServices, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
+        UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
         ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter);
@@ -95,6 +100,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
     public void Dispose()
     {
+        SharingDictionary?.Dispose();
         ContextMenuHandler?.Dispose();
         IpcProvider?.Dispose();
         LodestoneNetworker?.Dispose();

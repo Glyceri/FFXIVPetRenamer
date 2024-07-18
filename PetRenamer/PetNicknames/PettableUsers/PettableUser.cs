@@ -1,6 +1,8 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
+using PetRenamer.PetNicknames.IPC;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -21,7 +23,6 @@ internal unsafe class PettableUser : IPettableUser
     public BattleChara* BattleChara { get; }
     public bool IsActive => DataBaseEntry.IsActive;
 
-    IPetServices PetServices { get; init; }
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
     public nint User { get; private set; }
     public uint ShortObjectID { get; private set; }
@@ -32,11 +33,14 @@ internal unsafe class PettableUser : IPettableUser
 
     uint lastCast;
 
+    readonly IPetServices PetServices;
     readonly IPettableDirtyListener DirtyListener;
+    readonly ISharingDictionary SharingDictionary;
 
-    public PettableUser(IPettableDatabase dataBase, IPetServices petServices, IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
+    public PettableUser(in ISharingDictionary sharingDictionary, in IPettableDatabase dataBase, in IPetServices petServices, in IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
     {
         DirtyListener = dirtyListener;
+        SharingDictionary = sharingDictionary;
 
         DirtyListener.RegisterOnClearEntry(OnDirty);
         DirtyListener.RegisterOnDirtyEntry(OnDirty);
@@ -71,7 +75,7 @@ internal unsafe class PettableUser : IPettableUser
 
         IPettablePet? storedPet = FindPet(ref c->Character);
         if (storedPet != null) storedPet.Update((nint)c);
-        else CreateNewPet(new PettableCompanion(c, this, DataBaseEntry, PetServices));
+        else CreateNewPet(new PettableCompanion(c, this, in SharingDictionary, DataBaseEntry, PetServices));
     }
 
     public void OnLastCastChanged(uint cast)
@@ -155,7 +159,7 @@ internal unsafe class PettableUser : IPettableUser
 
             IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
             if (storedPet != null) storedPet.Update((nint)bChara.Value);
-            else CreateNewPet(new PettableBattlePet(bChara.Value, this, DataBaseEntry, PetServices));
+            else CreateNewPet(new PettableBattlePet(bChara.Value, this, in SharingDictionary, DataBaseEntry, PetServices));
         }
     }
 
