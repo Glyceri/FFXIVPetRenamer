@@ -17,7 +17,6 @@ internal class IpcProvider : IIpcProvider
     bool ready = false;
     string lastData = string.Empty;
 
-    readonly IDalamudPluginInterface PetNicknamesPlugin;
     readonly IDataWriter DataWriter;
     readonly IDataParser DataReader;
 
@@ -79,7 +78,6 @@ internal class IpcProvider : IIpcProvider
 
     public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
     {
-        PetNicknamesPlugin = petNicknamesPlugin;
         DataReader = dataReader;
         DataWriter = dataWriter;
 

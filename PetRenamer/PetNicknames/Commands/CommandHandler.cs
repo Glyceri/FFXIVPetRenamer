@@ -18,16 +18,15 @@ internal class CommandHandler : ICommandHandler
         DalamudServices = dalamudServices;
         WindowHandler = windowHandler;
 
-        _RegisterCommands();
+        RegisterCommands();
     }
 
-    void _RegisterCommands()
+    void RegisterCommands()
     {
         RegisterCommand(new PetnameCommand(in DalamudServices, in WindowHandler));
         RegisterCommand(new PetsettingsCommand(in DalamudServices, in WindowHandler));
         RegisterCommand(new PetsharingCommand(in DalamudServices, in WindowHandler));
         RegisterCommand(new PetlistCommand(in DalamudServices, in WindowHandler));
-
     }
 
     void RegisterCommand(ICommand command)

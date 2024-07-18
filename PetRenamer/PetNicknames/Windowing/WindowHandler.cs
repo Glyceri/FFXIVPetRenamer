@@ -69,10 +69,10 @@ internal class WindowHandler : IWindowHandler
         DalamudServices.PetNicknamesPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
         DalamudServices.PetNicknamesPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
 
-        _Register();
+        Register();
     }
 
-    void _Register()
+    void Register()
     {
         AddWindow(new KofiWindow(this, in DalamudServices, in Configuration));
         AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
@@ -90,7 +90,7 @@ internal class WindowHandler : IWindowHandler
 
     public void Open<T>() where T : IPetWindow
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             if (window is not T tWindow) continue;
             tWindow.Open();
@@ -99,7 +99,7 @@ internal class WindowHandler : IWindowHandler
 
     public void Close<T>() where T : IPetWindow
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             if (window is not T tWindow) continue;
             tWindow.Close();
@@ -113,7 +113,7 @@ internal class WindowHandler : IWindowHandler
 
     public void Toggle<T>() where T : IPetWindow
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             if (window is not T tWindow) continue;
             tWindow.Toggle();
@@ -123,7 +123,7 @@ internal class WindowHandler : IWindowHandler
     public void SetWindowMode(PetWindowMode mode)
     {
         _windowMode = mode;
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             window.SetPetMode(mode);
         }
@@ -131,7 +131,7 @@ internal class WindowHandler : IWindowHandler
 
     public void SetKofiMode(bool mode)
     {
-        foreach (PetWindow window in WindowSystem.Windows)
+        foreach (PetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             window.HeaderBar.SetKofiButton(mode);
         }
@@ -173,7 +173,7 @@ internal class WindowHandler : IWindowHandler
 
     void HandleDirty()
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             DalamudServices.Framework.Run(window.OnDirty);
         }
@@ -181,7 +181,7 @@ internal class WindowHandler : IWindowHandler
 
     void HandleModeChange()
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             if (!window.RequestsModeChange) continue;
             DalamudServices.Framework.Run(() => SetWindowMode(window.NewMode));
@@ -200,12 +200,12 @@ internal class WindowHandler : IWindowHandler
     public void Rebuild()
     {
         ClearAllWindows();
-        _Register();
+        Register();
     }
 
     void ClearAllWindows()
     {
-        foreach (IPetWindow window in WindowSystem.Windows)
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
             window?.Dispose();
         }

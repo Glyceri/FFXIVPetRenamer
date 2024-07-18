@@ -1,5 +1,4 @@
 ﻿using PetRenamer.PetNicknames.Services;
-using System;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
@@ -11,9 +10,6 @@ internal class RenameTitleNode : Node
     public readonly Node UnderlineNode;
     public readonly Node TextNode;
     public readonly Node LabelNode;
-
-    public Action? Hovered;
-    public Action? HoveredExit;
 
     public bool Interactable { get; set; } = false;
 
@@ -46,29 +42,11 @@ internal class RenameTitleNode : Node
                 NodeValue = text,
             },
         ];
-
-        RegisterInputs(text);
     }
-
-    void HoverInvoke(Node _) => DalamudServices.Framework.Run(() => Hovered?.Invoke());
-    void HoverExitInvoke(Node _) => DalamudServices.Framework.Run(() => HoveredExit?.Invoke());
 
     public void SetText(string text)
     {
         TextNode.NodeValue = text;
-        RegisterInputs(text);
-    }
-
-    void RegisterInputs(string text)
-    {
-        TextNode.OnMouseEnter -= HoverInvoke;
-        TextNode.OnMouseLeave -= HoverExitInvoke;
-
-        if (text != string.Empty && Interactable)
-        {
-            TextNode.OnMouseEnter += HoverInvoke;
-            TextNode.OnMouseLeave += HoverExitInvoke;
-        }
     }
 
     readonly Stylesheet stylesheet = new Stylesheet([

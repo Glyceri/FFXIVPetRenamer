@@ -47,5 +47,5 @@ public static class PluginConstants
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
-    public static readonly int[] BaseSkeletons = new int[5] { BaseSummonerSkeleton, BaseGarudaEgiSkeleton, BaseTitanEgiSkeleton, BaseIfritEgiSkeleton, BaseScholarSkeleton };
+    public static readonly int[] BaseSkeletons = [BaseSummonerSkeleton, BaseGarudaEgiSkeleton, BaseTitanEgiSkeleton, BaseIfritEgiSkeleton, BaseScholarSkeleton];
 }
