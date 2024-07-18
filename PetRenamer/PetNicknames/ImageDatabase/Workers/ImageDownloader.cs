@@ -31,7 +31,7 @@ internal class ImageDownloader : IImageDownloader
         Networker = networker;
     }
 
-    public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
+    public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure, bool comesFromAutomation = false)
     {
         if (IsBeingDownloaded(entry)) return;
 
@@ -39,6 +39,8 @@ internal class ImageDownloader : IImageDownloader
         {
             return;
         }
+
+        if (!PetServices.Configuration.downloadProfilePictures && comesFromAutomation) return;
 
         Networker.SearchCharacter(entry, (entry, searchData) => OnSuccess(entry, searchData, success, failure), (e) => PetServices.PetLog.LogVerbose(e));
     }

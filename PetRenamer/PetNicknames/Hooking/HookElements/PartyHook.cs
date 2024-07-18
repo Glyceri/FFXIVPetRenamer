@@ -39,6 +39,8 @@ internal unsafe class PartyHook : HookableElement
 
     void SetPetname(AddonPartyList* partyNode)
     {
+        if (!PetServices.Configuration.showOnPartyList) return;
+
         IPettableUser? localPlayer = UserList.LocalPlayer;
         if (localPlayer == null) return;
 
@@ -53,6 +55,8 @@ internal unsafe class PartyHook : HookableElement
 
     void SetCastlist(AddonPartyList* partyNode)
     {
+        if (!PetServices.Configuration.showOnCastbars) return;
+
         foreach (PartyListMemberStruct member in partyNode->PartyMembers)
         {
             if (member.Name == null) continue;

@@ -11,6 +11,7 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
@@ -80,6 +81,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new EmptyWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
         AddWindow(new PetSharingWindow(this, in DalamudServices, in Configuration, in DataParser, in DataWriter));
         AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
+        AddWindow(new ColourEditorWindow(this, in DalamudServices, in Configuration));
     }
 
     void AddWindow(PetWindow window)

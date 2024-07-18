@@ -13,7 +13,7 @@ internal class HeaderBarButtonNode : Node
     public readonly PetShareButton PetShareSquare;
     public readonly PetConfigButton PetConfigSquare;
 
-    public HeaderBarButtonNode(in DalamudServices DalamudServices, in PetWindow petWindow, in Configuration configuration, in WindowHandler windowHandler)
+    public HeaderBarButtonNode(in DalamudServices DalamudServices, in PetWindow petWindow, in Configuration configuration, in WindowHandler windowHandler, bool hasExtraButtons)
     {
         Style = new Style()
         {
@@ -29,6 +29,13 @@ internal class HeaderBarButtonNode : Node
             PetShareSquare = new PetShareButton(in configuration, in windowHandler),
             PetConfigSquare = new PetConfigButton(in configuration, in windowHandler),
         ];
+
+        if (hasExtraButtons) return;
+
+        RemoveChild(PetRenameSquare, true);
+        RemoveChild(PetListSquare, true);
+        RemoveChild(PetConfigSquare, true);
+        RemoveChild(PetShareSquare, true);
     }
 
 }

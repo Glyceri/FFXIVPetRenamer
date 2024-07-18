@@ -21,6 +21,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
     protected abstract Vector2 DefaultSize { get; }
 
     protected abstract bool HasModeToggle { get; }
+    protected abstract bool HasExtraButtons { get; }
 
     protected Size ContentSize { get; private set; } = new Size();
 
@@ -28,6 +29,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     protected readonly DalamudServices DalamudServices;
     protected readonly WindowHandler WindowHandler;
+    protected readonly Configuration Configuration;
 
     readonly BackgroundNode _windowNode;
 
@@ -41,6 +43,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
     {
         WindowHandler = windowHandler;
         DalamudServices = dalamudServices;
+        Configuration = configuration;
 
         _windowNode = new BackgroundNode()
         {
@@ -57,7 +60,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
                     ClassList = ["window--titlebar-text"],
                     NodeValue = Title,
                 },
-                new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler),
+                new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler, HasExtraButtons),
                 ContentNode = new Node()
                 {
                     ClassList = ["window--content"],

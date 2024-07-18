@@ -34,6 +34,7 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer5());
         legacyStepperElements.Add(new LegacyNamingVer6(PetServices));
         legacyStepperElements.Add(new LegacyNamingVer7(PetServices));
+        legacyStepperElements.Add(new LegacyNamingVer8());
 
         foreach (ILegacyStepperElement legacyStepperElement in legacyStepperElements)
         {

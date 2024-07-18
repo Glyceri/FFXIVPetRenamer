@@ -20,6 +20,7 @@ internal partial class PetRenameWindow : PetWindow
     protected override Vector2 MaxSize { get; } = new Vector2(475, 170);
     protected override Vector2 DefaultSize { get; } = new Vector2(475, 170);
     protected override bool HasModeToggle { get; } = true;
+    protected override bool HasExtraButtons { get; } = true;
 
     protected override string Title { get; } = Translator.GetLine("WindowHandler.Title");
     protected override string ID { get; } = "WindowHandler";

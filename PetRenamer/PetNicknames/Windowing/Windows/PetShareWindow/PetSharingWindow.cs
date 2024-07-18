@@ -9,7 +9,6 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
-using System.Data;
 using System.Numerics;
 using Una.Drawing;
 
@@ -26,13 +25,14 @@ internal class PetSharingWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(300, 100);
     protected override bool HasModeToggle { get; } = false;
     protected override string Title { get; } = Translator.GetLine("PetList.Sharing");
+    protected override bool HasExtraButtons { get; } = false;
 
     readonly QuickButton ExportButton;
     readonly QuickButton ImportButton;
 
     public PetSharingWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "PetSharing")
     {
-        IsOpen = true;
+        IsOpen = false;
 
         DataParser = dataParser;
         DataWriter = dataWriter;

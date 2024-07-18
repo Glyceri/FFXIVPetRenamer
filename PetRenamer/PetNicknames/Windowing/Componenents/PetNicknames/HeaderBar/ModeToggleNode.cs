@@ -67,8 +67,6 @@ internal class ModeToggleNode : Node
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
                     BackgroundColor = new("ModeToggleInactive"),
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.BottomLeft,
                 }),
             new(".ModeToggleUnavailableBattlePet",
                 new()
@@ -76,8 +74,6 @@ internal class ModeToggleNode : Node
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
                     BackgroundColor = new("ModeToggleInactive"),
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
                 }),
             new(".BattlePetModeActive",
                 new()
@@ -85,8 +81,6 @@ internal class ModeToggleNode : Node
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
                     BackgroundColor = new("Titlebar.BattlePet"),
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
                 }),
             new(".BattlePetModeActive:hover",
                 new()
@@ -100,8 +94,6 @@ internal class ModeToggleNode : Node
                     Flow = Flow.Vertical,
                     Size = new Size(32, 15),
                     BackgroundColor = new("Titlebar.Minion"),
-                    BorderRadius = 6,
-                    RoundedCorners = RoundedCorners.TopLeft | RoundedCorners.BottomLeft,
                 }),
             new(".MinionModeActive:hover",
                 new()

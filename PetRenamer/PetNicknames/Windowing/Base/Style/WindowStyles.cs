@@ -71,6 +71,8 @@ internal static class WindowStyles
         Color.AssignByName("Window.Background:active", new Color(26, 20, 0, 255).ToUInt());
         Color.AssignByName("Window.BackgroundLight", new Color(161, 155, 138, 110).ToUInt());
 
+        Color.AssignByName("SearchBarBackground", new Color(150, 150, 150, 150).ToUInt());
+
         Color.AssignByName("ModeToggleInactive", new Color(15, 15, 15).ToUInt());
 
         Color.AssignByName("Window.TextOutline", new Color(189, 141, 6, 190).ToUInt());

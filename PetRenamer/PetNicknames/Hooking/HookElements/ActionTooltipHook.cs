@@ -32,7 +32,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
         DalamudServices.GameGui.HoveredActionChanged += OnHoveredActionChanged;
     }
 
-    bool Allowed(int id) => true;
+    bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
     void OnHoveredActionChanged(object? sender, HoveredAction e)
     {

@@ -12,4 +12,5 @@ internal partial class PetListWindow
     protected override Vector2 MaxSize { get; } = new Vector2(550, 997);
     protected override Vector2 DefaultSize { get; } = new Vector2(550, 282);
     protected override bool HasModeToggle { get; } = true;
+    protected override bool HasExtraButtons { get; } = true;
 }

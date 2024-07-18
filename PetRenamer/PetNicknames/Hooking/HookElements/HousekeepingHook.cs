@@ -9,8 +9,11 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class HousekeepingHook : HookableElement, IHousekeepingHook
 {
+    readonly Configuration Configuration;
+
     public HousekeepingHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
+        Configuration = petServices.Configuration;
     }
 
     public override void Init()
@@ -20,6 +23,8 @@ internal class HousekeepingHook : HookableElement, IHousekeepingHook
 
     void OnPVPEnter()
     {
+        if (Configuration.disablePVPChatMessage) return;
+
         DalamudServices.ChatGui.PrintError(Translator.GetLine("PVPWarning"));
     }
 

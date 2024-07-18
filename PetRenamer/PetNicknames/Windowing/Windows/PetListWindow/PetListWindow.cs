@@ -11,6 +11,8 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Enum;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow.Structs;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
@@ -132,7 +134,7 @@ internal partial class PetListWindow : PetWindow
         {
             ScrollistContentNode.RemoveChild(ScrollistContentNode.ChildNodes[i], true);
         }
-        
+
 
         if (inUserMode) HandleUserMode();
         else HandlePetMode();
@@ -154,7 +156,7 @@ internal partial class PetListWindow : PetWindow
     {
         HandleHeaderUsermode();
 
-        IPettableDatabaseEntry[] entries = [..Database.DatabaseEntries, ..LegacyDatabase.DatabaseEntries];
+        IPettableDatabaseEntry[] entries = [.. Database.DatabaseEntries, .. LegacyDatabase.DatabaseEntries];
         int length = entries.Length;
 
         Looper(length, (index) =>
@@ -164,7 +166,7 @@ internal partial class PetListWindow : PetWindow
 
             if (inSearchMode)
             {
-                if (!(SearchBarNode.Valid(entry.Name) 
+                if (!(SearchBarNode.Valid(entry.Name)
                  || SearchBarNode.Valid(entry.HomeworldName)
                  || SearchBarNode.Valid(entry.Version)
                  || SearchBarNode.Valid(entry.AddedOn))) return false;
@@ -197,9 +199,21 @@ internal partial class PetListWindow : PetWindow
         if (ActiveEntry == null) return;
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
-        int[] validIDS = names.IDs;
-        string[] validNames = names.Names;
-        int newLength = names.Length;
+
+        List<int> validIDS = names.IDs.ToList();
+        List<string> validNames = names.Names.ToList();
+
+        if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
+        {
+            List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIDS);
+            foreach (IPetSheetData p in data)
+            {
+                validIDS.Add(p.Model);
+                validNames.Add("");
+            }
+        }
+
+        int newLength = validIDS.Count;
 
         Looper(newLength, (index) =>
         {
@@ -220,9 +234,9 @@ internal partial class PetListWindow : PetWindow
                  || SearchBarNode.Valid(customName))) return false;
             }
 
-            if (!index.Item2) 
+            if (!index.Item2)
             {
-                return true; 
+                return true;
             }
 
             PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, customName, isLocalEntry);

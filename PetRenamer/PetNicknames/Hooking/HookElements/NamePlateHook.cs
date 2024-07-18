@@ -8,7 +8,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using System.Text;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -55,6 +54,8 @@ internal unsafe class NamePlateHook : HookableElement
 
     void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint gameObject)
     {
+        if (!PetServices.Configuration.showOnNameplates) return;
+
         IPettablePet? pPet = UserList.GetPet(gameObject);
         if (pPet == null) return;
 

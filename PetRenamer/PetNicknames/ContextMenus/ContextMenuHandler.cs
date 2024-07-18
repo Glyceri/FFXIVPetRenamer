@@ -50,6 +50,8 @@ internal class ContextMenuHandler : IDisposable
 
     void OnOpenMenu(IMenuOpenedArgs args)
     {
+        if (!PetServices.Configuration.useContextMenus) return;
+
         foreach(IContextMenuElement contextMenuElement in ContextMenuElements)
         {
             if (contextMenuElement.AddonName != args.AddonName) continue;

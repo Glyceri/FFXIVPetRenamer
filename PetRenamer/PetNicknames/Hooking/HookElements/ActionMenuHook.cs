@@ -193,6 +193,8 @@ internal unsafe class ActionMenuHook : HookableElement
         string? customName = user.DataBaseEntry.GetName(softData.Model);
         if (customName == null) return;
 
+        if (!PetServices.Configuration.showNamesInActionLog) return;
+
         PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet);
     }
 

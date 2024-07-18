@@ -21,16 +21,15 @@ internal unsafe class TargetBarHook : QuickHookableElement
 
         Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed).RegsterTarget(FocusTargetPet);
 
-        Hook<CastBarHook>("_CastBar", [4], Allowed, true);
-        Hook<TargetCastBarHook>("_TargetInfo", [12], Allowed, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
-        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], Allowed, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
-        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], Allowed, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
+        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, true);
+        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
+        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
+        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
 
-        Hook<NotebookHook>("MinionNoteBook", [67], Allowed);
-        Hook<NotebookHook>("LovmPaletteEdit", [48], Allowed);
-        Hook<NotebookHook>("LovmActionDetail", [4], Allowed);
-
-        Hook<NotebookHook>("YKWNote", [28], Allowed);
+        Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook);
+        Hook<NotebookHook>("LovmPaletteEdit", [48], AllowedNotebook);
+        Hook<NotebookHook>("LovmActionDetail", [4], AllowedNotebook);
+        Hook<NotebookHook>("YKWNote", [28], AllowedNotebook);
     }
 
     IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.GameObjectId ?? 0);
@@ -40,5 +39,7 @@ internal unsafe class TargetBarHook : QuickHookableElement
     IGameObject? FocusTarget => DalamudServices.TargetManager.FocusTarget;
     IGameObject? Target => DalamudServices.TargetManager.SoftTarget ?? DalamudServices.TargetManager.Target;
 
-    bool Allowed(int id) => true;
+    bool Allowed(int id) => PetServices.Configuration.showOnTargetBars;
+    bool AllowedCastbar(int id) => PetServices.Configuration.showOnCastbars;
+    bool AllowedNotebook(int id) => PetServices.Configuration.showNamesInMinionBook;
 }

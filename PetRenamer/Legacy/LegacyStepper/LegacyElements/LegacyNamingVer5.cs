@@ -9,16 +9,8 @@ internal class LegacyNamingVer5 : ILegacyStepperElement
 
     public void Upgrade(Configuration configuration)
     {
-        configuration.allowCastBarPet = configuration.allowCastBar;
-        configuration.useCustomFlyoutPet = configuration.useCustomFlyoutInChat;
-        configuration.useCustomPetNamesInBattleChat = configuration.useCustomNamesInChat;
-        configuration.useContextMenuOnBattlePets = configuration.useContextMenus;
-        configuration.allowTooltipsBattlePets = configuration.allowTooltips;
-        configuration.replaceEmotesBattlePets = configuration.replaceEmotes;
-
-        configuration.useContextMenuOnMinions = configuration.useContextMenus;
-        configuration.allowTooltipsOnMinions = configuration.allowTooltips;
-        configuration.replaceEmotesOnMinions = configuration.replaceEmotes;
+        // This used to convert from old settings to new, but in 2.0 this is irrelevant
+        // We still need to step up though
 
         configuration.Version = 6;
     }

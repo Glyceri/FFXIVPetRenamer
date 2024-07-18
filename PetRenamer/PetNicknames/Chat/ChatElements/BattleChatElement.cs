@@ -22,6 +22,8 @@ internal unsafe class BattleChatElement : RestrictedChatElement
 
     internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
+        if (!PetServices.Configuration.showInBattleChat) return;
+
         BattleChara* dealer = PetServices.PetCastHelper.LastCastDealer;
         int lastCastID = PetServices.PetCastHelper.LastCastID;
 

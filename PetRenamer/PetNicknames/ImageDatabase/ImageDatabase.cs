@@ -54,9 +54,8 @@ internal class ImageDatabase : IImageDatabase
 
             _imageDatabase.Add(new GlyceriTextureWrap(petUser));
         }
-        //TODO: CHECK HERE IF THE USER WANTS TO AUTOMATICALLY DOWNLOAD PICTURES
 
-        ImageDownloader.DownloadImage(databaseEntry, OnSuccess, (e) => PetServices.PetLog.LogException(e));
+        ImageDownloader.DownloadImage(databaseEntry, OnSuccess, PetServices.PetLog.LogException, true);
 
         return SearchTexture;
     }

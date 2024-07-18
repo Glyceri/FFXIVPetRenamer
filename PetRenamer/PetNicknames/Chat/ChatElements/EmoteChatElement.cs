@@ -27,6 +27,7 @@ internal unsafe class EmoteChatElement : IChatElement
 
     public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
+        if (!PetServices.Configuration.showOnEmotes) return;
         if (type != XivChatType.StandardEmote) return;
 
         BattleChara* bChara = CharacterManager.Instance()->LookupBattleCharaByName(sender.ToString(), true);

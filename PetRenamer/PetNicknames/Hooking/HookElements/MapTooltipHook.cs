@@ -41,7 +41,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
         showTooltip?.Enable();
     }
 
-    bool Allowed(int id) => true;
+    bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
     unsafe int ShowTooltipDetour(AtkUnitBase* tooltip, byte tooltipType, ushort addonID, AtkUnitBase* a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8)
     {
