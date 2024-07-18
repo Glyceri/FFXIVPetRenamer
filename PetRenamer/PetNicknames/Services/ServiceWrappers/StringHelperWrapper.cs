@@ -16,21 +16,27 @@ internal class StringHelperWrapper : IStringHelper
     {
         if (atkNode == null) return baseString;
         string newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace);
-        return SetATKString(atkNode, newString);
+        atkNode->NodeText.SetString(newString);
+        return newString;
     }
 
     public unsafe string SetATKString(AtkTextNode* atkNode, string text)
-    {
-        return SetUtf8String(in atkNode->NodeText, text);
-    }
-
-    public string SetUtf8String(in Utf8String utf8String, string text) 
     {
         string newString = text + '\0';
 
         byte[] data = Encoding.UTF8.GetBytes(newString);
 
-        utf8String.SetString(data);
+        atkNode->NodeText.SetString(data);
+
+        return text;
+    }
+
+
+    public string SetUtf8String(in Utf8String utf8String, string text)
+    {
+        string newString = text + '\0';
+
+        utf8String.SetString(newString);
 
         return text;
     }
@@ -72,7 +78,7 @@ internal class StringHelperWrapper : IStringHelper
             baseString = baseString.Replace(MakeString(PluginConstants.forbiddenCharacter, i + 1), replaceString);
         }
 
-        return baseString;
+        return baseString + '\0';
     }
 
     List<string> GetString(IPetSheetData petData)
