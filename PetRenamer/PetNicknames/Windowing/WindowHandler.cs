@@ -12,12 +12,10 @@ using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
-using PetRenamer.PetNicknames.Windowing.Windows.EmptyWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetListWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.PetShareWindow;
 using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
-using System.Data;
 using System.Linq;
 using Una.Drawing;
 
@@ -76,9 +74,9 @@ internal class WindowHandler : IWindowHandler
 
     void _Register()
     {
+        AddWindow(new KofiWindow(this, in DalamudServices, in Configuration));
         AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
         AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
-        AddWindow(new EmptyWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
         AddWindow(new PetSharingWindow(this, in DalamudServices, in Configuration, in DataParser, in DataWriter));
         AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
         AddWindow(new ColourEditorWindow(this, in DalamudServices, in Configuration));
@@ -131,6 +129,14 @@ internal class WindowHandler : IWindowHandler
         }
     }
 
+    public void SetKofiMode(bool mode)
+    {
+        foreach (PetWindow window in WindowSystem.Windows)
+        {
+            window.HeaderBar.SetKofiButton(mode);
+        }
+    }
+
     bool isDirty = false;
 
     void HandleDirty(INamesDatabase namesDatabase)
@@ -145,7 +151,14 @@ internal class WindowHandler : IWindowHandler
 
     void Draw()
     {
-        Node.ScaleFactor = ImGuiHelpers.GlobalScale;
+        if (PetServices.Configuration.petNicknamesUIScale <= 0)
+        {
+            Node.ScaleFactor = ImGuiHelpers.GlobalScale;
+        }
+        else
+        {
+            Node.ScaleFactor = PetServices.Configuration.petNicknamesUIScale;
+        }
 
         WindowSystem.Draw();
 

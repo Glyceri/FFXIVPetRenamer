@@ -31,6 +31,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
     protected readonly WindowHandler WindowHandler;
     protected readonly Configuration Configuration;
 
+    public readonly HeaderBarButtonNode HeaderBar;
+
     readonly BackgroundNode _windowNode;
 
     readonly Node TitlebarNode;
@@ -60,7 +62,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
                     ClassList = ["window--titlebar-text"],
                     NodeValue = Title,
                 },
-                new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler, HasExtraButtons),
+                HeaderBar = new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler, HasExtraButtons),
                 ContentNode = new Node()
                 {
                     ClassList = ["window--content"],
@@ -68,15 +70,9 @@ internal abstract partial class PetWindow : Window, IPetWindow
             ]
         };
 
-        SizeConstraints = new WindowSizeConstraints()
-        {
-            MinimumSize = MinSize,
-            MaximumSize = MaxSize,
-        };
-        Size = DefaultSize;
-        SizeCondition = ImGuiCond.FirstUseEver;
-
         if (HasModeToggle) PetModeConstructor();
+
+        HeaderBar.SetKofiButton(Configuration.showKofiButton);
     }
 
     public void Close() => IsOpen = false;
@@ -84,6 +80,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     public sealed override void PreDraw()
     {
+        ImGui.SetNextWindowSizeConstraints(MinSize * Node.ScaleFactor, MaxSize * Node.ScaleFactor);
+        ImGui.SetNextWindowSize(DefaultSize, ImGuiCond.FirstUseEver);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
@@ -99,12 +97,8 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
     public sealed override void Draw()
     {
-        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Right))
-        {
-            Node.DrawDebugInfo ^= true;
-        }
+        Vector2 size = ImGui.GetWindowSize() / Node.ScaleFactor;
 
-        Vector2 size = ImGui.GetWindowSize() * (1.0f / Node.ScaleFactor);
         if (lastSize != size)
         {
             lastSize = size;
@@ -117,7 +111,15 @@ internal abstract partial class PetWindow : Window, IPetWindow
             ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
             ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
         }
-        _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background:active") : new Color("Window.Background");
+
+        if (Configuration.transparentBackground)
+        {
+            _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background:active") : new Color("Window.Background");
+        }
+        else
+        {
+            _windowNode.Style.BackgroundColor = new Color("Window.Background:active");
+        }
 
         _windowNode.Style.StrokeColor = IsFocused ? WindowStyles.WindowBorderActive : WindowStyles.WindowBorderInactive;
 

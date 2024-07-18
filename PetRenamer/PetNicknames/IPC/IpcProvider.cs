@@ -1,7 +1,5 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -21,7 +19,6 @@ internal class IpcProvider : IIpcProvider
     bool ready = false;
     string lastData = string.Empty;
 
-    readonly IPetServices PetServices;
     readonly IDalamudPluginInterface PetNicknamesPlugin;
     readonly IDataWriter DataWriter;
     readonly IDataParser DataReader;
@@ -85,9 +82,8 @@ internal class IpcProvider : IIpcProvider
      * ----------------------END READ ME -----------------------
      */
 
-    public IpcProvider(in IPetServices petServices, in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
+    public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
     {
-        PetServices = petServices;
         PetNicknamesPlugin = petNicknamesPlugin;
         DataReader = dataReader;
         DataWriter = dataWriter;

@@ -9,6 +9,6 @@ internal class PetShareButton : WindowOpenerButton<PetSharingWindow>
     public PetShareButton(in Configuration configuration, in WindowHandler windowHandler) : base(configuration, windowHandler)
     {
         Tooltip = "Sharing";
-        NodeValue = FontAwesomeIcon.AddressBook.ToIconString();
+        NodeValue = FontAwesomeIcon.FileExport.ToIconString();
     }
 }

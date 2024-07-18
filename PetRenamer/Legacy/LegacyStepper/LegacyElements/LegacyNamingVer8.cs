@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
-using PetRenamer.Legacy.LegacyStepper.LegacyElements.Interfaces;
+﻿using PetRenamer.Legacy.LegacyStepper.LegacyElements.Interfaces;
 
 namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
@@ -16,4 +15,3 @@ internal class LegacyNamingVer8 : ILegacyStepperElement
         configuration.Version = 9;
     }
 }
-#pragma warning restore CS0618 // Type or member is obsolete

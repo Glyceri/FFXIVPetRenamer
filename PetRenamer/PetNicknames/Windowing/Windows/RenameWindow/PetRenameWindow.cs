@@ -40,7 +40,7 @@ internal partial class PetRenameWindow : PetWindow
 
         UserList = userList;
         PetServices = petServices;
-        petRenameNode = new PetRenameNode(null, null, in DalamudServices);
+        petRenameNode = new PetRenameNode(null, null, in DalamudServices, in configuration);
         AddNode(ContentNode, petRenameNode);
         petRenameNode.OnSave += OnSave;
     }

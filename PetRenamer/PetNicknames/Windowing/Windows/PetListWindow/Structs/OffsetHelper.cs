@@ -16,7 +16,7 @@ internal struct OffsetHelper
 
     public void IncrementValidOffset() => currentValidOffset++;
 
-    public OffsetResult OffsetResult()
+    public readonly OffsetResult OffsetResult()
     {
         bool isEarly = currentValidOffset < Offset;
         bool isTechnicallyLate = currentValidOffset == OffsetPlusOne;

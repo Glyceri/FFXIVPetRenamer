@@ -37,7 +37,7 @@ internal class SmallHeaderNode : Node
     }
 
 
-    Stylesheet stylesheet = new Stylesheet([
+    readonly Stylesheet stylesheet = new Stylesheet([
         new (".HeaderText", new Style()
         {
             FontSize = 12,

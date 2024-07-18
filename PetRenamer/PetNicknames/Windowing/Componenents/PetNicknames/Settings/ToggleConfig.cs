@@ -31,23 +31,37 @@ internal class ToggleConfig : Node
         };
 
         ChildNodes = [
-            buttonClick = new QuickSquareButton()
+            new Node()
             {
-                NodeValue = startValue ? FontAwesomeIcon.Check.ToIconString() : string.Empty,
-            },
-           LabelNode = new Node()
-           {
-               Stylesheet = stylesheet,
-               ClassList = ["LabelNode"],
-               NodeValue = label,
-               ChildNodes = [
+                Style = new Style()
+                {
+                    Flow = Flow.Vertical,
+                    Size = new Size(15, 18),
+                    Gap = 1,
+                },
+                ChildNodes = [
+                    buttonClick = new QuickSquareButton()
+                    {
+                        NodeValue = startValue ? FontAwesomeIcon.Check.ToIconString() : string.Empty,
+                        Style = new Style()
+                        {
+                            Flow = Flow.Vertical,
+                        },
+                    },
                     UnderlineNode = new Node()
                     {
                         Stylesheet = stylesheet,
                         ClassList = ["UnderlineNode"],
                     },
-               ]
-           },
+                ]
+            },
+            LabelNode = new Node()
+            {
+                Stylesheet = stylesheet,
+                ClassList = ["LabelNode"],
+                NodeValue = label,
+
+            },
         ];
 
         buttonClick.OnClick += () =>
@@ -75,7 +89,6 @@ internal class ToggleConfig : Node
         new(".UnderlineNode", new Style()
         {
             Size = new Size(300, 2),
-            Anchor = Anchor.BottomLeft,
             BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,

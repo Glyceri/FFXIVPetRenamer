@@ -27,8 +27,12 @@ internal class RotatableUVImage : Node
 
     public Vector3 Color { get; set; } = new Vector3(255, 255, 255);
 
-    public RotatableUVImage(in DalamudServices dalamudServices, uint icon, float topLeftX, float topLeftY, float botRightX, float botRightY)
+    readonly Configuration Configuration;
+
+    public RotatableUVImage(in DalamudServices dalamudServices, in Configuration configuration, uint icon, float topLeftX, float topLeftY, float botRightX, float botRightY)
     {
+        Configuration = configuration;
+
         Texture = dalamudServices.TextureProvider.GetFromGameIcon(icon);
         StartTime = DateTime.Now;
 
@@ -38,13 +42,15 @@ internal class RotatableUVImage : Node
         this.botRightY = botRightY;
     }
 
-    public RotatableUVImage(in DalamudServices dalamudServices, uint icon, Vector2 topLeft, Vector2 botRight) : this (in dalamudServices, icon, topLeft.X, topLeft.Y, botRight.X, botRight.Y)
+    public RotatableUVImage(in DalamudServices dalamudServices, in Configuration configuration, uint icon, Vector2 topLeft, Vector2 botRight) : this (in dalamudServices, in configuration, icon, topLeft.X, topLeft.Y, botRight.X, botRight.Y)
     {
-
+       
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
+        if (!Configuration.uiFlare) return;
+
         DateTime now = DateTime.Now;
         TimeSpan time = StartTime - now;
         StartTime = now;

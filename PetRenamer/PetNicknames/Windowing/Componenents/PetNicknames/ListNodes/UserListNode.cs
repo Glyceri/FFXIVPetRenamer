@@ -26,14 +26,17 @@ internal class UserListNode : Node
     readonly Node HolderNode;
 
     readonly DalamudServices DalamudServices;
+    readonly Configuration Configuration;
 
     readonly IPettableDatabaseEntry ActiveEntry;
 
     public Action<IPettableDatabaseEntry>? OnView;
 
-    public UserListNode(in DalamudServices services, in IImageDatabase imageDatabase, in IPettableDatabaseEntry entry, bool asLocal)
+    public UserListNode(in DalamudServices services, in Configuration configuration, in IImageDatabase imageDatabase, in IPettableDatabaseEntry entry, bool asLocal)
     {
+        Configuration = configuration;
         DalamudServices = services;
+
         ActiveEntry = entry;
         Style = new Style()
         {
@@ -133,7 +136,7 @@ internal class UserListNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        base.OnDraw(drawList);
+        if (!Configuration.uiFlare) return;
 
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;

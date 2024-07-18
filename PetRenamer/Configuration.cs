@@ -28,7 +28,6 @@ internal class Configuration : IPluginConfiguration
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
     public bool disablePVPChatMessage = false;
-
     // ------------------------------- Pet -------------------------------
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;
@@ -43,6 +42,9 @@ internal class Configuration : IPluginConfiguration
     // --------------------------- UI SETTINGS ---------------------------
     public bool quickButtonsToggle = false;
     public bool showKofiButton = true;
+    public float petNicknamesUIScale = 0;
+    public bool uiFlare = true;
+    public bool transparentBackground = true;
 
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {

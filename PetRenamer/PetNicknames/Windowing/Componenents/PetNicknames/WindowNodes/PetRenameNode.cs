@@ -12,6 +12,7 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNode
 internal class PetRenameNode : Node
 {
     readonly DalamudServices DalamudServices;
+    readonly Configuration Configuration;
 
     readonly IconNode IconNode;
 
@@ -30,9 +31,11 @@ internal class PetRenameNode : Node
 
     readonly Node HolderNode;
 
-    public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services)
+    public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services, in Configuration configuration)
     {
         DalamudServices = services;
+        Configuration = configuration;
+
         CurrentValue = customName;
         ActivePet = activePet;
         ChildNodes =
@@ -93,7 +96,7 @@ internal class PetRenameNode : Node
                     },
                     ChildNodes =
                     [
-                        CircleImageNode = new TechnoCircleImageNode(in services)
+                        CircleImageNode = new TechnoCircleImageNode(in services, in configuration)
                         { 
                             Opacity = 0.3f,
                             RoationSpeed = 12,
@@ -126,6 +129,8 @@ internal class PetRenameNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
+        if (!Configuration.uiFlare) return;
+
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;
 

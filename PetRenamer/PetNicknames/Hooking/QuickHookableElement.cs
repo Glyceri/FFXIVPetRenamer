@@ -13,7 +13,7 @@ internal abstract class QuickHookableElement : HookableElement
 {
     public QuickHookableElement(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
-    List<ITextHook> textHooks = new List<ITextHook>();
+    readonly List<ITextHook> textHooks = new List<ITextHook>();
 
     public T Hook<T>(string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false) where T : ITextHook, new()
     {

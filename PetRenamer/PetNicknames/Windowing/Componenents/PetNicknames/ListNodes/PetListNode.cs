@@ -24,10 +24,13 @@ internal class PetListNode : Node
     public Action<string?>? OnSave;
 
     readonly DalamudServices DalamudServices;
+    readonly Configuration Configuration;
 
-    public PetListNode(in DalamudServices services, in IPetSheetData data, string? customName, bool asLocalEntry)
+    public PetListNode(in DalamudServices services, in Configuration configuration, in IPetSheetData data, string? customName, bool asLocalEntry)
     {
+        Configuration = configuration;
         DalamudServices = services;
+
         Style = new Style()
         {
             Flow = Flow.Horizontal,
@@ -88,7 +91,7 @@ internal class PetListNode : Node
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        base.OnDraw(drawList);
+        if (!Configuration.uiFlare) return;
 
         Rect activeRect = SpeciesNode.UnderlineNode.Bounds.ContentRect;
         Rect iconRect = IconNode.Bounds.ContentRect;

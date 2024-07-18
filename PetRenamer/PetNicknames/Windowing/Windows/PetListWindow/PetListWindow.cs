@@ -179,7 +179,7 @@ internal partial class PetListWindow : PetWindow
 
             bool isLocal = HandleIfLocalEntry(entry);
 
-            UserListNode userNode = new UserListNode(in DalamudServices, in ImageDatabase, in entry, isLocal);
+            UserListNode userNode = new UserListNode(in DalamudServices, in Configuration, in ImageDatabase, in entry, isLocal);
             ScrollistContentNode.AppendChild(userNode);
 
             userNode.OnView += (user) =>
@@ -239,7 +239,7 @@ internal partial class PetListWindow : PetWindow
                 return true;
             }
 
-            PetListNode newPetListNode = new PetListNode(in DalamudServices, petData, customName, isLocalEntry);
+            PetListNode newPetListNode = new PetListNode(in DalamudServices, in Configuration, petData, customName, isLocalEntry);
             ScrollistContentNode.AppendChild(newPetListNode);
             newPetListNode.OnSave += (value) => OnSave(value, id);
 

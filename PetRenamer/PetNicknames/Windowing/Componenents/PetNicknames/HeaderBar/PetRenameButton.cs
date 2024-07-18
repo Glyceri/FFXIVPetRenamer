@@ -8,7 +8,7 @@ internal class PetRenameButton : WindowOpenerButton<PetRenameWindow>
 {
     public PetRenameButton(in Configuration configuration, in WindowHandler windowHandler) : base(configuration, windowHandler)
     {
-        NodeValue = FontAwesomeIcon.AddressCard.ToIconString();
+        NodeValue = FontAwesomeIcon.PenSquare.ToIconString();
         Tooltip = "Rename Pet";
     }
 }

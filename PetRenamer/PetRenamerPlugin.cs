@@ -78,7 +78,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         DataWriter = new DataWriter(in PettableUserList);
         DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
 
-        IpcProvider = new IpcProvider(in _PetServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
         UpdateHandler = new UpdateHandler(in _DalamudServices, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);

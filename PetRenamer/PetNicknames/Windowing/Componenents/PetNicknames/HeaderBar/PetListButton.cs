@@ -9,6 +9,6 @@ internal class PetListButton : WindowOpenerButton<PetListWindow>
     public PetListButton(in Configuration configuration, in WindowHandler windowHandler) : base(configuration, windowHandler)
     {
         Tooltip = "Pet List";
-        NodeValue = FontAwesomeIcon.List.ToIconString();
+        NodeValue = FontAwesomeIcon.ListUl.ToIconString();
     }
 }
