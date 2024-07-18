@@ -1,37 +1,46 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using PetRenamer.PetNicknames.Commands.Commands;
+using PetRenamer.PetNicknames.Commands.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.Interface;
-using System;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Commands;
 
-internal class CommandHandler : IDisposable
+internal class CommandHandler : ICommandHandler
 {
     readonly DalamudServices DalamudServices;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList UserList;
+    readonly IWindowHandler WindowHandler;
 
-    public CommandHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
+    readonly List<ICommand> Commands = new List<ICommand>();
+
+    public CommandHandler(in DalamudServices dalamudServices, in IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
-        PetServices = petServices;
-        UserList = userList;
+        WindowHandler = windowHandler;
 
         _RegisterCommands();
     }
 
     void _RegisterCommands()
     {
+        RegisterCommand(new PetnameCommand(in DalamudServices, in WindowHandler));
+        RegisterCommand(new PetsettingsCommand(in DalamudServices, in WindowHandler));
+        RegisterCommand(new PetsharingCommand(in DalamudServices, in WindowHandler));
+        RegisterCommand(new PetlistCommand(in DalamudServices, in WindowHandler));
 
     }
 
-    void RegisterCommand()
+    void RegisterCommand(ICommand command)
     {
-
+        Commands.Add(command);
     }
 
     public void Dispose()
     {
-        
+        foreach(ICommand command in Commands)
+        {
+            command?.Dispose();
+        }   
+        Commands.Clear();
     }
 }

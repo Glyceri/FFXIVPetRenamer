@@ -23,8 +23,6 @@ internal class PetConfigWindow : PetWindow
 
     public PetConfigWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Configuration")
     {
-        IsOpen = true;
-
         ContentNode.Overflow = false;
 
         ContentNode.Style = new Style()

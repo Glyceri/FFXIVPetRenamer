@@ -32,8 +32,6 @@ internal class PetSharingWindow : PetWindow
 
     public PetSharingWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "PetSharing")
     {
-        IsOpen = false;
-
         DataParser = dataParser;
         DataWriter = dataWriter;
 

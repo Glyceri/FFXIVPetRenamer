@@ -1,4 +1,5 @@
-﻿using Dalamud.Utility;
+﻿using Dalamud.Interface.Utility;
+using Dalamud.Utility;
 using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -38,7 +39,7 @@ internal class SearchBarNode : RenameTitleNode
 
     protected override void OnDraw(ImDrawListPtr drawList)
     {
-        ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.TopLeft - new Vector2(0, Node.ScaleFactor * 3));
+        ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.BottomLeft - new Vector2(0, 18 * ImGuiHelpers.GlobalScale));
         ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
         ImGui.PushStyleColor(ImGuiCol.FrameBg, new Color("SearchBarBackground").ToUInt());
         if (ImGui.InputText($"##RenameField_{InternalID}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))

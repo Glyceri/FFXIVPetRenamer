@@ -9,7 +9,7 @@ internal static class Translator
 {
     static DalamudServices DalamudServices = null!;
 
-    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.English;
+    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.Default;
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
@@ -78,6 +78,11 @@ internal static class Translator
         { "Kofi.Line1", "This is about real life money." },
         { "Kofi.Line2", "It will be used to buy dog toys!" },
         { "Kofi.TakeMe", "Take me" },
+
+        { "Command.Petname", "Open the Pet Rename window." },
+        { "Command.Petlist", "Open the Pet List window." },
+        { "Command.PetSettings", "Open the Settings window." },
+        { "Command.PetSharing", "Open the Sharing window." },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -138,13 +143,18 @@ internal static class Translator
         { "Config.Notebook", "Spitznamen im „Begleiter-Verzeichnis“ anzeigen." },
         { "Config.ActionLog", "Spitznamen in der „Kommandoliste“ anzeigen." },
         { "Config.Targetbar", "Spitznamen für Ziele anzeigen." },
-        { "Config.Partylist", "Spitznamen auf der Partyliste anzeigen." },
+        { "Config.Partylist", "Spitznamen auf der „Partyliste“ anzeigen." },
         { "Config.ContextMenu", "Kontextmenüs zulassen." },
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "Hier geht es um echtes Geld." },
         { "Kofi.Line2", "Es wird für den Kauf von Hundespielzeug verwendet!" },
         { "Kofi.TakeMe", "Los geht's" },
+
+        { "Command.Petname", "Öffnet das Fenster „Haustierausweis“." },
+        { "Command.Petlist", "Öffnet das Fenster „Spitznamenliste“." },
+        { "Command.PetSettings", "Öffnet das Fenster „Einstellungen“." },
+        { "Command.PetSharing", "Öffnet das Fenster „Teilen“." },
     };
 
 

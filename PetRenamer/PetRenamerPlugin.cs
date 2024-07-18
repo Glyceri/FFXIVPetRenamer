@@ -83,27 +83,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         UpdateHandler = new UpdateHandler(in _DalamudServices, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
         ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
-        CommandHandler = new CommandHandler(_DalamudServices, _PetServices, PettableUserList);
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter);
+        CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
-
-        _DalamudServices.CommandManager.AddHandler("/petname", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetRenameWindow>())
-        {
-            HelpMessage = "Temporary",
-            ShowInHelp = true
-        });
-
-        _DalamudServices.CommandManager.AddHandler("/petlist", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Open<PetListWindow>())
-        {
-            HelpMessage = "Temporary",
-            ShowInHelp = true
-        });
-
-        _DalamudServices.CommandManager.AddHandler("/petrestart", new Dalamud.Game.Command.CommandInfo((s, ss) => WindowHandler.Rebuild())
-        {
-            HelpMessage = "Temporary",
-            ShowInHelp = true
-        });
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
         IpcProvider.Prepare();
