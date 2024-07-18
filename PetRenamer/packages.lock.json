@@ -13,6 +13,31 @@
         "requested": "[1.11.54, )",
         "resolved": "1.11.54",
         "contentHash": "bgB79N4urc4D7hrD4R+Qk6CjPiYOfs6vfXNsmw3nCcfQEQvBQGjfAcl5k/tB1ZP1hA0d7xXs0jK8xAXV36IVUg=="
+      },
+      "SkiaSharp": {
+        "type": "Transitive",
+        "resolved": "3.0.0-preview.3.1",
+        "contentHash": "msnZ1Z6XFlPzCFBvr7aM8i28NLucgvYqjpsHDWerptLeeU390Y+GTNcupQ9wSvu/t8p0t77x0FJbiiaXbVmTwA==",
+        "dependencies": {
+          "SkiaSharp.NativeAssets.Win32": "3.0.0-preview.3.1",
+          "SkiaSharp.NativeAssets.macOS": "3.0.0-preview.3.1"
+        }
+      },
+      "SkiaSharp.NativeAssets.macOS": {
+        "type": "Transitive",
+        "resolved": "3.0.0-preview.3.1",
+        "contentHash": "bsvo75mbE5f4XefR3jGazRtKUb727knkpt0jVK3pAQayOJTcavKhOW+2wtMn24dGda2Yiu4dlbjYRQeVjCyD5Q=="
+      },
+      "SkiaSharp.NativeAssets.Win32": {
+        "type": "Transitive",
+        "resolved": "3.0.0-preview.3.1",
+        "contentHash": "GxeVii9xXqjoRp43uKyXrBqEfxpyEvrMAIEerYsK2aLIN3JltD1ZkyMu9o0b6EP9tIVRudpuAGoPntAJEoYiDg=="
+      },
+      "una.drawing": {
+        "type": "Project",
+        "dependencies": {
+          "SkiaSharp": "[3.0.0-preview.3.1, )"
+        }
       }
     }
   }
