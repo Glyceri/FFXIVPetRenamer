@@ -9,7 +9,7 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
-    public bool Touched { get; set; } = false;
+    public bool Marked { get; set; } = false;
 
     public nint PetPointer { get; private set; }
     public int SkeletonID { get; init; }
@@ -35,7 +35,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
         PetPointer = (nint)pet;
 
-        Touched = true;
+        Marked = true;
         Owner = owner;
         SkeletonID = pet->CharacterData.ModelCharaId;
         if (asBattlePet) SkeletonID = -SkeletonID;
@@ -53,7 +53,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         if (CustomName != null) SharingDictionary.Set(ObjectID, CustomName);
 
         Lifetime++;
-        Touched = true;
+        Marked = true;
         PetPointer = pointer;
     }
 

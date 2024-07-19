@@ -10,7 +10,6 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 internal interface IPettableUser : IBattleUser
 {
     bool IsActive { get; }  
-    nint User { get; }
     bool IsLocalPlayer { get; }
     bool IsDirty { get; }
 

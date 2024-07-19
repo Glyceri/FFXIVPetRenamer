@@ -12,7 +12,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using System.Collections.Generic;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.IPC;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
