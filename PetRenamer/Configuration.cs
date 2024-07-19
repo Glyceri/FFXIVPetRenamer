@@ -42,7 +42,7 @@ internal class Configuration : IPluginConfiguration
     // --------------------------- UI SETTINGS ---------------------------
     public bool quickButtonsToggle = false;
     public bool showKofiButton = true;
-    public float petNicknamesUIScale = 0;
+    public float petNicknamesUIScale = 1.5f;
     public bool uiFlare = true;
     public bool transparentBackground = true;
 

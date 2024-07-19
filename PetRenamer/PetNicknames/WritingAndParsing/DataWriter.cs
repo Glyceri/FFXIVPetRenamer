@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -42,7 +43,13 @@ internal class DataWriter : IDataWriter
 
         for (int i = 0; i < length; i++)
         {
-            string newLine = $"{database.IDs[i]}{PluginConstants.forbiddenCharacter}{database.Names[i]}";
+            string name = database.Names[i];
+            int id = database.IDs[i];
+
+            if (id == 0) continue;
+            if (name.IsNullOrWhitespace()) continue;
+
+            string newLine = $"{id}{PluginConstants.forbiddenCharacter}{name}";
             petLines.Add(newLine);
         }
 

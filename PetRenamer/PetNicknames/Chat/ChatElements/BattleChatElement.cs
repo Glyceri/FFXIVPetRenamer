@@ -17,7 +17,7 @@ internal unsafe class BattleChatElement : RestrictedChatElement
     {
         UserList = userList;
         PetServices = petServices;
-        RegisterChat(2091, 2219, 16427);
+        RegisterChat(2091, 2219, 16427, 4139, 18475);
     }
 
     internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)

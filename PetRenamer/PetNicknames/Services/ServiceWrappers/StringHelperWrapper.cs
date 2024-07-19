@@ -25,7 +25,7 @@ internal class StringHelperWrapper : IStringHelper
 
     public unsafe string SetATKString(AtkTextNode* atkNode, string text)
     {
-        string newString = text + '\0';
+        string newString = text ;
 
         byte[] data = Encoding.UTF8.GetBytes(newString);
 
@@ -37,7 +37,7 @@ internal class StringHelperWrapper : IStringHelper
 
     public string SetUtf8String(in Utf8String utf8String, string text)
     {
-        string newString = text + '\0';
+        string newString = text;
 
         utf8String.SetString(newString);
 
@@ -81,7 +81,7 @@ internal class StringHelperWrapper : IStringHelper
             baseString = baseString.Replace(MakeString(PluginConstants.forbiddenCharacter, i + 1), replaceString);
         }
 
-        return baseString + '\0';
+        return baseString;
     }
 
     List<string> GetString(IPetSheetData petData)
