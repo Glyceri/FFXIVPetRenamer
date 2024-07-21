@@ -83,6 +83,8 @@ internal static class Translator
         { "Command.Petlist", "Opens the Pet List window." },
         { "Command.PetSettings", "Opens the Settings window." },
         { "Command.PetSharing", "Opens the Sharing window." },
+
+        { "Style.Title.Default", "Default" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -155,6 +157,8 @@ internal static class Translator
         { "Command.Petlist", "Öffnet das Fenster „Spitznamenliste“." },
         { "Command.PetSettings", "Öffnet das Fenster „Einstellungen“." },
         { "Command.PetSharing", "Öffnet das Fenster „Teilen“." },
+
+        { "Style.Title.Default", "Standard" },
     };
 
 

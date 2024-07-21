@@ -63,7 +63,7 @@ internal class UIScaleSettingsBar : Node
                         {
                             Margin = new EdgeSize(1, 0, 0, 0),
                             Size = new Size(300, 2),
-                            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
+                            BackgroundGradient = GradientColor.Horizontal(new Color("Outline"), new Color("Outline:Fade")),
                         }
                     },
                 ]

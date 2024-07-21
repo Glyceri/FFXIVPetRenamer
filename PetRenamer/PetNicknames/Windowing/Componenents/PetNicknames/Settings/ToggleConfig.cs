@@ -89,7 +89,7 @@ internal class ToggleConfig : Node
         new(".UnderlineNode", new Style()
         {
             Size = new Size(300, 2),
-            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
+            BackgroundGradient = GradientColor.Horizontal(new Color("Outline"), new Color("Outline:Fade")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
         }),

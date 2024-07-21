@@ -12,6 +12,6 @@ internal class TechnoCircleImageNode : RotatableUVImage
 
     public TechnoCircleImageNode(in DalamudServices dalamudServices, in Configuration configuration) : base(in dalamudServices, in configuration, 195007, topLeftX, topLeftY, botRightX, botRightY)
     {
-        Color = new System.Numerics.Vector3(255, 255, 0);
+        
     }
 }

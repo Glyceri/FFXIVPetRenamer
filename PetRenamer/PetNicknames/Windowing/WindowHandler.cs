@@ -1,6 +1,5 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using PetRenamer.PetNicknames.ColourProfiling;
 using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
@@ -10,7 +9,6 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
-using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
@@ -80,8 +78,7 @@ internal class WindowHandler : IWindowHandler
     {
         AddWindow(new KofiWindow(this, in DalamudServices, in Configuration));
         AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
-        AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase));
-        AddWindow(new PetSharingWindow(this, in DalamudServices, in Configuration, in DataParser, in DataWriter));
+        AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase, in DataParser, in DataWriter));
         AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
         AddWindow(new ColourEditorWindow(this, in DalamudServices, in Configuration, in ColourProfileHandler));
     }

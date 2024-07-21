@@ -1,8 +1,7 @@
-﻿using Dalamud.Utility;
-using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+﻿using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
-using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.ColourProfiling;
 
@@ -25,17 +24,6 @@ internal class ColourProfile : IColourProfile
         return new ColourProfile(result.ThemeName, result.ThemeAuthor, result.Colours);
     }
 
-    public void Activate()
-    {
-        for (int i = 0; i < Colours.Count; i++)
-        {
-            PetColour colour = Colours[i];
-            if (colour.Name.IsNullOrWhitespace()) continue;
-
-            Color.AssignByName(colour.Name, colour.Colour);
-        }
-    }
-
     public void SetColor(string name, uint color)
     {
         for(int i = 0; i < Colours.Count; i++)
@@ -48,5 +36,17 @@ internal class ColourProfile : IColourProfile
         }
 
         Colours.Add(new PetColour(name, color));
+    }
+
+    public PetColour? GetColour(string name)
+    {
+        for (int i = 0; i < Colours.Count; i++)
+        {
+            PetColour colour = Colours[i];
+            if (colour.Name != name) continue;
+            return colour;
+        }
+
+        return null;
     }
 }

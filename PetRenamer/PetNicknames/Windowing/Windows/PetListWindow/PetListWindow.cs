@@ -1,4 +1,4 @@
-﻿using Dalamud.Utility;
+﻿using Dalamud.Interface;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -273,7 +273,7 @@ internal partial class PetListWindow : PetWindow
 
     void HandleHeaderPetmode()
     {
-        UserListButton.SetText(Translator.GetLine("PetList.UserList"));
+        PetListButton.NodeValue = FontAwesomeIcon.PersonRays.ToIconString();
 
         if (ActiveEntry == UserList.LocalPlayer?.DataBaseEntry)
         {
@@ -301,16 +301,8 @@ internal partial class PetListWindow : PetWindow
 
     void HandleHeaderUsermode()
     {
-        if (UserList.LocalPlayer != null)
-        {
-            UserListButton.SetText(Translator.GetLine("PetList.MyList"));
-        }
-        else
-        {
-            UserListButton.SetText(Translator.GetLine("PetList.Title"));
-        }
-
         SmallHeaderNode.NodeValue = Translator.GetLine("PetList.UserList");
+        PetListButton.NodeValue = FontAwesomeIcon.Cat.ToIconString();
     }
 
     void OnSave(string? newName, int skeleton) => DalamudServices.Framework.Run(() => ActiveEntry?.SetName(skeleton, newName ?? ""));

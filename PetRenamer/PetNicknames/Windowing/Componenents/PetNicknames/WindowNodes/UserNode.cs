@@ -69,12 +69,8 @@ internal class UserNode : Node
             new(".NamePlateElement", new Style()
             {
                 Margin = new EdgeSize(6, 5, 0, 0),
-                BorderColor = new(new("Window.TitlebarBorder")),
-                BackgroundColor = new Color("Window.BackgroundLight"),
+                BorderColor = new(new("Outline")),
                 BorderWidth = new EdgeSize(3),
-                //RoundedCorners = RoundedCorners.All,
-                //BorderRadius = 6,
-                //StrokeRadius = 6,
                 Size = new Size(235, 25),
                 TextOffset = new System.Numerics.Vector2(5, 7),
                 FontSize = 10,

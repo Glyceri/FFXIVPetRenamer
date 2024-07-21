@@ -73,12 +73,17 @@ internal class ColourSettingsNode : Node
     public void UpdateProfile(IColourProfile colourProfile) 
     {
         myProfile = colourProfile;
+
+        
         Set();
     }
 
     void Set()
     {
+        PetColour? colour = myProfile?.GetColour(Label);
+        if (colour == null) return;
 
+        currentValue = colour.Colour;
     }
 
     void OnColourChange()
@@ -153,7 +158,7 @@ internal class ColourSettingsNode : Node
         new(".UnderlineNode", new Style()
         {
             Size = new Size(300, 2),
-            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
+            BackgroundGradient = GradientColor.Horizontal(new Color("Outline"), new Color("Outline:Fade")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
         }),

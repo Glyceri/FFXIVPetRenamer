@@ -29,7 +29,7 @@ internal class Configuration : IPluginConfiguration
 
     public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
     public SerializableColourProfile[]? ColourProfiles { get; set; } = null;
-    public SerializableColourProfile? ActiveProfile { get; set; } = null;
+    public int ActiveProfile { get; set; } = -1;
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
@@ -74,7 +74,7 @@ internal class Configuration : IPluginConfiguration
         if (currentSaveFileVersion != Version || !isSetup) return;
         SerializableUsersV4 = Database!.SerializeDatabase();
         ColourProfiles = ColourProfileHandler!.Serialize();
-        ActiveProfile = ColourProfileHandler!.GetActiveProfile();
+        ActiveProfile = ColourProfileHandler!.GetActiveAsSerialized();
 #pragma warning disable CS0618
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
 #pragma warning restore CS0618

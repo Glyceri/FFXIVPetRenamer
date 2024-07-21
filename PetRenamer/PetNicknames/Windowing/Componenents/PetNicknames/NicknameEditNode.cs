@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Interface;
+using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -9,8 +10,8 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class NicknameEditNode : SearchBarNode
 {
-    public readonly QuickButton EditButton;
-    public readonly QuickButton ClearButton;
+    public readonly QuickSquareButton EditButton;
+    public readonly QuickSquareButton ClearButton;
 
     bool editMode = false;
 
@@ -21,7 +22,7 @@ internal class NicknameEditNode : SearchBarNode
 
     public NicknameEditNode(in DalamudServices services, string label, string? text) : base(in services, label, text ?? Translator.GetLine("..."))
     {
-        EditButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Edit")}")
+        EditButton = new QuickSquareButton()
         {
             Style = new Style()
             {
@@ -30,7 +31,7 @@ internal class NicknameEditNode : SearchBarNode
                 Anchor = Anchor.TopRight,
             }
         };
-        ClearButton = new QuickButton(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Clear")}")
+        ClearButton = new QuickSquareButton()
         {
             Style = new Style()
             {
@@ -40,8 +41,8 @@ internal class NicknameEditNode : SearchBarNode
             }
         };
 
-        ClearButton.Clicked += ClearClicked;
-        EditButton.Clicked += EditClicked;
+        ClearButton.OnClick += ClearClicked;
+        EditButton.OnClick += EditClicked;
 
         UnderlineNode.AppendChild(ClearButton);
         UnderlineNode.AppendChild(EditButton);
@@ -84,8 +85,12 @@ internal class NicknameEditNode : SearchBarNode
 
     void StartEditMode()
     {
-        EditButton.SetText($"{Translator.GetLine("PetRenameNode.Save")}");
-        ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Cancel")}");
+        EditButton.NodeValue = FontAwesomeIcon.Save.ToIconString();
+        ClearButton.NodeValue = FontAwesomeIcon.Times.ToIconString();
+
+        EditButton.Tooltip = Translator.GetLine("PetRenameNode.Save");
+        ClearButton.Tooltip = Translator.GetLine("PetRenameNode.Cancel");
+
         SetText("");
         editMode = true;
     }
@@ -93,8 +98,12 @@ internal class NicknameEditNode : SearchBarNode
     void StopEditMode()
     {
         editMode = false;
-        ClearButton.SetText($"{Translator.GetLine("PetRenameNode.Clear")}");
-        EditButton.SetText($"{Translator.GetLine("PetRenameNode.Edit")}");
+
+        ClearButton.NodeValue = FontAwesomeIcon.Eraser.ToIconString();
+        EditButton.NodeValue = FontAwesomeIcon.Edit.ToIconString();
+        EditButton.Tooltip = Translator.GetLine("PetRenameNode.Edit");
+        ClearButton.Tooltip = Translator.GetLine("PetRenameNode.Clear");
+
         SetText(CurrentValue ?? Translator.GetLine("..."));
         SetInputFieldValue(CurrentValue ?? string.Empty);
     }

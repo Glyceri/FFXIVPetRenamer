@@ -24,7 +24,7 @@ internal class SettingsHolderNode : Node
         {
             Size = new Size(384, 0),
             Flow = Flow.Vertical,
-            BorderColor = new(new("Window.TitlebarBorder")),
+            BorderColor = new(new("Outline")),
             BorderWidth = new EdgeSize(1),
         };
 

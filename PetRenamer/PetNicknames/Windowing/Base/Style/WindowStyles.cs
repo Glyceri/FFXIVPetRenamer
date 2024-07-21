@@ -1,5 +1,5 @@
 ﻿using PetRenamer.PetNicknames.ColourProfiling;
-using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Base.Style;
@@ -25,7 +25,7 @@ internal static class WindowStyles
                 new()
                 {
                     BackgroundColor = new Color(0, 0, 0, 0),
-                    BorderColor = new(new("Window.TitlebarBorder")),
+                    BorderColor = new(new("Outline")),
                     BorderWidth = new(1),
                 }
             ),
@@ -45,7 +45,7 @@ internal static class WindowStyles
                 ".window--content",
                 new()
                 {
-                    BorderColor = new(new("Window.TitlebarBorder")),
+                    BorderColor = new(new("Outline")),
                     BorderWidth = new(0, 1, 1, 1),
                     IsAntialiased = false,
                     Anchor = Anchor.TopLeft,
@@ -55,17 +55,17 @@ internal static class WindowStyles
         ]
     );
 
-    public static readonly ColourProfile DefaultColourProfile = new ColourProfile("Default", "System", new()
+    public static readonly ColourProfile DefaultColourProfile = new ColourProfile(Translator.GetLine("Style.Title.Default"), "Glyceri", new()
     {
-        new("UnderlineColour",              new Color(255, 255, 255, 255).ToUInt()),
-        new("UnderlineColour:Fade",         new Color(255, 255, 255, 100).ToUInt()),
+        new("Outline",                      new Color(176, 169, 120).ToUInt()),
+        new("Outline:Fade",                 new Color(176, 169, 120, 100).ToUInt()),
         new("Titlebar.Minion",              new Color(255, 194, 63, 150).ToUInt()),
         new("Titlebar.Minion:Dark",         new Color(110, 78, 10).ToUInt()),
         new("Titlebar.BattlePet",           new Color(37, 112, 37, 150).ToUInt()),
         new("Titlebar.BattlePet:Dark",      new Color(26, 84, 26).ToUInt()),
         new("Titlebar.Base",                new Color(255, 255, 255).ToUInt()),
         new("Window.Background",            new Color(26, 20, 0, 255).ToUInt()),
-        new("Window.BackgroundLight",       new Color(161, 155, 138, 110).ToUInt()),
+        new("Window.BackgroundLight",       new Color(26, 20, 0, 150).ToUInt()),
         new("SearchBarBackground",          new Color(150, 150, 150, 150).ToUInt()),
         new("ModeToggleInactive",           new Color(15, 15, 15).ToUInt()),
         new("Window.TextOutline",           new Color(189, 141, 6, 190).ToUInt()),
@@ -74,8 +74,11 @@ internal static class WindowStyles
         new("PetNicknamesButton:Hover",     new Color(47, 69, 41, 150).ToUInt()),
         new("Window.Text",                  0xFFD0D0D0),
         new("Window.TextLight",             0xFFFFFFFF),
-        new("Window.TitlebarBorder",        new Color(176, 169, 120).ToUInt()),
         new("WindowBorder:Active",          new Color(224, 183, 18).ToUInt()),
         new("WindowBorder:Inactive",        0xFF404040),
+        new("Button.Background",            new Color(76, 69, 20, 200).ToUInt()),
+        new("Button.Background:Hover",      new Color(76, 69, 20, 250).ToUInt()),
+        new("Button.Background:Inactive",   new Color(76, 69, 20, 100).ToUInt()),
+        new("FlareImageColour",             new Color(255, 255, 0).ToUInt()),
     });
 }

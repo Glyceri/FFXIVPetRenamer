@@ -43,7 +43,7 @@ internal class UserListNode : Node
             Flow = Flow.Horizontal,
             BackgroundColor = new Color(26, 20, 0, 130),
             Size = new Size(412, 70),
-            BorderColor = new(new("Window.TitlebarBorder")),
+            BorderColor = new(new("Outline")),
             BorderWidth = new EdgeSize(1),
             IsAntialiased = false,
         };
@@ -68,7 +68,7 @@ internal class UserListNode : Node
                 {
                     Size = new Size(50, 50),
                     Margin = new EdgeSize(10, 0, 0, 15),
-                    BorderColor = new BorderColor(new Color("UnderlineColour")),
+                    BorderColor = new BorderColor(new Color("Outline")),
                     BorderWidth = new EdgeSize(4),
                 },
                 ChildNodes = [
@@ -145,7 +145,7 @@ internal class UserListNode : Node
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
         Vector2 earlyiconPos = iconPos - new Vector2(12, 0) * ScaleFactor;
 
-        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
-        drawList.AddLine(earlyiconPos, iconPos, new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(activePos, earlyiconPos + new Vector2(ScaleFactor * 0.5f, 0), new Color("Outline").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color("Outline").ToUInt(), 2 * ScaleFactor);
     }
 }

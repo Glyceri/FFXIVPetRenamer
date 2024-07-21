@@ -1,16 +1,24 @@
 ﻿using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
+using PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 using System.Collections.Generic;
+using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.ColourProfiling;
 
+// My plogon is actually very well protected against people
+// editing their save file and breaking stuff right.
+// Not this time, not here.
+// If you edit this and dont set the proper active colourprofile, you are cooking a bit.
 internal class ColourProfileHandler : IColourProfileHandler
 {
+    IWindowHandler? WindowHandler;
     readonly Configuration Configuration;
-    readonly List<ColourProfile> ColourProfiles = new List<ColourProfile>();
+    public List<IColourProfile> ColourProfiles { get; } = new List<IColourProfile>();
 
-    ColourProfile? activeProfile;
+    int activeProfile;
 
     public ColourProfileHandler(in Configuration configuration)
     {
@@ -24,16 +32,11 @@ internal class ColourProfileHandler : IColourProfileHandler
             }
         }
 
-        WindowStyles.DefaultColourProfile?.Activate();
-
-        if (Configuration.ActiveProfile != null)
-        {
-            activeProfile = FromSerializable(Configuration.ActiveProfile);
-            activeProfile?.Activate();
-        }
+        activeProfile = Configuration.ActiveProfile;
+        Activate(GetActiveProfile());
     }
 
-    ColourProfile FromSerializable(SerializableColourProfile serializableColourProfile)
+    IColourProfile FromSerializable(SerializableColourProfile serializableColourProfile)
     {
         List<PetColour> petColours = new List<PetColour>();
 
@@ -50,7 +53,7 @@ internal class ColourProfileHandler : IColourProfileHandler
         return new ColourProfile(serializableColourProfile.Name, serializableColourProfile.Author, petColours);
     }
 
-    SerializableColourProfile ToSerializable(ColourProfile colourProfile)
+    SerializableColourProfile ToSerializable(IColourProfile colourProfile)
     {
         List<string> colourNames = new List<string>();
         List<uint> colourValues = new List<uint>();
@@ -64,22 +67,9 @@ internal class ColourProfileHandler : IColourProfileHandler
         return new SerializableColourProfile(colourProfile.Name, colourProfile.Author, colourNames.ToArray(), colourValues.ToArray());
     }
 
-    public void SetActiveProfile(SerializableColourProfile? profile)
+    public int GetActiveAsSerialized()
     {
-        if (profile == null)
-        {
-            activeProfile = null;
-            return;
-        }
-
-        activeProfile = FromSerializable(profile);
-    }
-
-    public SerializableColourProfile? GetActiveProfile()
-    {
-        if (activeProfile == null) return null;
-
-        return ToSerializable(activeProfile);
+        return activeProfile;
     }
 
     public SerializableColourProfile[] Serialize()
@@ -94,8 +84,93 @@ internal class ColourProfileHandler : IColourProfileHandler
         return serializableColourProfiles.ToArray();
     }
 
-    public IColourProfile? GetActive()
+    public IColourProfile GetActiveProfile()
     {
-        return activeProfile;
+        if (activeProfile <= -1)
+        {
+            return WindowStyles.DefaultColourProfile;
+        }
+
+        if (activeProfile >= ColourProfiles.Count)
+        {
+            return WindowStyles.DefaultColourProfile;
+        }
+
+        return ColourProfiles[activeProfile];
+    }
+
+    public void RegisterWindowHandler(in IWindowHandler windowHandler)
+    {
+        WindowHandler = windowHandler;
+    }
+
+    public void AddColourProfile(IColourProfile colourProfile)
+    {
+        if (ColourProfiles.Contains(colourProfile)) return;
+
+        ColourProfiles.Add(colourProfile);
+
+        WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged();
+    }
+
+    public void RemoveColourProfile(IColourProfile colourProfile)
+    {
+        int indexOf = ColourProfiles.IndexOf(colourProfile);
+        if (indexOf == -1) return;
+
+        if (indexOf == activeProfile)
+        {
+            SetActiveProfile(null);
+        }
+        else if (indexOf < activeProfile)
+        {
+            activeProfile--;
+        }
+
+        ColourProfiles.RemoveAt(indexOf);
+
+        WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged();
+    }
+
+    public void SetActiveProfile(IColourProfile? profile)
+    {
+        if (profile == null || profile == WindowStyles.DefaultColourProfile)
+        {
+            activeProfile = -1;
+            Activate(WindowStyles.DefaultColourProfile);
+        }
+        else
+        {
+            int colourProfileCount = ColourProfiles.Count;
+
+            for (int i = 0; i < colourProfileCount; i++)
+            {
+                IColourProfile colourProfile = ColourProfiles[i];
+                if (colourProfile != profile) continue;
+
+                activeProfile = i;
+                Activate(colourProfile);
+
+                break;
+            }
+        }
+    }
+
+    void Activate(IColourProfile colourProfile)
+    {
+        if (colourProfile != WindowStyles.DefaultColourProfile)
+        {
+            Activate(WindowStyles.DefaultColourProfile);
+        }
+
+        foreach (PetColour petColour in colourProfile.Colours)
+        {
+            Color.AssignByName(petColour.Name, petColour.Colour);
+        }
+    }
+
+    public void Refresh()
+    {
+        Activate(GetActiveProfile());
     }
 }

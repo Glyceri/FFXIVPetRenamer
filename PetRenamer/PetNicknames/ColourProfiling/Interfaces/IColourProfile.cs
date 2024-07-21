@@ -9,6 +9,6 @@ internal interface IColourProfile
 
     List<PetColour> Colours { get; }
 
+    PetColour? GetColour(string name);
     void SetColor(string name, uint color);
-    void Activate();
 }
