@@ -1,5 +1,6 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.Core.Handlers;
@@ -38,13 +39,9 @@ internal unsafe class PartyListHook : HookableElement
         if (user == null) return;
         if (!user.BattlePet.Has) return;
         string nickname = user.BattlePet.UsedName;
-        if (nickname == string.Empty) return;
+        if (nickname.IsNullOrWhitespace()) return;
 
-        nickname += '\0';
-
-        byte[] nameplateData = Encoding.UTF8.GetBytes(nickname);
-
-        partyNode->Pet.Name->NodeText.SetString(nameplateData);
+        partyNode->Pet.Name->NodeText.SetString(nickname);
     }
 
     void SetCastlist(AddonPartyList* partyNode)

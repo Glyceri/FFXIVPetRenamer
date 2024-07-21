@@ -103,6 +103,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.4.8.8"), new CLE("General", "PetRenamer.GameObjectRenameDict is now available for other plogons to use!")) },
         { new CLS(new Version("1.5.0.1"), new CLE("General", "Removed Mappy IPC (Don't worry, Mappy will still work! Even better than before now!)", "Updated to ApiX", "Updated for 7.0 version of the game.")) },
         { new CLS(new Version("1.5.0.2"), new CLE("General", "Fixed deprecation issue.", "Re-enabled context menus.")) },
+        { new CLS(new Version("1.5.0.3"), new CLE("General", "Fixed deprecation issue. Part 2 c:")) },
     };
 
     const string starter = "  ◉   ";

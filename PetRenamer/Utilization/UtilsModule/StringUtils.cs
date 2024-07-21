@@ -100,11 +100,7 @@ internal class StringUtils : UtilsRegistryType, ISingletonBase<StringUtils>
         string? outcomeText = textNode->NodeText.ToString();
         ReplaceString(ref outcomeText, ref validNames);
 
-        string newOutcomeText = outcomeText + '\0';
-
-        byte[] nameplateData = Encoding.UTF8.GetBytes(newOutcomeText);
-
-        textNode->NodeText.SetString(nameplateData);
+        textNode->NodeText.SetString(outcomeText);
 
         if (nineGridNode == null) return;
 

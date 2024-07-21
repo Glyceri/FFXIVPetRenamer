@@ -42,11 +42,7 @@ public unsafe sealed class NamePlateHook : HookableElement
 
         string nameToUse = currentPet.UsedNameNameplate;
 
-        nameToUse += '\0';
-
-        byte[] nameplateData = Encoding.UTF8.GetBytes(nameToUse);
-
-        if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameplateData);
+        if (nameToUse != string.Empty) namePlateInfo->Name.SetString(nameToUse);
         if (currentPet.nameChanged) namePlateInfo->IsDirty = true;
     }
 
