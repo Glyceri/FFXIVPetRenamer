@@ -66,6 +66,8 @@ internal static class WindowStyles
         new("Titlebar.Base",                new Color(255, 255, 255).ToUInt()),
         new("Window.Background",            new Color(26, 20, 0, 255).ToUInt()),
         new("Window.BackgroundLight",       new Color(26, 20, 0, 150).ToUInt()),
+        new("BackgroundImageColour",        new Color(40, 40, 0, 230).ToUInt()),
+        new("ListElementBackground",        new Color(26, 20, 0, 130).ToUInt()),
         new("SearchBarBackground",          new Color(150, 150, 150, 150).ToUInt()),
         new("ModeToggleInactive",           new Color(15, 15, 15).ToUInt()),
         new("Window.TextOutline",           new Color(189, 141, 6, 190).ToUInt()),

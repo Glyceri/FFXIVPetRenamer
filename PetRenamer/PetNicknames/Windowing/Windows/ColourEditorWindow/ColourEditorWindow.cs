@@ -16,9 +16,9 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 
 internal class ColourEditorWindow : PetWindow
 {
-    protected override Vector2 MinSize { get; } = new Vector2(400, 300);
-    protected override Vector2 MaxSize { get; } = new Vector2(400, 1200);
-    protected override Vector2 DefaultSize { get; } = new Vector2(400, 600);
+    protected override Vector2 MinSize { get; } = new Vector2(340, 300);
+    protected override Vector2 MaxSize { get; } = new Vector2(340, 1200);
+    protected override Vector2 DefaultSize { get; } = new Vector2(340, 600);
     protected override bool HasModeToggle { get; } = false;
     protected override bool HasExtraButtons { get; } = false;
 
@@ -45,6 +45,14 @@ internal class ColourEditorWindow : PetWindow
 
         ContentNode.Overflow = false;
 
+        ContentNode.Style = new Style()
+        {
+            ScrollbarTrackColor = new Color(0, 0, 0, 0),
+            ScrollbarThumbColor = new Color("Button.Background"),
+            ScrollbarThumbHoverColor = new Color("Button.Background:Hover"),
+            ScrollbarThumbActiveColor = new Color("Button.Background:Active"),
+        };
+
         ContentNode.ChildNodes = 
         [
             new Node()
@@ -52,6 +60,10 @@ internal class ColourEditorWindow : PetWindow
                 Style = new Style()
                 {
                     Flow = Flow.Vertical,
+                    ScrollbarTrackColor = new Color(0, 0, 0, 0),
+                    ScrollbarThumbColor = new Color("Button.Background"),
+                    ScrollbarThumbHoverColor = new Color("Button.Background:Hover"),
+                    ScrollbarThumbActiveColor = new Color("Button.Background:Active"),
                 },
                 ChildNodes = [
                     QuickButton = new QuickSquareButton(),
@@ -60,7 +72,7 @@ internal class ColourEditorWindow : PetWindow
                     {
                         Style = new Style()
                         {
-                            Flow = Flow.Vertical
+                            Flow = Flow.Vertical,
                         }
                     },
                 ]
@@ -76,7 +88,9 @@ internal class ColourEditorWindow : PetWindow
         Register("Outline:Fade");
         Register("Window.Background");
         Register("Window.BackgroundLight");
+        Register("BackgroundImageColour");
         Register("SearchBarBackground");
+        Register("ListElementBackground");
         Register("Window.TextOutline");
         Register("Window.TextOutlineButton");
         Register("Window.Text");
@@ -110,8 +124,10 @@ internal class ColourEditorWindow : PetWindow
 
 
         int index = -1;
-        AddColourprofile(WindowStyles.DefaultColourProfile, index, index == activeIndex);
+        ColourProfileConfig cConfig = AddColourprofile(WindowStyles.DefaultColourProfile, index, index == activeIndex);
         index++;
+
+        cConfig.HolderNode.RemoveChild(cConfig.ClearButton);
 
         foreach (IColourProfile cProfile in ColourProfileHandler.ColourProfiles)
         {
@@ -127,16 +143,20 @@ internal class ColourEditorWindow : PetWindow
         }
     }
 
-    void AddColourprofile(IColourProfile cProfile, int index, bool active)
+    ColourProfileConfig AddColourprofile(IColourProfile cProfile, int index, bool active)
     {
-        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, cProfile.Name, cProfile.Author, index, active, (value) => {
+        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, in DalamudServices, cProfile.Name, cProfile.Author, index, active, (value) => {
             DalamudServices.Framework.Run(() => 
             { 
                 ColourProfileHandler.SetActiveProfile(cProfile); 
                 WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged(); 
             });
         });
+
+        cConfig.ClearButton.OnClick += () => ColourProfileHandler.RemoveColourProfile(cProfile);
         PresetList.ContentNode.ChildNodes.Add(cConfig);
+
+        return cConfig;
     }
 
     public override void OnDraw()

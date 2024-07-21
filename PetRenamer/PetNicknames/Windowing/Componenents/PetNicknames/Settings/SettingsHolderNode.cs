@@ -72,7 +72,7 @@ internal class SettingsHolderNode : Node
                     IsVisible = false,
                     Margin = new EdgeSize(3, 3, 3, 21),
                     Flow = Flow.Vertical,
-                    Gap = 3,
+                    Gap = 20,
                 },
             }
         ];

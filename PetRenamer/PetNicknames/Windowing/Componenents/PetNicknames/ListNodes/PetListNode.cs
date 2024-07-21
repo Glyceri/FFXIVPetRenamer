@@ -34,7 +34,7 @@ internal class PetListNode : Node
         Style = new Style()
         {
             Flow = Flow.Horizontal,
-            BackgroundColor = new Color(26, 20, 0, 130),
+            BackgroundColor = new Color("ListElementBackground"),
             Size = new Size(412, 70),
             BorderColor = new(new("Outline")),
             BorderWidth = new EdgeSize(1),
