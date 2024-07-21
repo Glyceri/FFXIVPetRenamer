@@ -16,7 +16,7 @@ internal partial class PetListWindow
                     Size = new Size(20, 20),
                     Anchor = Anchor.TopRight,
                     BackgroundColor = new("Window.BackgroundLight"),
-                    StrokeColor = WindowStyles.WindowBorderActive,
+                    StrokeColor = new Color("WindowBorder:Active"),
                     StrokeWidth = 1,
                     TextAlign = Anchor.MiddleCenter,
                     Font = 2,
@@ -40,7 +40,7 @@ internal partial class PetListWindow
                     Color = new("Window.Text"),
                     OutlineColor = new(0, 0, 0),
                     StrokeWidth = 1,
-                    StrokeColor = WindowStyles.WindowBorderInactive,
+                    StrokeColor = new Color("WindowBorder:Inactive"),
                 }
             ),
         ]

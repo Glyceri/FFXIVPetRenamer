@@ -49,7 +49,7 @@ internal class QuickSquareButton : Node
             Color = new("Window.Text"),
             OutlineColor = new(0, 0, 0),
             StrokeWidth = 1,
-            StrokeColor = WindowStyles.WindowBorderInactive,
+            StrokeColor = new Color("WindowBorder:Inactive"),
         })
     ]);
 

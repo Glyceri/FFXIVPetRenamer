@@ -114,14 +114,14 @@ internal abstract partial class PetWindow : Window, IPetWindow
 
         if (Configuration.transparentBackground)
         {
-            _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background:active") : new Color("Window.Background");
+            _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background") : new Color("Window.BackgroundLight");
         }
         else
         {
-            _windowNode.Style.BackgroundColor = new Color("Window.Background:active");
+            _windowNode.Style.BackgroundColor = new Color("Window.Background");
         }
 
-        _windowNode.Style.StrokeColor = IsFocused ? WindowStyles.WindowBorderActive : WindowStyles.WindowBorderInactive;
+        _windowNode.Style.StrokeColor = IsFocused ? new Color("WindowBorder:Active") : new Color("WindowBorder:Inactive");
 
         RenderWindowInstance();
     }

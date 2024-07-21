@@ -1,4 +1,6 @@
 ﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.ColourProfiling;
+using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
@@ -17,6 +19,22 @@ internal class DataWriter : IDataWriter
     public DataWriter(in IPettableUserList userList)
     {
         UserList = userList;
+    }
+
+    public string WriteColourData(in IColourProfile colourProfile)
+    {
+        List<string> strings = new List<string>() { colourProfile.Name, colourProfile.Author };
+
+        foreach (PetColour petColour in colourProfile.Colours)
+        {
+            strings.Add($"{petColour.Name}{PluginConstants.forbiddenCharacter}{petColour.Colour}");
+        }
+
+        string outcome = string.Join("\n", strings);
+
+        outcome = Convert.ToBase64String(Encoding.Unicode.GetBytes(outcome));
+
+        return outcome;
     }
 
     public string WriteData()

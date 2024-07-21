@@ -70,7 +70,7 @@ internal class DataParserVersion2 : IDataParserElement
         foreach(string s in splitData)
         {
             // Soft skeletons are ALWAYS negative!
-            if (!s.StartsWith("-"))
+            if (!s.StartsWith('-'))
             {
                 return null;
             }

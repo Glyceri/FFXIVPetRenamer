@@ -9,6 +9,8 @@ internal enum ParseVersion
     Version1,
     [Description("[PetNicknames(2)]")]
     Version2,
+    [Description("[PetNicknamesColour(1)]")]
+    ColourVersion1,
 
     COUNT
 }

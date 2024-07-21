@@ -208,7 +208,7 @@ internal partial class PetListWindow
             {
                 Style = new Style()
                 {
-                    BackgroundGradient = GradientColor.Vertical(WindowStyles.WindowBorderActive, new Color(224, 183, 18, 0)),
+                    BackgroundGradient = GradientColor.Vertical(new Color("WindowBorder:Active"), new Color(224, 183, 18, 0)),
                     Margin = new(129, 0, 0, 0),
                     Size = new Size(422, 2),
                     Anchor = Anchor.TopCenter,
@@ -218,7 +218,7 @@ internal partial class PetListWindow
             {
                 Style = new Style()
                 {
-                    BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), WindowStyles.WindowBorderActive),
+                    BackgroundGradient = GradientColor.Vertical(new Color(224, 183, 18, 0), new Color("WindowBorder:Active")),
                     Margin = new(0, 0, 29, 0),
                     Size = new Size(422, 2),
                     Anchor = Anchor.BottomCenter,
