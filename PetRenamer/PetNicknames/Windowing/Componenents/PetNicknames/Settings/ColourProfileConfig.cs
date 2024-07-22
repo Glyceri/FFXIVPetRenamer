@@ -36,6 +36,9 @@ internal class ColourProfileConfig : ToggleConfig
               Size = new Size(35, 15),  
             },
         });
+
+        ExportButton.OnClick += () => export?.Invoke();
+
         HolderNode.ChildNodes.Add(ClearButton = new QuickClearButton());
         ChildNodes.Add(AuthorNode = new RenameTitleNode(in dalamudServices, "Author", cProfile.Author));
     }

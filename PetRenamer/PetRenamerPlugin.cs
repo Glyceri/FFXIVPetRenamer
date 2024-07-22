@@ -91,7 +91,18 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
         ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
+
+        // UI is the most DOGSHIT thing in this whole plugin. I hate EVERY SINGLE LINE OF CODE from it...
+        // If I had know how unreadable Una.Drawing would make my UI code I wouldve never done it like this....
+        // This project was such a pleasure to work on before UI
+        // So fun, so great
+        // Then UI came along...
+        // Ive lost interest in writing this code
+        // I do not even care if it looks good anymore
+        // If some UI element shows weird or doesnt align properly
+        // Help me find the motivation to fix it, because I truly couldnt care less anymore
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter, in ColourProfileHandler);
+
         ColourProfileHandler.RegisterWindowHandler(in WindowHandler);
         CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);

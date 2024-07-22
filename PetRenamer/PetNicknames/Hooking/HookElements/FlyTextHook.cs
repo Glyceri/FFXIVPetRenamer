@@ -28,7 +28,7 @@ internal unsafe class FlyTextHook : HookableElement
 
     void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
-
+        // Todo: Implement this?
     }
 
     unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int unkownCastFlag, char a4, int castID, int a6, int a7, int a8)

@@ -1,7 +1,10 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Utility;
+using ImGuiNET;
 using PetRenamer.PetNicknames.ColourProfiling;
 using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -18,9 +21,9 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 
 internal class ColourEditorWindow : PetWindow
 {
-    protected override Vector2 MinSize { get; } = new Vector2(370, 300);
-    protected override Vector2 MaxSize { get; } = new Vector2(370, 1200);
-    protected override Vector2 DefaultSize { get; } = new Vector2(370, 600);
+    protected override Vector2 MinSize { get; } = new Vector2(334, 300);
+    protected override Vector2 MaxSize { get; } = new Vector2(334, 1200);
+    protected override Vector2 DefaultSize { get; } = new Vector2(334, 600);
     protected override bool HasModeToggle { get; } = false;
     protected override bool HasExtraButtons { get; } = false;
 
@@ -36,12 +39,17 @@ internal class ColourEditorWindow : PetWindow
     readonly SettingsHolderNode PresetList;
     readonly SettingsHolderNode ColourHolderNode;
 
-    public ColourEditorWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IColourProfileHandler colourProfileHandler) : base(windowHandler, dalamudServices, configuration, "ColourEditorWindow")
+    readonly IDataParser DataParser;
+    readonly IDataWriter DataWriter;
+
+    public ColourEditorWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IColourProfileHandler colourProfileHandler, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "ColourEditorWindow")
     {
         IsOpen = true;
 
         ColourProfileHandler = colourProfileHandler;
 
+        DataParser = dataParser;
+        DataWriter = dataWriter;
 
         ContentNode.Overflow = false;
 
@@ -182,14 +190,37 @@ internal class ColourEditorWindow : PetWindow
 
     ColourProfileConfig AddColourprofile(IColourProfile cProfile, int index, bool active)
     {
-        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, in DalamudServices, cProfile, index, active, (value) => {
-            DalamudServices.Framework.Run(() => 
-            { 
-                ColourProfileHandler.SetActiveProfile(cProfile); 
-                WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged(); 
+        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, in DalamudServices, cProfile, index, active, (value) =>
+        {
+            DalamudServices.Framework.Run(() =>
+            {
+                ColourProfileHandler.SetActiveProfile(cProfile);
+                WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged();
             });
-        }, 
-        () => { }
+        },
+        () => 
+            {
+                string exportData = DataWriter.WriteColourData(cProfile);
+
+                if (exportData.IsNullOrWhitespace())
+                {
+                    DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
+                    {
+                        Type = Dalamud.Interface.ImGuiNotification.NotificationType.Warning,
+                        Content = Translator.GetLine("ColourEditorWindow.ExportError"),
+                    });
+                }
+                else
+                {
+                    DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
+                    {
+                        Type = Dalamud.Interface.ImGuiNotification.NotificationType.Success,
+                        Content = Translator.GetLine("ColourEditorWindow.ExportSuccess"),
+                    });
+
+                    ImGui.SetClipboardText(exportData);
+                }
+            }
         );
 
         cConfig.LabelNode.Style.Size = new Size(234, 15);

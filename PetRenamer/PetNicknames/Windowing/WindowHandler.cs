@@ -80,7 +80,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration,  PetServices, UserList));
         AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase, in DataParser, in DataWriter));
         AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
-        AddWindow(new ColourEditorWindow(this, in DalamudServices, in Configuration, in ColourProfileHandler));
+        AddWindow(new ColourEditorWindow(this, in DalamudServices, in Configuration, in ColourProfileHandler, in DataParser, in DataWriter));
     }
 
     void AddWindow(PetWindow window)
