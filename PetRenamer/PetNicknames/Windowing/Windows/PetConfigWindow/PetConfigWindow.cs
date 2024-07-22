@@ -65,8 +65,7 @@ internal class PetConfigWindow : PetWindow
         ];
 
         GeneralSettingsNode.ContentNode.ChildNodes = [
-             new ToggleConfig(in Configuration, Translator.GetLine("Config.PVPMessage"), Configuration.disablePVPChatMessage, (value) => Configuration.disablePVPChatMessage = value),
-            new ToggleConfig(in Configuration, Translator.GetLine("Config.ProfilePictures"), Configuration.downloadProfilePictures, (value) => Configuration.downloadProfilePictures = value),
+             new ToggleConfig(in Configuration, Translator.GetLine("Config.ProfilePictures"), Configuration.downloadProfilePictures, (value) => Configuration.downloadProfilePictures = value),
         ];
 
         UISettingsNode.ContentNode.ChildNodes = [

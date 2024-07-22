@@ -77,7 +77,7 @@ internal class NicknameEditNode : SearchBarNode
     {
         if (editMode)
         {
-            OnSave?.Invoke(inputFieldvalue);
+            OnSave?.Invoke(InputFieldvalue);
             StopEditMode();
         }
         else StartEditMode();

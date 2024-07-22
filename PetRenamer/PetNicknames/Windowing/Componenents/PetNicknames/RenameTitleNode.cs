@@ -5,7 +5,7 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class RenameTitleNode : Node
 {
-    readonly string Label;
+    protected readonly string Label;
 
     public readonly Node UnderlineNode;
     public readonly Node TextNode;

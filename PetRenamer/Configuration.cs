@@ -33,7 +33,6 @@ internal class Configuration : IPluginConfiguration
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
-    public bool disablePVPChatMessage = false;
     // ------------------------------- Pet -------------------------------
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;

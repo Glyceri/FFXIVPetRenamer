@@ -11,7 +11,7 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class SearchBarNode : RenameTitleNode
 {
-    protected string inputFieldvalue = "";
+    public string InputFieldvalue = "";
 
     protected string InternalID = "SEARCH";
 
@@ -24,17 +24,17 @@ internal class SearchBarNode : RenameTitleNode
 
     public void ClearSearchbar()
     {
-        inputFieldvalue = "";
+        InputFieldvalue = "";
     }
 
     public void SetInputFieldValue(string value)
     {
-        inputFieldvalue = value ?? string.Empty;
+        InputFieldvalue = value ?? string.Empty;
     }
 
     protected virtual void OnSearch()
     {
-        OnSave?.Invoke(inputFieldvalue);
+        OnSave?.Invoke(InputFieldvalue);
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
@@ -42,7 +42,7 @@ internal class SearchBarNode : RenameTitleNode
         ImGui.SetCursorScreenPos(TextNode.Bounds.ContentRect.BottomLeft - new Vector2(0, 18 * ImGuiHelpers.GlobalScale));
         ImGui.SetNextItemWidth(TextNode.Bounds.ContentRect.Width);
         ImGui.PushStyleColor(ImGuiCol.FrameBg, new Color("SearchBarBackground").ToUInt());
-        if (ImGui.InputText($"##RenameField_{InternalID}", ref inputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
+        if (ImGui.InputText($"##RenameField_{this.GetFullNodePath()}_{Label}", ref InputFieldvalue, PluginConstants.ffxivNameSize, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.None))
         {
             OnSearch();
         }
@@ -51,8 +51,8 @@ internal class SearchBarNode : RenameTitleNode
 
     public bool Valid(string input)
     {
-        if (inputFieldvalue.IsNullOrWhitespace()) return true;
+        if (InputFieldvalue.IsNullOrWhitespace()) return true;
 
-        return input.Contains(inputFieldvalue, StringComparison.InvariantCultureIgnoreCase);
+        return input.Contains(InputFieldvalue, StringComparison.InvariantCultureIgnoreCase);
     }
 }

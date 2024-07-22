@@ -1,12 +1,14 @@
-﻿using PetRenamer.PetNicknames.ColourProfiling;
+﻿using Dalamud.Interface;
+using Dalamud.Utility;
+using PetRenamer.PetNicknames.ColourProfiling;
 using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Settings;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -16,9 +18,9 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 
 internal class ColourEditorWindow : PetWindow
 {
-    protected override Vector2 MinSize { get; } = new Vector2(340, 300);
-    protected override Vector2 MaxSize { get; } = new Vector2(340, 1200);
-    protected override Vector2 DefaultSize { get; } = new Vector2(340, 600);
+    protected override Vector2 MinSize { get; } = new Vector2(370, 300);
+    protected override Vector2 MaxSize { get; } = new Vector2(370, 1200);
+    protected override Vector2 DefaultSize { get; } = new Vector2(370, 600);
     protected override bool HasModeToggle { get; } = false;
     protected override bool HasExtraButtons { get; } = false;
 
@@ -33,8 +35,6 @@ internal class ColourEditorWindow : PetWindow
 
     readonly SettingsHolderNode PresetList;
     readonly SettingsHolderNode ColourHolderNode;
-
-    readonly QuickSquareButton QuickButton;
 
     public ColourEditorWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IColourProfileHandler colourProfileHandler) : base(windowHandler, dalamudServices, configuration, "ColourEditorWindow")
     {
@@ -66,7 +66,6 @@ internal class ColourEditorWindow : PetWindow
                     ScrollbarThumbActiveColor = new Color("Button.Background:Active"),
                 },
                 ChildNodes = [
-                    QuickButton = new QuickSquareButton(),
                     PresetList = new SettingsHolderNode(in Configuration, Translator.GetLine("ColourSettings.PresetListHeader")),
                     ColourHolderNode = new SettingsHolderNode(in Configuration, Translator.GetLine("ColourSettings.Header"))
                     {
@@ -78,11 +77,6 @@ internal class ColourEditorWindow : PetWindow
                 ]
             }
         ];
-
-        QuickButton.OnClick += () =>
-        {
-            ColourProfileHandler.AddColourProfile(new ColourProfile("Testing", "Glyceri", WindowStyles.DefaultColourProfile.Colours.ToList()));
-        };
 
         Register("Outline");
         Register("Outline:Fade");
@@ -128,6 +122,7 @@ internal class ColourEditorWindow : PetWindow
         index++;
 
         cConfig.HolderNode.RemoveChild(cConfig.ClearButton);
+        cConfig.HolderNode.RemoveChild(cConfig.ExportButton);
 
         foreach (IColourProfile cProfile in ColourProfileHandler.ColourProfiles)
         {
@@ -141,19 +136,64 @@ internal class ColourEditorWindow : PetWindow
         {
             node.UpdateProfile(activeProfile);
         }
+
+        Node node2;
+        SearchBarNode nameNode;
+        SearchBarNode authorNode;
+        QuickSquareButton addButton;
+        PresetList.ContentNode.ChildNodes.Add(node2 = new Node()
+        {
+            Style = new Style()
+            {
+                Flow = Flow.Vertical,
+                BorderColor = new(new("Outline")),
+                BorderWidth = new EdgeSize(1),
+                Size = new Size(300, 46),
+            },
+            ChildNodes = 
+            [
+                nameNode = new SearchBarNode(in DalamudServices, "Name", string.Empty),
+                authorNode = new SearchBarNode(in DalamudServices, "Author", string.Empty),
+                addButton = new QuickSquareButton()
+                {
+                    Style = new Style()
+                    {
+                        Anchor = Anchor.BottomRight,
+                    },
+                    NodeValue = FontAwesomeIcon.Plus.ToIconString(),
+                },
+            ]
+        });
+
+        addButton.OnClick += () =>
+        {
+            string nameNodeField = nameNode.InputFieldvalue;
+            string authorField = authorNode.InputFieldvalue;
+
+            nameNodeField = nameNodeField.Replace(PluginConstants.forbiddenCharacter.ToString(), string.Empty);
+            authorField = authorField.Replace(PluginConstants.forbiddenCharacter.ToString(), string.Empty);
+
+            if (nameNodeField.IsNullOrWhitespace()) return;
+            if (authorField.IsNullOrWhitespace()) return;
+
+            DalamudServices.Framework.Run(() => ColourProfileHandler.AddColourProfile(new ColourProfile(nameNodeField, authorField, WindowStyles.DefaultColourProfile.Colours.ToList())));
+        };
     }
 
     ColourProfileConfig AddColourprofile(IColourProfile cProfile, int index, bool active)
     {
-        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, in DalamudServices, cProfile.Name, cProfile.Author, index, active, (value) => {
+        ColourProfileConfig cConfig = new ColourProfileConfig(in Configuration, in DalamudServices, cProfile, index, active, (value) => {
             DalamudServices.Framework.Run(() => 
             { 
                 ColourProfileHandler.SetActiveProfile(cProfile); 
                 WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged(); 
             });
-        });
+        }, 
+        () => { }
+        );
 
-        cConfig.ClearButton.OnClick += () => ColourProfileHandler.RemoveColourProfile(cProfile);
+        cConfig.LabelNode.Style.Size = new Size(234, 15);
+        cConfig.ClearButton.OnClick += () => DalamudServices.Framework.Run(() => ColourProfileHandler.RemoveColourProfile(cProfile));
         PresetList.ContentNode.ChildNodes.Add(cConfig);
 
         return cConfig;
