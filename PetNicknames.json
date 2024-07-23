@@ -4,6 +4,7 @@
     "Name": "Pet Nicknames",
     "InternalName": "PetRenamer",
     "AssemblyVersion": "2.0.0.0",
+    "TestingAssemblyVersion": "2.0.0.0",
     "Description": "Give your minions, Carbuncles and Faeries cute nicknames\nand share them with your friends.",
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/Glyceri/FFXIVPetRenamer",
@@ -25,6 +26,6 @@
     "AcceptsFeedback": true,
     "DownloadLinkInstall": "https://github.com/Glyceri/FFXIVPetRenamer/releases/download/2.0.0.0/PetNicknames.zip",
     "DownloadLinkUpdate": "https://github.com/Glyceri/FFXIVPetRenamer/releases/download/2.0.0.0/PetNicknames.zip",
-    "DownloadLinkTesting": "https://github.com/Glyceri/FFXIVPetRenamer/releases/download/2.0.0.0/PetNicknames.zip",
+    "DownloadLinkTesting": "https://github.com/Glyceri/FFXIVPetRenamer/releases/download/2.0.0.0/PetNicknames.zip"
   }
 ]
