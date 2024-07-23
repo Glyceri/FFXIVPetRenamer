@@ -25,7 +25,7 @@ internal class RotatableUVImage : Node
 
     DateTime StartTime;
 
-    public Vector3 Color { get; set; } = new Vector3(255, 255, 255);
+    public Color Color { get; set; } = new Color("FlareImageColour");
 
     readonly Configuration Configuration;
 
@@ -92,7 +92,7 @@ internal class RotatableUVImage : Node
         uv3 = RotateAroundPoint(uv3, centre) / resolution;
         uv4 = RotateAroundPoint(uv4, centre) / resolution;
 
-        drawList.AddImageQuad(wrap.ImGuiHandle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft, uv, uv2, uv3, uv4, new Color((byte)Color.X, (byte)Color.Y, (byte)Color.Z, Opacity).ToUInt());
+        drawList.AddImageQuad(wrap.ImGuiHandle, contentRect.TopLeft, contentRect.TopRight, contentRect.BottomRight, contentRect.BottomLeft, uv, uv2, uv3, uv4, new Color((byte)Color.R, (byte)Color.G, (byte)Color.B, Opacity).ToUInt());
     }
 
     Vector2 RotateAroundPoint(Vector2 point, Vector2 centre)

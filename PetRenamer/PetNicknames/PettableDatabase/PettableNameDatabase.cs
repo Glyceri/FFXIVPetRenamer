@@ -91,7 +91,7 @@ internal class PettableNameDatabase : INamesDatabase
         IDs = newIds.ToArray();
         Names = newNames.ToArray();
     }
-
+     
     public SerializableNameData SerializeData() => new SerializableNameData(this);
 
     public void Update(int[] ids, string[] names, IPettableDirtyCaller dirtyCaller)

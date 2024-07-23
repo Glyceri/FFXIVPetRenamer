@@ -1,7 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
-using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -24,7 +23,6 @@ internal unsafe class PettableUser : IPettableUser
     public bool IsActive => DataBaseEntry.IsActive;
 
     public IPettableDatabaseEntry DataBaseEntry { get; private set; }
-    public nint User { get; private set; }
     public uint ShortObjectID { get; private set; }
     public uint CurrentCastID { get; private set; }
     public bool IsLocalPlayer { get; private set; }
@@ -58,14 +56,13 @@ internal unsafe class PettableUser : IPettableUser
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;
-        User = (nint)BattleChara;
         if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID, true);
     }
 
     public void Set(Pointer<BattleChara> pointer)
     {
         Reset();
-        User = (nint)pointer.Value;
+        Address = (nint)pointer.Value;
         CurrentCastID = BattleChara->CastInfo.ActionId;
         if (lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
         if (!DataBaseEntry.IsActive) return;
@@ -134,14 +131,14 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet pet = PettablePets[i];
 
-            if (!pet.Touched)
+            if (!pet.Marked)
             {
                 IsDirty = true;
                 PettablePets.RemoveAt(i);
                 continue;
             }
 
-            pet.Touched = false;
+            pet.Marked = false;
         }
     }
 

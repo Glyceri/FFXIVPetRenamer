@@ -24,6 +24,7 @@ internal class DataParser : IDataParser
 
     static readonly IDataParserElement DataParserVersion1 = new DataParserVersion1();
     static readonly IDataParserElement DataParserVersion2 = new DataParserVersion2();
+    static readonly IDataParserElement ColourParser1 = new ColourParserVersion1();
 
     public DataParser(in DalamudServices dalamudServices, in IPettableUserList userList, in IPettableDatabase database, in ILegacyDatabase legacyDatabase)
     {
@@ -95,17 +96,14 @@ internal class DataParser : IDataParser
 
 
         ParseVersion parseVersion = GetParseVersion(incomingData);
-        switch (parseVersion)
+        return parseVersion switch
         {
-            case ParseVersion.Invalid:
-                return new InvalidParseResult("Data is not Pet Nicknames data.");
-            case ParseVersion.Version1:
-                return DataParserVersion1.Parse(incomingData);
-            case ParseVersion.Version2:
-                return DataParserVersion2.Parse(incomingData);
-            default:
-                return new InvalidParseResult("Invalid Parse Version.");
-        }
+            ParseVersion.Invalid => new InvalidParseResult("Data is not Pet Nicknames data."),
+            ParseVersion.Version1 => DataParserVersion1.Parse(incomingData),
+            ParseVersion.Version2 => DataParserVersion2.Parse(incomingData),
+            ParseVersion.ColourVersion1 => ColourParser1.Parse(incomingData),
+            _ => new InvalidParseResult("Invalid Parse Version."),
+        };
     }
 
     static bool TryFromBase64(string s, [NotNullWhen(true)] out byte[]? data)

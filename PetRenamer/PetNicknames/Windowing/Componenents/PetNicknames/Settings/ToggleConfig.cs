@@ -14,6 +14,8 @@ internal class ToggleConfig : Node
     public readonly Node UnderlineNode;
     public readonly Node LabelNode;
 
+    public readonly Node HolderNode;
+
     readonly QuickSquareButton buttonClick;
 
     bool CurrentValue;
@@ -25,43 +27,48 @@ internal class ToggleConfig : Node
 
         CurrentValue = startValue;
 
-        Style = new Style()
-        {
-            Flow = Flow.Horizontal,
-        };
 
         ChildNodes = [
-            new Node()
+            HolderNode = new Node()
             {
                 Style = new Style()
                 {
-                    Flow = Flow.Vertical,
-                    Size = new Size(15, 18),
-                    Gap = 1,
+                    Flow = Flow.Horizontal,
                 },
                 ChildNodes = [
-                    buttonClick = new QuickSquareButton()
+                    new Node()
                     {
-                        NodeValue = startValue ? FontAwesomeIcon.Check.ToIconString() : string.Empty,
                         Style = new Style()
                         {
                             Flow = Flow.Vertical,
+                            Size = new Size(15, 18),
+                            Gap = 1,
                         },
+                        ChildNodes = [
+                                    buttonClick = new QuickSquareButton()
+                                    {
+                                        NodeValue = startValue ? FontAwesomeIcon.Check.ToIconString() : string.Empty,
+                                        Style = new Style()
+                                        {
+                                            Flow = Flow.Vertical,
+                                        },
+                                    },
+                            UnderlineNode = new Node()
+                            {
+                                Stylesheet = stylesheet,
+                                ClassList = ["UnderlineNode"],
+                            },
+                        ]
                     },
-                    UnderlineNode = new Node()
+                    LabelNode = new Node()
                     {
                         Stylesheet = stylesheet,
-                        ClassList = ["UnderlineNode"],
+                        ClassList = ["LabelNode"],
+                        NodeValue = label,
+
                     },
                 ]
-            },
-            LabelNode = new Node()
-            {
-                Stylesheet = stylesheet,
-                ClassList = ["LabelNode"],
-                NodeValue = label,
-
-            },
+            }
         ];
 
         buttonClick.OnClick += () =>
@@ -89,7 +96,7 @@ internal class ToggleConfig : Node
         new(".UnderlineNode", new Style()
         {
             Size = new Size(300, 2),
-            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour"), new Color("UnderlineColour:Fade")),
+            BackgroundGradient = GradientColor.Horizontal(new Color("Outline"), new Color("Outline:Fade")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
         }),

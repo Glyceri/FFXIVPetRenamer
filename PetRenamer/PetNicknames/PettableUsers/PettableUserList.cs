@@ -47,7 +47,7 @@ internal class PettableUserList : IPettableUserList
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
-            if (pUser.User == user) return pUser;
+            if (pUser.Address == user) return pUser;
             if (pUser.GetPet(user) == null) continue;
             return pUser;
         }

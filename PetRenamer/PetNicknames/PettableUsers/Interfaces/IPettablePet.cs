@@ -7,7 +7,7 @@ internal interface IPettablePet
 {
     IPettableUser? Owner { get; }
 
-    public bool Touched { get; set; }
+    public bool Marked { get; set; }
 
     public nint PetPointer { get; }
     public int SkeletonID { get; }

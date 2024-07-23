@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface;
-using PetRenamer.PetNicknames.Windowing.Base.Style;
 using System;
 using Una.Drawing;
 
@@ -26,8 +25,8 @@ internal class QuickSquareButton : Node
     new(".ClearButton", new Style()
     {
         Size = new(15, 15),
-        BackgroundColor = new("Window.BackgroundLight"),
-        StrokeColor = new("Window.TitlebarBorder"),
+        BackgroundColor = new("Button.Background"),
+        StrokeColor = new("Outline"),
         StrokeWidth = 1,
         StrokeInset = 0,
         TextAlign = Anchor.MiddleCenter,
@@ -40,17 +39,24 @@ internal class QuickSquareButton : Node
     }),
         new(".ClearButton:hover", new Style()
         {
-            BackgroundColor = new("Window.Background"),
+            BackgroundColor = new("Button.Background:Hover"),
             StrokeWidth = 2,
         }),
         new(".ClearButton:fakeDisabled", new Style()
         {
-            BackgroundColor = new("Window.Background"),
+            BackgroundColor = new("Button.Background:Inactive"),
             Color = new("Window.Text"),
-            OutlineColor = new(0, 0, 0),
+            OutlineColor = new("Window.TextOutlineButton"),
             StrokeWidth = 1,
-            StrokeColor = WindowStyles.WindowBorderInactive,
+            StrokeColor = new Color("Outline:Fade"),
+        }),
+        new(".ClearButton:disabled", new Style()
+        {
+            BackgroundColor = new("Button.Background:Inactive"),
+            Color = new("Window.Text"),
+            OutlineColor = new("Window.TextOutlineButton"),
+            StrokeWidth = 1,
+            StrokeColor = new Color("Outline:Fade"),
         })
     ]);
-
 }

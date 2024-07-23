@@ -5,7 +5,7 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 
 internal class RenameTitleNode : Node
 {
-    readonly string Label;
+    protected readonly string Label;
 
     public readonly Node UnderlineNode;
     public readonly Node TextNode;
@@ -65,7 +65,7 @@ internal class RenameTitleNode : Node
         new(".TextNode", new Style()
         {
             Size = new Size(200, 15),
-            BorderColor = new BorderColor(new Color("UnderlineColour")),
+            BorderColor = new BorderColor(new Color("Outline")),
             TextAlign = Anchor.MiddleRight,
             FontSize = 12,
             TextOverflow = false,
@@ -77,7 +77,7 @@ internal class RenameTitleNode : Node
         {
             Size = new Size(300, 2),
             Anchor = Anchor.BottomLeft,
-            BackgroundGradient = GradientColor.Horizontal(new Color("UnderlineColour:Fade"), new Color("UnderlineColour")),
+            BackgroundGradient = GradientColor.Horizontal(new Color("Outline:Fade"), new Color("Outline")),
             RoundedCorners = RoundedCorners.TopRight | RoundedCorners.BottomRight,
             BorderRadius = 3,
         }),

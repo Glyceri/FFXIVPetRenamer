@@ -18,7 +18,6 @@ internal class HookHandler : IDisposable
 
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
-    public IHousekeepingHook HousekeepingHook { get; private set; } = null!;
 
     public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList, in IPettableDirtyListener dirtyListener)
     {
@@ -39,9 +38,6 @@ internal class HookHandler : IDisposable
 
         MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
         Register(MapTooltipHook);
-
-        HousekeepingHook = new HousekeepingHook(DalamudServices, PettableUserList, PetServices, DirtyListener);
-        Register(HousekeepingHook);
 
         Register(new MapHook(DalamudServices, PetServices, PettableUserList, MapTooltipHook, DirtyListener));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList, DirtyListener));

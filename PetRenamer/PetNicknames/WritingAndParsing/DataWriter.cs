@@ -1,4 +1,7 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.ColourProfiling;
+using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -16,6 +19,27 @@ internal class DataWriter : IDataWriter
     public DataWriter(in IPettableUserList userList)
     {
         UserList = userList;
+    }
+
+    public string WriteColourData(in IColourProfile colourProfile)
+    {
+        List<string> strings = new List<string>() 
+        {
+            ParseVersion.ColourVersion1.GetDescription(),
+            colourProfile.Name, 
+            colourProfile.Author 
+        };
+
+        foreach (PetColour petColour in colourProfile.Colours)
+        {
+            strings.Add($"{petColour.Name}{PluginConstants.forbiddenCharacter}{petColour.Colour}");
+        }
+
+        string outcome = string.Join("\n", strings);
+
+        outcome = Convert.ToBase64String(Encoding.Unicode.GetBytes(outcome));
+
+        return outcome;
     }
 
     public string WriteData()
@@ -42,7 +66,13 @@ internal class DataWriter : IDataWriter
 
         for (int i = 0; i < length; i++)
         {
-            string newLine = $"{database.IDs[i]}{PluginConstants.forbiddenCharacter}{database.Names[i]}";
+            string name = database.Names[i];
+            int id = database.IDs[i];
+
+            if (id == 0) continue;
+            if (name.IsNullOrWhitespace()) continue;
+
+            string newLine = $"{id}{PluginConstants.forbiddenCharacter}{name}";
             petLines.Add(newLine);
         }
 

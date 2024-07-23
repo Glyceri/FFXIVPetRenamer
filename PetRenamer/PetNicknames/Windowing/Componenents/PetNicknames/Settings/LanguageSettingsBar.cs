@@ -1,17 +1,18 @@
 ﻿using Dalamud.Game.Text;
+using Dalamud.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Settings;
 
-internal class UIScaleSettingsBar : Node
+internal class LanguageSettingsBar : Node
 {
     public readonly Node LabelNode;
     public readonly Node UnderlineNode;
 
     readonly Configuration Configuration;
 
-    public UIScaleSettingsBar(in Configuration configuration)
+    public LanguageSettingsBar(in Configuration configuration)
     {
         Configuration = configuration;
         ChildNodes = [
@@ -25,7 +26,7 @@ internal class UIScaleSettingsBar : Node
                 ChildNodes = [
                     LabelNode = new Node()
                     {
-                        NodeValue = Translator.GetLine("Config.UISettings.UIScale.Header.Title"),
+                        NodeValue = Translator.GetLine("Config.LanguageSettingsBar.Header.Title"),
                         Style = new Style()
                         {
                             Size = new Size(300, 10),
@@ -45,16 +46,11 @@ internal class UIScaleSettingsBar : Node
                         },
                         ChildNodes = 
                         [
-                            new UIScaleButton(SeIconChar.BoxedLetterD.ToIconString(), () => SetSize(0)),
-                            new UIScaleButton("80%",  () => SetSize(0.8f)),
-                            new UIScaleButton("100%", () => SetSize(1.0f)),
-                            new UIScaleButton("117%", () => SetSize(1.17f)),
-                            new UIScaleButton("150%", () => SetSize(1.5f)),
-                            new UIScaleButton("200%", () => SetSize(2.0f)),
-                            new UIScaleButton("250%", () => SetSize(2.5f)),
-                            new UIScaleButton("300%", () => SetSize(3.0f)),
-                            new UIScaleButton("350%", () => SetSize(3.5f)),
-                            new UIScaleButton("400%", () => SetSize(4.0f)),
+                            new UIScaleButton(FontAwesomeIcon.Gamepad.ToIconString(), () => SetLangage(0)) { Tooltip = Translator.GetLine("Language.Game") },
+                            new UIScaleButton(SeIconChar.BoxedLetterE.ToIconString(), () => SetLangage(1)) { Tooltip = Translator.GetLine("Language.English") },
+                            new UIScaleButton(SeIconChar.BoxedLetterG.ToIconString(), () => SetLangage(2)) { Tooltip = Translator.GetLine("Language.German") },
+                            new UIScaleButton(SeIconChar.BoxedLetterF.ToIconString(), () => SetLangage(3)) { Tooltip = Translator.GetLine("Language.French") },
+                            new UIScaleButton(SeIconChar.BoxedLetterJ.ToIconString(), () => SetLangage(4)) { Tooltip = Translator.GetLine("Language.Japanese") },
                         ]
                     },
                     UnderlineNode = new Node()
@@ -71,9 +67,10 @@ internal class UIScaleSettingsBar : Node
         ];
     }
 
-    void SetSize(float size)
+    void SetLangage(int language)
     {
-        Configuration.petNicknamesUIScale = size;
+        Configuration.languageSettings = language;
         Configuration.Save();
+        
     }
 }

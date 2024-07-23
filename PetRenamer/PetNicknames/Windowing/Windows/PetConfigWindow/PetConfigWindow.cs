@@ -4,6 +4,8 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Settings;
 using Una.Drawing;
 using System.Numerics;
+using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
+using Dalamud.Interface;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
 
@@ -20,6 +22,8 @@ internal class PetConfigWindow : PetWindow
     readonly SettingsHolderNode UISettingsNode;
     readonly SettingsHolderNode GeneralSettingsNode;
     readonly SettingsHolderNode PetSettingsNode;
+
+    readonly QuickSquareButton PaletteButton;
 
     public PetConfigWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Configuration")
     {
@@ -65,17 +69,25 @@ internal class PetConfigWindow : PetWindow
         ];
 
         GeneralSettingsNode.ContentNode.ChildNodes = [
-             new ToggleConfig(in Configuration, Translator.GetLine("Config.PVPMessage"), Configuration.disablePVPChatMessage, (value) => Configuration.disablePVPChatMessage = value),
-            new ToggleConfig(in Configuration, Translator.GetLine("Config.ProfilePictures"), Configuration.downloadProfilePictures, (value) => Configuration.downloadProfilePictures = value),
+             new ToggleConfig(in Configuration, Translator.GetLine("Config.ProfilePictures"), Configuration.downloadProfilePictures, (value) => Configuration.downloadProfilePictures = value),
+             new LanguageSettingsBar(in Configuration),
         ];
 
         UISettingsNode.ContentNode.ChildNodes = [
-             new UIScaleSettingsBar(in Configuration),
+            new UIScaleSettingsBar(in Configuration),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Toggle"), Configuration.quickButtonsToggle, (value) => { Configuration.quickButtonsToggle = value; }),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Kofi"), Configuration.showKofiButton, (value) => { Configuration.showKofiButton = value; WindowHandler.SetKofiMode(Configuration.showKofiButton); }),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.TransparentBackground"), Configuration.transparentBackground, (value) => Configuration.transparentBackground = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.UIFlare"), Configuration.uiFlare, (value) => Configuration.uiFlare = value),
+            PaletteButton = new QuickSquareButton()
+            {
+                NodeValue = FontAwesomeIcon.Palette.ToIconString(),
+                Style = new Style() { Size = new Size(32, 15), },
+            }
         ];
+
+
+        PaletteButton.OnClick += () => WindowHandler.Open<ColourEditorWindow.ColourEditorWindow>();
     }
 
     public override void OnDraw()

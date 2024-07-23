@@ -72,6 +72,7 @@ internal class SheetsWrapper : IPetSheets
 
                 if (singular.IsNullOrWhitespace()) continue;
 
+                singular = StringHelper.MakeTitleCase(singular);
 
                 string plural = companion.Plural.ToDalamudString().TextValue;
                 uint icon = companion.Icon;
@@ -100,7 +101,10 @@ internal class SheetsWrapper : IPetSheets
             if (petAction == null) continue;
 
             ushort petIcon = petAction.Icon;
+
             string name = pet.Name;
+            name = StringHelper.MakeTitleCase(name);
+
             string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(petAction.Name));
 
             petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, 0, name, cleanedActionName, petAction.Name, petAction.RowId, in DalamudServices));

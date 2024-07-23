@@ -90,7 +90,7 @@ internal class PetRenameNode : Node
                         Size = new Size(90, 90),
                         Margin = new EdgeSize(20, 30),
                         IconId = ActivePet?.Icon ?? 66310,
-                        BorderColor = new BorderColor(new Color("UnderlineColour")),
+                        BorderColor = new BorderColor(new Color("Outline")),
                         BorderWidth = new EdgeSize(4),
                         //BorderRadius = 8,
                     },
@@ -138,8 +138,8 @@ internal class PetRenameNode : Node
         Vector2 iconPos = iconRect.TopLeft + (iconRect.BottomLeft - iconRect.TopLeft) * 0.5f;
         Vector2 earlyiconPos = iconPos - new Vector2(14f, 0) * ScaleFactor;
 
-        drawList.AddLine(activePos, earlyiconPos, new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
-        drawList.AddLine(earlyiconPos, iconPos, new Color("UnderlineColour").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(activePos, earlyiconPos, new Color("Outline").ToUInt(), 2 * ScaleFactor);
+        drawList.AddLine(earlyiconPos, iconPos, new Color("Outline").ToUInt(), 2 * ScaleFactor);
     }
 
     readonly Stylesheet stylesheet = new Stylesheet([

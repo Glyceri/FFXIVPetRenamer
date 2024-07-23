@@ -26,6 +26,8 @@ using System;
 using System.Reflection;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
+using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
+using PetRenamer.PetNicknames.ColourProfiling;
 
 namespace PetRenamer;
 
@@ -56,6 +58,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly ILodestoneNetworker LodestoneNetworkerInterface;
 
     readonly PettableDirtyHandler DirtyHandler;
+    readonly IColourProfileHandler ColourProfileHandler;
 
     readonly SaveHandler SaveHandler;
 
@@ -66,11 +69,13 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         SharingDictionary = new SharingDictionary(_DalamudServices);
 
-        Translator.Initialise(_DalamudServices);
+        Translator.Initialise(_DalamudServices, _PetServices.Configuration);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 
         DirtyHandler = new PettableDirtyHandler(_DalamudServices);
+
+        ColourProfileHandler = new ColourProfileHandler(_PetServices.Configuration);
 
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(in _PetServices, DirtyHandler);
@@ -86,11 +91,23 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
         ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
-        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter);
+
+        // UI is the most DOGSHIT thing in this whole plugin. I hate EVERY SINGLE LINE OF CODE from it...
+        // If I had know how unreadable Una.Drawing would make my UI code I wouldve never done it like this....
+        // This project was such a pleasure to work on before UI
+        // So fun, so great
+        // Then UI came along...
+        // Ive lost interest in writing this code
+        // I do not even care if it looks good anymore
+        // If some UI element shows weird or doesnt align properly
+        // Help me find the motivation to fix it, because I truly couldnt care less anymore
+        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter, in ColourProfileHandler);
+
+        ColourProfileHandler.RegisterWindowHandler(in WindowHandler);
         CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
-        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
+        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase, ColourProfileHandler);
         IpcProvider.Prepare();
 
         SaveHandler = new SaveHandler(_DalamudServices, _PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
