@@ -44,7 +44,7 @@ internal class ColourEditorWindow : PetWindow
 
     public ColourEditorWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IColourProfileHandler colourProfileHandler, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "ColourEditorWindow")
     {
-        IsOpen = true;
+        IsOpen = false;
 
         ColourProfileHandler = colourProfileHandler;
 
