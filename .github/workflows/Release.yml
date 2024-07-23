@@ -36,7 +36,7 @@ jobs:
           $content = $json | ConvertTo-Json
           set-content -Path $path -Value $content
       - name: Archive
-        run: Compress-Archive -Path PetRenamer/bin/Release/* -DestinationPath PetRenamer.zip
+        run: Compress-Archive -Path PetRenamer/bin/x64/Release/* -DestinationPath PetRenamer.zip
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.1
         with:
