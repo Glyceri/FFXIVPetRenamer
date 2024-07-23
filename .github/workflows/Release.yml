@@ -30,7 +30,7 @@ jobs:
       - name: write version into jsons
         run: |
           $ver = '${{ github.ref_name }}'
-          $path = './PetRenamer/bin/Release/PetRenamer.json'
+          $path = './PetRenamer/bin/x64/Release/PetRenamer.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json.AssemblyVersion = $ver
           $content = $json | ConvertTo-Json
@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2.2.1
         with:
           path: |
-            ./PetRenamer/bin/Release/*
+            ./PetRenamer/bin/x64/Release/*
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
