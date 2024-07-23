@@ -4,7 +4,8 @@ on:
   push:
     tags-ignore:
       - testing_*
-
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: windows-latest
