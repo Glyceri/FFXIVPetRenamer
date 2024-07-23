@@ -94,9 +94,9 @@ internal class ColourEditorWindow : PetWindow
         Register("BackgroundImageColour");
         Register("SearchBarBackground");
         Register("ListElementBackground");
-        Register("Window.Text");
-        Register("Window.TextOutline");
         Register("Window.TextLight");
+        Register("Window.TextOutline");
+        Register("Window.Text");
         Register("Window.TextOutlineButton");
         Register("WindowBorder:Active");
         Register("WindowBorder:Inactive");
