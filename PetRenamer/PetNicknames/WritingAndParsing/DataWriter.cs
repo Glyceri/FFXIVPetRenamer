@@ -23,7 +23,12 @@ internal class DataWriter : IDataWriter
 
     public string WriteColourData(in IColourProfile colourProfile)
     {
-        List<string> strings = new List<string>() { colourProfile.Name, colourProfile.Author };
+        List<string> strings = new List<string>() 
+        {
+            ParseVersion.ColourVersion1.GetDescription(),
+            colourProfile.Name, 
+            colourProfile.Author 
+        };
 
         foreach (PetColour petColour in colourProfile.Colours)
         {

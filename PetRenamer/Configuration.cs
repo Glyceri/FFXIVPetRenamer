@@ -33,6 +33,7 @@ internal class Configuration : IPluginConfiguration
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
+    public int languageSettings = 0;
     // ------------------------------- Pet -------------------------------
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;

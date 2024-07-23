@@ -69,7 +69,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         SharingDictionary = new SharingDictionary(_DalamudServices);
 
-        Translator.Initialise(_DalamudServices);
+        Translator.Initialise(_DalamudServices, _PetServices.Configuration);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 

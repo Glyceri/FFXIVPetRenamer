@@ -8,8 +8,7 @@ namespace PetRenamer.PetNicknames.TranslatorSystem;
 internal static class Translator
 {
     static DalamudServices DalamudServices = null!;
-
-    static PetNicknamesLanguage OverridenLanguage = PetNicknamesLanguage.Default;
+    static Configuration Configuration = null!;
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
@@ -83,8 +82,34 @@ internal static class Translator
         { "Command.Petlist", "Opens the Pet List window." },
         { "Command.PetSettings", "Opens the Settings window." },
         { "Command.PetSharing", "Opens the Sharing window." },
+        { "Command.PetTheme", "Opens the Colour Editor window." },
 
         { "Style.Title.Default", "Default" },
+
+        { "ColourEditorWindow.Name", "Name" },
+        { "ColourEditorWindow.Author", "Author" },
+
+        { "ColourSetting.Outline", "Outlines" },
+        { "ColourSetting.Outline:Fade", "Outline Fade" },
+        { "ColourSetting.Window.Background", "Window Background" },
+        { "ColourSetting.Window.BackgroundLight", "Faded Window Background" },
+        { "ColourSetting.BackgroundImageColour", "Window Background Image Colour" },
+        { "ColourSetting.SearchBarBackground", "Search Bar" },
+        { "ColourSetting.ListElementBackground", "List Element Background" },
+        { "ColourSetting.Window.TextOutline", "Text Outline" },
+        { "ColourSetting.Window.TextOutlineButton", "Text Outline Disabled" },
+        { "ColourSetting.Window.Text", "Text" },
+        { "ColourSetting.Window.TextLight", "Text Disabled" },
+        { "ColourSetting.WindowBorder:Active", "Border Active" },
+        { "ColourSetting.WindowBorder:Inactive", "Border Inactive" },
+        { "ColourSetting.Button.Background", "Button" },
+        { "ColourSetting.Button.Background:Hover", "Button Hover" },
+        { "ColourSetting.Button.Background:Inactive", "Button Disabled" },
+        { "ColourSetting.FlareImageColour", "Image" },
+
+        { "ColourEditorWindow.Title", "Colour Editor" },
+        { "ColourSettings.PresetListHeader", "Presets" },
+        { "ColourSettings.Header", "Colour Settings" },
     };
 
     static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
@@ -157,8 +182,34 @@ internal static class Translator
         { "Command.Petlist", "Öffnet das Fenster „Spitznamenliste“." },
         { "Command.PetSettings", "Öffnet das Fenster „Einstellungen“." },
         { "Command.PetSharing", "Öffnet das Fenster „Teilen“." },
+        { "Command.PetTheme", "Öffnet das Fenster „Farbeditor“." },
 
         { "Style.Title.Default", "Standard" },
+
+        { "ColourEditorWindow.Name", "Name" },
+        { "ColourEditorWindow.Author", "Autor" },
+
+        { "ColourSetting.Outline", "Konturen" },
+        { "ColourSetting.Outline:Fade", "Konturen Verblassen" },
+        { "ColourSetting.Window.Background", "Fensterhintergrund" },
+        { "ColourSetting.Window.BackgroundLight", "Verblasster Fensterhintergrund" },
+        { "ColourSetting.BackgroundImageColour", "Fensterhintergrund Bildfarbe" },
+        { "ColourSetting.SearchBarBackground", "Suchleiste" },
+        { "ColourSetting.ListElementBackground", "Listenelement Hintergrund" },
+        { "ColourSetting.Window.TextOutline", "Textumriss" },
+        { "ColourSetting.Window.TextOutlineButton", "Textumriss Deaktiviert" },
+        { "ColourSetting.Window.Text", "Text" },
+        { "ColourSetting.Window.TextLight", "Text Deaktiviert" },
+        { "ColourSetting.WindowBorder:Active", "Rahmen Aktiv" },
+        { "ColourSetting.WindowBorder:Inactive", "Rahmen Inaktiv" },
+        { "ColourSetting.Button.Background", "Schaltfläche" },
+        { "ColourSetting.Button.Background:Hover", "Schaltfläche Schweben" },
+        { "ColourSetting.Button.Background:Inactive", "Schaltfläche Deaktiviert" },
+        { "ColourSetting.FlareImageColour", "Bild" },
+
+        { "ColourEditorWindow.Title", "Farbeditor" },
+        { "ColourSettings.PresetListHeader", "Presets" },
+        { "ColourSettings.Header", "Farbeinstellungen" },
     };
 
 
@@ -232,6 +283,34 @@ internal static class Translator
         { "Command.Petlist", "Ouvre la fenêtre « Liste de surnoms »." },
         { "Command.PetSettings", "Ouvre la fenêtre « Paramètres »." },
         { "Command.PetSharing", "Ouvre la fenêtre « Partager »." },
+        { "Command.PetTheme", "Ouvre la fenêtre « Éditeur de Couleur »." },
+
+        { "Style.Title.Default", "Standard" },
+
+        { "ColourEditorWindow.Name", "Nom" },
+        { "ColourEditorWindow.Author", "Auteur" },
+
+        { "ColourSetting.Outline", "Contours" },
+        { "ColourSetting.Outline:Fade", "Estompe des Contours" },
+        { "ColourSetting.Window.Background", "Arrière-plan de la Fenêtre" },
+        { "ColourSetting.Window.BackgroundLight", "Arrière-plan Estompé de la Fenêtre" },
+        { "ColourSetting.BackgroundImageColour", "Couleur de l'Image de Fond de la Fenêtre" },
+        { "ColourSetting.SearchBarBackground", "Barre de Recherche" },
+        { "ColourSetting.ListElementBackground", "Arrière-plan de l'Élément de la Liste" },
+        { "ColourSetting.Window.TextOutline", "Contour du Texte" },
+        { "ColourSetting.Window.TextOutlineButton", "Contour du Texte Désactivé" },
+        { "ColourSetting.Window.Text", "Texte" },
+        { "ColourSetting.Window.TextLight", "Texte Désactivé" },
+        { "ColourSetting.WindowBorder:Active", "Bordure Active" },
+        { "ColourSetting.WindowBorder:Inactive", "Bordure Inactive" },
+        { "ColourSetting.Button.Background", "Bouton" },
+        { "ColourSetting.Button.Background:Hover", "Bouton Survolé" },
+        { "ColourSetting.Button.Background:Inactive", "Bouton Désactivé" },
+        { "ColourSetting.FlareImageColour", "Image" },
+
+        { "ColourEditorWindow.Title", "Éditeur de Couleur" },
+        { "ColourSettings.PresetListHeader", "Préréglages" },
+        { "ColourSettings.Header", "Paramètres de Couleur" },
     };
 
     static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
@@ -304,28 +383,54 @@ internal static class Translator
     { "Command.Petlist", "「ニックネームリスト」ウィンドウを開く。" },
     { "Command.PetSettings", "「設定」ウィンドウを開く。" },
     { "Command.PetSharing", "「共有」ウィンドウを開く。" },
+    { "Command.PetTheme", "「カラーエディター」ウィンドウを開く。" },
+
+    { "Style.Title.Default", "標準" },
+
+    { "ColourEditorWindow.Name", "名前" },
+    { "ColourEditorWindow.Author", "著者" },
+
+    { "ColourSetting.Outline", "輪郭" },
+    { "ColourSetting.Outline:Fade", "輪郭のフェード" },
+    { "ColourSetting.Window.Background", "ウィンドウの背景" },
+    { "ColourSetting.Window.BackgroundLight", "フェードしたウィンドウの背景" },
+    { "ColourSetting.BackgroundImageColour", "ウィンドウの背景画像の色" },
+    { "ColourSetting.SearchBarBackground", "検索バー" },
+    { "ColourSetting.ListElementBackground", "リスト要素の背景" },
+    { "ColourSetting.Window.TextOutline", "テキストの輪郭" },
+    { "ColourSetting.Window.TextOutlineButton", "テキストの輪郭無効" },
+    { "ColourSetting.Window.Text", "テキスト" },
+    { "ColourSetting.Window.TextLight", "テキスト無効" },
+    { "ColourSetting.WindowBorder:Active", "枠のアクティブ" },
+    { "ColourSetting.WindowBorder:Inactive", "枠の非アクティブ" },
+    { "ColourSetting.Button.Background", "ボタン" },
+    { "ColourSetting.Button.Background:Hover", "ボタンのホバー" },
+    { "ColourSetting.Button.Background:Inactive", "ボタンの無効" },
+    { "ColourSetting.FlareImageColour", "画像" },
+
+    { "ColourEditorWindow.Title", "カラーエディター" },
+    { "ColourSettings.PresetListHeader", "プリセット" },
+    { "ColourSettings.Header", "カラー設定" },
 };
 
-    internal static void Initialise(DalamudServices dalamudServices)
+    internal static void Initialise(DalamudServices dalamudServices, Configuration configuration)
     {
         DalamudServices = dalamudServices;
-    }
-
-    internal static void OverrideLanguage(PetNicknamesLanguage petNicknamesLanguage)
-    {
-        OverridenLanguage = petNicknamesLanguage;
+        Configuration = configuration;
     }
 
     internal static string GetLine(string identifier)
     {
         ClientLanguage language = DalamudServices.ClientState.ClientLanguage;
 
-        if (OverridenLanguage != PetNicknamesLanguage.Default)
+        PetNicknamesLanguage Language = (PetNicknamesLanguage)Configuration.languageSettings;
+
+        if (Language != PetNicknamesLanguage.Default)
         {
-            if (OverridenLanguage == PetNicknamesLanguage.English) language = ClientLanguage.English;
-            else if (OverridenLanguage == PetNicknamesLanguage.German) language = ClientLanguage.German;
-            else if (OverridenLanguage == PetNicknamesLanguage.French) language = ClientLanguage.French;
-            else if (OverridenLanguage == PetNicknamesLanguage.Japanese) language = ClientLanguage.Japanese;
+            if (Language == PetNicknamesLanguage.English) language = ClientLanguage.English;
+            else if (Language == PetNicknamesLanguage.German) language = ClientLanguage.German;
+            else if (Language == PetNicknamesLanguage.French) language = ClientLanguage.French;
+            else if (Language == PetNicknamesLanguage.Japanese) language = ClientLanguage.Japanese;
         }
 
         if (language == ClientLanguage.German) return GetTranslation(ref GermanTranslations, identifier);

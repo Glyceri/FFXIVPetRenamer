@@ -46,7 +46,8 @@ internal class NamePlateHook : HookableElement
 
     void OnSpecificPlateUpdate(INamePlateUpdateHandler handler)
     {
-        if (handler.NamePlateKind != NamePlateKind.BattleNpcFriendly && handler.NamePlateKind != NamePlateKind.EventNpcCompanion) return;
+        if (handler.NamePlateKind != NamePlateKind.BattleNpcFriendly && 
+            handler.NamePlateKind != NamePlateKind.EventNpcCompanion) return;
 
         if (handler.GameObject == null) return;
         nint address = handler.GameObject.Address;

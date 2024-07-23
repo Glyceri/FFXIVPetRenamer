@@ -65,7 +65,7 @@ internal class ColourSettingsNode : Node
             {
                 Stylesheet = stylesheet,
                 ClassList = ["LabelNode"],
-                NodeValue = Translator.GetLine(label),
+                NodeValue = Translator.GetLine("ColourSetting." + label),
             },
         ];
     }

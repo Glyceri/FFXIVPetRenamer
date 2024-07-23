@@ -12,6 +12,7 @@ using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Settings;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -93,10 +94,10 @@ internal class ColourEditorWindow : PetWindow
         Register("BackgroundImageColour");
         Register("SearchBarBackground");
         Register("ListElementBackground");
-        Register("Window.TextOutline");
-        Register("Window.TextOutlineButton");
         Register("Window.Text");
+        Register("Window.TextOutline");
         Register("Window.TextLight");
+        Register("Window.TextOutlineButton");
         Register("WindowBorder:Active");
         Register("WindowBorder:Inactive");
         Register("Button.Background");
@@ -121,6 +122,32 @@ internal class ColourEditorWindow : PetWindow
     public void OnPresetListChanged()
     {
         PresetList.ContentNode.ChildNodes.Clear();
+        QuickSquareButton importButton;
+        PresetList.ContentNode.ChildNodes.Add(importButton = new QuickSquareButton());
+        importButton.Style.Size = new Size(32, 15);
+        importButton.NodeValue = FontAwesomeIcon.FileImport.ToIconString();
+        importButton.OnClick += () => DalamudServices.Framework.Run(() => 
+        {
+            IDataParseResult result = DataParser.ParseData(ImGui.GetClipboardText());
+            if (result is not IColourParseResult colourParseResult) 
+            {
+                DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
+                {
+                    Type = Dalamud.Interface.ImGuiNotification.NotificationType.Warning,
+                    Content = Translator.GetLine("ColourEditorWindow.ImportError"),
+                });
+            }
+            else
+            {
+                DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
+                {
+                    Type = Dalamud.Interface.ImGuiNotification.NotificationType.Warning,
+                    Content = Translator.GetLine("ColourEditorWindow.ImportSuccess"),
+                });
+
+                ColourProfileHandler.AddColourProfile(new ColourProfile(colourParseResult.ThemeName, colourParseResult.ThemeAuthor, colourParseResult.Colours.ToList()));
+            }
+        });
 
         int activeIndex = ColourProfileHandler.GetActiveAsSerialized();
 
@@ -160,8 +187,8 @@ internal class ColourEditorWindow : PetWindow
             },
             ChildNodes = 
             [
-                nameNode = new SearchBarNode(in DalamudServices, "Name", string.Empty),
-                authorNode = new SearchBarNode(in DalamudServices, "Author", string.Empty),
+                nameNode = new SearchBarNode(in DalamudServices, Translator.GetLine("ColourEditorWindow.Name"), string.Empty),
+                authorNode = new SearchBarNode(in DalamudServices, Translator.GetLine("ColourEditorWindow.Author"), string.Empty),
                 addButton = new QuickSquareButton()
                 {
                     Style = new Style()

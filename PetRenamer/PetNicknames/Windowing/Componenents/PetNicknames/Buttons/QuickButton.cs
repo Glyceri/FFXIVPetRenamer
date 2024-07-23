@@ -6,8 +6,6 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
 
 internal class QuickButton : Node
 {
-    public Action? Clicked;
-
     readonly DalamudServices DalamudServices;
 
     public QuickButton(in DalamudServices services, string text)
@@ -16,11 +14,6 @@ internal class QuickButton : Node
         Stylesheet = stylesheet;
         ClassList = ["Button"];
         NodeValue = text;
-
-        OnMouseUp += _ =>
-        {
-            DalamudServices.Framework.Run(() => Clicked?.Invoke());
-        };
     }
 
     public void SetText(string text)
