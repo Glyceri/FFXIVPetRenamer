@@ -42,7 +42,7 @@ internal class UserListNode : Node
         {
             Flow = Flow.Horizontal,
             BackgroundColor = new Color("ListElementBackground"),
-            Size = new Size(412, 70),
+            Size = new Size(412, 60),
             BorderColor = new(new("Outline")),
             BorderWidth = new EdgeSize(1),
             IsAntialiased = false,
@@ -54,7 +54,7 @@ internal class UserListNode : Node
                 Style = new Style()
                 {
                     Flow = Flow.Vertical,
-                    Margin = new EdgeSize(11, 0, 0, 8),
+                    Margin = new EdgeSize(5, 0, 0, 8),
                 },
                 ChildNodes = [
                     SpeciesNode = new RenameTitleNode(in DalamudServices, Translator.GetLine("Name") + ":", entry.Name),
@@ -67,7 +67,7 @@ internal class UserListNode : Node
                 Style = new Style()
                 {
                     Size = new Size(50, 50),
-                    Margin = new EdgeSize(10, 0, 0, 15),
+                    Margin = new EdgeSize(5, 0, 0, 20),
                     BorderColor = new BorderColor(new Color("Outline")),
                     BorderWidth = new EdgeSize(4),
                 },
@@ -88,7 +88,7 @@ internal class UserListNode : Node
                 {
                     Flow = Flow.Vertical,
                     Anchor = Anchor.TopRight,
-                    Padding = new EdgeSize(10, 10),
+                    Padding = new EdgeSize(5, 5),
                     Gap = 4,
                 },
                 ChildNodes = [

@@ -12,6 +12,6 @@ internal unsafe class PettableCompanion : BasePettablePet, IPettableCompanion
 
     public PettableCompanion(Companion* companion, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices) : base(&companion->Character, in owner, in sharingDictionary, in entry, in petServices)
     {
-
+        
     }
 }

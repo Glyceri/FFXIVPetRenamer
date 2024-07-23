@@ -25,9 +25,12 @@ internal class ColourProfileConfig : ToggleConfig
             Flow = Flow.Vertical,
             StrokeWidth = 1,
             StrokeColor = new Color("Outline"),
+            Padding = new EdgeSize(2),
+            BackgroundColor = new Color("ListElementBackground"),
         };
 
-       
+        //HolderNode.Style.Margin = new EdgeSize(2);
+
         HolderNode.ChildNodes.Add(ExportButton = new QuickSquareButton()
         {
             NodeValue = FontAwesomeIcon.FileExport.ToIconString(),
@@ -37,9 +40,15 @@ internal class ColourProfileConfig : ToggleConfig
             },
         });
 
+        LabelNode.Style.Size = new Size(234, 15);
+
+        UnderlineNode.ParentNode?.RemoveChild(UnderlineNode);
+
         ExportButton.OnClick += () => export?.Invoke();
 
         HolderNode.ChildNodes.Add(ClearButton = new QuickClearButton());
         ChildNodes.Add(AuthorNode = new RenameTitleNode(in dalamudServices, "Author", cProfile.Author));
+
+        AuthorNode.UnderlineNode.ParentNode?.RemoveChild(AuthorNode.UnderlineNode);
     }
 }

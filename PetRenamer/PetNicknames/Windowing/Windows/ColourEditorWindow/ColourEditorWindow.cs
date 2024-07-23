@@ -21,9 +21,9 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.ColourEditorWindow;
 
 internal class ColourEditorWindow : PetWindow
 {
-    protected override Vector2 MinSize { get; } = new Vector2(334, 300);
-    protected override Vector2 MaxSize { get; } = new Vector2(334, 1200);
-    protected override Vector2 DefaultSize { get; } = new Vector2(334, 600);
+    protected override Vector2 MinSize { get; } = new Vector2(338, 300);
+    protected override Vector2 MaxSize { get; } = new Vector2(338, 1200);
+    protected override Vector2 DefaultSize { get; } = new Vector2(338, 600);
     protected override bool HasModeToggle { get; } = false;
     protected override bool HasExtraButtons { get; } = false;
 
@@ -124,7 +124,6 @@ internal class ColourEditorWindow : PetWindow
 
         int activeIndex = ColourProfileHandler.GetActiveAsSerialized();
 
-
         int index = -1;
         ColourProfileConfig cConfig = AddColourprofile(WindowStyles.DefaultColourProfile, index, index == activeIndex);
         index++;
@@ -156,7 +155,8 @@ internal class ColourEditorWindow : PetWindow
                 Flow = Flow.Vertical,
                 BorderColor = new(new("Outline")),
                 BorderWidth = new EdgeSize(1),
-                Size = new Size(300, 46),
+                Size = new Size(304, 46),
+                BackgroundColor = new Color("ListElementBackground"),
             },
             ChildNodes = 
             [
@@ -184,7 +184,11 @@ internal class ColourEditorWindow : PetWindow
             if (nameNodeField.IsNullOrWhitespace()) return;
             if (authorField.IsNullOrWhitespace()) return;
 
-            DalamudServices.Framework.Run(() => ColourProfileHandler.AddColourProfile(new ColourProfile(nameNodeField, authorField, WindowStyles.DefaultColourProfile.Colours.ToList())));
+            DalamudServices.Framework.Run(() =>
+            {
+                ColourProfileHandler.AddColourProfile(new ColourProfile(nameNodeField, authorField, WindowStyles.DefaultColourProfile.Colours.ToList()));
+                Configuration.Save();
+            });
         };
     }
 
@@ -196,7 +200,8 @@ internal class ColourEditorWindow : PetWindow
             {
                 ColourProfileHandler.SetActiveProfile(cProfile);
                 WindowHandler?.GetWindow<ColourEditorWindow>()?.OnPresetListChanged();
-            });
+                Configuration.Save();
+            }); 
         },
         () => 
             {
@@ -223,8 +228,15 @@ internal class ColourEditorWindow : PetWindow
             }
         );
 
-        cConfig.LabelNode.Style.Size = new Size(234, 15);
-        cConfig.ClearButton.OnClick += () => DalamudServices.Framework.Run(() => ColourProfileHandler.RemoveColourProfile(cProfile));
+        cConfig.ClearButton.OnClick += () =>
+        {
+            DalamudServices.Framework.Run(() =>
+            {
+                ColourProfileHandler.RemoveColourProfile(cProfile);
+                Configuration.Save();
+            });
+        };
+
         PresetList.ContentNode.ChildNodes.Add(cConfig);
 
         return cConfig;
@@ -240,7 +252,7 @@ internal class ColourEditorWindow : PetWindow
         {
             didActivate = false;
             ColourProfileHandler.Refresh();
-
+            Configuration.Save();
         }
     }
 }

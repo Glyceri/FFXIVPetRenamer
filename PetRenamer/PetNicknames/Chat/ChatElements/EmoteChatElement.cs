@@ -43,10 +43,10 @@ internal unsafe class EmoteChatElement : IChatElement
             if (!user.IsActive) continue;
 
             IPettablePet? pet = user.GetPet(emoteTarget);
-            if (pet == null) continue; 
+            if (pet == null) continue;
 
             string? customName = pet.CustomName;
-            if (customName == null) continue; 
+            if (customName == null) continue;
 
             IPetSheetData? data = pet.PetData;
             if (data == null) continue;
