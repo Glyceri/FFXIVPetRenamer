@@ -21,8 +21,6 @@ internal class PetRenameNode : Node
 
     public Action<string?>? OnSave;
 
-    readonly TechnoCircleImageNode CircleImageNode;
-
     readonly RenameTitleNode SpeciesNode;
     readonly RenameTitleNode RaceNode;
     readonly RenameTitleNode BehaviourNode;
@@ -92,21 +90,7 @@ internal class PetRenameNode : Node
                         IconId = ActivePet?.Icon ?? 66310,
                         BorderColor = new BorderColor(new Color("Outline")),
                         BorderWidth = new EdgeSize(4),
-                        //BorderRadius = 8,
                     },
-                    ChildNodes =
-                    [
-                        CircleImageNode = new TechnoCircleImageNode(in services, in configuration)
-                        { 
-                            Opacity = 0.3f,
-                            RoationSpeed = 12,
-                            Style = new Style()
-                            {
-                                Anchor = Anchor.MiddleCenter,
-                                Size = new Size(130, 130),
-                            }
-                        }
-                    ]
                 },
             ];
 
@@ -123,8 +107,6 @@ internal class PetRenameNode : Node
         BehaviourNode.SetText(activePet?.BehaviourName ?? Translator.GetLine("..."));
         IDNode.SetText(ActivePet?.Model.ToString() ?? Translator.GetLine("..."));
         NicknameNode.SetPet(customName, activePet);
-
-        CircleImageNode.Style.IsVisible = activePet != null;
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
