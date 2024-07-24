@@ -69,7 +69,7 @@ public class PetBase
         _objectID = gObject->GetGameObjectId().ObjectId;
         _nameChanged = serializableUserV3.changed;
 
-        if (_objectID != 0 && _customName != null && _customName != string.Empty) IpcProvider.PetNicknameDict.TryAdd(_objectID, _customName);
+        if (_objectID != 0 && _customName != null && _customName != string.Empty) IpcProvider.PetNicknameDict.TryAdd(gObject->GetGameObjectId(), _customName);
 
         if (!_petChanged && !_nameChanged) return;
 

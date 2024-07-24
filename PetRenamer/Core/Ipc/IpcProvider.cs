@@ -30,7 +30,7 @@ public static class IpcProvider
     static ICallGateProvider<string, object>? OnPlayerDataChangedSingle;
     static ICallGateProvider<IPlayerCharacter, object>? ClearPlayerDataAll;
 
-    internal static Dictionary<uint, string> PetNicknameDict { get; private set; } = new Dictionary<uint, string>();
+    internal static Dictionary<ulong, string> PetNicknameDict { get; private set; } = new Dictionary<ulong, string>();
 
     // ------------------------ READ ME ------------------------
     // {PluginConstants.apiNamespace} = "PetRenamer."
@@ -96,7 +96,11 @@ public static class IpcProvider
 
     static void RegisterDictionaries()
     {
-        PetNicknameDict = PluginHandlers.PluginInterface.GetOrCreateData($"{PluginConstants.apiNamespace}GameObjectRenameDict", () => new Dictionary<uint, string>());
+        try
+        {
+            PetNicknameDict = PluginHandlers.PluginInterface.GetOrCreateData($"{PluginConstants.apiNamespace}GameObjectRenameDict", () => new Dictionary<ulong, string>());
+        }
+        catch { }
     }
 
     // Notifiers
