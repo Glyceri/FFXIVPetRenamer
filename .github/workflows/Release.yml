@@ -1,36 +1,88 @@
-# This is a basic workflow to help you get started with Actions
+name: Create Release
 
-name: Release
-
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the $default-branch branch
   push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    tags-ignore:
+      - testing_*
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: windows-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+        with:
+          submodules: recursive
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x.x'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Download Dalamud
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/stg/latest.zip -OutFile latest.zip
+          Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+      - name: Build
+        run: |
+          $ver = '${{ github.ref_name }}'
+          invoke-expression 'dotnet build --no-restore --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
+      - name: write version into jsons
+        run: |
+          $ver = '${{ github.ref_name }}'
+          $path = './PetNicknames/bin/x64/Release/PetNicknames.json'
+          $json = Get-Content -Raw $path | ConvertFrom-Json
+          $json.AssemblyVersion = $ver
+          $content = $json | ConvertTo-Json
+          set-content -Path $path -Value $content
+      - name: Archive
+        run: Compress-Archive -Path PetNicknames/bin/x64/Release/* -DestinationPath PetNicknames.zip
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          path: |
+            ./PetNicknames/bin/x64/Release/*
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: PetNicknames ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./PetNicknames.zip
+          asset_name: PetNicknames.zip
+          asset_content_type: application/zip
+
+      - name: Write out PetNicknames.json
+        run: |
+          $ver = '${{ github.ref_name }}'
+          $path = './PetNicknames.json'
+          $json = Get-Content -Raw $path | ConvertFrom-Json
+          $json[0].AssemblyVersion = $ver
+          $json[0].TestingAssemblyVersion = $ver
+          $json[0].DownloadLinkInstall = $json.DownloadLinkInstall -replace '[^/]+/PetNicknames.zip',"$ver/PetNicknames.zip"
+          $json[0].DownloadLinkTesting = $json.DownloadLinkTesting -replace '[^/]+/PetNicknames.zip',"$ver/PetNicknames.zip"
+          $json[0].DownloadLinkUpdate = $json.DownloadLinkUpdate -replace '[^/]+/PetNicknames.zip',"$ver/PetNicknames.zip"
+          $content = $json | ConvertTo-Json -AsArray
+          set-content -Path $path -Value $content
+
+      - name: Commit PetNicknames.json
+        run: |
+          git config --global user.name "Actions User"
+          git config --global user.email "actions@github.com"
+          git fetch origin main
+          git branch -f main ${{ github.sha }}
+          git checkout main
+          git add PetNicknames.json
+          git commit -m "[CI] Updating PetNicknames.json for ${{ github.ref_name }}" || true
+          git push origin main
