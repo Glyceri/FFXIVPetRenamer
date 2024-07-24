@@ -111,7 +111,7 @@ internal struct PetSheetData : IPetSheetData
     readonly string[] pronounList = ["er", "e", "es", "en"];
     readonly string[] englishStarters = ["the ", string.Empty];
     readonly string[] germanStarters = ["den ", "des ", "dem ", "die ", "der ", "das ", string.Empty];
-    readonly string[] frenchStarters = ["le ", "la ", string.Empty];
+    readonly string[] frenchStarters = ["le ", "la ", "l'", string.Empty];
     readonly string[] japaneseStarters = [string.Empty];
 
     readonly string[] GetList(ClientLanguage clientLanguage) => clientLanguage switch
