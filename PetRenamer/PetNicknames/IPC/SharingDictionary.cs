@@ -16,8 +16,12 @@ internal class SharingDictionary : ISharingDictionary
     {
         DalamudServices = dalamudServices;
 
-        // Data sharing
-        PetNicknameDict = DalamudServices.PetNicknamesPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
+        try
+        {
+            // Data sharing
+            PetNicknameDict = DalamudServices.PetNicknamesPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
+        }
+        catch { }
     }
 
     public void Set(GameObjectId gameObjectID, string customName)

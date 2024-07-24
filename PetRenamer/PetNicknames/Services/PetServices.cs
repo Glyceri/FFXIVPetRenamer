@@ -22,7 +22,6 @@ internal class PetServices : IPetServices
         DalamudServices = services;
 
         PetLog = new PetLogWrapper(services.PluginLog);
-        RenameOldConfig();
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         StringHelper = new StringHelperWrapper();
         PetSheets = new SheetsWrapper(ref services, StringHelper);
@@ -35,26 +34,5 @@ internal class PetServices : IPetServices
     {
         if (Configuration.currentSaveFileVersion == Configuration.Version) return;
         _ = new LegacyStepper(Configuration, this);
-    }
-
-    void RenameOldConfig()
-    {
-        DirectoryInfo directory = DalamudServices.PetNicknamesPlugin.ConfigDirectory;
-        if (directory == null) return;
-
-        try
-        {
-            string? path = directory.Parent?.FullName;
-            if (string.IsNullOrEmpty(path)) return;
-
-            string oldPath = path + "\\PetRenamer.json";
-            string newPath = path + "\\PetNicknames.json";
-
-            File.Move(oldPath, newPath);
-        } 
-        catch (Exception e) 
-        {
-            DalamudServices.PluginLog.Debug(e.Message);
-        }
     }
 }
