@@ -98,8 +98,8 @@ internal struct PetSheetData : IPetSheetData
     {
         try
         {
-            baseString = baseString.Replace("[p]", "");
-            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]));
+            baseString = baseString.Replace("[p]", "", System.StringComparison.InvariantCultureIgnoreCase);
+            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]), System.StringComparison.InvariantCultureIgnoreCase);
             return baseString;
         }
         catch
