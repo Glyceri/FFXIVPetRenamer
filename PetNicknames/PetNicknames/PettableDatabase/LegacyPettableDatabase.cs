@@ -28,7 +28,9 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
     public void ApplyParseResult(IBaseParseResult parseResult, bool isFromIPC)
     {
-        IPettableDatabaseEntry entry = GetEntry(parseResult.UserName, parseResult.Homeworld);
+        IPettableDatabaseEntry? entry = GetEntry(parseResult.UserName, parseResult.Homeworld, true);
+        if (entry == null) return;
+
         entry.UpdateEntryBase(parseResult, isFromIPC);
         SetDirty();
     }

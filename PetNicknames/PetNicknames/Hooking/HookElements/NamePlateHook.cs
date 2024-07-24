@@ -14,10 +14,12 @@ internal class NamePlateHook : HookableElement
     public override void Init()
     {
         DalamudServices.NameplateGUI.OnNamePlateUpdate += OnPlateUpdate;
+        Refresh();
     }
 
     protected override void OnDispose()
     {
+        Refresh();
         DalamudServices.NameplateGUI.OnNamePlateUpdate -= OnPlateUpdate;
     }
 

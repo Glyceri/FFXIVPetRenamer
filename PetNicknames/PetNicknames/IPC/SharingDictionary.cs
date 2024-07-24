@@ -10,19 +10,23 @@ internal class SharingDictionary : ISharingDictionary
     readonly DalamudServices DalamudServices;
 
     // Data Sharing
-    readonly Dictionary<uint, string> PetNicknameDict = new Dictionary<uint, string>();
+    readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
 
     public SharingDictionary(in DalamudServices dalamudServices)
     {
         DalamudServices = dalamudServices;
 
-        // Data sharing
-        PetNicknameDict = DalamudServices.PetNicknamesPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<uint, string>());
+        try
+        {
+            // Data sharing
+            PetNicknameDict = DalamudServices.PetNicknamesPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
+        }
+        catch { }
     }
 
     public void Set(GameObjectId gameObjectID, string customName)
     {
-        PetNicknameDict.Add(gameObjectID.ObjectId, customName);
+        PetNicknameDict.Add(gameObjectID, customName);
     }
 
     public void Clear()

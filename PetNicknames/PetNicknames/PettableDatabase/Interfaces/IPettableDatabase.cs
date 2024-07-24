@@ -12,7 +12,7 @@ internal interface IPettableDatabase
     /// </summary>
     /// <param name="name">Player Name</param>
     /// <returns>The Data Base Entry</returns>
-    IPettableDatabaseEntry GetEntry(string name, ushort homeworld);
+    IPettableDatabaseEntry? GetEntry(string name, ushort homeworld, bool create);
     /// <summary>
     /// Get's the database entry if it exists. In the case it doesn't it creates a new one!
     /// </summary>
