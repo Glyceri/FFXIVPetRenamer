@@ -21,13 +21,13 @@ internal class UpdateHandler : IDisposable
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
     readonly IPettableDatabase PettableDatabase;
-    readonly IPettableDatabase LegacyPettableDatabase;
+    readonly ILegacyDatabase LegacyPettableDatabase;
     readonly IPettableDirtyListener DirtyListener;
     readonly IImageDatabase ImageDatabase;
     readonly LodestoneNetworker LodestoneNetworker;
     readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener)
+    public UpdateHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in ILegacyDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         SharingDictionary = sharingDictionary;
@@ -45,8 +45,7 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
-        _updatables.Add(new LegacyDatabaseHelper(in DalamudServices, in LegacyPettableDatabase, in PettableDatabase, in PetServices, in PettableUserList));
-        _updatables.Add(new PettableUserHandler(in DalamudServices, in SharingDictionary, in PettableUserList, in PettableDatabase, in PetServices, in DirtyListener));
+        _updatables.Add(new PettableUserHandler(in DalamudServices, in SharingDictionary, in PettableUserList, in PettableDatabase, in LegacyPettableDatabase, in PetServices, in DirtyListener));
         _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker, in ImageDatabase));
     }
 

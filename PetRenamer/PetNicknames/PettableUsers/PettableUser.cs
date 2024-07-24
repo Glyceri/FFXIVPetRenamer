@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -35,7 +36,7 @@ internal unsafe class PettableUser : IPettableUser
     readonly IPettableDirtyListener DirtyListener;
     readonly ISharingDictionary SharingDictionary;
 
-    public PettableUser(in ISharingDictionary sharingDictionary, in IPettableDatabase dataBase, in IPetServices petServices, in IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
+    public PettableUser(in ISharingDictionary sharingDictionary, in IPettableDatabase dataBase, in ILegacyDatabase legacyDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
     {
         DirtyListener = dirtyListener;
         SharingDictionary = sharingDictionary;
@@ -53,6 +54,15 @@ internal unsafe class PettableUser : IPettableUser
 
         ObjectID = BattleChara->GetGameObjectId();
         ShortObjectID = BattleChara->GetGameObjectId().ObjectId;
+
+        IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(Name, Homeworld, false);
+        if (legacyEntry != null)
+        {
+            legacyEntry.UpdateContentID(ContentID, true);
+            legacyDatabase.RemoveEntry(legacyEntry);
+            legacyEntry.MoveToDataBase(dataBase);
+        }
+
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
         PetServices = petServices;

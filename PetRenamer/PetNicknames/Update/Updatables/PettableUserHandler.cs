@@ -25,9 +25,10 @@ internal unsafe class PettableUserHandler : IUpdatable
     readonly IPettableUserList PettableUserList;
     readonly IPetLog PetLog;
     readonly IPettableDatabase PettableDatabase;
+    readonly ILegacyDatabase LegacyDatabase;
     readonly IPettableDirtyListener DirtyListener;
 
-    public PettableUserHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
+    public PettableUserHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         SharingDictionary = sharingDictionary;
@@ -35,6 +36,7 @@ internal unsafe class PettableUserHandler : IUpdatable
         PettableUserList = pettableUserList;
         PetLog = PetServices.PetLog;
         PettableDatabase = pettableDatabase;
+        LegacyDatabase = legacyDatabase;
         DirtyListener = dirtyListener;
     }
 
@@ -74,7 +76,7 @@ internal unsafe class PettableUserHandler : IUpdatable
             if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
             {
                 // Create a user
-                IPettableUser newUser = new PettableUser(in SharingDictionary, in PettableDatabase, in PetServices, in DirtyListener, battleChara);
+                IPettableUser newUser = new PettableUser(in SharingDictionary, in PettableDatabase, in LegacyDatabase, in PetServices, in DirtyListener, battleChara);
                 PettableUserList.PettableUsers[i] = newUser;
                 continue;
             }

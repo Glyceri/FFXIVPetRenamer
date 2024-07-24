@@ -54,7 +54,7 @@ internal class PettableDatabase : IPettableDatabase
         _entries = newEntries;
     }
 
-    public IPettableDatabaseEntry GetEntry(string name, ushort homeworld)
+    public IPettableDatabaseEntry? GetEntry(string name, ushort homeworld, bool create)
     {
         int entriesCount = _entries.Count;
         for (int i = 0; i < entriesCount; i++)
@@ -62,6 +62,11 @@ internal class PettableDatabase : IPettableDatabase
             IPettableDatabaseEntry entry = _entries[i];
             if (entry.Name != name || entry.Homeworld != homeworld) continue;
             return entry;
+        }
+
+        if (!create)
+        {
+            return null;
         }
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, DateTime.Now.ToString("yyyyMMdd"), PetRenamerPlugin.PuginVersion.ToString(), false);
