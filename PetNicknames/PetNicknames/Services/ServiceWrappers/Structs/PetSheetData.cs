@@ -99,13 +99,10 @@ internal struct PetSheetData : IPetSheetData
         try
         {
             baseString = baseString.Replace("[p]", "", System.StringComparison.InvariantCultureIgnoreCase);
-            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]), System.StringComparison.InvariantCultureIgnoreCase);
-            return baseString;
-        }
-        catch
-        {
-            return baseString;
-        }
+            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]), System.StringComparison.InvariantCultureIgnoreCase);   
+        } catch { }
+
+        return baseString;
     }
 
     readonly string[] pronounList = ["er", "e", "es", "en"];

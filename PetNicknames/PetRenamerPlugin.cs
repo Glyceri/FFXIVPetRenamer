@@ -73,7 +73,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 
-        DirtyHandler = new PettableDirtyHandler(_DalamudServices);
+        DirtyHandler = new PettableDirtyHandler();
 
         ColourProfileHandler = new ColourProfileHandler(_PetServices.Configuration);
 
@@ -110,7 +110,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase, ColourProfileHandler);
         IpcProvider.Prepare();
 
-        SaveHandler = new SaveHandler(_DalamudServices, _PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
+        SaveHandler = new SaveHandler(_PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
     }
 
     public void Dispose()

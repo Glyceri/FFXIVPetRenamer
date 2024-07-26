@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
@@ -8,19 +9,18 @@ namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 internal class HeaderBarButtonNode : Node
 {
     public readonly CloseButton CloseButton;
-    public readonly PetListButton PetListSquare;
     public readonly PetRenameButton PetRenameSquare;
     public readonly PetShareButton PetShareSquare;
     public readonly PetConfigButton PetConfigSquare;
 
-    readonly Configuration Configuration;
     readonly WindowHandler WindowHandler;
+    readonly IPetWindow PetWindow;
 
     readonly bool HasExtraButtons;
 
-    public HeaderBarButtonNode(in DalamudServices DalamudServices, in PetWindow petWindow, in Configuration configuration, in WindowHandler windowHandler, bool hasExtraButtons)
+    public HeaderBarButtonNode(in DalamudServices DalamudServices, in PetWindow petWindow, in WindowHandler windowHandler, bool hasExtraButtons)
     {
-        Configuration = configuration;
+        PetWindow = petWindow;
         WindowHandler = windowHandler;
 
         HasExtraButtons = hasExtraButtons;
@@ -34,16 +34,14 @@ internal class HeaderBarButtonNode : Node
 
         ChildNodes = [
             CloseButton = new CloseButton(in DalamudServices, petWindow),
-            PetRenameSquare = new PetRenameButton(in configuration, in windowHandler),
-            PetListSquare = new PetListButton(in configuration, in windowHandler),
-            PetShareSquare = new PetShareButton(in configuration, in windowHandler),
-            PetConfigSquare = new PetConfigButton(in configuration, in windowHandler),
+            PetRenameSquare = new PetRenameButton(in windowHandler, petWindow),
+            PetShareSquare = new PetShareButton(in windowHandler, petWindow),
+            PetConfigSquare = new PetConfigButton(in windowHandler, petWindow),
         ];
 
         if (hasExtraButtons) return;
 
         RemoveChild(PetRenameSquare, true);
-        RemoveChild(PetListSquare, true);
         RemoveChild(PetConfigSquare, true);
         RemoveChild(PetShareSquare, true);
     }
@@ -58,7 +56,7 @@ internal class HeaderBarButtonNode : Node
 
         kofiMode = value;
 
-        if (kofiMode && HasExtraButtons) ChildNodes.Add(kofiButton = new KofiButton(in Configuration, in WindowHandler));
+        if (kofiMode && HasExtraButtons) ChildNodes.Add(kofiButton = new KofiButton(in WindowHandler, PetWindow));
         else
         {
             if (kofiButton != null)

@@ -44,6 +44,11 @@ internal class RenameTitleNode : Node
         ];
     }
 
+    public void SetLabel(string text)
+    {
+        LabelNode.NodeValue = text;
+    }
+
     public void SetText(string text)
     {
         TextNode.NodeValue = text;

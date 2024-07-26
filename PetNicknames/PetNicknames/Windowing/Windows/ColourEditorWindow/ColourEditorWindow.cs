@@ -103,7 +103,6 @@ internal class ColourEditorWindow : PetWindow
         Register("Button.Background");
         Register("Button.Background:Hover");
         Register("Button.Background:Inactive");
-        Register("FlareImageColour");
 
         OnPresetListChanged();
     }

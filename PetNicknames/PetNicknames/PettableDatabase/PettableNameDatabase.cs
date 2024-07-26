@@ -8,11 +8,11 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableNameDatabase : INamesDatabase
 {
-    public int[] IDs { get; private set; } = new int[0];
-    public string[] Names { get; private set; } = new string[0];
+    public int[] IDs { get; private set; } = [];
+    public string[] Names { get; private set; } = [];
     public int Length { get => IDs.Length; }
 
-    IPettableDirtyCaller? DirtyCaller = null;
+    readonly IPettableDirtyCaller? DirtyCaller = null;
 
     public PettableNameDatabase(int[] ids, string[] names, in IPettableDirtyCaller dirtyCaller)
     {

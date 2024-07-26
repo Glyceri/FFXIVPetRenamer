@@ -62,7 +62,7 @@ internal abstract partial class PetWindow : Window, IPetWindow
                     ClassList = ["window--titlebar-text"],
                     NodeValue = Title,
                 },
-                HeaderBar = new HeaderBarButtonNode(in DalamudServices, this, in configuration, in windowHandler, HasExtraButtons),
+                HeaderBar = new HeaderBarButtonNode(in DalamudServices, this, in windowHandler, HasExtraButtons),
                 ContentNode = new Node()
                 {
                     ClassList = ["window--content"],
