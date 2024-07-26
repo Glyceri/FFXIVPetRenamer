@@ -46,7 +46,6 @@ internal class Configuration : IPluginConfiguration
     public bool showOnTargetBars = true;
     public bool showOnPartyList = true;
     // --------------------------- UI SETTINGS ---------------------------
-    public bool quickButtonsToggle = false;
     public bool showKofiButton = true;
     public float petNicknamesUIScale = 1.5f;
     public bool uiFlare = true;

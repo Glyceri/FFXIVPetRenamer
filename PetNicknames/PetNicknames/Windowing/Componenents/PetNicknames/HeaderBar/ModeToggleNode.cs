@@ -66,26 +66,29 @@ internal class ModeToggleNode : Node
                 {
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
-                    BackgroundColor = new("ModeToggleInactive"),
+                    BackgroundColor = new(0, 0, 0, 120),
                 }),
             new(".ModeToggleUnavailableBattlePet",
                 new()
                 {
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
-                    BackgroundColor = new("ModeToggleInactive"),
+                    BackgroundColor = new(0, 0, 0, 120),
                 }),
             new(".BattlePetModeActive",
                 new()
                 {
                     Anchor = Anchor.MiddleLeft,
                     Size = new Size(32, 15),
+                    StrokeColor = new("Outline"),
+                    StrokeWidth = 1,
                     BackgroundColor = new("Titlebar.BattlePet"),
                 }),
             new(".BattlePetModeActive:hover",
                 new()
                 {
                     BackgroundColor = new("Titlebar.BattlePet:Dark"),
+                    StrokeWidth = 2,
                 }),
             new(".MinionModeActive",
                 new()
@@ -93,11 +96,14 @@ internal class ModeToggleNode : Node
                     Anchor = Anchor.MiddleLeft,
                     Flow = Flow.Vertical,
                     Size = new Size(32, 15),
+                    StrokeColor = new("Outline"),
+                    StrokeWidth = 1,
                     BackgroundColor = new("Titlebar.Minion"),
                 }),
             new(".MinionModeActive:hover",
                 new()
                 {
+                    StrokeWidth = 2,
                     BackgroundColor = new("Titlebar.Minion:Dark"),
                 }
             ),

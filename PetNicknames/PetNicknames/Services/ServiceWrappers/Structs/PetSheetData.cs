@@ -98,20 +98,17 @@ internal struct PetSheetData : IPetSheetData
     {
         try
         {
-            baseString = baseString.Replace("[p]", "");
-            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]));
-            return baseString;
-        }
-        catch
-        {
-            return baseString;
-        }
+            baseString = baseString.Replace("[p]", "", System.StringComparison.InvariantCultureIgnoreCase);
+            baseString = baseString.Replace("[a]", checked(pronounList[pronoun]), System.StringComparison.InvariantCultureIgnoreCase);   
+        } catch { }
+
+        return baseString;
     }
 
     readonly string[] pronounList = ["er", "e", "es", "en"];
     readonly string[] englishStarters = ["the ", string.Empty];
     readonly string[] germanStarters = ["den ", "des ", "dem ", "die ", "der ", "das ", string.Empty];
-    readonly string[] frenchStarters = ["le ", "la ", string.Empty];
+    readonly string[] frenchStarters = ["le ", "la ", "l'", string.Empty];
     readonly string[] japaneseStarters = [string.Empty];
 
     readonly string[] GetList(ClientLanguage clientLanguage) => clientLanguage switch

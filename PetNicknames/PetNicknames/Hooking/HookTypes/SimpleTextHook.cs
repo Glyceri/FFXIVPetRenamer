@@ -55,15 +55,11 @@ internal unsafe class SimpleTextHook : ITextHook
     
     void OnName(INamesDatabase nameDatabase)
     {
-        if (lastPettableUser == null) return;
-        if (lastPettableUser.DataBaseEntry.ActiveDatabase != nameDatabase) return;
         SetDirty();
     }
 
     void OnEntry(IPettableDatabaseEntry entry)
     {
-        if (lastPettableUser == null) return;
-        if (lastPettableUser.DataBaseEntry != entry) return;
         SetDirty();
     }
 

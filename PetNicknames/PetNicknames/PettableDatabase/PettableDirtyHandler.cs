@@ -1,5 +1,4 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using System;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -10,13 +9,6 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     Action<IPettableDatabaseEntry>? OnEntry = _ => { };
     Action<IPettableDatabaseEntry>? OnClear = _ => { };
     Action<INamesDatabase>? OnName = _ => { };
-
-    readonly DalamudServices DalamudServices;
-
-    public PettableDirtyHandler(DalamudServices dalamudServices)
-    {
-        DalamudServices = dalamudServices;
-    }
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {

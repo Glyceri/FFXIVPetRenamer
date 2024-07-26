@@ -1,17 +1,16 @@
 ﻿using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
 using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar.Helper;
 
 internal class WindowOpenerButton<T> : QuickSquareButton where T : PetWindow
 {
-    readonly Configuration Configuration;
     readonly WindowHandler WindowHandler;
 
-    public WindowOpenerButton(in Configuration configuration, in WindowHandler windowHandler)
+    public WindowOpenerButton(in WindowHandler windowHandler, in IPetWindow petWindow)
     {
-        Configuration = configuration;
         WindowHandler = windowHandler;
 
         Style = new Style()
@@ -22,16 +21,8 @@ internal class WindowOpenerButton<T> : QuickSquareButton where T : PetWindow
             Margin = new EdgeSize(6, 0),
         };
 
-        OnClick = () =>
-        {
-            if (Configuration.quickButtonsToggle)
-            {
-                WindowHandler.Toggle<T>();
-            }
-            else
-            {
-                WindowHandler.Open<T>();
-            }
-        };
+        if (typeof(T) == petWindow.GetType()) Style.IsVisible = false;
+
+        OnClick = WindowHandler.Open<T>;
     }
 }

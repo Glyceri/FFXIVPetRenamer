@@ -75,7 +75,6 @@ internal class PetConfigWindow : PetWindow
 
         UISettingsNode.ContentNode.ChildNodes = [
             new UIScaleSettingsBar(in Configuration),
-            new ToggleConfig(in Configuration, Translator.GetLine("Config.Toggle"), Configuration.quickButtonsToggle, (value) => { Configuration.quickButtonsToggle = value; }),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Kofi"), Configuration.showKofiButton, (value) => { Configuration.showKofiButton = value; WindowHandler.SetKofiMode(Configuration.showKofiButton); }),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.TransparentBackground"), Configuration.transparentBackground, (value) => Configuration.transparentBackground = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.UIFlare"), Configuration.uiFlare, (value) => Configuration.uiFlare = value),

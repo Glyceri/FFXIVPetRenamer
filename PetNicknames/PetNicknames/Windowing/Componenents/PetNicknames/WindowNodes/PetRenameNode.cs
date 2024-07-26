@@ -41,43 +41,20 @@ internal class PetRenameNode : Node
                 // Rename Node part
                 HolderNode = new Node()
                 {
+                    Stylesheet = stylesheet,
                     Style = new Style()
                     {
                         Flow = Flow.Vertical,
                         Margin = new EdgeSize(10, 0, 0, 0),
                     },
+
                     ChildNodes =
                     [
-                        SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? Translator.GetLine("..."))
-                        {
-                            Stylesheet = stylesheet,
-                            ClassList = ["MarginSheet"],
-                            Interactable = true,
-                        },
-                        IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? Translator.GetLine("..."))
-                        {
-                            Stylesheet = stylesheet,
-                            ClassList = ["MarginSheet"],
-                            Interactable = true,
-                        },
-                        RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? Translator.GetLine("..."))
-                        {
-                            Stylesheet = stylesheet,
-                            ClassList = ["MarginSheet"],
-                            Interactable = true,
-                        },
-                        BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? Translator.GetLine("..."))
-                        {
-                            Stylesheet = stylesheet,
-                            ClassList = ["MarginSheet"],
-                            Interactable = true,
-                        },
-                        NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue)
-                        {
-                            Stylesheet = stylesheet,
-                            ClassList = ["MarginSheet"],
-                            Interactable = true,
-                        },
+                        SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
+                        IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
+                        RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
+                        BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
+                        NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", CurrentValue) { ClassList = ["MarginSheet"] },
                     ]
                 },
                 // This is the node that holds the image together
@@ -100,13 +77,43 @@ internal class PetRenameNode : Node
     public void Setup(string? customName, in IPetSheetData? activePet)
     {
         ActivePet = activePet;
+
+        if (ActivePet != null)
+        {
+            SpeciesNode.SetLabel($"{Translator.GetLine("PetRenameNode.Species")}:");
+            SpeciesNode.SetText(activePet?.BaseSingular ?? Translator.GetLine("..."));
+            AppendNodes();
+        }
+        else
+        {
+            SpeciesNode.SetLabel($"{Translator.GetLine("PetRenameNode.PleaseSummonWarningLabel")}:");
+            SpeciesNode.SetText(Translator.GetLine("PetRenameNode.PleaseSummonWarning"));
+            RemoveNodes();
+        }
+
         CurrentValue = customName;
         IconNode.IconID = activePet?.Icon ?? 66310;
-        SpeciesNode.SetText(activePet?.BaseSingular ?? Translator.GetLine("..."));
+        
         RaceNode.SetText(activePet?.RaceName ?? Translator.GetLine("..."));
         BehaviourNode.SetText(activePet?.BehaviourName ?? Translator.GetLine("..."));
         IDNode.SetText(ActivePet?.Model.ToString() ?? Translator.GetLine("..."));
         NicknameNode.SetPet(customName, activePet);
+    }
+
+    void RemoveNodes()
+    {
+        HolderNode.RemoveChild(IDNode);
+        HolderNode.RemoveChild(RaceNode);
+        HolderNode.RemoveChild(BehaviourNode);
+        HolderNode.RemoveChild(NicknameNode);
+    }
+
+    void AppendNodes()
+    {
+        HolderNode.AppendChild(IDNode);
+        HolderNode.AppendChild(RaceNode);
+        HolderNode.AppendChild(BehaviourNode);
+        HolderNode.AppendChild(NicknameNode);
     }
 
     protected override void OnDraw(ImDrawListPtr drawList)
