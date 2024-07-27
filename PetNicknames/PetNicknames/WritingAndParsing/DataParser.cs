@@ -46,9 +46,9 @@ internal class DataParser : IDataParser
 
         if (result is IClearParseResult clearParseResult)
         {
-            if (clearParseResult.ContentID == 0) return false;
+            if (clearParseResult.Name.IsNullOrWhitespace() || clearParseResult.Homeworld == 0) return false;
 
-            Database.GetEntry(clearParseResult.ContentID).Clear(false);
+            Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false)?.Clear(false);
             return true;
         }
 

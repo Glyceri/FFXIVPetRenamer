@@ -2,5 +2,6 @@
 
 internal interface IClearParseResult : IDataParseResult
 {
-    ulong ContentID { get; }
+    ushort Homeworld { get; }
+    string Name { get; }
 }
