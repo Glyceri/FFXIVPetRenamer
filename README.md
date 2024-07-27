@@ -1,23 +1,20 @@
-# FFXIVPetRenamer
-Give cute nicknames to your FFXIV companions.
+# Pet Nicknames
+Give your minions, Carbuncles and Faeries cute nicknames\nand share them with your friends.
 
-### Tutorial
-Type [/petname] to open the pet settings. The following panel will show.
+## Download the latest version here:
+`https://raw.githubusercontent.com/Glyceri/FFXIVPetRenamer/main/PetNicknames.json`
 
-![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/EmptyPanel.png)
+## Tutorial
+Type [/petname] to open the pet rename window. If you dont have a minion or battle pet out it will give you a warning.
 
-Summon any companion and the panel will update. 
+![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/NameWarning.png)
 
-![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/ChoseName.png)
+Summon any companion or battle pet and you will see this pannel. In some cases you need to click edit. Click edit and type a name in the bar that appears then click `save`.
 
-Select the long gray bar and type a name.
-After having typed the name press [Save Name]. 
+![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/NameEnter.png)
 
-![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/CustomName.png)
+The outcome should look as follows:
 
-Resummon your pet (or look away and back) and...
-There he is, little JimJim! 
+![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/Outcome.png)
 
-![](https://github.com/Glyceri/FFXIVPetRenamer/blob/main/res/JimJim.png)
-
-You can remove a nickname at any point by clicking Remove Nickname and then resummoning your pet.
+You can remove a nickname at any point by clicking Clear Nickname.
