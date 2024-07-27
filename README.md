@@ -1,5 +1,5 @@
 # Pet Nicknames
-Give your minions, Carbuncles and Faeries cute nicknames\nand share them with your friends.
+Give your minions, Carbuncles and Faeries cute nicknames and share them with your friends.
 
 ## Download the latest version here:
 `https://raw.githubusercontent.com/Glyceri/FFXIVPetRenamer/main/PetNicknames.json`
