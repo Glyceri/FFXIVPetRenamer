@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -146,12 +147,14 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         IsIPC = asIPC;
     }
 
-    public void Clear()
+    public void Clear(bool fromIPC)
     {
         SetActiveDatabase([], []);
         IsIPC = false;
         IsActive = false;
         IsLegacy = false;
+
+        if (fromIPC) return;
 
         MarkCleared();
         MarkDirty();

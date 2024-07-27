@@ -2,7 +2,6 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -244,7 +243,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (DataBaseEntry.IsIPC)
         {
-            DataBaseEntry.Clear();
+            DataBaseEntry.Clear(true);
         }
     }
 }

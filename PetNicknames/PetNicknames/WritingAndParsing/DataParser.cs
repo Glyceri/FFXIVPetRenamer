@@ -48,7 +48,7 @@ internal class DataParser : IDataParser
         {
             if (clearParseResult.ContentID == 0) return false;
 
-            Database.GetEntry(clearParseResult.ContentID).Clear();
+            Database.GetEntry(clearParseResult.ContentID).Clear(false);
             return true;
         }
 
