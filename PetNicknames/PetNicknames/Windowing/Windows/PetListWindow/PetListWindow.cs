@@ -36,8 +36,24 @@ internal partial class PetListWindow : PetWindow
         SetUser(UserList.LocalPlayer?.DataBaseEntry);
     }
 
+    DateTime lastTime = DateTime.Now;
+
     public override void OnDraw()
     {
+        DateTime now = DateTime.Now;
+
+        TimeSpan deltaSpan = lastTime - now;
+        lastTime = now;
+
+        if (internalDisabledTimer >= 0)
+        {
+            internalDisabledTimer += deltaSpan.TotalSeconds;
+        }
+        else if (ImportButton.IsDisabled)
+        {
+            ImportButton.IsDisabled = false;
+        }
+
         BottomPortion.Style.Size = new Size(ContentSize.Width, ContentSize.Height - 100);
         ScrollListBaseNode.Style.Size = new Size(BottomPortion.Style.Size.Width - 120, BottomPortion.Style.Size.Height - 60);
 
@@ -168,8 +184,7 @@ internal partial class PetListWindow : PetWindow
             {
                 if (!(SearchBarNode.Valid(entry.Name)
                  || SearchBarNode.Valid(entry.HomeworldName)
-                 || SearchBarNode.Valid(entry.Version)
-                 || SearchBarNode.Valid(entry.AddedOn))) return false;
+                 )) return false;
             }
 
             if (!index.Item2)

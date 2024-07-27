@@ -70,7 +70,7 @@ internal class PetConfigWindow : PetWindow
 
         GeneralSettingsNode.ContentNode.ChildNodes = [
              new ToggleConfig(in Configuration, Translator.GetLine("Config.ProfilePictures"), Configuration.downloadProfilePictures, (value) => Configuration.downloadProfilePictures = value),
-             new LanguageSettingsBar(in Configuration),
+             //new LanguageSettingsBar(in Configuration),
         ];
 
         UISettingsNode.ContentNode.ChildNodes = [

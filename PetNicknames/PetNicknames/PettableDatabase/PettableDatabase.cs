@@ -37,19 +37,7 @@ internal class PettableDatabase : IPettableDatabase
             SerializableNameData[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;
 
-            string addedOn = user.AddedOn;
-            if (addedOn.IsNullOrWhitespace())
-            {
-                addedOn = "DateTime.Unkown";
-            }
-
-            string version = user.Version;
-            if (version.IsNullOrWhitespace())
-            {
-                version = "Version.Unkown";
-            }
-
-            newEntries.Add(new PettableDataBaseEntry(in PetServices, in DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, addedOn, version, true));
+            newEntries.Add(new PettableDataBaseEntry(in PetServices, in DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
         }
         _entries = newEntries;
     }
@@ -69,7 +57,7 @@ internal class PettableDatabase : IPettableDatabase
             return null;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, DateTime.Now.ToString("yyyyMMdd"), PetRenamerPlugin.PuginVersion.ToString(), false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -84,7 +72,7 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, DateTime.Now.ToString("yyyyMMdd"), PetRenamerPlugin.PuginVersion.ToString(), false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }

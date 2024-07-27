@@ -129,7 +129,7 @@ internal class UserListNode : Node
 
         IPCIndicatorNode.TagsList.Add("fakeDisabled");
 
-        ClearButtonNode.OnClick += () => DalamudServices.Framework.Run(() => ActiveEntry.Clear());
+        ClearButtonNode.OnClick += () => DalamudServices.Framework.Run(() => ActiveEntry.Clear(false));
         EyeButtonNode.OnClick += () => DalamudServices.Framework.Run(() => OnView?.Invoke(ActiveEntry));
     }
 

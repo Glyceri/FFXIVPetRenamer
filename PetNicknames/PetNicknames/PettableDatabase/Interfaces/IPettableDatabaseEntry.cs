@@ -11,8 +11,6 @@ internal interface IPettableDatabaseEntry
     string Name { get; }
     ushort Homeworld { get; }
     string HomeworldName { get; }
-    string AddedOn { get; }
-    string Version { get; }
 
     bool IsActive { get; }
     bool IsIPC { get; }
@@ -35,7 +33,7 @@ internal interface IPettableDatabaseEntry
     int? GetSoftSkeleton(int softIndex);
     void SetSoftSkeleton(int index, int softSkeleton);
     void SetName(int skeletonID, string name);
-    void Clear();
+    void Clear(bool fromIPC);
 
     void UpdateEntry(IModernParseResult parseResult, bool asIPC);
     void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC);

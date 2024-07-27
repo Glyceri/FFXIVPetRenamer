@@ -1,8 +1,10 @@
 ﻿using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
@@ -12,11 +14,12 @@ internal class IpcProvider : IIpcProvider
 {
     const string ApiNamespace = "PetRenamer.";
     const uint MajorVersion = 3;
-    const uint MinorVersion = 0;
+    const uint MinorVersion = 1;
 
     bool ready = false;
-    string lastData = string.Empty;
+    string lastData = "[unprepared]";
 
+    readonly DalamudServices DalamudServices;
     readonly IDataWriter DataWriter;
     readonly IDataParser DataReader;
 
@@ -33,7 +36,7 @@ internal class IpcProvider : IIpcProvider
 
     // Actions
     readonly ICallGateProvider<string, object> SetPlayerData;
-    readonly ICallGateProvider<ulong, object> ClearPlayerIPCData;
+    readonly ICallGateProvider<ushort, object> ClearPlayerIPCData;
 
 
     /* ------------------------ READ ME ------------------------
@@ -70,14 +73,15 @@ internal class IpcProvider : IIpcProvider
      *          Applies the data to the database
      *          (You can never set the data of the current active local player.)
      *          
-     *      - ClearPlayerIPCData <ulong>:
-     *          Call this action to clear the IPC data of the given ContentID.
+     *      - ClearPlayerIPCData <ushort>:
+     *          Call this action to clear the IPC data of the given ObjectIndex.
      *          
      * ----------------------END READ ME -----------------------
      */
 
-    public IpcProvider(in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
+    public IpcProvider(in DalamudServices dalamudServices, in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
     {
+        DalamudServices = dalamudServices;
         DataReader = dataReader;
         DataWriter = dataWriter;
 
@@ -93,7 +97,7 @@ internal class IpcProvider : IIpcProvider
 
         // Actions
         SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ulong, object>                          ($"{ApiNamespace}ClearPlayerData");
+        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ushort, object>                         ($"{ApiNamespace}ClearPlayerData");
     }
 
     public void Prepare()
@@ -105,6 +109,8 @@ internal class IpcProvider : IIpcProvider
 
         ready = true;
         NotifyReady();
+
+        NotifyDataChanged();
     }
 
     void RegsterActions()
@@ -124,12 +130,22 @@ internal class IpcProvider : IIpcProvider
     public void SetPlayerDataDetour(string data)
     {
         IDataParseResult result = DataReader.ParseData(data);
-        DataReader.ApplyParseData(result, true);
+        DalamudServices.Framework.Run(() => DataReader.ApplyParseData(result, true));
     }
 
-    public unsafe void ClearIPCDataDetour(ulong contentID)
+    public unsafe void ClearIPCDataDetour(ushort objectIndex)
     {
-        DataReader.ApplyParseData(new ClearParseResult(contentID), true);
+        try
+        {
+            DalamudServices.Framework.Run(() =>
+            {
+                BattleChara* bChara = (BattleChara*)DalamudServices.ObjectTable.GetObjectAddress(objectIndex);
+                if (bChara == null) return;
+
+                DataReader.ApplyParseData(new ClearParseResult(bChara->ContentId), true);
+            });
+        }
+        catch { }
     }
 
     // Functions

@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.Serialization;
@@ -49,7 +50,7 @@ internal class SaveHandler : IDisposable
         NotifyIPC();
     }
 
-    void OnDirtyDatabase(IPettableDatabase database) 
+    void OnDirtyDatabase(IPettableDatabase database)
     {
         Save();
     }
