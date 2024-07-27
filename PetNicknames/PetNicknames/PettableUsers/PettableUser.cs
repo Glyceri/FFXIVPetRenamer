@@ -241,5 +241,10 @@ internal unsafe class PettableUser : IPettableUser
         DirtyListener.UnregisterOnClearEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyName(OnDirty);
+
+        if (DataBaseEntry.IsIPC)
+        {
+            DataBaseEntry.Clear();
+        }
     }
 }

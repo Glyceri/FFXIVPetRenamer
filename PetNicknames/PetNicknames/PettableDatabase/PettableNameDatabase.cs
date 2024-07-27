@@ -46,6 +46,9 @@ internal class PettableNameDatabase : INamesDatabase
         {
             if (validName != null)
             {
+                string current = Names[index];
+                if (current == validName) return;
+
                 Names[index] = validName;
             }
             else

@@ -11,7 +11,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Buttons;
-using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.WindowNodes;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
@@ -314,6 +313,8 @@ internal partial class PetListWindow
                 string username = string.Empty;
                 if (parseResult is IBaseParseResult baseResult) username = baseResult.UserName;
 
+                StartDisabledTimer();
+
                 DalamudServices.NotificationManager.AddNotification(new Dalamud.Interface.ImGuiNotification.Notification()
                 {
                     Type = Dalamud.Interface.ImGuiNotification.NotificationType.Success,
@@ -321,5 +322,15 @@ internal partial class PetListWindow
                 });
             }
         });
+    }
+
+    double internalDisabledTimer = 0;
+
+    void StartDisabledTimer()
+    {
+        if (ImportButton.IsDisabled) return;
+
+        ImportButton.IsDisabled = true;
+        internalDisabledTimer = 4;
     }
 }

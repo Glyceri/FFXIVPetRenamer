@@ -86,9 +86,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         DataWriter = new DataWriter(in PettableUserList);
         DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
 
-        IpcProvider = new IpcProvider(_DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+        IpcProvider = new IpcProvider(_DalamudServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
 
-        UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler);
+        UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler, IpcProvider);
         HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
         ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
 
@@ -108,7 +108,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase, ColourProfileHandler);
-        IpcProvider.Prepare();
 
         SaveHandler = new SaveHandler(_PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
     }
