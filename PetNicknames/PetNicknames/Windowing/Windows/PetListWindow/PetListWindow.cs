@@ -184,8 +184,7 @@ internal partial class PetListWindow : PetWindow
             {
                 if (!(SearchBarNode.Valid(entry.Name)
                  || SearchBarNode.Valid(entry.HomeworldName)
-                 || SearchBarNode.Valid(entry.Version)
-                 || SearchBarNode.Valid(entry.AddedOn))) return false;
+                 )) return false;
             }
 
             if (!index.Item2)

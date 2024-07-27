@@ -14,20 +14,16 @@ internal class SerializableUserV4
     public readonly string Name;
     public readonly ushort Homeworld;
     public readonly int[] SoftSkeletonData;
-    public readonly string AddedOn;
-    public readonly string Version;
 
     public readonly SerializableNameData[] SerializableNameDatas;
 
     [JsonConstructor]
-    public SerializableUserV4(ulong contentId, string name, ushort homeworld, int[] softSkeletonData, string addedOn, string version, SerializableNameData[] serializableNameDatas)
+    public SerializableUserV4(ulong contentId, string name, ushort homeworld, int[] softSkeletonData, SerializableNameData[] serializableNameDatas)
     {
         ContentID = contentId;
         Name = name;
         Homeworld = homeworld;
         SerializableNameDatas = serializableNameDatas;
-        AddedOn = addedOn;
-        Version = version;
         SoftSkeletonData = softSkeletonData;
     }
 
@@ -36,8 +32,6 @@ internal class SerializableUserV4
         ContentID = entry.ContentID;
         Name = entry.Name;
         Homeworld = entry.Homeworld;
-        AddedOn = entry.AddedOn;
-        Version = entry.Version;
         SoftSkeletonData = entry.SoftSkeletons.ToArray();
 
         List<SerializableNameData> list = new List<SerializableNameData>();

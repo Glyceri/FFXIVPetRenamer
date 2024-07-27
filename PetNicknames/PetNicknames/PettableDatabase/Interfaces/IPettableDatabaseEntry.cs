@@ -11,8 +11,6 @@ internal interface IPettableDatabaseEntry
     string Name { get; }
     ushort Homeworld { get; }
     string HomeworldName { get; }
-    string AddedOn { get; }
-    string Version { get; }
 
     bool IsActive { get; }
     bool IsIPC { get; }
