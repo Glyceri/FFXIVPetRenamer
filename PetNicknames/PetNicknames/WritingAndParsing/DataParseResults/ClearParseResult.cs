@@ -4,10 +4,12 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 
 internal class ClearParseResult : IClearParseResult
 {
-    public ulong ContentID { get; }
+    public string Name { get; }
+    public ushort Homeworld { get; }
 
-    public ClearParseResult(ulong contentID)
+    public ClearParseResult(string name, ushort homeworld)
     {
-        ContentID = contentID;
+        Name = name;
+        Homeworld = homeworld;
     }
 }

@@ -1,4 +1,6 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -7,6 +9,7 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using System;
 
 namespace PetRenamer;
 
@@ -129,8 +132,18 @@ internal class IpcProvider : IIpcProvider
     // Actions
     public void SetPlayerDataDetour(string data)
     {
-        IDataParseResult result = DataReader.ParseData(data);
-        DalamudServices.Framework.Run(() => DataReader.ApplyParseData(result, true));
+        try
+        {
+            DalamudServices.Framework.Run(() =>
+            {
+                IDataParseResult result = DataReader.ParseData(data);
+                DataReader.ApplyParseData(result, true);
+            });
+        }
+        catch (Exception e)
+        {
+            DalamudServices.PluginLog.Error(e, "Error in Set Player Data");
+        }
     }
 
     public unsafe void ClearIPCDataDetour(ushort objectIndex)
@@ -139,13 +152,16 @@ internal class IpcProvider : IIpcProvider
         {
             DalamudServices.Framework.Run(() =>
             {
-                BattleChara* bChara = (BattleChara*)DalamudServices.ObjectTable.GetObjectAddress(objectIndex);
-                if (bChara == null) return;
+                if (DalamudServices.ObjectTable.Length <= objectIndex) return;
+                if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc) return;
 
-                DataReader.ApplyParseData(new ClearParseResult(bChara->ContentId), true);
+                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)pc.HomeWorld.Id), true);
             });
         }
-        catch { }
+        catch(Exception e)
+        {
+            DalamudServices.PluginLog.Error(e, "Error in clear IPC");
+        }
     }
 
     // Functions
