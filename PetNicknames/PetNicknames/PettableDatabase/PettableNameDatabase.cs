@@ -3,6 +3,8 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PN.S;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using static FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.VertexShader;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -124,6 +126,12 @@ internal class PettableNameDatabase : INamesDatabase
     {
         if (name.IsNullOrWhitespace()) return null;
 
+        try
+        {
+            name = urlRegex.Replace(name, string.Empty);
+        }
+        catch { }
+
         if (name.Length > PluginConstants.ffxivNameSize)
         {
             name = name.Substring(0, PluginConstants.ffxivNameSize);
@@ -136,4 +144,9 @@ internal class PettableNameDatabase : INamesDatabase
 
         return name;
     }
+
+    readonly Regex urlRegex = new Regex(
+        @"\b(?:(?:https?|ftp):\/\/)?(?:(?:[a-z0-9\-]+\.)+[a-z]{2,}|localhost)(?::\d{1,5})?(?:\/[^\s]*)?\b",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
 }
