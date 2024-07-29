@@ -1,8 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
