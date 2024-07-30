@@ -118,11 +118,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         int oldSkeleton = temporaryArray[index];
 
         if (oldSkeleton == softSkeleton) return;
-
-        MarkDirty();
-
+        
         temporaryArray[index] = softSkeleton;
         SoftSkeletons = ImmutableArray.Create(temporaryArray);
+
+        MarkDirty();
     }
 
     public SerializableUserV4 SerializeEntry() => new SerializableUserV4(this);
