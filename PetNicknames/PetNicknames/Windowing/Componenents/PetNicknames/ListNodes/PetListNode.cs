@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -25,9 +26,11 @@ internal class PetListNode : Node
 
     readonly DalamudServices DalamudServices;
     readonly Configuration Configuration;
+    readonly IPetMode PetMode;
 
-    public PetListNode(in DalamudServices services, in Configuration configuration, in IPetSheetData data, string? customName, bool asLocalEntry)
+    public PetListNode(in IPetMode petMode, in DalamudServices services, in Configuration configuration, in IPetSheetData data, string? customName, bool asLocalEntry)
     {
+        PetMode = petMode;
         Configuration = configuration;
         DalamudServices = services;
 
@@ -49,7 +52,7 @@ internal class PetListNode : Node
                     Margin = new EdgeSize(6, 0, 0, 8),
                 },
                 ChildNodes = [
-                    SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", data.BaseSingular),
+                    SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine(PetMode.CurrentMode == Enums.PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", data.BaseSingular),
                     IDNode = new RenameTitleNode(in DalamudServices, $"ID:", data.Model.ToString()),
                     NicknameNode = new NicknameEditNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Nickname")}:", customName ?? Translator.GetLine("...")),
                 ]

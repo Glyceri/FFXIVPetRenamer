@@ -4,7 +4,6 @@ using PN.S;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.VertexShader;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 

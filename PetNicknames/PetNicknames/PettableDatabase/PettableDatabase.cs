@@ -3,8 +3,6 @@ using PN.S;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
-using System;
-using Dalamud.Utility;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -85,9 +83,14 @@ internal class PettableDatabase : IPettableDatabase
             if (_entries[i].ContentID != entry.ContentID) continue;
 
             _entries.RemoveAt(i);
-            SetDirty();
             hasRemoved = true;
         }
+
+        if (hasRemoved)
+        {
+            SetDirty();
+        }
+
         return hasRemoved;
     }
 

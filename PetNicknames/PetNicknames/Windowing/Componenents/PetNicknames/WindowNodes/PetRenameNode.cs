@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -26,11 +27,13 @@ internal class PetRenameNode : Node
     readonly RenameTitleNode BehaviourNode;
     readonly NicknameEditNode NicknameNode;
     readonly RenameTitleNode IDNode;
+    readonly IPetMode PetMode;
 
     readonly Node HolderNode;
 
-    public PetRenameNode(string? customName, in IPetSheetData? activePet, in DalamudServices services, in Configuration configuration)
+    public PetRenameNode(in IPetMode petMode, string? customName, in IPetSheetData? activePet, in DalamudServices services, in Configuration configuration)
     {
+        PetMode = petMode;
         DalamudServices = services;
         Configuration = configuration;
 
@@ -50,7 +53,7 @@ internal class PetRenameNode : Node
 
                     ChildNodes =
                     [
-                        SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Species")}:", ActivePet?.BaseSingular ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
+                        SpeciesNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine(PetMode.CurrentMode == Enums.PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", ActivePet?.BaseSingular ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
                         IDNode = new RenameTitleNode(in DalamudServices, "ID:", ActivePet?.Model.ToString() ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
                         RaceNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Race")}:", ActivePet?.RaceName ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
                         BehaviourNode = new RenameTitleNode(in DalamudServices, $"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePet?.BehaviourName ?? Translator.GetLine("...")) { ClassList = ["MarginSheet"] },
@@ -80,7 +83,7 @@ internal class PetRenameNode : Node
 
         if (ActivePet != null)
         {
-            SpeciesNode.SetLabel($"{Translator.GetLine("PetRenameNode.Species")}:");
+            SpeciesNode.SetLabel($"{Translator.GetLine(PetMode.CurrentMode == Enums.PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:");
             SpeciesNode.SetText(activePet?.BaseSingular ?? Translator.GetLine("..."));
             AppendNodes();
         }

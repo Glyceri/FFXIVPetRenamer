@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
 using PetRenamer.PetNicknames.TranslatorSystem;
-using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -68,8 +67,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
-        pEntry.MarkDirty();
         pEntry.UpdateContentID(ContentID, !IsIPC);
+        pEntry.MarkDirty();
         return true;
     }
 
@@ -118,11 +117,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         int oldSkeleton = temporaryArray[index];
 
         if (oldSkeleton == softSkeleton) return;
-
-        MarkDirty();
-
+        
         temporaryArray[index] = softSkeleton;
         SoftSkeletons = ImmutableArray.Create(temporaryArray);
+
+        MarkDirty();
     }
 
     public SerializableUserV4 SerializeEntry() => new SerializableUserV4(this);

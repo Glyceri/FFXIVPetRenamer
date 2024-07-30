@@ -21,6 +21,7 @@ internal static class Translator
         { "Version.Unkown", "Version Unknown" },
         { "ContextMenu.Rename", "Give Nickname" },
         { "PetRenameNode.Species", "Minion" },
+        { "PetRenameNode.Species2", "Battle Pet" },
         { "PetRenameNode.Race", "Race" },
         { "PetRenameNode.Behaviour", "Behaviour" },
         { "PetRenameNode.Nickname", "Nickname" },

@@ -166,6 +166,7 @@ internal class PetGlamourChat : RestrictedChatElement
 
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
+
         localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, sheetData.Model);
     }
 
