@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base.Style;
 using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
@@ -11,9 +12,9 @@ using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Base;
 
-internal abstract partial class PetWindow : Window, IPetWindow
+internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 {
-    protected PetWindowMode CurrentMode { get; private set; }
+    public PetWindowMode CurrentMode { get; private set; }
 
     protected abstract string ID { get; }
     protected abstract Vector2 MinSize { get; }

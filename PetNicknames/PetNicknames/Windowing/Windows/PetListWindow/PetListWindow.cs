@@ -254,7 +254,7 @@ internal partial class PetListWindow : PetWindow
                 return true;
             }
 
-            PetListNode newPetListNode = new PetListNode(in DalamudServices, in Configuration, petData, customName, isLocalEntry);
+            PetListNode newPetListNode = new PetListNode(this, in DalamudServices, in Configuration, petData, customName, isLocalEntry);
             ScrollistContentNode.AppendChild(newPetListNode);
             newPetListNode.OnSave += (value) => OnSave(value, id);
 
