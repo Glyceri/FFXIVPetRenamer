@@ -33,9 +33,6 @@ namespace PetRenamer;
 
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
-    // Quite frankly this can be static
-    public static readonly Version PuginVersion = Assembly.GetAssembly(typeof(PetRenamerPlugin))?.GetName()?.Version ?? new Version("vERROR");
-
     readonly DalamudServices _DalamudServices;
     readonly IPetServices _PetServices;
     readonly ISharingDictionary SharingDictionary;
