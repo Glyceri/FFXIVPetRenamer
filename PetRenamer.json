@@ -2,7 +2,7 @@
   {
     "Author": "Glyceri",
     "Name": "Pet Nicknames",
-    "InternalName": "PetNicknames",
+    "InternalName": "PetRenamer",
     "AssemblyVersion": "2.0.0.5",
     "TestingAssemblyVersion": "2.0.0.5",
     "Description": "Give your minions, Carbuncles and Faeries cute nicknames\nand share them with your friends.",
