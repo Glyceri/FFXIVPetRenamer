@@ -71,17 +71,32 @@ internal unsafe class PettableUser : IPettableUser
     public void Set(Pointer<BattleChara> pointer)
     {
         Reset();
+
         Address = (nint)pointer.Value;
         CurrentCastID = BattleChara->CastInfo.ActionId;
         if (lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
+
         if (!DataBaseEntry.IsActive) return;
         if (pointer.Value == null) return;
+
+        HandleCompanion(pointer);
+    }
+
+    void HandleCompanion(Pointer<BattleChara> pointer)
+    {
         Companion* c = pointer.Value->CompanionData.CompanionObject;
         if (c == null) return;
 
         IPettablePet? storedPet = FindPet(ref c->Character);
-        if (storedPet != null) storedPet.Update((nint)c);
-        else CreateNewPet(new PettableCompanion(c, this, in SharingDictionary, DataBaseEntry, PetServices));
+
+        if (storedPet != null)
+        {
+            storedPet.Update((nint)c);
+        }
+        else 
+        { 
+            CreateNewPet(new PettableCompanion(c, this, in SharingDictionary, DataBaseEntry, PetServices)); 
+        }
     }
 
     public void OnLastCastChanged(uint cast)
@@ -164,8 +179,14 @@ internal unsafe class PettableUser : IPettableUser
             pets.RemoveAt(i);
 
             IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
-            if (storedPet != null) storedPet.Update((nint)bChara.Value);
-            else CreateNewPet(new PettableBattlePet(bChara.Value, this, in SharingDictionary, DataBaseEntry, PetServices));
+            if (storedPet != null)
+            {
+                storedPet.Update((nint)bChara.Value);
+            }
+            else 
+            { 
+                CreateNewPet(new PettableBattlePet(bChara.Value, this, in SharingDictionary, DataBaseEntry, PetServices));
+            }
         }
     }
 

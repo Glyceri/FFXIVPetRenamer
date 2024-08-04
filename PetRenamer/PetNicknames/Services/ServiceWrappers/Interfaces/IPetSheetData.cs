@@ -14,7 +14,6 @@ internal interface IPetSheetData
 
     public string? RaceName { get; }
     public string? BehaviourName { get; }
-    public uint FootstepIcon { get; }
 
     string ActionName { get;  }
     uint ActionID { get; }

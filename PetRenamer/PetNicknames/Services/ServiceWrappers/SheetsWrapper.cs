@@ -77,14 +77,12 @@ internal class SheetsWrapper : IPetSheets
                 string plural = companion.Plural.ToDalamudString().TextValue;
                 uint icon = companion.Icon;
 
-                //uint betterIcon = companion.Icon + (uint)64000; // Thats the cuter icon
-
-                uint footstepIcon = companion.Icon + (uint)65000;
                 sbyte pronoun = companion.Pronoun;
-                string raceName = companion.MinionRace?.Value?.Name ?? Translator.GetLine("...");
 
+                string raceName = companion.MinionRace?.Value?.Name ?? Translator.GetLine("...");
                 string behaviourName = companion.Behavior.Value?.Name ?? Translator.GetLine("...");
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, footstepIcon, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
+
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
             }
         }
         if (battlePetSheet == null) return;

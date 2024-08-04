@@ -61,6 +61,7 @@ internal class PetConfigWindow : PetWindow
             new ToggleConfig(in Configuration, Translator.GetLine("Config.BattleChat"), Configuration.showInBattleChat, (value) => Configuration.showInBattleChat = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Emote"), Configuration.showOnEmotes, (value) => Configuration.showOnEmotes = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Tooltip"), Configuration.showOnTooltip, (value) => Configuration.showOnTooltip = value),
+            new ToggleConfig(in Configuration, Translator.GetLine("Config.Flyout"), Configuration.showOnFlyout, (value) => Configuration.showOnFlyout = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Notebook"), Configuration.showNamesInMinionBook, (value) => Configuration.showNamesInMinionBook = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.ActionLog"), Configuration.showNamesInActionLog, (value) => Configuration.showNamesInActionLog = value),
             new ToggleConfig(in Configuration, Translator.GetLine("Config.Targetbar"), Configuration.showOnTargetBars, (value) => Configuration.showOnTargetBars = value),

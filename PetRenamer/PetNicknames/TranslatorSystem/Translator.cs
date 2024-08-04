@@ -69,6 +69,7 @@ internal static class Translator
         { "Config.Castbar", "Show nicknames on Cast bars." },
         { "Config.BattleChat", "Show nicknames in the Battle Chat." },
         { "Config.Emote", "Show nicknames for Emotes." },
+        { "Config.Flyout", "Show nicknames on Flyout Text." },
         { "Config.Tooltip", "Show nicknames on Tooltips." },
         { "Config.Notebook", "Show nicknames in the Minion Notebook." },
         { "Config.ActionLog", "Show nicknames in the Action List." },

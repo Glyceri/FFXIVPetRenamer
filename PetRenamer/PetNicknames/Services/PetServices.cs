@@ -1,10 +1,7 @@
-﻿using Dalamud.Utility;
-using PetRenamer.Legacy.LegacyStepper;
+﻿using PetRenamer.Legacy.LegacyStepper;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
-using System.IO;
 
 namespace PetRenamer.PetNicknames.Services;
 
@@ -23,7 +20,6 @@ internal class PetServices : IPetServices
         DalamudServices = services;
 
         PetLog = new PetLogWrapper(services.PluginLog);
-        MoveOldConfig();
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         StringHelper = new StringHelperWrapper();
         PetSheets = new SheetsWrapper(ref services, StringHelper);
@@ -36,22 +32,5 @@ internal class PetServices : IPetServices
     {
         if (Configuration.currentSaveFileVersion == Configuration.Version) return;
         _ = new LegacyStepper(Configuration, this);
-    }
-
-    void MoveOldConfig()
-    {
-        DirectoryInfo directory = DalamudServices.PetNicknamesPlugin.ConfigDirectory;
-        if (directory == null) return;
-
-        try
-        {
-            string? path = directory.Parent!.FullName;
-            if (path.IsNullOrWhitespace()) return;
-
-            string oldPath = path + "\\PetRenamer.json";
-            string newPath = path + "\\PetNicknames.json";
-
-            File.Move(oldPath, newPath);
-        } catch { }
     }
 }
