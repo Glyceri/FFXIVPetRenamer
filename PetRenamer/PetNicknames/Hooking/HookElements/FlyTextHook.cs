@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
@@ -28,7 +29,21 @@ internal unsafe class FlyTextHook : HookableElement
 
     void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
-        // Todo: Implement this?
+        if (!PetServices.Configuration.showOnFlyout) return;
+
+        nint lastCastDealer = (nint)PetServices.PetCastHelper.LastCastDealer;
+
+        IPettablePet? casterPet = UserList.GetPet(lastCastDealer);
+        if (casterPet == null) return;
+
+        string? customName = casterPet.CustomName;
+        if (customName == null) return;
+
+        IPetSheetData? sheetData = casterPet.PetData;
+        if (sheetData == null) return;
+
+        PetServices.StringHelper.ReplaceSeString(ref text1, customName, sheetData);
+        PetServices.StringHelper.ReplaceSeString(ref text2, customName, sheetData);
     }
 
     unsafe void AddToScreenLogWithLogMessageIdDetour(IntPtr target, IntPtr castDealer, int unkownCastFlag, char a4, int castID, int a6, int a7, int a8)

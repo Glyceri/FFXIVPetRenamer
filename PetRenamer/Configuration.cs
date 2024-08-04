@@ -38,6 +38,7 @@ internal class Configuration : IPluginConfiguration
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;
     public bool showInBattleChat = true;
+    public bool showOnFlyout = true;
     public bool showOnEmotes = true;
     public bool showOnTooltip = true;
     public bool showNamesInMinionBook = true;
