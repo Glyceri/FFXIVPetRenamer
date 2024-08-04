@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Game.Text;
+using ImGuiNET;
 using PetRenamer.Windows.Attributes;
 using System.Numerics;
 
@@ -116,7 +117,7 @@ internal class PetHelpWindow : PetWindow
 
     readonly string[] namingBox1Help = new string[]
     {
-        "You can open the naming window by right-clicking on your minion or pet and choosing the [Give Nickname] option.",
+        $"You can open the naming window by right-clicking on your minion or pet and choosing the [{SeIconChar.BoxedLetterP.ToIconString()} Rename] option.",
         "You may also type: [/minionname] or [/petname].",
         "It may ask you to summon a pet if one isn't out. Please do as instructed.",
         "Depending on if you are naming a minion or battle pet you need to switch modes.",

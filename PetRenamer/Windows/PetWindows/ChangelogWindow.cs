@@ -105,7 +105,7 @@ internal class ChangelogWindow : PetWindow
         { new CLS(new Version("1.5.0.2"), new CLE("General", "Fixed deprecation issue.", "Re-enabled context menus.")) },
         { new CLS(new Version("1.5.0.3"), new CLE("General", "Fixed deprecation issue. Part 2 c:")) },
         { new CLS(new Version("1.5.0.4"), new CLE("General", "Fixed data sharing issues.")) },
-        { new CLS(new Version("1.5.0.5"), new CLE("General", "Updated Changelog.")) }
+        { new CLS(new Version("1.5.0.5"), new CLE("UI", "Fixed a wrong value in the help window.", "Updated Changelog.")) },
     };
 
     const string starter = "  ◉   ";
