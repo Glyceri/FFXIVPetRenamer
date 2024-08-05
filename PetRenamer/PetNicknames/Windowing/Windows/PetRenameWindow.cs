@@ -153,12 +153,12 @@ internal class PetRenameWindow : PetWindow
     void DrawElement()
     {
         ImGuiStylePtr stylePtr = ImGui.GetStyle();
-        float framePaddingY = stylePtr.FramePadding.Y * 2;
+        float framePaddingX = stylePtr.ItemSpacing.X;
 
         Vector2 region = ImGui.GetContentRegionAvail();
         float regionHeight = region.Y;
 
-        if (Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingY * 1.5f, 0)))
+        if (Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
         {
 
             Listbox.End();

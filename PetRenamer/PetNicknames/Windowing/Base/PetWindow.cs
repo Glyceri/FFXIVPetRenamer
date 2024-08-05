@@ -56,23 +56,15 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
         }
     }
 
-    const float IndentSpacing = 21f;
-    const float ChildBorderSize = 1;
-    readonly Vector2 cellPadding = new(4, 2);
     readonly Vector2 framePadding = new(4, 3);
     readonly Vector2 itemInnerSpacing = new(4, 4);
-    readonly Vector2 itemSpacing = new(8, 4);
-    readonly Vector2 windowPadding = new(8, 8);
+    readonly Vector2 itemSpacing = new(4, 4);
 
     public sealed override void PreDraw()
     {
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, windowPadding);
         ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, framePadding);
-        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, cellPadding);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, itemSpacing);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing);
-        ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, IndentSpacing);
-        ImGui.PushStyleVar(ImGuiStyleVar.ChildBorderSize, ChildBorderSize);
 
         OnEarlyDraw();
     }
@@ -80,7 +72,7 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     public sealed override void PostDraw()
     {
         OnLateDraw();
-        ImGui.PopStyleVar(7);
+        ImGui.PopStyleVar(3);
     }
 
     public sealed override void Draw()

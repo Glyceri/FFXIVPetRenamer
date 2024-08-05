@@ -28,18 +28,20 @@ internal static class HeaderBar
 
             HeaderBarWidth = 0;
 
-            WindowStruct<PetRenameWindow> petRenameWindow = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"));
-            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"));
+            WindowStruct<KofiWindow> kofiWindow = new WindowStruct<KofiWindow>(in windowHandler, in configuration, FontAwesomeIcon.Coffee, Translator.GetLine("Kofi.Title"), configuration.showKofiButton);
             WindowStruct<PetConfigWindow> petConfigWindow = new WindowStruct<PetConfigWindow>(in windowHandler, in configuration, FontAwesomeIcon.Cogs, Translator.GetLine("Config.Title"));
+            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"));
+            WindowStruct<PetRenameWindow> petRenameWindow = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"));
 
             float availableWidth = ImGui.GetContentRegionAvail().X;
             availableWidth -= HeaderBarWidth;
 
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(availableWidth, 0));
 
-            petRenameWindow.Draw();
-            petListWindow.Draw();
+            kofiWindow.Draw();
             petConfigWindow.Draw();
+            petListWindow.Draw();
+            petRenameWindow.Draw();
 
             Listbox.End();
         }
@@ -52,10 +54,13 @@ ref struct WindowStruct<T> where T : PetWindow
     readonly Configuration Configuration;
     readonly FontAwesomeIcon Icon;
     readonly string Tooltip;
+    readonly bool Active;
 
-    public WindowStruct(in WindowHandler handler, in Configuration configuration, FontAwesomeIcon icon, string tooltip)
+    public WindowStruct(in WindowHandler handler, in Configuration configuration, FontAwesomeIcon icon, string tooltip, bool active = true)
     {
-        HeaderBar.HeaderBarWidth += WindowButton.Width;
+        Active = active;
+
+        if (Active) HeaderBar.HeaderBarWidth += WindowButton.Width;
 
         WindowHandler = handler;
         Configuration = configuration;
@@ -65,6 +70,8 @@ ref struct WindowStruct<T> where T : PetWindow
 
     public void Draw() 
     {
+        if (!Active) return;
+
         WindowButton.Draw<T>(in WindowHandler, in Configuration, Icon, Tooltip);
         ImGui.SameLine(0, 0);
     }
