@@ -17,6 +17,9 @@ namespace PetRenamer.PetNicknames.Windowing;
 
 internal class WindowHandler : IWindowHandler
 {
+    static int _internalCounter = 0;
+    public static int InternalCounter { get  => _internalCounter++; }
+
     PetWindowMode _windowMode = PetWindowMode.Minion;
     public PetWindowMode PetWindowMode { get => _windowMode; set => SetWindowMode(value); }
 
@@ -138,6 +141,7 @@ internal class WindowHandler : IWindowHandler
 
     void Draw()
     {
+        _internalCounter = 0;
         WindowSystem.Draw();
 
         if (isDirty)

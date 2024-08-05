@@ -22,7 +22,7 @@ internal class PetRenameWindow : PetWindow
     protected override Vector2 MaxSize { get; } = new Vector2(1500, 392);
     protected override Vector2 DefaultSize { get; } = new Vector2(437, 192);
 
-    protected override bool HasModeToggle { get; }
+    protected override bool HasModeToggle { get; } = true;
     protected override bool HasExtraButtons { get; }
 
     IPettableUser? ActiveUser;
@@ -158,7 +158,7 @@ internal class PetRenameWindow : PetWindow
         Vector2 region = ImGui.GetContentRegionAvail();
         float regionHeight = region.Y;
 
-        if (Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingY, 0)))
+        if (Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingY * 1.5f, 0)))
         {
 
             Listbox.End();

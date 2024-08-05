@@ -45,6 +45,7 @@ internal class Configuration : IPluginConfiguration
     public float petNicknamesUIScale = 1.5f;
     public bool uiFlare = true;
     public bool transparentBackground = true;
+    public bool quickButtonsToggle = true;
 
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {

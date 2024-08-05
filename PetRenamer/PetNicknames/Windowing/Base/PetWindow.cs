@@ -2,6 +2,7 @@
 using ImGuiNET;
 using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Windowing.Components.Header;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System.Numerics;
@@ -40,8 +41,6 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
             MinimumSize = MinSize,
             MaximumSize = MaxSize,
         };
-      
-        //if (HasModeToggle) PetModeConstructor();
     }
 
     public void Close() => IsOpen = false;
@@ -84,7 +83,11 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
         ImGui.PopStyleVar(7);
     }
 
-    public sealed override void Draw() => OnDraw();
+    public sealed override void Draw()
+    {
+        if (HasModeToggle) HeaderBar.Draw(in WindowHandler, in Configuration, this);
+        OnDraw();
+    }
     public void NotifyDirty() => OnDirty();
 
     protected virtual void OnEarlyDraw() { }
