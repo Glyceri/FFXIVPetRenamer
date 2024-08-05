@@ -4,7 +4,7 @@ using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
+using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
 
 namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;

@@ -2,7 +2,7 @@
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows.PetConfigWindow;
+using PetRenamer.PetNicknames.Windowing.Windows;
 
 namespace PetRenamer.PetNicknames.Commands.Commands;
 

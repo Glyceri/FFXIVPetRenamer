@@ -22,12 +22,8 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
 using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
-using System;
-using System.Reflection;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
-using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
-using PetRenamer.PetNicknames.ColourProfiling;
 
 namespace PetRenamer;
 
@@ -55,7 +51,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly ILodestoneNetworker LodestoneNetworkerInterface;
 
     readonly PettableDirtyHandler DirtyHandler;
-    readonly IColourProfileHandler ColourProfileHandler;
 
     readonly SaveHandler SaveHandler;
 
@@ -71,8 +66,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
 
         DirtyHandler = new PettableDirtyHandler();
-
-        ColourProfileHandler = new ColourProfileHandler(_PetServices.Configuration);
 
         PettableUserList = new PettableUserList();
         PettableDatabase = new PettableDatabase(in _PetServices, DirtyHandler);
@@ -91,13 +84,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         // UI is the most DOGSHIT thing in this whole plugin. I hate EVERY SINGLE LINE OF CODE from it...
         // If I had know how unreadable Una.Drawing would make my UI code I wouldve never done it like this....
-        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter, in ColourProfileHandler);
+        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter);
 
-        ColourProfileHandler.RegisterWindowHandler(in WindowHandler);
         CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
-        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase, ColourProfileHandler);
+        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
 
         SaveHandler = new SaveHandler(_PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
     }

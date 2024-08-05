@@ -9,11 +9,8 @@ internal interface IPetWindow : IDisposable
     void Close();
     void Toggle();
 
-    void Draw();
-    void OnDraw();
-
     void SetPetMode(PetWindowMode mode);
-    void OnDirty();
+    void NotifyDirty();
     bool RequestsModeChange { get; }
     PetWindowMode NewMode { get; }
     void DeclareModeChangedSeen();

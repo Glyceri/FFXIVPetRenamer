@@ -27,7 +27,6 @@ internal class CommandHandler : ICommandHandler
         RegisterCommand(new PetsettingsCommand  (in DalamudServices, in WindowHandler));
         RegisterCommand(new PetsharingCommand   (in DalamudServices, in WindowHandler));
         RegisterCommand(new PetlistCommand      (in DalamudServices, in WindowHandler));
-        RegisterCommand(new PetThemeCommand     (in DalamudServices, in WindowHandler));
     }
 
     void RegisterCommand(ICommand command)
