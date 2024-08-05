@@ -25,6 +25,7 @@ internal static class WindowButton
         // Hehe sex
         bool shouldDoWindow = ImGui.Button($"{icon.ToIconString()}##quickButton_{WindowHandler.InternalCounter}", new Vector2(size, size));
 
+
         ImGui.PopFont();
 
         if (ImGui.IsItemHovered())

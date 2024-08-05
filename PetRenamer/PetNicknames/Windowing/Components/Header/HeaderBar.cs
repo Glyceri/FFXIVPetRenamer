@@ -20,9 +20,11 @@ internal static class HeaderBar
 
         if (Listbox.Begin($"##headerbar_{WindowHandler.InternalCounter}", contentSize))
         {
+            Vector2 lastPos = ImGui.GetCursorPos();
+
             ModeToggle.Draw(petWindow);
 
-            ImGui.SameLine(0, 0);
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X, lastPos.Y));
 
             HeaderBarWidth = 0;
 
@@ -32,7 +34,7 @@ internal static class HeaderBar
 
             float availableWidth = ImGui.GetContentRegionAvail().X;
             availableWidth -= HeaderBarWidth;
-            
+
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(availableWidth, 0));
 
             petRenameWindow.Draw();

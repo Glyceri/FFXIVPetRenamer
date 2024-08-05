@@ -13,6 +13,7 @@ internal static class ModeToggle
     public static void Draw(in PetWindow petWindow)
     {
         Vector2 lastCursorPos = ImGui.GetCursorPos();
+        Vector2 curCursorPos = ImGui.GetCursorPos();
 
         float height = ImGui.GetContentRegionAvail().Y;
 
@@ -21,7 +22,7 @@ internal static class ModeToggle
 
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        lastCursorPos += new Vector2(0, (height - cutHeight - style.FramePadding.Y * 2) * 0.5f);
+        lastCursorPos += new Vector2(0, (height - cutHeight - style.FramePadding.Y) * 0.5f);
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() + lastCursorPos);
 
