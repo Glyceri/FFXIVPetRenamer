@@ -11,7 +11,7 @@ internal interface IPetWindow : IDisposable
 
     void SetPetMode(PetWindowMode mode);
     void NotifyDirty();
-    bool RequestsModeChange { get; }
-    PetWindowMode NewMode { get; }
+    bool RequestsModeChange { get; set; }
+    PetWindowMode NewMode { get; set; }
     void DeclareModeChangedSeen();
 }

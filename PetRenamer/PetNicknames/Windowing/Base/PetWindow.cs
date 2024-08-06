@@ -24,8 +24,8 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     protected readonly WindowHandler WindowHandler;
     protected readonly Configuration Configuration;
 
-    public bool RequestsModeChange { get; private set; }
-    public PetWindowMode NewMode { get; private set; } = PetWindowMode.Minion;
+    public bool RequestsModeChange { get; set; }
+    public PetWindowMode NewMode { get; set; } = PetWindowMode.Minion;
 
     protected PetWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
     {

@@ -45,6 +45,10 @@ internal class Configuration : IPluginConfiguration
     public bool quickButtonsToggle = true;
     public int minionIconType = 1;
 
+    // ------------------------- Debug SETTINGS --------------------------
+    public bool debugModeActive = false;
+    public bool openDebugWindowOnStart = false;
+
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;

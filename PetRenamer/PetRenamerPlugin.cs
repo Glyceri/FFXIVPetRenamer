@@ -86,7 +86,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         // If I had know how unreadable Una.Drawing would make my UI code I wouldve never done it like this....
         WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter);
 
-        CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
+        CommandHandler = new CommandHandler(in _DalamudServices, _PetServices.Configuration, in WindowHandler);
         ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);

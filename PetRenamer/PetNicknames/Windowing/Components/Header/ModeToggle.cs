@@ -50,15 +50,21 @@ internal static class ModeToggle
         {
             if(ModeToggleNode.DrawDisabled(expanedHeight, cutHeight))
             {
-                petWindow.SetPetMode(mode);
+                SetMode(in petWindow, mode);
             }
         }
         else
         {
             if (ModeToggleNode.Draw(expanedHeight, cutHeight))
             {
-                petWindow.SetPetMode(mode);
+                SetMode(in petWindow, mode);
             }
         }
+    }
+
+    static void SetMode(in PetWindow petWindow, PetWindowMode mode)
+    {
+        petWindow.RequestsModeChange = true;
+        petWindow.NewMode = mode;
     }
 }

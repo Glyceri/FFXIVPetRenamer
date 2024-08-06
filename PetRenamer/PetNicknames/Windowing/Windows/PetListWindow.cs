@@ -25,9 +25,6 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
-using static Dalamud.Interface.Utility.Raii.ImRaii;
-using FFXIVClientStructs.FFXIV.Common.Lua;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.GroupPoseModule;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -43,7 +40,7 @@ internal class PetListWindow : PetWindow
     readonly IDataWriter DataWriter;
 
     protected override Vector2 MinSize { get; } = new Vector2(400, 250);
-    protected override Vector2 MaxSize { get; } = new Vector2(800, 1500);
+    protected override Vector2 MaxSize { get; } = new Vector2(1600, 1500);
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 500);
     protected override bool HasModeToggle { get; } = true;
 
@@ -65,8 +62,6 @@ internal class PetListWindow : PetWindow
 
     public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "Pet List Window", ImGuiWindowFlags.None)
     {
-        Open();
-
         UserList = userList;
         Database = database;
         LegacyDatabase = legacyDatabase;

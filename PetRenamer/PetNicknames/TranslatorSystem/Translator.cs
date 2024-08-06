@@ -79,7 +79,7 @@ internal static class Translator
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "This is about real life money." },
-        { "Kofi.Line2", "It will be used to buy dog toys!" },
+        { "Kofi.Line2", "It will be used to my cat toys!" },
         { "Kofi.TakeMe", "Take me" },
 
         { "Command.Petname", "Opens the Pet Rename window." },
