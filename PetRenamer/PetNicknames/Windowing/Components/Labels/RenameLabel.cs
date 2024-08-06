@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using ImGuiNET;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -27,17 +28,42 @@ internal static class RenameLabel
 
         shouldActivate |= ImGui.Button($"{FontAwesomeIcon.Save.ToIconString()}##saveButton_{WindowHandler.InternalCounter}", new Vector2(height, height));
 
+        ImGui.PopFont();
+
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip(Translator.GetLine("PetRenameNode.Save"));
+        }
+
         ImGui.EndDisabled();
 
         ImGui.SameLine();
+
+        bool keyComboNotPressed = !ImGui.IsKeyDown(ImGuiKey.LeftCtrl) || !ImGui.IsKeyDown(ImGuiKey.LeftShift);
+
+        ImGui.BeginDisabled(keyComboNotPressed);
+
+        ImGui.PushFont(UiBuilder.IconFont);
 
         if (ImGui.Button($"{FontAwesomeIcon.Eraser.ToIconString()}##clearButton_{WindowHandler.InternalCounter}", new Vector2(height, height)))
         {
             value = string.Empty;
             shouldActivate |= true;
         }
-
         ImGui.PopFont();
+        ImGui.EndDisabled();
+
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            if (keyComboNotPressed)
+            {
+                ImGui.SetTooltip(Translator.GetLine("ClearButton.Label"));
+            }
+            else
+            {
+                ImGui.SetTooltip(Translator.GetLine("PetRenameNode.Clear"));
+            }
+        }
 
         ImGui.SameLine();
 

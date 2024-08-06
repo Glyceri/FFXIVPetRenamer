@@ -25,6 +25,9 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
+using static Dalamud.Interface.Utility.Raii.ImRaii;
+using FFXIVClientStructs.FFXIV.Common.Lua;
+using static FFXIVClientStructs.FFXIV.Client.UI.Misc.GroupPoseModule;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -252,7 +255,7 @@ internal class PetListWindow : PetWindow
         }
     }
 
-    void DrawList()
+    unsafe void DrawList()
     {
         if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
         {
@@ -290,7 +293,105 @@ internal class PetListWindow : PetWindow
 
             foreach (PetListUser user in petListDrawables.Where(v => v is PetListUser))
             {
-                BasicLabel.Draw(user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
+                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * ImGuiHelpers.GlobalScale)))
+                {
+                    float size = ImGui.GetContentRegionAvail().Y;
+
+                    PlayerImage.Draw(user.Entry, in ImageDatabase);
+                    ImGui.SameLine();
+
+                    if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
+                    {
+                        if (user.Entry == ActiveEntry)
+                        {
+                            if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight)))
+                            {
+                                DalamudServices.Framework.Run(() => SetUser(user.Entry));
+                                ToggleUserMode();
+                            }
+                        }
+                        else
+                        {
+                            bool isLegacy = user.Entry.IsLegacy;
+                            bool isIPC = user.Entry.IsIPC;
+
+                            bool isSpecial = isLegacy || isIPC;
+
+                            int buttonCount = isSpecial ? 2 : 1;
+
+                            float buttonSize = BarHeight;
+
+                            ImGuiStylePtr style = ImGui.GetStyle();
+
+                            if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), BarHeight)))
+                            {
+                                DalamudServices.Framework.Run(() => SetUser(user.Entry));
+                                ToggleUserMode();
+                            }
+
+                            if (isSpecial)
+                            {
+                                ImGui.SameLine();
+                                
+
+                                Vector4* colour = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
+
+                                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, *colour);
+                                ImGui.PushStyleColor(ImGuiCol.Button, *colour);
+                                ImGui.PushStyleColor(ImGuiCol.ButtonActive, *colour);
+
+                                ImGui.PushFont(UiBuilder.IconFont);
+                                ImGui.Button($"{FontAwesomeIcon.Exclamation.ToIconString()}##Exlemation_{WindowHandler.InternalCounter}", new Vector2(buttonSize, buttonSize));
+                                ImGui.PopFont();
+                                if (ImGui.IsItemHovered())
+                                {
+                                    if (isLegacy)
+                                    {
+                                        ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningOldUser"));
+                                    }
+                                    else if (isIPC)
+                                    {
+                                        ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningIPC"));
+                                    }
+                                }
+
+                                ImGui.PopStyleColor(3);
+
+                            }
+
+                            ImGui.SameLine();
+
+                            bool keyComboNotPressed = !ImGui.IsKeyDown(ImGuiKey.LeftCtrl) || !ImGui.IsKeyDown(ImGuiKey.LeftShift);
+                            ImGui.BeginDisabled(keyComboNotPressed);
+                            ImGui.PushFont(UiBuilder.IconFont);
+
+                            if (ImGui.Button($"{FontAwesomeIcon.Eraser.ToIconString()}##clearButton_{WindowHandler.InternalCounter}", new Vector2(buttonSize, buttonSize)))
+                            {
+                                DalamudServices.Framework.Run(() => user.Entry.Clear(false));
+                            }
+
+                            ImGui.PopFont();
+                            ImGui.EndDisabled();
+
+                            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                            {
+                                if (keyComboNotPressed)
+                                {
+                                    ImGui.SetTooltip(Translator.GetLine("ClearButton.Label"));
+                                }
+                                else
+                                {
+                                    ImGui.SetTooltip(Translator.GetLine("PetRenameNode.Clear"));
+                                }
+                            }
+                        }
+                        LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
+                        LabledLabel.Draw("Pet Count:", user.Entry.ActiveDatabase.Length.ToString(), new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
+
+                        Listbox.End();
+                    }
+                    Listbox.End();
+                }
             }
 
             Listbox.End();
@@ -387,6 +488,8 @@ internal class PetListWindow : PetWindow
         for (int i = 0; i < length; i++)
         {
             IPettableDatabaseEntry entry = entries[i];
+
+            if (!entry.IsActive && !entry.IsLegacy) continue;
 
             if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentID.ToString()))) continue;
 
