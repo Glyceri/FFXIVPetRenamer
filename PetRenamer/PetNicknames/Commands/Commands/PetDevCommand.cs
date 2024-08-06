@@ -22,7 +22,7 @@ internal class PetDevCommand : Command
     {
         if (Configuration.debugModeActive)
         {
-            WindowHandler.Open<PetListWindow>();
+            WindowHandler.Open<PetDevWindow>();
         }
     }
 }
