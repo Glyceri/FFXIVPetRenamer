@@ -28,7 +28,6 @@ internal class PetRenameWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(437, 250);
 
     protected override bool HasModeToggle { get; } = true;
-    protected override bool HasExtraButtons { get; }
 
     IPettableUser? ActiveUser;
     ulong lastContentID = 0;
@@ -45,8 +44,6 @@ internal class PetRenameWindow : PetWindow
 
     public PetRenameWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Open();
-
         UserList = userList;
         PetServices = petServices;
     }

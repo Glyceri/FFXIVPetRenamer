@@ -19,7 +19,6 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     protected abstract Vector2 DefaultSize { get; }
 
     protected abstract bool HasModeToggle { get; }
-    protected abstract bool HasExtraButtons { get; }
 
     protected readonly DalamudServices DalamudServices;
     protected readonly WindowHandler WindowHandler;
