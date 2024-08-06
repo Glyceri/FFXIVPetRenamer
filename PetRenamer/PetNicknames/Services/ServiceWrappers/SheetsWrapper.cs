@@ -79,10 +79,11 @@ internal class SheetsWrapper : IPetSheets
 
                 sbyte pronoun = companion.Pronoun;
 
+                uint raceID = companion.MinionRace?.Value?.RowId ?? 0;
                 string raceName = companion.MinionRace?.Value?.Name ?? Translator.GetLine("...");
                 string behaviourName = companion.Behavior.Value?.Name ?? Translator.GetLine("...");
 
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
+                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
             }
         }
         if (battlePetSheet == null) return;

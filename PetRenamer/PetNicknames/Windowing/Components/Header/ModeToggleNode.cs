@@ -10,10 +10,11 @@ internal static class ModeToggleNode
        return ImGui.Button($"##ModeToggle_{WindowHandler.InternalCounter}", new Vector2(expanedHeight, cutHeight));
     }
 
-    public static void DrawDisabled(float expanedHeight, float cutHeight)
+    public static bool DrawDisabled(float expanedHeight, float cutHeight)
     {
         ImGui.BeginDisabled(true);
-        Draw(expanedHeight, cutHeight);
+        bool value = Draw(expanedHeight, cutHeight);
         ImGui.EndDisabled();
+        return value;
     }
 }

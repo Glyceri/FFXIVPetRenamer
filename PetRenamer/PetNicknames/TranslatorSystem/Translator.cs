@@ -22,7 +22,7 @@ internal static class Translator
         { "ContextMenu.Rename", "Give Nickname" },
         { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Species2", "Battle Pet" },
-        { "PetRenameNode.Race", "Race" },
+        { "PetRenameNode.Race", "Type" },
         { "PetRenameNode.Behaviour", "Behaviour" },
         { "PetRenameNode.Nickname", "Nickname" },
         { "PetRenameNode.Edit", "Edit" },

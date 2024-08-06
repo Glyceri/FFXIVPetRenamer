@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface.Utility;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -56,15 +57,17 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
         }
     }
 
+    readonly Vector2 windowPadding = new(8, 8);
     readonly Vector2 framePadding = new(4, 3);
     readonly Vector2 itemInnerSpacing = new(4, 4);
     readonly Vector2 itemSpacing = new(4, 4);
 
     public sealed override void PreDraw()
     {
-        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, framePadding);
-        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, itemSpacing);
-        ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, windowPadding * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, framePadding * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, itemSpacing * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing * ImGuiHelpers.GlobalScale);
 
         OnEarlyDraw();
     }
@@ -72,7 +75,7 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     public sealed override void PostDraw()
     {
         OnLateDraw();
-        ImGui.PopStyleVar(3);
+        ImGui.PopStyleVar(4);
     }
 
     public sealed override void Draw()

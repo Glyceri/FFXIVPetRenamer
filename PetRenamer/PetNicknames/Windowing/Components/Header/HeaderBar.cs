@@ -28,10 +28,10 @@ internal static class HeaderBar
 
             HeaderBarWidth = 0;
 
-            WindowStruct<KofiWindow> kofiWindow = new WindowStruct<KofiWindow>(in windowHandler, in configuration, FontAwesomeIcon.Coffee, Translator.GetLine("Kofi.Title"), configuration.showKofiButton);
-            WindowStruct<PetConfigWindow> petConfigWindow = new WindowStruct<PetConfigWindow>(in windowHandler, in configuration, FontAwesomeIcon.Cogs, Translator.GetLine("Config.Title"));
-            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"));
-            WindowStruct<PetRenameWindow> petRenameWindow = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"));
+            WindowStruct<KofiWindow> kofiWindow = new WindowStruct<KofiWindow>(in windowHandler, in configuration, FontAwesomeIcon.Coffee, Translator.GetLine("Kofi.Title"), configuration.showKofiButton || petWindow is not KofiWindow);
+            WindowStruct<PetConfigWindow> petConfigWindow = new WindowStruct<PetConfigWindow>(in windowHandler, in configuration, FontAwesomeIcon.Cogs, Translator.GetLine("Config.Title"), petWindow is not PetConfigWindow);
+            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"), petWindow is not PetListWindow);
+            WindowStruct<PetRenameWindow> petRenameWindow = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"), petWindow is not PetRenameWindow);
 
             float availableWidth = ImGui.GetContentRegionAvail().X;
             availableWidth -= HeaderBarWidth;

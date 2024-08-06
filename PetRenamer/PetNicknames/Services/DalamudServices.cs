@@ -25,6 +25,7 @@ internal class DalamudServices
     [PluginService] internal IContextMenu                    ContextMenu                 { get; private set; } = null!;
     [PluginService] internal INotificationManager            NotificationManager         { get; private set; } = null!;
     [PluginService] internal INamePlateGui                   NameplateGUI                { get; private set; } = null!;
+    [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
 
     public static DalamudServices Create(ref IDalamudPluginInterface plugin)
     {

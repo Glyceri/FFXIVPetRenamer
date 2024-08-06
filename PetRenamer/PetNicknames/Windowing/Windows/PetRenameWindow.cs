@@ -10,10 +10,11 @@ using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Image;
+using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
+using PetRenamer.PetNicknames.Windowing.Components.Texture;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.AozNoteModule;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -35,9 +36,12 @@ internal class PetRenameWindow : PetWindow
     string? lastCustomName = null!;
     bool isContextOpen = false;
 
-    string? ActiveCustomName;
+    string ActiveCustomName = string.Empty;
+    string ActualCustomName = string.Empty;
     IPetSheetData? ActivePetData;
     ISharedImmediateTexture? ActivePetTexture;
+
+    float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
 
     public PetRenameWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
@@ -150,7 +154,8 @@ internal class PetRenameWindow : PetWindow
     void CleanOldNode() => Setup(null, null);
     void Setup(string? customName, in IPetSheetData? petData)
     {
-        ActiveCustomName = customName;
+        ActiveCustomName = customName ?? string.Empty;
+        ActualCustomName = ActiveCustomName;
         ActivePetData = petData;
         if (petData != null)
         {
@@ -191,7 +196,7 @@ internal class PetRenameWindow : PetWindow
     {
         if (ActivePetData == null)
         {
-            CenteredLabel.Draw(Translator.GetLine("PetRenameNode.PleaseSummonWarning"), new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, 30 * ImGuiHelpers.GlobalScale), Translator.GetLine("PetRenameNode.PleaseSummonWarningLabel"));
+            CenteredLabel.Draw(Translator.GetLine("PetRenameNode.PleaseSummonWarning"), new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, BarHeight), Translator.GetLine("PetRenameNode.PleaseSummonWarningLabel"));
         }
         else
         {
@@ -201,28 +206,56 @@ internal class PetRenameWindow : PetWindow
 
     void DrawPetData()
     {
-        LabledLabel.Draw($"{Translator.GetLine(CurrentMode == Enums.PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", ActivePetData?.BaseSingular ?? Translator.GetLine("..."), new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale));
-        LabledLabel.Draw("ID:", ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale));
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData?.RaceName ?? Translator.GetLine("..."), new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale));
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale));
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName ?? Translator.GetLine("..."), new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale));
+        Vector2 contentSpot = new Vector2(ImGui.GetContentRegionAvail().X, BarHeight);
+
+        LabledLabel.Draw($"{Translator.GetLine(CurrentMode == PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", ActivePetData?.BaseSingular ?? Translator.GetLine("..."), contentSpot);
+        LabledLabel.Draw("ID:", ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), contentSpot);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData?.RaceName ?? Translator.GetLine("..."), contentSpot);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), contentSpot);
+
+        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == ActualCustomName, ref ActiveCustomName, contentSpot))
+        {
+            OnSave(ActiveCustomName);
+        }
+
+        ActiveCustomName = ActiveCustomName.Replace("\n", string.Empty);
     }
 
     void DrawImageInternals(float regionHeight)
     {
-        IDalamudTextureWrap? searchTexture = null;
+        ImGuiStylePtr stylePtr = ImGui.GetStyle();
+        float framePaddingX = stylePtr.FramePadding.X;
+        float framePaddingY = stylePtr.FramePadding.Y;
+
+        Vector2 size = new Vector2(regionHeight, regionHeight);
+
+        UldIcon? raceIcon = RaceIconHelper.GetFromRaceID(ActivePetData?.RaceID ?? 0);
+
         if (ActivePetTexture == null)
         {
-            searchTexture = SearchImage.SearchTextureWrap;
-        }
-        else
-        {
-            searchTexture = ActivePetTexture.GetWrapOrEmpty();
-        }
+            IDalamudTextureWrap? searchTexture = SearchImage.SearchTextureWrap;
 
-        if (searchTexture != null)
+            if (searchTexture != null)
+            {
+                BoxedImage.Draw(searchTexture, size);
+                
+            }
+        }
+        else if (ActivePetData != null)
         {
-            BoxedImage.Draw(searchTexture, new Vector2(regionHeight, regionHeight));
+            if (Listbox.Begin("##image", size))
+            {
+                BoxedImage.DrawMinion(ActivePetData, in DalamudServices, in Configuration, ImGui.GetContentRegionAvail());
+
+                if (raceIcon != null)
+                {
+                    ImGui.SameLine(0, 0);
+                    ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(45 * ImGuiHelpers.GlobalScale + framePaddingX, - framePaddingY));
+                    IconImage.DrawUld(raceIcon.Value, new Vector2(32, 32) * ImGuiHelpers.GlobalScale);
+                }
+
+                Listbox.End();
+            }
         }
     }
 }

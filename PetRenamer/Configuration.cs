@@ -42,10 +42,8 @@ internal class Configuration : IPluginConfiguration
     public bool showOnPartyList = true;
     // --------------------------- UI SETTINGS ---------------------------
     public bool showKofiButton = true;
-    public float petNicknamesUIScale = 1.5f;
-    public bool uiFlare = true;
-    public bool transparentBackground = true;
     public bool quickButtonsToggle = true;
+    public int minionIconType = 1;
 
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {

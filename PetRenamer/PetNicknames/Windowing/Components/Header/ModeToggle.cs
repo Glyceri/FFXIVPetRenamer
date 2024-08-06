@@ -48,7 +48,10 @@ internal static class ModeToggle
     {
         if (petWindow.CurrentMode == mode)
         {
-            ModeToggleNode.DrawDisabled(expanedHeight, cutHeight);
+            if(ModeToggleNode.DrawDisabled(expanedHeight, cutHeight))
+            {
+                petWindow.SetPetMode(mode);
+            }
         }
         else
         {
