@@ -125,6 +125,17 @@ internal class PetListWindow : PetWindow
                 {
                     DalamudServices.Framework.Run(ToggleUserMode);
                 }
+                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                {
+                    if (!inUserMode)
+                    {
+                        ImGui.SetTooltip(Translator.GetLine("PetList.UserList"));
+                    }
+                    else
+                    {
+                        ImGui.SetTooltip(Translator.GetLine("PetList.Title"));
+                    }
+                }
                 BasicLabel.Draw(ActiveEntry?.HomeworldName ?? Translator.GetLine("..."), barSize);
                 BasicLabel.Draw(ActiveEntry?.ActiveDatabase.Length.ToString() ?? Translator.GetLine("..."), barSize);
 
@@ -170,6 +181,11 @@ internal class PetListWindow : PetWindow
                         ImGui.SetClipboardText(data);
                     }
                 }
+                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                {
+                    ImGui.SetTooltip(Translator.GetLine("ShareWindow.Export"));
+                }
+
                 ImGui.SameLine();
 
                 ImGui.BeginDisabled(importDisabled);
@@ -205,7 +221,10 @@ internal class PetListWindow : PetWindow
                         });
                     }
                 }
-
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(Translator.GetLine("ShareWindow.Import"));
+                }
                 ImGui.EndDisabled();
                 Listbox.End();
             }
@@ -238,13 +257,20 @@ internal class PetListWindow : PetWindow
                 clicked |= true;
             }
 
+            ImGui.PopFont();
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(Translator.GetLine("Search"));
+            }
+
             if (clicked)
             {
                 activeSearchText = SearchText;
                 SetUser(ActiveEntry);
             }
 
-            ImGui.PopFont();
+            
 
             Listbox.End();
         }

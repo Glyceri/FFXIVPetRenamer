@@ -4,6 +4,7 @@ using Dalamud.Interface.Utility;
 using ImGuiNET;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Image;
@@ -34,6 +35,11 @@ internal static class PlayerImage
         if (ImGui.Button(SeIconChar.QuestSync.ToIconString() + $"##RedownloadButton_{WindowHandler.InternalCounter}", buttonSize))
         {
             imageDatabase.Redownload(entry);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Redownload profile Picture");
         }
 
         ImGui.EndDisabled();
