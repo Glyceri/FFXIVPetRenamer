@@ -193,7 +193,7 @@ internal class PetRenameWindow : PetWindow
     {
         if (ActivePetData == null)
         {
-            CenteredLabel.Draw(Translator.GetLine("PetRenameNode.PleaseSummonWarning"), new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, BarHeight), Translator.GetLine("PetRenameNode.PleaseSummonWarningLabel"));
+            CenteredLabel.Draw(Translator.GetLine("PetRenameNode.PleaseSummonWarning"), new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, BarHeight));
         }
         else
         {

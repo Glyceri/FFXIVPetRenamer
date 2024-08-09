@@ -30,6 +30,10 @@ internal static class ModeToggle
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.3f, 0.3f, 1f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.36f, 0.36f, 1f, 1f));
         DrawFor(in petWindow, PetWindowMode.Minion);
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip("Minion Mode");
+        }
         ImGui.PopStyleColor(3);
 
         ImGui.SameLine(0, 0);
@@ -38,6 +42,10 @@ internal static class ModeToggle
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.3f, 0.8f, 0.3f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.36f, 1f, 0.36f, 1f));
         DrawFor(in petWindow, PetWindowMode.BattlePet);
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip("Battle Pet Mode");
+        }
         ImGui.PopStyleColor(3);
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() - lastCursorPos);
