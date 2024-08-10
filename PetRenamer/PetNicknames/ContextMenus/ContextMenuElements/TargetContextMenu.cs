@@ -34,6 +34,14 @@ internal class TargetContextMenu : IContextMenuElement
         if (target == null) return null;
 
         IPettablePet? pet = localUser.GetPet(target.Address);
+        if (pet == null)
+        {
+            IPettableUser? islandUser = UserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex];
+            if (islandUser == null) return null;
+
+            pet = islandUser.GetPet(target.Address);
+        }
+
         if (pet == null) return null;
 
         return (a) => WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);

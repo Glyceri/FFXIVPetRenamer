@@ -27,6 +27,7 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
 
         Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook);
+        Hook<NotebookHook>("MJIMinionNoteBook", [65], AllowedNotebook);
         Hook<NotebookHook>("LovmPaletteEdit", [48], AllowedNotebook);
         Hook<NotebookHook>("LovmActionDetail", [4], AllowedNotebook);
         Hook<NotebookHook>("YKWNote", [28], AllowedNotebook);

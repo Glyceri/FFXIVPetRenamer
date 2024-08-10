@@ -29,6 +29,7 @@ internal class PetConfigWindow : PetWindow
         {
             if (ImGui.Checkbox(Translator.GetLine("Config.Kofi"), ref Configuration.showKofiButton)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.Toggle"), ref Configuration.quickButtonsToggle)) Configuration.Save();
+            if (ImGui.Checkbox(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning)) Configuration.Save();
             if (ImGui.BeginMenu($"Icon Type##Menu_{WindowHandler.InternalCounter}"))
             {
                 if (ImGui.MenuItem($"Action##Menu_{WindowHandler.InternalCounter}"))

@@ -76,6 +76,7 @@ internal static class Translator
         { "Config.Targetbar", "Show nicknames for Targets." },
         { "Config.Partylist", "Show nicknames on the Party List." },
         { "Config.ContextMenu", "Allow Context Menus." },
+        { "Config.IslandWarning", "Show a warning upon unresolved Island Owner" },
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "This is about real life money." },

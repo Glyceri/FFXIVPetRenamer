@@ -4,7 +4,8 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal class PettableUserList : IPettableUserList
 {
-    const int PettableUserArraySize = 100;
+    const int PettableUserArraySize = 101;
+    public const int IslandIndex = 100;
 
     public IPettableUser?[] PettableUsers { get; set; } = new IPettableUser[PettableUserArraySize];
     public IPettableUser? LocalPlayer { get => PettableUsers[0]; }
