@@ -1,5 +1,3 @@
 ﻿namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal interface IIslandUser : IPettableUser
-{
-}
+internal interface IIslandUser : IPettableUser;

@@ -25,12 +25,10 @@ internal unsafe class PettableIslandPet : IIslandPet
     public BattleChara* BattlePet { get; }
 
     readonly IPettableDatabaseEntry Entry;
-    readonly ISharingDictionary SharingDictionary;
 
-    public PettableIslandPet(BattleChara* pet, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices)
+    public PettableIslandPet(BattleChara* pet, in IPettableUser owner, in IPettableDatabaseEntry entry, in IPetServices petServices)
     {
         Entry = entry;
-        SharingDictionary = sharingDictionary;
 
         PetPointer = (nint)pet;
 
@@ -55,15 +53,10 @@ internal unsafe class PettableIslandPet : IIslandPet
         return skeletonID == SkeletonID && index == Index && OldObjectID == objectID;
     }
 
-    public void Recalculate()
-    {
-        CustomName = Entry.GetName(SkeletonID);
-    }
+    public void Recalculate() => CustomName = Entry.GetName(SkeletonID);
 
     public void Update(nint pointer)
     {
-        if (CustomName != null) SharingDictionary.Set(ObjectID, CustomName);
-
         Lifetime++;
         Marked = true;
         PetPointer = pointer;

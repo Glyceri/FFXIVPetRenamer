@@ -1,7 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
-using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -27,12 +26,10 @@ internal unsafe class PettableIslandUser : IIslandUser
     public unsafe BattleChara* BattleChara { get; } = null;
 
     readonly IPetServices PetServices;
-    readonly ISharingDictionary SharingDictionary;
 
-    public PettableIslandUser(in IPetServices petServices, in ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry)
+    public PettableIslandUser(in IPetServices petServices, IPettableDatabaseEntry entry)
     {
         PetServices = petServices;
-        SharingDictionary = sharingDictionary;
 
         DataBaseEntry = entry;
         Name = entry.Name;
@@ -58,7 +55,7 @@ internal unsafe class PettableIslandUser : IIslandUser
             }
             else
             {
-                PettablePets.Add(new PettableIslandPet(bChara.Value, this, in SharingDictionary, DataBaseEntry, PetServices));
+                PettablePets.Add(new PettableIslandPet(bChara.Value, this, DataBaseEntry, PetServices));
             }
         }
     }

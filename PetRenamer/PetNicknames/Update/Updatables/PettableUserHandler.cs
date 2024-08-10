@@ -161,7 +161,7 @@ internal unsafe class PettableUserHandler : IUpdatable
     void CreateIslandUser(IPettableDatabaseEntry entry)
     {
         ClearIslandUser();
-        PettableUserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex] = new PettableIslandUser(in PetServices, in SharingDictionary, entry);
+        PettableUserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex] = new PettableIslandUser(in PetServices, entry);
     }
 
     void SetIslandPets(ref List<Pointer<BattleChara>> pets)
