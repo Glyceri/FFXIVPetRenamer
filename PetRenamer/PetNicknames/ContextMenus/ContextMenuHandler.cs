@@ -41,6 +41,7 @@ internal class ContextMenuHandler : IDisposable
     {
         Register(new TargetContextMenu(in DalamudServices, in UserList, in WindowHandler));
         Register(new MinionNoteBookContextMenu(PetServices.PetSheets, in UserList, in WindowHandler, in ActionTooltipHook));
+        Register(new MJIMinionNotebookContextMenu(PetServices.PetSheets, in UserList, in WindowHandler, in ActionTooltipHook));
     }
 
     void Register(IContextMenuElement contextMenuElement)
