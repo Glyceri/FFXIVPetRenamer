@@ -1,9 +1,6 @@
 # Pet Nicknames
 Give your minions, Carbuncles and Faeries cute nicknames and share them with your friends.
 
-## Download the latest version here:
-`https://raw.githubusercontent.com/Glyceri/FFXIVPetRenamer/main/PetNicknames.json`
-
 ## Tutorial
 Type [/petname] to open the pet rename window. If you dont have a minion or battle pet out it will give you a warning.
 
