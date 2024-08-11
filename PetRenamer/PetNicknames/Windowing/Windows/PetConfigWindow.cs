@@ -64,8 +64,8 @@ internal class PetConfigWindow : PetWindow
             if (ImGui.Checkbox(Translator.GetLine("Config.ActionLog"), ref Configuration.showNamesInActionLog)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.Targetbar"), ref Configuration.showOnTargetBars)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.Partylist"), ref Configuration.showOnPartyList)) Configuration.Save();
+            if (ImGui.Checkbox(Translator.GetLine("Config.IslandPets"), ref Configuration.showOnIslandPets)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.ContextMenu"), ref Configuration.useContextMenus)) Configuration.Save();
-
         }
 
        

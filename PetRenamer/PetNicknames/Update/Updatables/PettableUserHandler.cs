@@ -121,6 +121,8 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     void HandleIsland()
     {
+        if (!PetServices.Configuration.showOnIslandPets) return;
+
         IslandHook.Update();
         UpdateIslandUser();
 

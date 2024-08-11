@@ -40,6 +40,7 @@ internal class Configuration : IPluginConfiguration
     public bool useContextMenus = true;
     public bool showOnTargetBars = true;
     public bool showOnPartyList = true;
+    public bool showOnIslandPets = true;
     // --------------------------- UI SETTINGS ---------------------------
     public bool showKofiButton = true;
     public bool quickButtonsToggle = true;
