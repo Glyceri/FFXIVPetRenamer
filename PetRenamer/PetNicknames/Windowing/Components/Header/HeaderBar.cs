@@ -31,7 +31,8 @@ internal static class HeaderBar
             WindowStruct<PetDevWindow> petDevWindow = new WindowStruct<PetDevWindow>(in windowHandler, in configuration, FontAwesomeIcon.Biohazard, "Pet Dev", configuration.debugModeActive);
             WindowStruct<KofiWindow> kofiWindow = new WindowStruct<KofiWindow>(in windowHandler, in configuration, FontAwesomeIcon.Coffee, Translator.GetLine("Kofi.Title"), configuration.showKofiButton && petWindow is not KofiWindow);
             WindowStruct<PetConfigWindow> petConfigWindow = new WindowStruct<PetConfigWindow>(in windowHandler, in configuration, FontAwesomeIcon.Cogs, Translator.GetLine("Config.Title"), petWindow is not PetConfigWindow || configuration.quickButtonsToggle);
-            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"), petWindow is not PetListWindow || configuration.quickButtonsToggle);
+            WindowStruct<PetListWindow> petListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"), (petWindow is not PetListWindow) && (configuration.listButtonLayout == 0 || configuration.listButtonLayout == 1));
+            WindowStruct<PetListWindow> actualPetListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.List, Translator.GetLine("PetList.Title"), (petWindow is not PetListWindow) && (configuration.listButtonLayout == 0 || configuration.listButtonLayout == 2));
             WindowStruct<PetRenameWindow> petRenameWindow = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"), petWindow is not PetRenameWindow || configuration.quickButtonsToggle);
 
             float availableWidth = ImGui.GetContentRegionAvail().X;
@@ -43,6 +44,7 @@ internal static class HeaderBar
             kofiWindow.Draw();
             petConfigWindow.Draw();
             petListWindow.Draw();
+            actualPetListWindow.Draw();
             petRenameWindow.Draw();
 
             Listbox.End();

@@ -44,6 +44,7 @@ internal class Configuration : IPluginConfiguration
     // --------------------------- UI SETTINGS ---------------------------
     public bool showKofiButton = true;
     public bool quickButtonsToggle = true;
+    public int listButtonLayout = 0;
     public int minionIconType = 1;
     public bool showIslandWarning = true;
 
