@@ -66,8 +66,17 @@ internal struct PetSheetData : IPetSheetData
         string[] starterList = GetList(clientLanguage);
         if (clientLanguage == ClientLanguage.German)
         {
-            Singular = GetGermanNamedList(starterList, singular);
-            Plural = GetGermanNamedList(starterList, plural);
+            string[] sArr = GetGermanNamedList(starterList, singular);
+            string[] pArr = GetGermanNamedList(starterList, plural);
+
+            string[] tempSArr = sArr;
+            string[] tempPArr = pArr;
+
+            tempSArr = AddSuffixToArray(tempSArr, "s");
+            tempPArr = AddSuffixToArray(tempPArr, "s");
+
+            Singular = [.. sArr, .. tempSArr];
+            Plural = [.. pArr, .. tempPArr];
         }
         else
         {
