@@ -8,5 +8,6 @@ internal interface IPetServices
     public IPetSheets PetSheets { get; }
     public IStringHelper StringHelper { get; }
     public IPetCastHelper PetCastHelper { get; }
+    public IPetActionHelper PetActionHelper { get; }
     public Configuration Configuration { get; }
 }

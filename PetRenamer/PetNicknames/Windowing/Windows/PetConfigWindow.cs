@@ -98,8 +98,9 @@ internal class PetConfigWindow : PetWindow
             bool keyComboPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl) && ImGui.IsKeyDown(ImGuiKey.LeftShift);
 
             ImGui.BeginDisabled(!keyComboPressed && !Configuration.debugModeActive);
-            if (ImGui.Checkbox("Enable Debug Mode", ref Configuration.debugModeActive)) Configuration.Save();
-            if (ImGui.Checkbox("Open Debug Window On Start", ref Configuration.openDebugWindowOnStart)) Configuration.Save();
+            if (ImGui.Checkbox("Enable Debug Mode.", ref Configuration.debugModeActive)) Configuration.Save();
+            if (ImGui.Checkbox("Open Debug Window On Start.", ref Configuration.openDebugWindowOnStart)) Configuration.Save();
+            if (ImGui.Checkbox("Show chat code.", ref Configuration.debugShowChatCode)) Configuration.Save();
             ImGui.EndDisabled();
         }
     }

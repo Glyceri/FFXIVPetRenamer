@@ -28,6 +28,8 @@ internal class ChatHandler : IDisposable
         Register(new PetGlamourChat(in DalamudServices, in PetServices, in PettableUserList));
         Register(new EmoteChatElement(in DalamudServices, in PetServices, in PettableUserList));
         Register(new BattleChatElement(in PetServices, in PettableUserList));
+        Register(new PetActionChat(in PetServices, in PettableUserList));
+        Register(new DebugChatCode(PetServices.Configuration));
     }
 
     readonly List<IChatElement> _chatElements = new List<IChatElement>(); 

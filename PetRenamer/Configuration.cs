@@ -51,6 +51,7 @@ internal class Configuration : IPluginConfiguration
     // ------------------------- Debug SETTINGS --------------------------
     public bool debugModeActive = false;
     public bool openDebugWindowOnStart = false;
+    public bool debugShowChatCode = false;
 
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {

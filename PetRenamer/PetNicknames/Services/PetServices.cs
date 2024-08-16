@@ -12,6 +12,7 @@ internal class PetServices : IPetServices
     public IPetSheets PetSheets { get; init; }
     public IStringHelper StringHelper { get; init; }
     public IPetCastHelper PetCastHelper { get; init; }
+    public IPetActionHelper PetActionHelper { get; init; }
 
     readonly DalamudServices DalamudServices;
 
@@ -24,6 +25,7 @@ internal class PetServices : IPetServices
         StringHelper = new StringHelperWrapper();
         PetSheets = new SheetsWrapper(ref services, StringHelper);
         PetCastHelper = new PetCastWrapper();
+        PetActionHelper = new PetActionWrapper();
 
         CheckConfigFailure();
     }
