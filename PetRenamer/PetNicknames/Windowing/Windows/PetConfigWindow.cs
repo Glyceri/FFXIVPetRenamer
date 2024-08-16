@@ -54,7 +54,7 @@ internal class PetConfigWindow : PetWindow
             }
 
             // Why for the life of me do I not know a better way to do this?
-            if (ImGui.BeginMenu($"List Button TYpe##Menu_{WindowHandler.InternalCounter}"))
+            if (ImGui.BeginMenu($"List Button Type##Menu_{WindowHandler.InternalCounter}"))
             {
                 if (ImGui.MenuItem($"Both##Menu_{WindowHandler.InternalCounter}"))
                 {
