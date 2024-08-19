@@ -13,24 +13,23 @@ internal class PettableDatabase : IPettableDatabase
     public bool ContainsLegacy { get; private set; } = false;
     public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
 
-    readonly IPetServices PetServices;
-    readonly IPettableDirtyCaller DirtyCaller;
-
-    public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, object? _)
-    {
-        PetServices = petServices;
-        DirtyCaller = dirtyCaller;
-    }
+    protected readonly IPetServices PetServices;
+    protected readonly IPettableDirtyCaller DirtyCaller;
 
     public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller)
     {
         PetServices = petServices;
         DirtyCaller = dirtyCaller;
 
+        Setup();
+    }
+
+    protected virtual void Setup()
+    {
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
-        SerializableUserV4[]? users = petServices.Configuration.SerializableUsersV4;
+        SerializableUserV4[]? users = PetServices.Configuration.SerializableUsersV4;
         if (users == null) return;
-        foreach(SerializableUserV4 user in users)
+        foreach (SerializableUserV4 user in users)
         {
             SerializableNameData[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;

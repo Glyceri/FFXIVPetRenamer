@@ -9,10 +9,6 @@ using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
-// All the [MethodImpl(MethodImplOptions.AggressiveInlining)]
-// used to be inlined. In order for code to stay clearer I made them into methods.
-// This is clarity only, they can be inlined
-
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
     public bool IsActive { get; private set; }
@@ -97,7 +93,10 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         ContentID = contentID;
         IsActive = true;
-        if (removeIPCStatus) IsIPC = false;
+        if (removeIPCStatus)
+        {
+            IsIPC = false;
+        }
     }
 
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
@@ -149,7 +148,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public void Clear(bool fromIPC)
     {
         SetActiveDatabase([], []);
-        IsIPC = false;
         IsActive = false;
         IsLegacy = false;
 

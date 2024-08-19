@@ -2,6 +2,7 @@
 
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
@@ -11,7 +12,9 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 {
-    public LegacyPettableDatabase(in IPetServices PetServices, in IPettableDirtyCaller DirtyCaller) : base(in PetServices, in DirtyCaller, null)
+    public LegacyPettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller) : base(in petServices, in dirtyCaller) { }
+
+    protected override void Setup()
     {
         SerializableUserV3[]? serializableUsers = PetServices.Configuration.serializableUsersV3;
         _entries.Clear();
