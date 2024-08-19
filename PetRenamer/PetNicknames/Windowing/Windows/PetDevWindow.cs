@@ -148,6 +148,15 @@ internal class PetDevWindow : PetWindow
             hasTarget = player!.ObjectIndex != 0;
         }
 
+        if (hasTarget)
+        {
+            IPettableUser? user = UserList.GetUser(player!.Address);
+            if (user != null)
+            {
+                hasTarget = !user.DataBaseEntry.IsActive;
+            }
+        }
+
         LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
 
         if (hasTarget)
