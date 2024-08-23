@@ -2,7 +2,6 @@
 using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
-using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;

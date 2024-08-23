@@ -70,6 +70,20 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
+    public IPettableUser? GetUserFromContentID(ulong contentID)
+    {
+        if (contentID == 0) return null;
+        for (int i = 0; i < PettableUserArraySize; i++)
+        {
+            IPettableUser? pUser = PettableUsers[i];
+            if (pUser == null) continue;
+            if (!pUser.IsActive) continue;
+            if (pUser.ContentID == contentID) return pUser;
+            return pUser;
+        }
+        return null;
+    }
+
     public IPettableUser? GetUser(string username)
     {
         if (username == null || username == string.Empty) return null;
