@@ -24,9 +24,19 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_PartyList", LifeCycleUpdate);
     }
 
+    protected override void OnNameDatabaseChange(INamesDatabase nameDatabase) => Refresh();
+    protected override void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
+    protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
+    protected override void Refresh() => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
+
     bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible|| baseD == null);
 
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
+    void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
+    {
+        Update((AtkUnitBase*)args.Addon);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
+    }
 
     void Update(AtkUnitBase* baseD)
     {

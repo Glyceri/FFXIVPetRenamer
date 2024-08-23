@@ -30,7 +30,9 @@ internal unsafe class SimpleTextHook : ITextHook
 
     IPettableUser? lastPettableUser = null;
 
-    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
+    string AddonName = string.Empty;
+
+    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
         Services = services;
         PettableUserList = userList;
@@ -39,6 +41,7 @@ internal unsafe class SimpleTextHook : ITextHook
         TextPos = textPos;
         AllowedToFunction = allowedCallback;
         IsSoft = isSoft;
+        AddonName = addonName;
 
         DirtyListener.RegisterOnDirtyName(OnName);
         DirtyListener.RegisterOnDirtyEntry(OnEntry);
@@ -51,8 +54,12 @@ internal unsafe class SimpleTextHook : ITextHook
     public void SetFaulty() => Faulty = true;
 
     protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
-    
-    
+    void HandleRefreshUpdate(AddonEvent addonEvent, AddonArgs addonArgs)
+    {
+        HandleUpdate(addonEvent, addonArgs);
+        Services.AddonLifecycle.UnregisterListener(HandleRefreshUpdate);
+    }
+
     void OnName(INamesDatabase nameDatabase)
     {
         SetDirty();
@@ -68,6 +75,12 @@ internal unsafe class SimpleTextHook : ITextHook
     void SetDirty()
     {
         isDirty = true;
+        Refresh();
+    }
+
+    void Refresh()
+    {
+        Services.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, AddonName, HandleRefreshUpdate);
     }
 
     void ClearDirty()

@@ -31,10 +31,11 @@ internal abstract class HookableElement : IHookableElement
     public abstract void Init();
     protected abstract void OnDispose();
 
-    protected virtual void OnNameDatabaseChange(INamesDatabase nameDatabase) { }
-    protected virtual void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) { }
-    protected virtual void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) { }
-    protected virtual void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) { }
+    protected virtual void OnNameDatabaseChange(INamesDatabase nameDatabase) => Refresh();
+    protected virtual void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) => Refresh();
+    protected virtual void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
+    protected virtual void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
+    protected virtual void Refresh() { }
 
     public void Dispose()
     {
