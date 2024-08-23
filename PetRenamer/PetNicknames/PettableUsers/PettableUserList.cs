@@ -28,13 +28,16 @@ internal class PettableUserList : IPettableUserList
     public IPettablePet? GetPet(ulong petId)
     {
         if (petId == 0) return null;
+
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
+
             IPettablePet? pPet = pUser.GetPet(petId);
             if (pPet == null) continue;
+
             return pPet;
         }
         return null;
@@ -43,6 +46,7 @@ internal class PettableUserList : IPettableUserList
     public IPettableUser? GetUser(nint user)
     {
         if (user == nint.Zero) return null;
+
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
@@ -50,6 +54,7 @@ internal class PettableUserList : IPettableUserList
             if (!pUser.IsActive) continue;
             if (pUser.Address == user) return pUser;
             if (pUser.GetPet(user) == null) continue;
+
             return pUser;
         }
         return null;
@@ -58,6 +63,7 @@ internal class PettableUserList : IPettableUserList
     public IPettableUser? GetUser(ulong userId)
     {
         if (userId == 0) return null;
+
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
@@ -65,6 +71,7 @@ internal class PettableUserList : IPettableUserList
             if (!pUser.IsActive) continue;
             if (pUser.ObjectID == userId) return pUser;
             if (pUser.GetPet(userId) == null) continue;
+
             return pUser;
         }
         return null;
@@ -73,12 +80,14 @@ internal class PettableUserList : IPettableUserList
     public IPettableUser? GetUserFromContentID(ulong contentID)
     {
         if (contentID == 0) return null;
+
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (!pUser.IsActive) continue;
-            if (pUser.ContentID == contentID) return pUser;
+            if (pUser.ContentID != contentID) continue;
+
             return pUser;
         }
         return null;
