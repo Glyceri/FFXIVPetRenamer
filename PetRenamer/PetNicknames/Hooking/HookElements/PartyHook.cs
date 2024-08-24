@@ -84,7 +84,16 @@ internal unsafe class PartyHook : HookableElement
             string castString = member.CastingActionName->NodeText.ToString();
             if (castString == string.Empty) continue;
 
-            IPettableUser? user = UserList.GetUserFromContentID(partyGroup[index]);
+            ulong contentID = partyGroup[index];
+            if (contentID == 0) // this means there is no party active
+            {
+                IPettableUser? localUser = UserList.LocalPlayer;
+                if (localUser == null) return;
+
+                contentID = localUser.ContentID;
+            }
+
+            IPettableUser? user = UserList.GetUserFromContentID(contentID);
             if (user == null) continue;
 
             IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, in user, true);

@@ -54,11 +54,6 @@ internal unsafe class SimpleTextHook : ITextHook
     public void SetFaulty() => Faulty = true;
 
     protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
-    void HandleRefreshUpdate(AddonEvent addonEvent, AddonArgs addonArgs)
-    {
-        HandleUpdate(addonEvent, addonArgs);
-        Services.AddonLifecycle.UnregisterListener(HandleRefreshUpdate);
-    }
 
     void OnName(INamesDatabase nameDatabase)
     {
@@ -75,12 +70,6 @@ internal unsafe class SimpleTextHook : ITextHook
     void SetDirty()
     {
         isDirty = true;
-        Refresh();
-    }
-
-    void Refresh()
-    {
-        Services.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, AddonName, HandleRefreshUpdate);
     }
 
     void ClearDirty()
@@ -102,7 +91,6 @@ internal unsafe class SimpleTextHook : ITextHook
         // Make sure it only runs once
         string tNodeText = tNode->NodeText.ToString();
         if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty) return;
-
         ClearDirty();
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;

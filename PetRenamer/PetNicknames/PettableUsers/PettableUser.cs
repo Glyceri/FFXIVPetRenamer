@@ -253,7 +253,11 @@ internal unsafe class PettableUser : IPettableUser
     public void RefreshCast()
     {
         if (BattleChara == null) return;
-        CurrentCastID = BattleChara->CastInfo.ActionId;
+
+        uint castID = BattleChara->CastInfo.ActionId;
+        if (castID == 0) return;
+
+        CurrentCastID = castID;
     }
 
     public void Dispose()
