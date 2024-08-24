@@ -14,7 +14,7 @@ internal class SaveHandler : IDisposable
     readonly IPettableDirtyListener DirtyListener;
     readonly IPetServices PetServices;
 
-    public SaveHandler(IPetServices petServices, in IPettableUserList userList, in IIpcProvider ipcProvider, in IPettableDirtyListener dirtyListener)
+    public SaveHandler(IPetServices petServices, IPettableUserList userList, IIpcProvider ipcProvider, IPettableDirtyListener dirtyListener)
     {
         PetServices = petServices;
         Configuration = PetServices.Configuration;
@@ -59,7 +59,6 @@ internal class SaveHandler : IDisposable
 
     void Save()
     {
-        PetServices.PetLog.LogWarning("SAVE!");
         Configuration.Save();
     }
 

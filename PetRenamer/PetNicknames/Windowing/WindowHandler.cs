@@ -36,10 +36,10 @@ internal class WindowHandler : IWindowHandler
 
     readonly WindowSystem WindowSystem;
 
-    public WindowHandler(in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener, in IDataParser dataParser, in IDataWriter dataWriter)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter)
     {
         DalamudServices = dalamudServices;
-        Configuration = configuration;
+        Configuration = petServices.Configuration;
         PetServices = petServices;
         UserList = userList;
         Database = pettableDatabase;
@@ -67,11 +67,11 @@ internal class WindowHandler : IWindowHandler
 
     void Register()
     {
-        AddWindow(new PetRenameWindow(this, in DalamudServices, in Configuration, PetServices, UserList));
-        AddWindow(new PetConfigWindow(this, in DalamudServices, in Configuration));
-        AddWindow(new PetListWindow(this, in DalamudServices, in Configuration, in PetServices, UserList, Database, LegacyDatabase, ImageDatabase, in DataParser, in DataWriter));
-        AddWindow(new KofiWindow(this, in DalamudServices, in Configuration));
-        AddWindow(new PetDevWindow(this, in DalamudServices, in Configuration, in UserList));
+        AddWindow(new PetRenameWindow(this, DalamudServices, PetServices, UserList));
+        AddWindow(new PetConfigWindow(this, DalamudServices, Configuration));
+        AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
+        AddWindow(new KofiWindow(this, DalamudServices, Configuration));
+        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList));
     }
 
     void AddWindow(PetWindow window)

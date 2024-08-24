@@ -17,7 +17,7 @@ internal unsafe class EmoteChatElement : IChatElement
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
 
-    public EmoteChatElement(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList) 
+    public EmoteChatElement(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) 
     {
         DalamudServices = dalamudServices;
         UserList = userList;

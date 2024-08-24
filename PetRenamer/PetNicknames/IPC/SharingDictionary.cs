@@ -12,7 +12,7 @@ internal class SharingDictionary : ISharingDictionary
     // Data Sharing
     readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
 
-    public SharingDictionary(in DalamudServices dalamudServices)
+    public SharingDictionary(DalamudServices dalamudServices)
     {
         DalamudServices = dalamudServices;
 

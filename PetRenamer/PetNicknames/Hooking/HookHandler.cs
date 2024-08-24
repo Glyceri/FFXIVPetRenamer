@@ -20,7 +20,7 @@ internal class HookHandler : IDisposable
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook IslandHook { get; private set; } = null!;
 
-    public HookHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList, in IPettableDirtyListener dirtyListener)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;

@@ -1,6 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
+using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -27,7 +28,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     readonly IPetServices PetServices;
 
-    public PettableIslandUser(in IPetServices petServices, IPettableDatabaseEntry entry)
+    public PettableIslandUser(IPetServices petServices, IPettableDatabaseEntry entry)
     {
         PetServices = petServices;
 
@@ -39,33 +40,27 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     public void Set(Pointer<BattleChara> pointer) => Reset();
 
-    public void CalculateBattlepets(ref List<Pointer<BattleChara>> pets)
+    public void SetBattlePet(BattleChara* pointer)
     {
-        for (int i = pets.Count - 1; i >= 0; i--)
+        IPettablePet? storedPet = FindPet();
+        if (storedPet != null)
         {
-            Pointer<BattleChara> bChara = pets[i];
-            if (bChara == null) continue;
-
-            pets.RemoveAt(i);
-
-            IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
-            if (storedPet != null)
-            {
-                storedPet.Update((nint)bChara.Value);
-            }
-            else
-            {
-                PettablePets.Add(new PettableIslandPet(bChara.Value, this, DataBaseEntry, PetServices));
-            }
+            storedPet.Update((nint)pointer);
+        }
+        else
+        {
+            PettablePets.Add(new PettableIslandPet(pointer, this, DataBaseEntry, PetServices));
         }
     }
 
-    IPettablePet? FindPet(ref Character character)
+    IPettablePet? FindPet()
     {
         for (int i = 0; i < PettablePets.Count; i++)
         {
             IPettablePet pet = PettablePets[i];
-            if (pet.Compare(character)) return pet;
+            if (pet.ObjectID != ObjectID) continue;
+
+            return pet;
         }
         return null;
     }
@@ -116,5 +111,5 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void OnLastCastChanged(uint cast) { } // Unused
     public void RefreshCast() { } // Unused
     public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None) => null; // Unused
-    public void Dispose() { } // Unused
+    public void Dispose(IPettableDatabase d) { } // Unused
 }

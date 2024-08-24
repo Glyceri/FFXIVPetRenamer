@@ -18,7 +18,7 @@ internal class MinionNoteBookContextMenu : IContextMenuElement
     readonly IActionTooltipHook ActionTooltipHook;
     readonly IPetSheets PetSheets;
 
-    public MinionNoteBookContextMenu(in IPetSheets petSheets, in IPettableUserList userList, in IWindowHandler windowHandler, in IActionTooltipHook actionTooltipHook)
+    public MinionNoteBookContextMenu(IPetSheets petSheets, IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook)
     {
         PetSheets = petSheets;
         UserList = userList;

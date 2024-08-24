@@ -2,7 +2,6 @@
 
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 {
-    public LegacyPettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller) : base(in petServices, in dirtyCaller) { }
+    public LegacyPettableDatabase(IPetServices petServices, IPettableDirtyCaller dirtyCaller) : base(petServices, dirtyCaller) { }
 
     protected override void Setup()
     {
@@ -23,7 +22,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
             _entries.Add(newEntry);
         }
     }

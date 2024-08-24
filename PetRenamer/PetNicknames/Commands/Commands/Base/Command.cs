@@ -15,7 +15,7 @@ internal abstract class Command : ICommand
     protected readonly DalamudServices DalamudServices;
     protected readonly IWindowHandler WindowHandler;
 
-    public Command(in DalamudServices dalamudServices, in IWindowHandler windowHandler)
+    public Command(DalamudServices dalamudServices, IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
         WindowHandler = windowHandler;

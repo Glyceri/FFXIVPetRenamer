@@ -18,8 +18,6 @@ internal unsafe abstract class BasePettablePet : IPettablePet
     public string Name { get; init; } = "";
     public string? CustomName { get; private set; }
     public IPetSheetData? PetData { get; private set; }
-    public uint OldObjectID { get; init; }
-    public byte PetType { get; init; }
     public ulong Lifetime { get; private set; }
     public IPettableUser? Owner { get; private set; }
 
@@ -27,7 +25,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
     readonly ISharingDictionary SharingDictionary;
     readonly bool AsBattlePet = false;
 
-    public BasePettablePet(Character* pet, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices, bool asBattlePet = false)
+    public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
     {
         Entry = entry;
         AsBattlePet = asBattlePet;
@@ -42,8 +40,6 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         Index = pet->GameObject.ObjectIndex;
         Name = pet->GameObject.NameString;
         ObjectID = pet->GetGameObjectId();
-        PetType = pet->GetGameObjectId().Type;
-        OldObjectID = pet->EntityId;
         CustomName = entry.GetName(SkeletonID);
         PetData = petServices.PetSheets.GetPet(SkeletonID);
     }
@@ -55,17 +51,6 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         Lifetime++;
         Marked = true;
         PetPointer = pointer;
-    }
-
-    public bool Compare(Character character)
-    {
-        int skeletonID = character.CharacterData.ModelCharaId;
-        ushort index = character.GameObject.ObjectIndex;
-        uint objectID = character.EntityId;
-
-        if (AsBattlePet) skeletonID = -skeletonID;
-
-        return skeletonID == SkeletonID && index == Index && OldObjectID == objectID;
     }
 
     public void Recalculate()

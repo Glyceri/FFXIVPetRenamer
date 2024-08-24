@@ -25,7 +25,7 @@ internal class DataParser : IDataParser
     static readonly IDataParserElement DataParserVersion1 = new DataParserVersion1();
     static readonly IDataParserElement DataParserVersion2 = new DataParserVersion2();
 
-    public DataParser(in DalamudServices dalamudServices, in IPettableUserList userList, in IPettableDatabase database, in ILegacyDatabase legacyDatabase)
+    public DataParser(DalamudServices dalamudServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         DalamudServices = dalamudServices;
         UserList = userList;

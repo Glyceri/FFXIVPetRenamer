@@ -31,7 +31,7 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
     {
         UserList = userList;
 

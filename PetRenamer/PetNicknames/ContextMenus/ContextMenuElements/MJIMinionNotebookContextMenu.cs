@@ -9,5 +9,5 @@ internal class MJIMinionNotebookContextMenu : MinionNoteBookContextMenu
 {
     public override string? AddonName { get; } = "MJIMinionNoteBook";
 
-    public MJIMinionNotebookContextMenu(in IPetSheets petSheets, in IPettableUserList userList, in IWindowHandler windowHandler, in IActionTooltipHook actionTooltipHook) : base(petSheets, userList, windowHandler, actionTooltipHook) { }
+    public MJIMinionNotebookContextMenu(IPetSheets petSheets, IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook) : base(petSheets, userList, windowHandler, actionTooltipHook) { }
 }

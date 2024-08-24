@@ -5,7 +5,7 @@ using PetRenamer.PetNicknames.Update.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
-internal class LodestoneQueueHelper(in LodestoneNetworker networker, in IImageDatabase imageDatabase) : IUpdatable
+internal class LodestoneQueueHelper(LodestoneNetworker networker, IImageDatabase imageDatabase) : IUpdatable
 {
     public bool Enabled { get; set; } = true;
 

@@ -18,10 +18,7 @@ internal class KofiWindow : PetWindow
 
     float BarSize = 30 * ImGuiHelpers.GlobalScale;
 
-    public KofiWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Kofi-Window", ImGuiWindowFlags.None)
-    {
-        
-    }
+    public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Kofi-Window", ImGuiWindowFlags.None) { }
 
     protected override void OnDraw()
     {

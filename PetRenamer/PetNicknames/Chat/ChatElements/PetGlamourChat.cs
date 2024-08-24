@@ -82,7 +82,7 @@ internal class PetGlamourChat : RestrictedChatElement
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
 
-    public PetGlamourChat(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList)
+    public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
     {
         DalamudServices = dalamudServices;
         UserList = userList;

@@ -60,7 +60,7 @@ internal class PetListWindow : PetWindow
 
     float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
 
-    public PetListWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, in IPetServices petServices, in IPettableUserList userList, in IPettableDatabase database, IPettableDatabase legacyDatabase, in IImageDatabase imageDatabase, in IDataParser dataParser, in IDataWriter dataWriter) : base(windowHandler, dalamudServices, configuration, "Pet List Window", ImGuiWindowFlags.None)
+    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet List Window", ImGuiWindowFlags.None)
     {
         UserList = userList;
         Database = database;

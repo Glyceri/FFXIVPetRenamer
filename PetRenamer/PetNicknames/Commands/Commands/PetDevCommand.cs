@@ -9,7 +9,7 @@ internal class PetDevCommand : Command
 {
     readonly Configuration Configuration;
 
-    public PetDevCommand(in DalamudServices dalamudServices, in Configuration configuration, in IWindowHandler windowHandler) : base(dalamudServices, windowHandler) 
+    public PetDevCommand(DalamudServices dalamudServices, Configuration configuration, IWindowHandler windowHandler) : base(dalamudServices, windowHandler) 
     { 
         Configuration = configuration;
     }

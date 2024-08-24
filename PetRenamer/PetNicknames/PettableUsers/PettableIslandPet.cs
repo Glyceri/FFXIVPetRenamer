@@ -25,7 +25,7 @@ internal unsafe class PettableIslandPet : IIslandPet
 
     readonly IPettableDatabaseEntry Entry;
 
-    public PettableIslandPet(BattleChara* pet, in IPettableUser owner, in IPettableDatabaseEntry entry, in IPetServices petServices)
+    public PettableIslandPet(BattleChara* pet, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices)
     {
         Entry = entry;
 

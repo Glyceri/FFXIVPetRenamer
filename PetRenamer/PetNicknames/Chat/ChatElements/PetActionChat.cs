@@ -13,7 +13,7 @@ internal class PetActionChat : RestrictedChatElement
     readonly IPetServices PetServices;
     readonly IPettableUserList UserList;
 
-    public PetActionChat(in IPetServices petServices, in IPettableUserList userList)
+    public PetActionChat(IPetServices petServices, IPettableUserList userList)
     {
         PetServices = petServices;
         UserList = userList;

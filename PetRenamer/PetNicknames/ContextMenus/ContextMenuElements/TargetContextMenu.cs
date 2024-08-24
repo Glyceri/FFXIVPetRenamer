@@ -18,7 +18,7 @@ internal class TargetContextMenu : IContextMenuElement
     readonly IPettableUserList UserList;
     readonly IWindowHandler WindowHandler;
 
-    public TargetContextMenu(in DalamudServices dalamudServices, in IPettableUserList userList, in IWindowHandler windowHandler)
+    public TargetContextMenu(DalamudServices dalamudServices, IPettableUserList userList, IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
         UserList = userList;

@@ -14,7 +14,7 @@ internal class DataWriter : IDataWriter
 {
     readonly IPettableUserList UserList;
 
-    public DataWriter(in IPettableUserList userList)
+    public DataWriter(IPettableUserList userList)
     {
         UserList = userList;
     }

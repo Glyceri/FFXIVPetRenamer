@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal interface IPettableUser : IBattleUser
+internal unsafe interface IPettableUser : IBattleUser
 {
     bool IsActive { get; }  
     bool IsLocalPlayer { get; }
@@ -23,8 +23,9 @@ internal interface IPettableUser : IBattleUser
 
     void OnLastCastChanged(uint cast);
     void Set(Pointer<BattleChara> pointer);
-    void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
+    void SetBattlePet(BattleChara* battlePet);
     void RefreshCast();
+    void Dispose(IPettableDatabase database);
 
     enum PetFilter
     {

@@ -8,7 +8,7 @@ namespace PetRenamer.PetNicknames.Commands.Commands;
 
 internal class PetnameCommand : Command
 {
-    public PetnameCommand(in DalamudServices dalamudServices, in IWindowHandler windowHandler) : base(dalamudServices, windowHandler) { }
+    public PetnameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) : base(dalamudServices, windowHandler) { }
 
     public override string CommandCode { get; } = "/petname";
     public override string Description { get; } = Translator.GetLine("Command.Petname");

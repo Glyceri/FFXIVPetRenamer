@@ -14,7 +14,7 @@ internal class CommandHandler : ICommandHandler
 
     readonly List<ICommand> Commands = new List<ICommand>();
 
-    public CommandHandler(in DalamudServices dalamudServices, in Configuration configuration, in IWindowHandler windowHandler)
+    public CommandHandler(DalamudServices dalamudServices, Configuration configuration, IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
         Configuration = configuration;
@@ -25,11 +25,11 @@ internal class CommandHandler : ICommandHandler
 
     void RegisterCommands()
     {
-        RegisterCommand(new PetnameCommand      (in DalamudServices, in WindowHandler));
-        RegisterCommand(new PetsettingsCommand  (in DalamudServices, in WindowHandler));
-        RegisterCommand(new PetsharingCommand   (in DalamudServices, in WindowHandler));
-        RegisterCommand(new PetlistCommand      (in DalamudServices, in WindowHandler));
-        RegisterCommand(new PetDevCommand       (in DalamudServices, in Configuration, in WindowHandler));
+        RegisterCommand(new PetnameCommand      (DalamudServices, WindowHandler));
+        RegisterCommand(new PetsettingsCommand  (DalamudServices, WindowHandler));
+        RegisterCommand(new PetsharingCommand   (DalamudServices, WindowHandler));
+        RegisterCommand(new PetlistCommand      (DalamudServices, WindowHandler));
+        RegisterCommand(new PetDevCommand       (DalamudServices, Configuration, WindowHandler));
     }
 
     void RegisterCommand(ICommand command)
