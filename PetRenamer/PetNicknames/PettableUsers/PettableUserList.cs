@@ -77,7 +77,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromContentID(ulong contentID)
+    public IPettableUser? GetUserFromContentID(ulong contentID, bool requireActive = true)
     {
         if (contentID == 0) return null;
 
@@ -85,7 +85,7 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
-            if (!pUser.IsActive) continue;
+            if (!pUser.IsActive && requireActive) continue;
             if (pUser.ContentID != contentID) continue;
 
             return pUser;

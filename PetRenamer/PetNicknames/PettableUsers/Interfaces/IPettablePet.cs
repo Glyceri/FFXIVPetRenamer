@@ -21,6 +21,6 @@ internal interface IPettablePet
     public ulong Lifetime { get; }
 
     void Update(nint pointer);
-    bool Compare(ref Character character);
+    bool Compare(Character character);
     void Recalculate();
 }

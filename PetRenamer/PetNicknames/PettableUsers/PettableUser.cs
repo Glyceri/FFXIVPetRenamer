@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using static PetRenamer.PetNicknames.PettableUsers.Interfaces.IPettableUser;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -82,12 +83,13 @@ internal unsafe class PettableUser : IPettableUser
         HandleCompanion(pointer);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void HandleCompanion(Pointer<BattleChara> pointer)
     {
         Companion* c = pointer.Value->CompanionData.CompanionObject;
         if (c == null) return;
 
-        IPettablePet? storedPet = FindPet(ref c->Character);
+        IPettablePet? storedPet = FindPet(c->Character);
 
         if (storedPet != null)
         {
@@ -117,12 +119,13 @@ internal unsafe class PettableUser : IPettableUser
         DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonID);
     }
 
-    IPettablePet? FindPet(ref Character character)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    IPettablePet? FindPet(Character character)
     {
         for (int i = 0; i < PettablePets.Count; i++)
         {
             IPettablePet pet = PettablePets[i];
-            if (pet.Compare(ref character)) return pet;
+            if (pet.Compare(character)) return pet;
         }
         return null;
     }
@@ -168,9 +171,8 @@ internal unsafe class PettableUser : IPettableUser
 
     public void CalculateBattlepets(ref List<Pointer<BattleChara>> pets)
     {
-        if (!DataBaseEntry.IsActive) return;
-
-        for (int i = pets.Count - 1; i >= 0; i--)
+        int petCount = pets.Count - 1;
+        for (int i = petCount; i >= 0; i--)
         {
             Pointer<BattleChara> bChara = pets[i];
             if (bChara == null) continue;
@@ -178,7 +180,7 @@ internal unsafe class PettableUser : IPettableUser
 
             pets.RemoveAt(i);
 
-            IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
+            IPettablePet? storedPet = FindPet(bChara.Value->Character);
             if (storedPet != null)
             {
                 storedPet.Update((nint)bChara.Value);

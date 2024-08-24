@@ -91,7 +91,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
 
-        SaveHandler = new SaveHandler(_PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
+        SaveHandler = new SaveHandler(_PetServices, in PettableUserList, IpcProvider, DirtyHandler);
     }
 
     public void Dispose()

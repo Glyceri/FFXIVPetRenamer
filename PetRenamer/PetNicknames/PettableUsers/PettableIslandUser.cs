@@ -65,7 +65,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         for (int i = 0; i < PettablePets.Count; i++)
         {
             IPettablePet pet = PettablePets[i];
-            if (pet.Compare(ref character)) return pet;
+            if (pet.Compare(character)) return pet;
         }
         return null;
     }

@@ -11,7 +11,7 @@ internal class PettableDatabase : IPettableDatabase
     protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
 
     public bool ContainsLegacy { get; private set; } = false;
-    public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
+    public IPettableDatabaseEntry[] DatabaseEntries { get => [.. _entries]; }
 
     protected readonly IPetServices PetServices;
     protected readonly IPettableDirtyCaller DirtyCaller;
@@ -101,7 +101,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry entry = _entries[i];
             if (!entry.IsActive) continue;
-            if (entry.IsIPC) continue;
+            //if (entry.IsIPC) continue;
             users.Add(entry.SerializeEntry());
         }
         return users.ToArray();

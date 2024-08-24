@@ -28,8 +28,6 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected bool IsSoft;
 
-    IPettableUser? lastPettableUser = null;
-
     string AddonName = string.Empty;
 
     public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
@@ -67,12 +65,12 @@ internal unsafe class SimpleTextHook : ITextHook
 
     bool isDirty = false;
 
-    void SetDirty()
+    protected void SetDirty()
     {
         isDirty = true;
     }
 
-    void ClearDirty()
+    protected void ClearDirty()
     {
         isDirty = false;
     }
@@ -100,7 +98,7 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        IPettableUser? user = lastPettableUser = GetUser();
+        IPettableUser? user = GetUser();
         if (user == null) return false;
 
         IPetSheetData? pet = GetPetData(text, in user);

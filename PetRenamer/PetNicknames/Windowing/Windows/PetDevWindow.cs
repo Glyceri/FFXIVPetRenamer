@@ -181,6 +181,7 @@ internal class PetDevWindow : PetWindow
                 startString += bChara->ContentId + "\n";
                 startString += "[-411,-417,-416,-415,-407]";
 
+                
                 BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
                 if (bPet != null)
                 {
@@ -188,7 +189,7 @@ internal class PetDevWindow : PetWindow
                     if (clicked)
                     {
                         int id = -bPet->Character.CharacterData.ModelCharaId;
-                        startString += $"{id}^{targetBattlePetName}\n";
+                        startString += $"\n{id}^{targetBattlePetName}";
                     }
                 }
 
@@ -206,6 +207,7 @@ internal class PetDevWindow : PetWindow
 
                 if (clicked)
                 {
+                    DalamudServices.PluginLog.Debug(startString);
                     SendAll(startString);
                 }
 

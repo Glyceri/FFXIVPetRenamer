@@ -134,7 +134,6 @@ internal unsafe class PartyHook : HookableElement
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IsCrossParty() => InfoProxyCrossRealm.Instance()->IsCrossRealm > 0 && GroupManager.Instance()->MainGroup.MemberCount < 1;
 
     int? GetCrossPartyIndex(ulong contentID)

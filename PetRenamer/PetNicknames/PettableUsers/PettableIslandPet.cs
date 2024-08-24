@@ -43,7 +43,7 @@ internal unsafe class PettableIslandPet : IIslandPet
         PetData = petServices.PetSheets.GetPet(SkeletonID);
     }
 
-    public bool Compare(ref Character character)
+    public bool Compare(Character character)
     {
         int skeletonID = character.CharacterData.ModelCharaId;
         ushort index = character.GameObject.ObjectIndex;

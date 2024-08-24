@@ -13,6 +13,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using System.Collections.Generic;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -50,7 +51,7 @@ internal unsafe class PettableUserHandler : IUpdatable
         DirtyListener.RegisterOnDirtyName(OnDirty);
     }
 
-    List<Pointer<BattleChara>> availablePets = new List<Pointer<BattleChara>>();
+    List<Pointer<BattleChara>> availablePets = new List<Pointer<BattleChara>>(100);
 
     public void OnUpdate(IFramework framework)
     {

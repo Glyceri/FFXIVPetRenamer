@@ -19,9 +19,8 @@ internal unsafe class MapHook : HookableElement
     int lastIndex = 0;
     int current = 0;
 
-    const int playerIconID = 60443;
     const int petIconID = 60961;
-    const int partyPlayerIconID = 60421;
+    const int alliancePetIconID = 60964;
 
     // IntPtr is the AtkMapAddon thing and AtkNaviMap thing, really it doesnt matter
     public delegate void NewMapDelegate(IntPtr a1);
@@ -39,8 +38,8 @@ internal unsafe class MapHook : HookableElement
 
     readonly IMapTooltipHook TooltipHook;
 
-    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) 
-    { 
+    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
+    {
         TooltipHook = tooltipHook;
     }
 
@@ -61,7 +60,6 @@ internal unsafe class MapHook : HookableElement
     void MiniMapDetour(IntPtr a1)
     {
         naviTooltip.Original(a1);
-
         int navimapIndex = (int)(*(uint*)(a1 + 14888));
         if (navimapIndex == -1) return;
 
@@ -107,7 +105,7 @@ internal unsafe class MapHook : HookableElement
             AtkTexture texture = asset->AtkTexture;
             AtkTextureResource* textureResource = texture.Resource;
             if (textureResource == null) continue;
-            if (textureResource->IconId != petIconID) continue;
+            if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) continue;
             current++;
             if (i != elementIndex + manager.PartsListCount) continue;
             GetDistanceAt(current);
@@ -154,7 +152,7 @@ internal unsafe class MapHook : HookableElement
             AtkTexture texture = asset->AtkTexture;
             AtkTextureResource* textureResource = texture.Resource;
             if (textureResource == null) continue;
-            if (textureResource->IconId != petIconID) continue;
+            if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) continue;
             current++;
             if (manager.PartsListCount + manager.ObjectCount + manager.AssetCount + i + 1 != index) continue;
             GetDistanceAt(current);
@@ -164,52 +162,80 @@ internal unsafe class MapHook : HookableElement
 
     void GetDistanceAt(int at)
     {
+        PetServices.PetLog.Log("1");
         GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
         if (gManager == null) return;
-
+        PetServices.PetLog.Log("2");
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
+        PetServices.PetLog.Log("3");
 
         BattleChara* pChara = localUser.BattleChara;
         if (pChara == null) return;
-
+        PetServices.PetLog.Log("4");
         Vector3 playerPos = pChara->Character.GameObject.Position;
 
-        List<nint> pets = new List<nint>();
-
-        foreach (PartyMember member in gManager->MainGroup.PartyMembers)
-        {
-            BattleChara* player = CharacterManager.Instance()->LookupBattleCharaByEntityId(member.EntityId);
-            if (player == null) continue;
-
-            BattleChara* chocobo = CharacterManager.Instance()->LookupBuddyByOwnerObject(player);
-            BattleChara* battlePet = CharacterManager.Instance()->LookupPetByOwnerObject(player);
-            if (battlePet != null) pets.Add((nint)battlePet);
-            if (chocobo != null) pets.Add((nint)chocobo);
-        }
-
-        BattleChara* chocobo2 = CharacterManager.Instance()->LookupBuddyByOwnerObject(pChara);
-        BattleChara* battlePet2 = CharacterManager.Instance()->LookupPetByOwnerObject(pChara);
-        if (battlePet2 != null && !pets.Contains((nint)battlePet2)) pets.Add((nint)battlePet2);
-        if (chocobo2 != null && !pets.Contains((nint)chocobo2)) pets.Add((nint)chocobo2);
+        List<IPettablePet> pets = new List<IPettablePet>();
+        MakeFromMembers(gManager->MainGroup.PartyMembers, ref pets);
+        MakeFromMembers(gManager->MainGroup.AllianceMembers, ref pets);
+        AddPets(localUser, ref pets);     
 
         pets.Sort((pet1, pet2) =>
         {
-            BattleChara* p1 = (BattleChara*)pet1;
-            BattleChara* p2 = (BattleChara*)pet2;
+            BattleChara* p1 = (BattleChara*)pet1.PetPointer;
+            BattleChara* p2 = (BattleChara*)pet2.PetPointer;
             Vector3 pos1 = playerPos - (Vector3)p1->Character.GameObject.Position;
             Vector3 pos2 = playerPos - (Vector3)p2->Character.GameObject.Position;
             return pos1.Length().CompareTo(pos2.Length());
         });
+
+        pets.Reverse();
+
+        foreach (IPettablePet pp in pets)
+        {
+            PetServices.PetLog.Log(pp.Owner?.Name + " : " + pp.Name + " : " + pp.CustomName);
+        }
+
         int index = at - 1;
+        PetServices.PetLog.Log("Index: " + index);
+
         if (index < 0) return;
+        PetServices.PetLog.Log("5");
         if (index >= pets.Count) return;
-
-        nint pet = pets[index];
-
-        IPettablePet? pettablePet = UserList.GetPet(pet);
-        TooltipHook.OverridePet(pettablePet);
+        PetServices.PetLog.Log("6");
+        TooltipHook.OverridePet(pets[index]);
     }
+
+    void MakeFromMembers(Span<PartyMember> members, ref List<IPettablePet> pets)
+    {
+        foreach (PartyMember member in members)
+        {
+
+            PetServices.PetLog.LogFatal(member.NameString);
+            IPettableUser? user = UserList.GetUserFromContentID(member.ContentId, false);
+            
+            if (user == null)
+            {
+                PetServices.PetLog.LogFatal("User is null: " + member.ContentId);
+                continue;
+            }
+
+            AddPets(user, ref pets);
+        }
+    }
+
+    void AddPets(IPettableUser user, ref List<IPettablePet> pets)
+    {
+        foreach (IPettablePet pet in user.PettablePets)
+        {
+            PetServices.PetLog.Log(user.Name + " | " + pet.Name);
+            if (pet is IPettableCompanion) continue;
+            if (pets.Contains(pet)) continue;
+
+            pets.Add(pet);
+        }
+    }
+
 
     protected override void OnDispose()
     {
