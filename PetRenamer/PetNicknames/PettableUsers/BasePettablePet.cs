@@ -40,21 +40,18 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         Index = pet->GameObject.ObjectIndex;
         Name = pet->GameObject.NameString;
         ObjectID = pet->GetGameObjectId();
-        CustomName = entry.GetName(SkeletonID);
         PetData = petServices.PetSheets.GetPet(SkeletonID);
-    }
-
-    public void Update(nint pointer)
-    {
-        if (CustomName != null) SharingDictionary.Set(ObjectID, CustomName);
-
-        Lifetime++;
-        Marked = true;
-        PetPointer = pointer;
+        Recalculate();
     }
 
     public void Recalculate()
     {
          CustomName = Entry.GetName(SkeletonID);
+         SharingDictionary.Set(ObjectID, CustomName);
+    }
+
+    public void Dispose()
+    {
+        SharingDictionary.Set(ObjectID, null);
     }
 }

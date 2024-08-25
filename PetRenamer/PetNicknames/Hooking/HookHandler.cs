@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -15,17 +16,23 @@ internal class HookHandler : IDisposable
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
     readonly IPettableDirtyListener DirtyListener;
+    readonly IPettableDatabase Database;
+    readonly ILegacyDatabase LegacyDatabase;
+    readonly ISharingDictionary SharingDictionary;
 
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook IslandHook { get; private set; } = null!;
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
         PettableUserList = pettableUserList;
         DirtyListener = dirtyListener;
+        Database = database;
+        LegacyDatabase = legacyDatabase;
+        SharingDictionary = sharingDictionary;
 
         _Register();
     }
@@ -48,6 +55,7 @@ internal class HookHandler : IDisposable
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary));
     }
 
     readonly List<IHookableElement> hookableElements = new List<IHookableElement>();

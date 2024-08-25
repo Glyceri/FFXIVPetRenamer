@@ -78,8 +78,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         IpcProvider = new IpcProvider(_DalamudServices, _DalamudServices.PetNicknamesPlugin, DataParser, DataWriter);
 
-        HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, DirtyHandler);
-        UpdateHandler = new UpdateHandler(_DalamudServices, SharingDictionary, PettableUserList, LegacyDatabase, PettableDatabase, _PetServices, LodestoneNetworker, ImageDatabase, DirtyHandler, IpcProvider, HookHandler.IslandHook);
+        HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, DirtyHandler, PettableDatabase, LegacyDatabase, SharingDictionary);
+        UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase);
         ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
 
         // UI is the most DOGSHIT thing in this whole plugin. I hate EVERY SINGLE LINE OF CODE from it...

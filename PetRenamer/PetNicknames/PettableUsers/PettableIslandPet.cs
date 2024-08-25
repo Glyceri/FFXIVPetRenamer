@@ -60,4 +60,6 @@ internal unsafe class PettableIslandPet : IIslandPet
         Marked = true;
         PetPointer = pointer;
     }
+
+    public void Dispose() { }
 }

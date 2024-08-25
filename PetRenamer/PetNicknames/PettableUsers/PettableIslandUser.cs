@@ -1,7 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.Interop;
-using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -38,18 +36,22 @@ internal unsafe class PettableIslandUser : IIslandUser
         Homeworld = entry.Homeworld;
     }
 
-    public void Set(Pointer<BattleChara> pointer) => Reset();
-
     public void SetBattlePet(BattleChara* pointer)
     {
-        IPettablePet? storedPet = FindPet();
-        if (storedPet != null)
+        PettablePets.Add(new PettableIslandPet(pointer, this, DataBaseEntry, PetServices));
+    }
+
+    public void RemoveBattlePet(BattleChara* pointer)
+    {
+        if (pointer == null) return;
+
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
-            storedPet.Update((nint)pointer);
-        }
-        else
-        {
-            PettablePets.Add(new PettableIslandPet(pointer, this, DataBaseEntry, PetServices));
+            IPettablePet? pet = PettablePets[i];
+            if (pet == null) continue;
+            if (pet.ObjectID != pointer->GetGameObjectId()) continue;
+
+            PettablePets.RemoveAt(i);
         }
     }
 
@@ -63,22 +65,6 @@ internal unsafe class PettableIslandUser : IIslandUser
             return pet;
         }
         return null;
-    }
-
-    void Reset()
-    {
-        for (int i = PettablePets.Count - 1; i >= 0; i--)
-        {
-            IPettablePet pet = PettablePets[i];
-
-            if (!pet.Marked)
-            {
-                PettablePets.RemoveAt(i);
-                continue;
-            }
-
-            pet.Marked = false;
-        }
     }
 
     public IPettablePet? GetPet(nint pet)
@@ -112,4 +98,8 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void RefreshCast() { } // Unused
     public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None) => null; // Unused
     public void Dispose(IPettableDatabase d) { } // Unused
+    public void Update() { } // Unused FOR NOW
+
+    public void SetCompanion(Companion* companion) { } // Unused
+    public void RemoveCompanion(Companion* companion) { } // Unused
 }

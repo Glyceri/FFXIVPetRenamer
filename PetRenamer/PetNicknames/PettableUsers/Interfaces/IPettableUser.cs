@@ -1,6 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
@@ -22,8 +21,11 @@ internal unsafe interface IPettableUser : IBattleUser
     string? GetCustomName(IPetSheetData sheetData);
 
     void OnLastCastChanged(uint cast);
-    void Set(Pointer<BattleChara> pointer);
+    void Update();
     void SetBattlePet(BattleChara* battlePet);
+    void RemoveBattlePet(BattleChara* battlePet);
+    void SetCompanion(Companion* companion);
+    void RemoveCompanion(Companion* companion);
     void RefreshCast();
     void Dispose(IPettableDatabase database);
 

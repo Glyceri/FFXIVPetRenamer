@@ -1,8 +1,9 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal interface IPettablePet
+internal interface IPettablePet : IDisposable
 {
     IPettableUser? Owner { get; }
 
@@ -15,8 +16,6 @@ internal interface IPettablePet
     public string Name { get; }
     public string? CustomName { get; }
     public IPetSheetData? PetData { get; }
-    public ulong Lifetime { get; }
 
-    void Update(nint pointer);
     void Recalculate();
 }

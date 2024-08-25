@@ -4,6 +4,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ImGuiNET;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -294,11 +295,33 @@ internal class PetDevWindow : PetWindow
 
     void DrawUserList()
     {
+        DrawBattlePetCount();
         foreach (IPettableUser? user in UserList.PettableUsers)
         {
             if (user == null) continue;
             NewDrawUser(user);
         }
+    }
+
+    unsafe void DrawBattlePetCount()
+    {
+        int battlePetCount = 0;
+
+        for (int i = 0; i < 100; i++)
+        {
+            BattleChara* bChara = CharacterManager.Instance()->BattleCharas[i];
+            if (bChara == null) continue;
+
+            ObjectKind objKind = bChara->ObjectKind;
+            if (objKind != ObjectKind.BattleNpc) continue;
+
+            uint ownerID = bChara->OwnerId;
+            if (ownerID == 0xE0000000) continue;
+
+            battlePetCount++;
+        }
+
+        LabledLabel.Draw("Accurate Battle Pet Count: ", $"{battlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize));
     }
 
     void NewDrawUser(IPettableUser user)

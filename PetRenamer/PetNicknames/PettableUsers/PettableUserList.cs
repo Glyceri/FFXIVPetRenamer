@@ -107,4 +107,19 @@ internal class PettableUserList : IPettableUserList
         }
         return null;
     }
+
+    public IPettableUser? GetUserFromOwnerID(uint ownerID)
+    {
+        if (ownerID == 0) return null;
+
+        for (int i = 0; i < PettableUserArraySize; i++)
+        {
+            IPettableUser? pUser = PettableUsers[i];
+            if (pUser == null) continue;
+            if (pUser.ShortObjectID != ownerID) continue;
+
+            return pUser;
+        }
+        return null;
+    }
 }
