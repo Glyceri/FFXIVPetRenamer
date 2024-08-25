@@ -17,9 +17,10 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? user = PettableUsers[i];
             if(user == null) continue;
-            if (!user.IsActive) continue;
+
             IPettablePet? pPet = user.GetPet(pet);
             if (pPet == null) continue;
+
             return pPet;
         }
         return null;
@@ -33,7 +34,6 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
-            if (!pUser.IsActive) continue;
 
             IPettablePet? pPet = pUser.GetPet(petId);
             if (pPet == null) continue;
@@ -51,7 +51,6 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
-            if (!pUser.IsActive) continue;
             if (pUser.Address == user) return pUser;
             if (pUser.GetPet(user) == null) continue;
 
@@ -68,8 +67,7 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
-            if (!pUser.IsActive) continue;
-            if (pUser.ObjectID == userId) return pUser;
+            if (pUser.ObjectID != userId) continue;
             if (pUser.GetPet(userId) == null) continue;
 
             return pUser;
@@ -77,7 +75,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromContentID(ulong contentID, bool requireActive = true)
+    public IPettableUser? GetUserFromContentID(ulong contentID)
     {
         if (contentID == 0) return null;
 
@@ -85,7 +83,6 @@ internal class PettableUserList : IPettableUserList
         {
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
-            if (!pUser.IsActive && requireActive) continue;
             if (pUser.ContentID != contentID) continue;
 
             return pUser;

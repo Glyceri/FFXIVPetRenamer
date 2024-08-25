@@ -24,6 +24,7 @@ internal abstract class HookableElement : IHookableElement
         DirtyListener.RegisterOnClearEntry(OnPettableEntryClear);
         DirtyListener.RegisterOnDirtyEntry(OnPettableEntryChange);
         DirtyListener.RegisterOnDirtyName(OnNameDatabaseChange);
+        DirtyListener.RegisterOnPlayerCharacterDirty(OnPlayerDirty);
 
         DalamudServices.Hooking.InitializeFromAttributes(this);
     }
@@ -35,6 +36,7 @@ internal abstract class HookableElement : IHookableElement
     protected virtual void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) => Refresh();
     protected virtual void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
     protected virtual void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
+    protected virtual void OnPlayerDirty(IPettableUser user) => Refresh();
     protected virtual void Refresh() { }
 
     public void Dispose()
@@ -43,6 +45,7 @@ internal abstract class HookableElement : IHookableElement
         DirtyListener.UnregisterOnClearEntry(OnPettableEntryClear);
         DirtyListener.UnregisterOnDirtyEntry(OnPettableEntryChange);
         DirtyListener.UnregisterOnDirtyName(OnNameDatabaseChange);
+        DirtyListener.UnregisterOnPlayerCharacterDirty(OnPlayerDirty);
 
         OnDispose();
     }

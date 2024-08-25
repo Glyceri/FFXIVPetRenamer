@@ -10,7 +10,6 @@ internal unsafe interface IPettableUser : IBattleUser
 {
     bool IsActive { get; }  
     bool IsLocalPlayer { get; }
-    bool IsDirty { get; }
 
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }

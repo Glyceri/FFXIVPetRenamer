@@ -2,6 +2,7 @@
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using ImGuiNET;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -22,6 +23,7 @@ internal class PetRenameWindow : PetWindow
 {
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
+    readonly IPettableDirtyListener DirtyListener;
 
     protected override Vector2 MinSize { get; } = new Vector2(437, 250);
     protected override Vector2 MaxSize { get; } = new Vector2(1500, 250);
@@ -40,12 +42,21 @@ internal class PetRenameWindow : PetWindow
     IPetSheetData? ActivePetData;
     ISharedImmediateTexture? ActivePetTexture;
 
+
     float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
 
-    public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         UserList = userList;
         PetServices = petServices;
+        DirtyListener = dirtyListener;
+
+        DirtyListener.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
+    }
+
+    protected override void OnDispose()
+    {
+        DirtyListener.UnregisterOnPlayerCharacterDirty(DirtyPlayerChar);
     }
 
     public void SetRenameWindow(int forSkeleton, bool open)
@@ -65,6 +76,13 @@ internal class PetRenameWindow : PetWindow
         if (isContextOpen) return;
         OnDraw();
         GetActiveSkeleton();
+    }
+
+    void DirtyPlayerChar(IPettableUser user)
+    {
+        if (user != ActiveUser) return;
+
+        OnDirty();
     }
 
     protected override void OnDirty()
@@ -92,7 +110,7 @@ internal class PetRenameWindow : PetWindow
     {
         ActiveUser = UserList.LocalPlayer;
 
-        if (ActiveUser?.IsDirty ?? false || lastContentID != ActiveUser?.ContentID)
+        if (lastContentID != ActiveUser?.ContentID)
         {
             lastContentID = ActiveUser?.ContentID ?? 0;
             isContextOpen = false;

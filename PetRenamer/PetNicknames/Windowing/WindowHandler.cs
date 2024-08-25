@@ -67,7 +67,7 @@ internal class WindowHandler : IWindowHandler
 
     void Register()
     {
-        AddWindow(new PetRenameWindow(this, DalamudServices, PetServices, UserList));
+        AddWindow(new PetRenameWindow(this, DalamudServices, PetServices, UserList, DirtyListener));
         AddWindow(new PetConfigWindow(this, DalamudServices, Configuration));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));

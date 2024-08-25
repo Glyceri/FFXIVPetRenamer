@@ -19,12 +19,13 @@ internal class HookHandler : IDisposable
     readonly IPettableDatabase Database;
     readonly ILegacyDatabase LegacyDatabase;
     readonly ISharingDictionary SharingDictionary;
+    readonly IPettableDirtyCaller DirtyCaller;
 
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook IslandHook { get; private set; } = null!;
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
@@ -33,6 +34,7 @@ internal class HookHandler : IDisposable
         Database = database;
         LegacyDatabase = legacyDatabase;
         SharingDictionary = sharingDictionary;
+        DirtyCaller = dirtyCaller;
 
         _Register();
     }
@@ -55,7 +57,7 @@ internal class HookHandler : IDisposable
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary));
+        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller));
     }
 
     readonly List<IHookableElement> hookableElements = new List<IHookableElement>();

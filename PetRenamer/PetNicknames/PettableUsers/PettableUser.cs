@@ -26,19 +26,19 @@ internal unsafe class PettableUser : IPettableUser
     public uint CurrentCastID { get; private set; }
     public bool IsLocalPlayer { get; }
 
-    public bool IsDirty { get; private set; }
-
     uint lastCast;
 
     readonly IPetServices PetServices;
     readonly IPettableDirtyListener DirtyListener;
+    readonly IPettableDirtyCaller DirtyCaller;
     readonly ISharingDictionary SharingDictionary;
 
-    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, BattleChara* battleChara)
+    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, BattleChara* battleChara)
     {
         PetServices = petServices;
         DirtyListener = dirtyListener;
         SharingDictionary = sharingDictionary;
+        DirtyCaller = dirtyCaller;
 
         DirtyListener.RegisterOnClearEntry(OnDirty);
         DirtyListener.RegisterOnDirtyEntry(OnDirty);
@@ -71,8 +71,6 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Update()
     {
-        IsDirty = false;
-
         CurrentCastID = BattleChara->CastInfo.ActionId;
         if (lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
     }
@@ -129,7 +127,6 @@ internal unsafe class PettableUser : IPettableUser
 
     void CreateNewPet(IPettablePet pet, int index = -1)
     {
-        IsDirty = true;
         if (index == -1)
         {
             PettablePets.Add(pet);
@@ -138,11 +135,11 @@ internal unsafe class PettableUser : IPettableUser
         {
             PettablePets.Insert(index, pet);
         }
+        DirtyCaller.DirtyPlayer(this);
     }
 
     public IPettablePet? GetPet(nint pet)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {
@@ -154,7 +151,6 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettablePet? GetPet(GameObjectId gameObjectId)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {

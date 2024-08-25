@@ -18,6 +18,7 @@ internal unsafe class MapHook : HookableElement
 {
     int lastIndex = 0;
     int current = 0;
+    int foundCurrent = -1;
 
     const int petIconID = 60961;
     const int alliancePetIconID = 60964;
@@ -26,14 +27,14 @@ internal unsafe class MapHook : HookableElement
     public delegate void NewMapDelegate(IntPtr a1);
 
     // 40 57 48 83 EC 60 48 8B F9 83 FA 64
-    [Signature("40 57 48 81 EC B0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 90 00 00 00 ", DetourName = nameof(MiniMapDetour))]
+    [Signature("40 57 48 81 EC B0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 90 00 00 00", DetourName = nameof(MiniMapDetour))]
     readonly Hook<NewMapDelegate> naviTooltip = null!;
 
     // "48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8"
     // This is the 6.58 hook
     // Everything has changed!
 
-    [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00 ", DetourName = nameof(MapDetour))]
+    [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00", DetourName = nameof(MapDetour))]
     readonly Hook<NewMapDelegate> mapTooltipHook = null!;
 
     readonly IMapTooltipHook TooltipHook;
@@ -49,120 +50,153 @@ internal unsafe class MapHook : HookableElement
         mapTooltipHook?.Enable();
     }
 
+    protected override void Refresh()
+    {
+        lastIndex = -1;
+    }
+
+    bool PrepareMap(int index)
+    {
+        if (lastIndex != index) lastIndex = index;
+        else return false;
+
+        current = 0;
+        foundCurrent = -1;
+
+        return true;
+    }
+
+    void EndMap()
+    {
+        if (foundCurrent == -1) return;
+
+        GetDistanceAt(foundCurrent);
+    }
+
     void MapDetour(IntPtr a1)
     {
         mapTooltipHook!.Original(a1);
+
         int mapIndex = (int)(*(uint*)(a1 + 1860));
         if (mapIndex == -1) return;
+
+        if (!PrepareMap(mapIndex)) return;
+
         MapTooltip((AtkUnitBase*)a1, mapIndex);
+
+        EndMap();
     }
 
     void MiniMapDetour(IntPtr a1)
     {
         naviTooltip.Original(a1);
+
         int navimapIndex = (int)(*(uint*)(a1 + 14888));
         if (navimapIndex == -1) return;
 
+        if (!PrepareMap(navimapIndex)) return;
+
         NaviTooltip((AtkUnitBase*)a1, navimapIndex);
+
+        EndMap();
     }
 
     void NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
-        if (lastIndex != elementIndex) lastIndex = elementIndex;
-        else return;
+        AtkUldManager? manager = GetUldManager(unitBase, 18);
+        if (manager == null) return;
 
-        BaseNode node = new BaseNode(unitBase);
-        if (node == null) return;
-        ComponentNode mapComponentNode = node.GetComponentNode(18);
-        if (mapComponentNode == null) return;
-        AtkComponentNode* atkComponentNode = mapComponentNode.GetPointer();
-        if (atkComponentNode == null) return;
-        AtkComponentBase* atkComponentBase = atkComponentNode->Component;
-        if (atkComponentBase == null) return;
-        AtkUldManager manager = atkComponentBase->UldManager;
-
-        current = 0;
-
-        for (int i = 0; i < manager.NodeListCount; i++)
+        for (int i = 0; i < manager.Value.NodeListCount; i++)
         {
-            AtkResNode* curNode = manager.NodeList[i];
-            if (curNode == null) continue;
-            if (!curNode->IsVisible()) continue;
-            AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
-            if (cNode == null) continue;
-            AtkComponentBase* cBase = cNode->Component;
-            if (cBase == null) continue;
-            AtkResNode* resNode = cBase->GetImageNodeById(3);
-            if (resNode == null) continue;
-            AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
-            if (imgNode == null) continue;
-            AtkUldPartsList* partsList = imgNode->PartsList;
-            if (partsList == null) continue;
-            AtkUldPart* parts = partsList->Parts;
-            if (parts == null) continue;
-            AtkUldAsset* asset = parts->UldAsset;
-            if (asset == null) continue;
-            AtkTexture texture = asset->AtkTexture;
-            AtkTextureResource* textureResource = texture.Resource;
-            if (textureResource == null) continue;
-            if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) continue;
-            current++;
-            if (i != elementIndex + manager.PartsListCount) continue;
-            GetDistanceAt(current);
-            return;
+            if (!GetResources(3, manager.Value.NodeList[i], out AtkTextureResource* textureResource)) continue;
+            if (!HandleTextureResource(textureResource)) continue;
+
+            if (i != elementIndex + manager.Value.PartsListCount) continue;
+
+            CurrentIsIndex();
+            break;
         }
     }
 
     void MapTooltip(AtkUnitBase* a1, int index)
     {
-        if (lastIndex != index) lastIndex = index;
-        else return;
+        AtkUldManager? manager = GetUldManager(a1, 53);
+        if (manager == null) return;
 
-        current = 0;
-        if (index == -1) return;
-
-        BaseNode node = new BaseNode(a1);
-        ComponentNode cNode1 = node.GetComponentNode(53);
-        if (cNode1 == null) return;
-        AtkComponentNode* atkComponentNode = cNode1.GetPointer();
-        if (atkComponentNode == null) return;
-        AtkComponentBase* atkCompontentBase = atkComponentNode->Component;
-        if (atkCompontentBase == null) return;
-        AtkUldManager manager = atkCompontentBase->UldManager;
-
-        for (int i = 0; i < manager.NodeListCount; i++)
+        for (int i = 0; i < manager.Value.NodeListCount; i++)
         {
-            AtkResNode* curNode = manager.NodeList[i];
-            if (curNode == null) continue;
-            if (!curNode->IsVisible()) continue;
-            AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
-            if (cNode == null) continue;
-            AtkComponentBase* cBase = cNode->Component;
-            if (cBase == null) continue;
-            AtkResNode* resNode = cBase->GetImageNodeById(5);
-            if (resNode == null) continue;
-            AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
-            if (imgNode == null) continue;
-            AtkUldPartsList* partsList = imgNode->PartsList;
-            if (partsList == null) continue;
-            AtkUldPart* parts = partsList->Parts;
-            if (parts == null) continue;
-            AtkUldAsset* asset = parts->UldAsset;
-            if (asset == null) continue;
-            AtkTexture texture = asset->AtkTexture;
-            AtkTextureResource* textureResource = texture.Resource;
-            if (textureResource == null) continue;
-            if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) continue;
-            current++;
-            if (manager.PartsListCount + manager.ObjectCount + manager.AssetCount + i + 1 != index) continue;
-            GetDistanceAt(current);
-            return;
+            if (!GetResources(5, manager.Value.NodeList[i], out AtkTextureResource* textureResource)) continue;
+            if (!HandleTextureResource(textureResource)) continue;
+
+            if (manager.Value.PartsListCount + manager.Value.ObjectCount + manager.Value.AssetCount + i + 1 != index) continue;
+
+            CurrentIsIndex();
+            break;
         }
+    }
+
+    AtkUldManager? GetUldManager(AtkUnitBase* unitBase, uint slot)
+    {
+        BaseNode node = new BaseNode(unitBase);
+
+        ComponentNode cNode1 = node.GetComponentNode(slot);
+        if (cNode1 == null) return null;
+
+        AtkComponentNode* atkComponentNode = cNode1.GetPointer();
+        if (atkComponentNode == null) return null;
+
+        AtkComponentBase* atkCompontentBase = atkComponentNode->Component;
+        if (atkCompontentBase == null) return null;
+
+        AtkUldManager manager = atkCompontentBase->UldManager;
+        return manager;
+    }
+
+    bool GetResources(uint imageID, AtkResNode* curNode, out AtkTextureResource* textureResource)
+    {
+        textureResource = null;
+
+        if (curNode == null) return false;
+        if (!curNode->IsVisible()) return false;
+        AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
+        if (cNode == null) return false;
+        AtkComponentBase* cBase = cNode->Component;
+        if (cBase == null) return false;
+        AtkResNode* resNode = cBase->GetImageNodeById(imageID);
+        if (resNode == null) return false;
+        AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
+        if (imgNode == null) return false;
+        AtkUldPartsList* partsList = imgNode->PartsList;
+        if (partsList == null) return false;
+        AtkUldPart* parts = partsList->Parts;
+        if (parts == null) return false;
+        AtkUldAsset* asset = parts->UldAsset;
+        if (asset == null) return false;
+        AtkTexture texture = asset->AtkTexture;
+        textureResource = texture.Resource;
+        if (textureResource == null) return false;
+
+        return true;
+    }
+
+    bool HandleTextureResource(AtkTextureResource* textureResource)
+    {
+        if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) return false;
+
+        current++;
+        return true;
+    }
+
+    void CurrentIsIndex()
+    {
+        if (foundCurrent != -1) return;
+
+        foundCurrent = current;
     }
 
     void GetDistanceAt(int at)
     {
-        PetServices.PetLog.Log("1");
+        PetServices.PetLog.Log("Get distance at: " + at);
         GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
         if (gManager == null) return;
         PetServices.PetLog.Log("2");
@@ -174,29 +208,39 @@ internal unsafe class MapHook : HookableElement
         if (pChara == null) return;
         PetServices.PetLog.Log("4");
         Vector3 playerPos = pChara->Character.GameObject.Position;
+        Vector2 flatPlayerPos = new Vector2(playerPos.X, playerPos.Z);
 
         List<IPettablePet> pets = new List<IPettablePet>();
         MakeFromMembers(gManager->MainGroup.PartyMembers, ref pets);
         MakeFromMembers(gManager->MainGroup.AllianceMembers, ref pets);
-        AddPets(localUser, ref pets);     
+        AddPets(localUser, ref pets);
+
+        PetServices.PetLog.Log("-----");
+        foreach (IPettablePet pet in pets)
+        {
+            PetServices.PetLog.Log(pet.Name +" : " + pet.Owner?.Name);
+        }
+        PetServices.PetLog.Log("-----");
 
         pets.Sort((pet1, pet2) =>
         {
             BattleChara* p1 = (BattleChara*)pet1.PetPointer;
             BattleChara* p2 = (BattleChara*)pet2.PetPointer;
-            Vector3 pos1 = playerPos - (Vector3)p1->Character.GameObject.Position;
-            Vector3 pos2 = playerPos - (Vector3)p2->Character.GameObject.Position;
+            Vector3 p1p = p1->Character.GameObject.Position;
+            Vector3 p2p = p2->Character.GameObject.Position;
+            Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
+            Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
             return pos1.Length().CompareTo(pos2.Length());
         });
 
-        pets.Reverse();
+        //pets.Reverse();
 
         foreach (IPettablePet pp in pets)
         {
             PetServices.PetLog.Log(pp.Owner?.Name + " : " + pp.Name + " : " + pp.CustomName);
         }
 
-        int index = at - 1;
+        int index = at;
         PetServices.PetLog.Log("Index: " + index);
 
         if (index < 0) return;
@@ -210,15 +254,8 @@ internal unsafe class MapHook : HookableElement
     {
         foreach (PartyMember member in members)
         {
-
-            PetServices.PetLog.LogFatal(member.NameString);
-            IPettableUser? user = UserList.GetUserFromContentID(member.ContentId, false);
-            
-            if (user == null)
-            {
-                PetServices.PetLog.LogFatal("User is null: " + member.ContentId);
-                continue;
-            }
+            IPettableUser? user = UserList.GetUserFromContentID(member.ContentId);
+            if (user == null) continue;
 
             AddPets(user, ref pets);
         }
@@ -228,9 +265,9 @@ internal unsafe class MapHook : HookableElement
     {
         foreach (IPettablePet pet in user.PettablePets)
         {
-            PetServices.PetLog.Log(user.Name + " | " + pet.Name);
-            if (pet is IPettableCompanion) continue;
+            if (pet is not IPettableBattlePet bPet) continue;
             if (pets.Contains(pet)) continue;
+            if (!bPet.BattlePet->GetIsTargetable()) continue;
 
             pets.Add(pet);
         }
