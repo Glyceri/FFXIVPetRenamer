@@ -6,6 +6,7 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ImGuiNET;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -21,6 +22,7 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 internal class PetDevWindow : PetWindow
 {
     readonly IPettableUserList UserList;
+    readonly IMapHook MapHook;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -32,9 +34,10 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList, IMapHook mapHook) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
     {
         UserList = userList;
+        MapHook = mapHook;
 
         if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
         {
@@ -43,6 +46,7 @@ internal class PetDevWindow : PetWindow
 
         devStructList.Add(new DevStruct("User List", DrawUserList));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
+        devStructList.Add(new DevStruct("Map Icon Layout", DrawMapList));
     }
 
     public override void OnOpen()
@@ -321,7 +325,24 @@ internal class PetDevWindow : PetWindow
             battlePetCount++;
         }
 
-        LabledLabel.Draw("Accurate Battle Pet Count: ", $"{battlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize));
+        int glyceriEstematedBattlePetCount = 0;
+
+        for (int i = 0; i < 100; i++)
+        {
+            IPettableUser? user = UserList.PettableUsers[i];
+            if (user == null) continue;
+
+            foreach(IPettablePet? pet in user.PettablePets)
+            {
+                if (pet == null) continue;
+                if (pet is not IPettableBattlePet) continue;
+
+                glyceriEstematedBattlePetCount++;
+            }
+        }
+
+        LabledLabel.Draw("Accurate Battle Pet Count: ", $"{battlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize), labelWidth: 400);
+        LabledLabel.Draw("My calculated Battle Pet Count (These should be equal): ", $"{glyceriEstematedBattlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize), labelWidth: 400);
     }
 
     void NewDrawUser(IPettableUser user)
@@ -361,6 +382,22 @@ internal class PetDevWindow : PetWindow
 
             ImGui.TableSetColumnIndex(4);
             ImGui.TextUnformatted(pet.Index.ToString());
+        }
+
+        ImGui.EndTable();
+    }
+
+    unsafe void DrawMapList()
+    {
+        if (!ImGui.BeginTable($"##mapTable{WindowHandler.InternalCounter}", 1, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+            return;
+
+        foreach (uint map in MapHook.Icons)
+        {
+            ImGui.TableNextRow();
+
+            ImGui.TableSetColumnIndex(0);
+            ImGui.TextUnformatted($"{map}");
         }
 
         ImGui.EndTable();

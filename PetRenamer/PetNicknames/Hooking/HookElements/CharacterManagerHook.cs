@@ -175,11 +175,12 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
+            temporaryPets.Remove(addressChara);
+
             IPettableUser? user = UserList.GetUser(addressChara);
             if (user == null) return;
             
             user.RemoveBattlePet(newBattleChara);
-            temporaryPets.Remove(addressChara);
         }
     }
 

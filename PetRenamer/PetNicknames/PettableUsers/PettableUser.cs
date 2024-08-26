@@ -210,6 +210,15 @@ internal unsafe class PettableUser : IPettableUser
 
     public void SetBattlePet(BattleChara* pointer)
     {
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
+        {
+            IPettablePet? pet = PettablePets[i];
+            if (pet == null) continue;
+            if (pet.PetPointer != (nint)pointer) continue;
+
+            return;
+        }
+
         CreateNewPet(new PettableBattlePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
     }
 
@@ -221,7 +230,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet? pet = PettablePets[i];
             if (pet == null) continue;
-            if (pet.ObjectID != pointer->GetGameObjectId()) continue;
+            if (pet.PetPointer != (nint)pointer) continue;
 
             pet?.Dispose();
             PettablePets.RemoveAt(i);

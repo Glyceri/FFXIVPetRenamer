@@ -2,6 +2,7 @@
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -10,11 +11,12 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal unsafe class MapHook : HookableElement
+internal unsafe class MapHook : HookableElement, IMapHook
 {
     int lastIndex = 0;
     int current = 0;
@@ -39,6 +41,8 @@ internal unsafe class MapHook : HookableElement
 
     readonly IMapTooltipHook TooltipHook;
 
+    public List<uint> Icons { get; } = new List<uint>();
+
     public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
         TooltipHook = tooltipHook;
@@ -62,6 +66,7 @@ internal unsafe class MapHook : HookableElement
 
         current = 0;
         foundCurrent = -1;
+        Icons.Clear();
 
         return true;
     }
@@ -114,7 +119,6 @@ internal unsafe class MapHook : HookableElement
             if (i != elementIndex + manager.Value.PartsListCount) continue;
 
             CurrentIsIndex();
-            break;
         }
     }
 
@@ -131,7 +135,6 @@ internal unsafe class MapHook : HookableElement
             if (manager.Value.PartsListCount + manager.Value.ObjectCount + manager.Value.AssetCount + i + 1 != index) continue;
 
             CurrentIsIndex();
-            break;
         }
     }
 
@@ -183,6 +186,8 @@ internal unsafe class MapHook : HookableElement
     {
         if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) return false;
 
+        Icons.Add(textureResource->IconId);
+
         current++;
         return true;
     }
@@ -207,40 +212,36 @@ internal unsafe class MapHook : HookableElement
         BattleChara* pChara = localUser.BattleChara;
         if (pChara == null) return;
         PetServices.PetLog.Log("4");
-        Vector3 playerPos = pChara->Character.GameObject.Position;
+        Vector3 playerPos = pChara->Character.DrawObject->Position;
         Vector2 flatPlayerPos = new Vector2(playerPos.X, playerPos.Z);
 
-        List<IPettablePet> pets = new List<IPettablePet>();
-        MakeFromMembers(gManager->MainGroup.PartyMembers, ref pets);
-        MakeFromMembers(gManager->MainGroup.AllianceMembers, ref pets);
-        AddPets(localUser, ref pets);
+        List<IPettablePet> partyPets = new List<IPettablePet>();
+        List<IPettablePet> alliPets = new List<IPettablePet>();
+
+
+        MakeFromMembers(gManager->MainGroup.PartyMembers, ref partyPets);
+        MakeFromMembers(gManager->MainGroup.AllianceMembers, ref alliPets);
+        AddPets(localUser, ref partyPets);
+
+        Sort(flatPlayerPos, ref partyPets);
+        Sort(flatPlayerPos, ref alliPets);
+
+        List<IPettablePet> pets = [.. alliPets, .. partyPets,];
 
         PetServices.PetLog.Log("-----");
         foreach (IPettablePet pet in pets)
         {
-            PetServices.PetLog.Log(pet.Name +" : " + pet.Owner?.Name);
+            PetServices.PetLog.Log(pet.Name + " : " + pet.Owner?.Name);
         }
         PetServices.PetLog.Log("-----");
 
-        pets.Sort((pet1, pet2) =>
-        {
-            BattleChara* p1 = (BattleChara*)pet1.PetPointer;
-            BattleChara* p2 = (BattleChara*)pet2.PetPointer;
-            Vector3 p1p = p1->Character.GameObject.Position;
-            Vector3 p2p = p2->Character.GameObject.Position;
-            Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
-            Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
-            return pos1.Length().CompareTo(pos2.Length());
-        });
-
-        //pets.Reverse();
 
         foreach (IPettablePet pp in pets)
         {
             PetServices.PetLog.Log(pp.Owner?.Name + " : " + pp.Name + " : " + pp.CustomName);
         }
 
-        int index = at;
+        int index = at - 1;
         PetServices.PetLog.Log("Index: " + index);
 
         if (index < 0) return;
@@ -248,6 +249,21 @@ internal unsafe class MapHook : HookableElement
         if (index >= pets.Count) return;
         PetServices.PetLog.Log("6");
         TooltipHook.OverridePet(pets[index]);
+    }
+
+    void Sort(Vector2 flatPlayerPos, ref List<IPettablePet> pets)
+    {
+        pets = pets.Distinct().ToList();
+        pets.Sort((pet1, pet2) =>
+        {
+            BattleChara* p1 = (BattleChara*)pet1.PetPointer;
+            BattleChara* p2 = (BattleChara*)pet2.PetPointer;
+            Vector3 p1p = p1->Character.DrawObject->Position;
+            Vector3 p2p = p2->Character.DrawObject->Position;
+            Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
+            Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
+            return pos1.Length().CompareTo(pos2.Length());
+        });
     }
 
     void MakeFromMembers(Span<PartyMember> members, ref List<IPettablePet> pets)
@@ -272,7 +288,6 @@ internal unsafe class MapHook : HookableElement
             pets.Add(pet);
         }
     }
-
 
     protected override void OnDispose()
     {
