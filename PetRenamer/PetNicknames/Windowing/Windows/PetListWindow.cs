@@ -285,9 +285,8 @@ internal class PetListWindow : PetWindow
                 if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * ImGuiHelpers.GlobalScale)))
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
-
                     BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
-                    ImGui.SameLine();
+                    
 
                     if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
                     {

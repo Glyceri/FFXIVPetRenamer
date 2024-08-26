@@ -238,13 +238,7 @@ internal class PetRenameWindow : PetWindow
 
     void DrawImageInternals(float regionHeight)
     {
-        ImGuiStylePtr stylePtr = ImGui.GetStyle();
-        float framePaddingX = stylePtr.FramePadding.X;
-        float framePaddingY = stylePtr.FramePadding.Y;
-
         Vector2 size = new Vector2(regionHeight, regionHeight);
-
-        UldIcon? raceIcon = RaceIconHelper.GetFromRaceID(ActivePetData?.RaceID ?? 0);
 
         if (ActivePetTexture == null)
         {
@@ -261,13 +255,6 @@ internal class PetRenameWindow : PetWindow
             if (Listbox.Begin("##image", size))
             {
                 BoxedImage.DrawMinion(ActivePetData, in DalamudServices, in Configuration, ImGui.GetContentRegionAvail());
-
-                if (raceIcon != null)
-                {
-                    ImGui.SameLine(0, 0);
-                    ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(45 * ImGuiHelpers.GlobalScale + framePaddingX, - framePaddingY));
-                    IconImage.DrawUld(raceIcon.Value, new Vector2(32, 32) * ImGuiHelpers.GlobalScale);
-                }
 
                 Listbox.End();
             }
