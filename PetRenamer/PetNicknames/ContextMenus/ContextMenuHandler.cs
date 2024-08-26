@@ -2,7 +2,6 @@
 using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
-using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -24,7 +23,7 @@ internal class ContextMenuHandler : IDisposable
 
     readonly List<IContextMenuElement> ContextMenuElements = new List<IContextMenuElement>();
 
-    public ContextMenuHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList, in IWindowHandler windowHandler, in IActionTooltipHook actionTooltipHook)
+    public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook)
     {
         DalamudServices = dalamudServices;
         WindowHandler = windowHandler;
@@ -39,8 +38,9 @@ internal class ContextMenuHandler : IDisposable
 
     void _Register()
     {
-        Register(new TargetContextMenu(in DalamudServices, in UserList, in WindowHandler));
-        Register(new MinionNoteBookContextMenu(PetServices.PetSheets, in UserList, in WindowHandler, in ActionTooltipHook));
+        Register(new TargetContextMenu(DalamudServices, UserList, WindowHandler));
+        Register(new MinionNoteBookContextMenu(PetServices.PetSheets, UserList, WindowHandler, ActionTooltipHook));
+        Register(new MJIMinionNotebookContextMenu(PetServices.PetSheets, UserList, WindowHandler, ActionTooltipHook));
     }
 
     void Register(IContextMenuElement contextMenuElement)

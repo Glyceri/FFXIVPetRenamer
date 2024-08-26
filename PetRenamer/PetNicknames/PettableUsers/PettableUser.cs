@@ -1,6 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -13,38 +12,39 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableUser : IPettableUser
 {
-    public string Name { get; private set; } = "";
-    public ulong ContentID { get; private set; }
-    public ushort Homeworld { get; private set; }
-    public ulong ObjectID { get; private set; }
+    public string Name { get; } = string.Empty;
+    public ulong ContentID { get; }
+    public ushort Homeworld { get; }
+    public ulong ObjectID { get; }
     public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
     public nint Address { get; private set; }
     public BattleChara* BattleChara { get; }
     public bool IsActive => DataBaseEntry.IsActive;
 
-    public IPettableDatabaseEntry DataBaseEntry { get; private set; }
-    public uint ShortObjectID { get; private set; }
+    public IPettableDatabaseEntry DataBaseEntry { get; }
+    public uint ShortObjectID { get; }
     public uint CurrentCastID { get; private set; }
-    public bool IsLocalPlayer { get; private set; }
-
-    public bool IsDirty { get; private set; }
+    public bool IsLocalPlayer { get; }
 
     uint lastCast;
 
     readonly IPetServices PetServices;
     readonly IPettableDirtyListener DirtyListener;
+    readonly IPettableDirtyCaller DirtyCaller;
     readonly ISharingDictionary SharingDictionary;
 
-    public PettableUser(in ISharingDictionary sharingDictionary, in IPettableDatabase dataBase, in ILegacyDatabase legacyDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener, Pointer<BattleChara> battleChara)
+    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, BattleChara* battleChara)
     {
+        PetServices = petServices;
         DirtyListener = dirtyListener;
         SharingDictionary = sharingDictionary;
+        DirtyCaller = dirtyCaller;
 
         DirtyListener.RegisterOnClearEntry(OnDirty);
         DirtyListener.RegisterOnDirtyEntry(OnDirty);
         DirtyListener.RegisterOnDirtyName(OnDirty);
 
-        BattleChara = battleChara.Value;
+        BattleChara = battleChara;
         Address = (nint)BattleChara;
         IsLocalPlayer = BattleChara->ObjectIndex == 0;
         Name = BattleChara->NameString;
@@ -60,43 +60,19 @@ internal unsafe class PettableUser : IPettableUser
             legacyEntry.UpdateContentID(ContentID, true);
             legacyDatabase.RemoveEntry(legacyEntry);
             legacyEntry.MoveToDataBase(dataBase);
+            legacyDatabase.SetDirty();
         }
 
         DataBaseEntry = dataBase.GetEntry(ContentID);
         DataBaseEntry.UpdateEntry(this);
-        PetServices = petServices;
+
         if (IsLocalPlayer) DataBaseEntry.UpdateContentID(ContentID, true);
     }
 
-    public void Set(Pointer<BattleChara> pointer)
+    public void Update()
     {
-        Reset();
-
-        Address = (nint)pointer.Value;
         CurrentCastID = BattleChara->CastInfo.ActionId;
         if (lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
-
-        if (!DataBaseEntry.IsActive) return;
-        if (pointer.Value == null) return;
-
-        HandleCompanion(pointer);
-    }
-
-    void HandleCompanion(Pointer<BattleChara> pointer)
-    {
-        Companion* c = pointer.Value->CompanionData.CompanionObject;
-        if (c == null) return;
-
-        IPettablePet? storedPet = FindPet(ref c->Character);
-
-        if (storedPet != null)
-        {
-            storedPet.Update((nint)c);
-        }
-        else 
-        { 
-            CreateNewPet(new PettableCompanion(c, this, in SharingDictionary, DataBaseEntry, PetServices)); 
-        }
     }
 
     public void OnLastCastChanged(uint cast)
@@ -115,16 +91,6 @@ internal unsafe class PettableUser : IPettableUser
         if (youngestPet == null) return;
 
         DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonID);
-    }
-
-    IPettablePet? FindPet(ref Character character)
-    {
-        for (int i = 0; i < PettablePets.Count; i++)
-        {
-            IPettablePet pet = PettablePets[i];
-            if (pet.Compare(ref character)) return pet;
-        }
-        return null;
     }
 
     void OnDirty(INamesDatabase database)
@@ -147,58 +113,21 @@ internal unsafe class PettableUser : IPettableUser
         }
     }
 
-    void Reset()
+    void CreateNewPet(IPettablePet pet, int index = -1)
     {
-        IsDirty = false;
-
-        for (int i = PettablePets.Count - 1; i >= 0; i--)
+        if (index == -1)
         {
-            IPettablePet pet = PettablePets[i];
-
-            if (!pet.Marked)
-            {
-                IsDirty = true;
-                PettablePets.RemoveAt(i);
-                continue;
-            }
-
-            pet.Marked = false;
+            PettablePets.Add(pet);
         }
-    }
-
-    public void CalculateBattlepets(ref List<Pointer<BattleChara>> pets)
-    {
-        if (!DataBaseEntry.IsActive) return;
-
-        for (int i = pets.Count - 1; i >= 0; i--)
+        else
         {
-            Pointer<BattleChara> bChara = pets[i];
-            if (bChara == null) continue;
-            if (bChara.Value->OwnerId != ShortObjectID) continue;
-
-            pets.RemoveAt(i);
-
-            IPettablePet? storedPet = FindPet(ref bChara.Value->Character);
-            if (storedPet != null)
-            {
-                storedPet.Update((nint)bChara.Value);
-            }
-            else 
-            { 
-                CreateNewPet(new PettableBattlePet(bChara.Value, this, in SharingDictionary, DataBaseEntry, PetServices));
-            }
+            PettablePets.Insert(index, pet);
         }
-    }
-
-    void CreateNewPet(IPettablePet pet)
-    {
-        IsDirty = true;
-        PettablePets.Add(pet);
+        DirtyCaller.DirtyPlayer(this);
     }
 
     public IPettablePet? GetPet(nint pet)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {
@@ -210,7 +139,6 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettablePet? GetPet(GameObjectId gameObjectId)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {
@@ -222,11 +150,8 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None)
     {
-        ulong lastLifetime = ulong.MaxValue;
-        IPettablePet? lastPet = null;
-        if (!IsActive) return null;
-        int petCount = PettablePets.Count;
-        for (int i = 0; i < petCount; i++)
+        // The last pet  in the list is always the youngest
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet pPet = PettablePets[i];
             if (filter != PetFilter.None)
@@ -237,26 +162,24 @@ internal unsafe class PettableUser : IPettableUser
                 if (filter == PetFilter.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID)) continue;
             }
 
-            if (pPet.Lifetime < lastLifetime)
-            {
-                lastLifetime = pPet.Lifetime;
-                lastPet = pPet;
-            }
+            return pPet;
         }
-        return lastPet;
+        return null;
     }
-
-    bool CastCheck(uint castID) => lastCast == castID && CurrentCastID != castID;
 
     public string? GetCustomName(IPetSheetData sheetData) => DataBaseEntry.GetName(sheetData.Model);
 
     public void RefreshCast()
     {
         if (BattleChara == null) return;
-        CurrentCastID = BattleChara->CastInfo.ActionId;
+
+        uint castID = BattleChara->CastInfo.ActionId;
+        if (castID == 0) return;
+
+        CurrentCastID = castID;
     }
 
-    public void Dispose()
+    public void Dispose(IPettableDatabase database)
     {
         DirtyListener.UnregisterOnClearEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyEntry(OnDirty);
@@ -266,5 +189,59 @@ internal unsafe class PettableUser : IPettableUser
         {
             DataBaseEntry.Clear(true);
         }
+
+        if (!IsActive)
+        {
+            database.RemoveEntry(DataBaseEntry);
+        }
+
+        foreach(IPettablePet? pet in PettablePets)
+        {
+            pet?.Dispose();
+        }
+    }
+
+    public void SetBattlePet(BattleChara* pointer)
+    {
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
+        {
+            IPettablePet? pet = PettablePets[i];
+            if (pet == null) continue;
+            if (pet.PetPointer != (nint)pointer) continue;
+
+            return;
+        }
+
+        CreateNewPet(new PettableBattlePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
+    }
+
+    public void RemoveBattlePet(BattleChara* pointer)
+    {
+        if (pointer == null) return;
+
+        for (int i = PettablePets.Count - 1; i >= 0; i--)
+        {
+            IPettablePet? pet = PettablePets[i];
+            if (pet == null) continue;
+            if (pet.PetPointer != (nint)pointer) continue;
+
+            pet?.Dispose();
+            PettablePets.RemoveAt(i);
+        }
+    }
+
+    public void SetCompanion(Companion* companion)
+    {
+        RemoveCompanion(companion);
+        CreateNewPet(new PettableCompanion(companion, this, SharingDictionary, DataBaseEntry, PetServices), 0);
+    }
+
+    public void RemoveCompanion(Companion* companion)
+    {
+        if (PettablePets.Count == 0) return;
+        if (PettablePets[0] is not PettableCompanion pCompanion) return;
+
+        pCompanion.Dispose();
+        PettablePets.RemoveAt(0);
     }
 }

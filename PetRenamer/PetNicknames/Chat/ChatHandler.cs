@@ -14,7 +14,7 @@ internal class ChatHandler : IDisposable
     readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
 
-    public ChatHandler(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList pettableUserList)
+    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList)
     {
         DalamudServices = dalamudServices;
         PetServices = petServices;
@@ -25,9 +25,11 @@ internal class ChatHandler : IDisposable
 
     void _Register()
     {
-        Register(new PetGlamourChat(in DalamudServices, in PetServices, in PettableUserList));
-        Register(new EmoteChatElement(in DalamudServices, in PetServices, in PettableUserList));
-        Register(new BattleChatElement(in PetServices, in PettableUserList));
+        Register(new PetGlamourChat(DalamudServices, PetServices, PettableUserList));
+        Register(new EmoteChatElement(DalamudServices, PetServices, PettableUserList));
+        Register(new BattleChatElement(PetServices, PettableUserList));
+        Register(new PetActionChat(PetServices, PettableUserList));
+        Register(new DebugChatCode(PetServices.Configuration));
     }
 
     readonly List<IChatElement> _chatElements = new List<IChatElement>(); 

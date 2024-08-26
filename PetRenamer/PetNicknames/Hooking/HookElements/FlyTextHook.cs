@@ -15,9 +15,13 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 internal unsafe class FlyTextHook : HookableElement
 {
     public delegate void AddToScreenLogWithLogMessageId(IntPtr a1, IntPtr a2, int a3, char a4, int a5, int a6, int a7, int a8);
+    public delegate IntPtr LogMethod(IntPtr a1, int a2, IntPtr a3, IntPtr a4);
 
     [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
+
+    [Signature("E8 ?? ?? ?? ?? 48 8D 8D 08 06 00 00 ", DetourName = nameof(LogMessageDetour))]
+    readonly Hook<LogMethod>? logMethod = null;
 
     public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
@@ -25,6 +29,7 @@ internal unsafe class FlyTextHook : HookableElement
     {
         DalamudServices.FlyTextGui.FlyTextCreated += OnFlyTextCreated;
         addToScreenLogWithLogMessageId?.Enable();
+        logMethod?.Enable();
     }
 
     void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
@@ -59,9 +64,19 @@ internal unsafe class FlyTextHook : HookableElement
         UserList.GetUser(castDealer)?.OnLastCastChanged((uint)castID);
     }
 
+    unsafe IntPtr LogMessageDetour(IntPtr a1, int a2, IntPtr a3, IntPtr a4)
+    {
+        BattleChara* chara = ((BattleChara*)a3);
+        bool isValid = 640 == a2 || 642 == a2;
+
+        PetServices.PetActionHelper.SetLatestUser(chara, isValid);
+        return logMethod!.Original(a1, a2, a3, a4);
+    }
+
     protected override void OnDispose()
     {
         DalamudServices.FlyTextGui.FlyTextCreated -= OnFlyTextCreated;
         addToScreenLogWithLogMessageId?.Dispose();
+        logMethod?.Dispose();
     }
 }

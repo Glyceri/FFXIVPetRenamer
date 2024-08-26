@@ -11,7 +11,9 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 {
-    public LegacyPettableDatabase(in IPetServices PetServices, in IPettableDirtyCaller DirtyCaller) : base(in PetServices, in DirtyCaller, null)
+    public LegacyPettableDatabase(IPetServices petServices, IPettableDirtyCaller dirtyCaller) : base(petServices, dirtyCaller) { }
+
+    protected override void Setup()
     {
         SerializableUserV3[]? serializableUsers = PetServices.Configuration.serializableUsersV3;
         _entries.Clear();
@@ -20,7 +22,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
             _entries.Add(newEntry);
         }
     }

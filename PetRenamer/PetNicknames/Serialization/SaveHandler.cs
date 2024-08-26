@@ -1,7 +1,7 @@
 ﻿using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using System;
 
 namespace PetRenamer.PetNicknames.Serialization;
@@ -12,10 +12,12 @@ internal class SaveHandler : IDisposable
     readonly IPettableUserList UserList;
     readonly IIpcProvider IpcProvider;
     readonly IPettableDirtyListener DirtyListener;
+    readonly IPetServices PetServices;
 
-    public SaveHandler(in Configuration configuration, in IPettableUserList userList, in IIpcProvider ipcProvider, in IPettableDirtyListener dirtyListener)
+    public SaveHandler(IPetServices petServices, IPettableUserList userList, IIpcProvider ipcProvider, IPettableDirtyListener dirtyListener)
     {
-        Configuration = configuration;
+        PetServices = petServices;
+        Configuration = PetServices.Configuration;
         UserList = userList;
         IpcProvider = ipcProvider;
         DirtyListener = dirtyListener;

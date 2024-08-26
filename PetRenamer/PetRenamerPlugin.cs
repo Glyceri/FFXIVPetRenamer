@@ -22,12 +22,8 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing;
 using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
-using System;
-using System.Reflection;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
-using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
-using PetRenamer.PetNicknames.ColourProfiling;
 
 namespace PetRenamer;
 
@@ -55,13 +51,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     readonly ILodestoneNetworker LodestoneNetworkerInterface;
 
     readonly PettableDirtyHandler DirtyHandler;
-    readonly IColourProfileHandler ColourProfileHandler;
 
     readonly SaveHandler SaveHandler;
 
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
-        _DalamudServices = DalamudServices.Create(ref dalamud)!;
+        _DalamudServices = DalamudServices.Create(dalamud)!;
         _PetServices = new PetServices(_DalamudServices);
 
         SharingDictionary = new SharingDictionary(_DalamudServices);
@@ -72,34 +67,29 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         DirtyHandler = new PettableDirtyHandler();
 
-        ColourProfileHandler = new ColourProfileHandler(_PetServices.Configuration);
-
         PettableUserList = new PettableUserList();
-        PettableDatabase = new PettableDatabase(in _PetServices, DirtyHandler);
-        LegacyDatabase = new LegacyPettableDatabase(in _PetServices, DirtyHandler);
+        PettableDatabase = new PettableDatabase(_PetServices, DirtyHandler);
+        LegacyDatabase = new LegacyPettableDatabase(_PetServices, DirtyHandler);
 
-        ImageDatabase = new ImageDatabase(in _DalamudServices, in _PetServices, in LodestoneNetworkerInterface);
+        ImageDatabase = new ImageDatabase(_DalamudServices, _PetServices, LodestoneNetworkerInterface);
 
-        DataWriter = new DataWriter(in PettableUserList);
-        DataParser = new DataParser(in _DalamudServices, in PettableUserList, in PettableDatabase, in LegacyDatabase);
+        DataWriter = new DataWriter(PettableUserList);
+        DataParser = new DataParser(_DalamudServices, PettableUserList, PettableDatabase, LegacyDatabase);
 
-        IpcProvider = new IpcProvider(_DalamudServices, _DalamudServices.PetNicknamesPlugin, in DataParser, in DataWriter);
+        IpcProvider = new IpcProvider(_DalamudServices, _DalamudServices.PetNicknamesPlugin, DataParser, DataWriter);
 
-        UpdateHandler = new UpdateHandler(in _DalamudServices, in SharingDictionary, in PettableUserList, LegacyDatabase, in PettableDatabase, in _PetServices, in LodestoneNetworker, in ImageDatabase, DirtyHandler, IpcProvider);
-        HookHandler = new HookHandler(in _DalamudServices, in _PetServices, in PettableUserList, DirtyHandler);
-        ChatHandler = new ChatHandler(in _DalamudServices, in _PetServices, in PettableUserList);
+        HookHandler = new HookHandler(_DalamudServices, _PetServices, PettableUserList, DirtyHandler, PettableDatabase, LegacyDatabase, SharingDictionary, DirtyHandler);
+        UpdateHandler = new UpdateHandler(_DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, _PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase);
+        ChatHandler = new ChatHandler(_DalamudServices, _PetServices, PettableUserList);
 
-        // UI is the most DOGSHIT thing in this whole plugin. I hate EVERY SINGLE LINE OF CODE from it...
-        // If I had know how unreadable Una.Drawing would make my UI code I wouldve never done it like this....
-        WindowHandler = new WindowHandler(in _DalamudServices, _PetServices.Configuration, in _PetServices, in PettableUserList, in PettableDatabase, in LegacyDatabase, in ImageDatabase, DirtyHandler, in DataParser, in DataWriter, in ColourProfileHandler);
+        WindowHandler = new WindowHandler(_DalamudServices, _PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
 
-        ColourProfileHandler.RegisterWindowHandler(in WindowHandler);
-        CommandHandler = new CommandHandler(in _DalamudServices, in WindowHandler);
-        ContextMenuHandler = new ContextMenuHandler(in _DalamudServices, in _PetServices, in PettableUserList, in WindowHandler, HookHandler.ActionTooltipHook);
+        CommandHandler = new CommandHandler(_DalamudServices, _PetServices.Configuration, WindowHandler);
+        ContextMenuHandler = new ContextMenuHandler(_DalamudServices, _PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
 
-        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase, ColourProfileHandler);
+        _PetServices.Configuration.Initialise(_DalamudServices.PetNicknamesPlugin, PettableDatabase, LegacyDatabase);
 
-        SaveHandler = new SaveHandler(_PetServices.Configuration, in PettableUserList, IpcProvider, DirtyHandler);
+        SaveHandler = new SaveHandler(_PetServices, PettableUserList, IpcProvider, DirtyHandler);
     }
 
     public void Dispose()

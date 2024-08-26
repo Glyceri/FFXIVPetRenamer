@@ -22,7 +22,7 @@ internal static class Translator
         { "ContextMenu.Rename", "Give Nickname" },
         { "PetRenameNode.Species", "Minion" },
         { "PetRenameNode.Species2", "Battle Pet" },
-        { "PetRenameNode.Race", "Race" },
+        { "PetRenameNode.Race", "Type" },
         { "PetRenameNode.Behaviour", "Behaviour" },
         { "PetRenameNode.Nickname", "Nickname" },
         { "PetRenameNode.Edit", "Edit" },
@@ -76,10 +76,12 @@ internal static class Translator
         { "Config.Targetbar", "Show nicknames for Targets." },
         { "Config.Partylist", "Show nicknames on the Party List." },
         { "Config.ContextMenu", "Allow Context Menus." },
+        { "Config.IslandWarning", "Show a warning upon unresolved Island Owner." },
+        { "Config.IslandPets", "Show names on Island Pets." },
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "This is about real life money." },
-        { "Kofi.Line2", "It will be used to buy dog toys!" },
+        { "Kofi.Line2", "It will be used to my cat toys!" },
         { "Kofi.TakeMe", "Take me" },
 
         { "Command.Petname", "Opens the Pet Rename window." },

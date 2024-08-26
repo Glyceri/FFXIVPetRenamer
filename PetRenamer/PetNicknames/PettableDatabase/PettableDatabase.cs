@@ -10,32 +10,30 @@ internal class PettableDatabase : IPettableDatabase
 {
     protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
 
-    public bool ContainsLegacy { get; private set; } = false;
-    public IPettableDatabaseEntry[] DatabaseEntries { get => _entries.ToArray(); }
+    public IPettableDatabaseEntry[] DatabaseEntries { get => [.. _entries]; }
 
-    readonly IPetServices PetServices;
-    readonly IPettableDirtyCaller DirtyCaller;
+    protected readonly IPetServices PetServices;
+    protected readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, object? _)
+    public PettableDatabase(IPetServices petServices, IPettableDirtyCaller dirtyCaller)
     {
         PetServices = petServices;
         DirtyCaller = dirtyCaller;
+
+        Setup();
     }
 
-    public PettableDatabase(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller)
+    protected virtual void Setup()
     {
-        PetServices = petServices;
-        DirtyCaller = dirtyCaller;
-
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
-        SerializableUserV4[]? users = petServices.Configuration.SerializableUsersV4;
+        SerializableUserV4[]? users = PetServices.Configuration.SerializableUsersV4;
         if (users == null) return;
-        foreach(SerializableUserV4 user in users)
+        foreach (SerializableUserV4 user in users)
         {
             SerializableNameData[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;
 
-            newEntries.Add(new PettableDataBaseEntry(in PetServices, in DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
+            newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
         }
         _entries = newEntries;
     }
@@ -55,7 +53,7 @@ internal class PettableDatabase : IPettableDatabase
             return null;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -63,6 +61,7 @@ internal class PettableDatabase : IPettableDatabase
     public IPettableDatabaseEntry GetEntry(ulong contentID)
     {
         int entriesCount = _entries.Count;
+
         for (int i = 0; i < entriesCount; i++)
         {
             IPettableDatabaseEntry entry = _entries[i];
@@ -70,28 +69,19 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(in PetServices, in DirtyCaller, contentID, "[UNKOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
 
-    public bool RemoveEntry(IPettableDatabaseEntry entry)
+    public void RemoveEntry(IPettableDatabaseEntry entry)
     {
-        bool hasRemoved = false;
         for (int i = _entries.Count - 1; i >= 0; i--)
         {
             if (_entries[i].ContentID != entry.ContentID) continue;
 
             _entries.RemoveAt(i);
-            hasRemoved = true;
         }
-
-        if (hasRemoved)
-        {
-            SetDirty();
-        }
-
-        return hasRemoved;
     }
 
     public SerializableUserV4[] SerializeDatabase()
@@ -115,7 +105,7 @@ internal class PettableDatabase : IPettableDatabase
         if (!isFromIPC) SetDirty();
     }
 
-    protected void SetDirty()
+    public void SetDirty()
     {
         DirtyCaller.DirtyDatabase(this);
     }

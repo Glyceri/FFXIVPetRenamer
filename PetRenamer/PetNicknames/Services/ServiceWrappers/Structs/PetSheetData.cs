@@ -22,15 +22,18 @@ internal struct PetSheetData : IPetSheetData
 
     public int LegacyModelID { get; private set; }
 
+    public uint RaceID { get; private set; } = 0;
     public string? RaceName { get; private set; } = null;
     public string? BehaviourName { get; private set; } = null;
     public uint FootstepIcon { get; private set; } = 0;
+    
 
-    public PetSheetData(int Model, int legacyModelID, uint Icon, string? raceName, string? behaviourName, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
+    public PetSheetData(int Model, int legacyModelID, uint Icon, string? raceName, uint raceID, string? behaviourName, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
         : this(Model, legacyModelID, Icon, Pronoun, Singular, Plural, actionName, actionID, in services)
     {
         this.RaceName = raceName;
         this.BehaviourName = behaviourName;
+        this.RaceID = raceID;
     }
 
     public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
@@ -63,8 +66,17 @@ internal struct PetSheetData : IPetSheetData
         string[] starterList = GetList(clientLanguage);
         if (clientLanguage == ClientLanguage.German)
         {
-            Singular = GetGermanNamedList(starterList, singular);
-            Plural = GetGermanNamedList(starterList, plural);
+            string[] sArr = GetGermanNamedList(starterList, singular);
+            string[] pArr = GetGermanNamedList(starterList, plural);
+
+            string[] tempSArr = sArr;
+            string[] tempPArr = pArr;
+
+            tempSArr = AddSuffixToArray(tempSArr, "s");
+            tempPArr = AddSuffixToArray(tempPArr, "s");
+
+            Singular = [.. sArr, .. tempSArr];
+            Plural = [.. pArr, .. tempPArr];
         }
         else
         {

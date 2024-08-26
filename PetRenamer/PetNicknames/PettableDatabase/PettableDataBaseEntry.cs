@@ -9,10 +9,6 @@ using PetRenamer.PetNicknames.TranslatorSystem;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
-// All the [MethodImpl(MethodImplOptions.AggressiveInlining)]
-// used to be inlined. In order for code to stay clearer I made them into methods.
-// This is clarity only, they can be inlined
-
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
     public bool IsActive { get; private set; }
@@ -33,20 +29,21 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     readonly IPetServices PetServices;
     readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(in IPetServices petServices, in IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices = petServices;
         DirtyCaller = dirtyCaller;
-        ActiveDatabase =  new PettableNameDatabase([], [], DirtyCaller);
+        ActiveDatabase = new PettableNameDatabase([], [], DirtyCaller);
 
-        SetName(name);
-        SetActiveDatabase(ids, names);
-        SetSoftSkeletons(softSkeletons);
-        SetHomeworld(homeworld);
         ContentID = contentID;
         IsActive = active;
         IsIPC = !IsActive;
         IsLegacy = isLegacy;
+
+        SetName(name);
+        SetSoftSkeletons(softSkeletons);
+        SetActiveDatabase(ids, names);
+        SetHomeworld(homeworld);
     }
 
     public void UpdateEntry(IPettableUser pettableUser)
@@ -97,7 +94,10 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         ContentID = contentID;
         IsActive = true;
-        if (removeIPCStatus) IsIPC = false;
+        if (removeIPCStatus)
+        {
+            IsIPC = false;
+        }
     }
 
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
@@ -117,7 +117,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         int oldSkeleton = temporaryArray[index];
 
         if (oldSkeleton == softSkeleton) return;
-        
+
         temporaryArray[index] = softSkeleton;
         SoftSkeletons = ImmutableArray.Create(temporaryArray);
 
@@ -149,7 +149,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public void Clear(bool fromIPC)
     {
         SetActiveDatabase([], []);
-        IsIPC = false;
         IsActive = false;
         IsLegacy = false;
 

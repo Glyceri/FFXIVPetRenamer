@@ -10,8 +10,5 @@ internal unsafe class PettableBattlePet : BasePettablePet, IPettableBattlePet
 {
     public BattleChara* BattlePet { get => (BattleChara*)PetPointer; }
 
-    public PettableBattlePet(BattleChara* battlePet, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices) : base(&battlePet->Character, in owner, in sharingDictionary, in entry, in petServices, true)
-    {
-        
-    }
+    public PettableBattlePet(BattleChara* battlePet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices) : base(&battlePet->Character, owner, sharingDictionary, entry, petServices, true) { }
 }

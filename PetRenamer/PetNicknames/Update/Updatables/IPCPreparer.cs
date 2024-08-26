@@ -12,7 +12,7 @@ internal class IPCPreparer : IUpdatable
     readonly IPettableUserList UserList;
     readonly IIpcProvider IIpcProvider;
 
-    public IPCPreparer(in IPettableUserList userList, in IIpcProvider ipcProvider)
+    public IPCPreparer(IPettableUserList userList, IIpcProvider ipcProvider)
     {
         UserList = userList;
         IIpcProvider = ipcProvider;

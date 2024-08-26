@@ -1,17 +1,10 @@
 ﻿using Dalamud.Plugin.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Update.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.Interop;
-using System;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using System.Collections.Generic;
-using PetRenamer.PetNicknames.IPC.Interfaces;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -19,79 +12,82 @@ internal unsafe class PettableUserHandler : IUpdatable
 {
     public bool Enabled { get; set; } = true;
 
-    readonly DalamudServices DalamudServices;
-    readonly ISharingDictionary SharingDictionary;
+    bool isDirty = false;
+
+    readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
-    readonly IPettableUserList PettableUserList;
-    readonly IPetLog PetLog;
-    readonly IPettableDatabase PettableDatabase;
-    readonly ILegacyDatabase LegacyDatabase;
+    readonly IIslandHook IslandHook;
     readonly IPettableDirtyListener DirtyListener;
+    readonly IPettableDatabase Database;
 
-    public PettableUserHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in IPettableDatabase pettableDatabase, in ILegacyDatabase legacyDatabase, in IPetServices petServices, in IPettableDirtyListener dirtyListener)
+    public PettableUserHandler(IPettableUserList userList, IPetServices petServices, IIslandHook islandHook, IPettableDirtyListener dirtyListener, IPettableDatabase database)
     {
-        DalamudServices = dalamudServices;
-        SharingDictionary = sharingDictionary;
+        UserList = userList;
         PetServices = petServices;
-        PettableUserList = pettableUserList;
-        PetLog = PetServices.PetLog;
-        PettableDatabase = pettableDatabase;
-        LegacyDatabase = legacyDatabase;
+        IslandHook = islandHook;
         DirtyListener = dirtyListener;
-    }
+        Database = database;
 
-    List<Pointer<BattleChara>> availablePets = new List<Pointer<BattleChara>>();
+        DirtyListener.RegisterOnClearEntry(OnDirty);
+        DirtyListener.RegisterOnDirtyDatabase(OnDirty);
+        DirtyListener.RegisterOnDirtyEntry(OnDirty);
+        DirtyListener.RegisterOnDirtyName(OnDirty);
+    }
 
     public void OnUpdate(IFramework framework)
     {
-        SharingDictionary.Clear();
-
-        Span<Pointer<BattleChara>> charaSpan = CharacterManager.Instance()->BattleCharas;
-        int charaSpanLength = charaSpan.Length;
-
-        availablePets.Clear();
-
-        for (int i = 0; i < charaSpanLength; i++)
+        for (int i = 0; i < PettableUsers.PettableUserList.PettableUserArraySize; i++)
         {
-            Pointer<BattleChara> battleChara = charaSpan[i];
-            IPettableUser? pettableUser = PettableUserList.PettableUsers[i];
+            IPettableUser? user = UserList.PettableUsers[i];
+            if (user == null) continue;
 
-            ObjectKind currentObjectKind = ObjectKind.None;
-            ulong pettableContentID = ulong.MaxValue;
-            ulong contentID = ulong.MaxValue;
-            if (battleChara != null) 
-            {
-                contentID = battleChara.Value->ContentId; 
-                currentObjectKind = battleChara.Value->GetObjectKind();
-            }
-            if (pettableUser != null) pettableContentID = pettableUser.ContentID;
-
-            if (contentID == ulong.MaxValue || contentID == 0 || pettableContentID != contentID)
-            {
-                // Destroy the user
-                PettableUserList.PettableUsers[i]?.Dispose();
-                PettableUserList.PettableUsers[i] = null;
-            }
-
-            if (pettableUser == null && battleChara != null && currentObjectKind == ObjectKind.Pc)
-            {
-                // Create a user
-                IPettableUser newUser = new PettableUser(in SharingDictionary, in PettableDatabase, in LegacyDatabase, in PetServices, in DirtyListener, battleChara);
-                PettableUserList.PettableUsers[i] = newUser;
-                continue;
-            }
-
-            if (currentObjectKind == ObjectKind.BattleNpc) availablePets.Add(battleChara);
-
-            // Update the user
-            pettableUser?.Set(battleChara);
+            user.Update();
         }
 
-        IPettableUser?[] users = PettableUserList.PettableUsers;
-        int size = users.Length;
-        for (int i = 0; i < size; i++)
+        HandleIsland();
+    }
+
+    void HandleIsland()
+    {
+        if (PetServices.Configuration.showOnIslandPets)
         {
-            users[i]?.CalculateBattlepets(ref availablePets);
+            IslandHook.Update();
+
+            if (!IslandHook.IslandStatusChanged && !isDirty) return;
+
+            ClearDirty();
+
+            if (IslandHook.IsOnIsland) HandleOnIsland();
+            else HandleNotOnIsland();
         }
+    }
+
+    void OnDirty(IPettableDatabase database) => SetDirty();
+    void OnDirty(INamesDatabase database) => SetDirty();
+    void OnDirty(IPettableDatabaseEntry entry) => SetDirty();
+    void SetDirty() => isDirty = true;
+    void ClearDirty() => isDirty = false;
+
+    void HandleNotOnIsland() => ClearIslandUser();
+    void HandleOnIsland()
+    {
+        if (IslandHook.VisitingFor == null || IslandHook.VisitingHomeworld == null) return;
+
+        IPettableDatabaseEntry? entry = Database.GetEntry(IslandHook.VisitingFor, (ushort)IslandHook.VisitingHomeworld, false);
+        if (entry == null) return;
+
+        CreateIslandUser(entry);
+    }
+
+    void ClearIslandUser()
+    {
+        UserList.PettableUsers[PettableUserList.IslandIndex]?.Dispose(Database);
+        UserList.PettableUsers[PettableUserList.IslandIndex] = null;
+    }
+
+    void CreateIslandUser(IPettableDatabaseEntry entry)
+    {
+        ClearIslandUser();
+        UserList.PettableUsers[PettableUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
     }
 }

@@ -9,13 +9,13 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableNameDatabase : INamesDatabase
 {
-    public int[] IDs { get; private set; } = [];
-    public string[] Names { get; private set; } = [];
+    public int[] IDs { get; private set; }
+    public string[] Names { get; private set; }
     public int Length { get => IDs.Length; }
 
     readonly IPettableDirtyCaller? DirtyCaller = null;
 
-    public PettableNameDatabase(int[] ids, string[] names, in IPettableDirtyCaller dirtyCaller)
+    public PettableNameDatabase(int[] ids, string[] names, IPettableDirtyCaller dirtyCaller)
     {
         Names = names;
         IDs = ids;
@@ -133,7 +133,7 @@ internal class PettableNameDatabase : INamesDatabase
 
         if (name.Length > PluginConstants.ffxivNameSize)
         {
-            name = name.Substring(0, PluginConstants.ffxivNameSize);
+            name = name[..PluginConstants.ffxivNameSize];
         }
 
         name = name.Replace(PluginConstants.forbiddenCharacter.ToString(), string.Empty);
@@ -144,7 +144,7 @@ internal class PettableNameDatabase : INamesDatabase
         return name;
     }
 
-    readonly Regex urlRegex = new Regex(
+    static readonly Regex urlRegex = new Regex(
         @"\b(?:(?:https?|ftp):\/\/)?(?:(?:[a-z0-9\-]+\.)+[a-z]{2,}|localhost)(?::\d{1,5})?(?:\/[^\s]*)?\b",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );

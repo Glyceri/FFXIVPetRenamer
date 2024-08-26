@@ -23,12 +23,7 @@ internal class NamePlateHook : HookableElement
         DalamudServices.NameplateGUI.OnNamePlateUpdate -= OnPlateUpdate;
     }
 
-    protected override void OnNameDatabaseChange(INamesDatabase nameDatabase) => Refresh();
-    protected override void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) => Refresh();
-    protected override void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
-    protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
-
-    void Refresh()
+    protected override void Refresh()
     {
         DalamudServices.NameplateGUI.RequestRedraw();
     }

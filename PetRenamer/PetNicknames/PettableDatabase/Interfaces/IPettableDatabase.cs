@@ -24,9 +24,10 @@ internal interface IPettableDatabase
     /// </summary>
     /// <param name="entry">Entry to remove.</param>
     /// <returns>Whether the remove succeeded.</returns>
-    bool RemoveEntry(IPettableDatabaseEntry entry);
+    void RemoveEntry(IPettableDatabaseEntry entry);
 
     SerializableUserV4[] SerializeDatabase();
 
+    void SetDirty();
     void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC);
 }

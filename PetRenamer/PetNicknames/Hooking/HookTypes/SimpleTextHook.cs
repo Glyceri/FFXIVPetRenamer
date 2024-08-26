@@ -28,9 +28,9 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected bool IsSoft;
 
-    IPettableUser? lastPettableUser = null;
+    string AddonName = string.Empty;
 
-    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
+    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
     {
         Services = services;
         PettableUserList = userList;
@@ -39,6 +39,7 @@ internal unsafe class SimpleTextHook : ITextHook
         TextPos = textPos;
         AllowedToFunction = allowedCallback;
         IsSoft = isSoft;
+        AddonName = addonName;
 
         DirtyListener.RegisterOnDirtyName(OnName);
         DirtyListener.RegisterOnDirtyEntry(OnEntry);
@@ -51,8 +52,7 @@ internal unsafe class SimpleTextHook : ITextHook
     public void SetFaulty() => Faulty = true;
 
     protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
-    
-    
+
     void OnName(INamesDatabase nameDatabase)
     {
         SetDirty();
@@ -65,12 +65,12 @@ internal unsafe class SimpleTextHook : ITextHook
 
     bool isDirty = false;
 
-    void SetDirty()
+    protected void SetDirty()
     {
         isDirty = true;
     }
 
-    void ClearDirty()
+    protected void ClearDirty()
     {
         isDirty = false;
     }
@@ -89,7 +89,6 @@ internal unsafe class SimpleTextHook : ITextHook
         // Make sure it only runs once
         string tNodeText = tNode->NodeText.ToString();
         if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty) return;
-
         ClearDirty();
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
@@ -99,7 +98,7 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        IPettableUser? user = lastPettableUser = GetUser();
+        IPettableUser? user = GetUser();
         if (user == null) return false;
 
         IPetSheetData? pet = GetPetData(text, in user);

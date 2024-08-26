@@ -82,7 +82,7 @@ internal class PetGlamourChat : RestrictedChatElement
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
 
-    public PetGlamourChat(in DalamudServices dalamudServices, in IPetServices petServices, in IPettableUserList userList)
+    public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
     {
         DalamudServices = dalamudServices;
         UserList = userList;
@@ -142,10 +142,7 @@ internal class PetGlamourChat : RestrictedChatElement
     {
         if (nextRow > 0) nextRow--;
 
-        string basePetName = match.Groups["petname"].Value;
-        string changedPetName = match.Groups["petname2"].Value;
-
-        Remap(basePetName, changedPetName);
+        MatchRemap(match);
     }
 
     void MatchRemap(Match match)

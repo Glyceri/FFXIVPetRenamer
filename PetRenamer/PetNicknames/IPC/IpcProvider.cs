@@ -80,7 +80,7 @@ internal class IpcProvider : IIpcProvider
      * ----------------------END READ ME -----------------------
      */
 
-    public IpcProvider(in DalamudServices dalamudServices, in IDalamudPluginInterface petNicknamesPlugin, in IDataParser dataReader, in IDataWriter dataWriter)
+    public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter)
     {
         DalamudServices = dalamudServices;
         DataReader = dataReader;

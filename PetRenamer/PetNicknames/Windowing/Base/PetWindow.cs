@@ -1,14 +1,12 @@
-﻿using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface.Utility;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Windowing.Base.Style;
-using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.HeaderBar;
-using PetRenamer.PetNicknames.Windowing.Componenents.PetNicknames.Images;
+using PetRenamer.PetNicknames.Windowing.Components.Header;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System.Numerics;
-using Una.Drawing;
 
 namespace PetRenamer.PetNicknames.Windowing.Base;
 
@@ -16,162 +14,88 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 {
     public PetWindowMode CurrentMode { get; private set; }
 
-    protected abstract string ID { get; }
     protected abstract Vector2 MinSize { get; }
     protected abstract Vector2 MaxSize { get; }
     protected abstract Vector2 DefaultSize { get; }
 
     protected abstract bool HasModeToggle { get; }
-    protected abstract bool HasExtraButtons { get; }
-
-    protected Size ContentSize { get; private set; } = new Size();
-
-    protected abstract string Title { get; }
 
     protected readonly DalamudServices DalamudServices;
     protected readonly WindowHandler WindowHandler;
     protected readonly Configuration Configuration;
 
-    public readonly HeaderBarButtonNode HeaderBar;
+    public bool RequestsModeChange { get; set; }
+    public PetWindowMode NewMode { get; set; } = PetWindowMode.Minion;
 
-    readonly BackgroundNode _windowNode;
-
-    readonly Node TitlebarNode;
-    readonly Node TitlebarTextNode;
-    protected readonly Node ContentNode;
-
-    Vector2 lastSize = Vector2.Zero;
-
-    protected PetWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, string name, ImGuiWindowFlags additionalFlags = ImGuiWindowFlags.None) : base(name, ImGuiWindowFlags | additionalFlags, true)
+    protected PetWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
     {
         WindowHandler = windowHandler;
         DalamudServices = dalamudServices;
         Configuration = configuration;
 
-        _windowNode = new BackgroundNode()
+        SizeCondition = ImGuiCond.FirstUseEver;
+        Size = DefaultSize;
+
+        SizeConstraints = new WindowSizeConstraints()
         {
-            Stylesheet = WindowStyles.WindowStylesheet,
-            ClassList = ["window"],
-            ChildNodes =
-            [
-                TitlebarNode = new Node()
-                {
-                    ClassList = ["window--titlebar"],
-                },
-                TitlebarTextNode = new Node()
-                {
-                    ClassList = ["window--titlebar-text"],
-                    NodeValue = Title,
-                },
-                HeaderBar = new HeaderBarButtonNode(in DalamudServices, this, in windowHandler, HasExtraButtons),
-                ContentNode = new Node()
-                {
-                    ClassList = ["window--content"],
-                },
-            ]
+            MinimumSize = MinSize,
+            MaximumSize = MaxSize,
         };
-
-        if (HasModeToggle) PetModeConstructor();
-
-        HeaderBar.SetKofiButton(Configuration.showKofiButton);
     }
 
     public void Close() => IsOpen = false;
     public void Open() => IsOpen = true;
+    public void DeclareModeChangedSeen() => RequestsModeChange = false;
+
+    public void SetPetMode(PetWindowMode mode)
+    {
+        if (CurrentMode != mode)
+        {
+            CurrentMode = mode;
+            OnModeChange();
+        }
+    }
+
+    readonly Vector2 windowPadding = new(8, 8);
+    readonly Vector2 framePadding = new(4, 3);
+    readonly Vector2 itemInnerSpacing = new(4, 4);
+    readonly Vector2 itemSpacing = new(4, 4);
 
     public sealed override void PreDraw()
     {
-        ImGui.SetNextWindowSizeConstraints(MinSize * Node.ScaleFactor, MaxSize * Node.ScaleFactor);
-        ImGui.SetNextWindowSize(DefaultSize, ImGuiCond.FirstUseEver);
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
-        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(0, 0));
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, windowPadding * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, framePadding * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, itemSpacing * ImGuiHelpers.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing * ImGuiHelpers.GlobalScale);
+
+        OnEarlyDraw();
     }
 
     public sealed override void PostDraw()
     {
-        ImGui.PopStyleVar(6);
+        OnLateDraw();
+        ImGui.PopStyleVar(4);
     }
 
     public sealed override void Draw()
     {
-        Vector2 size = ImGui.GetWindowSize() / Node.ScaleFactor;
-
-        if (lastSize != size)
-        {
-            lastSize = size;
-
-            _windowNode.Style.Size = new Size((int)size.X - 3, (int)size.Y - 3);
-
-            TitlebarNode.Style.Size = new((int)size.X - 9, 32);
-            TitlebarTextNode.Style.Size = new((int)size.X - 9, 32);
-
-            ContentNode.Style.Size = new((int)size.X - 9, (int)size.Y - 41);
-            ContentSize = new(ContentNode.Style.Size.Width, ContentNode.Style.Size.Height);
-        }
-
-        if (Configuration.transparentBackground)
-        {
-            _windowNode.Style.BackgroundColor = IsFocused ? new Color("Window.Background") : new Color("Window.BackgroundLight");
-        }
-        else
-        {
-            _windowNode.Style.BackgroundColor = new Color("Window.Background");
-        }
-
-        _windowNode.Style.StrokeColor = IsFocused ? new Color("WindowBorder:Active") : new Color("WindowBorder:Inactive");
-
-        RenderWindowInstance();
-    }
-
-    void RenderWindowInstance()
-    {
-        ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-        ImGui.SetCursorPos(new(0, 0));
-
+        if (HasModeToggle) HeaderBar.Draw(in WindowHandler, in Configuration, this);
         OnDraw();
-
-        Vector2 ps = ImGui.GetWindowPos();
-        Point pt = new((int)ps.X + 2, (int)ps.Y + 2);
-        _windowNode.Render(drawList, pt);
-
-        OnLateDraw();
     }
+    public void NotifyDirty() => OnDirty();
 
-    protected void AddNode(Node parentNode, Node newNode)
+    protected virtual void OnEarlyDraw() { }
+    protected virtual void OnDraw() { }
+    protected virtual void OnLateDraw() { }
+    protected virtual void OnDirty() { }
+    protected virtual void OnModeChange() { }
+    protected virtual void OnDispose() { }
+
+    protected void RequestPetModeChange(PetWindowMode newMode)
     {
-        DalamudServices.Framework.Run(() => parentNode.AppendChild(newNode));
+        RequestsModeChange = true;
+        NewMode = newMode;
     }
 
-    protected void PrepependNode(Node parentNode, Node newNode)
-    {
-        DalamudServices.Framework.Run(() => parentNode.ChildNodes.Insert(0, newNode));
-    }
-
-    protected void RemoveNode(Node parentNode, Node oldNode)
-    {
-        DalamudServices.Framework.Run(() => parentNode.RemoveChild(oldNode, true));
-    }
-
-    public abstract void OnDraw();
-    public virtual void OnLateDraw() { }
-    public virtual void OnDirty() { }
-
-    public void Dispose()
-    {
-        _windowNode?.Dispose();
-    }
-
-    static ImGuiWindowFlags ImGuiWindowFlags =>
-         ImGuiWindowFlags.NoTitleBar |
-         ImGuiWindowFlags.NoCollapse |
-         ImGuiWindowFlags.NoDocking |
-         ImGuiWindowFlags.NoScrollbar |
-         ImGuiWindowFlags.NoScrollWithMouse |
-         ImGuiWindowFlags.NoBackground |
-        ImGuiWindowFlags.None;
+    public void Dispose() => OnDispose();
 }

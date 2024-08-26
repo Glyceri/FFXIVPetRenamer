@@ -13,7 +13,7 @@ internal unsafe class BattleChatElement : RestrictedChatElement
     readonly IPettableUserList UserList;
     readonly IPetServices PetServices;
 
-    public BattleChatElement(in IPetServices petServices, in IPettableUserList userList)
+    public BattleChatElement(IPetServices petServices, IPettableUserList userList)
     {
         UserList = userList;
         PetServices = petServices;

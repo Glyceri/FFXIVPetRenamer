@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Dalamud.Plugin.Services;
 using PetNicknames.PetNicknames.Update.Updatables;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -18,29 +18,37 @@ namespace PetRenamer.PetNicknames.Update;
 internal class UpdateHandler : IDisposable
 {
     readonly DalamudServices DalamudServices;
-    readonly ISharingDictionary SharingDictionary;
-    readonly IPetServices PetServices;
     readonly IPettableUserList PettableUserList;
-    readonly IPettableDatabase PettableDatabase;
-    readonly ILegacyDatabase LegacyPettableDatabase;
-    readonly IPettableDirtyListener DirtyListener;
     readonly IImageDatabase ImageDatabase;
     readonly IIpcProvider IpcProvider;
     readonly LodestoneNetworker LodestoneNetworker;
+    readonly IPetServices PetServices;
+    readonly IIslandHook IslandHook;
+    readonly IPettableDirtyListener DirtyListener;
+    readonly IPettableDatabase Database;
+
     readonly List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    public UpdateHandler(in DalamudServices dalamudServices, in ISharingDictionary sharingDictionary, in IPettableUserList pettableUserList, in ILegacyDatabase legacyDatabase, in IPettableDatabase pettableDatabase, in IPetServices petServices, in LodestoneNetworker lodestoneNetworker, in IImageDatabase imageDatabase, in IPettableDirtyListener dirtyListener, in IIpcProvider ipcProvider)
+    public UpdateHandler(
+        DalamudServices dalamudServices, 
+        IPettableUserList pettableUserList, 
+        LodestoneNetworker lodestoneNetworker, 
+        IIpcProvider ipcProvider, 
+        IImageDatabase imageDatabase, 
+        IPetServices petServices,
+        IIslandHook islandHook,
+        IPettableDirtyListener dirtyListener,
+        IPettableDatabase database)
     {
         DalamudServices = dalamudServices;
-        SharingDictionary = sharingDictionary;
-        PetServices = petServices;
         PettableUserList = pettableUserList;
-        PettableDatabase = pettableDatabase;
-        LegacyPettableDatabase = legacyDatabase;
         LodestoneNetworker = lodestoneNetworker;
         ImageDatabase = imageDatabase;
-        DirtyListener = dirtyListener;
         IpcProvider = ipcProvider;
+        PetServices = petServices;
+        IslandHook = islandHook;
+        DirtyListener = dirtyListener;
+        Database = database;
 
         DalamudServices.Framework.Update += OnUpdate;
         Setup();
@@ -48,9 +56,9 @@ internal class UpdateHandler : IDisposable
 
     void Setup()
     {
-        _updatables.Add(new PettableUserHandler(in DalamudServices, in SharingDictionary, in PettableUserList, in PettableDatabase, in LegacyPettableDatabase, in PetServices, in DirtyListener));
-        _updatables.Add(new LodestoneQueueHelper(in LodestoneNetworker, in ImageDatabase));
-        _updatables.Add(new IPCPreparer(in PettableUserList, in IpcProvider));
+        _updatables.Add(new PettableUserHandler(PettableUserList, PetServices, IslandHook, DirtyListener, Database));
+        _updatables.Add(new LodestoneQueueHelper(LodestoneNetworker, ImageDatabase));
+        _updatables.Add(new IPCPreparer(PettableUserList, IpcProvider));
     }
 
     void OnUpdate(IFramework framework)

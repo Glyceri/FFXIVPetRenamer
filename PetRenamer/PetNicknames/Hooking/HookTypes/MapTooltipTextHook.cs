@@ -38,6 +38,7 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
     public void SetPet(IPettablePet? pettablePet)
     {
         currentPet = pettablePet;
+        SetDirty();
     }
 
     protected override bool BlockedCheck() => blocked || base.BlockedCheck();

@@ -3,7 +3,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal unsafe interface IBattleUser : IDisposable
+internal unsafe interface IBattleUser
 {
     string Name { get; }
     ulong ContentID { get; }

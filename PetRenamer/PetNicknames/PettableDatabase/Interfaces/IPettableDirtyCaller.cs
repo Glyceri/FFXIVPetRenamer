@@ -1,4 +1,5 @@
-﻿
+﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDirtyCaller
@@ -7,4 +8,5 @@ internal interface IPettableDirtyCaller
     void DirtyEntry(in IPettableDatabaseEntry entry);
     void ClearEntry(in IPettableDatabaseEntry entry);
     void DirtyDatabase(in IPettableDatabase database);
+    void DirtyPlayer(IPettableUser user);
 }

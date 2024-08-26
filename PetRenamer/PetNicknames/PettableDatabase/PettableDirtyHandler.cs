@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -9,6 +10,7 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     Action<IPettableDatabaseEntry>? OnEntry = _ => { };
     Action<IPettableDatabaseEntry>? OnClear = _ => { };
     Action<INamesDatabase>? OnName = _ => { };
+    Action<IPettableUser>? OnUser = _ => { };
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {
@@ -28,6 +30,11 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     public void DirtyName(in INamesDatabase nameDatabase)
     {
         OnName?.Invoke(nameDatabase);
+    }
+
+    public void DirtyPlayer(IPettableUser user)
+    {
+        OnUser?.Invoke(user);   
     }
 
     public void RegisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry)
@@ -54,6 +61,12 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
         OnName += onNamesDatabase;
     }
 
+    public void RegisterOnPlayerCharacterDirty(Action<IPettableUser> user)
+    {
+        OnUser -= user;
+        OnUser += user;
+    }
+
     public void UnregisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry)
     {
         OnClear -= onEntry;
@@ -72,5 +85,10 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     public void UnregisterOnDirtyName(Action<INamesDatabase> onNamesDatabase)
     {
         OnName -= onNamesDatabase;
+    }
+
+    public void UnregisterOnPlayerCharacterDirty(Action<IPettableUser> user)
+    {
+        OnUser -= user;
     }
 }

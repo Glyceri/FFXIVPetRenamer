@@ -19,7 +19,7 @@ internal class StringHelperWrapper : IStringHelper
     {
         if (atkNode == null) return baseString;
         string newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace);
-        atkNode->NodeText.SetString(newString);
+        atkNode->SetText(newString);
         return newString;
     }
 
@@ -29,7 +29,7 @@ internal class StringHelperWrapper : IStringHelper
 
         byte[] data = Encoding.UTF8.GetBytes(newString);
 
-        atkNode->NodeText.SetString(data);
+        atkNode->SetText(data);
 
         return text;
     }

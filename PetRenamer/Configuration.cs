@@ -1,9 +1,7 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using PetRenamer.Core.Serialization;
-using PetRenamer.PetNicknames.ColourProfiling.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Serialization;
 using PN.S;
 using System;
 using System.Text.Json.Serialization;
@@ -20,16 +18,12 @@ internal class Configuration : IPluginConfiguration
     [JsonIgnore]
     ILegacyDatabase? LegacyDatabase = null;
     [JsonIgnore]
-    IColourProfileHandler? ColourProfileHandler = null;
-    [JsonIgnore]
     bool isSetup = false;
     [JsonIgnore]
     public const int currentSaveFileVersion = 9;
     public int Version { get; set; } = currentSaveFileVersion;
 
     public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
-    public SerializableColourProfile[]? ColourProfiles { get; set; } = null;
-    public int ActiveProfile { get; set; } = -1;
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
@@ -46,18 +40,24 @@ internal class Configuration : IPluginConfiguration
     public bool useContextMenus = true;
     public bool showOnTargetBars = true;
     public bool showOnPartyList = true;
+    public bool showOnIslandPets = true;
     // --------------------------- UI SETTINGS ---------------------------
     public bool showKofiButton = true;
-    public float petNicknamesUIScale = 1.5f;
-    public bool uiFlare = true;
-    public bool transparentBackground = true;
+    public bool quickButtonsToggle = true;
+    public int listButtonLayout = 0;
+    public int minionIconType = 1;
+    public bool showIslandWarning = true;
 
-    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IColourProfileHandler colourProfileHandler)
+    // ------------------------- Debug SETTINGS --------------------------
+    public bool debugModeActive = false;
+    public bool openDebugWindowOnStart = false;
+    public bool debugShowChatCode = false;
+
+    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;
         Database = database;
         LegacyDatabase = legacyDatabase;
-        ColourProfileHandler = colourProfileHandler;
         LegacyInitialise();
         CurrentInitialise();
         isSetup = true;
@@ -66,15 +66,12 @@ internal class Configuration : IPluginConfiguration
     void CurrentInitialise()
     {
         SerializableUsersV4 ??= [];
-        ColourProfiles ??= [];
     }
 
     public void Save()
     {
         if (currentSaveFileVersion != Version || !isSetup) return;
         SerializableUsersV4 = Database!.SerializeDatabase();
-        ColourProfiles = ColourProfileHandler!.Serialize();
-        ActiveProfile = ColourProfileHandler!.GetActiveAsSerialized();
 #pragma warning disable CS0618
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
 #pragma warning restore CS0618

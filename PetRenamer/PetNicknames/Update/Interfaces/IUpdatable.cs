@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Plugin.Services;
+﻿using Dalamud.Plugin.Services;
 
 namespace PetRenamer.PetNicknames.Update.Interfaces;
 

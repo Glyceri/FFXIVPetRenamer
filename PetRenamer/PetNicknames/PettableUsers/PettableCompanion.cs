@@ -10,8 +10,5 @@ internal unsafe class PettableCompanion : BasePettablePet, IPettableCompanion
 {
     public Companion* Companion { get => (Companion*)PetPointer; }
 
-    public PettableCompanion(Companion* companion, in IPettableUser owner, in ISharingDictionary sharingDictionary, in IPettableDatabaseEntry entry, in IPetServices petServices) : base(&companion->Character, in owner, in sharingDictionary, in entry, in petServices)
-    {
-        
-    }
+    public PettableCompanion(Companion* companion, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices) : base(&companion->Character, owner, sharingDictionary, entry, petServices) { }
 }

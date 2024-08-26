@@ -4,7 +4,7 @@ using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows.TempWindow;
+using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
 
 namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
@@ -18,7 +18,7 @@ internal class TargetContextMenu : IContextMenuElement
     readonly IPettableUserList UserList;
     readonly IWindowHandler WindowHandler;
 
-    public TargetContextMenu(in DalamudServices dalamudServices, in IPettableUserList userList, in IWindowHandler windowHandler)
+    public TargetContextMenu(DalamudServices dalamudServices, IPettableUserList userList, IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
         UserList = userList;
@@ -34,6 +34,14 @@ internal class TargetContextMenu : IContextMenuElement
         if (target == null) return null;
 
         IPettablePet? pet = localUser.GetPet(target.Address);
+        if (pet == null)
+        {
+            IPettableUser? islandUser = UserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex];
+            if (islandUser == null) return null;
+
+            pet = islandUser.GetPet(target.Address);
+        }
+
         if (pet == null) return null;
 
         return (a) => WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);

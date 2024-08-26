@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
+﻿using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ internal class SharingDictionary : ISharingDictionary
     // Data Sharing
     readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
 
-    public SharingDictionary(in DalamudServices dalamudServices)
+    public SharingDictionary(DalamudServices dalamudServices)
     {
         DalamudServices = dalamudServices;
 
@@ -24,14 +25,13 @@ internal class SharingDictionary : ISharingDictionary
         catch { }
     }
 
-    public void Set(GameObjectId gameObjectID, string customName)
+    public void Set(GameObjectId gameObjectID, string? customName)
     {
-        PetNicknameDict.Add(gameObjectID, customName);
-    }
-
-    public void Clear()
-    {
-        PetNicknameDict.Clear();
+        PetNicknameDict.Remove(gameObjectID);
+        if (!customName.IsNullOrWhitespace())
+        {
+            PetNicknameDict.Add(gameObjectID, customName);
+        }
     }
 
     public void Dispose()

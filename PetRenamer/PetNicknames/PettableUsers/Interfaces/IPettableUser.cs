@@ -1,17 +1,15 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.Interop;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal interface IPettableUser : IBattleUser
+internal unsafe interface IPettableUser : IBattleUser
 {
     bool IsActive { get; }  
     bool IsLocalPlayer { get; }
-    bool IsDirty { get; }
 
     IPettableDatabaseEntry DataBaseEntry { get; }
     List<IPettablePet> PettablePets { get; }
@@ -22,9 +20,13 @@ internal interface IPettableUser : IBattleUser
     string? GetCustomName(IPetSheetData sheetData);
 
     void OnLastCastChanged(uint cast);
-    void Set(Pointer<BattleChara> pointer);
-    void CalculateBattlepets(ref List<Pointer<BattleChara>> pets);
+    void Update();
+    void SetBattlePet(BattleChara* battlePet);
+    void RemoveBattlePet(BattleChara* battlePet);
+    void SetCompanion(Companion* companion);
+    void RemoveCompanion(Companion* companion);
     void RefreshCast();
+    void Dispose(IPettableDatabase database);
 
     enum PetFilter
     {
