@@ -22,7 +22,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 internal class PetDevWindow : PetWindow
 {
     readonly IPettableUserList UserList;
-    readonly IMapHook MapHook;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -34,10 +33,9 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList, IMapHook mapHook) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
     {
         UserList = userList;
-        MapHook = mapHook;
 
         if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
         {
@@ -46,7 +44,6 @@ internal class PetDevWindow : PetWindow
 
         devStructList.Add(new DevStruct("User List", DrawUserList));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
-        devStructList.Add(new DevStruct("Map Icon Layout", DrawMapList));
     }
 
     public override void OnOpen()
@@ -382,22 +379,6 @@ internal class PetDevWindow : PetWindow
 
             ImGui.TableSetColumnIndex(4);
             ImGui.TextUnformatted(pet.Index.ToString());
-        }
-
-        ImGui.EndTable();
-    }
-
-    unsafe void DrawMapList()
-    {
-        if (!ImGui.BeginTable($"##mapTable{WindowHandler.InternalCounter}", 1, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
-            return;
-
-        foreach (uint map in MapHook.Icons)
-        {
-            ImGui.TableNextRow();
-
-            ImGui.TableSetColumnIndex(0);
-            ImGui.TextUnformatted($"{map}");
         }
 
         ImGui.EndTable();

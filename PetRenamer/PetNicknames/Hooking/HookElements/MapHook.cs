@@ -2,7 +2,6 @@
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -16,7 +15,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal unsafe class MapHook : HookableElement, IMapHook
+internal unsafe class MapHook : HookableElement
 {
     int lastIndex = 0;
     int current = 0;
@@ -41,8 +40,6 @@ internal unsafe class MapHook : HookableElement, IMapHook
 
     readonly IMapTooltipHook TooltipHook;
 
-    public List<uint> Icons { get; } = new List<uint>();
-
     public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
         TooltipHook = tooltipHook;
@@ -66,7 +63,6 @@ internal unsafe class MapHook : HookableElement, IMapHook
 
         current = 0;
         foundCurrent = -1;
-        Icons.Clear();
 
         return true;
     }
@@ -186,9 +182,8 @@ internal unsafe class MapHook : HookableElement, IMapHook
     {
         if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) return false;
 
-        Icons.Add(textureResource->IconId);
-
         current++;
+
         return true;
     }
 
@@ -201,23 +196,20 @@ internal unsafe class MapHook : HookableElement, IMapHook
 
     void GetDistanceAt(int at)
     {
-        PetServices.PetLog.Log("Get distance at: " + at);
         GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
         if (gManager == null) return;
-        PetServices.PetLog.Log("2");
+
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
-        PetServices.PetLog.Log("3");
 
         BattleChara* pChara = localUser.BattleChara;
         if (pChara == null) return;
-        PetServices.PetLog.Log("4");
+
         Vector3 playerPos = pChara->Character.DrawObject->Position;
         Vector2 flatPlayerPos = new Vector2(playerPos.X, playerPos.Z);
 
         List<IPettablePet> partyPets = new List<IPettablePet>();
         List<IPettablePet> alliPets = new List<IPettablePet>();
-
 
         MakeFromMembers(gManager->MainGroup.PartyMembers, ref partyPets);
         MakeFromMembers(gManager->MainGroup.AllianceMembers, ref alliPets);
@@ -226,28 +218,11 @@ internal unsafe class MapHook : HookableElement, IMapHook
         Sort(flatPlayerPos, ref partyPets);
         Sort(flatPlayerPos, ref alliPets);
 
-        List<IPettablePet> pets = [.. alliPets, .. partyPets,];
-
-        PetServices.PetLog.Log("-----");
-        foreach (IPettablePet pet in pets)
-        {
-            PetServices.PetLog.Log(pet.Name + " : " + pet.Owner?.Name);
-        }
-        PetServices.PetLog.Log("-----");
-
-
-        foreach (IPettablePet pp in pets)
-        {
-            PetServices.PetLog.Log(pp.Owner?.Name + " : " + pp.Name + " : " + pp.CustomName);
-        }
+        IPettablePet[] pets = [.. alliPets, .. partyPets];
 
         int index = at - 1;
-        PetServices.PetLog.Log("Index: " + index);
-
         if (index < 0) return;
-        PetServices.PetLog.Log("5");
-        if (index >= pets.Count) return;
-        PetServices.PetLog.Log("6");
+
         TooltipHook.OverridePet(pets[index]);
     }
 

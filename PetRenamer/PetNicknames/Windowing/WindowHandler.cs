@@ -34,11 +34,10 @@ internal class WindowHandler : IWindowHandler
     readonly IPettableDirtyListener DirtyListener;
     readonly IDataParser DataParser;
     readonly IDataWriter DataWriter;
-    readonly IMapHook MapHook;
 
     readonly WindowSystem WindowSystem;
 
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter, IMapHook mapHook)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter)
     {
         DalamudServices = dalamudServices;
         Configuration = petServices.Configuration;
@@ -48,7 +47,6 @@ internal class WindowHandler : IWindowHandler
         LegacyDatabase = legacyDatabase;
         ImageDatabase = imageDatabase;
         DirtyListener = dirtyListener;
-        MapHook = mapHook;
 
         DataParser = dataParser;
         DataWriter = dataWriter;
@@ -74,7 +72,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetConfigWindow(this, DalamudServices, Configuration));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));
-        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList, MapHook));
+        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList));
     }
 
     void AddWindow(PetWindow window)

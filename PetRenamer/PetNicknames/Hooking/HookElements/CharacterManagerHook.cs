@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -100,7 +99,6 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     BattleChara* TerminateBattleChara(BattleChara* bChara) 
     {
-        PetServices.PetLog.Log("Want to terminate: " + bChara->NameString);
         HandleAsDeleted(bChara);
 
         return OnTerminateBattleCharaHook!.Original(bChara);
