@@ -20,7 +20,6 @@ internal unsafe class CharacterManagerHook : HookableElement
     delegate Companion* Companion_TerminateDelegate(Companion* companion);
     delegate BattleChara* BattleChara_OnInitializeDelegate(BattleChara* battleChara);
     delegate BattleChara* BattleChara_TerminateDelegate(BattleChara* battleChara);
-    delegate BattleChara* BattleChara_Destroy(BattleChara* battleChara, bool freeMemory);
 
     [Signature("48 89 5C 24 ?? 57 48 83 EC 20 33 FF 48 8B D9 48 89 B9 ?? ?? ?? ?? 66 89 B9 ?? ?? ?? ??", DetourName = nameof(InitializeCompanion))]
     readonly Hook<Companion_OnInitializeDelegate>? OnInitializeCompanionHook = null;

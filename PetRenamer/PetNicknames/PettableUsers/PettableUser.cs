@@ -93,18 +93,6 @@ internal unsafe class PettableUser : IPettableUser
         DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonID);
     }
 
-    IPettablePet? FindPet()
-    {
-        for (int i = 0; i < PettablePets.Count; i++)
-        {
-            IPettablePet pet = PettablePets[i];
-            if (pet.ObjectID != ObjectID) continue;
-
-            return pet;
-        }
-        return null;
-    }
-
     void OnDirty(INamesDatabase database)
     {
         if (database != DataBaseEntry.ActiveDatabase) return;
@@ -205,6 +193,11 @@ internal unsafe class PettableUser : IPettableUser
         if (!IsActive)
         {
             database.RemoveEntry(DataBaseEntry);
+        }
+
+        foreach(IPettablePet? pet in PettablePets)
+        {
+            pet?.Dispose();
         }
     }
 

@@ -9,8 +9,6 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
-    public bool Marked { get; set; } = false;
-
     public nint PetPointer { get; private set; }
     public int SkeletonID { get; init; }
     public ulong ObjectID { get; init; }
@@ -33,7 +31,6 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
         PetPointer = (nint)pet;
 
-        Marked = true;
         Owner = owner;
         SkeletonID = pet->CharacterData.ModelCharaId;
         if (asBattlePet) SkeletonID = -SkeletonID;

@@ -7,8 +7,6 @@ internal interface IPettablePet : IDisposable
 {
     IPettableUser? Owner { get; }
 
-    public bool Marked { get; set; }
-
     public nint PetPointer { get; }
     public int SkeletonID { get; }
     public ulong ObjectID { get; }

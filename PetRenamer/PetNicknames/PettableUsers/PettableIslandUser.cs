@@ -55,21 +55,8 @@ internal unsafe class PettableIslandUser : IIslandUser
         }
     }
 
-    IPettablePet? FindPet()
-    {
-        for (int i = 0; i < PettablePets.Count; i++)
-        {
-            IPettablePet pet = PettablePets[i];
-            if (pet.ObjectID != ObjectID) continue;
-
-            return pet;
-        }
-        return null;
-    }
-
     public IPettablePet? GetPet(nint pet)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {
@@ -81,7 +68,6 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     public IPettablePet? GetPet(GameObjectId gameObjectId)
     {
-        if (!IsActive) return null;
         int petCount = PettablePets.Count;
         for (int i = 0; i < petCount; i++)
         {
