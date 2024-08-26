@@ -57,7 +57,7 @@ internal class HookHandler : IDisposable
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller));
+        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }
 
     readonly List<IHookableElement> hookableElements = new List<IHookableElement>();

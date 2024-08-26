@@ -2,6 +2,7 @@
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
@@ -37,15 +38,17 @@ internal unsafe class CharacterManagerHook : HookableElement
     readonly ILegacyDatabase LegacyDatabase;
     readonly ISharingDictionary SharingDictionary;
     readonly IPettableDirtyCaller DirtyCaller;
+    readonly IIslandHook IslandHook;
 
     readonly List<IntPtr> temporaryPets = new List<IntPtr>();
 
-    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller) : base(services, userList, petServices, dirtyListener) 
+    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) : base(services, userList, petServices, dirtyListener) 
     { 
         Database = database;
         LegacyDatabase = legacyDatabase;
         SharingDictionary = sharingDictionary;
         DirtyCaller = dirtyCaller;
+        IslandHook = islandHook;
     }
 
     public override void Init()
@@ -144,9 +147,31 @@ internal unsafe class CharacterManagerHook : HookableElement
 
             if (!gotOwner)
             {
-                temporaryPets.Add((nint)newBattleChara);
+                if (!HandleAsIsland(newBattleChara))
+                {
+                    temporaryPets.Add((nint)newBattleChara);
+                }
             }
         }
+    }
+
+    bool HandleAsIsland(BattleChara* newBattleChara)
+    {
+        if (!IslandHook.IsOnIsland) return false;
+
+        if (newBattleChara->SubKind != 10) return false;
+        if (newBattleChara->HomeWorld != ushort.MaxValue) return false;
+        if (newBattleChara->CurrentWorld != ushort.MaxValue) return false;
+        if (newBattleChara->OwnerId != 0xE0000000) return false;
+        if (PetServices.PetSheets.GetPet(newBattleChara->ModelCharaId) == null) return false;
+
+        IPettableUser? user = UserList.PettableUsers[PettableUserList.IslandIndex];
+        if (user == null) return false;
+
+        if (user is not IIslandUser islandUser) return false;
+
+        islandUser.SetBattlePet(newBattleChara);
+        return true;
     }
 
     void HandleAsDeleted(BattleChara* newBattleChara)
