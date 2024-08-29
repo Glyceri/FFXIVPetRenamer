@@ -173,7 +173,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         if (BattleChara == null) return;
 
-        uint castID = BattleChara->CastInfo.ActionId;
+        uint castID = BattleChara->GetCastInfo()->ActionId;
         if (castID == 0) return;
 
         CurrentCastID = castID;

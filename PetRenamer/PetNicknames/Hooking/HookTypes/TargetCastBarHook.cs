@@ -6,7 +6,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
-internal class TargetCastBarHook : CastBarHook
+internal class TargetCastBarHook : CastBarHook 
 {
     Func<IPettableUser?>? callGetUser = null;
 
@@ -22,5 +22,5 @@ internal class TargetCastBarHook : CastBarHook
         SetUnfaulty();
     }
 
-    protected override IPettableUser? GetUser() => callGetUser?.Invoke();
+    protected override IPettableUser? GetUser() => callGetUser?.Invoke();  
 }

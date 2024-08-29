@@ -10,7 +10,6 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
