@@ -512,6 +512,8 @@ internal class PetListWindow : PetWindow
 
             if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentID.ToString()))) continue;
 
+            if (entry.ActiveDatabase.Length == 0) continue;
+
             petListDrawables.Add(new PetListUser(in DalamudServices, in entry));
         }
     }
