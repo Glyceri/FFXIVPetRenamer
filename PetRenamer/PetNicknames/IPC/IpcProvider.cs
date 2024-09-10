@@ -198,13 +198,19 @@ internal class IpcProvider : IIpcProvider
     // Interface Functions
     public void NotifyDataChanged()
     {
-        lastData = DataWriter.WriteData();
+        lock (lastData)
+        {
+            lastData = DataWriter.WriteData();
+        }
         OnDataChanged();
     }
 
     public void ClearCachedData()
     {
-        lastData = "";
+        lock (lastData)
+        {
+            lastData = "";
+        }
     }
 
     public void Dispose()

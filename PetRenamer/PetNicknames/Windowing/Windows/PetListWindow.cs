@@ -54,7 +54,7 @@ internal class PetListWindow : PetWindow
 
     bool isLocalEntry = false;
 
-    List<IPetListDrawable> petListDrawables = new List<IPetListDrawable>();
+    readonly List<IPetListDrawable> petListDrawables = new List<IPetListDrawable>();
 
     bool importDisabled = false;
 
@@ -308,7 +308,6 @@ internal class PetListWindow : PetWindow
                     }
                     Listbox.End();
                 }
-                    
             }
 
             foreach (PetListUser user in petListDrawables.Where(v => v is PetListUser))
@@ -322,7 +321,7 @@ internal class PetListWindow : PetWindow
 
                     if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
                     {
-                        if (user.Entry == ActiveEntry)
+                        if (user.Entry.ContentID == UserList.LocalPlayer?.ContentID)
                         {
                             if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight)))
                             {
