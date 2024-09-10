@@ -34,7 +34,7 @@ internal unsafe class EmoteChatElement : IChatElement
 
         nint value = nint.Zero;
 
-        GameObjectId emoteTarget = bChara->Character.EmoteController.Target;
+        GameObjectId emoteTarget = bChara->GetTargetId();
         if (emoteTarget.Type != 0 && emoteTarget.Type != 4) return;
 
         foreach(IPettableUser? user in UserList.PettableUsers)

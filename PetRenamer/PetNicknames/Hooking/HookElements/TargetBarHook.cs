@@ -22,9 +22,9 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed).RegsterTarget(FocusTargetPet);
 
         Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, true);
-        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
-        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.GameObjectId ?? 0));
-        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.GameObjectId ?? 0));
+        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
+        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
+        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
 
         Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook);
         Hook<NotebookHook>("MJIMinionNoteBook", [65], AllowedNotebook);
@@ -33,9 +33,9 @@ internal unsafe class TargetBarHook : QuickHookableElement
         Hook<NotebookHook>("YKWNote", [28], AllowedNotebook);
     }
 
-    IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.GameObjectId ?? 0);
-    IPettablePet? TargetOfTarget() => UserList.GetPet(Target?.TargetObject?.GameObjectId ?? 0);
-    IPettablePet? TargetObject() => UserList.GetPet(Target?.GameObjectId ?? 0);
+    IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.Address ?? nint.Zero);
+    IPettablePet? TargetOfTarget() => UserList.GetPet(Target?.TargetObject?.Address ?? nint.Zero);
+    IPettablePet? TargetObject() => UserList.GetPet(Target?.Address ?? nint.Zero);
 
     IGameObject? FocusTarget => DalamudServices.TargetManager.FocusTarget;
     IGameObject? Target => DalamudServices.TargetManager.SoftTarget ?? DalamudServices.TargetManager.Target;

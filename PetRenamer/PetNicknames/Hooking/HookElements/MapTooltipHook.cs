@@ -27,7 +27,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
     // The dalamud TooltipType enum is NOT accurate it seems
     public delegate int AccurateShowTooltip(AtkUnitBase* tooltip, byte tooltipType, ushort addonID, AtkUnitBase* a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8);
 
-    [Signature("E8 ?? ?? ?? ?? B8 5E 01 00 00 ", DetourName = nameof(ShowTooltipDetour))]
+    [Signature("E8 ?? ?? ?? ?? B8 5E 01 00 00", DetourName = nameof(ShowTooltipDetour))]
     readonly Hook<AccurateShowTooltip> showTooltip = null!;
 
     public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
