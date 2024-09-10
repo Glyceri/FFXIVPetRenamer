@@ -140,10 +140,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        MarkDirty();
-
-        if (!IsIPC) return;
         IsIPC = asIPC;
+
+        MarkDirty();        
     }
 
     public void Clear(bool fromIPC)
