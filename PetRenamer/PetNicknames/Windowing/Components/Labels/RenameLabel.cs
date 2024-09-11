@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
+using Dalamud.Utility;
 using ImGuiNET;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
@@ -8,7 +9,7 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Labels;
 
 internal static class RenameLabel
 {
-    public static bool Draw(string label, bool activeSave, ref string value, Vector2 size, string tooltipLabel = "",float labelWidth = 140)
+    public static bool Draw(string label, bool activeSave, ref string value, Vector2 size, string tooltipLabel = "", float labelWidth = 140)
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
@@ -67,7 +68,21 @@ internal static class RenameLabel
 
         ImGui.SameLine();
 
+        bool valueNullOrWhitespace = value.IsNullOrWhitespace();
+
+        if (valueNullOrWhitespace)
+        {
+            ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
+            ImGui.PushStyleColor(ImGuiCol.Border, 0xFF404040);
+        }
+
         shouldActivate |= ImGui.InputTextMultiline($"##RenameBar_{WindowHandler.InternalCounter}", ref value, PluginConstants.ffxivNameSize, size - new Vector2(actualWidth + style.ItemSpacing.X * 3 + height * 2, 0), ImGuiInputTextFlags.CtrlEnterForNewLine | ImGuiInputTextFlags.EnterReturnsTrue);
+
+        if (valueNullOrWhitespace)
+        {
+            ImGui.PopStyleColor(1);
+            ImGui.PopStyleVar(1);
+        }
 
         return shouldActivate;
     }
