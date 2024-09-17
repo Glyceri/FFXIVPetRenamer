@@ -7,11 +7,13 @@
   "ApplicableVersion": "any",
   "Tags": [
     "Pet",
-    "plugin",
+    "Plugin",
     "Rename",
     "Nickname",
     "Name",
-    "Minion"
+    "Minion",
+    "PetNicknames",
+    "PetRenamer"
   ],
   "IconUrl": "https://github.com/Glyceri/FFXIVPetRenamer/raw/main/icon.png",
   "RepoUrl": "https://github.com/Glyceri/FFXIVPetRenamer"

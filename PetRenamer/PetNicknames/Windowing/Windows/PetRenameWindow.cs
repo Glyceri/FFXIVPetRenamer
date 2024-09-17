@@ -25,9 +25,9 @@ internal class PetRenameWindow : PetWindow
     readonly IPetServices PetServices;
     readonly IPettableDirtyListener DirtyListener;
 
-    protected override Vector2 MinSize { get; } = new Vector2(437, 250);
+    protected override Vector2 MinSize { get; } = new Vector2(570, 250);
     protected override Vector2 MaxSize { get; } = new Vector2(1500, 250);
-    protected override Vector2 DefaultSize { get; } = new Vector2(437, 250);
+    protected override Vector2 DefaultSize { get; } = new Vector2(570, 250);
 
     protected override bool HasModeToggle { get; } = true;
 

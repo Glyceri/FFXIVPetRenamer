@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
+using Dalamud.Utility;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -165,7 +166,15 @@ internal class IpcProvider : IIpcProvider
     // Functions
     public (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
     public bool EnabledDetour() => ready;
-    public string GetPlayerDataDetour() => lastData;
+    public string GetPlayerDataDetour()
+    {
+        if (lastData.IsNullOrWhitespace())
+        {
+            RefreshLastData();
+        }
+
+        return lastData;
+    }
 
     // Notifications
     void NotifyReady()
@@ -198,11 +207,16 @@ internal class IpcProvider : IIpcProvider
     // Interface Functions
     public void NotifyDataChanged()
     {
+        RefreshLastData();
+        OnDataChanged();
+    }
+
+    void RefreshLastData()
+    {
         lock (lastData)
         {
             lastData = DataWriter.WriteData();
         }
-        OnDataChanged();
     }
 
     public void ClearCachedData()
