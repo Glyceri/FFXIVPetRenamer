@@ -58,7 +58,8 @@ internal class PettableDatabase : IPettableDatabase
         return newEntry;
     }
 
-    public IPettableDatabaseEntry GetEntry(ulong contentID)
+
+    public IPettableDatabaseEntry? GetEntryNoCreate(ulong contentID)
     {
         int entriesCount = _entries.Count;
 
@@ -68,6 +69,14 @@ internal class PettableDatabase : IPettableDatabase
             if (entry.ContentID != contentID) continue;
             return _entries[i];
         }
+
+        return null;
+    }
+
+    public IPettableDatabaseEntry GetEntry(ulong contentID)
+    {
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentID);
+        if (entry != null) return entry;
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
@@ -100,7 +109,9 @@ internal class PettableDatabase : IPettableDatabase
 
     public void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC)
     {
-        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(parseResult.ContentID);
+        if (entry == null) return;
+
         entry.UpdateEntry(parseResult, isFromIPC);
         if (!isFromIPC) SetDirty();
     }

@@ -47,7 +47,13 @@ internal class DataParser : IDataParser
         {
             if (clearParseResult.Name.IsNullOrWhitespace() || clearParseResult.Homeworld == 0) return false;
 
-            Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false)?.Clear(false);
+            IPettableDatabaseEntry? entry = Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false);
+
+            if (entry != null)
+            {
+                Database.RemoveEntry(entry);
+            }
+
             return true;
         }
 

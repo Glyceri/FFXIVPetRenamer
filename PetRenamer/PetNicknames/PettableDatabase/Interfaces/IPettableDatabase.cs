@@ -14,6 +14,12 @@ internal interface IPettableDatabase
     /// <returns>The Data Base Entry</returns>
     IPettableDatabaseEntry? GetEntry(string name, ushort homeworld, bool create);
     /// <summary>
+    /// Get's the database entry if it exists.
+    /// </summary>
+    /// <param name="name">Player Content ID</param>
+    /// <returns>The Data Base Entry</returns>
+    IPettableDatabaseEntry? GetEntryNoCreate(ulong contentID);
+    /// <summary>
     /// Get's the database entry if it exists. In the case it doesn't it creates a new one!
     /// </summary>
     /// <param name="name">Player Content ID</param>
