@@ -157,7 +157,7 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
         if (localPlayer == null) return;
 
         string name = localPlayer.Name.TextValue;
-        uint curWorld = localPlayer.HomeWorld.Id;
+        uint curWorld = localPlayer.HomeWorld.ValueNullable?.RowId ?? 0;
 
         SetFor(name, curWorld);
     }
@@ -169,7 +169,7 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
 
         string firstname = match.Groups["firstname"].Value;
         string lastname = match.Groups["lastname"].Value;
-        uint curWorld = localPlayer.CurrentWorld.Id;
+        uint curWorld = localPlayer.CurrentWorld.ValueNullable?.RowId ?? 0;
 
         SetFor(firstname, lastname, curWorld);
     }

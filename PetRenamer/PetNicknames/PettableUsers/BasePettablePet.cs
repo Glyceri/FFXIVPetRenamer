@@ -32,7 +32,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         PetPointer = (nint)pet;
 
         Owner = owner;
-        SkeletonID = pet->CharacterData.ModelCharaId;
+        SkeletonID = pet->ModelContainer.ModelCharaId;
         if (asBattlePet) SkeletonID = -SkeletonID;
         Index = pet->GameObject.ObjectIndex;
         Name = pet->GameObject.NameString;

@@ -6,9 +6,15 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class PetLogWrapper : IPetLog
 {
+    public static IPetLog? Instance { get; private set; }
+
     readonly IPluginLog PluginLog;
 
-    public PetLogWrapper(IPluginLog pluginLog) => PluginLog = pluginLog;
+    public PetLogWrapper(IPluginLog pluginLog) 
+    {
+        PluginLog = pluginLog;
+        Instance = this;
+    }
 
     public void Log(object? message)
     {

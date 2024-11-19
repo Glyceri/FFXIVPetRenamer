@@ -6,7 +6,6 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ImGuiNET;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -190,7 +189,7 @@ internal class PetDevWindow : PetWindow
                     RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, sizeIn, labelWidth: 300);
                     if (clicked)
                     {
-                        int id = -bPet->Character.CharacterData.ModelCharaId;
+                        int id = -bPet->Character.ModelContainer.ModelCharaId;
                         startString += $"\n{id}^{targetBattlePetName}";
                     }
                 }
@@ -202,7 +201,7 @@ internal class PetDevWindow : PetWindow
 
                     if (clicked)
                     {
-                        int id = minion->CharacterData.ModelCharaId;
+                        int id = minion->ModelContainer.ModelCharaId;
                         startString += $"\n{id}^{targetMinionName}";
                     }
                 }

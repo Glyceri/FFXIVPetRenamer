@@ -1,7 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.Utility;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets2;
+using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -57,14 +57,14 @@ internal class SheetsWrapper : IPetSheets
         {
             foreach (Companion companion in petSheet)
             {
-                if (companion == null) continue;
+                if (!companion.Model.IsValid) continue;
 
-                ModelChara? model = companion.Model.Value;
+                ModelChara? model = companion.Model.ValueNullable;
                 if (model == null) continue;
 
                 uint companionIndex = companion.RowId;
-                int modelID = (int)model.RowId;
-                int legacyModelID = (int)model.Model;
+                int modelID = (int)model.Value.RowId;
+                int legacyModelID = (int)model.Value.Model;
 
                 if (legacyModelID == 0) continue;
 
@@ -79,9 +79,9 @@ internal class SheetsWrapper : IPetSheets
 
                 sbyte pronoun = companion.Pronoun;
 
-                uint raceID = companion.MinionRace?.Value?.RowId ?? 0;
-                string raceName = companion.MinionRace?.Value?.Name ?? Translator.GetLine("...");
-                string behaviourName = companion.Behavior.Value?.Name ?? Translator.GetLine("...");
+                uint raceID = companion.MinionRace.ValueNullable?.RowId ?? 0;
+                string raceName = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
+                string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
 
                 petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
             }
@@ -90,7 +90,6 @@ internal class SheetsWrapper : IPetSheets
 
         foreach (Pet pet in battlePetSheet)
         {
-            if (pet == null) continue;
             uint sheetSkeleton = pet.RowId;
 
             if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton)) continue;
@@ -99,14 +98,17 @@ internal class SheetsWrapper : IPetSheets
             Action? petAction = GetAction(actionID);
             if (petAction == null) continue;
 
-            ushort petIcon = petAction.Icon;
+            ushort petIcon = petAction.Value.Icon;
 
-            string name = pet.Name;
+            string name = pet.Name.ExtractText();
             name = StringHelper.MakeTitleCase(name);
 
-            string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(petAction.Name));
+            string actionName = petAction.Value.Name.ExtractText();
+            uint actionRowID = petAction.Value.RowId;
 
-            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, 0, name, cleanedActionName, petAction.Name, petAction.RowId, in DalamudServices));
+            string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(actionName));
+
+            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, 0, name, cleanedActionName, actionName, actionRowID, in DalamudServices));
         }
     }
 
@@ -118,7 +120,7 @@ internal class SheetsWrapper : IPetSheets
         if (classJob == null) return null;
         foreach (ClassJob cls in classJob)
             if (cls.RowId == id)
-                return cls.Name;
+                return cls.Name.ExtractText();
         return null;
     }
 
@@ -127,7 +129,7 @@ internal class SheetsWrapper : IPetSheets
         if (worlds == null) return null;
         World? world = worlds.GetRow(worldID);
         if (world == null) return null;
-        return world.InternalName;
+        return world.Value.InternalName.ExtractText();
     }
 
     public IPetSheetData? GetPet(int skeletonID)

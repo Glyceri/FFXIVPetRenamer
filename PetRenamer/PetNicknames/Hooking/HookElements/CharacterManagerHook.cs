@@ -34,7 +34,7 @@ internal unsafe class CharacterManagerHook : HookableElement
     [Signature("40 53 48 83 EC 20 8B 91 ?? ?? ?? ?? 48 8B D9 E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ??", DetourName = nameof(TerminateBattleChara))]
     readonly Hook<BattleChara_TerminateDelegate>? OnTerminateBattleCharaHook = null;
 
-    [Signature("48 89 5C 24 08 57 48 83 EC 20 48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 8B DA 48 8D 05 ?? ?? ?? ?? 48 89 81 A0 01 00 00 48 81 C1 20 36 00 00", DetourName = nameof(DestroyBattleChara))]
+    [Signature("48 89 5C 24 08 57 48 83 EC 20 48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 8B DA 48 8D 05 ?? ?? ?? ?? 48 89 81 A0 01 00 00 48 81 C1 90 36 00 00", DetourName = nameof(DestroyBattleChara))]
     readonly Hook<BattleChara_DestroyDelegate>? OnDestroyBattleCharaHook = null;
 
     readonly IPettableDatabase Database;
@@ -174,7 +174,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         if (newBattleChara->HomeWorld != ushort.MaxValue) return false;
         if (newBattleChara->CurrentWorld != ushort.MaxValue) return false;
         if (newBattleChara->OwnerId != 0xE0000000) return false;
-        if (PetServices.PetSheets.GetPet(newBattleChara->ModelCharaId) == null) return false;
+        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null) return false;
 
         IPettableUser? user = UserList.PettableUsers[PettableUserList.IslandIndex];
         if (user == null) return false;

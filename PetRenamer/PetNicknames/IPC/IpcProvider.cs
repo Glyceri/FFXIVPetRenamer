@@ -154,7 +154,7 @@ internal class IpcProvider : IIpcProvider
                 if (DalamudServices.ObjectTable.Length <= objectIndex) return;
                 if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc) return;
 
-                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)pc.HomeWorld.Id), true);
+                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), true);
             });
         }
         catch(Exception e)

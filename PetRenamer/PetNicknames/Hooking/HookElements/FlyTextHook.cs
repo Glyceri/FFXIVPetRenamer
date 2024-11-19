@@ -20,7 +20,7 @@ internal unsafe class FlyTextHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 
-    [Signature("E8 ?? ?? ?? ?? 48 8D 8D 08 06 00 00 ", DetourName = nameof(LogMessageDetour))]
+    [Signature("E8 ?? ?? ?? ?? 45 38 7E 1F", DetourName = nameof(LogMessageDetour))]
     readonly Hook<LogMethod>? logMethod = null;
 
     public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }

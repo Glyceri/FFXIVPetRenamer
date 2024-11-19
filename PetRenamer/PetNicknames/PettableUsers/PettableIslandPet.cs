@@ -27,7 +27,7 @@ internal unsafe class PettableIslandPet : IIslandPet
         PetPointer = (nint)pet;
 
         Owner = owner;
-        SkeletonID = pet->Character.CharacterData.ModelCharaId;
+        SkeletonID = pet->Character.ModelContainer.ModelCharaId;
         Index = pet->Character.GameObject.ObjectIndex;
         Name = pet->Character.GameObject.NameString;
         ObjectID = pet->GetGameObjectId();
