@@ -13,24 +13,24 @@ internal unsafe class TargetBarHook : QuickHookableElement
 
     public override void Init()
     {
-        Hook<TargetTextHook>("_TargetInfo", [16], Allowed).RegsterTarget(TargetObject);
-        Hook<TargetTextHook>("_TargetInfo", [7], Allowed).RegsterTarget(TargetOfTarget);
+        Hook<TargetTextHook>("_TargetInfo", [16], Allowed, true).RegsterTarget(TargetObject);
+        Hook<TargetTextHook>("_TargetInfo", [7], Allowed, true).RegsterTarget(TargetOfTarget);
 
-        Hook<TargetTextHook>("_TargetInfoMainTarget", [10], Allowed).RegsterTarget(TargetObject);
-        Hook<TargetTextHook>("_TargetInfoMainTarget", [7], Allowed).RegsterTarget(TargetOfTarget);
+        Hook<TargetTextHook>("_TargetInfoMainTarget", [10], Allowed, true).RegsterTarget(TargetObject);
+        Hook<TargetTextHook>("_TargetInfoMainTarget", [7], Allowed, true).RegsterTarget(TargetOfTarget);
 
-        Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed).RegsterTarget(FocusTargetPet);
+        Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed, true).RegsterTarget(FocusTargetPet);
 
-        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, true);
-        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
-        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
-        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
+        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, false, true);
+        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
+        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
+        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
 
-        Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook);
-        Hook<NotebookHook>("MJIMinionNoteBook", [65], AllowedNotebook);
-        Hook<NotebookHook>("LovmPaletteEdit", [48], AllowedNotebook);
-        Hook<NotebookHook>("LovmActionDetail", [4], AllowedNotebook);
-        Hook<NotebookHook>("YKWNote", [28], AllowedNotebook);
+        Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook, false);
+        Hook<NotebookHook>("MJIMinionNoteBook", [65], AllowedNotebook, false);
+        Hook<NotebookHook>("LovmPaletteEdit", [48], AllowedNotebook, false);
+        Hook<NotebookHook>("LovmActionDetail", [4], AllowedNotebook, false);
+        Hook<NotebookHook>("YKWNote", [28], AllowedNotebook, false);
     }
 
     IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.Address ?? nint.Zero);

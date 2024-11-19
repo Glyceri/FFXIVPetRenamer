@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -59,10 +60,15 @@ internal unsafe class PartyHook : HookableElement
         IPettablePet? pet = localPlayer.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
         if (pet == null) return;
 
+        IPetSheetData? petData = pet.PetData;
+        if (petData == null) return;
+
         string? lastPetname = pet.CustomName;
         if (lastPetname == string.Empty || lastPetname == null) return;
 
-        PetServices.StringHelper.SetATKString(partyNode->Pet.Name, lastPetname);
+        pet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+
+        PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet.Name, lastPetname, edgeColour, textColour, petData);
     }
 
     void SetCastlist(AddonPartyList* partyNode)
@@ -101,7 +107,7 @@ internal unsafe class PartyHook : HookableElement
             string? customName = user.DataBaseEntry.GetName(data.Model);
             if (customName == null) continue;
 
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, data, false);
+            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, new Vector3(1, 0, 0), null, data, false);
         }
     }
 

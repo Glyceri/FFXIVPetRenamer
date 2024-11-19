@@ -13,6 +13,10 @@ internal class PetConfigWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(400, 500);
     protected override bool HasModeToggle { get; } = true;
 
+    string[] listIconTypes = ["Both", "Sharing", "List Only"];
+    string[] iconMenuTypes = ["Action", "Notebook", "Item"];
+    string[] colourDisplay = ["Everyone", "Only Myself", "No Colours"];
+
     public PetConfigWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Pet Config Window", ImGuiWindowFlags.None)
     {
         
@@ -23,6 +27,8 @@ internal class PetConfigWindow : PetWindow
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
         {
             if (ImGui.Checkbox(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures)) Configuration.Save();
+
+            DrawMenu("Name Colours", colourDisplay, ref Configuration.showColours);
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
@@ -30,50 +36,9 @@ internal class PetConfigWindow : PetWindow
             if (ImGui.Checkbox(Translator.GetLine("Config.Kofi"), ref Configuration.showKofiButton)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.Toggle"), ref Configuration.quickButtonsToggle)) Configuration.Save();
             if (ImGui.Checkbox(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning)) Configuration.Save();
-            
-            // Why for the life of me do I not know a better way to do this?
-            if (ImGui.BeginMenu($"Icon Type##Menu_{WindowHandler.InternalCounter}"))
-            {
-                if (ImGui.MenuItem($"Action##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.minionIconType = 0;
-                    Configuration.Save();
-                }
-                if (ImGui.MenuItem($"Notebook##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.minionIconType = 1;
-                    Configuration.Save();
-                }
-                if (ImGui.MenuItem($"Item##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.minionIconType = 2;
-                    Configuration.Save();
-                }
 
-                ImGui.EndMenu();
-            }
-
-            // Why for the life of me do I not know a better way to do this?
-            if (ImGui.BeginMenu($"List Button Type##Menu_{WindowHandler.InternalCounter}"))
-            {
-                if (ImGui.MenuItem($"Both##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.listButtonLayout = 0;
-                    Configuration.Save();
-                }
-                if (ImGui.MenuItem($"Sharing Only##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.listButtonLayout = 1;
-                    Configuration.Save();
-                }
-                if (ImGui.MenuItem($"List Only##Menu_{WindowHandler.InternalCounter}"))
-                {
-                    Configuration.listButtonLayout = 2;
-                    Configuration.Save();
-                }
-
-                ImGui.EndMenu();
-            }
+            DrawMenu("List Button Type", listIconTypes, ref Configuration.listButtonLayout);
+            DrawMenu("Icon Type", iconMenuTypes, ref Configuration.minionIconType);
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
@@ -102,6 +67,23 @@ internal class PetConfigWindow : PetWindow
             if (ImGui.Checkbox("Open Debug Window On Start.", ref Configuration.openDebugWindowOnStart)) Configuration.Save();
             if (ImGui.Checkbox("Show chat code.", ref Configuration.debugShowChatCode)) Configuration.Save();
             ImGui.EndDisabled();
+        }
+    }
+
+    void DrawMenu(string title, string[] elements, ref int configurationInt)
+    {
+        if (ImGui.BeginMenu($"{title}   ({elements[configurationInt]})##Menu_{WindowHandler.InternalCounter}"))
+        {
+            for (int i = 0; i < elements.Length; i++)
+            {
+                if (ImGui.MenuItem($"{elements[i]}##Menu_{WindowHandler.InternalCounter}"))
+                {
+                    configurationInt = i;
+                    Configuration.Save();
+                }
+            }
+
+            ImGui.EndMenu();
         }
     }
 }

@@ -24,6 +24,7 @@ using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
+using System.Numerics;
 
 namespace PetRenamer;
 

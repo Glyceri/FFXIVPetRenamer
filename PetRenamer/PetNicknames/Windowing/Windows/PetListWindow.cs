@@ -292,9 +292,9 @@ internal class PetListWindow : PetWindow
                     {
                         if (isLocalEntry) {
 
-                            if (RenameLabel.Draw($"Nickname:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight)))
+                            if (RenameLabel.Draw($"Nickname:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, ref pet.EdgeColour, ref pet.TextColour, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight)))
                             {
-                                OnSave(pet.TempName, pet.PetSheetData.Model);
+                                OnSave(pet.TempName, pet.PetSheetData.Model, pet.EdgeColour, pet.TextColour);
                             }
                         }
                         else
@@ -380,28 +380,9 @@ internal class PetListWindow : PetWindow
 
                             ImGui.SameLine();
 
-                            bool keyComboNotPressed = !ImGui.IsKeyDown(ImGuiKey.LeftCtrl) || !ImGui.IsKeyDown(ImGuiKey.LeftShift);
-                            ImGui.BeginDisabled(keyComboNotPressed);
-                            ImGui.PushFont(UiBuilder.IconFont);
-
-                            if (ImGui.Button($"{FontAwesomeIcon.Eraser.ToIconString()}##clearButton_{WindowHandler.InternalCounter}", new Vector2(buttonSize, buttonSize)))
+                            if (EraserButton.Draw(new Vector2(buttonSize, buttonSize), Translator.GetLine("ClearButton.Label"), Translator.GetLine("PetRenameNode.Clear")))
                             {
                                 DalamudServices.Framework.Run(() => user.Entry.Clear(false));
-                            }
-
-                            ImGui.PopFont();
-                            ImGui.EndDisabled();
-
-                            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                            {
-                                if (keyComboNotPressed)
-                                {
-                                    ImGui.SetTooltip(Translator.GetLine("ClearButton.Label"));
-                                }
-                                else
-                                {
-                                    ImGui.SetTooltip(Translator.GetLine("PetRenameNode.Clear"));
-                                }
                             }
                         }
                         LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
@@ -526,6 +507,8 @@ internal class PetListWindow : PetWindow
 
         List<int> validIDS = names.IDs.ToList();
         List<string> validNames = names.Names.ToList();
+        List<Vector3?> validEdgeColours = names.EdgeColours.ToList();
+        List<Vector3?> validTextColours = names.TextColours.ToList();
 
         if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
         {
@@ -534,6 +517,8 @@ internal class PetListWindow : PetWindow
             {
                 validIDS.Add(p.Model);
                 validNames.Add("");
+                validEdgeColours.Add(null);
+                validTextColours.Add(null);
             }
         }
 
@@ -550,10 +535,12 @@ internal class PetListWindow : PetWindow
             if (petData == null) continue;
 
             string name = validNames[i];
+            Vector3? edgeColour = validEdgeColours[i];
+            Vector3? textColour = validTextColours[i];
 
             if (!(Valid(name) || Valid(ID.ToString()) || Valid(petData.BaseSingular))) continue;
 
-            petListDrawables.Add(new PetListPet(in DalamudServices, in petData, name));
+            petListDrawables.Add(new PetListPet(in DalamudServices, in petData, name, edgeColour, textColour));
         }
     }
 
@@ -564,5 +551,8 @@ internal class PetListWindow : PetWindow
         return input.Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    void OnSave(string? newName, int skeleton) => DalamudServices.Framework.Run(() => ActiveEntry?.SetName(skeleton, newName ?? ""));
+    void OnSave(string? newName, int skeleton, Vector3? edgeColour, Vector3? textColour)
+    {
+        DalamudServices.Framework.Run(() => ActiveEntry?.SetName(skeleton, newName ?? "", edgeColour, textColour));
+    }
 }

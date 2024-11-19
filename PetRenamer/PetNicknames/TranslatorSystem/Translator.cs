@@ -42,6 +42,7 @@ internal static class Translator
         { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
         { "PetListWindow.ListHeaderOtherBattlePet", "{0}'s Battle Pets" },
         { "ClearButton.Label", "Hold \"Left Ctrl\" + \"Left Shift\" to delete an entry." },
+        { "ClearButton.ColourLabel", "Hold \"Left Ctrl\" + \"Left Shift\" to clear the colour." },
         { "UserListElement.WarningClear", "You cannot clear yourself." },
         { "UserListElement.WarningIPC", "This user is temporarily added via an\nexternal plugin and will not be saved." },
         { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },

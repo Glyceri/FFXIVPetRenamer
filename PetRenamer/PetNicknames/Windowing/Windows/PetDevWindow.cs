@@ -90,6 +90,8 @@ internal class PetDevWindow : PetWindow
 
     string targetMinionName = baseName;
     string targetBattlePetName = baseName;
+    Vector3? targetEdgeColour = null;
+    Vector3? targetTextColour = null;
 
     const string baseName = "[Test Name]";
 
@@ -101,6 +103,8 @@ internal class PetDevWindow : PetWindow
     {
         targetMinionName = baseName.ToString();
         targetBattlePetName = baseName.ToString();
+        targetEdgeColour = null;
+        targetTextColour = null;
     }
 
     unsafe void DrawIPCTester()
@@ -186,7 +190,7 @@ internal class PetDevWindow : PetWindow
                 BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
                 if (bPet != null)
                 {
-                    RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, sizeIn, labelWidth: 300);
+                    RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
                     if (clicked)
                     {
                         int id = -bPet->Character.ModelContainer.ModelCharaId;
@@ -197,7 +201,7 @@ internal class PetDevWindow : PetWindow
                 Character* minion = &bChara->CompanionObject->Character;
                 if (minion != null)
                 {
-                    RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, sizeIn, labelWidth: 300);
+                    RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
 
                     if (clicked)
                     {

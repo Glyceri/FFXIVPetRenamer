@@ -1,4 +1,6 @@
-﻿namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+﻿using System.Numerics;
+
+namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 internal interface IBaseParseResult : IDataParseResult
 {
@@ -7,4 +9,6 @@ internal interface IBaseParseResult : IDataParseResult
 
     int[] IDs { get; }
     string[] Names { get; }
+    Vector3?[] EdgeColous { get; }
+    Vector3?[] TextColours { get; }
 }

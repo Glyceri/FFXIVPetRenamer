@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
@@ -18,13 +19,17 @@ internal unsafe abstract class BasePettablePet : IPettablePet
     public IPetSheetData? PetData { get; private set; }
     public ulong Lifetime { get; private set; }
     public IPettableUser? Owner { get; private set; }
+    public Vector3? EdgeColour { get; private set; }
+    public Vector3? TextColour { get; private set; }
 
+    readonly IPetServices PetServices;
     readonly IPettableDatabaseEntry Entry;
     readonly ISharingDictionary SharingDictionary;
     readonly bool AsBattlePet = false;
 
     public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
     {
+        PetServices = petServices;
         Entry = entry;
         AsBattlePet = asBattlePet;
         SharingDictionary = sharingDictionary;
@@ -43,12 +48,29 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
     public void Recalculate()
     {
-         CustomName = Entry.GetName(SkeletonID);
-         SharingDictionary.Set(ObjectID, CustomName);
+        CustomName = Entry.GetName(SkeletonID);
+        EdgeColour = Entry.GetEdgeColour(SkeletonID);
+        TextColour = Entry.GetTextColour(SkeletonID);
+
+        SharingDictionary.Set(ObjectID, CustomName);
     }
 
     public void Dispose()
     {
         SharingDictionary.Set(ObjectID, null);
+    }
+
+    public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour)
+    {
+        edgeColour = null;
+        textColour = null;
+
+        int colourSetting = PetServices.Configuration.showColours;
+
+        if (colourSetting >= 2) return;
+        if (colourSetting == 1 && (Owner?.IsLocalPlayer ?? false)) return;
+
+        edgeColour = EdgeColour;
+        textColour = TextColour;
     }
 }

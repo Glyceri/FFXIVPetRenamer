@@ -5,6 +5,7 @@ using System;
 // Keep save file size shorter ....
 namespace PN.S;
 
+[Obsolete("Use SerializableNameDataV2 instead")]
 [Serializable]
 internal class SerializableNameData
 {

@@ -16,7 +16,7 @@ internal class IpcProvider : IIpcProvider
 {
     const string ApiNamespace = "PetRenamer.";
     const uint MajorVersion = 3;
-    const uint MinorVersion = 1;
+    const uint MinorVersion = 2;
 
     bool ready = false;
     string lastData = "[unprepared]";

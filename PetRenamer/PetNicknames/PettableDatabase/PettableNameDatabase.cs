@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PN.S;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -12,31 +13,57 @@ internal class PettableNameDatabase : INamesDatabase
     public int[] IDs { get; private set; }
     public string[] Names { get; private set; }
     public int Length { get => IDs.Length; }
+    public Vector3?[] EdgeColours { get; private set; }
+    public Vector3?[] TextColours { get; private set; }
 
     readonly IPettableDirtyCaller? DirtyCaller = null;
 
-    public PettableNameDatabase(int[] ids, string[] names, IPettableDirtyCaller dirtyCaller)
+    public PettableNameDatabase(int[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, IPettableDirtyCaller dirtyCaller)
     {
         Names = names;
         IDs = ids;
+        EdgeColours = edgeColours;
+        TextColours = textColours;
         DirtyCaller = dirtyCaller;
     }
 
-    public string? GetName(int ID)
+    int GetIndex(int ID)
     {
         for (int i = 0; i < Length; i++)
         {
             if (IDs[i] != ID) continue;
 
-            string customName = Names[i];
-            if (customName == string.Empty) return null;
-
-            return customName;
+            return i;
         }
-        return null;
+
+        return -1;
     }
 
-    public void SetName(int ID, string? name)
+    public string? GetName(int ID)
+    {
+        int index = GetIndex(ID);
+        if (index == -1) return null;
+        
+        return Names[index];
+    }
+
+    public Vector3? GetEdgeColour(int ID)
+    {
+        int index = GetIndex(ID);
+        if (index == -1) return null;
+
+        return EdgeColours[index];
+    }
+
+    public Vector3? GetTextColour(int ID)
+    {
+        int index = GetIndex(ID);
+        if (index == -1) return null;
+
+        return TextColours[index];
+    }
+
+    public void SetName(int ID, string? name, Vector3? edgeColour, Vector3? textColour)
     {
         if (ID == -1) return;
 
@@ -47,10 +74,9 @@ internal class PettableNameDatabase : INamesDatabase
         {
             if (validName != null)
             {
-                string current = Names[index];
-                if (current == validName) return;
-
                 Names[index] = validName;
+                EdgeColours[index] = edgeColour;
+                TextColours[index] = textColour;
             }
             else
             {
@@ -59,7 +85,7 @@ internal class PettableNameDatabase : INamesDatabase
         }
         else if (validName != null)
         {
-            Add(ID, validName);
+            Add(ID, validName, edgeColour, textColour);
         }
 
         SetDirty();
@@ -80,25 +106,37 @@ internal class PettableNameDatabase : INamesDatabase
     {
         List<int> newIds = IDs.ToList();
         List<string> newNames = Names.ToList();
+        List<Vector3?> edgeColours = EdgeColours.ToList();
+        List<Vector3?> textColours = TextColours.ToList();
         newIds.RemoveAt(index);
         newNames.RemoveAt(index);
+        edgeColours.RemoveAt(index);
+        textColours.RemoveAt(index);
         IDs = newIds.ToArray();
         Names = newNames.ToArray();
+        EdgeColours = edgeColours.ToArray();
+        TextColours = textColours.ToArray();
     }
 
-    void Add(int id, string name)
+    void Add(int id, string name, Vector3? edgeColour, Vector3? textColour)
     {
         List<int> newIds = IDs.ToList();
         List<string> newNames = Names.ToList();
+        List<Vector3?> edgeColours = EdgeColours.ToList();
+        List<Vector3?> textColours = TextColours.ToList();
         newIds.Add(id);
         newNames.Add(name);
+        edgeColours.Add(edgeColour);
+        textColours.Add(textColour);
         IDs = newIds.ToArray();
         Names = newNames.ToArray();
+        EdgeColours = edgeColours.ToArray();
+        TextColours = textColours.ToArray();
     }
      
-    public SerializableNameData SerializeData() => new SerializableNameData(this);
+    public SerializableNameDataV2 SerializeData() => new SerializableNameDataV2(this);
 
-    public void Update(int[] ids, string[] names, IPettableDirtyCaller dirtyCaller)
+    public void Update(int[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, IPettableDirtyCaller dirtyCaller)
     {
         if (ids.Length != names.Length)
         {
@@ -114,6 +152,8 @@ internal class PettableNameDatabase : INamesDatabase
 
         IDs = ids;
         Names = newNames.ToArray();
+        EdgeColours = edgeColours.ToArray();
+        TextColours = textColours.ToArray();
     }
 
     void SetDirty()

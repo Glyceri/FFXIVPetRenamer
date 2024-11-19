@@ -32,7 +32,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 
     public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
     {
-        tooltipHookMap = Hook<MapTooltipTextHook>("Tooltip", [2], Allowed, false);
+        tooltipHookMap = Hook<MapTooltipTextHook>("Tooltip", [2], Allowed, false, false);
         tooltipHookMap.Register(3);
     }
 

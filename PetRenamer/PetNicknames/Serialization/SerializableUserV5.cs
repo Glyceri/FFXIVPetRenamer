@@ -3,22 +3,23 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 // Keep save file size shorter ....
 namespace PN.S;
 
 [Serializable]
-internal class SerializableUserV4
+internal class SerializableUserV5
 {
     public readonly ulong ContentID;
     public readonly string Name;
     public readonly ushort Homeworld;
     public readonly int[] SoftSkeletonData;
 
-    public readonly SerializableNameData[] SerializableNameDatas;
+    public readonly SerializableNameDataV2[] SerializableNameDatas;
 
     [JsonConstructor]
-    public SerializableUserV4(ulong contentId, string name, ushort homeworld, int[] softSkeletonData, SerializableNameData[] serializableNameDatas)
+    public SerializableUserV5(ulong contentId, string name, ushort homeworld, int[] softSkeletonData, SerializableNameDataV2[] serializableNameDatas)
     {
         ContentID = contentId;
         Name = name;
@@ -27,17 +28,17 @@ internal class SerializableUserV4
         SoftSkeletonData = softSkeletonData;
     }
 
-    public SerializableUserV4(in IPettableDatabaseEntry entry)
+    public SerializableUserV5(in IPettableDatabaseEntry entry)
     {
         ContentID = entry.ContentID;
         Name = entry.Name;
         Homeworld = entry.Homeworld;
         SoftSkeletonData = entry.SoftSkeletons.ToArray();
 
-        List<SerializableNameData> list = new List<SerializableNameData>();
+        List<SerializableNameDataV2> list = new List<SerializableNameDataV2>();
         foreach (INamesDatabase database in entry.AllDatabases)
         {
-            list.Add(new SerializableNameData(database));
+            list.Add(new SerializableNameDataV2(database));
         }
         SerializableNameDatas = list.ToArray();
     }

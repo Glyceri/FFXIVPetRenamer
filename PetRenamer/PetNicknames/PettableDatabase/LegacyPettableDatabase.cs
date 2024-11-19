@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -22,7 +23,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, userV3.softSkeletons, false, true);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, userV3.ids, userV3.names, new Vector3?[userV3.ids.Length], new Vector3?[userV3.ids.Length], userV3.softSkeletons, false, true);
             _entries.Add(newEntry);
         }
     }

@@ -1,17 +1,17 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal unsafe interface IStringHelper
 {
+    SeString MakeSeString(string petName, Vector3? edgeColor = null, Vector3? textColor= null);
     string MakeTitleCase(string str);
-    string? ReplaceStringPart(string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpaces = true);
-    void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true);
-    string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true);
-    string SetATKString(AtkTextNode* atkNode, string text);
-    string SetUtf8String(in Utf8String utf8String, string text);
+    SeString? ReplaceStringPart(string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpaces = true, Vector3? edgeColor = null, Vector3? textColor = null);
+    void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true, Vector3? edgeColor = null, Vector3? textColor = null);
+    string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor, IPetSheetData petData, bool checkForEmptySpace = true);
     string CleanupString(string str);
     string CleanupActionName(string str);
 }

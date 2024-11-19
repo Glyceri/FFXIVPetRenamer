@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -55,6 +56,8 @@ internal class NamePlateHook : HookableElement
         string? customPetName = pPet.CustomName;
         if (customPetName == null) return;
 
-        handler.NameParts.Text = customPetName;
+        pPet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+
+        handler.NameParts.Text = PetServices.StringHelper.MakeSeString(customPetName, edgeColour, textColour);
     }
 }

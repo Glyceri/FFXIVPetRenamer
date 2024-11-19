@@ -195,7 +195,7 @@ internal unsafe class ActionMenuHook : HookableElement
 
         if (!PetServices.Configuration.showNamesInActionLog) return;
 
-        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, petSheet);
+        PetServices.StringHelper.ReplaceATKString(textNode, textNodeText, customName, null, null, petSheet);
     }
 
     protected override void OnDispose()

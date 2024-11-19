@@ -15,10 +15,10 @@ internal abstract class QuickHookableElement : HookableElement
 
     readonly List<ITextHook> textHooks = new List<ITextHook>();
 
-    public T Hook<T>(string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false) where T : ITextHook, new()
+    public T Hook<T>(string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false) where T : ITextHook, new()
     {
         T t = new T();
-        t.Setup(DalamudServices, UserList, PetServices, DirtyListener, addonName, textPos, allowedCallback, isSoft);
+        t.Setup(DalamudServices, UserList, PetServices, DirtyListener, addonName, textPos, allowedCallback, allowColours, isSoft);
         // Cant use the [t is SimpleTextHook tHook] because it can only run this code if it is of the ACTUAL type SimpleTextHook.
         // Not any inherited type
         if (t.GetType() == typeof(SimpleTextHook))

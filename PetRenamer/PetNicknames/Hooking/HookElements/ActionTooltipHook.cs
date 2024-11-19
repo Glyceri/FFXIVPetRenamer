@@ -20,10 +20,10 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
     {
-        tooltipHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, true);
+        tooltipHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, false, true);
         tooltipHook.Register(3);
 
-        actionTooltipHook = Hook<ActionTooltipTextHook>("ActionDetail", [5], Allowed, true);
+        actionTooltipHook = Hook<ActionTooltipTextHook>("ActionDetail", [5], Allowed, false, true);
         actionTooltipHook.Register();
     }
 
