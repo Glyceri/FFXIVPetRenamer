@@ -27,7 +27,7 @@ internal class DataWriter : IDataWriter
             return string.Empty;
         }
 
-        string header = ParseVersion.Version2.GetDescription();
+        string header = ParseVersion.Version3.GetDescription();
 
         IPettableDatabaseEntry entry = localUser.DataBaseEntry;
 
