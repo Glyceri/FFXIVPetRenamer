@@ -22,7 +22,7 @@ internal class PetServices : IPetServices
 
         PetLog = new PetLogWrapper(services.PluginLog);
         Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
-        StringHelper = new StringHelperWrapper();
+        StringHelper = new StringHelperWrapper(this);
         PetSheets = new SheetsWrapper(ref services, StringHelper);
         PetCastHelper = new PetCastWrapper();
         PetActionHelper = new PetActionWrapper();

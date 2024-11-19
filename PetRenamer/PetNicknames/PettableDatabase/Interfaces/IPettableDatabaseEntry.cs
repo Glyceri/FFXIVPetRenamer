@@ -2,6 +2,7 @@
 using PN.S;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
@@ -30,13 +31,15 @@ internal interface IPettableDatabaseEntry
     /// <returns>If the move succeeded.</returns>
     bool MoveToDataBase(IPettableDatabase database);
     string? GetName(int skeletonID);
+    Vector3? GetEdgeColour(int skeletonID);
+    Vector3? GetTextColour(int skeletonID);
     int? GetSoftSkeleton(int softIndex);
     void SetSoftSkeleton(int index, int softSkeleton);
-    void SetName(int skeletonID, string name);
+    void SetName(int skeletonID, string name, Vector3? edgeColour, Vector3? textColour);
     void Clear(bool fromIPC);
 
     void UpdateEntry(IModernParseResult parseResult, bool asIPC);
     void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC);
 
-    SerializableUserV4 SerializeEntry();
+    SerializableUserV5 SerializeEntry();
 }

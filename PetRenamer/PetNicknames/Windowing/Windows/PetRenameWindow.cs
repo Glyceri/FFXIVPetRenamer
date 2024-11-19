@@ -11,9 +11,7 @@ using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Image;
-using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
-using PetRenamer.PetNicknames.Windowing.Components.Texture;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
 
@@ -25,9 +23,9 @@ internal class PetRenameWindow : PetWindow
     readonly IPetServices PetServices;
     readonly IPettableDirtyListener DirtyListener;
 
-    protected override Vector2 MinSize { get; } = new Vector2(437, 250);
+    protected override Vector2 MinSize { get; } = new Vector2(570, 250);
     protected override Vector2 MaxSize { get; } = new Vector2(1500, 250);
-    protected override Vector2 DefaultSize { get; } = new Vector2(437, 250);
+    protected override Vector2 DefaultSize { get; } = new Vector2(570, 250);
 
     protected override bool HasModeToggle { get; } = true;
 
@@ -39,9 +37,10 @@ internal class PetRenameWindow : PetWindow
 
     string ActiveCustomName = string.Empty;
     string ActualCustomName = string.Empty;
+    Vector3? ActiveEdgeColour = null;
+    Vector3? ActiveTextColour = null;
     IPetSheetData? ActivePetData;
     ISharedImmediateTexture? ActivePetTexture;
-
 
     float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
 
@@ -163,14 +162,19 @@ internal class PetRenameWindow : PetWindow
         string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
         lastCustomName = customName;
 
-        Setup(customName, in data);
+        Vector3? edgeColour = ActiveUser.DataBaseEntry.GetEdgeColour(activeSkeleton);
+        Vector3? textColour = ActiveUser.DataBaseEntry.GetTextColour(activeSkeleton);
+
+        Setup(customName, edgeColour, textColour, in data);
     }
 
-    void CleanOldNode() => Setup(null, null);
-    void Setup(string? customName, in IPetSheetData? petData)
+    void CleanOldNode() => Setup(null, null, null, null);
+    void Setup(string? customName, Vector3? edgeColour, Vector3? textColour, in IPetSheetData? petData)
     {
         ActiveCustomName = customName ?? string.Empty;
         ActualCustomName = ActiveCustomName;
+        ActiveEdgeColour = edgeColour;
+        ActiveTextColour = textColour;
         ActivePetData = petData;
         if (petData != null)
         {
@@ -182,11 +186,10 @@ internal class PetRenameWindow : PetWindow
         }
     }
 
-    void OnSave(string? newName)
+    void OnSave(string? newName, Vector3? edgeColour, Vector3? textColour)
     {
-        ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "");
+        ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? "", edgeColour, textColour);
     }
-
 
     void DrawElement()
     {
@@ -228,9 +231,9 @@ internal class PetRenameWindow : PetWindow
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData?.RaceName ?? Translator.GetLine("..."), contentSpot);
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), contentSpot);
 
-        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == ActualCustomName, ref ActiveCustomName, contentSpot))
+        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == ActualCustomName, ref ActiveCustomName, ref ActiveEdgeColour, ref ActiveTextColour, contentSpot))
         {
-            OnSave(ActiveCustomName);
+            OnSave(ActiveCustomName, ActiveEdgeColour, ActiveTextColour);
         }
 
         ActiveCustomName = ActiveCustomName.Replace("\n", string.Empty);

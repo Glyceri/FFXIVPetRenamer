@@ -26,14 +26,14 @@ internal class PettableDatabase : IPettableDatabase
     protected virtual void Setup()
     {
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
-        SerializableUserV4[]? users = PetServices.Configuration.SerializableUsersV4;
+        SerializableUserV5[]? users = PetServices.Configuration.SerializableUsersV5;
         if (users == null) return;
-        foreach (SerializableUserV4 user in users)
+        foreach (SerializableUserV5 user in users)
         {
-            SerializableNameData[] datas = user.SerializableNameDatas;
+            SerializableNameDataV2[] datas = user.SerializableNameDatas;
             if (datas.Length == 0) continue;
 
-            newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, user.SoftSkeletonData, true));
+            newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, datas[0].EdgeColours, datas[0].TextColours, user.SoftSkeletonData, true));
         }
         _entries = newEntries;
     }
@@ -53,12 +53,13 @@ internal class PettableDatabase : IPettableDatabase
             return null;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, name, homeworld, [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, name, homeworld, [], [], [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
 
-    public IPettableDatabaseEntry GetEntry(ulong contentID)
+
+    public IPettableDatabaseEntry? GetEntryNoCreate(ulong contentID)
     {
         int entriesCount = _entries.Count;
 
@@ -69,7 +70,15 @@ internal class PettableDatabase : IPettableDatabase
             return _entries[i];
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], PluginConstants.BaseSkeletons, false);
+        return null;
+    }
+
+    public IPettableDatabaseEntry GetEntry(ulong contentID)
+    {
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentID);
+        if (entry != null) return entry;
+
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
         _entries.Add(newEntry);
         return newEntry;
     }
@@ -84,9 +93,9 @@ internal class PettableDatabase : IPettableDatabase
         }
     }
 
-    public SerializableUserV4[] SerializeDatabase()
+    public SerializableUserV5[] SerializeDatabase()
     {
-        List<SerializableUserV4> users = new List<SerializableUserV4>();
+        List<SerializableUserV5> users = new List<SerializableUserV5>();
         int entryCount = _entries.Count;
         for (int i = 0; i < entryCount; i++)
         {
@@ -100,7 +109,9 @@ internal class PettableDatabase : IPettableDatabase
 
     public void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC)
     {
-        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(parseResult.ContentID);
+        if (entry == null) return;
+
         entry.UpdateEntry(parseResult, isFromIPC);
         if (!isFromIPC) SetDirty();
     }

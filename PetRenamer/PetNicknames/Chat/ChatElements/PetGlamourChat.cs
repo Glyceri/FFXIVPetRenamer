@@ -56,15 +56,21 @@ internal class PetGlamourChat : RestrictedChatElement
     //Titan-Egi  Carbuncle topaze
     //Garuda-Egi  Garuda-Egi
 
+    // LogKind = 57
+
     readonly Regex fullRegexEn = new(@"Pet glamour settings", RegexOptions.Compiled);
     readonly Regex fullRegexJp = new(@"ペットの見た目の設定状態", RegexOptions.Compiled);
     readonly Regex fullRegexDe = new(@"Momentanes Aussehen deiner Familiare:", RegexOptions.Compiled);
     readonly Regex fullRegexFr = new(@"Apparences de vos familiers", RegexOptions.Compiled);
 
+    // Change is in LogMessage at 3840
+
     readonly Regex changeRegexEn = new(@"^The next (?<petname>.+) summoned will appear glamoured as (?<petname2>.+)\.$", RegexOptions.Compiled);
     readonly Regex changeRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を「(?<petname2>.+)」に変更しました\。$", RegexOptions.Compiled);
     readonly Regex changeRegexDe = new(@"^(?<petname>.+) wird nächstes Mal als (?<petname2>.+) erscheinen\.$", RegexOptions.Compiled);
     readonly Regex changeRegexFr = new(@"^(?<petname>.+) aura l'apparence de (?<petname2>.+) lors de sa prochaine invocation\.$", RegexOptions.Compiled);
+
+    // Reset is in LogMessage at index 3841
 
     readonly Regex resetRegexEn = new(@"^The next (?<petname>.+) summoned will appear unglamoured\.$", RegexOptions.Compiled);
     readonly Regex resetRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を元に戻しました\。$", RegexOptions.Compiled);

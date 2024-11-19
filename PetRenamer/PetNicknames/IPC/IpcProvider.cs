@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
+using Dalamud.Utility;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Parsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -15,7 +16,7 @@ internal class IpcProvider : IIpcProvider
 {
     const string ApiNamespace = "PetRenamer.";
     const uint MajorVersion = 3;
-    const uint MinorVersion = 1;
+    const uint MinorVersion = 2;
 
     bool ready = false;
     string lastData = "[unprepared]";
@@ -153,7 +154,7 @@ internal class IpcProvider : IIpcProvider
                 if (DalamudServices.ObjectTable.Length <= objectIndex) return;
                 if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc) return;
 
-                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)pc.HomeWorld.Id), true);
+                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), true);
             });
         }
         catch(Exception e)
@@ -165,7 +166,15 @@ internal class IpcProvider : IIpcProvider
     // Functions
     public (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
     public bool EnabledDetour() => ready;
-    public string GetPlayerDataDetour() => lastData;
+    public string GetPlayerDataDetour()
+    {
+        if (lastData.IsNullOrWhitespace())
+        {
+            RefreshLastData();
+        }
+
+        return lastData;
+    }
 
     // Notifications
     void NotifyReady()
@@ -198,13 +207,24 @@ internal class IpcProvider : IIpcProvider
     // Interface Functions
     public void NotifyDataChanged()
     {
-        lastData = DataWriter.WriteData();
+        RefreshLastData();
         OnDataChanged();
+    }
+
+    void RefreshLastData()
+    {
+        lock (lastData)
+        {
+            lastData = DataWriter.WriteData();
+        }
     }
 
     public void ClearCachedData()
     {
-        lastData = "";
+        lock (lastData)
+        {
+            lastData = "";
+        }
     }
 
     public void Dispose()

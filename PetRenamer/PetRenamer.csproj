@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Glyceri</Authors>
     <Company></Company>
-    <Version>2.2.0.2</Version>
+    <Version>2.3.0.0</Version>
     <Description>A pet nickname plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Glyceri/FFXIVPetRenamer</PackageProjectUrl>
@@ -35,8 +35,8 @@
   </PropertyGroup>
   
    <ItemGroup>
-     <PackageReference Include="DalamudPackager" Version="2.1.13" />
-     <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
+     <PackageReference Include="DalamudPackager" Version="11.0.0" />
+     <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
    </ItemGroup>
 
   <ItemGroup>

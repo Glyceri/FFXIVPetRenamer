@@ -45,11 +45,13 @@ internal class DataWriter : IDataWriter
         {
             string name = database.Names[i];
             int id = database.IDs[i];
+            string edgeColour = database.EdgeColours[i]?.ToString() ?? "null";
+            string textColour = database.TextColours[i]?.ToString() ?? "null";
 
             if (id == 0) continue;
             if (name.IsNullOrWhitespace()) continue;
 
-            string newLine = $"{id}{PluginConstants.forbiddenCharacter}{name}";
+            string newLine = $"{id}{PluginConstants.forbiddenCharacter}{name}{PluginConstants.forbiddenCharacter}{edgeColour}{PluginConstants.forbiddenCharacter}{textColour}";
             petLines.Add(newLine);
         }
 

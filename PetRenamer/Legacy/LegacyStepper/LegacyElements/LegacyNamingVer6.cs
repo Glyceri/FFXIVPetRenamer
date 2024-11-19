@@ -55,9 +55,9 @@ internal class LegacyNamingVer6 : ILegacyStepperElement
             }
 
             configuration.serializableUsersV3 = newSerializableUsers.ToArray();
-
-            configuration.Version = 7;
         }
+
+        configuration.Version = 7;
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete

@@ -24,6 +24,7 @@ internal class DataParser : IDataParser
 
     static readonly IDataParserElement DataParserVersion1 = new DataParserVersion1();
     static readonly IDataParserElement DataParserVersion2 = new DataParserVersion2();
+    static readonly IDataParserElement DataParserVersion3 = new DataParserVersion3();
 
     public DataParser(DalamudServices dalamudServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
@@ -47,7 +48,13 @@ internal class DataParser : IDataParser
         {
             if (clearParseResult.Name.IsNullOrWhitespace() || clearParseResult.Homeworld == 0) return false;
 
-            Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false)?.Clear(false);
+            IPettableDatabaseEntry? entry = Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false);
+
+            if (entry != null)
+            {
+                Database.RemoveEntry(entry);
+            }
+
             return true;
         }
 
@@ -100,6 +107,7 @@ internal class DataParser : IDataParser
             ParseVersion.Invalid => new InvalidParseResult("Data is not Pet Nicknames data."),
             ParseVersion.Version1 => DataParserVersion1.Parse(incomingData),
             ParseVersion.Version2 => DataParserVersion2.Parse(incomingData),
+            ParseVersion.Version3 => DataParserVersion3.Parse(incomingData),
             _ => new InvalidParseResult("Invalid Parse Version."),
         };
     }

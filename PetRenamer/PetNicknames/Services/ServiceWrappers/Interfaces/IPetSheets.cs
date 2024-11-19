@@ -1,4 +1,4 @@
-﻿using Lumina.Excel.GeneratedSheets2;
+﻿using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using System.Collections.Generic;
 

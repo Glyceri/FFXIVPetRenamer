@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -35,7 +36,7 @@ internal unsafe class BattleChatElement : RestrictedChatElement
 
         IPetSheetData? petData;
 
-        IPettablePet ? battlePet = UserList.GetPet((nint)dealer);
+        IPettablePet? battlePet = UserList.GetPet((nint)dealer);
 
         if (battlePet == null) petData = PetServices.PetSheets.GetPetFromAction((uint)lastCastID, in user, true);
         else petData = battlePet.PetData;
@@ -45,6 +46,9 @@ internal unsafe class BattleChatElement : RestrictedChatElement
         string? customName = user.GetCustomName(petData);
         if (customName == null) return;
 
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData);
+        Vector3? edgeColour = user.DataBaseEntry.GetEdgeColour(petData.Model);
+        Vector3? textColour = user.DataBaseEntry.GetTextColour(petData.Model);
+
+        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, edgeColour, textColour);
     }
 }

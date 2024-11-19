@@ -1,4 +1,6 @@
-﻿using Dalamud.Hooking;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
@@ -24,20 +26,6 @@ internal unsafe class MapHook : HookableElement
     const int petIconID = 60961;
     const int alliancePetIconID = 60964;
 
-    // IntPtr is the AtkMapAddon thing and AtkNaviMap thing, really it doesnt matter
-    public delegate void NewMapDelegate(IntPtr a1);
-
-    // 40 57 48 83 EC 60 48 8B F9 83 FA 64
-    [Signature("40 57 48 81 EC B0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 90 00 00 00", DetourName = nameof(MiniMapDetour))]
-    readonly Hook<NewMapDelegate> naviTooltip = null!;
-
-    // "48 89 5C 24 ?? 55 48 83 EC 60 41 0F B6 E8"
-    // This is the 6.58 hook
-    // Everything has changed!
-
-    [Signature("E8 ?? ?? ?? ?? 8B 8F 44 07 00 00", DetourName = nameof(MapDetour))]
-    readonly Hook<NewMapDelegate> mapTooltipHook = null!;
-
     readonly IMapTooltipHook TooltipHook;
 
     public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
@@ -47,9 +35,12 @@ internal unsafe class MapHook : HookableElement
 
     public override void Init()
     {
-        naviTooltip?.Enable();
-        mapTooltipHook?.Enable();
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "_NaviMap", NaviMapUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "AreaMap", AreaMapUpdate);
     }
+
+    void NaviMapUpdate(AddonEvent type, AddonArgs args) => MiniMapDetour(args.Addon);
+    void AreaMapUpdate(AddonEvent type, AddonArgs args) => MapDetour(args.Addon);
 
     protected override void Refresh()
     {
@@ -76,8 +67,6 @@ internal unsafe class MapHook : HookableElement
 
     void MapDetour(IntPtr a1)
     {
-        mapTooltipHook!.Original(a1);
-
         int mapIndex = (int)(*(uint*)(a1 + 1860));
         if (mapIndex == -1) return;
 
@@ -90,8 +79,6 @@ internal unsafe class MapHook : HookableElement
 
     void MiniMapDetour(IntPtr a1)
     {
-        naviTooltip.Original(a1);
-
         int navimapIndex = (int)(*(uint*)(a1 + 14888));
         if (navimapIndex == -1) return;
 
@@ -266,7 +253,7 @@ internal unsafe class MapHook : HookableElement
 
     protected override void OnDispose()
     {
-        naviTooltip?.Dispose();
-        mapTooltipHook?.Dispose();
+        DalamudServices.AddonLifecycle.UnregisterListener(NaviMapUpdate);
+        DalamudServices.AddonLifecycle.UnregisterListener(AreaMapUpdate);
     }
 }

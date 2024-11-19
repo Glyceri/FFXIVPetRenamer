@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Immutable;
 using System.Linq;
 using PetRenamer.PetNicknames.TranslatorSystem;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -29,11 +30,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     readonly IPetServices PetServices;
     readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, int[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, int[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, int[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices = petServices;
         DirtyCaller = dirtyCaller;
-        ActiveDatabase = new PettableNameDatabase([], [], DirtyCaller);
+        ActiveDatabase = new PettableNameDatabase([], [], [], [], DirtyCaller);
 
         ContentID = contentID;
         IsActive = active;
@@ -42,7 +43,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         SetName(name);
         SetSoftSkeletons(softSkeletons);
-        SetActiveDatabase(ids, names);
+        SetActiveDatabase(ids, names, edgeColours, textColours);
         SetHomeworld(homeworld);
     }
 
@@ -60,7 +61,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     {
         IPettableDatabaseEntry entry = database.GetEntry(ContentID);
         if (entry is not PettableDataBaseEntry pEntry) return false;
-        pEntry.SetActiveDatabase(ActiveDatabase.IDs, ActiveDatabase.Names);
+        pEntry.SetActiveDatabase(ActiveDatabase.IDs, ActiveDatabase.Names, ActiveDatabase.EdgeColours, ActiveDatabase.TextColours);
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
@@ -80,9 +81,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         Name = name;
     }
 
-    void SetActiveDatabase(int[] ids, string[] names)
+    void SetActiveDatabase(int[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours)
     {
-        ActiveDatabase.Update(ids, names, DirtyCaller);
+        ActiveDatabase.Update(ids, names, edgeColours, textColours, DirtyCaller);
     }
 
     void SetSoftSkeletons(int[] softSkeletons)
@@ -101,7 +102,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     }
 
     public string? GetName(int skeletonID) => ActiveDatabase.GetName(skeletonID);
-    public void SetName(int skeletonID, string? name) => ActiveDatabase.SetName(skeletonID, name);
+    public Vector3? GetEdgeColour(int skeletonID) => ActiveDatabase.GetEdgeColour(skeletonID);
+    public Vector3? GetTextColour(int skeletonID) => ActiveDatabase?.GetTextColour(skeletonID);
+    public void SetName(int skeletonID, string? name, Vector3? edgeColour, Vector3? textColour) => ActiveDatabase.SetName(skeletonID, name, edgeColour, textColour);
 
     public int? GetSoftSkeleton(int softIndex)
     {
@@ -124,7 +127,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         MarkDirty();
     }
 
-    public SerializableUserV4 SerializeEntry() => new SerializableUserV4(this);
+    public SerializableUserV5 SerializeEntry() => new SerializableUserV5(this);
 
     public void UpdateEntry(IModernParseResult parseResult, bool asIPC)
     {
@@ -136,19 +139,18 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC)
     {
-        SetActiveDatabase(parseResult.IDs, parseResult.Names);
+        SetActiveDatabase(parseResult.IDs, parseResult.Names, parseResult.EdgeColous, parseResult.TextColours);
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        MarkDirty();
-
-        if (!IsIPC) return;
         IsIPC = asIPC;
+
+        MarkDirty();        
     }
 
     public void Clear(bool fromIPC)
     {
-        SetActiveDatabase([], []);
+        SetActiveDatabase([], [], [], []);
         IsActive = false;
         IsLegacy = false;
 

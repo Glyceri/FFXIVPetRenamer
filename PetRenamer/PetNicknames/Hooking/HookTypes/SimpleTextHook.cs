@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -27,10 +28,15 @@ internal unsafe class SimpleTextHook : ITextHook
     protected Func<int, bool> AllowedToFunction = _ => false;
 
     protected bool IsSoft;
+    protected bool AllowColours;
 
     string AddonName = string.Empty;
 
-    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool isSoft = false)
+    protected IPettableUser? CurrentUser;
+    protected IPetSheetData? CurrentPet;
+    protected IPettableDatabaseEntry? CurrentDatabaseEntry;
+
+    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         Services = services;
         PettableUserList = userList;
@@ -38,6 +44,7 @@ internal unsafe class SimpleTextHook : ITextHook
         DirtyListener = dirtyListener;
         TextPos = textPos;
         AllowedToFunction = allowedCallback;
+        AllowColours = allowColours;
         IsSoft = isSoft;
         AddonName = addonName;
 
@@ -98,23 +105,53 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        IPettableUser? user = GetUser();
-        if (user == null) return false;
+        CurrentUser = GetUser();
+        if (CurrentUser == null) return false;
 
-        IPetSheetData? pet = GetPetData(text, in user);
-        if (pet == null) return false;
+        CurrentPet = GetPetData(text, in CurrentUser);
+        if (CurrentPet == null) return false;
 
-        string? customName = user.DataBaseEntry.GetName(pet.Model);
+        CurrentDatabaseEntry = CurrentUser.DataBaseEntry;
+        if (CurrentDatabaseEntry == null) return false;
+
+        string? customName = CurrentDatabaseEntry.GetName(CurrentPet.Model);
         if (customName == null) return false;
 
-        SetText(textNode, text, customName, pet);
+        SetText(textNode, text, customName, CurrentPet);
         return true;
     }
 
     protected virtual void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
         if (!CheckIfCanFunction(text, pPet)) return;
-        LastAnswer = PetServices.StringHelper.ReplaceATKString(textNode, text, customName, pPet);
+
+        Vector3? edgeColour = null;
+        Vector3? textColour = null;
+
+        if (AllowColours)
+        {
+            GetColours(out edgeColour, out textColour);
+        }
+
+        LastAnswer = PetServices.StringHelper.ReplaceATKString(textNode, text, customName, edgeColour, textColour, pPet);
+    }
+
+    protected virtual void GetColours(out Vector3? edgeColour, out Vector3? textColour)
+    {
+        edgeColour = null;
+        textColour = null;
+
+        if (CurrentUser == null) return;
+        if (CurrentPet == null) return;
+        if (CurrentDatabaseEntry == null) return;
+
+        int colourSetting = PetServices.Configuration.showColours;
+
+        if (colourSetting >= 2) return;
+        if (colourSetting == 1 && !CurrentUser.IsLocalPlayer) return;
+
+        edgeColour = CurrentDatabaseEntry.GetEdgeColour(CurrentPet.Model);
+        textColour = CurrentDatabaseEntry.GetTextColour(CurrentPet.Model);
     }
 
     protected virtual bool CheckIfCanFunction(string text, IPetSheetData pPet)

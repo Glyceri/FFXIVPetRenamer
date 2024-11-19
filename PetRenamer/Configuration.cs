@@ -20,14 +20,18 @@ internal class Configuration : IPluginConfiguration
     [JsonIgnore]
     bool isSetup = false;
     [JsonIgnore]
-    public const int currentSaveFileVersion = 9;
+    public const int currentSaveFileVersion = 10;
     public int Version { get; set; } = currentSaveFileVersion;
 
-    public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
+    public SerializableUserV5[]? SerializableUsersV5 { get; set; } = null;
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
     public int languageSettings = 0;
+    // 0 == All
+    // 1 == Only yourself
+    // 2 == No colours
+    public int showColours = 0;
     // ------------------------------- Pet -------------------------------
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;
@@ -65,13 +69,13 @@ internal class Configuration : IPluginConfiguration
 
     void CurrentInitialise()
     {
-        SerializableUsersV4 ??= [];
+        SerializableUsersV5 ??= [];
     }
 
     public void Save()
     {
         if (currentSaveFileVersion != Version || !isSetup) return;
-        SerializableUsersV4 = Database!.SerializeDatabase();
+        SerializableUsersV5 = Database!.SerializeDatabase();
 #pragma warning disable CS0618
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
 #pragma warning restore CS0618
@@ -95,6 +99,8 @@ internal class Configuration : IPluginConfiguration
     public SerializableUserV2[]? serializableUsersV2 { get; set; } = null;
     [Obsolete("Old User Save System. Very innefficient. Please... OH PLEASE")]
     public SerializableUserV3[]? serializableUsersV3 = null;
+    [Obsolete("Old User Save System. Very innefficient.")]
+    public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
 
 #pragma warning restore IDE1006
 
@@ -105,6 +111,7 @@ internal class Configuration : IPluginConfiguration
         serializableUsers ??= Array.Empty<SerializableUser>();
         serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
         serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
+        SerializableUsersV4 ??= Array.Empty<SerializableUserV4>();
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 

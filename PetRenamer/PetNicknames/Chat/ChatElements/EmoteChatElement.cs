@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -51,7 +52,9 @@ internal unsafe class EmoteChatElement : IChatElement
             IPetSheetData? data = pet.PetData;
             if (data == null) continue;
 
-            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese));
+            pet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+
+            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese), edgeColour, textColour);
             break;
         }
     }
