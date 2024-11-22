@@ -46,9 +46,6 @@ internal unsafe class BattleChatElement : RestrictedChatElement
         string? customName = user.GetCustomName(petData);
         if (customName == null) return;
 
-        Vector3? edgeColour = user.DataBaseEntry.GetEdgeColour(petData.Model);
-        Vector3? textColour = user.DataBaseEntry.GetTextColour(petData.Model);
-
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, edgeColour, textColour);
+        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, null, null);
     }
 }

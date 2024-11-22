@@ -21,9 +21,9 @@ internal unsafe class TargetBarHook : QuickHookableElement
 
         Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed, true).RegsterTarget(FocusTargetPet);
 
-        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, false, true);
+        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, false, false);
         Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
-        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
+        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, true, false).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
         Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, true, true).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
 
         Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook, false);

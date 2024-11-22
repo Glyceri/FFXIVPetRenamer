@@ -43,8 +43,6 @@ internal class PetActionChat : RestrictedChatElement
         string? customName = user.GetCustomName(petData);
         if (customName == null) return;
 
-        battlePet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
-
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, edgeColour, textColour);
+        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, null, null);
     }
 }

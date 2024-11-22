@@ -52,9 +52,7 @@ internal unsafe class EmoteChatElement : IChatElement
             IPetSheetData? data = pet.PetData;
             if (data == null) continue;
 
-            pet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
-
-            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese), edgeColour, textColour);
+            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese), null, null);
             break;
         }
     }
