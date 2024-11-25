@@ -25,6 +25,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -123,7 +124,7 @@ internal class PetListWindow : PetWindow
 
                 if (ImGui.Button(ActiveEntry?.Name ?? Translator.GetLine("...") + $"##ToggleButtonButton_{WindowHandler.InternalCounter}", barSize))
                 {
-                    DalamudServices.Framework.Run(ToggleUserMode);
+                    DalamudServices.Framework.Run(() => ToggleUserMode());
                 }
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
                 {
@@ -267,10 +268,8 @@ internal class PetListWindow : PetWindow
             if (clicked)
             {
                 activeSearchText = SearchText;
-                SetUser(ActiveEntry);
+                DalamudServices.Framework.Run(() => SetUser(ActiveEntry));
             }
-
-            
 
             Listbox.End();
         }
@@ -286,7 +285,6 @@ internal class PetListWindow : PetWindow
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
                     BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
-                    
 
                     if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
                     {
@@ -325,8 +323,11 @@ internal class PetListWindow : PetWindow
                         {
                             if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight)))
                             {
-                                DalamudServices.Framework.Run(() => SetUser(user.Entry));
-                                ToggleUserMode();
+                                DalamudServices.Framework.Run(() =>
+                                {
+                                    ToggleUserMode();
+                                    SetUser(user.Entry);
+                                });
                             }
                         }
                         else
@@ -344,14 +345,16 @@ internal class PetListWindow : PetWindow
 
                             if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), BarHeight)))
                             {
-                                DalamudServices.Framework.Run(() => SetUser(user.Entry));
-                                ToggleUserMode();
+                                DalamudServices.Framework.Run(() =>
+                                {
+                                    ToggleUserMode();
+                                    SetUser(user.Entry);
+                                });
                             }
 
                             if (isSpecial)
                             {
                                 ImGui.SameLine();
-                                
 
                                 Vector4* colour = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
 
@@ -418,14 +421,14 @@ internal class PetListWindow : PetWindow
             ActiveEntry = UserList.LocalPlayer?.DataBaseEntry;
         }
 
-        SetUser(ActiveEntry);
+        DalamudServices.Framework.Run(() => SetUser(ActiveEntry));
     }
 
     protected override void OnModeChange()
     {
         if (inUserMode) return;
         ClearSearchBar();
-        SetUser(ActiveEntry);
+        DalamudServices.Framework.Run(() => SetUser(ActiveEntry));
     }
 
     void ToggleUserMode()
