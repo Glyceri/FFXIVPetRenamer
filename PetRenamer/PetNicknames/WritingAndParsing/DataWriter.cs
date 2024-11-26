@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace PetRenamer.PetNicknames.ReadingAndParsing;
@@ -46,8 +47,8 @@ internal class DataWriter : IDataWriter
         {
             string name = database.Names[i];
             int id = database.IDs[i];
-            string edgeColour = database.EdgeColours[i]?.ToString() ?? "null";
-            string textColour = database.TextColours[i]?.ToString() ?? "null";
+            string edgeColour = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
+            string textColour = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
 
             if (id == 0) continue;
             if (name.IsNullOrWhitespace()) continue;

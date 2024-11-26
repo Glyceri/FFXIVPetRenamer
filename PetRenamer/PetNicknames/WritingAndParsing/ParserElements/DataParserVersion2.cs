@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
 
@@ -40,7 +41,7 @@ internal class DataParserVersion2 : IDataParserElement
             {
                 string[] splitNickname = splitLines[i].Split(PluginConstants.forbiddenCharacter);
                 if (splitNickname.Length < 1) continue;
-                if (!int.TryParse(splitNickname[0], out int ID)) continue;
+                if (!int.TryParse(splitNickname[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID)) continue;
                 string nickname = splitNickname[1];
                 ids.Add(ID);
                 names.Add(nickname);
