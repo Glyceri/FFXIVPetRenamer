@@ -4,7 +4,9 @@ using System;
 using System.Numerics;
 
 // Keep save file size shorter ....
+#pragma warning disable IDE0130 // Namespace does not match folder structure (This is to keep the save file shorter)
 namespace PN.S;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 [Serializable]
 internal class SerializableNameDataV2
@@ -31,7 +33,6 @@ internal class SerializableNameDataV2
         TextColours = textColours;
     }
 #pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
-#pragma warning disable CS0612 // Type or member is obsolete
     public SerializableNameDataV2(SerializableNameData serializableNameData)
     {
         IDS = serializableNameData.IDS;
@@ -39,7 +40,6 @@ internal class SerializableNameDataV2
         EdgeColours = new Vector3?[IDS.Length];
         TextColours = new Vector3?[IDS.Length];
     }
-#pragma warning restore CS0612 // Type or member is obsolete
 #pragma warning restore CS0618 // Type or member is obsolete
 
     public SerializableNameDataV2(in INamesDatabase namesDatabase)

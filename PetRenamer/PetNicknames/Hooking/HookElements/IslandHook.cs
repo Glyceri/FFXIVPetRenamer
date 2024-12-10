@@ -56,8 +56,6 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
 
     public IslandHook(in DalamudServices services, in IPettableUserList userList, in IPetServices petServices, in IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
-
         activeRegex = DalamudServices.ClientState.ClientLanguage switch
         {
             ClientLanguage.Japanese => fullRegexJp,
@@ -81,7 +79,7 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
 
     public override void Init()
     {
-        
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
     }
 
     public void Update()

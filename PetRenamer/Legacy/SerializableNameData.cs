@@ -3,7 +3,9 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 
 // Keep save file size shorter ....
+#pragma warning disable IDE0130 // Namespace does not match folder structure (This is to keep the save file shorter)
 namespace PN.S;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 [Obsolete("Use SerializableNameDataV2 instead")]
 [Serializable]

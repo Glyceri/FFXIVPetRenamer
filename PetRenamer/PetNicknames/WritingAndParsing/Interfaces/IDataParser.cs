@@ -1,6 +1,6 @@
 ﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
-namespace PetRenamer.PetNicknames.Parsing.Interfaces;
+namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 
 internal interface IDataParser
 {

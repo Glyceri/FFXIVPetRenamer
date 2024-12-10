@@ -69,7 +69,7 @@ internal class DataParserVersion3 : IDataParserElement
 
         if (line == "null") return null;
 
-        if (!line.StartsWith("<") && !line.EndsWith(">")) return null;
+        if (!line.StartsWith('<') && !line.EndsWith('>')) return null;
 
         line = line.Replace("<", string.Empty).Replace(">", string.Empty);
 

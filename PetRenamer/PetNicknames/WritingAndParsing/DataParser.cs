@@ -1,19 +1,18 @@
 ﻿using Dalamud.Utility;
-using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace PetRenamer.PetNicknames.Parsing;
+namespace PetRenamer.PetNicknames.WritingAndParsing;
 
 internal class DataParser : IDataParser
 {

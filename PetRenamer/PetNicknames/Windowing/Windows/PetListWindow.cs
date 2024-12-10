@@ -10,7 +10,7 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList.Interfaces;

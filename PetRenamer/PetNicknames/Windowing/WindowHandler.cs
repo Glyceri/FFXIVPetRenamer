@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
