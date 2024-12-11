@@ -75,12 +75,12 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
         };
     }
 
-    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
-
     public override void Init()
     {
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
     }
+
+    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
 
     public void Update()
     {
