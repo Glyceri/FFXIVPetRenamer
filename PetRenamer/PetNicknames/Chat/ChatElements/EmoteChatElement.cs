@@ -52,7 +52,7 @@ internal unsafe class EmoteChatElement : IChatElement
             IPetSheetData? data = pet.PetData;
             if (data == null) continue;
 
-            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese), null, null);
+            PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !(DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese));
             break;
         }
     }

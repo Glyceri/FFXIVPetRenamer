@@ -46,6 +46,6 @@ internal unsafe class BattleChatElement : RestrictedChatElement
         string? customName = user.GetCustomName(petData);
         if (customName == null) return;
 
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, null, null);
+        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true);
     }
 }

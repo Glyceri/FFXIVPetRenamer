@@ -109,10 +109,9 @@ internal class PettableDatabase : IPettableDatabase
 
     public void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC)
     {
-        IPettableDatabaseEntry? entry = GetEntryNoCreate(parseResult.ContentID);
-        if (entry == null) return;
-
+        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
         entry.UpdateEntry(parseResult, isFromIPC);
+
         if (!isFromIPC) SetDirty();
     }
 

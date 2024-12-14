@@ -1,11 +1,11 @@
 ﻿using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -41,8 +41,8 @@ internal class PetActionChat : RestrictedChatElement
         if (petData == null) return;
 
         string? customName = user.GetCustomName(petData);
-        if (customName == null) return;
+        if (customName.IsNullOrWhitespace()) return;
 
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true, null, null);
+        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true);
     }
 }

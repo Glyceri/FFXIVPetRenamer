@@ -78,6 +78,11 @@ internal class StringHelperWrapper : IStringHelper
 
     public SeString ReplaceStringPart(string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpaces = true, Vector3? edgeColor = null, Vector3? textColor = null)
     {
+        if (replaceString.IsNullOrWhitespace())
+        {
+            return new SeString(new TextPayload(baseString));
+        }
+
         List<Payload> newPayloads = new List<Payload>();
         List<string> parts = GetString(petData);
 
