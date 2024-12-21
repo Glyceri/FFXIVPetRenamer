@@ -5,7 +5,6 @@ namespace PetRenamer.PetNicknames.Windowing.Components;
 
 internal static class TextAligner
 {
-
     public static void Align(TextAlignment alignment)
     {
         Vector2 basicAlign = new Vector2(0.5f, 0.5f);
@@ -20,7 +19,6 @@ internal static class TextAligner
     {
         ImGui.PopStyleVar();
     }
-
 }
 
 public enum TextAlignment

@@ -25,7 +25,6 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
-using PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 

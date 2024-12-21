@@ -16,9 +16,9 @@ internal class KofiWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(350, 136);
     protected override bool HasModeToggle { get; } = false;
 
-    float BarSize = 30 * ImGuiHelpers.GlobalScale;
+    float BarSize => 30 * ImGuiHelpers.GlobalScale;
 
-    public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Kofi-Window", ImGuiWindowFlags.None) { }
+    public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Pet Nicknames Kofi-Window", ImGuiWindowFlags.None) { }
 
     protected override void OnDraw()
     {

@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Interface.Utility;
+using ImGuiNET;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -70,20 +71,30 @@ internal class PetConfigWindow : PetWindow
         }
     }
 
-    void DrawMenu(string title, string[] elements, ref int configurationInt)
+    void DrawMenu(string title, string[] elements, ref int configurationInt, float width = 150)
     {
-        if (ImGui.BeginMenu($"{title}   ({elements[configurationInt]})##Menu_{WindowHandler.InternalCounter}"))
+        if (configurationInt < 0 || configurationInt >= elements.Length)
+        {
+            configurationInt = 0;
+        }
+
+        if (width <= 0) width = ImGui.GetContentRegionAvail().X;
+        else width = width * ImGuiHelpers.GlobalScale;
+
+        ImGui.SetNextItemWidth(width);
+
+        if (ImGui.BeginCombo(title, elements[configurationInt], ImGuiComboFlags.PopupAlignLeft))
         {
             for (int i = 0; i < elements.Length; i++)
             {
-                if (ImGui.MenuItem($"{elements[i]}##Menu_{WindowHandler.InternalCounter}"))
+                if (ImGui.Selectable(elements[i], i == configurationInt, ImGuiSelectableFlags.AllowDoubleClick))
                 {
                     configurationInt = i;
                     Configuration.Save();
                 }
             }
 
-            ImGui.EndMenu();
+            ImGui.EndCombo();
         }
     }
 }
