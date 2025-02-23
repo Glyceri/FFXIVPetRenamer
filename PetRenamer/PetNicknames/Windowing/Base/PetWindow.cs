@@ -79,7 +79,7 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 
     public sealed override void Draw()
     {
-        if (HasModeToggle) HeaderBar.Draw(in WindowHandler, in Configuration, this);
+        if (HasModeToggle) HeaderBar.Draw(DalamudServices, WindowHandler, Configuration, this);
         OnDraw();
     }
     public void NotifyDirty() => OnDirty();

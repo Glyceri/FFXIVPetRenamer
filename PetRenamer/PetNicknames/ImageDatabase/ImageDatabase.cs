@@ -117,7 +117,6 @@ internal class ImageDatabase : IImageDatabase
 
     public void Update()
     {
-
         int length = _imageDatabase.Count;
         for (int i = length - 1; i >= 0; i--)
         {

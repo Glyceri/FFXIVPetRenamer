@@ -20,7 +20,7 @@ internal class SharingDictionary : ISharingDictionary
         try
         {
             // Data sharing
-            PetNicknameDict = DalamudServices.PetNicknamesPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
+            PetNicknameDict = DalamudServices.DalamudPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
         }
         catch { }
     }
@@ -37,6 +37,6 @@ internal class SharingDictionary : ISharingDictionary
     public void Dispose()
     {
         PetNicknameDict.Clear();
-        DalamudServices.PetNicknamesPlugin.RelinquishData($"PetRenamer.GameObjectRenameDict");
+        DalamudServices.DalamudPlugin.RelinquishData($"PetRenamer.GameObjectRenameDict");
     }
 }

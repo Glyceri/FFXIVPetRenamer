@@ -257,10 +257,10 @@ internal class PetDevWindow : PetWindow
     {
         lastData = string.Empty;
 
-        getPlayerDataAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string>("PetRenamer.GetPlayerData");
-        onObjectChangeAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string, object>("PetRenamer.PlayerDataChanged");
-        setPlayerDataAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string, object>("PetRenamer.SetPlayerData");
-        clearPlayerData = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<ulong, object>("PetRenamer.ClearPlayerData");
+        getPlayerDataAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string>("PetRenamer.GetPlayerData");
+        onObjectChangeAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string, object>("PetRenamer.PlayerDataChanged");
+        setPlayerDataAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string, object>("PetRenamer.SetPlayerData");
+        clearPlayerData = DalamudServices.DalamudPlugin.GetIpcSubscriber<ulong, object>("PetRenamer.ClearPlayerData");
 
         onObjectChangeAll?.Unsubscribe(OnPlayerDataChanged);
         onObjectChangeAll?.Subscribe(OnPlayerDataChanged);

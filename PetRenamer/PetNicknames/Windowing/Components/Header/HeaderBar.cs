@@ -1,10 +1,13 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using ImGuiNET;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Windows;
+using System;
 using System.Numerics;
+using System.Reflection;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
@@ -13,7 +16,7 @@ internal static class HeaderBar
     const float HEADER_BAR_HEIGHT = 35;
     public static float HeaderBarWidth = 0;
 
-    public static void Draw(in WindowHandler windowHandler, in Configuration configuration, in PetWindow petWindow)
+    public static void Draw(DalamudServices dalamudServices, WindowHandler windowHandler, Configuration configuration, PetWindow petWindow)
     {
         Vector2 contentSize = ImGui.GetContentRegionAvail();
         contentSize.Y = HEADER_BAR_HEIGHT * ImGuiHelpers.GlobalScale;
@@ -23,8 +26,16 @@ internal static class HeaderBar
             Vector2 lastPos = ImGui.GetCursorPos();
 
             ModeToggle.Draw(petWindow);
+            
+            ImGui.SameLine();
 
-            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X, lastPos.Y));
+            Vector2 currentCursorPos = ImGui.GetCursorPos();
+
+            string version = dalamudServices.PetNicknamesPlugin.Version;
+
+            ImGui.Text($"v{version}");
+
+            ImGui.SetCursorPos(new Vector2(currentCursorPos.X, lastPos.Y));
 
             HeaderBarWidth = 0;
 

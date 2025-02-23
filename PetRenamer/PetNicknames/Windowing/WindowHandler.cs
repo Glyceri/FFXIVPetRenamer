@@ -57,9 +57,9 @@ internal class WindowHandler : IWindowHandler
 
 
         WindowSystem = new WindowSystem(PluginConstants.pluginName);
-        DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += Draw;
-        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
-        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
+        DalamudServices.DalamudPlugin.UiBuilder.Draw += Draw;
+        DalamudServices.DalamudPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
+        DalamudServices.DalamudPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
 
         ComponentLibrary.Initialise(in dalamudServices);
 
@@ -169,7 +169,7 @@ internal class WindowHandler : IWindowHandler
 
     public void Dispose()
     {
-        DalamudServices.PetNicknamesPlugin.UiBuilder.Draw -= Draw;
+        DalamudServices.DalamudPlugin.UiBuilder.Draw -= Draw;
         ClearAllWindows();
 
         ComponentLibrary.Dispose();
