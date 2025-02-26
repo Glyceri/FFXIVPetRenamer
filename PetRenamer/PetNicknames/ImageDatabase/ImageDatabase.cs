@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Textures.TextureWraps;
+﻿using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Texture;
 using PetRenamer.PetNicknames.ImageDatabase.Workers;
@@ -20,7 +21,7 @@ internal class ImageDatabase : IImageDatabase
 
     readonly DalamudServices DalamudServices;
     readonly IPetServices PetServices;
-    readonly IDalamudTextureWrap SearchTexture;
+    readonly ISharedImmediateTexture SearchTexture;
     readonly ILodestoneNetworker Networker;
     readonly IImageDownloader ImageDownloader;
 
@@ -30,12 +31,12 @@ internal class ImageDatabase : IImageDatabase
         PetServices = petServices;
         Networker = networker;
         ImageDownloader = new ImageDownloader(DalamudServices, PetServices, Networker);
-        SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(66310).RentAsync().Result;
+        SearchTexture = DalamudServices.TextureProvider.GetFromGameIcon(66310);
     }
 
     public IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry)
     {
-        if (databaseEntry == null) return SearchTexture;
+        if (databaseEntry == null) return SearchTexture.GetWrapOrEmpty();
 
         lock (_imageDatabase)
         {
@@ -48,7 +49,7 @@ internal class ImageDatabase : IImageDatabase
                 if (wrap.User == petUser)
                 {
                     wrap.Refresh();
-                    return wrap.TextureWrap ?? SearchTexture;
+                    return wrap.TextureWrap ?? SearchTexture.GetWrapOrEmpty();
                 }
             }
 
@@ -57,7 +58,7 @@ internal class ImageDatabase : IImageDatabase
 
         ImageDownloader.DownloadImage(databaseEntry, OnSuccess, PetServices.PetLog.LogException, true);
 
-        return SearchTexture;
+        return SearchTexture.GetWrapOrEmpty();
     }
 
     public void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null)
@@ -100,7 +101,6 @@ internal class ImageDatabase : IImageDatabase
 
     public void Dispose()
     {
-        SearchTexture?.Dispose();
         ImageDownloader?.Dispose();
         foreach (IGlyceriTextureWrap? tWrap in _imageDatabase)
         {
