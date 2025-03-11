@@ -76,9 +76,9 @@ internal class Configuration : IPluginConfiguration
     {
         if (currentSaveFileVersion != Version || !isSetup) return;
         SerializableUsersV5 = Database!.SerializeDatabase();
-#pragma warning disable CS0618
+#pragma warning disable CS0618 // Oboslete (Legacy database is supposed to handle obsolete objects
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
-#pragma warning restore CS0618
+#pragma warning restore CS0618 // Obsolete
         PetNicknamesPlugin?.SavePluginConfig(this);
 
     }

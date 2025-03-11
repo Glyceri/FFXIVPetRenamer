@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
@@ -33,8 +34,8 @@ internal class DataParserVersion3 : IDataParserElement
 
         List<int> ids = new List<int>();
         List<string> names = new List<string>();
-        List<Vector3?> edgeColour = new List<Vector3?>();
-        List<Vector3?> textColour = new List<Vector3?>();
+        List<Vector3?> edgeColours = new List<Vector3?>();
+        List<Vector3?> textColours = new List<Vector3?>();
 
         for (int i = 5; i < splitLines.Length; i++)
         {
@@ -44,12 +45,12 @@ internal class DataParserVersion3 : IDataParserElement
             {
                 string[] splitNickname = splitLines[i].Split(PluginConstants.forbiddenCharacter);
                 if (splitNickname.Length < 3) continue;
-                if (!int.TryParse(splitNickname[0], out int ID)) continue;
+                if (!int.TryParse(splitNickname[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID)) continue;
                 string nickname = splitNickname[1];
                 ids.Add(ID);
                 names.Add(nickname);
-                edgeColour.Add(ParseVector3(splitNickname[2]));
-                textColour.Add(ParseVector3(splitNickname[3]));
+                edgeColours.Add(ParseVector3(splitNickname[2]));
+                textColours.Add(ParseVector3(splitNickname[3]));
             }
             catch { continue; }
         }
@@ -59,7 +60,7 @@ internal class DataParserVersion3 : IDataParserElement
             return new InvalidParseResult("IDs and Names don't match up");
         }
 
-        return new Version2ParseResult(userName, homeWorld, contentID, softSkeletonsArray, ids.ToArray(), names.ToArray());
+        return new Version3ParseResult(userName, homeWorld, contentID, softSkeletonsArray, ids.ToArray(), names.ToArray(), edgeColours.ToArray(), textColours.ToArray());
     }
 
     Vector3? ParseVector3(string line)
@@ -68,7 +69,7 @@ internal class DataParserVersion3 : IDataParserElement
 
         if (line == "null") return null;
 
-        if (!line.StartsWith("<") || !line.EndsWith(">")) return null;
+        if (!line.StartsWith('<') && !line.EndsWith('>')) return null;
 
         line = line.Replace("<", string.Empty).Replace(">", string.Empty);
 
@@ -76,9 +77,9 @@ internal class DataParserVersion3 : IDataParserElement
 
         if (numbers.Length != 3) return null;
 
-        if (!float.TryParse(numbers[0], out float X)) return null;
-        if (!float.TryParse(numbers[1], out float Y)) return null;
-        if (!float.TryParse(numbers[2], out float Z)) return null;
+        if (!float.TryParse(numbers[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float X)) return null;
+        if (!float.TryParse(numbers[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float Y)) return null;
+        if (!float.TryParse(numbers[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float Z)) return null;
 
         return new Vector3(X, Y, Z);
     }
@@ -123,7 +124,7 @@ internal class DataParserVersion3 : IDataParserElement
      * 0                                        // Homeworld ID (ushort)
      * 0                                        // Content ID (ulong)
      * [-000,-000,-000,-000,-000]               // Array of soft skeletons. Always 5 in length. Soft skeletons must always start with a minus
-     * 0^customName^edgeColour^textColour       / Start of skeleton to name entries (the ^ is a symbol the user cannot use) 
+     * 0^customName^edgeColour^textColour       // Start of skeleton to name entries (the ^ is a symbol the user cannot use) <0.1,0.1,0.1> is the layout of edgecolour and textcolour
      * 1^customName^edgeColour^textColour
      * 2^customName^edgeColour^textColour
      * ...

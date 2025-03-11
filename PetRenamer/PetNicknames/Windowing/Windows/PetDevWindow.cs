@@ -6,6 +6,7 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ImGuiNET;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -21,6 +22,7 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 internal class PetDevWindow : PetWindow
 {
     readonly IPettableUserList UserList;
+    readonly IPettableDatabase Database;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -32,9 +34,10 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
     {
         UserList = userList;
+        Database = database;
 
         if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
         {
@@ -43,6 +46,7 @@ internal class PetDevWindow : PetWindow
 
         devStructList.Add(new DevStruct("User List", DrawUserList));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
+        devStructList.Add(new DevStruct("Database", DrawDatabase));
     }
 
     public override void OnOpen()
@@ -79,6 +83,41 @@ internal class PetDevWindow : PetWindow
         devStructList[currentActive].onSelected?.Invoke();
 
         ImGui.EndTabBar();
+    }
+
+    void DrawDatabase()
+    {
+        IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
+
+        foreach (IPettableDatabaseEntry entry in entries)
+        {
+            DrawDatabaseUser(entry);
+        }
+    }
+
+    void DrawDatabaseUser(IPettableDatabaseEntry user)
+    {
+        if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+            return;
+
+        ImGui.TableNextRow();
+
+        ImGui.TableSetColumnIndex(0);
+        ImGui.TextUnformatted(user.IsActive ? "O" : "X");
+
+        ImGui.TableSetColumnIndex(1);
+        ImGui.TextUnformatted($"{user.Name}");
+
+        ImGui.TableSetColumnIndex(2);
+        ImGui.TextUnformatted(user.Homeworld.ToString());
+
+        ImGui.TableSetColumnIndex(3);
+        ImGui.TextUnformatted(user.IsIPC ? "O" : "X");
+
+        ImGui.TableSetColumnIndex(4);
+        ImGui.TextUnformatted(UserList.GetUserFromContentID(user.ContentID) != null ? "O" : "X");
+
+        ImGui.EndTable();
     }
 
     ICallGateSubscriber<string>? getPlayerDataAll;
@@ -257,10 +296,10 @@ internal class PetDevWindow : PetWindow
     {
         lastData = string.Empty;
 
-        getPlayerDataAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string>("PetRenamer.GetPlayerData");
-        onObjectChangeAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string, object>("PetRenamer.PlayerDataChanged");
-        setPlayerDataAll = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<string, object>("PetRenamer.SetPlayerData");
-        clearPlayerData = DalamudServices.PetNicknamesPlugin.GetIpcSubscriber<ulong, object>("PetRenamer.ClearPlayerData");
+        getPlayerDataAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string>("PetRenamer.GetPlayerData");
+        onObjectChangeAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string, object>("PetRenamer.PlayerDataChanged");
+        setPlayerDataAll = DalamudServices.DalamudPlugin.GetIpcSubscriber<string, object>("PetRenamer.SetPlayerData");
+        clearPlayerData = DalamudServices.DalamudPlugin.GetIpcSubscriber<ulong, object>("PetRenamer.ClearPlayerData");
 
         onObjectChangeAll?.Unsubscribe(OnPlayerDataChanged);
         onObjectChangeAll?.Subscribe(OnPlayerDataChanged);

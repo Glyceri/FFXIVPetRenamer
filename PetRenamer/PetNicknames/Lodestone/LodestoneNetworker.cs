@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace PetRenamer.PetNicknames.Lodestone;
 
@@ -66,7 +67,7 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
     void MoveToObtain(LodestoneQueueElement lodestoneQueueElement)
     {
         lodestoneQueueElement.SetState(LodestoneQueueState.Obtaining);
-        string URL = $"https://na.finalfantasyxiv.com/lodestone/character/?q={lodestoneQueueElement.Entry.Name.Replace(" ", "+")}&worldname={lodestoneQueueElement.Entry.HomeworldName}";
+        string URL = $"https://na.finalfantasyxiv.com/lodestone/character/?q={HttpUtility.UrlEncode(lodestoneQueueElement.Entry.Name.Replace(" ", "+"))}&worldname={lodestoneQueueElement.Entry.HomeworldName}";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, URL);
         if (lodestoneQueueElement.Cancelled)
         {

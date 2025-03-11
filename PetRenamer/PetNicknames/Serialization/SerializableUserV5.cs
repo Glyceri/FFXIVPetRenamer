@@ -6,7 +6,9 @@ using System.Linq;
 using System.Numerics;
 
 // Keep save file size shorter ....
+#pragma warning disable IDE0130 // Namespace does not match folder structure (This is to keep the save file shorter)
 namespace PN.S;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 [Serializable]
 internal class SerializableUserV5

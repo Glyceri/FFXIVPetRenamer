@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for compatibility reasons)
 namespace PetRenamer.Core.Serialization;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
+[Obsolete("Use SerializableUserV5 instead")]
 [Serializable]
 public class SerializableUserV3
 {

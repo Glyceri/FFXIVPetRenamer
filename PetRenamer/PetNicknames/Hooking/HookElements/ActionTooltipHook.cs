@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -15,11 +16,14 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     readonly ActionTooltipTextHook tooltipHook = null!;
     readonly ActionTooltipTextHook actionTooltipHook = null!;
+    readonly ITooltipHookHelper TooltipHook;
 
     public uint LastActionID { get; private set; } = 0;
 
-    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, petServices, userList, dirtyListener)
+    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener, ITooltipHookHelper tooltipHookHelper) : base(services, petServices, userList, dirtyListener)
     {
+        TooltipHook = tooltipHookHelper;
+
         tooltipHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, false, true);
         tooltipHook.Register(3);
 
@@ -29,10 +33,17 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     public override void Init()
     {
+        TooltipHook.RegisterCallback(OnShowTooltipDetour);
         DalamudServices.GameGui.HoveredActionChanged += OnHoveredActionChanged;
     }
 
     bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
+
+    void OnShowTooltipDetour(IntPtr tooltip, byte tooltipType, ushort addonID, IntPtr a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8)
+    {
+        tooltipHook.SetPetSheetData(null);
+        actionTooltipHook.SetPetSheetData(null);
+    }
 
     void OnHoveredActionChanged(object? sender, HoveredAction e)
     {
@@ -52,6 +63,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     protected override void OnQuickDispose()
     {
+        TooltipHook.DeregisterCallback(OnShowTooltipDetour);
         DalamudServices.GameGui.HoveredActionChanged -= OnHoveredActionChanged;
     }
 }

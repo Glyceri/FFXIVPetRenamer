@@ -9,7 +9,6 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Labels;
 internal static class ColourPicker
 {
     static Vector3? colourHolder = Vector3.One;
-    static bool popupIsOpen = false;
 
     public static bool Draw(string ID, string tooltip, ref Vector3? colour, Vector2 size)
     {

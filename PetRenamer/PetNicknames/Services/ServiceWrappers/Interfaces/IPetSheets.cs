@@ -8,6 +8,7 @@ internal interface IPetSheets
 {
     TextCommand? GetCommand(uint id);
     Action? GetAction(uint actionID);
+    BNpcName? GetBNPCName(uint bnpcID);
     string? GetClassName(int id);
     string? GetWorldName(ushort worldID);
     IPetSheetData? GetPet(int skeletonID);

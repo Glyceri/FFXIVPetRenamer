@@ -21,7 +21,7 @@ internal class PetServices : IPetServices
         DalamudServices = services;
 
         PetLog = new PetLogWrapper(services.PluginLog);
-        Configuration = services.PetNicknamesPlugin.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         StringHelper = new StringHelperWrapper(this);
         PetSheets = new SheetsWrapper(ref services, StringHelper);
         PetCastHelper = new PetCastWrapper();

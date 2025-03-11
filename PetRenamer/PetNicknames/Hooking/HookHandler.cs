@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking;
+
 internal class HookHandler : IDisposable
 {
     readonly DalamudServices DalamudServices;
@@ -21,6 +22,7 @@ internal class HookHandler : IDisposable
     readonly ISharingDictionary SharingDictionary;
     readonly IPettableDirtyCaller DirtyCaller;
 
+    readonly ITooltipHookHelper TooltipHookHelper;
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook IslandHook { get; private set; } = null!;
@@ -36,6 +38,8 @@ internal class HookHandler : IDisposable
         SharingDictionary = sharingDictionary;
         DirtyCaller = dirtyCaller;
 
+        TooltipHookHelper = new TooltipHookHelper(DalamudServices);
+
         _Register();
     }
 
@@ -43,10 +47,10 @@ internal class HookHandler : IDisposable
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
 
-        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, TooltipHookHelper);
         Register(ActionTooltipHook);
 
-        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, TooltipHookHelper);
         Register(MapTooltipHook);
 
         IslandHook = new IslandHook(DalamudServices, PettableUserList, PetServices, DirtyListener);
@@ -72,5 +76,7 @@ internal class HookHandler : IDisposable
     {
         foreach(IHookableElement hookableElement in hookableElements)
             hookableElement.Dispose();
+
+        TooltipHookHelper.Dispose();
     }
 }

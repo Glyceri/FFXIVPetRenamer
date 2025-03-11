@@ -5,7 +5,6 @@ using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
@@ -25,6 +24,7 @@ internal class SheetsWrapper : IPetSheets
     readonly ExcelSheet<ClassJob>? classJob;
     readonly ExcelSheet<Action>? actions;
     readonly ExcelSheet<TextCommand>? textCommands;
+    readonly ExcelSheet<BNpcName>? bnpcNames;
 
     public SheetsWrapper(ref DalamudServices dalamudServices, IStringHelper helper)
     {
@@ -38,6 +38,7 @@ internal class SheetsWrapper : IPetSheets
         battlePetSheet = dalamudServices.DataManager.GetExcelSheet<Pet>();
         actions = dalamudServices.DataManager.GetExcelSheet<Action>();
         textCommands = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
+        bnpcNames = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
 
         SetupSheetDataCache();
 
@@ -94,13 +95,17 @@ internal class SheetsWrapper : IPetSheets
 
             if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton)) continue;
             if (!petIDToAction.TryGetValue(skeleton, out uint actionID)) continue;
+            if (!battlePetToBNpcName.TryGetValue(skeleton, out uint bnpcnameId)) continue;
 
             Action? petAction = GetAction(actionID);
             if (petAction == null) continue;
 
             ushort petIcon = petAction.Value.Icon;
 
-            string name = pet.Name.ExtractText();
+            BNpcName? bnpcName = GetBNPCName(bnpcnameId);
+            if (bnpcName == null) continue;
+
+            string name = bnpcName.Value.Singular.ExtractText();
             name = StringHelper.MakeTitleCase(name);
 
             string actionName = petAction.Value.Name.ExtractText();
@@ -108,12 +113,13 @@ internal class SheetsWrapper : IPetSheets
 
             string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(actionName));
 
-            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, 0, name, cleanedActionName, actionName, actionRowID, in DalamudServices));
+            petSheetCache.Add(new PetSheetData(skeleton, -1, petIcon, bnpcName.Value.Pronoun, name, cleanedActionName, actionName, actionRowID, in DalamudServices));
         }
     }
 
     public TextCommand? GetCommand(uint id) => textCommands?.GetRow(id);
     public Action? GetAction(uint actionID) => actions?.GetRow(actionID);
+    public BNpcName? GetBNPCName(uint bnpcID) => bnpcNames?.GetRow(bnpcID);
 
     public string? GetClassName(int id)
     {
@@ -340,6 +346,30 @@ internal class SheetsWrapper : IPetSheets
 
         return sheetData;
     }
+
+    public readonly Dictionary<int, uint> battlePetToBNpcName = new Dictionary<int, uint>()
+    {
+        { PluginConstants.EmeraldCarbuncle      , 1401 },
+        { PluginConstants.RubyCarbuncle         , 4149 },
+        { PluginConstants.Carbuncle             , 10261 },
+        { PluginConstants.TopazCarbuncle        , 1400 },
+        { PluginConstants.IfritEgi              , 1402 },
+        { PluginConstants.TitanEgi              , 1403 },
+        { PluginConstants.GarudaEgi             , 1404 },
+        { PluginConstants.Eos                   , 1398 },
+        { PluginConstants.Selene                , 1399 },
+        { PluginConstants.AutomatonQueen        , 8230 },
+        { PluginConstants.Seraph                , 8227 },
+        { PluginConstants.Phoenix               , 8228 },
+        { PluginConstants.LivingShadow          , 8229 },
+        { PluginConstants.IffritII              , 10262 },
+        { PluginConstants.GarudaII              , 10263 },
+        { PluginConstants.TitanII               , 10264 },
+        { PluginConstants.Bahamut               , 6566 },
+        { PluginConstants.RookAutoTurret        , 3666 },
+        { PluginConstants.SolarBahamut          , 13159 },
+
+    };
 
     public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
     {

@@ -107,7 +107,7 @@ internal unsafe class PartyHook : HookableElement
             string? customName = user.DataBaseEntry.GetName(data.Model);
             if (customName == null) continue;
 
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, new Vector3(1, 0, 0), null, data, false);
+            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, null, null, data, false);
         }
     }
 

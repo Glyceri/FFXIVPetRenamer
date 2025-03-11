@@ -3,14 +3,16 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Utility;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
 namespace PetRenamer;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 internal class IpcProvider : IIpcProvider
 {

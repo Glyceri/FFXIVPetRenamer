@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
-using PetRenamer.PetNicknames.Parsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
@@ -57,9 +57,9 @@ internal class WindowHandler : IWindowHandler
 
 
         WindowSystem = new WindowSystem(PluginConstants.pluginName);
-        DalamudServices.PetNicknamesPlugin.UiBuilder.Draw += Draw;
-        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
-        DalamudServices.PetNicknamesPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
+        DalamudServices.DalamudPlugin.UiBuilder.Draw += Draw;
+        DalamudServices.DalamudPlugin.UiBuilder.OpenMainUi += Open<PetRenameWindow>;
+        DalamudServices.DalamudPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
 
         ComponentLibrary.Initialise(in dalamudServices);
 
@@ -72,7 +72,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetConfigWindow(this, DalamudServices, Configuration));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));
-        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList));
+        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList, Database));
     }
 
     void AddWindow(PetWindow window)
@@ -169,7 +169,7 @@ internal class WindowHandler : IWindowHandler
 
     public void Dispose()
     {
-        DalamudServices.PetNicknamesPlugin.UiBuilder.Draw -= Draw;
+        DalamudServices.DalamudPlugin.UiBuilder.Draw -= Draw;
         ClearAllWindows();
 
         ComponentLibrary.Dispose();

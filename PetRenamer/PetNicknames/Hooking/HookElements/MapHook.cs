@@ -1,9 +1,8 @@
 ﻿using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Hooking;
-using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -67,7 +66,7 @@ internal unsafe class MapHook : HookableElement
 
     void MapDetour(IntPtr a1)
     {
-        int mapIndex = (int)(*(uint*)(a1 + 1860));
+        int mapIndex = (int)(*(uint*)(a1 + 1864));
         if (mapIndex == -1) return;
 
         if (!PrepareMap(mapIndex)) return;
@@ -79,7 +78,7 @@ internal unsafe class MapHook : HookableElement
 
     void MiniMapDetour(IntPtr a1)
     {
-        int navimapIndex = (int)(*(uint*)(a1 + 14888));
+        int navimapIndex = (int)(*(uint*)(a1 + 14896));
         if (navimapIndex == -1) return;
 
         if (!PrepareMap(navimapIndex)) return;
@@ -115,7 +114,7 @@ internal unsafe class MapHook : HookableElement
             if (!GetResources(5, manager.Value.NodeList[i], out AtkTextureResource* textureResource)) continue;
             if (!HandleTextureResource(textureResource)) continue;
 
-            if (manager.Value.PartsListCount + manager.Value.ObjectCount + manager.Value.AssetCount + i + 1 != index) continue;
+            if (manager.Value.PartsListCount + manager.Value.ObjectCount + manager.Value.AssetCount + i + 32 + 1 != index) continue;
 
             CurrentIsIndex();
         }
