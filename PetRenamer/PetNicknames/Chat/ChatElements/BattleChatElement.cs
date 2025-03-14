@@ -25,18 +25,15 @@ internal unsafe class BattleChatElement : RestrictedChatElement
     {
         if (!PetServices.Configuration.showInBattleChat) return;
 
-        BattleChara* dealer = PetServices.PetCastHelper.LastCastDealer;
         int lastCastID = PetServices.PetCastHelper.LastCastID;
 
-        if (dealer == null) return;
-
-        IPettableUser? user = UserList.GetUser((nint)dealer);
+        IPettableUser? user = UserList.GetUser(PetServices.PetCastHelper.LastCastDealer);
         if (user == null) return;
         if (!user.IsActive) return;
 
         IPetSheetData? petData;
 
-        IPettablePet? battlePet = UserList.GetPet((nint)dealer);
+        IPettablePet? battlePet = UserList.GetPet(PetServices.PetCastHelper.LastCastDealer);
 
         if (battlePet == null) petData = PetServices.PetSheets.GetPetFromAction((uint)lastCastID, in user, true);
         else petData = battlePet.PetData;
