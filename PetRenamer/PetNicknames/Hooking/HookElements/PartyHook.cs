@@ -29,7 +29,7 @@ internal unsafe class PartyHook : HookableElement
     protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
     protected override void Refresh() => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
 
-    bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible|| baseD == null);
+    bool CanContinue(AtkUnitBase* baseD) => baseD != null && baseD->IsVisible;
 
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
     void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
