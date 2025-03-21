@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -39,7 +40,7 @@ internal class IPCWatcher : IUpdatable
     {
         PetServices.PetLog.LogVerbose("Verify Database");
 
-        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
+        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries.ToArray())
         {
             if (!entry.IsIPC) continue;
 

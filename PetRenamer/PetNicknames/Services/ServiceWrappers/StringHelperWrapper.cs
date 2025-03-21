@@ -52,7 +52,7 @@ internal class StringHelperWrapper : IStringHelper
 
     unsafe void SetAtkString(AtkTextNode* atkNode, SeString seString)
     {
-        atkNode->SetText(seString.EncodeWithNullTerminator());
+        atkNode->SetText(seString.Encode());
     }
 
     public void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true, Vector3? edgeColor = null, Vector3? textColor = null)
