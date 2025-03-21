@@ -30,7 +30,8 @@ internal class DalamudServices
 
     public static DalamudServices Create(IDalamudPluginInterface plugin, PetRenamerPlugin petNicknames)
     {
-        DalamudServices service = plugin.Create<DalamudServices>()!;
+        DalamudServices service = new();
+        plugin.Inject(service);
         service.PetNicknamesPlugin = petNicknames;
         service.DalamudPlugin = plugin;
         return service;

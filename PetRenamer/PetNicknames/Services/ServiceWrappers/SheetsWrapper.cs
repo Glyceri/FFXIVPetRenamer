@@ -20,7 +20,6 @@ internal class SheetsWrapper : IPetSheets
     readonly ExcelSheet<Companion>? petSheet;
     readonly ExcelSheet<Pet>? battlePetSheet;
     readonly ExcelSheet<World>? worlds;
-    readonly ExcelSheet<Race>? races;
     readonly ExcelSheet<ClassJob>? classJob;
     readonly ExcelSheet<Action>? actions;
     readonly ExcelSheet<TextCommand>? textCommands;
@@ -33,7 +32,6 @@ internal class SheetsWrapper : IPetSheets
 
         petSheet = dalamudServices.DataManager.GetExcelSheet<Companion>();
         worlds = dalamudServices.DataManager.GetExcelSheet<World>();
-        races = dalamudServices.DataManager.GetExcelSheet<Race>();
         classJob = dalamudServices.DataManager.GetExcelSheet<ClassJob>();
         battlePetSheet = dalamudServices.DataManager.GetExcelSheet<Pet>();
         actions = dalamudServices.DataManager.GetExcelSheet<Action>();
@@ -65,17 +63,17 @@ internal class SheetsWrapper : IPetSheets
 
                 uint companionIndex = companion.RowId;
                 int modelID = (int)model.Value.RowId;
-                int legacyModelID = (int)model.Value.Model;
+                int legacyModelID = model.Value.Model;
 
                 if (legacyModelID == 0) continue;
 
-                string singular = companion.Singular.ToDalamudString().TextValue;
+                string singular = companion.Singular.ExtractText();
 
                 if (singular.IsNullOrWhitespace()) continue;
 
-                singular = StringHelper.MakeTitleCase(singular);
+                singular = StringHelper.ToTitleCase(singular);
 
-                string plural = companion.Plural.ToDalamudString().TextValue;
+                string plural = companion.Plural.ExtractText();
                 uint icon = companion.Icon;
 
                 sbyte pronoun = companion.Pronoun;
@@ -105,9 +103,7 @@ internal class SheetsWrapper : IPetSheets
             BNpcName? bnpcName = GetBNPCName(bnpcnameId);
             if (bnpcName == null) continue;
 
-            string name = bnpcName.Value.Singular.ExtractText();
-            name = StringHelper.MakeTitleCase(name);
-
+            string name = StringHelper.ToTitleCase(bnpcName.Value.Singular.ExtractText());
             string actionName = petAction.Value.Name.ExtractText();
             uint actionRowID = petAction.Value.RowId;
 

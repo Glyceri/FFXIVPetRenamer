@@ -58,6 +58,6 @@ internal class NamePlateHook : HookableElement
 
         pPet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
 
-        handler.NameParts.Text = PetServices.StringHelper.MakeSeString(customPetName, edgeColour, textColour);
+        handler.NameParts.Text = PetServices.StringHelper.WrapInColor(customPetName, edgeColour, textColour);
     }
 }

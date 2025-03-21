@@ -4,9 +4,9 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using Lumina.Text.ReadOnly;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -29,17 +29,27 @@ internal unsafe class ActionMenuHook : HookableElement
 
     void Update3(AtkUnitBase* baseD)
     {
+        if (!baseD->IsFullyLoaded()) return;
         if (!baseD->IsVisible) return;
 
         IPettableUser? user = UserList.LocalPlayer;
         if (user == null) return;
         if (!user.IsActive) return;
 
-        AtkComponentBase* resNode = baseD->GetComponentNodeById(6)->Component;
+        AtkComponentNode* compNode = baseD->GetComponentNodeById(6);
+        if (compNode == null) return;
+
+        AtkComponentBase* resNode = compNode->Component;
         if (resNode == null) return;
 
-        AtkTextNode* textNode = resNode->GetTextNodeById(10)->GetAsAtkTextNode();
+        AtkResNode* textResNode = resNode->GetTextNodeById(10);
+        if (textResNode == null) return;
+
+        AtkTextNode* textNode = textResNode->GetAsAtkTextNode();
         if (textNode == null) return;
+
+        if (resNode->UldManager.LoadedState != AtkLoadState.Loaded) return;
+        if (resNode->UldManager.NodeList == null) return;
 
         ushort nodeCount = resNode->UldManager.NodeListCount;
         if (nodeCount < 6) return;
@@ -47,16 +57,25 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkResNode* nodeListEl = resNode->UldManager.NodeList[5];
         if (nodeListEl == null) return;
 
-        AtkComponentIcon* icon = (AtkComponentIcon*)nodeListEl->GetAsAtkComponentNode()->Component;
+        AtkComponentNode* iconCompNode = nodeListEl->GetAsAtkComponentNode();
+        if (iconCompNode == null) return;
+
+        AtkComponentIcon* icon = (AtkComponentIcon*)iconCompNode->Component;
         if (icon == null) return;
 
         long iconID = icon->IconId;
 
-        AtkComponentBase* resNode2 = baseD->GetComponentNodeById(11)->Component;
+        AtkComponentNode* resCompNode2 = baseD->GetComponentNodeById(11);
+        if (resCompNode2 == null) return;
+
+        AtkComponentBase* resNode2 = resCompNode2->Component;
         if (resNode2 == null) return;
 
-        AtkTextNode* textNode2 = resNode2->GetTextNodeById(10)->GetAsAtkTextNode();
+        AtkTextNode* textNode2 = (AtkTextNode*)resNode2->GetTextNodeById(10);
         if (textNode2 == null) return;
+
+        if (resNode2->UldManager.LoadedState != AtkLoadState.Loaded) return;
+        if (resNode2->UldManager.NodeList == null) return;
 
         ushort nodeCount2 = resNode2->UldManager.NodeListCount;
         if (nodeCount2 < 6) return;
@@ -64,7 +83,10 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkResNode* iconResNode = resNode2->UldManager.NodeList[5];
         if (iconResNode == null) return;
 
-        AtkComponentIcon* icon2 = (AtkComponentIcon*)iconResNode->GetAsAtkComponentNode()->Component;
+        AtkComponentNode* iconCompNode2 = iconResNode->GetAsAtkComponentNode();
+        if (iconCompNode2 == null) return;
+
+        AtkComponentIcon* icon2 = (AtkComponentIcon*)iconCompNode2->Component;
         if (icon2 == null) return;
 
         long iconID2 = icon2->IconId;
@@ -79,6 +101,7 @@ internal unsafe class ActionMenuHook : HookableElement
 
         AtkComponentList* list = baseD->GetComponentListById(3);
         if (list == null) return;
+        if (list->ItemRendererList == null) return;
 
         IPettableUser? user = UserList.LocalPlayer;
         if (user == null) return;
@@ -86,21 +109,25 @@ internal unsafe class ActionMenuHook : HookableElement
 
         for (int i = 0; i < list->ListLength; i++)
         {
-            ListItem lItem = list->ItemRendererList[i];
-            AtkComponentListItemRenderer* renderer = lItem.AtkComponentListItemRenderer;
+            AtkComponentListItemRenderer* renderer = list->ItemRendererList[i].AtkComponentListItemRenderer;
             if (renderer == null) continue;
+            if (renderer->UldManager.LoadedState != AtkLoadState.Loaded) return;
 
-            AtkComponentButton button = renderer->AtkComponentButton;
-            AtkComponentBase cBase = button.AtkComponentBase;
-
-            AtkTextNode* tNode = (AtkTextNode*)cBase.GetTextNodeById(4);
+            AtkTextNode* tNode = (AtkTextNode*)renderer->GetTextNodeById(4);
             if (tNode == null) continue;
             if (!tNode->IsVisible()) continue;
 
-            ushort nodelistCount = cBase.UldManager.NodeListCount;
+            ushort nodelistCount = renderer->UldManager.NodeListCount;
             if (nodelistCount < 5) continue;
+            if (renderer->UldManager.NodeList == null) continue;
 
-            AtkComponentIcon* icon = (AtkComponentIcon*)cBase.UldManager.NodeList[4]->GetAsAtkComponentNode()->Component;
+            AtkResNode* resNode = renderer->UldManager.NodeList[4];
+            if (resNode == null) continue;
+
+            AtkComponentNode* compNode = resNode->GetAsAtkComponentNode();
+            if (compNode == null) continue;
+
+            AtkComponentIcon* icon = (AtkComponentIcon*)compNode->Component;
             if (icon == null) continue;
 
             long iconID = icon->IconId;
@@ -116,14 +143,17 @@ internal unsafe class ActionMenuHook : HookableElement
         IPettableUser? user = UserList.LocalPlayer;
         if (user == null) return;
         if (!user.IsActive) return;
+        if (baseD->UldManager.LoadedState != AtkLoadState.Loaded) return;
+        if (baseD->UldManager.NodeList == null) return;
 
         for (int i = 0; i < baseD->UldManager.NodeListCount; i++)
         {
             AtkComponentNode* node = baseD->UldManager.NodeList[i]->GetAsAtkComponentNode();
             if (node == null) continue;
-            if (!node->IsVisible()) continue;
             if (node->Component == null) continue;
+            if (node->Component->UldManager.LoadedState != AtkLoadState.Loaded) continue;
             if (node->Component->UldManager.NodeListCount != 11) continue;
+            if (!node->IsVisible()) continue;
 
             AtkComponentBase* atkNode = node->Component;
             if (atkNode == null) continue;
@@ -135,6 +165,9 @@ internal unsafe class ActionMenuHook : HookableElement
 
     bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
+        if (atkNode->UldManager.LoadedState != AtkLoadState.Loaded) return false;
+        if (atkNode->UldManager.NodeList == null) return false;
+
         AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
         if (tNode == null) return false;
         if (!tNode->IsVisible()) return false;
@@ -151,7 +184,10 @@ internal unsafe class ActionMenuHook : HookableElement
         ushort count2 = dragDropBase->UldManager.NodeListCount;
         if (count2 < 2) return false;
 
-        AtkComponentNode* iconBaseNode = (AtkComponentNode*)dragDropBase->UldManager.NodeList[2]->GetAsAtkComponentNode();
+        if (dragDropBase->UldManager.LoadedState != AtkLoadState.Loaded) return false;
+        if (dragDropBase->UldManager.NodeList == null) return false;
+
+        AtkComponentNode* iconBaseNode = dragDropBase->UldManager.NodeList[2]->GetAsAtkComponentNode();
         if (iconBaseNode == null) return false;
 
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
@@ -173,7 +209,7 @@ internal unsafe class ActionMenuHook : HookableElement
         ushort count = atkNode->UldManager.NodeListCount;
         if (count < 6) return false;
 
-        AtkComponentNode* iconBaseNode = (AtkComponentNode*)atkNode->UldManager.NodeList[5]->GetAsAtkComponentNode();
+        AtkComponentNode* iconBaseNode = atkNode->UldManager.NodeList[5]->GetAsAtkComponentNode();
         if (iconBaseNode == null) return false;
 
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
@@ -188,7 +224,7 @@ internal unsafe class ActionMenuHook : HookableElement
 
     void Rename(AtkTextNode* textNode, in IPettableUser user, long iconID)
     {
-        string textNodeText = textNode->NodeText.ToString();
+        string textNodeText = new ReadOnlySeStringSpan(textNode->NodeText).ExtractText();
 
         IPetSheetData? petSheet = PetServices.PetSheets.GetPetFromIcon(iconID);
         if (petSheet == null) return;

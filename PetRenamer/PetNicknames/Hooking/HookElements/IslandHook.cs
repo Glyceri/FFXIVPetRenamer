@@ -6,6 +6,7 @@ using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Text.ReadOnly;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -126,7 +127,7 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
         AtkTextNode* tNode = yesNoBox.GetNode<AtkTextNode>(2);
         if (tNode == null) return;
 
-        string text = tNode->NodeText.ToString();
+        string text = new ReadOnlySeStringSpan(tNode->NodeText).ExtractText();
         if (text.IsNullOrWhitespace()) return;
 
         ParseText(text);

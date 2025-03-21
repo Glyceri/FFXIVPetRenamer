@@ -9,6 +9,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System.Numerics;
+using Lumina.Text.ReadOnly;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -94,7 +95,7 @@ internal unsafe class SimpleTextHook : ITextHook
         if (tNode == null) return;
 
         // Make sure it only runs once
-        string tNodeText = tNode->NodeText.ToString();
+        string tNodeText = new ReadOnlySeStringSpan(tNode->NodeText).ExtractText();
         if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty) return;
         ClearDirty();
 

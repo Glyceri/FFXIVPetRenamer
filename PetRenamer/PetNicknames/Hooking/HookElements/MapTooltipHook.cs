@@ -45,6 +45,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(addonID);
         if (hoveredOverAddon == null) return;
+        if (!hoveredOverAddon->IsFullyLoaded()) return;
 
         string addonName = hoveredOverAddon->NameString;
         bool validAddonMap = allowedTooltipAddonsMap.Contains(addonName);
