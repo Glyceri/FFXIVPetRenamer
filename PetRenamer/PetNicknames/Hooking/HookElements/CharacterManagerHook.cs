@@ -238,10 +238,10 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     IPettableUser? CreateUser(BattleChara* newBattleChara)
     {
-        IPettableUser? newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, newBattleChara);
-
         int actualIndex = CreateActualIndex(newBattleChara->ObjectIndex);
         if (actualIndex < 0 || actualIndex >= 100) return null;
+
+        PettableUser newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, newBattleChara);
 
         UserList.PettableUsers[actualIndex] = newUser;
 

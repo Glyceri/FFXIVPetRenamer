@@ -2,7 +2,7 @@
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
-using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -48,9 +48,9 @@ internal unsafe class MapHook : HookableElement
 
     bool PrepareMap(int index)
     {
-        if (lastIndex != index) lastIndex = index;
-        else return false;
+        if (lastIndex == index) return false;
 
+        lastIndex = index;
         current = 0;
         foundCurrent = -1;
 
@@ -66,7 +66,7 @@ internal unsafe class MapHook : HookableElement
 
     void MapDetour(IntPtr a1)
     {
-        int mapIndex = (int)(*(uint*)(a1 + 1864));
+        int mapIndex = *(int*)(a1 + 1864);
         if (mapIndex == -1) return;
 
         if (!PrepareMap(mapIndex)) return;
@@ -78,7 +78,7 @@ internal unsafe class MapHook : HookableElement
 
     void MiniMapDetour(IntPtr a1)
     {
-        int navimapIndex = (int)(*(uint*)(a1 + 14896));
+        int navimapIndex = *(int*)(a1 + 14896);
         if (navimapIndex == -1) return;
 
         if (!PrepareMap(navimapIndex)) return;
@@ -191,7 +191,10 @@ internal unsafe class MapHook : HookableElement
         BattleChara* pChara = localUser.BattleChara;
         if (pChara == null) return;
 
-        Vector3 playerPos = pChara->Character.DrawObject->Position;
+        DrawObject* drawObject = pChara->Character.DrawObject;
+        if (drawObject == null) return;
+
+        Vector3 playerPos = drawObject->Position;
         Vector2 flatPlayerPos = new Vector2(playerPos.X, playerPos.Z);
 
         List<IPettablePet> partyPets = new List<IPettablePet>();
@@ -219,8 +222,8 @@ internal unsafe class MapHook : HookableElement
         {
             BattleChara* p1 = (BattleChara*)pet1.PetPointer;
             BattleChara* p2 = (BattleChara*)pet2.PetPointer;
-            Vector3 p1p = p1->Character.DrawObject->Position;
-            Vector3 p2p = p2->Character.DrawObject->Position;
+            Vector3 p1p = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
+            Vector3 p2p = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;
             Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
             Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
             return pos1.Length().CompareTo(pos2.Length());
@@ -244,6 +247,7 @@ internal unsafe class MapHook : HookableElement
         {
             if (pet is not IPettableBattlePet bPet) continue;
             if (pets.Contains(pet)) continue;
+            if (bPet.BattlePet == null) continue;
             if (!bPet.BattlePet->GetIsTargetable()) continue;
 
             pets.Add(pet);

@@ -11,6 +11,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using System.Numerics;
+using Lumina.Text.ReadOnly;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -29,7 +30,7 @@ internal unsafe class PartyHook : HookableElement
     protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
     protected override void Refresh() => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
 
-    bool CanContinue(AtkUnitBase* baseD) => !(!baseD->IsVisible|| baseD == null);
+    bool CanContinue(AtkUnitBase* baseD) => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
 
     void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
     void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
@@ -86,7 +87,7 @@ internal unsafe class PartyHook : HookableElement
             if (member.CastingProgressBar == null) continue;
             if (!member.CastingProgressBar->AtkResNode.IsVisible()) continue;
 
-            string castString = member.CastingActionName->NodeText.ToString();
+            string castString = new ReadOnlySeStringSpan(member.CastingActionName->NodeText).ExtractText();
             if (castString == string.Empty) continue;
 
             ulong contentID = partyGroup[index];

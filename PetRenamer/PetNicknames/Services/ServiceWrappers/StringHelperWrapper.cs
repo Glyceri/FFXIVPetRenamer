@@ -4,16 +4,14 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using LSeStringBuilder = Lumina.Text.SeStringBuilder;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
-
 
 // I am probably breaking around 10000000 SeString rules or w/e O.O
 // I have no idea, but throughout all my testing it has honestly worked... just fine c:
@@ -26,40 +24,37 @@ internal class StringHelperWrapper : IStringHelper
         PetServices = petServices;
     }
 
-    public string MakeTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
+    public string ToTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
-    public SeString MakeSeString(string petName, Vector3? edgeColor = null, Vector3? textColor = null)
+    public SeString WrapInColor(string text, Vector3? edgeColor = null, Vector3? textColor = null)
     {
-        if (petName.IsNullOrWhitespace()) return SeString.Empty;
+        if (text.IsNullOrWhitespace()) return SeString.Empty;
 
-        SeStringBuilder builder = new SeStringBuilder();
-        if (textColor != null) builder.Add(new ColourPayload(textColor.Value));
-        if (edgeColor != null) builder.Add(new GlowPayload(edgeColor.Value));
-        builder.AddText(petName);
-        if (edgeColor != null) builder.Add(new GlowEndPayload());
-        if (textColor != null) builder.Add(new ColourEndPayload());
+        LSeStringBuilder builder = new LSeStringBuilder();
 
-        return builder.Build();
+        if (textColor != null) builder.PushColorRgba(new Vector4(textColor.Value, 1f));
+        if (edgeColor != null) builder.PushEdgeColorRgba(new Vector4(edgeColor.Value, 1f));
+        builder.Append(text);
+        if (edgeColor != null) builder.PopEdgeColor();
+        if (textColor != null) builder.PopColor();
+
+        return builder.ToReadOnlySeString().ToDalamudString();
     }
 
     public unsafe string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor, IPetSheetData petData, bool checkForEmptySpace = true)
     {
         if (atkNode == null) return baseString;
         SeString newString = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace, edgeColor, textColor);
-        SetAtkString(atkNode, newString);
+        atkNode->SetText(newString.EncodeWithNullTerminator());
         return newString.TextValue;
-    }
-
-    unsafe void SetAtkString(AtkTextNode* atkNode, SeString seString)
-    {
-        atkNode->SetText(seString.Encode());
     }
 
     public void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true, Vector3? edgeColor = null, Vector3? textColor = null)
     {
+        if (message == null || message.Payloads.Count == 0) return;
+
         List<Payload> newPayloads = new List<Payload>();
 
-        if (message == null) return;
         for (int i = 0; i < message.Payloads.Count; i++)
         {
             if (message.Payloads[i] is not TextPayload tPayload)
@@ -83,7 +78,7 @@ internal class StringHelperWrapper : IStringHelper
             return new SeString(new TextPayload(baseString));
         }
 
-        List<Payload> newPayloads = new List<Payload>();
+        SeString newSeString = new SeString();
         List<string> parts = GetString(petData);
 
         int length = parts.Count;
@@ -107,20 +102,16 @@ internal class StringHelperWrapper : IStringHelper
             if (s.IsNullOrWhitespace()) continue;
             if (!s.Contains(PluginConstants.forbiddenCharacter))
             {
-                newPayloads.Add(new TextPayload(s));
+                newSeString.Append(new TextPayload(s));
                 continue;
             }
             else
             {
-                if (edgeColor != null) newPayloads.Add(new GlowPayload(edgeColor.Value));
-                if (textColor != null) newPayloads.Add(new ColourPayload(textColor.Value));
-                newPayloads.Add(new TextPayload(replaceString));
-                if (edgeColor != null) newPayloads.Add(new GlowEndPayload());
-                if (textColor != null) newPayloads.Add(new ColourEndPayload());
+                newSeString.Append(WrapInColor(replaceString, edgeColor, textColor));
             }
         }
 
-        return new SeString(newPayloads);
+        return newSeString;
     }
 
     List<string> GetString(IPetSheetData petData)
@@ -133,8 +124,6 @@ internal class StringHelperWrapper : IStringHelper
 
         return parts;
     }
-
-    string MakeString(char c, int count) => new string(c, count);
 
     public string CleanupString(string str)
     {
