@@ -55,6 +55,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
         {
             LastActionID = action;
         }
+
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(action, in localUser, true);
 
         tooltipHook.SetPetSheetData(petData);

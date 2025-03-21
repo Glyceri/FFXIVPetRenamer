@@ -44,7 +44,10 @@ internal unsafe class ActionMenuHook : HookableElement
         ushort nodeCount = resNode->UldManager.NodeListCount;
         if (nodeCount < 6) return;
 
-        AtkComponentIcon* icon = (AtkComponentIcon*)resNode->UldManager.NodeList[5]->GetAsAtkComponentNode()->Component;
+        AtkResNode* nodeListEl = resNode->UldManager.NodeList[5];
+        if (nodeListEl == null) return;
+
+        AtkComponentIcon* icon = (AtkComponentIcon*)nodeListEl->GetAsAtkComponentNode()->Component;
         if (icon == null) return;
 
         long iconID = icon->IconId;
@@ -58,7 +61,10 @@ internal unsafe class ActionMenuHook : HookableElement
         ushort nodeCount2 = resNode2->UldManager.NodeListCount;
         if (nodeCount2 < 6) return;
 
-        AtkComponentIcon* icon2 = (AtkComponentIcon*)resNode2->UldManager.NodeList[5]->GetAsAtkComponentNode()->Component;
+        AtkResNode* iconResNode = resNode2->UldManager.NodeList[5];
+        if (iconResNode == null) return;
+
+        AtkComponentIcon* icon2 = (AtkComponentIcon*)iconResNode->GetAsAtkComponentNode()->Component;
         if (icon2 == null) return;
 
         long iconID2 = icon2->IconId;

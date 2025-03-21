@@ -22,15 +22,15 @@ internal class PetActionChat : RestrictedChatElement
         RegisterChat(2105, 2106);
     }
 
-    internal unsafe override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
         if (!PetServices.PetActionHelper.LastValid) return;
         if (!PetServices.Configuration.showInBattleChat) return;
 
-        BattleChara* owner = PetServices.PetActionHelper.LastUser;
-        if (owner == null) return;
+        nint owner = PetServices.PetActionHelper.LastUser;
+        if (owner == nint.Zero) return;
 
-        IPettableUser? user = UserList.GetUser((nint)owner);
+        IPettableUser? user = UserList.GetUser(owner);
         if (user == null) return;
         if (!user.IsActive) return;
 
