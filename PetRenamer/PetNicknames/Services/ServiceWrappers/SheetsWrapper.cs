@@ -120,17 +120,24 @@ internal class SheetsWrapper : IPetSheets
     public string? GetClassName(int id)
     {
         if (classJob == null) return null;
+
         foreach (ClassJob cls in classJob)
-            if (cls.RowId == id)
-                return cls.Name.ExtractText();
+        {
+            if (cls.RowId != id) continue;
+
+            return cls.Name.ExtractText();
+        }
+
         return null;
     }
 
     public string? GetWorldName(ushort worldID)
     {
         if (worlds == null) return null;
+
         World? world = worlds.GetRow(worldID);
         if (world == null) return null;
+
         return world.Value.InternalName.ExtractText();
     }
 
@@ -138,8 +145,9 @@ internal class SheetsWrapper : IPetSheets
     {
         for (int i = 0; i < petSheetCache.Count; i++)
         {
-            if (petSheetCache[i].Model == skeletonID)
-                return petSheetCache[i];
+            if (petSheetCache[i].Model != skeletonID) continue;
+
+            return petSheetCache[i];
         }
 
         return null;
@@ -149,19 +157,25 @@ internal class SheetsWrapper : IPetSheets
     {
         bool canBeSoft = mutatableID.Contains(skeletonID);
 
-        if (!canBeSoft) return skeletonID;
+        if (!canBeSoft)
+        {
+            return skeletonID;
+        }
 
         int index = -1;
 
         for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
         {
-            if (PluginConstants.BaseSkeletons[i] == skeletonID)
-            {
-                index = i;
-                break;
-            }
+            if (PluginConstants.BaseSkeletons[i] != skeletonID) continue;
+            
+            index = i;
+            break;
         }
-        if (index >= 0 && index < softSkeletons.Length) return softSkeletons[index];
+
+        if (index >= 0 && index < softSkeletons.Length)
+        {
+            return softSkeletons[index];
+        }
 
         return skeletonID;
     }
@@ -169,25 +183,31 @@ internal class SheetsWrapper : IPetSheets
     public IPetSheetData? GetPetFromName(string name)
     {
         int sheetCount = petSheetCache.Count;
+
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
             if (!pet.IsPet(name)) continue;
+
             return pet;
         }
+
         return null;
     }
 
     public int? NameToSoftSkeletonIndex(string name)
     {
         name = name.Trim();
+
         if (name == string.Empty || name == null) return null;
+
         for (int i = 0; i < nameToClass.Length; i++)
         {
             string nameToClassUnmodified = nameToClass[i];
             string converted = StringHelper.CleanupActionName(nameToClassUnmodified);
 
-            if (!string.Equals(nameToClassUnmodified, name, System.StringComparison.InvariantCultureIgnoreCase) && !string.Equals(converted, name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            if (!string.Equals(nameToClassUnmodified, name, System.StringComparison.InvariantCultureIgnoreCase)  && 
+                !string.Equals(converted,             name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
             
             return i;
         }
@@ -220,9 +240,9 @@ internal class SheetsWrapper : IPetSheets
                 return list;
             }
 
-            if ((!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) || pet.BaseSingular == string.Empty) &&
-                (!line.Contains(pet.BasePlural, System.StringComparison.InvariantCultureIgnoreCase) || pet.BasePlural == string.Empty) &&
-                (!line.Contains(pet.ActionName, System.StringComparison.InvariantCultureIgnoreCase) || pet.ActionName == string.Empty)) continue;
+            if ((!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) || pet.BaseSingular == string.Empty)  &&
+                (!line.Contains(pet.BasePlural,   System.StringComparison.InvariantCultureIgnoreCase) || pet.BasePlural   == string.Empty)  &&
+                (!line.Contains(pet.ActionName,   System.StringComparison.InvariantCultureIgnoreCase) || pet.ActionName   == string.Empty)) continue;
 
             list.Add(pet);
         }
@@ -250,21 +270,30 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? GetPetFromIcon(long iconID)
     {
-        if (iconID == 0 || iconID == long.MaxValue) return null;
+        if (iconID == 0 || iconID == long.MaxValue)
+        {
+            return null;
+        }
 
         int sheetCount = petSheetCache.Count;
+
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
             if (pet.Icon  != iconID) continue;
+
             return pet;
         }
+
         return null;
     }
 
     public IPetSheetData? GetPetFromAction(uint actionID, in IPettableUser user, bool IsSoft)
     {
-        if (actionID == 0 || actionID == uint.MaxValue) return null;
+        if (actionID == 0 || actionID == uint.MaxValue)
+        {
+            return null;
+        }
 
         IPetSheetData? activePet = null;
 
@@ -273,12 +302,20 @@ internal class SheetsWrapper : IPetSheets
         {
             IPetSheetData pet = petSheetCache[i];
             if (!pet.IsAction(actionID)) continue;
+
             activePet = pet;
             break;
         }
-        if (activePet == null) return null;
 
-        if (!IsSoft) return activePet;
+        if (activePet == null)
+        {
+            return null;
+        }
+
+        if (!IsSoft)
+        {
+            return activePet;
+        }
 
         return MakeSoft(in user, in activePet);
     }

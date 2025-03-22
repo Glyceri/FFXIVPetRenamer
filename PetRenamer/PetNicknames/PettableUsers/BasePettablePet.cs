@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Numerics;
 
@@ -68,7 +69,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         int colourSetting = PetServices.Configuration.showColours;
 
         if (colourSetting >= 2) return;
-        if (colourSetting == 1 && (Owner?.IsLocalPlayer ?? false)) return;
+        if (colourSetting == 1 && (!Owner?.IsLocalPlayer ?? false)) return;
 
         edgeColour = EdgeColour;
         textColour = TextColour;
