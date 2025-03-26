@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Numerics;
 
@@ -11,17 +10,17 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
-    public nint PetPointer { get; private set; }
-    public int SkeletonID { get; init; }
-    public ulong ObjectID { get; init; }
-    public ushort Index { get; init; }
-    public string Name { get; init; } = "";
-    public string? CustomName { get; private set; }
-    public IPetSheetData? PetData { get; private set; }
-    public ulong Lifetime { get; private set; }
-    public IPettableUser? Owner { get; private set; }
-    public Vector3? EdgeColour { get; private set; }
-    public Vector3? TextColour { get; private set; }
+    public nint PetPointer          { get; }
+    public int SkeletonID           { get; }
+    public ulong ObjectID           { get; }
+    public ushort Index             { get; }
+    public string Name              { get; }
+    public IPetSheetData? PetData   { get; }
+    public IPettableUser? Owner     { get; }
+
+    public string? CustomName       { get; private set; }
+    public Vector3? EdgeColour      { get; private set; }
+    public Vector3? TextColour      { get; private set; }
 
     readonly IPetServices PetServices;
     readonly IPettableDatabaseEntry Entry;
@@ -30,20 +29,26 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
     public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
     {
-        PetServices = petServices;
-        Entry = entry;
-        AsBattlePet = asBattlePet;
-        SharingDictionary = sharingDictionary;
+        PetServices         = petServices;
+        Entry               = entry;
+        AsBattlePet         = asBattlePet;
+        SharingDictionary   = sharingDictionary;
 
-        PetPointer = (nint)pet;
+        PetPointer          = (nint)pet;
 
-        Owner = owner;
-        SkeletonID = pet->ModelContainer.ModelCharaId;
-        if (asBattlePet) SkeletonID = -SkeletonID;
-        Index = pet->GameObject.ObjectIndex;
-        Name = pet->GameObject.NameString;
-        ObjectID = pet->GetGameObjectId();
-        PetData = petServices.PetSheets.GetPet(SkeletonID);
+        Owner               = owner;
+        SkeletonID          = pet->ModelContainer.ModelCharaId;
+
+        if (asBattlePet)
+        {
+            SkeletonID = -SkeletonID;
+        }
+
+        Index               = pet->GameObject.ObjectIndex;
+        Name                = pet->GameObject.NameString;
+        ObjectID            = pet->GetGameObjectId();
+        PetData             = petServices.PetSheets.GetPet(SkeletonID);
+
         Recalculate();
     }
 
@@ -66,10 +71,12 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         edgeColour = null;
         textColour = null;
 
+        if (Owner == null) return;  // This should NEVER be the case
+
         int colourSetting = PetServices.Configuration.showColours;
 
         if (colourSetting >= 2) return;
-        if (colourSetting == 1 && (!Owner?.IsLocalPlayer ?? false)) return;
+        if (colourSetting == 1 && !Owner.IsLocalPlayer) return;
 
         edgeColour = EdgeColour;
         textColour = TextColour;

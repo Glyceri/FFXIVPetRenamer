@@ -21,14 +21,18 @@ internal unsafe class PartyHook : HookableElement
 
     public override void Init()
     {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "_PartyList", LifeCycleUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "_PartyList", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_PartyList", LifeCycleUpdate);
     }
 
-    protected override void OnNameDatabaseChange(INamesDatabase nameDatabase) => Refresh();
+    protected override void OnNameDatabaseChange(INamesDatabase nameDatabase)           => Refresh();
     protected override void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
-    protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry) => Refresh();
-    protected override void Refresh() => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
+    protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry)  => Refresh();
+
+    protected override void Refresh()
+    {
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
+    }
 
     bool CanContinue(AtkUnitBase* baseD) => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
 
@@ -42,8 +46,9 @@ internal unsafe class PartyHook : HookableElement
     void Update(AtkUnitBase* baseD)
     {
         if (!CanContinue(baseD)) return;
-        SetPetname((AddonPartyList*)baseD);
-        SetCastlist((AddonPartyList*)baseD);
+
+        SetPetname  ((AddonPartyList*)baseD);
+        SetCastlist ((AddonPartyList*)baseD);
     }
 
     protected override void OnDispose()
@@ -140,7 +145,13 @@ internal unsafe class PartyHook : HookableElement
         }
     }
 
-    bool IsCrossParty() => InfoProxyCrossRealm.Instance()->IsCrossRealm > 0 && GroupManager.Instance()->MainGroup.MemberCount < 1;
+    bool IsCrossParty()
+    {
+        bool isCrossRealm       = InfoProxyCrossRealm.Instance()->IsCrossRealm   > 0;
+        bool noMembersInGroup   = GroupManager.Instance()->MainGroup.MemberCount < 1;
+
+        return isCrossRealm && noMembersInGroup;
+    }
 
     int? GetCrossPartyIndex(ulong contentID)
     {
@@ -168,6 +179,8 @@ internal unsafe class PartyHook : HookableElement
             }
 
             PartyMember* member = GroupManager.Instance()->MainGroup.GetPartyMemberByIndex(i);
+            if (member == null) continue;
+
             if (member->ContentId == localContentID)
             {
                 foundSelf = true;
@@ -179,6 +192,7 @@ internal unsafe class PartyHook : HookableElement
                 return actualCurrent;
             }
         }
+
         return null;
     }
 }

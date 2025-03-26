@@ -1,5 +1,4 @@
 ﻿using Dalamud.Hooking;
-using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
@@ -16,42 +15,33 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class CharacterManagerHook : HookableElement
 {
-    delegate Companion* Companion_OnInitializeDelegate(Companion* companion);
-    delegate Companion* Companion_TerminateDelegate(Companion* companion);
-    delegate BattleChara* BattleChara_OnInitializeDelegate(BattleChara* battleChara);
-    delegate BattleChara* BattleChara_TerminateDelegate(BattleChara* battleChara);
-    delegate BattleChara* BattleChara_DestroyDelegate(BattleChara* battleChara, bool freeMemory);
+    private readonly Hook<Companion.Delegates.OnInitialize>? OnInitializeCompanionHook;
+    private readonly Hook<Companion.Delegates.Terminate>? OnTerminateCompanionHook;
+    private readonly Hook<BattleChara.Delegates.OnInitialize> OnInitializeBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Terminate> OnTerminateBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Dtor> OnDestroyBattleCharaHook;
 
-    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 33 FF 48 8B D9 48 89 B9 ?? ?? ?? ?? 66 89 B9 ?? ?? ?? ??", DetourName = nameof(InitializeCompanion))]
-    readonly Hook<Companion_OnInitializeDelegate>? OnInitializeCompanionHook = null;
+    private readonly IPettableDatabase Database;
+    private readonly ILegacyDatabase LegacyDatabase;
+    private readonly ISharingDictionary SharingDictionary;
+    private readonly IPettableDirtyCaller DirtyCaller;
+    private readonly IIslandHook IslandHook;
 
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 33 ED 48 8D 99 ?? ?? ?? ?? 48 89 A9 ?? ?? ?? ??", DetourName = nameof(TerminateCompanion))]
-    readonly Hook<Companion_TerminateDelegate>? OnTerminateCompanionHook = null;
+    private readonly List<nint> temporaryPets = new List<nint>();
 
-    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B F9 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7", DetourName = nameof(InitializeBattleChara))]
-    readonly Hook<BattleChara_OnInitializeDelegate>? OnInitializeBattleCharaHook = null;
-
-    [Signature("40 53 48 83 EC 20 8B 91 ?? ?? ?? ?? 48 8B D9 E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ??", DetourName = nameof(TerminateBattleChara))]
-    readonly Hook<BattleChara_TerminateDelegate>? OnTerminateBattleCharaHook = null;
-
-    [Signature("48 89 5C 24 08 57 48 83 EC 20 48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 8B DA 48 8D 05 ?? ?? ?? ?? 48 89 81 A0 01 00 00 48 81 C1 90 36 00 00", DetourName = nameof(DestroyBattleChara))]
-    readonly Hook<BattleChara_DestroyDelegate>? OnDestroyBattleCharaHook = null;
-
-    readonly IPettableDatabase Database;
-    readonly ILegacyDatabase LegacyDatabase;
-    readonly ISharingDictionary SharingDictionary;
-    readonly IPettableDirtyCaller DirtyCaller;
-    readonly IIslandHook IslandHook;
-
-    readonly List<IntPtr> temporaryPets = new List<IntPtr>();
-
-    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) : base(services, userList, petServices, dirtyListener) 
-    { 
+    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) : base(services, userList, petServices, dirtyListener)
+    {
         Database = database;
         LegacyDatabase = legacyDatabase;
         SharingDictionary = sharingDictionary;
         DirtyCaller = dirtyCaller;
         IslandHook = islandHook;
+
+        OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
+        OnTerminateCompanionHook    = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.Terminate>        ((nint)Companion.StaticVirtualTablePointer->Terminate,          TerminateCompanion);
+        OnInitializeBattleCharaHook = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.OnInitialize>   ((nint)BattleChara.StaticVirtualTablePointer->OnInitialize,     InitializeBattleChara);
+        OnTerminateBattleCharaHook  = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.Terminate>      ((nint)BattleChara.StaticVirtualTablePointer->Terminate,        TerminateBattleChara);
+        OnDestroyBattleCharaHook    = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.Dtor>           ((nint)BattleChara.StaticVirtualTablePointer->Dtor,             DestroyBattleChara);
     }
 
     public override void Init()
@@ -74,48 +64,81 @@ internal unsafe class CharacterManagerHook : HookableElement
 
             ObjectKind charaKind = bChara->GetObjectKind();
             if (charaKind != ObjectKind.Pc && charaKind != ObjectKind.BattleNpc) continue;
-            
+
             HandleAsCreated(bChara);
         }
     }
 
-    Companion* InitializeCompanion(Companion* companion)
+    void InitializeCompanion(Companion* companion)
     {
-        Companion* initializedCompanion = OnInitializeCompanionHook!.Original(companion);
+        try
+        {
+            OnInitializeCompanionHook!.OriginalDisposeSafe(companion);
+        }
+        catch (Exception e)
+        {
+            PetServices.PetLog.LogException(e);
+        }
 
         DalamudServices.Framework.Run(() => HandleAsCreatedCompanion(companion));
-
-        return initializedCompanion;
     }
 
-    Companion* TerminateCompanion(Companion* companion)
+    void TerminateCompanion(Companion* companion)
     {
         HandleAsDeletedCompanion(companion);
 
-        return OnTerminateCompanionHook!.Original(companion);
+        try
+        {
+            OnTerminateCompanionHook!.OriginalDisposeSafe(companion);
+        }
+        catch (Exception e)
+        {
+            PetServices.PetLog.LogException(e);
+        }
     }
 
-    BattleChara* InitializeBattleChara(BattleChara* bChara)
+    void InitializeBattleChara(BattleChara* bChara)
     {
-        BattleChara* initializedBattleChara = OnInitializeBattleCharaHook!.Original(bChara);
+        try
+        {
+            OnInitializeBattleCharaHook!.OriginalDisposeSafe(bChara);
+        }
+        catch (Exception e)
+        {
+            PetServices.PetLog.LogException(e);
+        }
 
         DalamudServices.Framework.Run(() => HandleAsCreated(bChara));
-
-        return initializedBattleChara;
     }
 
-    BattleChara* TerminateBattleChara(BattleChara* bChara) 
+    void TerminateBattleChara(BattleChara* bChara)
     {
         HandleAsDeleted(bChara);
 
-        return OnTerminateBattleCharaHook!.Original(bChara);
+        try
+        {
+            OnTerminateBattleCharaHook!.OriginalDisposeSafe(bChara);
+        }
+        catch (Exception e)
+        {
+            PetServices.PetLog.LogException(e);
+        }
     }
 
-    BattleChara* DestroyBattleChara(BattleChara* bChara, bool freeMemory)
+    GameObject* DestroyBattleChara(BattleChara* bChara, byte freeMemory)
     {
         HandleAsDeleted(bChara);
 
-        return OnDestroyBattleCharaHook!.Original(bChara, freeMemory);
+        try
+        {
+            return OnDestroyBattleCharaHook!.OriginalDisposeSafe(bChara, freeMemory);
+        }
+        catch (Exception e)
+        {
+            PetServices.PetLog.LogException(e);
+        }
+
+        return null;
     }
 
     void HandleAsCreatedCompanion(Companion* companion) => GetOwner(companion)?.SetCompanion(companion);
@@ -213,7 +236,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
             IPettableUser? user = UserList.GetUser(addressChara);
             if (user == null) return;
-            
+
             user.RemoveBattlePet(newBattleChara);
         }
     }
@@ -247,7 +270,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         AddTempPetsToUser(newUser);
 
-        if (newBattleChara->CompanionData.CompanionObject != null) 
+        if (newBattleChara->CompanionData.CompanionObject != null)
         {
             newUser.SetCompanion(newBattleChara->CompanionData.CompanionObject);
         }
@@ -256,7 +279,7 @@ internal unsafe class CharacterManagerHook : HookableElement
     }
 
     int CreateActualIndex(ushort index) => (int)MathF.Floor(index * 0.5f);
-    
+
     protected override void OnDispose()
     {
         OnInitializeCompanionHook?.Dispose();

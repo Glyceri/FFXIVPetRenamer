@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -64,26 +65,30 @@ internal unsafe class MapHook : HookableElement
         GetDistanceAt(foundCurrent);
     }
 
-    void MapDetour(IntPtr a1)
+    void MapDetour(nint a1)
     {
-        int mapIndex = *(int*)(a1 + 1864);
-        if (mapIndex == -1) return;
+        PetNicknamesAddonAreaMap* mapAddon = (PetNicknamesAddonAreaMap*)a1;
+        if (mapAddon == null) return;
 
-        if (!PrepareMap(mapIndex)) return;
+        if (mapAddon->TooltipHoveredIndex == -1) return;
 
-        MapTooltip((AtkUnitBase*)a1, mapIndex);
+        if (!PrepareMap(mapAddon->TooltipHoveredIndex)) return;
+
+        MapTooltip((AtkUnitBase*)a1, mapAddon->TooltipHoveredIndex);
 
         EndMap();
     }
 
-    void MiniMapDetour(IntPtr a1)
+    void MiniMapDetour(nint a1)
     {
-        int navimapIndex = *(int*)(a1 + 14896);
-        if (navimapIndex == -1) return;
+        PetNicknamesAddonNaviMap* naviMapAddon = (PetNicknamesAddonNaviMap*)a1;
+        if (naviMapAddon == null) return;
 
-        if (!PrepareMap(navimapIndex)) return;
+        if (naviMapAddon->TooltipHoveredIndex == -1) return;
 
-        NaviTooltip((AtkUnitBase*)a1, navimapIndex);
+        if (!PrepareMap(naviMapAddon->TooltipHoveredIndex)) return;
+
+        NaviTooltip((AtkUnitBase*)a1, naviMapAddon->TooltipHoveredIndex);
 
         EndMap();
     }
@@ -143,22 +148,31 @@ internal unsafe class MapHook : HookableElement
 
         if (curNode == null) return false;
         if (!curNode->IsVisible()) return false;
+
         AtkComponentNode* cNode = curNode->GetAsAtkComponentNode();
         if (cNode == null) return false;
+
         AtkComponentBase* cBase = cNode->Component;
         if (cBase == null) return false;
+
         AtkResNode* resNode = cBase->GetImageNodeById(imageID);
         if (resNode == null) return false;
+
         AtkImageNode* imgNode = resNode->GetAsAtkImageNode();
         if (imgNode == null) return false;
+
         AtkUldPartsList* partsList = imgNode->PartsList;
         if (partsList == null) return false;
+
         AtkUldPart* parts = partsList->Parts;
         if (parts == null) return false;
+
         AtkUldAsset* asset = parts->UldAsset;
         if (asset == null) return false;
+
         AtkTexture texture = asset->AtkTexture;
         textureResource = texture.Resource;
+
         if (textureResource == null) return false;
 
         return true;
@@ -198,10 +212,11 @@ internal unsafe class MapHook : HookableElement
         Vector2 flatPlayerPos = new Vector2(playerPos.X, playerPos.Z);
 
         List<IPettablePet> partyPets = new List<IPettablePet>();
-        List<IPettablePet> alliPets = new List<IPettablePet>();
+        List<IPettablePet> alliPets  = new List<IPettablePet>();
 
-        MakeFromMembers(gManager->MainGroup.PartyMembers, ref partyPets);
+        MakeFromMembers(gManager->MainGroup.PartyMembers,    ref partyPets);
         MakeFromMembers(gManager->MainGroup.AllianceMembers, ref alliPets);
+
         AddPets(localUser, ref partyPets);
 
         Sort(flatPlayerPos, ref partyPets);
@@ -218,16 +233,22 @@ internal unsafe class MapHook : HookableElement
     void Sort(Vector2 flatPlayerPos, ref List<IPettablePet> pets)
     {
         pets = pets.Distinct().ToList();
-        pets.Sort((pet1, pet2) =>
-        {
-            BattleChara* p1 = (BattleChara*)pet1.PetPointer;
-            BattleChara* p2 = (BattleChara*)pet2.PetPointer;
-            Vector3 p1p = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
-            Vector3 p2p = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;
-            Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
-            Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
-            return pos1.Length().CompareTo(pos2.Length());
-        });
+
+        pets.Sort(
+        (pet1, pet2) =>
+            {
+                BattleChara* p1 = (BattleChara*)pet1.PetPointer;
+                BattleChara* p2 = (BattleChara*)pet2.PetPointer;
+
+                Vector3 p1p = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
+                Vector3 p2p = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;
+
+                Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
+                Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
+
+                return pos1.Length().CompareTo(pos2.Length());
+            }
+        );
     }
 
     void MakeFromMembers(Span<PartyMember> members, ref List<IPettablePet> pets)
