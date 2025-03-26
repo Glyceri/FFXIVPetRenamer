@@ -1,5 +1,5 @@
 ﻿using Dalamud.Hooking;
-using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
@@ -10,14 +10,11 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
 {
     readonly DalamudServices DalamudServices;
 
-    // The dalamud TooltipType enum is NOT accurate it seems
-    public delegate int AccurateShowTooltip (nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8);
-    public delegate void TooltipDelegate    (nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8);
+    public delegate void TooltipDelegate    (nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8);
 
     event TooltipDelegate TooltipEvent = (_, _, _, _, _, _, _, _) => { };
 
-    [Signature("E8 ?? ?? ?? ?? 33 D2 EB 02 ?? ?? ?? ?? ?? ?? ??", DetourName = nameof(ShowTooltipDetour))]
-    readonly Hook<AccurateShowTooltip> showTooltip = null!;
+    readonly Hook<AtkTooltipManager.Delegates.ShowTooltip> showTooltipHook = null!;
 
     public TooltipHookHelper(DalamudServices dalamudServices)
     {
@@ -25,17 +22,20 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
 
         DalamudServices.Hooking.InitializeFromAttributes(this);
 
-        showTooltip.Enable();
+        showTooltipHook = DalamudServices.Hooking.HookFromAddress<AtkTooltipManager.Delegates.ShowTooltip>(AtkTooltipManager.Addresses.ShowTooltip.Value, AtkTooltipManagerShowTooltipDetour);
+
+        showTooltipHook.Enable();
     }
 
-    int ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8)
+    private void AtkTooltipManagerShowTooltipDetour(AtkTooltipManager* thisPtr, AtkTooltipManager.AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipManager.AtkTooltipArgs* tooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, void*> unkDelegate, bool unk7, bool unk8)
     {
-        CallCallbacks(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
+        showTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
 
-        return showTooltip!.Original(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
+        CallCallbacks((nint)thisPtr, type, parentId, (nint)targetNode, (nint)tooltipArgs, (nint)unkDelegate, unk7, unk8);
+        // do something
     }
 
-    void CallCallbacks(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8)
+    void CallCallbacks(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         TooltipEvent?.Invoke(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
     }
@@ -54,6 +54,6 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
 
     public void Dispose()
     {
-        showTooltip.Dispose();
+        showTooltipHook.Dispose();
     }
 }

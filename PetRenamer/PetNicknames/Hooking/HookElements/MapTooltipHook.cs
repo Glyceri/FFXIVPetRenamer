@@ -39,7 +39,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 
     bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8)
+    void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         if (addonID == lastId) return;
 

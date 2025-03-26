@@ -37,7 +37,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, ushort a7, ushort a8)
+    void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         tooltipHook.SetPetSheetData(null);
         actionTooltipHook.SetPetSheetData(null);
