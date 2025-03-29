@@ -29,10 +29,9 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
 
     private void AtkTooltipManagerShowTooltipDetour(AtkTooltipManager* thisPtr, AtkTooltipManager.AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipManager.AtkTooltipArgs* tooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, void*> unkDelegate, bool unk7, bool unk8)
     {
-        showTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
-
         CallCallbacks((nint)thisPtr, type, parentId, (nint)targetNode, (nint)tooltipArgs, (nint)unkDelegate, unk7, unk8);
-        // do something
+
+        showTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
     }
 
     void CallCallbacks(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
