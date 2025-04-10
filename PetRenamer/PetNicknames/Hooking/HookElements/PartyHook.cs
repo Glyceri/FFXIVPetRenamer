@@ -17,6 +17,8 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class PartyHook : HookableElement
 {
+    private bool hasRegisteredListener = false;
+
     public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
@@ -25,12 +27,12 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_PartyList", LifeCycleUpdate);
     }
 
-    protected override void OnNameDatabaseChange(INamesDatabase nameDatabase)           => Refresh();
-    protected override void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry) => Refresh();
-    protected override void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry)  => Refresh();
-
     protected override void Refresh()
     {
+        if (hasRegisteredListener) return;
+
+        hasRegisteredListener = true;
+
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
     }
 
@@ -40,6 +42,8 @@ internal unsafe class PartyHook : HookableElement
     void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
     {
         Update((AtkUnitBase*)args.Addon);
+
+        hasRegisteredListener = false;
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
@@ -54,6 +58,7 @@ internal unsafe class PartyHook : HookableElement
     protected override void OnDispose()
     {
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
     void SetPetname(AddonPartyList* partyNode)
