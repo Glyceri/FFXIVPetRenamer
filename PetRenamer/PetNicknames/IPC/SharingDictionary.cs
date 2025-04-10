@@ -22,7 +22,10 @@ internal class SharingDictionary : ISharingDictionary
             // Data sharing
             PetNicknameDict = DalamudServices.DalamudPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
         }
-        catch { }
+        catch(Exception e) 
+        {
+            DalamudServices.PluginLog.Error(e, "Error in Rename Dict Creation");
+        }
     }
 
     public void Set(GameObjectId gameObjectID, string? customName)
