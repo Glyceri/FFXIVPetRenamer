@@ -42,6 +42,7 @@ internal class IPCWatcher : IUpdatable
 
         foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
         {
+            if (!entry.IsActive) continue;
             if (!entry.IsIPC) continue;
 
             IPettableUser? user = UserList.GetUser(entry.ContentID);
