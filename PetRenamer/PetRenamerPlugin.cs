@@ -25,6 +25,9 @@ using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
 using System.Reflection;
+using Dalamud.Utility;
+using System;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace PetRenamer;
 
@@ -57,12 +60,27 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
     readonly SaveHandler SaveHandler;
 
+    bool crashPreventorActivated = false;
+
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
         Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown Version";
 
         _DalamudServices = DalamudServices.Create(dalamud, this)!;
         _PetServices = new PetServices(_DalamudServices);
+
+        Version? currentDalamudVersion = typeof(IDalamudPlugin).Assembly.GetName().Version;
+        if (currentDalamudVersion == null)
+        {
+            TemporaryCrashPreventer();
+            return;
+        }
+
+        if (currentDalamudVersion < new Version("12.0.0.9"))
+        {
+            TemporaryCrashPreventer();
+            return;
+        }
 
         SharingDictionary = new SharingDictionary(_DalamudServices);
 
@@ -97,8 +115,26 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         SaveHandler = new SaveHandler(_PetServices, PettableUserList, IpcProvider, DirtyHandler);
     }
 
+    void TemporaryCrashPreventer()
+    {
+        crashPreventorActivated = true;
+
+        _DalamudServices.NotificationManager.AddNotification(new Notification()
+        {
+            Type = NotificationType.Error,
+            Content = "Please restart your game for Pet Nicknames to function again.",
+            Minimized = false,
+            InitialDuration = TimeSpan.FromSeconds(15)
+        });
+    }
+
     public void Dispose()
     {
+        if (crashPreventorActivated)
+        {
+            return;
+        }
+
         SharingDictionary?.Dispose();
         ContextMenuHandler?.Dispose();
         IpcProvider?.Dispose();
