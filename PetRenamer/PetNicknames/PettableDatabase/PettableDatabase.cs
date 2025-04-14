@@ -87,8 +87,11 @@ internal class PettableDatabase : IPettableDatabase
     {
         for (int i = _entries.Count - 1; i >= 0; i--)
         {
-            if (_entries[i].ContentID != entry.ContentID) continue;
+            IPettableDatabaseEntry currentEntry = _entries[i];
 
+            if (currentEntry.ContentID != entry.ContentID) continue;
+
+            currentEntry.Clear(true);
             _entries.RemoveAt(i);
         }
     }

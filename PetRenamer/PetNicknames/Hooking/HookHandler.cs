@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using System;
 using System.Collections.Generic;
 
@@ -61,6 +62,7 @@ internal class HookHandler : IDisposable
         Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }
 
@@ -74,8 +76,10 @@ internal class HookHandler : IDisposable
 
     public void Dispose()
     {
-        foreach(IHookableElement hookableElement in hookableElements)
+        foreach (IHookableElement hookableElement in hookableElements)
+        {
             hookableElement.Dispose();
+        }
 
         TooltipHookHelper.Dispose();
     }

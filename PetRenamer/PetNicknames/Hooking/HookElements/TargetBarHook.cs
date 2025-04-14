@@ -13,34 +13,33 @@ internal unsafe class TargetBarHook : QuickHookableElement
 
     public override void Init()
     {
-        Hook<TargetTextHook>("_TargetInfo", [16], Allowed, allowColours: true).RegsterTarget(TargetObject);
-        Hook<TargetTextHook>("_TargetInfo", [7], Allowed, allowColours: true).RegsterTarget(TargetOfTarget);
+        Hook<TargetTextHook>    ("_TargetInfo",             [16],   Allowed,         allowColours: true,  isSoft: false).RegsterTarget(TargetObject);
+        Hook<TargetTextHook>    ("_TargetInfo",             [7],    Allowed,         allowColours: true,  isSoft: false).RegsterTarget(TargetOfTarget);
+        Hook<TargetTextHook>    ("_TargetInfoMainTarget",   [10],   Allowed,         allowColours: true,  isSoft: false).RegsterTarget(TargetObject);
+        Hook<TargetTextHook>    ("_TargetInfoMainTarget",   [7],    Allowed,         allowColours: true,  isSoft: false).RegsterTarget(TargetOfTarget);
+        Hook<TargetTextHook>    ("_FocusTargetInfo",        [10],   Allowed,         allowColours: true,  isSoft: false).RegsterTarget(FocusTargetPet);
 
-        Hook<TargetTextHook>("_TargetInfoMainTarget", [10], Allowed, allowColours: true).RegsterTarget(TargetObject);
-        Hook<TargetTextHook>("_TargetInfoMainTarget", [7], Allowed, allowColours: true).RegsterTarget(TargetOfTarget);
+        Hook<CastBarHook>       ("_CastBar",                [4],    AllowedCastbar,  allowColours: false, isSoft: true );
 
-        Hook<TargetTextHook>("_FocusTargetInfo", [10], Allowed, allowColours: true).RegsterTarget(FocusTargetPet);
+        Hook<TargetCastBarHook> ("_TargetInfo",             [12],   AllowedCastbar,  allowColours: false, isSoft: true ).RegsterTarget(() => UserList.GetUser(Target?.Address      ?? nint.Zero));
+        Hook<TargetCastBarHook> ("_TargetInfoCastBar",      [4],    AllowedCastbar,  allowColours: false, isSoft: true ).RegsterTarget(() => UserList.GetUser(Target?.Address      ?? nint.Zero));
+        Hook<TargetCastBarHook> ("_FocusTargetInfo",        [5],    AllowedCastbar,  allowColours: false, isSoft: true ).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
 
-        Hook<CastBarHook>("_CastBar", [4], AllowedCastbar, allowColours: false, isSoft: true);
-        Hook<TargetCastBarHook>("_TargetInfo", [12], AllowedCastbar, allowColours: false, isSoft: true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
-        Hook<TargetCastBarHook>("_TargetInfoCastBar", [4], AllowedCastbar, allowColours: false, isSoft: true).RegsterTarget(() => UserList.GetUser(Target?.Address ?? nint.Zero));
-        Hook<TargetCastBarHook>("_FocusTargetInfo", [5], AllowedCastbar, allowColours: false, isSoft: true).RegsterTarget(() => UserList.GetUser(FocusTarget?.Address ?? nint.Zero));
-
-        Hook<NotebookHook>("MinionNoteBook", [67], AllowedNotebook, allowColours: false);
-        Hook<NotebookHook>("MJIMinionNoteBook", [65], AllowedNotebook, allowColours: false);
-        Hook<NotebookHook>("LovmPaletteEdit", [48], AllowedNotebook, allowColours: false);
-        Hook<NotebookHook>("LovmActionDetail", [4], AllowedNotebook, allowColours: false);
-        Hook<NotebookHook>("YKWNote", [28], AllowedNotebook, allowColours: false);
+        Hook<NotebookHook>      ("MinionNoteBook",          [67],   AllowedNotebook, allowColours: false, isSoft: false);
+        Hook<NotebookHook>      ("MJIMinionNoteBook",       [65],   AllowedNotebook, allowColours: false, isSoft: false);
+        Hook<NotebookHook>      ("LovmPaletteEdit",         [48],   AllowedNotebook, allowColours: false, isSoft: false);
+        Hook<NotebookHook>      ("LovmActionDetail",        [4],    AllowedNotebook, allowColours: false, isSoft: false);
+        Hook<NotebookHook>      ("YKWNote",                 [28],   AllowedNotebook, allowColours: false, isSoft: false);
     }
 
     IPettablePet? FocusTargetPet() => UserList.GetPet(FocusTarget?.Address ?? nint.Zero);
     IPettablePet? TargetOfTarget() => UserList.GetPet(Target?.TargetObject?.Address ?? nint.Zero);
-    IPettablePet? TargetObject() => UserList.GetPet(Target?.Address ?? nint.Zero);
+    IPettablePet? TargetObject()   => UserList.GetPet(Target?.Address ?? nint.Zero);
 
-    IGameObject? FocusTarget => DalamudServices.TargetManager.FocusTarget;
-    IGameObject? Target => DalamudServices.TargetManager.SoftTarget ?? DalamudServices.TargetManager.Target;
+    IGameObject? FocusTarget       => DalamudServices.TargetManager.FocusTarget;
+    IGameObject? Target            => DalamudServices.TargetManager.SoftTarget ?? DalamudServices.TargetManager.Target;
 
-    bool Allowed(int id) => PetServices.Configuration.showOnTargetBars;
-    bool AllowedCastbar(int id) => PetServices.Configuration.showOnCastbars;
-    bool AllowedNotebook(int id) => PetServices.Configuration.showNamesInMinionBook;
+    bool Allowed(int id)           => PetServices.Configuration.showOnTargetBars;
+    bool AllowedCastbar(int id)    => PetServices.Configuration.showOnCastbars;
+    bool AllowedNotebook(int id)   => PetServices.Configuration.showNamesInMinionBook;
 }

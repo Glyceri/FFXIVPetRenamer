@@ -18,7 +18,7 @@ internal class FlyTextHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 
-    [Signature("E8 ?? ?? ?? ?? 45 38 7E 1F", DetourName = nameof(LogMessageDetour))]
+    [Signature("E8 ?? ?? ?? ?? 45 38 7E 25", DetourName = nameof(LogMessageDetour))]
     readonly Hook<LogMethod>? logMethod = null;
 
     public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }

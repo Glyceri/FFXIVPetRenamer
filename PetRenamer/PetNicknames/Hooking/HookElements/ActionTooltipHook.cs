@@ -6,14 +6,12 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 {
-    const int MinionActionKind = 34;
-
     readonly ActionTooltipTextHook tooltipHook = null!;
     readonly ActionTooltipTextHook actionTooltipHook = null!;
     readonly ITooltipHookHelper TooltipHook;
@@ -39,7 +37,7 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void OnShowTooltipDetour(IntPtr tooltip, byte tooltipType, ushort addonID, IntPtr a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8)
+    void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         tooltipHook.SetPetSheetData(null);
         actionTooltipHook.SetPetSheetData(null);

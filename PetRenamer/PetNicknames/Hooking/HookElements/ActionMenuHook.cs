@@ -16,19 +16,20 @@ internal unsafe class ActionMenuHook : HookableElement
 
     public override void Init()
     {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenu", LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "ActionMenu", LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenu", LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList", LifeCycleUpdate2);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "ActionMenuActionSetting", LifeCycleUpdate3);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenu",               LifeCycleUpdateActionMenu);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh,         "ActionMenu",               LifeCycleUpdateActionMenu);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenu",               LifeCycleUpdateActionMenu);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList",    LifeCycleUpdateReplaceMenu);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenuActionSetting",  LifeCycleUpdateActionSetting);
     }
 
-    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdate2(AddonEvent addonEvent, AddonArgs addonArgs) => Update2((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdate3(AddonEvent addonEvent, AddonArgs addonArgs) => Update3((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon);
 
-    void Update3(AtkUnitBase* baseD)
+    void UpdateActionSetting(AtkUnitBase* baseD)
     {
+        if (baseD == null) return;
         if (!baseD->IsFullyLoaded()) return;
         if (!baseD->IsVisible) return;
 
@@ -95,8 +96,9 @@ internal unsafe class ActionMenuHook : HookableElement
         Rename(textNode2, in user, iconID2);
     }
 
-    void Update2(AtkUnitBase* baseD)
+    void UpdateReplaceMenu(AtkUnitBase* baseD)
     {
+        if (baseD == null) return;
         if (!baseD->IsVisible) return;
 
         AtkComponentList* list = baseD->GetComponentListById(3);
@@ -136,8 +138,9 @@ internal unsafe class ActionMenuHook : HookableElement
         }
     }
 
-    void Update(AtkUnitBase* baseD)
+    void UpdateActionMenu(AtkUnitBase* baseD)
     {
+        if (baseD == null) return;
         if (!baseD->IsVisible) return;
 
         IPettableUser? user = UserList.LocalPlayer;
@@ -242,8 +245,8 @@ internal unsafe class ActionMenuHook : HookableElement
 
     protected override void OnDispose()
     {
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate2);
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate3);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionMenu);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateReplaceMenu);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionSetting);
     }
 }

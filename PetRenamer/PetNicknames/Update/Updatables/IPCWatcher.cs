@@ -40,8 +40,9 @@ internal class IPCWatcher : IUpdatable
     {
         PetServices.PetLog.LogVerbose("Verify Database");
 
-        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries.ToArray())
+        foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
         {
+            if (!entry.IsActive) continue;
             if (!entry.IsIPC) continue;
 
             IPettableUser? user = UserList.GetUser(entry.ContentID);

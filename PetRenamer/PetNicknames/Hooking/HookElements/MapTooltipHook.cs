@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Linq;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -38,9 +39,10 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 
     bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void ShowTooltipDetour(IntPtr tooltip, byte tooltipType, ushort addonID, IntPtr a4, IntPtr a5, IntPtr a6, ushort a7, ushort a8)
+    void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         if (addonID == lastId) return;
+
         lastId = addonID;
 
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(addonID);

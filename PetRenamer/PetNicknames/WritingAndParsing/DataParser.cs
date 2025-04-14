@@ -82,7 +82,7 @@ internal class DataParser : IDataParser
 
     public IDataParseResult ParseData(string data) => InternalParseData(data);
 
-    static IDataParseResult InternalParseData(string data)
+    IDataParseResult InternalParseData(string data)
     {
         string incomingData = data;
 
@@ -111,7 +111,7 @@ internal class DataParser : IDataParser
         };
     }
 
-    static bool TryFromBase64(string s, [NotNullWhen(true)] out byte[]? data)
+    bool TryFromBase64(string s, [NotNullWhen(true)] out byte[]? data)
     {
         try
         {
@@ -125,7 +125,7 @@ internal class DataParser : IDataParser
         }
     }
 
-    static bool TryGetString(byte[] data, [NotNullWhen(true)] out string? dataString)
+    bool TryGetString(byte[] data, [NotNullWhen(true)] out string? dataString)
     {
         try
         {
@@ -139,7 +139,7 @@ internal class DataParser : IDataParser
         }
     }
 
-    static ParseVersion GetParseVersion(string data)
+    ParseVersion GetParseVersion(string data)
     {
         for(int i = (int)ParseVersion.Invalid; i < (int)ParseVersion.COUNT; i++)
         {
