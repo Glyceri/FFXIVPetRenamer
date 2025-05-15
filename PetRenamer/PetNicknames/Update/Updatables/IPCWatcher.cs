@@ -3,13 +3,12 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
-using System.Linq;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class IPCWatcher : IUpdatable
 {
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } = false;  // This system doesn't work as I intended it to yet... this is extremely problematic as it causes double references and stale references and teehee heehee's all around
 
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
