@@ -1,9 +1,8 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using System;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal unsafe interface IBattleUser
+internal unsafe interface IBattleUser : IPettableEntity
 {
     string Name { get; }
     ulong ContentID { get; }
@@ -12,6 +11,5 @@ internal unsafe interface IBattleUser
     uint ShortObjectID { get; } 
     uint CurrentCastID { get; }
 
-    nint Address { get; }
     BattleChara* BattleChara { get; }
 }

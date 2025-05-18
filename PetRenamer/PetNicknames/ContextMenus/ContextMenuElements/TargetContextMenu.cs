@@ -1,8 +1,7 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.Gui.ContextMenu;
+﻿using Dalamud.Game.Gui.ContextMenu;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
@@ -14,15 +13,15 @@ internal class TargetContextMenu : IContextMenuElement
     // Null means context menu didn't come from an addon
     public string? AddonName { get; } = null;
 
-    readonly DalamudServices DalamudServices;
-    readonly IPettableUserList UserList;
-    readonly IWindowHandler WindowHandler;
+    readonly IPetServices       PetServices;
+    readonly IPettableUserList  UserList;
+    readonly IWindowHandler     WindowHandler;
 
-    public TargetContextMenu(DalamudServices dalamudServices, IPettableUserList userList, IWindowHandler windowHandler)
+    public TargetContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
     {
-        DalamudServices = dalamudServices;
-        UserList = userList;
-        WindowHandler = windowHandler;
+        PetServices     = petServices;
+        UserList        = userList;
+        WindowHandler   = windowHandler;
     }
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
@@ -30,7 +29,7 @@ internal class TargetContextMenu : IContextMenuElement
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return null;
 
-        IGameObject? target = DalamudServices.TargetManager.Target;
+        IPettableEntity? target = PetServices.TargetManager.Target;
         if (target == null) return null;
 
         IPettablePet? pet = localUser.GetPet(target.Address);

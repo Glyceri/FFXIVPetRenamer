@@ -6,7 +6,7 @@ internal interface IPettableUserList
     IPettableUser? LocalPlayer { get; }
 
     IPettablePet? GetPet(nint pet);
-    IPettableUser? GetUser(nint user);
+    IPettableUser? GetUser(nint user, bool petMeansOwner = true);
     IPettablePet? GetPet(ulong petId);
     IPettableUser? GetUser(ulong userId);
     IPettableUser? GetUserFromOwnerID(uint ownerID);

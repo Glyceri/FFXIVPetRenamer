@@ -32,6 +32,7 @@ internal class Configuration : IPluginConfiguration
     // 1 == Only yourself
     // 2 == No colours
     public int showColours = 0;
+    public bool showCommandFeedback = true;
     // ------------------------------- Pet -------------------------------
     public bool showOnNameplates = true;
     public bool showOnCastbars = true;

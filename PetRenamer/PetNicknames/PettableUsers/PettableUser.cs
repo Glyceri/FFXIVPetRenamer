@@ -132,7 +132,7 @@ internal unsafe class PettableUser : IPettableUser
         for (int i = 0; i < petCount; i++)
         {
             IPettablePet pPet = PettablePets[i];
-            if (pPet.PetPointer == pet) return pPet;
+            if (pPet.Address == pet) return pPet;
         }
         return null;
     }
@@ -207,7 +207,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet? pet = PettablePets[i];
             if (pet == null) continue;
-            if (pet.PetPointer != (nint)pointer) continue;
+            if (pet.Address != (nint)pointer) continue;
 
             return;
         }
@@ -223,7 +223,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet? pet = PettablePets[i];
             if (pet == null) continue;
-            if (pet.PetPointer != (nint)pointer) continue;
+            if (pet.Address != (nint)pointer) continue;
 
             pet?.Dispose();
             PettablePets.RemoveAt(i);

@@ -32,8 +32,10 @@ internal class DalamudServices
     {
         DalamudServices service = new DalamudServices();
         plugin.Inject(service);
+
         service.PetNicknamesPlugin = petNicknames;
         service.DalamudPlugin = plugin;
+
         return service;
     }
 }

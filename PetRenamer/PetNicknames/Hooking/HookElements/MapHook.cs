@@ -237,8 +237,8 @@ internal unsafe class MapHook : HookableElement
         pets.Sort(
         (pet1, pet2) =>
             {
-                BattleChara* p1 = (BattleChara*)pet1.PetPointer;
-                BattleChara* p2 = (BattleChara*)pet2.PetPointer;
+                BattleChara* p1 = (BattleChara*)pet1.Address;
+                BattleChara* p2 = (BattleChara*)pet2.Address;
 
                 Vector3 p1p = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
                 Vector3 p2p = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;

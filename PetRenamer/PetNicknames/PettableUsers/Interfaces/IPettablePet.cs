@@ -4,11 +4,10 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal interface IPettablePet : IDisposable
+internal interface IPettablePet : IPettableEntity, IDisposable
 {
     IPettableUser? Owner { get; }
 
-    nint PetPointer { get; }
     int SkeletonID { get; }
     ulong ObjectID { get; }
     ushort Index { get; }
