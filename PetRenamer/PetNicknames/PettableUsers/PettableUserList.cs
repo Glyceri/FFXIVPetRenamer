@@ -43,7 +43,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUser(nint user)
+    public IPettableUser? GetUser(nint user, bool petMeansOwner = true)
     {
         if (user == nint.Zero) return null;
 
@@ -52,10 +52,15 @@ internal class PettableUserList : IPettableUserList
             IPettableUser? pUser = PettableUsers[i];
             if (pUser == null) continue;
             if (pUser.Address == user) return pUser;
-            if (pUser.GetPet(user) == null) continue;
 
-            return pUser;
+            if (petMeansOwner)
+            {
+                if (pUser.GetPet(user) == null) continue;
+
+                return pUser;
+            }
         }
+
         return null;
     }
 

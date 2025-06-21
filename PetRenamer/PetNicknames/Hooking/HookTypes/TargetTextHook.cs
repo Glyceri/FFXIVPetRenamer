@@ -8,14 +8,12 @@ namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
 internal unsafe class TargetTextHook : SimpleTextHook
 {
-    Func<IPettablePet?>? callGetPet = null;
-    Func<IPettableUser?>? callGetUser = null;
+    private Func<IPettableEntity?>? callGetPet = null;
 
-    IPettablePet? currentActivePet;
+    private IPettablePet? currentActivePet;
 
-    public void RegsterTarget(Func<IPettablePet?> getPet, Func<IPettableUser?>? callGetUser = null)
+    public void RegsterTarget(Func<IPettableEntity?> getPet)
     {
-        this.callGetUser = callGetUser;
         callGetPet = getPet;
         SetUnfaulty();
     }
@@ -26,9 +24,13 @@ internal unsafe class TargetTextHook : SimpleTextHook
         return base.OnTextNode(textNode, text);
     }
 
-    bool NotSoftTextNode(AtkTextNode* textNode, string text)
+    private bool NotSoftTextNode(AtkTextNode* textNode, string text)
     {
-        currentActivePet = callGetPet?.Invoke();
+        IPettableEntity? currentEntity = callGetPet?.Invoke();
+        if (currentEntity == null) return false;
+        if (currentEntity is not IPettablePet pet) return false;
+
+        currentActivePet = pet;
         if (currentActivePet == null) return false; 
 
         IPetSheetData? petData = currentActivePet.PetData;
@@ -49,5 +51,5 @@ internal unsafe class TargetTextHook : SimpleTextHook
         currentActivePet?.GetDrawColours(out edgeColour, out textColour);
     }
 
-    protected override IPettableUser? GetUser() => callGetUser?.Invoke();
+    protected override IPettableUser? GetUser() => null;
 }

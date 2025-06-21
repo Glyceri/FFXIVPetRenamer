@@ -10,7 +10,7 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableIslandPet : IIslandPet
 {
-    public nint PetPointer { get; private set; }
+    public nint Address { get; private set; }
     public int SkeletonID { get; init; }
     public ulong ObjectID { get; init; }
     public ushort Index { get; init; }
@@ -30,7 +30,7 @@ internal unsafe class PettableIslandPet : IIslandPet
         PetServices = petServices;
         Entry = entry;
 
-        PetPointer = (nint)pet;
+        Address = (nint)pet;
 
         Owner = owner;
         SkeletonID = pet->Character.ModelContainer.ModelCharaId;

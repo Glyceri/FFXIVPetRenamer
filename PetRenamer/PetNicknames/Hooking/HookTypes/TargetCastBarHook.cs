@@ -8,7 +8,7 @@ namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
 internal class TargetCastBarHook : CastBarHook 
 {
-    Func<IPettableUser?>? callGetUser = null;
+    private Func<IPettableEntity?>? callGetUser = null;
 
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
@@ -16,11 +16,21 @@ internal class TargetCastBarHook : CastBarHook
         SetFaulty();
     }
 
-    public void RegsterTarget(Func<IPettableUser?> callGetUser)
+    public void RegisterTarget(Func<IPettableEntity?> callGetUser)
     {
         this.callGetUser = callGetUser;
         SetUnfaulty();
     }
 
-    protected override IPettableUser? GetUser() => callGetUser?.Invoke();  
+    protected override IPettableUser? GetUser()
+    {
+        IPettableEntity? entity = callGetUser?.Invoke();
+
+        if (entity is not IPettableUser user)
+        {
+            return null;
+        }
+
+        return user;
+    }
 }

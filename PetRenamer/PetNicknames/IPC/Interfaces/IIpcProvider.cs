@@ -1,8 +1,9 @@
-﻿using System;
+﻿using PetRenamer.PetNicknames.Update.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.IPC.Interfaces;
 
-internal interface IIpcProvider : IDisposable
+internal interface IIpcProvider : IUpdatable, IDisposable
 {
     void Prepare();
     void NotifyDataChanged();

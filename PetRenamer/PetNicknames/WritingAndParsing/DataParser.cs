@@ -11,6 +11,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 
@@ -21,16 +22,20 @@ internal class DataParser : IDataParser
     readonly IPettableDatabase Database;
     readonly ILegacyDatabase LegacyDatabase;
 
-    static readonly IDataParserElement DataParserVersion1 = new DataParserVersion1();
-    static readonly IDataParserElement DataParserVersion2 = new DataParserVersion2();
-    static readonly IDataParserElement DataParserVersion3 = new DataParserVersion3();
+    readonly IDataParserElement DataParserVersion1;
+    readonly IDataParserElement DataParserVersion2;
+    readonly IDataParserElement DataParserVersion3;
 
-    public DataParser(DalamudServices dalamudServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
+    public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         DalamudServices = dalamudServices;
-        UserList = userList;
-        Database = database;
-        LegacyDatabase = legacyDatabase;
+        UserList        = userList;
+        Database        = database;
+        LegacyDatabase  = legacyDatabase;
+
+        DataParserVersion1 = new DataParserVersion1();
+        DataParserVersion2 = new DataParserVersion2();
+        DataParserVersion3 = new DataParserVersion3(petServices);
     }
 
     public unsafe bool ApplyParseData(IDataParseResult result, bool isFromIPC)

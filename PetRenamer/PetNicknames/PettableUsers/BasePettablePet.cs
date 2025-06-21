@@ -10,7 +10,7 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
-    public nint PetPointer          { get; }
+    public nint Address          { get; }
     public int SkeletonID           { get; }
     public ulong ObjectID           { get; }
     public ushort Index             { get; }
@@ -34,7 +34,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         AsBattlePet         = asBattlePet;
         SharingDictionary   = sharingDictionary;
 
-        PetPointer          = (nint)pet;
+        Address          = (nint)pet;
 
         Owner               = owner;
         SkeletonID          = pet->ModelContainer.ModelCharaId;

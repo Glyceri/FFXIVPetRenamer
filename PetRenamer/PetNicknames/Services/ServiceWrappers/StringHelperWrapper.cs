@@ -26,6 +26,27 @@ internal class StringHelperWrapper : IStringHelper
 
     public string ToTitleCase(string str) => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLower());
 
+    public Vector3? ParseVector3(string? line)
+    {
+        if (line.IsNullOrWhitespace()) return null;
+
+        if (line == "null") return null;
+
+        if (!line.StartsWith('<') && !line.EndsWith('>')) return null;
+
+        line = line.Replace("<", string.Empty).Replace(">", string.Empty);
+
+        string[] numbers = line.Split(',');
+
+        if (numbers.Length != 3) return null;
+
+        if (!float.TryParse(numbers[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float X)) return null;
+        if (!float.TryParse(numbers[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float Y)) return null;
+        if (!float.TryParse(numbers[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float Z)) return null;
+
+        return new Vector3(X, Y, Z);
+    }
+
     public SeString WrapInColor(string text, Vector3? edgeColor = null, Vector3? textColor = null)
     {
         if (text.IsNullOrWhitespace()) return SeString.Empty;
@@ -141,5 +162,10 @@ internal class StringHelperWrapper : IStringHelper
                   .Replace(" Carbuncle", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("Carbuncle ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                   .Replace("-Karfunkel", string.Empty, StringComparison.InvariantCultureIgnoreCase);        
+    }
+
+    public string ToVector3String(Vector3 vector)
+    {
+        return vector.ToString("G", CultureInfo.InvariantCulture) ?? "null";
     }
 }

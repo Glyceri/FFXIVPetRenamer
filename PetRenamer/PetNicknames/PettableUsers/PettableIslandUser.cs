@@ -61,7 +61,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         for (int i = 0; i < petCount; i++)
         {
             IPettablePet pPet = PettablePets[i];
-            if (pPet.PetPointer == pet) return pPet;
+            if (pPet.Address == pet) return pPet;
         }
         return null;
     }

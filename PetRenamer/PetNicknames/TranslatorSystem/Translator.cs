@@ -85,7 +85,7 @@ internal static class Translator
         { "Kofi.Line2", "It will be used to my cat toys!" },
         { "Kofi.TakeMe", "Take me" },
 
-        { "Command.Petname", "Opens the Pet Rename window." },
+        { "Command.Petname", "Opens the Pet Rename window.\n        Type /petname help for information on naming via command." },
         { "Command.Petlist", "Opens the Pet List window." },
         { "Command.PetSettings", "Opens the Settings window." },
         { "Command.PetSharing", "Opens the Sharing window." },

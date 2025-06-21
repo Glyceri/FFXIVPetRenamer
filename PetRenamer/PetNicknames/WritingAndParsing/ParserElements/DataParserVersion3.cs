@@ -1,4 +1,4 @@
-﻿using Dalamud.Utility;
+﻿using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
@@ -10,6 +10,13 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.ParserElements;
 
 internal class DataParserVersion3 : IDataParserElement
 {
+    private readonly IPetServices PetServices; 
+
+    public DataParserVersion3(IPetServices petServices)
+    {
+        PetServices = petServices;
+    }
+
     public IDataParseResult Parse(string data)
     {
         string[] splitLines = data.Split('\n');
@@ -49,8 +56,8 @@ internal class DataParserVersion3 : IDataParserElement
                 string nickname = splitNickname[1];
                 ids.Add(ID);
                 names.Add(nickname);
-                edgeColours.Add(ParseVector3(splitNickname[2]));
-                textColours.Add(ParseVector3(splitNickname[3]));
+                edgeColours.Add(PetServices.StringHelper.ParseVector3(splitNickname[2]));
+                textColours.Add(PetServices.StringHelper.ParseVector3(splitNickname[3]));
             }
             catch { continue; }
         }
@@ -61,28 +68,7 @@ internal class DataParserVersion3 : IDataParserElement
         }
 
         return new Version3ParseResult(userName, homeWorld, contentID, softSkeletonsArray, ids.ToArray(), names.ToArray(), edgeColours.ToArray(), textColours.ToArray());
-    }
-
-    Vector3? ParseVector3(string line)
-    {
-        if (line.IsNullOrWhitespace()) return null;
-
-        if (line == "null") return null;
-
-        if (!line.StartsWith('<') && !line.EndsWith('>')) return null;
-
-        line = line.Replace("<", string.Empty).Replace(">", string.Empty);
-
-        string[] numbers = line.Split(',');
-
-        if (numbers.Length != 3) return null;
-
-        if (!float.TryParse(numbers[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float X)) return null;
-        if (!float.TryParse(numbers[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float Y)) return null;
-        if (!float.TryParse(numbers[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float Z)) return null;
-
-        return new Vector3(X, Y, Z);
-    }
+    }    
 
     int[]? ParseSoftSkeletons(string data)
     {
