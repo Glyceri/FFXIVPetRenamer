@@ -9,6 +9,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
+using Dalamud.Plugin.Services;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
 namespace PetRenamer;
@@ -16,31 +17,35 @@ namespace PetRenamer;
 
 internal class IpcProvider : IIpcProvider
 {
-    const string ApiNamespace = "PetRenamer.";
-    const uint MajorVersion = 3;
-    const uint MinorVersion = 2;
+    public bool Enabled { get; set; } = false;
 
-    bool ready = false;
-    string lastData = "[unprepared]";
+    private const string ApiNamespace = "PetRenamer.";
+    private const uint   MajorVersion = 3;
+    private const uint   MinorVersion = 2;
+    private const float  ReleaseInterval = 8.0f;    // A minimum of 8 seconds has to pass to release data.
 
-    readonly DalamudServices DalamudServices;
-    readonly IDataWriter DataWriter;
-    readonly IDataParser DataReader;
+    private string  lastData      = "[unprepared]";
+    private float   releaseTimer  = ReleaseInterval;
+    private bool    hasDataChange = false;
+
+    private readonly DalamudServices DalamudServices;
+    private readonly IDataWriter DataWriter;
+    private readonly IDataParser DataReader;
 
 
     // Notifications
-    readonly ICallGateProvider<object> Ready;
-    readonly ICallGateProvider<object> Disposing;
-    readonly ICallGateProvider<string, object> PlayerDataChanged;
+    private readonly ICallGateProvider<object> Ready;
+    private readonly ICallGateProvider<object> Disposing;
+    private readonly ICallGateProvider<string, object> PlayerDataChanged;
 
     // Functions
-    readonly ICallGateProvider<bool> Enabled;
-    readonly ICallGateProvider<(uint, uint)>? ApiVersion;
-    readonly ICallGateProvider<string> GetPlayerData;
+    private readonly ICallGateProvider<bool> EnabledFunction;
+    private readonly ICallGateProvider<(uint, uint)>? ApiVersion;
+    private readonly ICallGateProvider<string> GetPlayerData;
 
     // Actions
-    readonly ICallGateProvider<string, object> SetPlayerData;
-    readonly ICallGateProvider<ushort, object> ClearPlayerIPCData;
+    private readonly ICallGateProvider<string, object> SetPlayerData;
+    private readonly ICallGateProvider<ushort, object> ClearPlayerIPCData;
 
 
     /* ------------------------ READ ME ------------------------
@@ -96,7 +101,7 @@ internal class IpcProvider : IIpcProvider
 
         // Functions
         ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersion");
-        Enabled                 = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}Enabled");
+        EnabledFunction                 = petNicknamesPlugin.GetIpcProvider<bool>                           ($"{ApiNamespace}Enabled");
         GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
@@ -104,29 +109,62 @@ internal class IpcProvider : IIpcProvider
         ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ushort, object>                         ($"{ApiNamespace}ClearPlayerData");
     }
 
+    public void OnUpdate(IFramework framework)
+    {
+        // Timer
+        float deltaTime = (float)framework.UpdateDelta.TotalSeconds;
+
+        releaseTimer += deltaTime;
+
+        // Clamper
+        if (releaseTimer > 1000.0)
+        {
+            releaseTimer = 1000.0f;
+        }
+
+        // Timer Passe Check
+        if (releaseTimer < ReleaseInterval)
+        {
+            return;
+        }
+
+        // Has Dirty Data check
+        if (!hasDataChange)
+        {
+            return;
+        }
+
+        // Reset
+        hasDataChange = false;
+        releaseTimer = 0;
+
+        // Notify IPC
+        OnDataChanged();
+    }
+
     public void Prepare()
     {
-        if (ready) return;
+        if (Enabled) return;
 
         RegsterActions();
         RegisterFunctions();
 
-        ready = true;
+        Enabled = true;
         NotifyReady();
 
         NotifyDataChanged();
     }
 
-    void RegsterActions()
+    private void RegsterActions()
     {
         SetPlayerData!.RegisterAction(SetPlayerDataDetour);
         ClearPlayerIPCData!.RegisterAction(ClearIPCDataDetour);
     }
 
-    void RegisterFunctions()
+    private void RegisterFunctions()
     {
         ApiVersion!.RegisterFunc(VersionDetour);
-        Enabled!.RegisterFunc(EnabledDetour);
+        EnabledFunction!.RegisterFunc(EnabledDetour);
         GetPlayerData!.RegisterFunc(GetPlayerDataDetour);
     }
 
@@ -166,8 +204,16 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Functions
-    public (uint, uint) VersionDetour() => (MajorVersion, MinorVersion);
-    public bool EnabledDetour() => ready;
+    public (uint, uint) VersionDetour()
+    {
+        return (MajorVersion, MinorVersion);
+    }
+
+    public bool EnabledDetour()
+    {
+        return Enabled;
+    }
+
     public string GetPlayerDataDetour()
     {
         if (lastData.IsNullOrWhitespace())
@@ -179,7 +225,7 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Notifications
-    void NotifyReady()
+    private void NotifyReady()
     {
         try
         {
@@ -188,7 +234,7 @@ internal class IpcProvider : IIpcProvider
         catch { }
     }
 
-    void NotifyDisposing()
+    private void NotifyDisposing()
     {
         try
         {
@@ -197,7 +243,7 @@ internal class IpcProvider : IIpcProvider
         catch { }
     }
 
-    void OnDataChanged()
+    private void OnDataChanged()
     {
         try
         {
@@ -210,10 +256,11 @@ internal class IpcProvider : IIpcProvider
     public void NotifyDataChanged()
     {
         RefreshLastData();
-        OnDataChanged();
+
+        hasDataChange = true;
     }
 
-    void RefreshLastData()
+    private void RefreshLastData()
     {
         lock (lastData)
         {
@@ -231,6 +278,8 @@ internal class IpcProvider : IIpcProvider
 
     public void Dispose()
     {
+        Enabled = false;
+
         NotifyDisposing();
 
         // Actions
@@ -239,7 +288,7 @@ internal class IpcProvider : IIpcProvider
 
         // Functions
         ApiVersion?.UnregisterFunc();
-        Enabled?.UnregisterFunc();
+        EnabledFunction?.UnregisterFunc();
         GetPlayerData?.UnregisterFunc();
     }
 }

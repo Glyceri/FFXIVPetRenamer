@@ -60,6 +60,7 @@ internal class UpdateHandler : IDisposable
         _updatables.Add(new LodestoneQueueHelper(LodestoneNetworker, ImageDatabase));
         _updatables.Add(new IPCPreparer(PettableUserList, IpcProvider));
         _updatables.Add(new IPCWatcher(PettableUserList, Database, PetServices));
+        _updatables.Add(IpcProvider);
     }
 
     void OnUpdate(IFramework framework)
