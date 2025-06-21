@@ -397,7 +397,7 @@ internal partial class PetnameCommand : Command
             "    /petname [action] [target selector]\n" +
             "    /petname [action] [target selector] [nickname]\n" +
             "    /petname [action] [target selector] [nickname] [edge colour]\n" +
-            "    /petname [action] [target selector] [nickname] ]edge colour] [text colour]\n" +
+            "    /petname [action] [target selector] [nickname] [edge colour] [text colour]\n" +
             "\n" +
             "Example command: /petname set \"Hedgehoglet\" \"George\"\n" +
             "Or: /petname clear \"Hedgehoglet\"\n" +
@@ -427,7 +427,39 @@ internal partial class PetnameCommand : Command
             "\n" +
             "[nickname]\n" +
             "    \"NICKNAME\"\n" +
-            "        The new nickname the pet will adopt.\n"
+            "        The new nickname the pet will adopt.\n" +
+            "    clear\n" +
+            "        Clears the nickname of the specified target.\n" +
+            "    null\n" +
+            "        Clears the nickname of the specified target.\n" +
+            "    keep\n" +
+            "        Keeps the nickname of the specified target.\n" +
+            "    waive\n" +
+            "        Keeps the nickname of the specified target.\n" +
+            "\n" +
+            "[edge colour]\n" +
+            "    <R, G, B>\n" +
+            "        The new edge colour the pet will adopt.\n" +
+            "    clear\n" +
+            "        Clears the edge colour of the specified target.\n" +
+            "    null\n" +
+            "        Clears the edge colour of the specified target.\n" +
+            "    keep\n" +
+            "        Keeps the edge colour of the specified target.\n" +
+            "    waive\n" +
+            "        Keeps the edge colour of the specified target.\n" +
+            "\n" +
+            "[text colour]\n" +
+            "    <R, G, B>\n" +
+            "        The new text colour the pet will adopt.\n" +
+            "    clear\n" +
+            "        Clears the text colour of the specified target.\n" +
+            "    null\n" +
+            "        Clears the text colour of the specified target.\n" +
+            "    keep\n" +
+            "        Keeps the text colour of the specified target.\n" +
+            "    waive\n" +
+            "        Keeps the text colour of the specified target.\n"
         );
     }
 
