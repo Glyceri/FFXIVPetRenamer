@@ -13,4 +13,6 @@ internal unsafe interface IStringHelper
     string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor, IPetSheetData petData, bool checkForEmptySpace = true);
     string CleanupString(string str);
     string CleanupActionName(string str);
+    Vector3? ParseVector3(string? line);
+    string ToVector3String(Vector3 vector);
 }

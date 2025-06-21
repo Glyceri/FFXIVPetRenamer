@@ -191,20 +191,27 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     bool HandleAsIsland(BattleChara* newBattleChara)
     {
-        if (!IslandHook.IsOnIsland) return false;
+        if (!IslandHook.IsOnIsland)                                                             return false;
 
-        if (newBattleChara->SubKind != 10) return false;
-        if (newBattleChara->HomeWorld != ushort.MaxValue) return false;
-        if (newBattleChara->CurrentWorld != ushort.MaxValue) return false;
-        if (newBattleChara->OwnerId != 0xE0000000) return false;
-        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null) return false;
+        if (newBattleChara->SubKind         != 10)                                              return false;
+        if (newBattleChara->HomeWorld       != ushort.MaxValue)                                 return false;
+        if (newBattleChara->CurrentWorld    != ushort.MaxValue)                                 return false;
+        if (newBattleChara->OwnerId         != 0xE0000000)                                      return false;
+        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null)  return false;
 
         IPettableUser? user = UserList.PettableUsers[PettableUserList.IslandIndex];
-        if (user == null) return false;
+        if (user == null)
+        {
+            return false;
+        }
 
-        if (user is not IIslandUser islandUser) return false;
+        if (user is not IIslandUser islandUser)
+        {
+            return false;
+        }
 
         islandUser.SetBattlePet(newBattleChara);
+
         return true;
     }
 

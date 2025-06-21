@@ -5,19 +5,26 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace PetRenamer.PetNicknames.Commands.Commands;
 
+// This shit SUCKS
 internal partial class PetnameCommand : Command
 {
     private readonly IPetServices      PetServices;
     private readonly IPettableUserList UserList;
     private readonly IPettableDatabase Database;
+
+    private IPettableDatabaseEntry? activeEntry;
+    private IPetSheetData?          activeData;
 
     public PetnameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, windowHandler) 
     {
@@ -26,9 +33,9 @@ internal partial class PetnameCommand : Command
         Database    = database;
     }
 
-    public override string CommandCode { get; } = "/petname";
-    public override string Description { get; } = Translator.GetLine("Command.Petname");
-    public override bool   ShowInHelp { get; }  = true;
+    public override string CommandCode  { get; }    = "/petname";
+    public override string Description  { get; }    = Translator.GetLine("Command.Petname");
+    public override bool   ShowInHelp   { get; }    = true;
 
     private const string        CUSTOM_TAG          = "[custom]";
     private       string        lastCommandPart     = string.Empty;
@@ -90,12 +97,21 @@ internal partial class PetnameCommand : Command
         {
             throw new PetNicknamesCommandArgumentException($"'{lastCommandPart}' is invalid syntax. Use: target|minion|pet|\"PETNAME\"|\"0000\"");
         }
-        else if (targetState == TargetState.Custom)
+
+        if (!GetEntry(targetState))
         {
-            customCounter++;
+            ThrowTargetNotFoundException();
         }
 
-        IPettableDatabaseEntry? targetedEntry = GetEntry(targetState);
+        if (activeEntry == null)
+        {
+            ThrowNewNoPlayerFoundException();
+        }
+
+        if (activeData == null)
+        {
+            ThrowTargetNotFoundException();
+        }
 
         if (currentState == CommandState.Set)
         {
@@ -107,45 +123,218 @@ internal partial class PetnameCommand : Command
         }
     }
 
-    private IPettableDatabaseEntry? GetEntry(TargetState targetState)
+    private bool GetEntry(TargetState targetState)
     {
+        IPettableUser? localUser = UserList.LocalPlayer;
+
+        if (localUser == null)
+        {
+            return false;
+        }
+
+        activeEntry = localUser!.DataBaseEntry;
+
         if (targetState == TargetState.Target)
         {
             IPettableEntity? target = PetServices.TargetManager.Target;
 
             if (target == null)
             {
-                ThrowTargetNotFoundException();
-            }
-
-            IPettableUser? localUser = UserList.LocalPlayer;
-
-            if (localUser == null)
-            {
-                ThrowTargetNotFoundException();
+                return false;
             }
 
             IPettablePet? pet = localUser!.GetPet(target!.Address);
 
             if (pet == null)
             {
-                ThrowTargetNotFoundException();
+                return false;
             }
 
-            return pet!.
+            activeData = pet!.PetData;
+
+            return true;
+        }
+        else if (targetState == TargetState.Minion)
+        {
+            IPettablePet? pet = localUser!.GetYoungestPet(IPettableUser.PetFilter.Minion);
+
+            if (pet == null)
+            {
+                return false;
+            }
+
+            activeData = pet!.PetData;
+
+            return true;
+        }
+        else if (targetState == TargetState.BattlePet)
+        {
+            IPettablePet? pet = localUser!.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
+
+            if (pet == null)
+            {
+                return false;
+            }
+
+            activeData = pet!.PetData;
+
+            return true;
+        }
+        else if (targetState == TargetState.Custom)
+        {
+            string? customName = GetCustomString();
+
+            if (customName == null)
+            {
+                return false;
+            }
+
+            if (int.TryParse(customName, out int id))
+            {
+                IPetSheetData? idData = PetServices.PetSheets.GetPet(id);
+
+                if (idData == null)
+                {
+                    return false;
+                }
+
+                activeData = idData;
+
+                return true;
+            }
+            else
+            {
+                IPetSheetData? idData = PetServices.PetSheets.GetPetFromString(customName, localUser);
+
+                if (idData == null)
+                {
+                    return false;
+                }
+
+                activeData = idData;
+
+                return true;
+            }
         }
 
-        return null;
+        return false;
     }
 
     private void HandleSet(string[] commandArgs, TargetState targetState)
     {
-        
+        if (activeEntry == null)
+        {
+            ThrowNewErrorException();
+        }
+
+        if (activeData == null)
+        {
+            ThrowNewErrorException();
+        }
+
+        string? currentName         = activeEntry!.GetName(activeData!.Model);
+        Vector3? currentEdgeColour  = activeEntry!.GetEdgeColour(activeData!.Model);
+        Vector3? currentTextColour  = activeEntry!.GetTextColour(activeData!.Model);
+
+        string? currentEdgeText = null;
+        string? currentTextText = null;
+
+        if (currentEdgeColour != null)
+        {
+            currentEdgeColour   = currentEdgeColour.Value * 255.0f;
+
+            currentEdgeText     = PetServices.StringHelper.ToVector3String(currentEdgeColour.Value);
+        }
+
+        if (currentTextColour != null)
+        {
+            currentTextColour   = currentTextColour.Value * 255.0f;
+
+            currentTextText     = PetServices.StringHelper.ToVector3String(currentTextColour.Value);
+        }
+
+        SetState nameSetState = ParseSetState(commandArgs, SetIndex.Name);
+        SetState edgeSetState = ParseSetState(commandArgs, SetIndex.EdgeColour);
+        SetState textSetState = ParseSetState(commandArgs, SetIndex.TextColour);
+
+        currentName           = HandleSetStateText(currentName,     nameSetState);
+        currentEdgeText       = HandleSetStateText(currentEdgeText, edgeSetState);
+        currentTextText       = HandleSetStateText(currentTextText, textSetState);
+
+        currentEdgeColour     = PetServices.StringHelper.ParseVector3(currentEdgeText);
+        currentTextColour     = PetServices.StringHelper.ParseVector3(currentTextText);
+
+        if (currentEdgeColour != null)
+        {
+            currentEdgeColour = currentEdgeColour.Value / 255.0f;   // divide by 255
+        }
+
+        if (currentTextColour != null)
+        {
+            currentTextColour = currentTextColour.Value / 255.0f;    // divide by 255
+        }
+
+        activeEntry!.ActiveDatabase.SetName(activeData!.Model, currentName, currentEdgeColour, currentTextColour);
     }
 
     private void HandleClear(string[] commandArgs, TargetState targetState)
     {
+        if (activeEntry == null)
+        {
+            return;
+        }
 
+        if (activeData == null)
+        {
+            return;
+        }
+
+        activeEntry.SetName(activeData.Model, string.Empty, null, null);
+    }
+
+    private string? HandleSetStateText(string? text, SetState nameSetState)
+    {
+        string? current = text;
+
+        switch (nameSetState)
+        {
+            case SetState.Keep:
+            {
+                // Keep it
+                break;
+            }
+
+            case SetState.Null:
+            {
+                current = null;
+                break;
+            }
+
+            case SetState.Custom:
+            {
+                current = GetCustomString();
+
+                if (current == null)
+                {
+                    throw new PetNicknamesCommandArgumentException("You didn't provide a valid argument.");
+                }
+
+                if (current.IsNullOrWhitespace())
+                {
+                    throw new PetNicknamesCommandArgumentException("You didn't provide a valid argument.");
+                }
+
+                break;
+            }
+
+            case SetState.INVALID:
+            default:
+            {
+                throw new PetNicknamesCommandArgumentException($"'{lastCommandPart}' is invalid syntax. Use: clear|null|keep|waive|\"NAME\"|<xxx,xxx,xxx>");
+            }
+        }
+
+        return current;
     }
 
     private CommandState ParseCommandState(string[] commandArgs)
@@ -175,6 +364,29 @@ internal partial class PetnameCommand : Command
         };
     }
 
+    private SetState ParseSetState(string[] commandArgs, SetIndex atIndex)
+    {
+        int commandPart = atIndex switch
+        {
+            SetIndex.Name       => 2,
+            SetIndex.EdgeColour => 3,
+            SetIndex.TextColour => 4,
+            _                   => 2
+        };
+
+        string part = GetCommandPart(commandArgs, commandPart, false, "keep");
+
+        return part switch
+        {
+            CUSTOM_TAG  => SetState.Custom,
+            "clear"     => SetState.Null,
+            "null"      => SetState.Null,
+            "keep"      => SetState.Keep,
+            "waive"     => SetState.Keep,
+            _           => SetState.INVALID,
+        };
+    }
+
     private void PrintHelp()
     {
         DalamudServices.ChatGui.Print
@@ -184,9 +396,14 @@ internal partial class PetnameCommand : Command
             "A Pet Rename command is build as follows:\n" +
             "    /petname [action] [target selector]\n" +
             "    /petname [action] [target selector] [nickname]\n" +
+            "    /petname [action] [target selector] [nickname] [edge colour]\n" +
+            "    /petname [action] [target selector] [nickname] ]edge colour] [text colour]\n" +
             "\n" +
             "Example command: /petname set \"Hedgehoglet\" \"George\"\n" +
-            "Or: /petname clear \"Hedgehoglet\"" +
+            "Or: /petname clear \"Hedgehoglet\"\n" +
+            "Or: /petname set minion \"George\" <100, 100, 100>\n" +
+            "Or: /petname set target \"George\" keep <255, 255, 255>\n" +
+            "Or: /petname set 2442 \"George\" clear keep\n" +
             "\n" +
             "[action]\n" +
             "    set\n" +
@@ -216,9 +433,12 @@ internal partial class PetnameCommand : Command
 
     private void ClearLast()
     {
-        lastCommandPart = string.Empty;
+        lastCommandPart         = string.Empty;
         matchedArguments.Clear();
-        customCounter = 0;
+        customCounter           = 0;
+
+        activeEntry             = null;
+        activeData              = null;
     }
 
     private void PrepareArguments(ref string arguments)
@@ -234,36 +454,77 @@ internal partial class PetnameCommand : Command
         }
     }
 
-    [GeneratedRegex("(\".+?\")")]
+    [GeneratedRegex("\"[^\"]*\"|<[^>]*>|-?\\d+")]
     private partial Regex QuotationRegex();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string[] GetArguments(string args)
     {
-        args = args.ToLower();
-
         return args.Split(' ');
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowArgumentException()
     {
         throw new PetNicknamesCommandArgumentException("Missing arguments. Use \"/petname help\" for more information.");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowTargetNotFoundException()
     {
         throw new PetNicknamesCommandArgumentException("Target could not be found.");
     }
 
-    private string GetCommandPart(string[] commandArgs, int location)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowNewNoPlayerFoundException()
     {
-        if (commandArgs.Length <= location)
+        throw new PetNicknamesCommandArgumentException("Local player could not be found.");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowNewErrorException()
+    {
+        throw new PetNicknamesCommandArgumentException("An unknown error occurred whilst parsing this command.");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string GetCommandPart(string[] commandArgs, int location, bool throws = true, string filler = "keep")
+    {
+        if (location >= commandArgs.Length)
         {
-            ThrowArgumentException();
+            if (throws)
+            {
+                ThrowArgumentException();
+            }
+            else
+            {
+                lastCommandPart = filler;
+            }
+        }
+        else
+        {
+            lastCommandPart = commandArgs[location];
+
+            if (lastCommandPart.IsNullOrWhitespace() && !throws)
+            {
+                lastCommandPart = filler;
+            }
         }
 
-        lastCommandPart = commandArgs[location];
-
         return lastCommandPart;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string? GetCustomString(bool applyCounter = true)
+    {
+        string? customString = matchedArguments[customCounter];
+
+        if (applyCounter)
+        {
+            customCounter++;
+        }
+
+        return customString;
     }
 
     private enum CommandState
@@ -281,5 +542,20 @@ internal partial class PetnameCommand : Command
         BattlePet,
         Target,
         Custom
+    }
+
+    private enum SetState
+    {
+        INVALID,
+        Keep,
+        Null,
+        Custom
+    }
+
+    private enum SetIndex
+    {
+        Name,
+        EdgeColour,
+        TextColour
     }
 }
