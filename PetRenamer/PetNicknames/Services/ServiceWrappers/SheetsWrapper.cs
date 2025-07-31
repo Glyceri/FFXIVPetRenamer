@@ -268,9 +268,9 @@ internal class SheetsWrapper : IPetSheets
         return MakeSoft(in user, in normalPetData);
     }
 
-    public IPetSheetData? GetPetFromIcon(long iconID)
+    public IPetSheetData? GetPetFromIcon(uint iconID)
     {
-        if (iconID == 0 || iconID == long.MaxValue)
+        if (iconID == 0 || iconID == uint.MaxValue)
         {
             return null;
         }
@@ -280,7 +280,7 @@ internal class SheetsWrapper : IPetSheets
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
-            if (pet.Icon  != iconID) continue;
+            if (pet.Icon != iconID) continue;
 
             return pet;
         }

@@ -64,7 +64,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* icon = (AtkComponentIcon*)iconCompNode->Component;
         if (icon == null) return;
 
-        long iconID = icon->IconId;
+        uint iconID = icon->IconId;
 
         AtkComponentNode* resCompNode2 = baseD->GetComponentNodeById(11);
         if (resCompNode2 == null) return;
@@ -90,7 +90,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* icon2 = (AtkComponentIcon*)iconCompNode2->Component;
         if (icon2 == null) return;
 
-        long iconID2 = icon2->IconId;
+        uint iconID2 = icon2->IconId;
 
         Rename(textNode, in user, iconID);
         Rename(textNode2, in user, iconID2);
@@ -132,7 +132,7 @@ internal unsafe class ActionMenuHook : HookableElement
             AtkComponentIcon* icon = (AtkComponentIcon*)compNode->Component;
             if (icon == null) continue;
 
-            long iconID = icon->IconId;
+            uint iconID = icon->IconId;
 
             Rename(tNode, in user, iconID);
         }
@@ -196,7 +196,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
         if (iconNode == null) return false;
 
-        long iconID = iconNode->IconId;
+        uint iconID = iconNode->IconId;
         if (iconID <= 0 || iconID > 50000) return false;
 
         Rename(tNode, in user, iconID);
@@ -218,14 +218,14 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
         if (iconNode == null) return false;
 
-        long iconID = iconNode->IconId;
+        uint iconID = iconNode->IconId;
         if (iconID == 0) return false;
 
         Rename(tNode, in user, iconID);
         return true;
     }
 
-    void Rename(AtkTextNode* textNode, in IPettableUser user, long iconID)
+    void Rename(AtkTextNode* textNode, in IPettableUser user, uint iconID)
     {
         string textNodeText = new ReadOnlySeStringSpan(textNode->NodeText).ExtractText();
 
