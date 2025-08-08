@@ -1,5 +1,5 @@
-﻿using Dalamud.Interface;
-using ImGuiNET;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using System.Numerics;
 

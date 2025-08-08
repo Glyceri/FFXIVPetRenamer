@@ -81,12 +81,12 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
     }
 
-    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => Update((AtkUnitBase*)addonArgs.Addon.Address);
 
     public void Update()
     {
         IslandStatusChanged = false;
-        IsOnIsland = MJIManager.Instance()->IsPlayerInSanctuary == 1;
+        IsOnIsland = MJIManager.Instance()->IsPlayerInSanctuary;
 
         if (lastWasOnIsland != IsOnIsland)
         {

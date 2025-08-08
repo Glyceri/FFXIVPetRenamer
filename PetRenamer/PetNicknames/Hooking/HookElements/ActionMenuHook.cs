@@ -23,9 +23,9 @@ internal unsafe class ActionMenuHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenuActionSetting",  LifeCycleUpdateActionSetting);
     }
 
-    void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon);
+    void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon.Address);
+    void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon.Address);
+    void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon.Address);
 
     void UpdateActionSetting(AtkUnitBase* baseD)
     {
@@ -43,7 +43,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentBase* resNode = compNode->Component;
         if (resNode == null) return;
 
-        AtkResNode* textResNode = resNode->GetTextNodeById(10);
+        AtkTextNode* textResNode = resNode->GetTextNodeById(10);
         if (textResNode == null) return;
 
         AtkTextNode* textNode = textResNode->GetAsAtkTextNode();
