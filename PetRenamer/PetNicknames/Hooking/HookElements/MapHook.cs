@@ -19,14 +19,14 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class MapHook : HookableElement
 {
-    int lastIndex = 0;
-    int current = 0;
-    int foundCurrent = -1;
+    private int lastIndex = 0;
+    private int current = 0;
+    private int foundCurrent = -1;
 
-    const int petIconID = 60961;
-    const int alliancePetIconID = 60964;
+    private const int petIconID = 60961;
+    private const int alliancePetIconID = 60964;
 
-    readonly IMapTooltipHook TooltipHook;
+    private readonly IMapTooltipHook TooltipHook;
 
     public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IMapTooltipHook tooltipHook, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener)
     {
@@ -39,15 +39,15 @@ internal unsafe class MapHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "AreaMap", AreaMapUpdate);
     }
 
-    void NaviMapUpdate(AddonEvent type, AddonArgs args) => MiniMapDetour(args.Addon);
-    void AreaMapUpdate(AddonEvent type, AddonArgs args) => MapDetour(args.Addon);
+    private void NaviMapUpdate(AddonEvent type, AddonArgs args) => MiniMapDetour(args.Addon);
+    private void AreaMapUpdate(AddonEvent type, AddonArgs args) => MapDetour(args.Addon);
 
     protected override void Refresh()
     {
         lastIndex = -1;
     }
 
-    bool PrepareMap(int index)
+    private bool PrepareMap(int index)
     {
         if (lastIndex == index) return false;
 
@@ -58,14 +58,14 @@ internal unsafe class MapHook : HookableElement
         return true;
     }
 
-    void EndMap()
+    private void EndMap()
     {
         if (foundCurrent == -1) return;
 
         GetDistanceAt(foundCurrent);
     }
 
-    void MapDetour(nint a1)
+    private void MapDetour(nint a1)
     {
         PetNicknamesAddonAreaMap* mapAddon = (PetNicknamesAddonAreaMap*)a1;
         if (mapAddon == null) return;
@@ -79,7 +79,7 @@ internal unsafe class MapHook : HookableElement
         EndMap();
     }
 
-    void MiniMapDetour(nint a1)
+    private void MiniMapDetour(nint a1)
     {
         PetNicknamesAddonNaviMap* naviMapAddon = (PetNicknamesAddonNaviMap*)a1;
         if (naviMapAddon == null) return;
@@ -93,7 +93,7 @@ internal unsafe class MapHook : HookableElement
         EndMap();
     }
 
-    void NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
+    private void NaviTooltip(AtkUnitBase* unitBase, int elementIndex)
     {
         AtkUldManager? manager = GetUldManager(unitBase, 18);
         if (manager == null) return;
@@ -109,7 +109,7 @@ internal unsafe class MapHook : HookableElement
         }
     }
 
-    void MapTooltip(AtkUnitBase* a1, int index)
+    private void MapTooltip(AtkUnitBase* a1, int index)
     {
         AtkUldManager? manager = GetUldManager(a1, 53);
         if (manager == null) return;
@@ -125,7 +125,7 @@ internal unsafe class MapHook : HookableElement
         }
     }
 
-    AtkUldManager? GetUldManager(AtkUnitBase* unitBase, uint slot)
+    private AtkUldManager? GetUldManager(AtkUnitBase* unitBase, uint slot)
     {
         BaseNode node = new BaseNode(unitBase);
 
@@ -142,7 +142,7 @@ internal unsafe class MapHook : HookableElement
         return manager;
     }
 
-    bool GetResources(uint imageID, AtkResNode* curNode, out AtkTextureResource* textureResource)
+    private bool GetResources(uint imageID, AtkResNode* curNode, out AtkTextureResource* textureResource)
     {
         textureResource = null;
 
@@ -178,7 +178,7 @@ internal unsafe class MapHook : HookableElement
         return true;
     }
 
-    bool HandleTextureResource(AtkTextureResource* textureResource)
+    private bool HandleTextureResource(AtkTextureResource* textureResource)
     {
         if (textureResource->IconId != petIconID && textureResource->IconId != alliancePetIconID) return false;
 
@@ -187,14 +187,14 @@ internal unsafe class MapHook : HookableElement
         return true;
     }
 
-    void CurrentIsIndex()
+    private void CurrentIsIndex()
     {
         if (foundCurrent != -1) return;
 
         foundCurrent = current;
     }
 
-    void GetDistanceAt(int at)
+    private void GetDistanceAt(int at)
     {
         GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
         if (gManager == null) return;
@@ -230,7 +230,7 @@ internal unsafe class MapHook : HookableElement
         TooltipHook.OverridePet(pets[index]);
     }
 
-    void Sort(Vector2 flatPlayerPos, ref List<IPettablePet> pets)
+    private void Sort(Vector2 flatPlayerPos, ref List<IPettablePet> pets)
     {
         pets = pets.Distinct().ToList();
 
@@ -251,7 +251,7 @@ internal unsafe class MapHook : HookableElement
         );
     }
 
-    void MakeFromMembers(Span<PartyMember> members, ref List<IPettablePet> pets)
+    private void MakeFromMembers(Span<PartyMember> members, ref List<IPettablePet> pets)
     {
         foreach (PartyMember member in members)
         {
@@ -262,7 +262,7 @@ internal unsafe class MapHook : HookableElement
         }
     }
 
-    void AddPets(IPettableUser user, ref List<IPettablePet> pets)
+    private void AddPets(IPettableUser user, ref List<IPettablePet> pets)
     {
         foreach (IPettablePet pet in user.PettablePets)
         {

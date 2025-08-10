@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using System;
 using System.Collections.Generic;
 
@@ -14,37 +13,37 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal class HookHandler : IDisposable
 {
-    readonly DalamudServices DalamudServices;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList PettableUserList;
-    readonly IPettableDirtyListener DirtyListener;
-    readonly IPettableDatabase Database;
-    readonly ILegacyDatabase LegacyDatabase;
-    readonly ISharingDictionary SharingDictionary;
-    readonly IPettableDirtyCaller DirtyCaller;
+    private readonly DalamudServices        DalamudServices;
+    private readonly IPetServices           PetServices;
+    private readonly IPettableUserList      PettableUserList;
+    private readonly IPettableDirtyListener DirtyListener;
+    private readonly IPettableDatabase      Database;
+    private readonly ILegacyDatabase        LegacyDatabase;
+    private readonly ISharingDictionary     SharingDictionary;
+    private readonly IPettableDirtyCaller   DirtyCaller;
+    private readonly ITooltipHookHelper     TooltipHookHelper;
 
-    readonly ITooltipHookHelper TooltipHookHelper;
     public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook IslandHook { get; private set; } = null!;
 
     public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller)
     {
-        DalamudServices = dalamudServices;
-        PetServices = petServices;
-        PettableUserList = pettableUserList;
-        DirtyListener = dirtyListener;
-        Database = database;
-        LegacyDatabase = legacyDatabase;
-        SharingDictionary = sharingDictionary;
-        DirtyCaller = dirtyCaller;
+        DalamudServices     = dalamudServices;
+        PetServices         = petServices;
+        PettableUserList    = pettableUserList;
+        DirtyListener       = dirtyListener;
+        Database            = database;
+        LegacyDatabase      = legacyDatabase;
+        SharingDictionary   = sharingDictionary;
+        DirtyCaller         = dirtyCaller;
 
-        TooltipHookHelper = new TooltipHookHelper(DalamudServices);
+        TooltipHookHelper   = new TooltipHookHelper(DalamudServices);
 
         _Register();
     }
 
-    void _Register()
+    private void _Register()
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
 
@@ -66,9 +65,9 @@ internal class HookHandler : IDisposable
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }
 
-    readonly List<IHookableElement> hookableElements = new List<IHookableElement>();
+    private readonly List<IHookableElement> hookableElements = new List<IHookableElement>();
 
-    void Register(IHookableElement element)
+    private void Register(IHookableElement element)
     {
         hookableElements.Add(element);
         element?.Init();

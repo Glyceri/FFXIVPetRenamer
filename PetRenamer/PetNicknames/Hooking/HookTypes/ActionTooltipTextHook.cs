@@ -11,14 +11,15 @@ namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
 internal unsafe class ActionTooltipTextHook : SimpleTextHook
 {
-    uint backgroundNodePos;
-    AtkNineGridNode* bgNode;
+    private uint backgroundNodePos;
+    private AtkNineGridNode* bgNode;
 
-    IPetSheetData? currentData = null;
+    private IPetSheetData? currentData = null;
 
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         base.Setup(services, userList, petServices, dirtyListener, AddonName, textPos, allowedCallback, allowColours, isSoft);
+
         services.AddonLifecycle.UnregisterListener(AddonEvent.PostRequestedUpdate, HandleUpdate);
         services.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, AddonName, HandleUpdate);
     }
@@ -26,6 +27,7 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
     public void Register(uint backgroundNodePos = uint.MaxValue)
     {
         this.backgroundNodePos = backgroundNodePos;
+
         SetUnfaulty();
     }
 
@@ -35,15 +37,19 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
         {
             bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
         }
+
         return base.GetTextNode(in bNode);
     }
 
     protected override unsafe void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
         base.SetText(textNode, text, customName, pPet);
+
         if (bgNode == null) return;
         if (textNode == null) return;
+
         textNode->ResizeNodeForCurrentText();
+
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 

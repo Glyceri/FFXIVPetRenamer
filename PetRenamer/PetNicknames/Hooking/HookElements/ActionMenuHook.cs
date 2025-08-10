@@ -23,9 +23,9 @@ internal unsafe class ActionMenuHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenuActionSetting",  LifeCycleUpdateActionSetting);
     }
 
-    void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon.Address);
-    void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon.Address);
-    void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon.Address);
+    private void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon.Address);
+    private void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon.Address);
+    private void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon.Address);
 
     void UpdateActionSetting(AtkUnitBase* baseD)
     {
@@ -43,10 +43,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentBase* resNode = compNode->Component;
         if (resNode == null) return;
 
-        AtkTextNode* textResNode = resNode->GetTextNodeById(10);
-        if (textResNode == null) return;
-
-        AtkTextNode* textNode = textResNode->GetAsAtkTextNode();
+        AtkTextNode* textNode = resNode->GetTextNodeById(10);
         if (textNode == null) return;
 
         if (resNode->UldManager.LoadedState != AtkLoadState.Loaded) return;
@@ -96,7 +93,7 @@ internal unsafe class ActionMenuHook : HookableElement
         Rename(textNode2, in user, iconID2);
     }
 
-    void UpdateReplaceMenu(AtkUnitBase* baseD)
+    private void UpdateReplaceMenu(AtkUnitBase* baseD)
     {
         if (baseD == null) return;
         if (!baseD->IsVisible) return;
@@ -138,7 +135,7 @@ internal unsafe class ActionMenuHook : HookableElement
         }
     }
 
-    void UpdateActionMenu(AtkUnitBase* baseD)
+    private void UpdateActionMenu(AtkUnitBase* baseD)
     {
         if (baseD == null) return;
         if (!baseD->IsVisible) return;
@@ -166,7 +163,7 @@ internal unsafe class ActionMenuHook : HookableElement
         }
     }
 
-    bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
         if (atkNode->UldManager.LoadedState != AtkLoadState.Loaded) return false;
         if (atkNode->UldManager.NodeList == null) return false;
@@ -203,7 +200,7 @@ internal unsafe class ActionMenuHook : HookableElement
         return true;
     }
 
-    bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
         AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
         if (tNode == null) return false;
@@ -225,7 +222,7 @@ internal unsafe class ActionMenuHook : HookableElement
         return true;
     }
 
-    void Rename(AtkTextNode* textNode, in IPettableUser user, uint iconID)
+    private void Rename(AtkTextNode* textNode, in IPettableUser user, uint iconID)
     {
         string textNodeText = new ReadOnlySeStringSpan(textNode->NodeText).ExtractText();
 

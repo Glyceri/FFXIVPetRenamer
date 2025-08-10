@@ -12,25 +12,26 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class FlyTextHook : HookableElement
 {
-    delegate void AddToScreenLogWithLogMessageId(nint a1, nint a2, int a3, char a4, int a5, int a6, int a7, int a8);
-    delegate nint LogMethod(nint a1, int a2, nint a3, nint a4);
+    private delegate void AddToScreenLogWithLogMessageId(nint a1, nint a2, int a3, char a4, int a5, int a6, int a7, int a8);
+    private delegate nint LogMethod(nint a1, int a2, nint a3, nint a4);
 
-    [Signature("E8 ?? ?? ?? ?? 8B 8C 24 ?? ?? ?? ?? 85 C9", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
-    readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
+    [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B9 9E 64 00 00", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
+    private readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 
     [Signature("E8 ?? ?? ?? ?? 45 38 7E 25", DetourName = nameof(LogMessageDetour))]
-    readonly Hook<LogMethod>? logMethod = null;
+    private readonly Hook<LogMethod>? logMethod = null;
 
     public FlyTextHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
     {
         DalamudServices.FlyTextGui.FlyTextCreated += OnFlyTextCreated;
+
         addToScreenLogWithLogMessageId?.Enable();
         logMethod?.Enable();
     }
 
-    void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
+    private void OnFlyTextCreated(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
         if (!PetServices.Configuration.showOnFlyout) return;
 
@@ -49,7 +50,7 @@ internal class FlyTextHook : HookableElement
         PetServices.StringHelper.ReplaceSeString(ref text2, customName, sheetData);
     }
 
-    unsafe void AddToScreenLogWithLogMessageIdDetour(nint target, nint castDealer, int unkownCastFlag, char a4, int castID, int a6, int a7, int a8)
+    private unsafe void AddToScreenLogWithLogMessageIdDetour(nint target, nint castDealer, int unkownCastFlag, char a4, int castID, int a6, int a7, int a8)
     {
         addToScreenLogWithLogMessageId?.Original(target, castDealer, unkownCastFlag, a4, castID, a6, a7, a8);
         
@@ -66,17 +67,19 @@ internal class FlyTextHook : HookableElement
         user.OnLastCastChanged((uint)castID);
     }
 
-    nint LogMessageDetour(nint a1, int a2, nint user, nint a4)
+    private nint LogMessageDetour(nint a1, int a2, nint user, nint a4)
     {
         bool isValid = 640 == a2 || 642 == a2;
 
         PetServices.PetActionHelper.SetLatestUser(user, isValid);
+
         return logMethod!.Original(a1, a2, user, a4);
     }
 
     protected override void OnDispose()
     {
         DalamudServices.FlyTextGui.FlyTextCreated -= OnFlyTextCreated;
+
         addToScreenLogWithLogMessageId?.Dispose();
         logMethod?.Dispose();
     }

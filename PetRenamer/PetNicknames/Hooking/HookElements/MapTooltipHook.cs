@@ -13,13 +13,14 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 {
-    ushort lastId = ushort.MaxValue;
+    private ushort lastId = ushort.MaxValue;
 
     // This one gets set in the 2nd constructor
-    readonly MapTooltipTextHook tooltipHookMap = null!;
-    readonly ITooltipHookHelper TooltipHook;
+    private readonly MapTooltipTextHook tooltipHookMap = null!;
+    private readonly ITooltipHookHelper TooltipHook;
 
-    readonly string[] allowedTooltipAddonsMap = [
+    private readonly string[] allowedTooltipAddonsMap = 
+    [
         "AreaMap",
         "_NaviMap"
     ];
@@ -37,9 +38,9 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
         TooltipHook.RegisterCallback(ShowTooltipDetour);
     }
 
-    bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
+    private bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
+    private void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         if (addonID == lastId) return;
 
