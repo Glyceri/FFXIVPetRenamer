@@ -155,7 +155,7 @@ internal unsafe class MapHook : HookableElement
         AtkComponentBase* cBase = cNode->Component;
         if (cBase == null) return false;
 
-        AtkResNode* resNode = cBase->GetImageNodeById(imageID);
+        AtkImageNode* resNode = cBase->GetImageNodeById(imageID);
         if (resNode == null) return false;
 
         AtkImageNode* imgNode = resNode->GetAsAtkImageNode();

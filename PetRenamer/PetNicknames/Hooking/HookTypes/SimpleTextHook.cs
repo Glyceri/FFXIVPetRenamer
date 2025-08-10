@@ -59,7 +59,7 @@ internal unsafe class SimpleTextHook : ITextHook
     public void SetUnfaulty() => Faulty = false;
     public void SetFaulty() => Faulty = true;
 
-    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
+    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon.Address);
 
     void OnName(INamesDatabase nameDatabase)
     {
