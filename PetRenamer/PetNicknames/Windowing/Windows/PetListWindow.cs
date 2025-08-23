@@ -385,7 +385,7 @@ internal class PetListWindow : PetWindow
 
                             if (EraserButton.Draw(new Vector2(buttonSize, buttonSize), Translator.GetLine("ClearButton.Label"), Translator.GetLine("PetRenameNode.Clear")))
                             {
-                                DalamudServices.Framework.Run(() => user.Entry.Clear(false));
+                                DalamudServices.Framework.Run(() => user.Entry.Clear(ParseSource.Manual));
                             }
                         }
                         LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));

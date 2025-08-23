@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
 using static PetRenamer.PetNicknames.PettableUsers.Interfaces.IPettableUser;
 
@@ -187,7 +188,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (DataBaseEntry.IsIPC)
         {
-            DataBaseEntry.Clear(true);
+            DataBaseEntry.Clear(ParseSource.IPC);
         }
 
         if (!IsActive)

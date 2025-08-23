@@ -38,9 +38,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
             return;
         }
 
-        bool isFromIPC = parseSource == ParseSource.IPC;
-
-        entry.UpdateEntryBase(parseResult, isFromIPC);
+        entry.UpdateEntryBase(parseResult, parseSource);
 
         SetDirty();
     }

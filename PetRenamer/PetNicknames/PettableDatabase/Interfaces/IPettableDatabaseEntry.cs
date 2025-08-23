@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PN.S;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PN.S;
 using System.Collections.Immutable;
 using System.Numerics;
 
@@ -36,10 +37,10 @@ internal interface IPettableDatabaseEntry
     int? GetSoftSkeleton(int softIndex);
     void SetSoftSkeleton(int index, int softSkeleton);
     void SetName(int skeletonID, string name, Vector3? edgeColour, Vector3? textColour);
-    void Clear(bool fromIPC);
 
-    void UpdateEntry(IModernParseResult parseResult, bool asIPC);
-    void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC);
+    void Clear(ParseSource parseSource);
+    void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);
+    void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource);
 
     SerializableUserV5 SerializeEntry();
 }

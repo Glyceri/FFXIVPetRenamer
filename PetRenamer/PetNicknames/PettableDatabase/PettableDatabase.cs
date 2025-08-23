@@ -90,9 +90,13 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry currentEntry = _entries[i];
 
-            if (currentEntry.ContentID != entry.ContentID) continue;
+            if (currentEntry.ContentID != entry.ContentID)
+            {
+                continue;
+            }
 
-            currentEntry.Clear(true);
+            currentEntry.Clear(ParseSource.None);
+
             _entries.RemoveAt(i);
         }
     }
@@ -117,7 +121,7 @@ internal class PettableDatabase : IPettableDatabase
 
         IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
 
-        entry.UpdateEntry(parseResult, isFromIPC);
+        entry.UpdateEntry(parseResult, parseSource);
 
         if (isFromIPC)
         {

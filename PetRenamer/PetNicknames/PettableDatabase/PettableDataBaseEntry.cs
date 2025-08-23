@@ -1,11 +1,12 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PN.S;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.TranslatorSystem;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PN.S;
 using System.Collections.Immutable;
 using System.Linq;
-using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
@@ -129,32 +130,35 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public SerializableUserV5 SerializeEntry() => new SerializableUserV5(this);
 
-    public void UpdateEntry(IModernParseResult parseResult, bool asIPC)
+    public void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource)
     {
-        UpdateEntryBase(parseResult, asIPC);
+        UpdateEntryBase(parseResult, parseSource);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
         UpdateContentID(parseResult.ContentID);
     }
 
-    public void UpdateEntryBase(IBaseParseResult parseResult, bool asIPC)
+    public void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource)
     {
         SetActiveDatabase(parseResult.IDs, parseResult.Names, parseResult.EdgeColous, parseResult.TextColours);
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        IsIPC = asIPC;
+        IsIPC = parseSource == ParseSource.IPC;
 
         MarkDirty();        
     }
 
-    public void Clear(bool fromIPC)
+    public void Clear(ParseSource parseSource)
     {
         SetActiveDatabase([], [], [], []);
         IsActive = false;
         IsLegacy = false;
 
-        if (fromIPC) return;
+        if (parseSource == ParseSource.IPC)
+        {
+            return;
+        }
 
         MarkCleared();
         MarkDirty();
