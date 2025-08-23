@@ -27,7 +27,7 @@ internal unsafe class PenumbraIPC : IPenumbraIPC
     private readonly IDataParser                DataParser;
 
     private readonly ICallGateSubscriber<JObject, string, Guid, object>? _pcpParsed;
-    private readonly ICallGateSubscriber<JObject, ushort, object>?       _pcpCreated;
+    private readonly ICallGateSubscriber<JObject, ushort, string, object>?       _pcpCreated;
 
     public PenumbraIPC(IPetServices petServices, IDalamudPluginInterface petNicknamesPlugin, IDataWriter dataWriter, IDataParser dataParser)
     {
@@ -39,7 +39,7 @@ internal unsafe class PenumbraIPC : IPenumbraIPC
         try
         { 
             _pcpParsed      = PetNicknamesPlugin.GetIpcSubscriber<JObject, string, Guid, object>("Penumbra.ParsingPcp");
-            _pcpCreated     = PetNicknamesPlugin.GetIpcSubscriber<JObject, ushort, object>("Penumbra.CreatingPcp");
+            _pcpCreated     = PetNicknamesPlugin.GetIpcSubscriber<JObject, ushort, string, object>("Penumbra.CreatingPcp");
         } 
         catch (Exception ex) 
         {
@@ -138,7 +138,7 @@ internal unsafe class PenumbraIPC : IPenumbraIPC
         PetServices.PetLog.LogInfo("Pet Nicknames has successfully imported data from the PCP file.");
     }
 
-    private void OnPcpCreated(JObject jsonObject, ushort objectIndex)
+    private void OnPcpCreated(JObject jsonObject, ushort objectIndex, string collection)
     {
         PetServices.PetLog.Log("Pet Nicknames is adding data to PCP for: " + objectIndex);
 
