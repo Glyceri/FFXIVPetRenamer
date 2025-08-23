@@ -25,6 +25,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -196,7 +197,7 @@ internal class PetListWindow : PetWindow
 
                     IDataParseResult parseResult = DataParser.ParseData(ImGui.GetClipboardText());
 
-                    if (!DataParser.ApplyParseData(parseResult, false))
+                    if (!DataParser.ApplyParseData(parseResult, ParseSource.Manual))
                     {
                         string error = string.Empty;
                         if (parseResult is InvalidParseResult invalidParseResult) error = invalidParseResult.Reason;

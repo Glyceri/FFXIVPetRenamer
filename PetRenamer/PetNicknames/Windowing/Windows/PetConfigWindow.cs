@@ -1,85 +1,110 @@
-﻿using Dalamud.Interface.Utility;
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetConfigWindow : PetWindow
 {
-    protected override Vector2 MinSize { get; } = new Vector2(400, 200);
-    protected override Vector2 MaxSize { get; } = new Vector2(400, 1200);
-    protected override Vector2 DefaultSize { get; } = new Vector2(400, 500);
-    protected override bool HasModeToggle { get; } = true;
+    protected override Vector2  MinSize         { get; } = new Vector2(400, 200);
+    protected override Vector2  MaxSize         { get; } = new Vector2(400, 1200);
+    protected override Vector2  DefaultSize     { get; } = new Vector2(400, 500);
 
-    string[] listIconTypes = ["Both", "Sharing", "List Only"];
-    string[] iconMenuTypes = ["Action", "Notebook", "Item"];
-    string[] colourDisplay = ["Everyone", "Only Myself", "No Colours"];
+    protected override bool     HasModeToggle   { get; } = true;
 
-    public PetConfigWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration) : base(windowHandler, dalamudServices, configuration, "Pet Config Window", ImGuiWindowFlags.None)
+    private static readonly string[] _listIconTypes = ["Both", "Sharing", "List Only"];
+    private static readonly string[] _iconMenuTypes = ["Action", "Notebook", "Item"];
+    private static readonly string[] _colourDisplay = ["Everyone", "Only Myself", "No Colours"];
+
+    private readonly Dictionary<string, bool> ThirdPartySupported = new Dictionary<string, bool>()
     {
-        
+        { "Penumbra", false },
+    };
+
+    private readonly IPluginWatcher PluginWatcher;
+
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher) : base(windowHandler, dalamudServices, configuration, "Pet Config Window", ImGuiWindowFlags.None)
+    {
+        PluginWatcher = pluginWatcher;
+
+        PluginWatcher.RegisterListener(OnPluginChanged);
     }
 
     protected override void OnDraw()
     {
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
         {
-            if (ImGui.Checkbox(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures)) Configuration.Save();
+            DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures);
 
-            DrawMenu("Name Colours", colourDisplay, ref Configuration.showColours);
+            DrawMenu("Name Colours", _colourDisplay, ref Configuration.showColours);
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
         {
-            if (ImGui.Checkbox(Translator.GetLine("Config.Kofi"), ref Configuration.showKofiButton)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Toggle"), ref Configuration.quickButtonsToggle)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning)) Configuration.Save();
+            DrawBasicToggle(Translator.GetLine("Config.Kofi"),          ref Configuration.showKofiButton);
+            DrawBasicToggle(Translator.GetLine("Config.Toggle"),        ref Configuration.quickButtonsToggle);
+            DrawBasicToggle(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning);
 
-            DrawMenu("List Button Type", listIconTypes, ref Configuration.listButtonLayout);
-            DrawMenu("Icon Type", iconMenuTypes, ref Configuration.minionIconType);
+            DrawMenu("List Button Type", _listIconTypes, ref Configuration.listButtonLayout);
+            DrawMenu("Icon Type",        _iconMenuTypes, ref Configuration.minionIconType);
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
-            if (ImGui.Checkbox(Translator.GetLine("Config.Nameplate"), ref Configuration.showOnNameplates)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Castbar"), ref Configuration.showOnCastbars)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.BattleChat"), ref Configuration.showInBattleChat)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Emote"), ref Configuration.showOnEmotes)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Tooltip"), ref Configuration.showOnTooltip)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Flyout"), ref Configuration.showOnFlyout)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Notebook"), ref Configuration.showNamesInMinionBook)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.ActionLog"), ref Configuration.showNamesInActionLog)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Targetbar"), ref Configuration.showOnTargetBars)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.Partylist"), ref Configuration.showOnPartyList)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.IslandPets"), ref Configuration.showOnIslandPets)) Configuration.Save();
-            if (ImGui.Checkbox(Translator.GetLine("Config.ContextMenu"), ref Configuration.useContextMenus)) Configuration.Save();
+            DrawBasicToggle(Translator.GetLine("Config.Nameplate"),     ref Configuration.showOnNameplates);
+            DrawBasicToggle(Translator.GetLine("Config.Castbar"),       ref Configuration.showOnCastbars);
+            DrawBasicToggle(Translator.GetLine("Config.BattleChat"),    ref Configuration.showInBattleChat);
+            DrawBasicToggle(Translator.GetLine("Config.Emote"),         ref Configuration.showOnEmotes);
+            DrawBasicToggle(Translator.GetLine("Config.Tooltip"),       ref Configuration.showOnTooltip);
+            DrawBasicToggle(Translator.GetLine("Config.Flyout"),        ref Configuration.showOnFlyout);
+            DrawBasicToggle(Translator.GetLine("Config.Notebook"),      ref Configuration.showNamesInMinionBook);
+            DrawBasicToggle(Translator.GetLine("Config.ActionLog"),     ref Configuration.showNamesInActionLog);
+            DrawBasicToggle(Translator.GetLine("Config.Targetbar"),     ref Configuration.showOnTargetBars);
+            DrawBasicToggle(Translator.GetLine("Config.Partylist"),     ref Configuration.showOnPartyList);
+            DrawBasicToggle(Translator.GetLine("Config.IslandPets"),    ref Configuration.showOnIslandPets);
+            DrawBasicToggle(Translator.GetLine("Config.ContextMenu"),   ref Configuration.useContextMenus);
         }
 
-       
+        if (DrawThirdPartyHeader("Penumbra"))
+        {
+            DrawBasicToggle(Translator.GetLine("Config.Penumbra.AttachToPCP"), ref Configuration.attachToPCP);
+            DrawBasicToggle(Translator.GetLine("Config.Penumbra.ReadFromPCP"), ref Configuration.readFromPCP);
+        }
+
         if (ImGui.CollapsingHeader(Translator.GetLine("Debug")))
         {
             bool keyComboPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl) && ImGui.IsKeyDown(ImGuiKey.LeftShift);
 
             ImGui.BeginDisabled(!keyComboPressed && !Configuration.debugModeActive);
-            if (ImGui.Checkbox("Enable Debug Mode.", ref Configuration.debugModeActive)) Configuration.Save();
-            if (ImGui.Checkbox("Open Debug Window On Start.", ref Configuration.openDebugWindowOnStart)) Configuration.Save();
-            if (ImGui.Checkbox("Show chat code.", ref Configuration.debugShowChatCode)) Configuration.Save();
+
+            DrawBasicToggle("Enable Debug Mode.",           ref Configuration.debugModeActive);
+            DrawBasicToggle("Open Debug Window On Start.",  ref Configuration.openDebugWindowOnStart);
+            DrawBasicToggle("Show chat code.",              ref Configuration.debugShowChatCode);
+
             ImGui.EndDisabled();
         }
     }
 
-    void DrawMenu(string title, string[] elements, ref int configurationInt, float width = 150)
+    private void DrawMenu(string title, string[] elements, ref int configurationInt, float width = 150)
     {
         if (configurationInt < 0 || configurationInt >= elements.Length)
         {
             configurationInt = 0;
         }
 
-        if (width <= 0) width = ImGui.GetContentRegionAvail().X;
-        else width = width * ImGuiHelpers.GlobalScale;
+        if (width <= 0)
+        {
+            width = ImGui.GetContentRegionAvail().X;
+        }
+        else
+        {
+            width = width * ImGuiHelpers.GlobalScale;
+        }
 
         ImGui.SetNextItemWidth(width);
 
@@ -87,14 +112,69 @@ internal class PetConfigWindow : PetWindow
         {
             for (int i = 0; i < elements.Length; i++)
             {
-                if (ImGui.Selectable(elements[i], i == configurationInt, ImGuiSelectableFlags.AllowDoubleClick))
+                bool elementIsCurrent = i == configurationInt;
+
+                if (ImGui.Selectable(elements[i], elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
                 {
                     configurationInt = i;
+
                     Configuration.Save();
                 }
             }
 
             ImGui.EndCombo();
         }
+    }
+
+    private bool DrawThirdPartyHeader(string internalName, string? displayTitle = null)
+    {
+        if (!ThirdPartySupported.ContainsKey(internalName))
+        {
+            return false;
+        }
+
+        if (!ThirdPartySupported[internalName])
+        {
+            return false;
+        }
+
+        string actualDisplayTitle = displayTitle ?? internalName;
+
+        return ImGui.CollapsingHeader(actualDisplayTitle);
+    }
+
+    private void DrawBasicToggle(string title, ref bool value)
+    {
+        if (!ImGui.Checkbox(title, ref value))
+        {
+            return;
+        }
+
+        Configuration.Save();
+    }
+
+    private void OnPluginChanged(string[] internalPlugins)
+    {
+        // Reset the whole list
+        foreach (string key in ThirdPartySupported.Keys)
+        {
+            ThirdPartySupported[key] = false;
+        }
+
+        // Flood the third parties
+        foreach (string plugin in internalPlugins)
+        {
+            if (!ThirdPartySupported.ContainsKey(plugin))
+            {
+                continue;
+            }
+
+            ThirdPartySupported[plugin] = true;
+        }
+    }
+
+    protected override void OnDispose()
+    {
+        PluginWatcher.DeregisterListener(OnPluginChanged);
     }
 }

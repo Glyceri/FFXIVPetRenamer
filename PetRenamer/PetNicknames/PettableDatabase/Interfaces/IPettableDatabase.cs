@@ -1,5 +1,6 @@
 ﻿using PN.S;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
@@ -35,5 +36,5 @@ internal interface IPettableDatabase
     SerializableUserV5[] SerializeDatabase();
 
     void SetDirty();
-    void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC);
+    void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource);
 }

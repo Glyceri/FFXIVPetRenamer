@@ -53,6 +53,10 @@ internal class Configuration : IPluginConfiguration
     public int minionIconType = 1;
     public bool showIslandWarning = true;
 
+    // ------------------------ PENUMBRA SETTINGS ------------------------
+    public bool attachToPCP = true;
+    public bool readFromPCP = true;
+
     // ------------------------- Debug SETTINGS --------------------------
     public bool debugModeActive = false;
     public bool openDebugWindowOnStart = false;

@@ -43,6 +43,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     private readonly IDataParser            DataParser;
     private readonly IDataWriter            DataWriter;
     private readonly IpcProvider            IpcProvider;
+    private readonly IPenumbraIPC           PenumbraIPC;
 
     // As long as no other module needs one, they won't be interfaced
     private readonly ContextMenuHandler     ContextMenuHandler;
@@ -84,6 +85,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         DataParser                  = new DataParser(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase);
 
         IpcProvider                 = new IpcProvider(DalamudServices, DalamudServices.DalamudPlugin, DataParser, DataWriter);
+        PenumbraIPC                 = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
 
         HookHandler                 = new HookHandler(DalamudServices, PetServices, PettableUserList, DirtyHandler, PettableDatabase, LegacyDatabase, SharingDictionary, DirtyHandler);
         UpdateHandler               = new UpdateHandler(DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase);
@@ -104,6 +106,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         SharingDictionary?.Dispose();
         ContextMenuHandler?.Dispose();
         IpcProvider?.Dispose();
+        PenumbraIPC?.Dispose();
         LodestoneNetworker?.Dispose();
         ImageDatabase?.Dispose();
         UpdateHandler?.Dispose();
@@ -112,5 +115,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         CommandHandler?.Dispose();
         WindowHandler?.Dispose();
         SaveHandler.Dispose();
+        PetServices?.Dispose();
     }
 }

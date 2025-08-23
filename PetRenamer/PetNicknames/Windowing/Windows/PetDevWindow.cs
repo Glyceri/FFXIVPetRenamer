@@ -432,7 +432,7 @@ internal class PetDevWindow : PetWindow
     }
 }
 
-struct DevStruct
+readonly struct DevStruct
 {
     public readonly string title;
     public readonly Action onSelected;

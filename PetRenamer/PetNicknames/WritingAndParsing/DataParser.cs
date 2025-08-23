@@ -38,7 +38,7 @@ internal class DataParser : IDataParser
         DataParserVersion3 = new DataParserVersion3(petServices);
     }
 
-    public unsafe bool ApplyParseData(IDataParseResult result, bool isFromIPC)
+    public unsafe bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
     {
         IPettableUser? localUser = UserList.LocalPlayer;
 
@@ -64,7 +64,7 @@ internal class DataParser : IDataParser
 
         if (result is IBaseParseResult baseParseResult)
         {
-            if (localUser != null && isFromIPC)
+            if (localUser != null && (parseSource == ParseSource.IPC || parseSource == ParseSource.PCP))
             {
                 if (localUser.Name == baseParseResult.UserName && localUser.Homeworld == baseParseResult.Homeworld)
                 {
@@ -74,11 +74,11 @@ internal class DataParser : IDataParser
 
             if (baseParseResult is IModernParseResult version2ParseResult)
             {
-                Database.ApplyParseResult(version2ParseResult, isFromIPC);
+                Database.ApplyParseResult(version2ParseResult, parseSource);
                 return true;
             }
 
-            LegacyDatabase.ApplyParseResult(baseParseResult, isFromIPC);
+            LegacyDatabase.ApplyParseResult(baseParseResult, parseSource);
             return true;
         }
 

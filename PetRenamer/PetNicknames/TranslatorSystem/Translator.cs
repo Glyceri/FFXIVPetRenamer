@@ -79,6 +79,8 @@ internal static class Translator
         { "Config.ContextMenu", "Allow Context Menus." },
         { "Config.IslandWarning", "Show a warning upon unresolved Island Owner." },
         { "Config.IslandPets", "Show names on Island Pets." },
+        { "Config.Penumbra.AttachToPCP", "Attach Pet Nicknames data to Penumbra .pcp files." },
+        { "Config.Penumbra.ReadFromPCP", "Read Pet Nicknames data from Penumbra .pcp files." },
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "This is about real life money." },

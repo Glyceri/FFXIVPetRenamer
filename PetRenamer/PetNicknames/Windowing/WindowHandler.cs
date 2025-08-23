@@ -13,29 +13,30 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Windowing;
 
 internal class WindowHandler : IWindowHandler
 {
-    static int _internalCounter = 0;
+    private static int _internalCounter = 0;
     public static int InternalCounter { get  => _internalCounter++; }
 
-    PetWindowMode _windowMode = PetWindowMode.Minion;
+    private PetWindowMode _windowMode = PetWindowMode.Minion;
     public PetWindowMode PetWindowMode { get => _windowMode; set => SetWindowMode(value); }
 
-    readonly DalamudServices DalamudServices;
-    readonly Configuration Configuration;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList UserList;
-    readonly IPettableDatabase Database;
-    readonly ILegacyDatabase LegacyDatabase;
-    readonly IImageDatabase ImageDatabase;
-    readonly IPettableDirtyListener DirtyListener;
-    readonly IDataParser DataParser;
-    readonly IDataWriter DataWriter;
+    private readonly DalamudServices DalamudServices;
+    private readonly Configuration Configuration;
+    private readonly IPetServices PetServices;
+    private readonly IPettableUserList UserList;
+    private readonly IPettableDatabase Database;
+    private readonly ILegacyDatabase LegacyDatabase;
+    private readonly IImageDatabase ImageDatabase;
+    private readonly IPettableDirtyListener DirtyListener;
+    private readonly IDataParser DataParser;
+    private readonly IDataWriter DataWriter;
 
-    readonly WindowSystem WindowSystem;
+    private readonly WindowSystem WindowSystem;
 
     public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter)
     {
@@ -69,7 +70,7 @@ internal class WindowHandler : IWindowHandler
     void Register()
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices, UserList, DirtyListener));
-        AddWindow(new PetConfigWindow(this, DalamudServices, Configuration));
+        AddWindow(new PetConfigWindow(this, DalamudServices, Configuration, PetServices.PluginWatcher));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));
         AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList, Database));
@@ -78,6 +79,7 @@ internal class WindowHandler : IWindowHandler
     void AddWindow(PetWindow window)
     {
         WindowSystem.AddWindow(window);
+
         DalamudServices.Framework.Run(() => window.SetPetMode(_windowMode));
     }
 

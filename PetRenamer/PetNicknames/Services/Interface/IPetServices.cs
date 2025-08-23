@@ -1,8 +1,9 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.Services.Interface;
 
-internal interface IPetServices
+internal interface IPetServices : IDisposable
 {
     IPetLog          PetLog          { get; }
     IPetSheets       PetSheets       { get; }
@@ -11,4 +12,5 @@ internal interface IPetServices
     IPetActionHelper PetActionHelper { get; }
     Configuration    Configuration   { get; }
     ITargetManager   TargetManager   { get; }
+    IPluginWatcher   PluginWatcher   { get; }
 }

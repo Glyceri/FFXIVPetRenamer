@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
 namespace PetRenamer;
@@ -176,7 +177,7 @@ internal class IpcProvider : IIpcProvider
             DalamudServices.Framework.Run(() =>
             {
                 IDataParseResult result = DataReader.ParseData(data);
-                DataReader.ApplyParseData(result, true);
+                DataReader.ApplyParseData(result, ParseSource.IPC);
             });
         }
         catch (Exception e)
@@ -194,7 +195,7 @@ internal class IpcProvider : IIpcProvider
                 if (DalamudServices.ObjectTable.Length <= objectIndex) return;
                 if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc) return;
 
-                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), true);
+                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), ParseSource.IPC);
             });
         }
         catch(Exception e)
