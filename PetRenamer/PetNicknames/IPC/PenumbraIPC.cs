@@ -26,8 +26,8 @@ internal unsafe class PenumbraIPC : IPenumbraIPC
     private readonly IDataWriter                DataWriter;
     private readonly IDataParser                DataParser;
 
-    private readonly ICallGateSubscriber<JObject, string, Guid, object>? _pcpParsed;
-    private readonly ICallGateSubscriber<JObject, ushort, string, object>?       _pcpCreated;
+    private readonly ICallGateSubscriber<JObject, string, Guid, object>?    _pcpParsed;
+    private readonly ICallGateSubscriber<JObject, ushort, string, object>?  _pcpCreated;
 
     public PenumbraIPC(IPetServices petServices, IDalamudPluginInterface petNicknamesPlugin, IDataWriter dataWriter, IDataParser dataParser)
     {
