@@ -12,21 +12,21 @@ internal unsafe class PettableUserHandler : IUpdatable
 {
     public bool Enabled { get; set; } = true;
 
-    bool isDirty = false;
+    private bool isDirty = false;
 
-    readonly IPettableUserList UserList;
-    readonly IPetServices PetServices;
-    readonly IIslandHook IslandHook;
-    readonly IPettableDirtyListener DirtyListener;
-    readonly IPettableDatabase Database;
+    private readonly IPettableUserList      UserList;
+    private readonly IPetServices           PetServices;
+    private readonly IIslandHook            IslandHook;
+    private readonly IPettableDirtyListener DirtyListener;
+    private readonly IPettableDatabase      Database;
 
     public PettableUserHandler(IPettableUserList userList, IPetServices petServices, IIslandHook islandHook, IPettableDirtyListener dirtyListener, IPettableDatabase database)
     {
-        UserList = userList;
-        PetServices = petServices;
-        IslandHook = islandHook;
-        DirtyListener = dirtyListener;
-        Database = database;
+        UserList        = userList;
+        PetServices     = petServices;
+        IslandHook      = islandHook;
+        DirtyListener   = dirtyListener;
+        Database        = database;
 
         DirtyListener.RegisterOnClearEntry(OnDirty);
         DirtyListener.RegisterOnDirtyDatabase(OnDirty);
@@ -39,7 +39,11 @@ internal unsafe class PettableUserHandler : IUpdatable
         for (int i = 0; i < PettableUsers.PettableUserList.PettableUserArraySize; i++)
         {
             IPettableUser? user = UserList.PettableUsers[i];
-            if (user == null) continue;
+
+            if (user == null)
+            {
+                continue;
+            }
 
             user.Update();
         }
@@ -53,41 +57,59 @@ internal unsafe class PettableUserHandler : IUpdatable
         {
             IslandHook.Update();
 
-            if (!IslandHook.IslandStatusChanged && !isDirty) return;
+            if (!IslandHook.IslandStatusChanged && !isDirty)
+            {
+                return;
+            }
 
             ClearDirty();
 
-            if (IslandHook.IsOnIsland) HandleOnIsland();
-            else HandleNotOnIsland();
+            if (IslandHook.IsOnIsland)
+            {
+                HandleOnIsland();
+            }
+            else
+            {
+                HandleNotOnIsland();
+            }
         }
     }
 
-    void OnDirty(IPettableDatabase database) => SetDirty();
-    void OnDirty(INamesDatabase database) => SetDirty();
-    void OnDirty(IPettableDatabaseEntry entry) => SetDirty();
-    void SetDirty() => isDirty = true;
-    void ClearDirty() => isDirty = false;
+    private void OnDirty(IPettableDatabase database)    => SetDirty();
+    private void OnDirty(INamesDatabase database)       => SetDirty();
+    private void OnDirty(IPettableDatabaseEntry entry)  => SetDirty();
 
-    void HandleNotOnIsland() => ClearIslandUser();
-    void HandleOnIsland()
+    private void SetDirty()     => isDirty = true;
+    private void ClearDirty()   => isDirty = false;
+
+    private void HandleNotOnIsland() => ClearIslandUser();
+    private void HandleOnIsland()
     {
-        if (IslandHook.VisitingFor == null || IslandHook.VisitingHomeworld == null) return;
+        if (IslandHook.VisitingFor == null || IslandHook.VisitingHomeworld == null)
+        {
+            return;
+        }
 
         IPettableDatabaseEntry? entry = Database.GetEntry(IslandHook.VisitingFor, (ushort)IslandHook.VisitingHomeworld, false);
-        if (entry == null) return;
+
+        if (entry == null)
+        {
+            return;
+        }
 
         CreateIslandUser(entry);
     }
 
-    void ClearIslandUser()
+    private void ClearIslandUser()
     {
         UserList.PettableUsers[PettableUserList.IslandIndex]?.Dispose(Database);
         UserList.PettableUsers[PettableUserList.IslandIndex] = null;
     }
 
-    void CreateIslandUser(IPettableDatabaseEntry entry)
+    private void CreateIslandUser(IPettableDatabaseEntry entry)
     {
         ClearIslandUser();
+
         UserList.PettableUsers[PettableUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
     }
 }

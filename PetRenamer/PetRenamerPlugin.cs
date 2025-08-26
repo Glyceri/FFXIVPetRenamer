@@ -88,7 +88,10 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         PenumbraIPC                 = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
 
         HookHandler                 = new HookHandler(DalamudServices, PetServices, PettableUserList, DirtyHandler, PettableDatabase, LegacyDatabase, SharingDictionary, DirtyHandler);
-        UpdateHandler               = new UpdateHandler(DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase);
+
+        SaveHandler                 = new SaveHandler(PetServices, PettableUserList, IpcProvider, DirtyHandler);
+
+        UpdateHandler               = new UpdateHandler(DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase, SaveHandler);
         ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList);
 
         WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
@@ -97,8 +100,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
 
         PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
-
-        SaveHandler                 = new SaveHandler(PetServices, PettableUserList, IpcProvider, DirtyHandler);
     }
 
     public void Dispose()
