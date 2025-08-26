@@ -1,11 +1,11 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using Newtonsoft.Json;
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PN.S;
 using System;
-using System.Text.Json.Serialization;
 
 namespace PetRenamer;
 
