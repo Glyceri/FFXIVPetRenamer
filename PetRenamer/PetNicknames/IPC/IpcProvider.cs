@@ -67,7 +67,7 @@ internal class IpcProvider : IIpcProvider
      *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
      *
      * Functions:
-     *      - GetEnabled <bool>:
+     *      - IsEnabled <bool>:
      *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
      *          
      *      - ApiVersion <(uint, uint)>:
