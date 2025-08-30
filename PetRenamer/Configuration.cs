@@ -1,10 +1,11 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using Newtonsoft.Json;
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PN.S;
 using System;
-using System.Text.Json.Serialization;
 
 namespace PetRenamer;
 
@@ -12,15 +13,18 @@ namespace PetRenamer;
 internal class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    IDalamudPluginInterface? PetNicknamesPlugin;
+    private IDalamudPluginInterface? PetNicknamesPlugin;
     [JsonIgnore]
-    IPettableDatabase? Database = null;
+    private IPettableDatabase? Database = null;
     [JsonIgnore]
-    ILegacyDatabase? LegacyDatabase = null;
+    private ILegacyDatabase? LegacyDatabase = null;
     [JsonIgnore]
-    bool isSetup = false;
+    private IPetServices? PetServices = null;
+    [JsonIgnore]
+    private bool isSetup = false;
     [JsonIgnore]
     public const int currentSaveFileVersion = 10;
+
     public int Version { get; set; } = currentSaveFileVersion;
 
     public SerializableUserV5[]? SerializableUsersV5 { get; set; } = null;
@@ -53,18 +57,26 @@ internal class Configuration : IPluginConfiguration
     public int minionIconType = 1;
     public bool showIslandWarning = true;
 
+    // ------------------------ PENUMBRA SETTINGS ------------------------
+    public bool attachToPCP = true;
+    public bool readFromPCP = true;
+
     // ------------------------- Debug SETTINGS --------------------------
     public bool debugModeActive = false;
     public bool openDebugWindowOnStart = false;
     public bool debugShowChatCode = false;
 
-    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase)
+    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;
-        Database = database;
-        LegacyDatabase = legacyDatabase;
+
+        Database        = database;
+        LegacyDatabase  = legacyDatabase;
+        PetServices     = petServices;
+
         LegacyInitialise();
         CurrentInitialise();
+
         isSetup = true;
     }
 
@@ -75,13 +87,27 @@ internal class Configuration : IPluginConfiguration
 
     public void Save()
     {
-        if (currentSaveFileVersion != Version || !isSetup) return;
+        if (currentSaveFileVersion != Version || !isSetup)
+        {
+            return;
+        }
+
+        PetServices?.PetLog.LogVerbose("Pet Nicknames will now attempt to save");   // I need to add more verbose logging, pet nicknames is kind of silent.
+
         SerializableUsersV5 = Database!.SerializeDatabase();
+
 #pragma warning disable CS0618 // Oboslete (Legacy database is supposed to handle obsolete objects
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
 #pragma warning restore CS0618 // Obsolete
-        PetNicknamesPlugin?.SavePluginConfig(this);
 
+        try
+        {
+            PetNicknamesPlugin?.SavePluginConfig(this);
+        }
+        catch (Exception ex)
+        {
+            PetServices?.PetLog.LogError(ex, "Pet Nicknames failed to save. This is actually a bit of a problem :bceStare2: and I am sorry if this causes issues :c");
+        }
     }
 
     #region OBSOLETE

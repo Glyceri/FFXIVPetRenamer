@@ -38,10 +38,10 @@ internal unsafe class PartyHook : HookableElement
 
     bool CanContinue(AtkUnitBase* baseD) => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
 
-    void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon);
+    void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon.Address);
     void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
     {
-        Update((AtkUnitBase*)args.Addon);
+        Update((AtkUnitBase*)args.Addon.Address);
 
         hasRegisteredListener = false;
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
@@ -152,7 +152,7 @@ internal unsafe class PartyHook : HookableElement
 
     bool IsCrossParty()
     {
-        bool isCrossRealm       = InfoProxyCrossRealm.Instance()->IsCrossRealm   > 0;
+        bool isCrossRealm       = InfoProxyCrossRealm.Instance()->IsCrossRealm;
         bool noMembersInGroup   = GroupManager.Instance()->MainGroup.MemberCount < 1;
 
         return isCrossRealm && noMembersInGroup;

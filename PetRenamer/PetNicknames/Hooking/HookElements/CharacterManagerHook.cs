@@ -31,11 +31,11 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) : base(services, userList, petServices, dirtyListener)
     {
-        Database = database;
-        LegacyDatabase = legacyDatabase;
-        SharingDictionary = sharingDictionary;
-        DirtyCaller = dirtyCaller;
-        IslandHook = islandHook;
+        Database            = database;
+        LegacyDatabase      = legacyDatabase;
+        SharingDictionary   = sharingDictionary;
+        DirtyCaller         = dirtyCaller;
+        IslandHook          = islandHook;
 
         OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
         OnTerminateCompanionHook    = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.Terminate>        ((nint)Companion.StaticVirtualTablePointer->Terminate,          TerminateCompanion);
@@ -55,7 +55,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         FloodInitialList();
     }
 
-    void FloodInitialList()
+    private void FloodInitialList()
     {
         for (int i = 0; i < 100; i++)
         {
@@ -69,7 +69,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    void InitializeCompanion(Companion* companion)
+    private void InitializeCompanion(Companion* companion)
     {
         try
         {
@@ -83,7 +83,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         DalamudServices.Framework.Run(() => HandleAsCreatedCompanion(companion));
     }
 
-    void TerminateCompanion(Companion* companion)
+    private void TerminateCompanion(Companion* companion)
     {
         HandleAsDeletedCompanion(companion);
 
@@ -97,7 +97,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    void InitializeBattleChara(BattleChara* bChara)
+    private void InitializeBattleChara(BattleChara* bChara)
     {
         try
         {
@@ -111,7 +111,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         DalamudServices.Framework.Run(() => HandleAsCreated(bChara));
     }
 
-    void TerminateBattleChara(BattleChara* bChara)
+    private void TerminateBattleChara(BattleChara* bChara)
     {
         HandleAsDeleted(bChara);
 
@@ -125,7 +125,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    GameObject* DestroyBattleChara(BattleChara* bChara, byte freeMemory)
+    private GameObject* DestroyBattleChara(BattleChara* bChara, byte freeMemory)
     {
         HandleAsDeleted(bChara);
 
@@ -141,17 +141,17 @@ internal unsafe class CharacterManagerHook : HookableElement
         return null;
     }
 
-    void HandleAsCreatedCompanion(Companion* companion) => GetOwner(companion)?.SetCompanion(companion);
-    void HandleAsDeletedCompanion(Companion* companion) => GetOwner(companion)?.RemoveCompanion(companion);
+    private void HandleAsCreatedCompanion(Companion* companion) => GetOwner(companion)?.SetCompanion(companion);
+    private void HandleAsDeletedCompanion(Companion* companion) => GetOwner(companion)?.RemoveCompanion(companion);
 
-    IPettableUser? GetOwner(Companion* companion)
+    private IPettableUser? GetOwner(Companion* companion)
     {
         if (companion == null) return null;
 
         return UserList.GetUserFromOwnerID(companion->CompanionOwnerId);
     }
 
-    void HandleAsCreated(BattleChara* newBattleChara)
+    private void HandleAsCreated(BattleChara* newBattleChara)
     {
         if (newBattleChara == null) return;
 
@@ -189,7 +189,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    bool HandleAsIsland(BattleChara* newBattleChara)
+    private bool HandleAsIsland(BattleChara* newBattleChara)
     {
         if (!IslandHook.IsOnIsland)                                                             return false;
 
@@ -215,7 +215,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         return true;
     }
 
-    void HandleAsDeleted(BattleChara* newBattleChara)
+    private void HandleAsDeleted(BattleChara* newBattleChara)
     {
         if (newBattleChara == null) return;
 
@@ -248,7 +248,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    void AddTempPetsToUser(IPettableUser user)
+    private void AddTempPetsToUser(IPettableUser user)
     {
         uint userID = user.ShortObjectID;
 
@@ -266,7 +266,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    IPettableUser? CreateUser(BattleChara* newBattleChara)
+    private IPettableUser? CreateUser(BattleChara* newBattleChara)
     {
         int actualIndex = CreateActualIndex(newBattleChara->ObjectIndex);
         if (actualIndex < 0 || actualIndex >= 100) return null;
@@ -285,7 +285,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         return newUser;
     }
 
-    int CreateActualIndex(ushort index) => (int)MathF.Floor(index * 0.5f);
+    private int CreateActualIndex(ushort index) => (int)MathF.Floor(index * 0.5f);
 
     protected override void OnDispose()
     {

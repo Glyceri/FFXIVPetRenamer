@@ -1,5 +1,5 @@
 ﻿using Dalamud.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Labels;

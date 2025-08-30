@@ -1,9 +1,10 @@
-﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+﻿using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 
 internal interface IDataParser
 {
     IDataParseResult ParseData(string data);
-    bool ApplyParseData(IDataParseResult result, bool isFromIPC);
+    bool ApplyParseData(IDataParseResult result, ParseSource parseSource);
 }

@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -25,6 +25,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -196,7 +197,7 @@ internal class PetListWindow : PetWindow
 
                     IDataParseResult parseResult = DataParser.ParseData(ImGui.GetClipboardText());
 
-                    if (!DataParser.ApplyParseData(parseResult, false))
+                    if (!DataParser.ApplyParseData(parseResult, ParseSource.Manual))
                     {
                         string error = string.Empty;
                         if (parseResult is InvalidParseResult invalidParseResult) error = invalidParseResult.Reason;
@@ -384,7 +385,7 @@ internal class PetListWindow : PetWindow
 
                             if (EraserButton.Draw(new Vector2(buttonSize, buttonSize), Translator.GetLine("ClearButton.Label"), Translator.GetLine("PetRenameNode.Clear")))
                             {
-                                DalamudServices.Framework.Run(() => user.Entry.Clear(false));
+                                DalamudServices.Framework.Run(() => user.Entry.Clear(ParseSource.Manual));
                             }
                         }
                         LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));

@@ -8,13 +8,14 @@ namespace PetRenamer.PetNicknames.Services;
 
 internal class PetServices : IPetServices
 {
-    public IPetLog PetLog                   { get; init; }
-    public Configuration Configuration      { get; init; }
-    public IPetSheets PetSheets             { get; init; }
-    public IStringHelper StringHelper       { get; init; }
-    public IPetCastHelper PetCastHelper     { get; init; }
-    public IPetActionHelper PetActionHelper { get; init; }
-    public ITargetManager TargetManager     { get; init; }
+    public IPetLog          PetLog            { get; }
+    public Configuration    Configuration     { get; }
+    public IPetSheets       PetSheets         { get; }
+    public IStringHelper    StringHelper      { get; }
+    public IPetCastHelper   PetCastHelper     { get; }
+    public IPetActionHelper PetActionHelper   { get; }
+    public ITargetManager   TargetManager     { get; }
+    public IPluginWatcher   PluginWatcher     { get; }
 
     public PetServices(DalamudServices services, IPettableUserList userList) 
     {
@@ -25,11 +26,12 @@ internal class PetServices : IPetServices
         PetCastHelper   = new PetCastWrapper();
         PetActionHelper = new PetActionWrapper();
         TargetManager   = new TargetManagerWrapper(services, userList);
+        PluginWatcher   = new PluginWatcher(services);
 
         CheckConfigFailure();
     }
 
-    void CheckConfigFailure()
+    private void CheckConfigFailure()
     {
         if (Configuration.currentSaveFileVersion == Configuration.Version)
         {
@@ -37,5 +39,10 @@ internal class PetServices : IPetServices
         }
 
         _ = new LegacyStepper(Configuration, this);
+    }
+
+    public void Dispose()
+    {
+        PluginWatcher?.Dispose();
     }
 }

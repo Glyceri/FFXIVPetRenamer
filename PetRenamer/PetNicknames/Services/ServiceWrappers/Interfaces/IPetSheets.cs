@@ -16,7 +16,7 @@ internal interface IPetSheets
     List<IPetSheetData> GetMissingPets(List<int> battlePetSkeletons);
     int ToSoftSkeleton(int skeletonID, int[] softSkeletons);
     IPetSheetData? GetPetFromName(string name);
-    IPetSheetData? GetPetFromIcon(long iconID);
+    IPetSheetData? GetPetFromIcon(uint iconID);
     IPetSheetData? GetPetFromAction(uint actionID, in IPettableUser user, bool IsSoft = true);
     IPetSheetData? GetPetFromString(string text, in IPettableUser user, bool IsSoft = false);
     IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData);

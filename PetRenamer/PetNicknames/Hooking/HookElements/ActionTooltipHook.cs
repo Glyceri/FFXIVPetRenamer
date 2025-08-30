@@ -12,9 +12,9 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 {
-    readonly ActionTooltipTextHook tooltipHook = null!;
-    readonly ActionTooltipTextHook actionTooltipHook = null!;
-    readonly ITooltipHookHelper TooltipHook;
+    private readonly ActionTooltipTextHook tooltipHook = null!;
+    private readonly ActionTooltipTextHook actionTooltipHook = null!;
+    private readonly ITooltipHookHelper TooltipHook;
 
     public uint LastActionID { get; private set; } = 0;
 
@@ -31,19 +31,20 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     public override void Init()
     {
-        TooltipHook.RegisterCallback(OnShowTooltipDetour);
+        TooltipHook?.RegisterCallback(OnShowTooltipDetour);
+
         DalamudServices.GameGui.HoveredActionChanged += OnHoveredActionChanged;
     }
 
-    bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
+    private bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
 
-    void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
+    private void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         tooltipHook.SetPetSheetData(null);
         actionTooltipHook.SetPetSheetData(null);
     }
 
-    void OnHoveredActionChanged(object? sender, HoveredAction e)
+    private void OnHoveredActionChanged(object? sender, HoveredAction e)
     {
         IPettableUser? localUser = UserList.LocalPlayer;
         if (localUser == null) return;
@@ -62,7 +63,8 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 
     protected override void OnQuickDispose()
     {
-        TooltipHook.DeregisterCallback(OnShowTooltipDetour);
+        TooltipHook?.DeregisterCallback(OnShowTooltipDetour);
+
         DalamudServices.GameGui.HoveredActionChanged -= OnHoveredActionChanged;
     }
 }

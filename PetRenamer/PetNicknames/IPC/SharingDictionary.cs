@@ -9,10 +9,10 @@ namespace PetRenamer.PetNicknames.IPC;
 
 internal class SharingDictionary : ISharingDictionary
 {
-    readonly DalamudServices DalamudServices;
+    private readonly DalamudServices DalamudServices;
 
     // Data Sharing
-    readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
+    private readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
 
     public SharingDictionary(DalamudServices dalamudServices)
     {
@@ -31,7 +31,8 @@ internal class SharingDictionary : ISharingDictionary
 
     public void Set(GameObjectId gameObjectID, string? customName)
     {
-        PetNicknameDict.Remove(gameObjectID);
+        _ = PetNicknameDict.Remove(gameObjectID);
+
         if (!customName.IsNullOrWhitespace())
         {
             PetNicknameDict.Add(gameObjectID, customName);
@@ -41,6 +42,7 @@ internal class SharingDictionary : ISharingDictionary
     public void Dispose()
     {
         PetNicknameDict.Clear();
+
         DalamudServices.DalamudPlugin.RelinquishData($"PetRenamer.GameObjectRenameDict");
     }
 }

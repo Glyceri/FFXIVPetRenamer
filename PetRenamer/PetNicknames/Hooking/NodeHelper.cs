@@ -15,7 +15,7 @@ internal unsafe class BaseNode
 
     public BaseNode(DalamudServices services, string addon)
     {
-        node = (AtkUnitBase*)services.GameGui.GetAddonByName(addon, 1);
+        node = (AtkUnitBase*)services.GameGui.GetAddonByName(addon, 1).Address;
     }
 
     public AtkResNode* GetRootNode()

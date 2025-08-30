@@ -3,6 +3,7 @@ using PN.S;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -12,7 +13,7 @@ internal class PettableDatabase : IPettableDatabase
 
     public IPettableDatabaseEntry[] DatabaseEntries { get => [.. _entries]; }
 
-    protected readonly IPetServices PetServices;
+    protected readonly IPetServices         PetServices;
     protected readonly IPettableDirtyCaller DirtyCaller;
 
     public PettableDatabase(IPetServices petServices, IPettableDirtyCaller dirtyCaller)
@@ -26,12 +27,22 @@ internal class PettableDatabase : IPettableDatabase
     protected virtual void Setup()
     {
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
+
         SerializableUserV5[]? users = PetServices.Configuration.SerializableUsersV5;
-        if (users == null) return;
+
+        if (users == null)
+        {
+            return;
+        }
+
         foreach (SerializableUserV5 user in users)
         {
             SerializableNameDataV2[] datas = user.SerializableNameDatas;
-            if (datas.Length == 0) continue;
+
+            if (datas.Length == 0)
+            {
+                continue;
+            }
 
             newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, datas[0].EdgeColours, datas[0].TextColours, user.SoftSkeletonData, true));
         }
@@ -41,10 +52,16 @@ internal class PettableDatabase : IPettableDatabase
     public IPettableDatabaseEntry? GetEntry(string name, ushort homeworld, bool create)
     {
         int entriesCount = _entries.Count;
+
         for (int i = 0; i < entriesCount; i++)
         {
             IPettableDatabaseEntry entry = _entries[i];
-            if (entry.Name != name || entry.Homeworld != homeworld) continue;
+
+            if (entry.Name != name || entry.Homeworld != homeworld)
+            {
+                continue;
+            }
+
             return entry;
         }
 
@@ -54,7 +71,9 @@ internal class PettableDatabase : IPettableDatabase
         }
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, name, homeworld, [], [], [], [], PluginConstants.BaseSkeletons, false);
+
         _entries.Add(newEntry);
+
         return newEntry;
     }
 
@@ -66,7 +85,12 @@ internal class PettableDatabase : IPettableDatabase
         for (int i = 0; i < entriesCount; i++)
         {
             IPettableDatabaseEntry entry = _entries[i];
-            if (entry.ContentID != contentID) continue;
+
+            if (entry.ContentID != contentID)
+            {
+                continue;
+            }
+
             return _entries[i];
         }
 
@@ -76,10 +100,16 @@ internal class PettableDatabase : IPettableDatabase
     public IPettableDatabaseEntry GetEntry(ulong contentID)
     {
         IPettableDatabaseEntry? entry = GetEntryNoCreate(contentID);
-        if (entry != null) return entry;
+
+        if (entry != null)
+        {
+            return entry;
+        }
 
         IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
+
         _entries.Add(newEntry);
+
         return newEntry;
     }
 
@@ -89,9 +119,13 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry currentEntry = _entries[i];
 
-            if (currentEntry.ContentID != entry.ContentID) continue;
+            if (currentEntry.ContentID != entry.ContentID)
+            {
+                continue;
+            }
 
-            currentEntry.Clear(true);
+            currentEntry.Clear(ParseSource.None);
+
             _entries.RemoveAt(i);
         }
     }
@@ -99,23 +133,43 @@ internal class PettableDatabase : IPettableDatabase
     public SerializableUserV5[] SerializeDatabase()
     {
         List<SerializableUserV5> users = new List<SerializableUserV5>();
+
         int entryCount = _entries.Count;
+
         for (int i = 0; i < entryCount; i++)
         {
             IPettableDatabaseEntry entry = _entries[i];
-            if (!entry.IsActive) continue;
-            if (entry.IsIPC) continue;
+
+            if (!entry.IsActive)
+            {
+                continue;
+            }
+
+            if (entry.IsIPC)
+            {
+                continue;
+            }
+
             users.Add(entry.SerializeEntry());
         }
+
         return users.ToArray();
     }
 
-    public void ApplyParseResult(IModernParseResult parseResult, bool isFromIPC)
+    public void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource)
     {
-        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
-        entry.UpdateEntry(parseResult, isFromIPC);
+        bool isFromIPC = parseSource == ParseSource.IPC;
 
-        if (!isFromIPC) SetDirty();
+        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
+
+        entry.UpdateEntry(parseResult, parseSource);
+
+        if (isFromIPC)
+        {
+            return;
+        }
+
+        SetDirty();
     }
 
     public void SetDirty()

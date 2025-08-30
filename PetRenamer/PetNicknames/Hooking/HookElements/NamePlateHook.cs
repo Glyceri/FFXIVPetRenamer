@@ -29,7 +29,7 @@ internal class NamePlateHook : HookableElement
         DalamudServices.NameplateGUI.RequestRedraw();
     }
 
-    void OnPlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
+    private void OnPlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
         if (!PetServices.Configuration.showOnNameplates) return;
 
@@ -42,7 +42,7 @@ internal class NamePlateHook : HookableElement
         }
     }
 
-    void OnSpecificPlateUpdate(INamePlateUpdateHandler handler)
+    private void OnSpecificPlateUpdate(INamePlateUpdateHandler handler)
     {
         if (handler.NamePlateKind != NamePlateKind.BattleNpcFriendly && 
             handler.NamePlateKind != NamePlateKind.EventNpcCompanion) return;

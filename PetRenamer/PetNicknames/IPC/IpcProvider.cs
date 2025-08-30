@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
 namespace PetRenamer;
@@ -19,33 +20,33 @@ internal class IpcProvider : IIpcProvider
 {
     public bool Enabled { get; set; } = false;
 
-    private const string ApiNamespace = "PetRenamer.";
-    private const uint   MajorVersion = 3;
-    private const uint   MinorVersion = 2;
-    private const float  ReleaseInterval = 8.0f;    // A minimum of 8 seconds has to pass to release data.
+    private const string ApiNamespace       = "PetRenamer.";
+    private const uint   MajorVersion       = 4;
+    private const uint   MinorVersion       = 0;
+    private const float  ReleaseInterval    = 8.0f;    // A minimum of 8 seconds has to pass to release data.
 
-    private string  lastData      = "[unprepared]";
-    private float   releaseTimer  = ReleaseInterval;
-    private bool    hasDataChange = false;
+    private string  lastData                = "[unprepared]";
+    private float   releaseTimer            = ReleaseInterval;
+    private bool    hasDataChange           = false;
 
-    private readonly DalamudServices DalamudServices;
-    private readonly IDataWriter DataWriter;
-    private readonly IDataParser DataReader;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IDataWriter        DataWriter;
+    private readonly IDataParser        DataReader;
 
 
     // Notifications
-    private readonly ICallGateProvider<object> Ready;
-    private readonly ICallGateProvider<object> Disposing;
-    private readonly ICallGateProvider<string, object> PlayerDataChanged;
+    private readonly ICallGateProvider<object>          Ready;
+    private readonly ICallGateProvider<object>          Disposing;
+    private readonly ICallGateProvider<string, object>  PlayerDataChanged;
 
     // Functions
-    private readonly ICallGateProvider<bool> EnabledFunction;
-    private readonly ICallGateProvider<(uint, uint)>? ApiVersion;
-    private readonly ICallGateProvider<string> GetPlayerData;
+    private readonly ICallGateProvider<bool>            EnabledFunction;
+    private readonly ICallGateProvider<(uint, uint)>?   ApiVersion;
+    private readonly ICallGateProvider<string>          GetPlayerData;
 
     // Actions
-    private readonly ICallGateProvider<string, object> SetPlayerData;
-    private readonly ICallGateProvider<ushort, object> ClearPlayerIPCData;
+    private readonly ICallGateProvider<string, object>  SetPlayerData;
+    private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
 
 
     /* ------------------------ READ ME ------------------------
@@ -56,22 +57,22 @@ internal class IpcProvider : IIpcProvider
      * (I don't even want to list the billion reasons as to why that is the ONLY way to make this plugin work.)
      * 
      * Notifications:
-     *      - Ready:
+     *      - OnReady:
      *          This triggers when the plugin enables. When subscribed, receiving this message means the plugin is active.
      *          
-     *      - Disposing:
+     *      - OnDisposing:
      *          This triggers when the plugin disables. When subscribed, receiving this message means the plugin is inactive.
      *          
-     *      - PlayerDataChanged (string):
+     *      - OnPlayerDataChanged (string):
      *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
      *
      * Functions:
-     *      - Enabled <bool>:
+     *      - GetEnabled <bool>:
      *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
      *          
      *      - ApiVersion <(uint, uint)>:
      *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).
-     *          For this release it should be (3, 0).
+     *          For this release it should be (4, 0).
      *
      *      - GetPlayerData <string>:
      *          Call this function to receive the local players pet data. This data is in the form of a string and will return [string.empty] when no local player is found.
@@ -91,17 +92,17 @@ internal class IpcProvider : IIpcProvider
     public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter)
     {
         DalamudServices = dalamudServices;
-        DataReader = dataReader;
-        DataWriter = dataWriter;
+        DataReader      = dataReader;
+        DataWriter      = dataWriter;
 
         // Notifiers
-        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Ready");
-        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}Disposing");
-        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}PlayerDataChanged");
+        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnReady");
+        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
         ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersion");
-        EnabledFunction                 = petNicknamesPlugin.GetIpcProvider<bool>                           ($"{ApiNamespace}Enabled");
+        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}IsEnabled");
         GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
@@ -136,7 +137,7 @@ internal class IpcProvider : IIpcProvider
 
         // Reset
         hasDataChange = false;
-        releaseTimer = 0;
+        releaseTimer  = 0;
 
         // Notify IPC
         OnDataChanged();
@@ -144,14 +145,17 @@ internal class IpcProvider : IIpcProvider
 
     public void Prepare()
     {
-        if (Enabled) return;
+        if (Enabled)
+        {
+            return;
+        }
 
         RegsterActions();
         RegisterFunctions();
 
         Enabled = true;
-        NotifyReady();
 
+        NotifyReady();
         NotifyDataChanged();
     }
 
@@ -173,10 +177,11 @@ internal class IpcProvider : IIpcProvider
     {
         try
         {
-            DalamudServices.Framework.Run(() =>
+            _ = DalamudServices.Framework.Run(() =>
             {
                 IDataParseResult result = DataReader.ParseData(data);
-                DataReader.ApplyParseData(result, true);
+                
+                _ = DataReader.ApplyParseData(result, ParseSource.IPC);
             });
         }
         catch (Exception e)
@@ -189,12 +194,19 @@ internal class IpcProvider : IIpcProvider
     {
         try
         {
-            DalamudServices.Framework.Run(() =>
+            _ = DalamudServices.Framework.Run(() =>
             {
-                if (DalamudServices.ObjectTable.Length <= objectIndex) return;
-                if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc) return;
+                if (DalamudServices.ObjectTable.Length <= objectIndex)
+                {
+                    return;
+                }
 
-                DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), true);
+                if (DalamudServices.ObjectTable[objectIndex] is not IPlayerCharacter pc)
+                {
+                    return;
+                }
+
+                _ = DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), ParseSource.IPC);
             });
         }
         catch(Exception e)
@@ -231,7 +243,10 @@ internal class IpcProvider : IIpcProvider
         {
             Ready?.SendMessage();
         }
-        catch { }
+        catch (Exception e)
+        {
+            DalamudServices.PluginLog.Error(e, "An error occurred when notifying ready.");
+        }
     }
 
     private void NotifyDisposing()
@@ -240,7 +255,10 @@ internal class IpcProvider : IIpcProvider
         {
             Disposing?.SendMessage();
         }
-        catch { }
+        catch(Exception e) 
+        {
+            DalamudServices.PluginLog.Error(e, "An error occurred when disposing.");
+        }
     }
 
     private void OnDataChanged()

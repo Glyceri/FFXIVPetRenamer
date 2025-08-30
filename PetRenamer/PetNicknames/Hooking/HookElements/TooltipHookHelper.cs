@@ -8,13 +8,13 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class TooltipHookHelper : ITooltipHookHelper
 {
-    readonly DalamudServices DalamudServices;
+    private readonly DalamudServices DalamudServices;
 
     public delegate void TooltipDelegate    (nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8);
 
-    event TooltipDelegate TooltipEvent = (_, _, _, _, _, _, _, _) => { };
+    private event TooltipDelegate TooltipEvent = (_, _, _, _, _, _, _, _) => { };
 
-    readonly Hook<AtkTooltipManager.Delegates.ShowTooltip> showTooltipHook = null!;
+    private readonly Hook<Delegates.ShowTooltip> showTooltipHook = null!;
 
     public TooltipHookHelper(DalamudServices dalamudServices)
     {
@@ -22,7 +22,7 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
 
         DalamudServices.Hooking.InitializeFromAttributes(this);
 
-        showTooltipHook = DalamudServices.Hooking.HookFromAddress<AtkTooltipManager.Delegates.ShowTooltip>(AtkTooltipManager.Addresses.ShowTooltip.Value, AtkTooltipManagerShowTooltipDetour);
+        showTooltipHook = DalamudServices.Hooking.HookFromAddress<Delegates.ShowTooltip>(Addresses.ShowTooltip.Value, AtkTooltipManagerShowTooltipDetour);
 
         showTooltipHook.Enable();
     }
@@ -34,7 +34,7 @@ internal unsafe class TooltipHookHelper : ITooltipHookHelper
         showTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
     }
 
-    void CallCallbacks(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
+    private void CallCallbacks(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
         TooltipEvent?.Invoke(tooltip, tooltipType, addonID, a4, a5, a6, a7, a8);
     }

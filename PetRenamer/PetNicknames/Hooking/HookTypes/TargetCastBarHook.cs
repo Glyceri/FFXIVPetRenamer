@@ -13,12 +13,14 @@ internal class TargetCastBarHook : CastBarHook
     public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         base.Setup(services, userList, petServices, dirtyListener, AddonName, textPos, allowedCallback, allowColours, isSoft);
+
         SetFaulty();
     }
 
     public void RegisterTarget(Func<IPettableEntity?> callGetUser)
     {
         this.callGetUser = callGetUser;
+
         SetUnfaulty();
     }
 

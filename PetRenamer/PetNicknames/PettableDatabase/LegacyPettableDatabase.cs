@@ -3,6 +3,7 @@
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,12 +29,17 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
         }
     }
 
-    public void ApplyParseResult(IBaseParseResult parseResult, bool isFromIPC)
+    public void ApplyParseResult(IBaseParseResult parseResult, ParseSource parseSource)
     {
         IPettableDatabaseEntry? entry = GetEntry(parseResult.UserName, parseResult.Homeworld, true);
-        if (entry == null) return;
 
-        entry.UpdateEntryBase(parseResult, isFromIPC);
+        if (entry == null)
+        {
+            return;
+        }
+
+        entry.UpdateEntryBase(parseResult, parseSource);
+
         SetDirty();
     }
 

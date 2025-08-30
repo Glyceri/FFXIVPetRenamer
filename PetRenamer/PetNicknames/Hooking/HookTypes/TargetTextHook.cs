@@ -15,12 +15,14 @@ internal unsafe class TargetTextHook : SimpleTextHook
     public void RegsterTarget(Func<IPettableEntity?> getPet)
     {
         callGetPet = getPet;
+
         SetUnfaulty();
     }
 
     protected override bool OnTextNode(AtkTextNode* textNode, string text)
     {
         if (!IsSoft) return NotSoftTextNode(textNode, text);
+
         return base.OnTextNode(textNode, text);
     }
 

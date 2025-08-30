@@ -23,9 +23,9 @@ internal unsafe class ActionMenuHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenuActionSetting",  LifeCycleUpdateActionSetting);
     }
 
-    void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon);
-    void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon);
+    private void LifeCycleUpdateActionMenu    (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionMenu    ((AtkUnitBase*)addonArgs.Addon.Address);
+    private void LifeCycleUpdateReplaceMenu   (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateReplaceMenu   ((AtkUnitBase*)addonArgs.Addon.Address);
+    private void LifeCycleUpdateActionSetting (AddonEvent addonEvent, AddonArgs addonArgs) => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon.Address);
 
     void UpdateActionSetting(AtkUnitBase* baseD)
     {
@@ -43,10 +43,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentBase* resNode = compNode->Component;
         if (resNode == null) return;
 
-        AtkResNode* textResNode = resNode->GetTextNodeById(10);
-        if (textResNode == null) return;
-
-        AtkTextNode* textNode = textResNode->GetAsAtkTextNode();
+        AtkTextNode* textNode = resNode->GetTextNodeById(10);
         if (textNode == null) return;
 
         if (resNode->UldManager.LoadedState != AtkLoadState.Loaded) return;
@@ -64,7 +61,7 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* icon = (AtkComponentIcon*)iconCompNode->Component;
         if (icon == null) return;
 
-        long iconID = icon->IconId;
+        uint iconID = icon->IconId;
 
         AtkComponentNode* resCompNode2 = baseD->GetComponentNodeById(11);
         if (resCompNode2 == null) return;
@@ -90,13 +87,13 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* icon2 = (AtkComponentIcon*)iconCompNode2->Component;
         if (icon2 == null) return;
 
-        long iconID2 = icon2->IconId;
+        uint iconID2 = icon2->IconId;
 
         Rename(textNode, in user, iconID);
         Rename(textNode2, in user, iconID2);
     }
 
-    void UpdateReplaceMenu(AtkUnitBase* baseD)
+    private void UpdateReplaceMenu(AtkUnitBase* baseD)
     {
         if (baseD == null) return;
         if (!baseD->IsVisible) return;
@@ -132,13 +129,13 @@ internal unsafe class ActionMenuHook : HookableElement
             AtkComponentIcon* icon = (AtkComponentIcon*)compNode->Component;
             if (icon == null) continue;
 
-            long iconID = icon->IconId;
+            uint iconID = icon->IconId;
 
             Rename(tNode, in user, iconID);
         }
     }
 
-    void UpdateActionMenu(AtkUnitBase* baseD)
+    private void UpdateActionMenu(AtkUnitBase* baseD)
     {
         if (baseD == null) return;
         if (!baseD->IsVisible) return;
@@ -166,7 +163,7 @@ internal unsafe class ActionMenuHook : HookableElement
         }
     }
 
-    bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
         if (atkNode->UldManager.LoadedState != AtkLoadState.Loaded) return false;
         if (atkNode->UldManager.NodeList == null) return false;
@@ -196,14 +193,14 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
         if (iconNode == null) return false;
 
-        long iconID = iconNode->IconId;
+        uint iconID = iconNode->IconId;
         if (iconID <= 0 || iconID > 50000) return false;
 
         Rename(tNode, in user, iconID);
         return true;
     }
 
-    bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
     {
         AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
         if (tNode == null) return false;
@@ -218,14 +215,14 @@ internal unsafe class ActionMenuHook : HookableElement
         AtkComponentIcon* iconNode = (AtkComponentIcon*)iconBaseNode->Component;
         if (iconNode == null) return false;
 
-        long iconID = iconNode->IconId;
+        uint iconID = iconNode->IconId;
         if (iconID == 0) return false;
 
         Rename(tNode, in user, iconID);
         return true;
     }
 
-    void Rename(AtkTextNode* textNode, in IPettableUser user, long iconID)
+    private void Rename(AtkTextNode* textNode, in IPettableUser user, uint iconID)
     {
         string textNodeText = new ReadOnlySeStringSpan(textNode->NodeText).ExtractText();
 

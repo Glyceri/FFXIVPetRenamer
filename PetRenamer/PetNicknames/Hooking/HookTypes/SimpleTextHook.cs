@@ -23,7 +23,7 @@ internal unsafe class SimpleTextHook : ITextHook
     protected DalamudServices Services = null!;
     protected IPettableUserList PettableUserList { get; set; } = null!;
     protected IPetServices PetServices { get; set; } = null!;
-    IPettableDirtyListener DirtyListener { get; set; } = null!;
+    private IPettableDirtyListener DirtyListener { get; set; } = null!;
 
     protected uint[] TextPos { get; set; } = Array.Empty<uint>();
     protected Func<int, bool> AllowedToFunction = _ => false;
@@ -31,7 +31,7 @@ internal unsafe class SimpleTextHook : ITextHook
     protected bool IsSoft;
     protected bool AllowColours;
 
-    string AddonName = string.Empty;
+    private string AddonName = string.Empty;
 
     protected IPettableUser? CurrentUser;
     protected IPetSheetData? CurrentPet;
@@ -59,19 +59,19 @@ internal unsafe class SimpleTextHook : ITextHook
     public void SetUnfaulty() => Faulty = false;
     public void SetFaulty() => Faulty = true;
 
-    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon);
+    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon.Address);
 
-    void OnName(INamesDatabase nameDatabase)
+    private void OnName(INamesDatabase nameDatabase)
     {
         SetDirty();
     }
 
-    void OnEntry(IPettableDatabaseEntry entry)
+    private void OnEntry(IPettableDatabaseEntry entry)
     {
         SetDirty();
     }
 
-    bool isDirty = false;
+    private bool isDirty = false;
 
     protected void SetDirty()
     {
@@ -83,7 +83,7 @@ internal unsafe class SimpleTextHook : ITextHook
         isDirty = false;
     }
 
-    void HandleRework(AtkUnitBase* baseElement)
+    private void HandleRework(AtkUnitBase* baseElement)
     {
         if (BlockedCheck()) return;
 
@@ -97,6 +97,7 @@ internal unsafe class SimpleTextHook : ITextHook
         // Make sure it only runs once
         string tNodeText = new ReadOnlySeStringSpan(tNode->NodeText).ExtractText();
         if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty) return;
+
         ClearDirty();
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
@@ -159,7 +160,9 @@ internal unsafe class SimpleTextHook : ITextHook
     {
         if (AllowedToFunction == null) return true;
         if (AllowedToFunction.Invoke(pPet.Model)) return true;
+
         LastAnswer = text;
+
         return false;
     }
 
@@ -186,6 +189,7 @@ internal unsafe class SimpleTextHook : ITextHook
     public void Dispose()
     {
         OnDispose();
+
         DirtyListener.UnregisterOnDirtyName(OnName);
         DirtyListener.UnregisterOnDirtyEntry(OnEntry);
         DirtyListener.UnregisterOnClearEntry(OnEntry);
