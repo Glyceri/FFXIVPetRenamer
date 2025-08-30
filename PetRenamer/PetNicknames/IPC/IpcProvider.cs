@@ -57,20 +57,20 @@ internal class IpcProvider : IIpcProvider
      * (I don't even want to list the billion reasons as to why that is the ONLY way to make this plugin work.)
      * 
      * Notifications:
-     *      - Ready:
+     *      - OnReady:
      *          This triggers when the plugin enables. When subscribed, receiving this message means the plugin is active.
      *          
-     *      - Disposing:
+     *      - OnDisposing:
      *          This triggers when the plugin disables. When subscribed, receiving this message means the plugin is inactive.
      *          
-     *      - PlayerDataChanged (string):
+     *      - OnPlayerDataChanged (string):
      *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
      *
      * Functions:
-     *      - Enabled <bool>:
+     *      - GetEnabled <bool>:
      *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
      *          
-     *      - ApiVersion <(uint, uint)>:
+     *      - GetApiVersion <(uint, uint)>:
      *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).
      *          For this release it should be (4, 0).
      *
@@ -92,22 +92,22 @@ internal class IpcProvider : IIpcProvider
     public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter)
     {
         DalamudServices = dalamudServices;
-        DataReader = dataReader;
-        DataWriter = dataWriter;
+        DataReader      = dataReader;
+        DataWriter      = dataWriter;
 
         // Notifiers
-        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}ReadyV4");
-        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}DisposingV4");
-        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}PlayerDataChangedV4");
+        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnReady");
+        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
-        ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersionV4");
-        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}EnabledV4");
-        GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerDataV4");
+        ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}GetApiVersion");
+        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}GetEnabled");
+        GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerDataV4");
-        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ushort, object>                         ($"{ApiNamespace}ClearPlayerDataV4");
+        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ushort, object>                         ($"{ApiNamespace}ClearPlayerData");
     }
 
     public void OnUpdate(IFramework framework)
