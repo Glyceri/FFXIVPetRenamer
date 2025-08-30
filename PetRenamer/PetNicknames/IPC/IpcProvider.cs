@@ -70,7 +70,7 @@ internal class IpcProvider : IIpcProvider
      *      - GetEnabled <bool>:
      *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
      *          
-     *      - GetApiVersion <(uint, uint)>:
+     *      - ApiVersion <(uint, uint)>:
      *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).
      *          For this release it should be (4, 0).
      *
