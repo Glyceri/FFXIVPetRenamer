@@ -102,7 +102,7 @@ internal class IpcProvider : IIpcProvider
 
         // Functions
         ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}GetApiVersion");
-        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}GetEnabled");
+        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}IsEnabled");
         GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
 
         // Actions
