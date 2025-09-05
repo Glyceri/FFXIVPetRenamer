@@ -83,7 +83,7 @@ internal class IpcProvider : IIpcProvider
      *          Applies the data to the database
      *          (You can never set the data of the current active local player.)
      *          
-     *      - ClearPlayerIPCData <ushort>:
+     *      - ClearPlayerData <ushort>:
      *          Call this action to clear the IPC data of the given ObjectIndex.
      *          
      * ----------------------END READ ME -----------------------
