@@ -359,7 +359,11 @@ internal class PetDevWindow : PetWindow
             if (objKind != ObjectKind.BattleNpc) continue;
 
             uint ownerID = bChara->OwnerId;
-            if (ownerID == 0xE0000000) continue;
+
+            if (ownerID == PluginConstants.InvalidId)
+            {
+                continue;
+            }
 
             battlePetCount++;
         }

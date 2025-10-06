@@ -10,9 +10,6 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableIslandUser : IIslandUser
 {
-    public bool IsActive { get; } = true;
-    public bool IsLocalPlayer { get; } = false;
-    public bool IsDirty { get; } = false;
     public IPettableDatabaseEntry DataBaseEntry { get; }
     public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
     public string Name { get; }
@@ -24,17 +21,29 @@ internal unsafe class PettableIslandUser : IIslandUser
     public nint Address { get; } = 0;
     public unsafe BattleChara* BattleChara { get; } = null;
 
-    readonly IPetServices PetServices;
+    private readonly IPetServices PetServices;
 
     public PettableIslandUser(IPetServices petServices, IPettableDatabaseEntry entry)
     {
-        PetServices = petServices;
+        PetServices     = petServices;
 
-        DataBaseEntry = entry;
-        Name = entry.Name;
-        ContentID = entry.ContentID;
-        Homeworld = entry.Homeworld;
+        DataBaseEntry   = entry;
+        Name            = entry.Name;
+        ContentID       = entry.ContentID;
+        Homeworld       = entry.Homeworld;
     }
+
+    public bool IsActive
+        => true;
+
+    public bool IsLocalPlayer
+        => false;
+
+    public bool IsDirty
+        => false;
+
+    public IPettableUserTargetManager? TargetManager
+        => null;
 
     public void SetBattlePet(BattleChara* pointer)
     {
@@ -43,13 +52,24 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     public void RemoveBattlePet(BattleChara* pointer)
     {
-        if (pointer == null) return;
+        if (pointer == null)
+        {
+            return;
+        }
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet? pet = PettablePets[i];
-            if (pet == null) continue;
-            if (pet.ObjectID != pointer->GetGameObjectId()) continue;
+
+            if (pet == null)
+            {
+                continue;
+            }
+
+            if (pet.ObjectID != pointer->GetGameObjectId())
+            {
+                continue;
+            }
 
             PettablePets.RemoveAt(i);
         }
@@ -58,34 +78,54 @@ internal unsafe class PettableIslandUser : IIslandUser
     public IPettablePet? GetPet(nint pet)
     {
         int petCount = PettablePets.Count;
+
         for (int i = 0; i < petCount; i++)
         {
             IPettablePet pPet = PettablePets[i];
-            if (pPet.Address == pet) return pPet;
+
+            if (pPet.Address != pet)
+            {
+                continue;
+            }
+
+            return pPet;
         }
+
         return null;
     }
 
     public IPettablePet? GetPet(GameObjectId gameObjectId)
     {
         int petCount = PettablePets.Count;
+
         for (int i = 0; i < petCount; i++)
         {
             IPettablePet pPet = PettablePets[i];
-            if (pPet.ObjectID == (ulong)gameObjectId) return pPet;
+
+            if (pPet.ObjectID != (ulong)gameObjectId)
+            {
+                continue;
+            }
+
+            return pPet;
         }
+
         return null;
     }
 
+    public IPettableEntity? GetTarget(IPettableUserList userList)
+        => null;
 
-    public string? GetCustomName(IPetSheetData sheetData) => DataBaseEntry.GetName(sheetData.Model);
+    public string? GetCustomName(IPetSheetData sheetData) 
+        => DataBaseEntry.GetName(sheetData.Model);
+
+    public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None)
+        => null;
 
     public void OnLastCastChanged(uint cast) { } // Unused
     public void RefreshCast() { } // Unused
-    public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None) => null; // Unused
     public void Dispose(IPettableDatabase d) { } // Unused
-    public void Update() { } // Unused FOR NOW
-
+    public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused
 }

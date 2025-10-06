@@ -17,11 +17,13 @@ internal class TargetCastBarHook : CastBarHook
         SetFaulty();
     }
 
-    public void RegisterTarget(Func<IPettableEntity?> callGetUser)
+    public TargetCastBarHook RegisterTarget(Func<IPettableEntity?> callGetUser)
     {
         this.callGetUser = callGetUser;
 
         SetUnfaulty();
+
+        return this;
     }
 
     protected override IPettableUser? GetUser()

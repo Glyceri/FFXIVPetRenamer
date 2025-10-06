@@ -67,6 +67,7 @@ internal class UpdateHandler : IDisposable
         _updatables.Add(new IPCWatcher(PettableUserList, Database, PetServices));
         _updatables.Add(IpcProvider);
         _updatables.Add(SaveHandler);
+        _updatables.Add(PetServices.TargetManager);
     }
 
     void OnUpdate(IFramework framework)

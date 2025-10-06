@@ -10,4 +10,6 @@ internal interface ITextHook : IDisposable
 {
     bool Faulty { get; }
     void Setup(DalamudServices service, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false);
+
+    void Refresh();
 }

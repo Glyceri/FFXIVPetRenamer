@@ -136,7 +136,7 @@ internal partial class PetnameCommand : Command
 
         if (targetState == TargetState.Target)
         {
-            IPettableEntity? target = PetServices.TargetManager.Target;
+            IPettableEntity? target = PetServices.TargetManager.LeadingTarget;
 
             if (target == null)
             {

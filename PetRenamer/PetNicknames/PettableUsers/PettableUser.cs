@@ -36,9 +36,9 @@ internal unsafe class PettableUser : IPettableUser
     private readonly IPettableDirtyCaller   DirtyCaller;
     private readonly ISharingDictionary     SharingDictionary;
 
-    public bool IsActive => DataBaseEntry.IsActive;
+    public IPettableUserTargetManager? TargetManager { get; private set; }
 
-    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, BattleChara* battleChara)
+    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, IPettableUserList userList, BattleChara* battleChara)
     {
         PetServices         = petServices;
         DirtyListener       = dirtyListener;
@@ -60,6 +60,8 @@ internal unsafe class PettableUser : IPettableUser
         ObjectID        = BattleChara->GetGameObjectId();
         ShortObjectID   = BattleChara->GetGameObjectId().ObjectId;
 
+        TargetManager   = new PettableUserTargetManager(this, userList);
+
         IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(Name, Homeworld, false);
 
         if (legacyEntry != null)
@@ -77,12 +79,23 @@ internal unsafe class PettableUser : IPettableUser
         {
             DataBaseEntry.UpdateContentID(ContentID, true);
         }
+
+#if DEBUG
+        PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+#endif
     }
+
+    public bool IsActive
+        => DataBaseEntry.IsActive;
 
     public void Update()
     {
         CurrentCastID = BattleChara->CastInfo.ActionId;
-        if (_lastCast != CurrentCastID) OnLastCastChanged(CurrentCastID);
+
+        if (_lastCast != CurrentCastID)
+        {
+            OnLastCastChanged(CurrentCastID);
+        }
     }
 
     public void OnLastCastChanged(uint cast)
@@ -155,6 +168,10 @@ internal unsafe class PettableUser : IPettableUser
 
     private void CreateNewPet(IPettablePet pet, int index = -1)
     {
+#if DEBUG
+        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectID} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+#endif
+
         if (index == -1)
         {
             PettablePets.Add(pet);
@@ -263,6 +280,10 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Dispose(IPettableDatabase database)
     {
+#if DEBUG
+        PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+#endif
+
         DirtyListener.UnregisterOnClearEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyName(OnDirty);

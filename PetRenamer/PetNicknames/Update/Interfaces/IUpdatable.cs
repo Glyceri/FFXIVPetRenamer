@@ -4,6 +4,6 @@ namespace PetRenamer.PetNicknames.Update.Interfaces;
 
 internal interface IUpdatable
 {
-    bool Enabled { get; set; }
-    void OnUpdate(IFramework framework);
+    public bool Enabled { get; set; }
+    public void OnUpdate(IFramework framework);
 }

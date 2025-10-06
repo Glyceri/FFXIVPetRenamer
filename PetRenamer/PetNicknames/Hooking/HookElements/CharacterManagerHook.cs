@@ -10,22 +10,23 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class CharacterManagerHook : HookableElement
 {
-    private readonly Hook<Companion.Delegates.OnInitialize>? OnInitializeCompanionHook;
-    private readonly Hook<Companion.Delegates.Terminate>? OnTerminateCompanionHook;
-    private readonly Hook<BattleChara.Delegates.OnInitialize> OnInitializeBattleCharaHook;
-    private readonly Hook<BattleChara.Delegates.Terminate> OnTerminateBattleCharaHook;
-    private readonly Hook<BattleChara.Delegates.Dtor> OnDestroyBattleCharaHook;
+    private readonly Hook<Companion.Delegates.OnInitialize>?    OnInitializeCompanionHook;
+    private readonly Hook<Companion.Delegates.Terminate>?       OnTerminateCompanionHook;
+    private readonly Hook<BattleChara.Delegates.OnInitialize>?  OnInitializeBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Terminate>?     OnTerminateBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Dtor>?          OnDestroyBattleCharaHook;
 
-    private readonly IPettableDatabase Database;
-    private readonly ILegacyDatabase LegacyDatabase;
-    private readonly ISharingDictionary SharingDictionary;
-    private readonly IPettableDirtyCaller DirtyCaller;
-    private readonly IIslandHook IslandHook;
+    private readonly IPettableDatabase      Database;
+    private readonly ILegacyDatabase        LegacyDatabase;
+    private readonly ISharingDictionary     SharingDictionary;
+    private readonly IPettableDirtyCaller   DirtyCaller;
+    private readonly IIslandHook            IslandHook;
 
     private readonly List<nint> temporaryPets = new List<nint>();
 
@@ -60,10 +61,18 @@ internal unsafe class CharacterManagerHook : HookableElement
         for (int i = 0; i < 100; i++)
         {
             BattleChara* bChara = CharacterManager.Instance()->BattleCharas[i];
-            if (bChara == null) continue;
+
+            if (bChara == null)
+            {
+                continue;
+            }
 
             ObjectKind charaKind = bChara->GetObjectKind();
-            if (charaKind != ObjectKind.Pc && charaKind != ObjectKind.BattleNpc) continue;
+
+            if (charaKind != ObjectKind.Pc && charaKind != ObjectKind.BattleNpc)
+            {
+                continue;
+            }
 
             HandleAsCreated(bChara);
         }
@@ -80,7 +89,10 @@ internal unsafe class CharacterManagerHook : HookableElement
             PetServices.PetLog.LogException(e);
         }
 
-        DalamudServices.Framework.Run(() => HandleAsCreatedCompanion(companion));
+        _ = DalamudServices.Framework.Run(() =>
+        {
+            HandleAsCreatedCompanion(companion);
+        });
     }
 
     private void TerminateCompanion(Companion* companion)
@@ -108,7 +120,10 @@ internal unsafe class CharacterManagerHook : HookableElement
             PetServices.PetLog.LogException(e);
         }
 
-        DalamudServices.Framework.Run(() => HandleAsCreated(bChara));
+        _ = DalamudServices.Framework.Run(() => 
+        {
+            HandleAsCreated(bChara);
+        });
     }
 
     private void TerminateBattleChara(BattleChara* bChara)
@@ -141,25 +156,36 @@ internal unsafe class CharacterManagerHook : HookableElement
         return null;
     }
 
-    private void HandleAsCreatedCompanion(Companion* companion) => GetOwner(companion)?.SetCompanion(companion);
-    private void HandleAsDeletedCompanion(Companion* companion) => GetOwner(companion)?.RemoveCompanion(companion);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void HandleAsCreatedCompanion(Companion* companion)
+        => GetOwner(companion)?.SetCompanion(companion);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void HandleAsDeletedCompanion(Companion* companion)
+        => GetOwner(companion)?.RemoveCompanion(companion);
 
     private IPettableUser? GetOwner(Companion* companion)
     {
-        if (companion == null) return null;
+        if (companion == null)
+        {
+            return null;
+        }
 
         return UserList.GetUserFromOwnerID(companion->CompanionOwnerId);
     }
 
     private void HandleAsCreated(BattleChara* newBattleChara)
     {
-        if (newBattleChara == null) return;
+        if (newBattleChara == null)
+        {
+            return;
+        }
 
         ObjectKind actualObjectKind = newBattleChara->ObjectKind;
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            CreateUser(newBattleChara);
+            _ = CreateUser(newBattleChara);
         }
 
         if (actualObjectKind == ObjectKind.BattleNpc)
@@ -171,11 +197,21 @@ internal unsafe class CharacterManagerHook : HookableElement
             for (int i = 0; i < UserList.PettableUsers.Length; i++)
             {
                 IPettableUser? user = UserList.PettableUsers[i];
-                if (user == null) continue;
-                if (user.ShortObjectID != owner) continue;
+
+                if (user == null)
+                {
+                    continue;
+                }
+
+                if (user.ShortObjectID != owner)
+                {
+                    continue;
+                }
 
                 user.SetBattlePet(newBattleChara);
+
                 gotOwner = true;
+
                 break;
             }
 
@@ -191,15 +227,38 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private bool HandleAsIsland(BattleChara* newBattleChara)
     {
-        if (!IslandHook.IsOnIsland)                                                             return false;
+        if (!IslandHook.IsOnIsland)
+        {
+            return false;
+        }
 
-        if (newBattleChara->SubKind         != 10)                                              return false;
-        if (newBattleChara->HomeWorld       != ushort.MaxValue)                                 return false;
-        if (newBattleChara->CurrentWorld    != ushort.MaxValue)                                 return false;
-        if (newBattleChara->OwnerId         != 0xE0000000)                                      return false;
-        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null)  return false;
+        if (newBattleChara->SubKind != 10)
+        {
+            return false;
+        }
+
+        if (newBattleChara->HomeWorld != ushort.MaxValue)
+        {
+            return false;
+        }
+
+        if (newBattleChara->CurrentWorld != ushort.MaxValue)
+        {
+            return false;
+        }
+
+        if (newBattleChara->OwnerId != PluginConstants.InvalidId)
+        {
+            return false;
+        }
+
+        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null)
+        {
+            return false;
+        }
 
         IPettableUser? user = UserList.PettableUsers[PettableUserList.IslandIndex];
+
         if (user == null)
         {
             return false;
@@ -217,7 +276,10 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void HandleAsDeleted(BattleChara* newBattleChara)
     {
-        if (newBattleChara == null) return;
+        if (newBattleChara == null)
+        {
+            return;
+        }
 
         nint addressChara = (nint)newBattleChara;
 
@@ -228,21 +290,35 @@ internal unsafe class CharacterManagerHook : HookableElement
             for (int i = 0; i < UserList.PettableUsers.Length; i++)
             {
                 IPettableUser? user = UserList.PettableUsers[i];
-                if (user == null) continue;
-                if (user.BattleChara != newBattleChara) continue;
+
+                if (user == null)
+                {
+                    continue;
+                }
+
+                if (user.BattleChara != newBattleChara)
+                {
+                    continue;
+                }
 
                 user?.Dispose(Database);
+
                 UserList.PettableUsers[i] = null;
+
                 break;
             }
         }
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
-            temporaryPets.Remove(addressChara);
+            _ = temporaryPets.Remove(addressChara);
 
             IPettableUser? user = UserList.GetUser(addressChara);
-            if (user == null) return;
+
+            if (user == null)
+            {
+                return;
+            }
 
             user.RemoveBattlePet(newBattleChara);
         }
@@ -255,11 +331,23 @@ internal unsafe class CharacterManagerHook : HookableElement
         for (int i = temporaryPets.Count - 1; i >= 0; i--)
         {
             nint tempPetPtr = temporaryPets[i];
-            if (tempPetPtr == 0) continue;
+
+            if (tempPetPtr == 0)
+            {
+                continue;
+            }
 
             BattleChara* tempPet = (BattleChara*)tempPetPtr;
-            if (tempPet == null) continue;
-            if (tempPet->OwnerId != userID) continue;
+
+            if (tempPet == null)
+            {
+                continue;
+            }
+
+            if (tempPet->OwnerId != userID)
+            {
+                continue;
+            }
 
             user.SetBattlePet(tempPet);
             temporaryPets.RemoveAt(i);
@@ -269,9 +357,13 @@ internal unsafe class CharacterManagerHook : HookableElement
     private IPettableUser? CreateUser(BattleChara* newBattleChara)
     {
         int actualIndex = CreateActualIndex(newBattleChara->ObjectIndex);
-        if (actualIndex < 0 || actualIndex >= 100) return null;
 
-        PettableUser newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, newBattleChara);
+        if (actualIndex < 0 || actualIndex >= 100)
+        {
+            return null;
+        }
+
+        PettableUser newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, UserList, newBattleChara);
 
         UserList.PettableUsers[actualIndex] = newUser;
 
@@ -285,8 +377,10 @@ internal unsafe class CharacterManagerHook : HookableElement
         return newUser;
     }
 
-    private int CreateActualIndex(ushort index) => (int)MathF.Floor(index * 0.5f);
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private int CreateActualIndex(ushort index)
+        => (int)MathF.Floor(index * 0.5f);
+    
     protected override void OnDispose()
     {
         OnInitializeCompanionHook?.Dispose();

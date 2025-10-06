@@ -8,6 +8,8 @@ public static class PluginConstants
 
     public const int ffxivNameSize = 32;
     public const char forbiddenCharacter = '^';
+    
+    public const ulong InvalidId            = 0xE0000000;
 
     public const int Eos                    = -407;
     public const int Selene                 = -408;

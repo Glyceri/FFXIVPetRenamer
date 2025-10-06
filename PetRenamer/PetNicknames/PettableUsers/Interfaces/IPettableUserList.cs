@@ -9,6 +9,7 @@ internal interface IPettableUserList
     IPettableUser? GetUser(nint user, bool petMeansOwner = true);
     IPettablePet? GetPet(ulong petId);
     IPettableUser? GetUser(ulong userId);
+    IPettableUser? GetUserFromObjectId(uint objectId);
     IPettableUser? GetUserFromOwnerID(uint ownerID);
     IPettableUser? GetUserFromContentID(ulong contentID);
     IPettableUser? GetUser(string username);
