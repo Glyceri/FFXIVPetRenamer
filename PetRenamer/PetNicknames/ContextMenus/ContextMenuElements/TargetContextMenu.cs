@@ -13,9 +13,9 @@ internal class TargetContextMenu : IContextMenuElement
     // Null means context menu didn't come from an addon
     public string? AddonName { get; } = null;
 
-    readonly IPetServices       PetServices;
-    readonly IPettableUserList  UserList;
-    readonly IWindowHandler     WindowHandler;
+    private readonly IPetServices       PetServices;
+    private readonly IPettableUserList  UserList;
+    private readonly IWindowHandler     WindowHandler;
 
     public TargetContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
     {
@@ -27,22 +27,41 @@ internal class TargetContextMenu : IContextMenuElement
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
     {
         IPettableUser? localUser = UserList.LocalPlayer;
-        if (localUser == null) return null;
 
-        IPettableEntity? target = PetServices.TargetManager.Target;
-        if (target == null) return null;
+        if (localUser == null)
+        {
+            return null;
+        }
+
+        IPettableEntity? target = PetServices.TargetManager.LeadingTarget;
+
+        if (target == null)
+        {
+            return null;
+        }
 
         IPettablePet? pet = localUser.GetPet(target.Address);
+
         if (pet == null)
         {
             IPettableUser? islandUser = UserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex];
-            if (islandUser == null) return null;
+
+            if (islandUser == null)
+            {
+                return null;
+            }
 
             pet = islandUser.GetPet(target.Address);
         }
 
-        if (pet == null) return null;
+        if (pet == null)
+        {
+            return null;
+        }
 
-        return (a) => WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);
+        return (a) =>
+        {
+            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);
+        };
     }
 }

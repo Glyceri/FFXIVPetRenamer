@@ -8,27 +8,30 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal unsafe interface IPettableUser : IBattleUser
 {
-    bool IsActive { get; }  
-    bool IsLocalPlayer { get; }
+    public bool IsActive        { get; }
+    public bool IsLocalPlayer   { get; }
 
-    IPettableDatabaseEntry DataBaseEntry { get; }
-    List<IPettablePet> PettablePets { get; }
-    IPettablePet? GetPet(nint pet);
-    IPettablePet? GetPet(GameObjectId gameObjectId);
-    IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
-    
-    string? GetCustomName(IPetSheetData sheetData);
+    public IPettableDatabaseEntry DataBaseEntry { get; }
+    public List<IPettablePet> PettablePets { get; }
 
-    void OnLastCastChanged(uint cast);
-    void Update();
-    void SetBattlePet(BattleChara* battlePet);
-    void RemoveBattlePet(BattleChara* battlePet);
-    void SetCompanion(Companion* companion);
-    void RemoveCompanion(Companion* companion);
-    void RefreshCast();
-    void Dispose(IPettableDatabase database);
+    public IPettablePet? GetPet(nint pet);
+    public IPettablePet? GetPet(GameObjectId gameObjectId);
+    public IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
 
-    enum PetFilter
+    public string? GetCustomName(IPetSheetData sheetData);
+
+    public void OnLastCastChanged(uint cast);
+    public void Update();
+    public void SetBattlePet(BattleChara* battlePet);
+    public void RemoveBattlePet(BattleChara* battlePet);
+    public void SetCompanion(Companion* companion);
+    public void RemoveCompanion(Companion* companion);
+    public void RefreshCast();
+    public void Dispose(IPettableDatabase database);
+
+    public IPettableUserTargetManager? TargetManager { get; }
+
+    public enum PetFilter
     {
         None,
         Minion,

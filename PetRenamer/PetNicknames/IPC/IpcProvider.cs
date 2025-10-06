@@ -80,7 +80,7 @@ internal class IpcProvider : IIpcProvider
      *          
      * Actions:
      *      - SetPlayerData <string>:
-     *          Applies the data to the database
+     *          Send the exported data from the GetPlayerData function or the OnPlayerDataChanged callback to add it to the database.
      *          (You can never set the data of the current active local player.)
      *          
      *      - ClearPlayerData <ushort>:

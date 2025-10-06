@@ -1,59 +1,47 @@
 ﻿using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class PetLogWrapper : IPetLog
 {
-    public static IPetLog? Instance { get; private set; }
+    public static IPetLog Instance;
 
-    readonly IPluginLog PluginLog;
+    private readonly IPluginLog PluginLog;
 
     public PetLogWrapper(IPluginLog pluginLog) 
     {
+        Instance  = this;
         PluginLog = pluginLog;
-        Instance = this;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Log(object? message)
-    {
-        if (message == null) return;
-        PluginLog.Debug($"{message}");
-    }
-
+        => PluginLog.Debug($"{message}");
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogError(Exception e, object? message)
-    {
-        if (message == null) return;
-        PluginLog.Error($"{e} : {message}");
-    }
+        => PluginLog.Error($"{e} : {message}");
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogException(Exception e)
-    {
-        PluginLog.Error($"{e}");
-    }
+        => PluginLog.Error($"{e}");
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogFatal(object? message)
-    {
-        if (message == null) return;
-        PluginLog.Fatal($"{message}");
-    }
+        => PluginLog.Fatal($"{message}");
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogInfo(object? message)
-    {
-        if (message == null) return;
-        PluginLog.Info($"{message}");
-    }
+        => PluginLog.Info($"{message}");
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogVerbose(object? message)
-    {
-        if (message == null) return;
-        PluginLog.Verbose($"{message}");
-    }
+        => PluginLog.Verbose($"{message}");
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogWarning(object? message)
-    {
-        if (message == null) return;
-        PluginLog.Warning($"{message}");
-    }
+        => PluginLog.Warning($"{message}");
 }

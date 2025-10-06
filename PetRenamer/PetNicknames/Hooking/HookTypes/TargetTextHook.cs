@@ -12,11 +12,13 @@ internal unsafe class TargetTextHook : SimpleTextHook
 
     private IPettablePet? currentActivePet;
 
-    public void RegsterTarget(Func<IPettableEntity?> getPet)
+    public TargetTextHook RegsterTarget(Func<IPettableEntity?> getPet)
     {
         callGetPet = getPet;
 
         SetUnfaulty();
+
+        return this;
     }
 
     protected override bool OnTextNode(AtkTextNode* textNode, string text)

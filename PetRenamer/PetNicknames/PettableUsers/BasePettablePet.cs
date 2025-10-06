@@ -49,6 +49,10 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         ObjectID            = pet->GetGameObjectId();
         PetData             = petServices.PetSheets.GetPet(SkeletonID);
 
+#if DEBUG
+        PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectID}");
+#endif
+
         Recalculate();
     }
 
@@ -63,6 +67,10 @@ internal unsafe abstract class BasePettablePet : IPettablePet
 
     public void Dispose()
     {
+#if DEBUG
+        PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectID}");
+#endif
+
         SharingDictionary.Set(ObjectID, null);
     }
 

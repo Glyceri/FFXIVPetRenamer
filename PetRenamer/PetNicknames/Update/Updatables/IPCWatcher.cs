@@ -44,7 +44,7 @@ internal class IPCWatcher : IUpdatable
             if (!entry.IsActive) continue;
             if (!entry.IsIPC) continue;
 
-            IPettableUser? user = UserList.GetUser(entry.ContentID);
+            IPettableUser? user = UserList.GetUserFromContentID(entry.ContentID);
             if (user != null) continue; // User exists so its fine to keep this IPC user
 
             PetServices.PetLog.LogVerbose($"IPCUser: {entry.Name} {entry.HomeworldName} was not found and has been removed from the database.");

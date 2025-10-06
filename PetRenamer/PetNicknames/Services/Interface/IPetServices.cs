@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Update.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.Services.Interface;

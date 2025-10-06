@@ -33,21 +33,21 @@ internal unsafe class SimpleTextHook : ITextHook
 
     private string AddonName = string.Empty;
 
-    protected IPettableUser? CurrentUser;
-    protected IPetSheetData? CurrentPet;
+    protected IPettableUser?          CurrentUser;
+    protected IPetSheetData?          CurrentPet;
     protected IPettableDatabaseEntry? CurrentDatabaseEntry;
 
     public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
-        Services = services;
-        PettableUserList = userList;
-        PetServices = petServices;
-        DirtyListener = dirtyListener;
-        TextPos = textPos;
-        AllowedToFunction = allowedCallback;
-        AllowColours = allowColours;
-        IsSoft = isSoft;
-        AddonName = addonName;
+        Services            = services;
+        PettableUserList    = userList;
+        PetServices         = petServices;
+        DirtyListener       = dirtyListener;
+        TextPos             = textPos;
+        AllowedToFunction   = allowedCallback;
+        AllowColours        = allowColours;
+        IsSoft              = isSoft;
+        AddonName           = addonName;
 
         DirtyListener.RegisterOnDirtyName(OnName);
         DirtyListener.RegisterOnDirtyEntry(OnEntry);
@@ -56,76 +56,115 @@ internal unsafe class SimpleTextHook : ITextHook
         services.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, AddonName, HandleUpdate);
     }
 
-    public void SetUnfaulty() => Faulty = false;
-    public void SetFaulty() => Faulty = true;
+    public void Refresh()
+        => SetDirty();
+    
+    public void SetUnfaulty() 
+        => Faulty = false;
 
-    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) => HandleRework((AtkUnitBase*)addonArgs.Addon.Address);
+    public void SetFaulty() 
+        => Faulty = true;
+
+    protected void HandleUpdate(AddonEvent addonEvent, AddonArgs addonArgs) 
+        => OnUpdate((AtkUnitBase*)addonArgs.Addon.Address);
 
     private void OnName(INamesDatabase nameDatabase)
-    {
-        SetDirty();
-    }
+        => Refresh();
 
     private void OnEntry(IPettableDatabaseEntry entry)
-    {
-        SetDirty();
-    }
+        => Refresh();
 
     private bool isDirty = false;
 
     protected void SetDirty()
-    {
-        isDirty = true;
-    }
-
+        => isDirty = true;
+   
     protected void ClearDirty()
-    {
-        isDirty = false;
-    }
+        => isDirty = false;
 
-    private void HandleRework(AtkUnitBase* baseElement)
+    private void OnUpdate(AtkUnitBase* baseElement)
     {
-        if (BlockedCheck()) return;
+        if (BlockedCheck())
+        {
+            return;
+        }
 
-        if (TextPos.Length == 0) return;
-        if (!baseElement->IsVisible) return;
+        if (TextPos.Length == 0)
+        {
+            return;
+        }
+
+        if (!baseElement->IsVisible)
+        {
+            return;
+        }
        
         BaseNode bNode = new BaseNode(baseElement);
+
         AtkTextNode* tNode = GetTextNode(in bNode);
-        if (tNode == null) return;
+
+        if (tNode == null)
+        {
+            return;
+        }
 
         // Make sure it only runs once
         string tNodeText = new ReadOnlySeStringSpan(tNode->NodeText).ExtractText();
-        if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty) return;
+
+        if ((tNodeText == string.Empty || tNodeText == LastAnswer) && !isDirty)
+        {
+            return;
+        }
 
         ClearDirty();
 
         if (!OnTextNode(tNode, tNodeText)) LastAnswer = tNodeText;
     }
 
-    protected virtual bool BlockedCheck() => Faulty;
+    protected virtual bool BlockedCheck() 
+        => Faulty;
 
     protected virtual bool OnTextNode(AtkTextNode* textNode, string text)
     {
         CurrentUser = GetUser();
-        if (CurrentUser == null) return false;
+
+        if (CurrentUser == null)
+        {
+            return false;
+        }
 
         CurrentPet = GetPetData(text, in CurrentUser);
-        if (CurrentPet == null) return false;
+
+        if (CurrentPet == null)
+        {
+            return false;
+        }
 
         CurrentDatabaseEntry = CurrentUser.DataBaseEntry;
-        if (CurrentDatabaseEntry == null) return false;
+
+        if (CurrentDatabaseEntry == null)
+        {
+            return false;
+        }
 
         string? customName = CurrentDatabaseEntry.GetName(CurrentPet.Model);
-        if (customName == null) return false;
+
+        if (customName == null)
+        {
+            return false;
+        }
 
         SetText(textNode, text, customName, CurrentPet);
+
         return true;
     }
 
     protected virtual void SetText(AtkTextNode* textNode, string text, string customName, IPetSheetData pPet)
     {
-        if (!CheckIfCanFunction(text, pPet)) return;
+        if (!CheckIfCanFunction(text, pPet))
+        {
+            return;
+        }
 
         Vector3? edgeColour = null;
         Vector3? textColour = null;
@@ -143,14 +182,32 @@ internal unsafe class SimpleTextHook : ITextHook
         edgeColour = null;
         textColour = null;
 
-        if (CurrentUser == null) return;
-        if (CurrentPet == null) return;
-        if (CurrentDatabaseEntry == null) return;
+        if (CurrentUser == null)
+        {
+            return;
+        }
+
+        if (CurrentPet == null)
+        {
+            return;
+        }
+
+        if (CurrentDatabaseEntry == null)
+        {
+            return;
+        }
 
         int colourSetting = PetServices.Configuration.showColours;
 
-        if (colourSetting >= 2) return;
-        if (colourSetting == 1 && !CurrentUser.IsLocalPlayer) return;
+        if (colourSetting >= 2)
+        {
+            return;
+        }
+
+        if (colourSetting == 1 && !CurrentUser.IsLocalPlayer)
+        {
+            return;
+        }
 
         edgeColour = CurrentDatabaseEntry.GetEdgeColour(CurrentPet.Model);
         textColour = CurrentDatabaseEntry.GetTextColour(CurrentPet.Model);
@@ -158,31 +215,51 @@ internal unsafe class SimpleTextHook : ITextHook
 
     protected virtual bool CheckIfCanFunction(string text, IPetSheetData pPet)
     {
-        if (AllowedToFunction == null) return true;
-        if (AllowedToFunction.Invoke(pPet.Model)) return true;
+        if (AllowedToFunction == null)
+        {
+            return true;
+        }
+
+        if (AllowedToFunction.Invoke(pPet.Model))
+        {
+            return true;
+        }
 
         LastAnswer = text;
 
         return false;
     }
 
-    protected virtual IPetSheetData? GetPetData(string text, in IPettableUser user) => PetServices.PetSheets.GetPetFromString(text, in user, IsSoft);
+    protected virtual IPetSheetData? GetPetData(string text, in IPettableUser user) 
+        => PetServices.PetSheets.GetPetFromString(text, in user, IsSoft);
 
-    protected virtual IPettableUser? GetUser() => PettableUserList.LocalPlayer;
+    protected virtual IPettableUser? GetUser() 
+        => PettableUserList.LocalPlayer;
 
     protected virtual AtkTextNode* GetTextNode(in BaseNode bNode)
     {
         if (TextPos.Length > 1)
         {
             ComponentNode cNode = bNode.GetComponentNode(TextPos[0]);
+
             for (int i = 1; i < TextPos.Length - 1; i++)
             {
-                if (cNode == null) return null!;
+                if (cNode == null)
+                {
+                    return null!;
+                }
+
                 cNode = cNode.GetComponentNode(TextPos[i]);
             }
-            if (cNode == null) return null!;
+
+            if (cNode == null)
+            {
+                return null!;
+            }
+
             return cNode.GetNode<AtkTextNode>(TextPos[^1]);
         }
+
         return bNode.GetNode<AtkTextNode>(TextPos[0]);
     }
 

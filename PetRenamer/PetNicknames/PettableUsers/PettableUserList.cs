@@ -80,6 +80,33 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
+    public IPettableUser? GetUserFromObjectId(uint objectId)
+    {
+        if (objectId == 0)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < PettableUserArraySize; i++)
+        {
+            IPettableUser? pUser = PettableUsers[i];
+
+            if (pUser == null)
+            {
+                continue;
+            }
+
+            if (pUser.ShortObjectID != objectId)
+            {
+                continue;
+            }
+
+            return pUser;
+        }
+
+        return null;
+    }
+
     public IPettableUser? GetUserFromContentID(ulong contentID)
     {
         if (contentID == 0) return null;
@@ -97,16 +124,33 @@ internal class PettableUserList : IPettableUserList
 
     public IPettableUser? GetUser(string username)
     {
-        if (username == null || username == string.Empty) return null;
+        if (username == null || username == string.Empty)
+        {
+            return null;
+        }
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
-            if (pUser == null) continue;
-            if (!pUser.IsActive) continue;
-            if (!string.Equals(pUser.Name, username, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+
+            if (pUser == null)
+            {
+                continue;
+            }
+
+            if (!pUser.IsActive)
+            {
+                continue;
+            }
+
+            if (!string.Equals(pUser.Name, username, System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                continue;
+            }
+
             return pUser;
         }
+
         return null;
     }
 

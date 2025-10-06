@@ -1,7 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Numerics;
@@ -22,8 +21,8 @@ internal unsafe class PettableIslandPet : IIslandPet
     public Vector3? EdgeColour { get; private set; }
     public Vector3? TextColour { get; private set; }
 
-    readonly IPettableDatabaseEntry Entry;
-    readonly IPetServices PetServices;
+    private readonly IPettableDatabaseEntry Entry;
+    private readonly IPetServices PetServices;
 
     public PettableIslandPet(BattleChara* pet, IPettableUser owner, IPettableDatabaseEntry entry, IPetServices petServices)
     {
