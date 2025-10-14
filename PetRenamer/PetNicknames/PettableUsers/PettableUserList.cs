@@ -138,11 +138,6 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (!pUser.IsActive)
-            {
-                continue;
-            }
-
             if (!string.Equals(pUser.Name, username, System.StringComparison.InvariantCultureIgnoreCase))
             {
                 continue;
