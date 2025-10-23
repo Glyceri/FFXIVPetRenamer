@@ -5,6 +5,6 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 
 internal interface IDataParser
 {
-    IDataParseResult ParseData(string data);
-    bool ApplyParseData(IDataParseResult result, ParseSource parseSource);
+    public IDataParseResult ParseData(string data);
+    public bool ApplyParseData(IDataParseResult result, ParseSource parseSource);
 }
