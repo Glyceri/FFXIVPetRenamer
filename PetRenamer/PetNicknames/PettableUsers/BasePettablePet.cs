@@ -10,31 +10,29 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
-    public nint Address          { get; }
-    public int SkeletonID           { get; }
-    public ulong ObjectID           { get; }
-    public ushort Index             { get; }
-    public string Name              { get; }
-    public IPetSheetData? PetData   { get; }
-    public IPettableUser? Owner     { get; }
+    public nint           Address    { get; }
+    public int            SkeletonID { get; }
+    public ulong          ObjectID   { get; }
+    public ushort         Index      { get; }
+    public string         Name       { get; }
+    public IPetSheetData? PetData    { get; }
+    public IPettableUser? Owner      { get; }
 
-    public string? CustomName       { get; private set; }
-    public Vector3? EdgeColour      { get; private set; }
-    public Vector3? TextColour      { get; private set; }
+    public string?        CustomName { get; private set; }
+    public Vector3?       EdgeColour { get; private set; }
+    public Vector3?       TextColour { get; private set; }
 
-    readonly IPetServices PetServices;
-    readonly IPettableDatabaseEntry Entry;
-    readonly ISharingDictionary SharingDictionary;
-    readonly bool AsBattlePet = false;
+    private readonly IPetServices           PetServices;
+    private readonly IPettableDatabaseEntry Entry;
+    private readonly ISharingDictionary     SharingDictionary;
 
     public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
     {
         PetServices         = petServices;
         Entry               = entry;
-        AsBattlePet         = asBattlePet;
         SharingDictionary   = sharingDictionary;
 
-        Address          = (nint)pet;
+        Address             = (nint)pet;
 
         Owner               = owner;
         SkeletonID          = pet->ModelContainer.ModelCharaId;
@@ -79,12 +77,23 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         edgeColour = null;
         textColour = null;
 
-        if (Owner == null) return;  // This should NEVER be the case
+        // This should NEVER be the case
+        if (Owner == null)
+        {
+            return;
+        }
 
         int colourSetting = PetServices.Configuration.showColours;
 
-        if (colourSetting >= 2) return;
-        if (colourSetting == 1 && !Owner.IsLocalPlayer) return;
+        if (colourSetting >= 2)
+        {
+            return;
+        }
+
+        if (colourSetting == 1 && !Owner.IsLocalPlayer)
+        {
+            return;
+        }
 
         edgeColour = EdgeColour;
         textColour = TextColour;

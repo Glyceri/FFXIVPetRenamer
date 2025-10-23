@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;

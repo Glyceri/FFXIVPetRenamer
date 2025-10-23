@@ -4,5 +4,5 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal unsafe interface IPettableCompanion : IPettablePet
 {
-    Companion* Companion { get; }
+    public Companion* Companion { get; }
 }
