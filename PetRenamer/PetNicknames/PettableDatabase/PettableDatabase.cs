@@ -124,7 +124,7 @@ internal class PettableDatabase : IPettableDatabase
                 continue;
             }
 
-            currentEntry.Clear(ParseSource.None);
+            currentEntry.Clear(ParseSource.Manual);
 
             _entries.RemoveAt(i);
         }

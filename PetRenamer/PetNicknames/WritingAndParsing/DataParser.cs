@@ -45,18 +45,22 @@ internal class DataParser : IDataParser
         if (result is InvalidParseResult invalidParseResult)
         {
             DalamudServices.PluginLog.Verbose(invalidParseResult.Reason);
+
             return false;
         }
 
         if (result is IClearParseResult clearParseResult)
         {
-            if (clearParseResult.Name.IsNullOrWhitespace() || clearParseResult.Homeworld == 0) return false;
+            if (clearParseResult.Name.IsNullOrWhitespace() || clearParseResult.Homeworld == 0)
+            {
+                return false;
+            }
 
-            IPettableDatabaseEntry? entry = Database.GetEntry(clearParseResult.Name,  clearParseResult.Homeworld, false);
+            IPettableDatabaseEntry? entry = Database.GetEntry(clearParseResult.Name, clearParseResult.Homeworld, false);
 
             if (entry != null)
             {
-                Database.RemoveEntry(entry);
+                entry.Clear(ParseSource.Manual);
             }
 
             return true;
