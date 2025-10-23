@@ -59,7 +59,8 @@ internal class PetListWindow : PetWindow
 
     bool importDisabled = false;
 
-    float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
+    float BarHeight 
+        => 30 * WindowHandler.GlobalScale;
 
     public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet List Window", ImGuiWindowFlags.None)
     {
@@ -110,7 +111,7 @@ internal class PetListWindow : PetWindow
 
     void DrawHeader()
     {
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(250, 110) * ImGuiHelpers.GlobalScale))
+        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
             PlayerImage.Draw(ActiveEntry, in ImageDatabase);
             ImGui.SameLine();
@@ -149,7 +150,7 @@ internal class PetListWindow : PetWindow
 
         ImGui.SameLine();
 
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * ImGuiHelpers.GlobalScale)))
+        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
         {
             if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
             {
@@ -235,7 +236,7 @@ internal class PetListWindow : PetWindow
 
     void DrawSearchbar()
     {
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale)))
+        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale)))
         {
             ImGuiStylePtr style = ImGui.GetStyle();
             float buttSize = ImGui.GetContentRegionAvail().Y;
@@ -281,7 +282,7 @@ internal class PetListWindow : PetWindow
         {
             foreach (PetListPet pet in petListDrawables.Where(v => v is PetListPet))
             {
-                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * ImGuiHelpers.GlobalScale)))
+                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
                     BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
@@ -310,7 +311,7 @@ internal class PetListWindow : PetWindow
 
             foreach (PetListUser user in petListDrawables.Where(v => v is PetListUser))
             {
-                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * ImGuiHelpers.GlobalScale)))
+                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
 
@@ -484,19 +485,30 @@ internal class PetListWindow : PetWindow
         }
     }
 
-    void HandleUserMode()
+    private void HandleUserMode()
     {
         IPettableDatabaseEntry[] entries = [.. Database.DatabaseEntries, .. LegacyDatabase.DatabaseEntries];
+
         int length = entries.Length;
+
         for (int i = 0; i < length; i++)
         {
             IPettableDatabaseEntry entry = entries[i];
 
-            if (!entry.IsActive && !entry.IsLegacy) continue;
+            if (!entry.IsActive && !entry.IsLegacy)
+            {
+                continue;
+            }
 
-            if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentID.ToString()))) continue;
+            if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentID.ToString())))
+            {
+                continue;
+            }
 
-            if (entry.ActiveDatabase.Length == 0 && !Configuration.debugModeActive) continue;
+            if (entry.ActiveDatabase.Length == 0 && !Configuration.debugModeActive)
+            {
+                continue;
+            }
 
             petListDrawables.Add(new PetListUser(in DalamudServices, in entry));
         }
@@ -508,14 +520,15 @@ internal class PetListWindow : PetWindow
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
 
-        List<int> validIDS = names.IDs.ToList();
-        List<string> validNames = names.Names.ToList();
+        List<int>      validIDS         = names.IDs.ToList();
+        List<string>   validNames       = names.Names.ToList();
         List<Vector3?> validEdgeColours = names.EdgeColours.ToList();
         List<Vector3?> validTextColours = names.TextColours.ToList();
 
         if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
         {
             List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIDS);
+
             foreach (IPetSheetData p in data)
             {
                 validIDS.Add(p.Model);
@@ -531,8 +544,15 @@ internal class PetListWindow : PetWindow
         {
             int ID = validIDS[i];
 
-            if (PetWindowMode.Minion == CurrentMode && ID <= -1) continue;
-            if (PetWindowMode.BattlePet == CurrentMode && ID >= -1) continue;
+            if (PetWindowMode.Minion == CurrentMode && ID <= -1)
+            {
+                continue;
+            }
+
+            if (PetWindowMode.BattlePet == CurrentMode && ID >= -1)
+            {
+                continue;
+            }
 
             IPetSheetData? petData = PetServices.PetSheets.GetPet(ID);
             if (petData == null) continue;

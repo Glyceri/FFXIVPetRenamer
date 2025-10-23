@@ -2,8 +2,8 @@
 
 internal interface IPetActionHelper
 {
-    nint LastUser { get; }
-    bool LastValid { get; }
+    public nint LastUser  { get; }
+    public bool LastValid { get; }
 
-    void SetLatestUser(nint user, bool valid);
+    public void SetLatestUser(nint user, bool valid);
 }

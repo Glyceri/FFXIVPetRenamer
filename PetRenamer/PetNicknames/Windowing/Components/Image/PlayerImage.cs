@@ -31,7 +31,7 @@ internal static class PlayerImage
         Vector2 buttonSize = new Vector2(24, 24);
 
         ImGui.SameLine(0, 0);
-        ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(buttonSize.X * ImGuiHelpers.GlobalScale + framePaddingX, -(size - buttonSize.Y - framePaddingY)));
+        ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(buttonSize.X * WindowHandler.GlobalScale + framePaddingX, -(size - buttonSize.Y - framePaddingY)));
         if (ImGui.Button(SeIconChar.QuestSync.ToIconString() + $"##RedownloadButton_{WindowHandler.InternalCounter}", buttonSize))
         {
             imageDatabase.Redownload(entry);

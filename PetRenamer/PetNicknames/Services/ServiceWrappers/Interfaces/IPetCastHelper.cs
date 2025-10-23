@@ -2,9 +2,9 @@
 
 internal unsafe interface IPetCastHelper
 {
-    nint LastCastTarget { get; }
-    nint LastCastDealer { get; }
-    int LastCastID { get; }
+    public nint LastCastTarget { get; }
+    public nint LastCastDealer { get; }
+    public int  LastCastID     { get; }
 
-    void SetLatestCast(nint target, nint dealer, int lastCastID);
+    public void SetLatestCast(nint target, nint dealer, int lastCastID);
 }

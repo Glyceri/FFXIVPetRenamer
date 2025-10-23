@@ -13,8 +13,8 @@ internal static class BasicLabel
         Vector4* colour = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
 
         ImGui.PushStyleColor(ImGuiCol.ButtonHovered, *colour);
-        ImGui.PushStyleColor(ImGuiCol.Button, *colour);
-        ImGui.PushStyleColor(ImGuiCol.ButtonActive, *colour);
+        ImGui.PushStyleColor(ImGuiCol.Button,        *colour);
+        ImGui.PushStyleColor(ImGuiCol.ButtonActive,  *colour);
 
         ImGui.Button(label, size);
 

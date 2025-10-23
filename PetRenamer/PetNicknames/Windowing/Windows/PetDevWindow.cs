@@ -29,7 +29,7 @@ internal class PetDevWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 400);
     protected override bool HasModeToggle { get; } = true;
 
-    float BarSize = 30 * ImGuiHelpers.GlobalScale;
+    float BarSize = 30 * WindowHandler.GlobalScale;
 
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
@@ -148,7 +148,7 @@ internal class PetDevWindow : PetWindow
 
     unsafe void DrawIPCTester()
     {
-        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale);
+        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
         if (LabledLabel.DrawButton("Recollect Data", "Click here##recollectButton", size))
         {
@@ -208,7 +208,7 @@ internal class PetDevWindow : PetWindow
 
             if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
             {
-                Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale);
+                Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
                 LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
 

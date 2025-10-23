@@ -42,7 +42,7 @@ internal class PetRenameWindow : PetWindow
     IPetSheetData? ActivePetData;
     ISharedImmediateTexture? ActivePetTexture;
 
-    float BarHeight => 30 * ImGuiHelpers.GlobalScaleSafe;
+    float BarHeight => 30 * WindowHandler.GlobalScale;
 
     public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {

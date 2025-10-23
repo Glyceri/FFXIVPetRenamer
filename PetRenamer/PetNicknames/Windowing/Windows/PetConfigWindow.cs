@@ -103,7 +103,7 @@ internal class PetConfigWindow : PetWindow
         }
         else
         {
-            width = width * ImGuiHelpers.GlobalScale;
+            width = width * WindowHandler.GlobalScale;
         }
 
         ImGui.SetNextItemWidth(width);

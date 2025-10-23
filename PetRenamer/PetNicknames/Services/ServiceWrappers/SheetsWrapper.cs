@@ -4,6 +4,7 @@ using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
 
@@ -11,101 +12,142 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class SheetsWrapper : IPetSheets
 {
-    readonly DalamudServices DalamudServices;
-    readonly IStringHelper StringHelper;
+    private readonly DalamudServices DalamudServices;
+    private readonly IStringHelper   StringHelper;
 
-    readonly List<IPetSheetData> petSheetCache = new List<IPetSheetData>();
-    readonly string[] nameToClass = [];
+    private readonly List<IPetSheetData>      petSheetCache = [];
+    private readonly string[]                 nameToClass   = [];
 
-    readonly ExcelSheet<Companion>? petSheet;
-    readonly ExcelSheet<Pet>? battlePetSheet;
-    readonly ExcelSheet<World>? worlds;
-    readonly ExcelSheet<ClassJob>? classJob;
-    readonly ExcelSheet<Action>? actions;
-    readonly ExcelSheet<TextCommand>? textCommands;
-    readonly ExcelSheet<BNpcName>? bnpcNames;
+    private readonly ExcelSheet<Companion>?   petSheet;
+    private readonly ExcelSheet<Pet>?         battlePetSheet;
+    private readonly ExcelSheet<World>?       worlds;
+    private readonly ExcelSheet<ClassJob>?    classJob;
+    private readonly ExcelSheet<Action>?      actions;
+    private readonly ExcelSheet<TextCommand>? textCommands;
+    private readonly ExcelSheet<BNpcName>?    bnpcNames;
 
     public SheetsWrapper(ref DalamudServices dalamudServices, IStringHelper helper)
     {
         DalamudServices = dalamudServices;
-        StringHelper = helper;
+        StringHelper    = helper;
 
-        petSheet = dalamudServices.DataManager.GetExcelSheet<Companion>();
-        worlds = dalamudServices.DataManager.GetExcelSheet<World>();
-        classJob = dalamudServices.DataManager.GetExcelSheet<ClassJob>();
-        battlePetSheet = dalamudServices.DataManager.GetExcelSheet<Pet>();
-        actions = dalamudServices.DataManager.GetExcelSheet<Action>();
-        textCommands = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
-        bnpcNames = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
+        petSheet        = dalamudServices.DataManager.GetExcelSheet<Companion>();
+        worlds          = dalamudServices.DataManager.GetExcelSheet<World>();
+        classJob        = dalamudServices.DataManager.GetExcelSheet<ClassJob>();
+        battlePetSheet  = dalamudServices.DataManager.GetExcelSheet<Pet>();
+        actions         = dalamudServices.DataManager.GetExcelSheet<Action>();
+        textCommands    = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
+        bnpcNames       = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
 
         SetupSheetDataCache();
 
         nameToClass = DalamudServices.ClientState.ClientLanguage switch
         {
             ClientLanguage.Japanese => japaneseNames,
-            ClientLanguage.English => englishNames,
-            ClientLanguage.German => germanNames,
-            ClientLanguage.French => frenchNames,
+            ClientLanguage.English  => englishNames,
+            ClientLanguage.German   => germanNames,
+            ClientLanguage.French   => frenchNames,
             _ => englishNames,
         };
     }
 
-    void SetupSheetDataCache()
+    private void SetupCopmanionSheet()
     {
-        if (petSheet != null)
+        if (petSheet == null)
         {
-            foreach (Companion companion in petSheet)
-            {
-                if (!companion.Model.IsValid) continue;
-
-                ModelChara? model = companion.Model.ValueNullable;
-                if (model == null) continue;
-
-                uint companionIndex = companion.RowId;
-                int modelID = (int)model.Value.RowId;
-                int legacyModelID = model.Value.Model;
-
-                if (legacyModelID == 0) continue;
-
-                string singular = companion.Singular.ExtractText();
-
-                if (singular.IsNullOrWhitespace()) continue;
-
-                singular = StringHelper.ToTitleCase(singular);
-
-                string plural = companion.Plural.ExtractText();
-                uint icon = companion.Icon;
-
-                sbyte pronoun = companion.Pronoun;
-
-                uint raceID = companion.MinionRace.ValueNullable?.RowId ?? 0;
-                string raceName = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
-                string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
-
-                petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
-            }
+            return;
         }
-        if (battlePetSheet == null) return;
+
+        foreach (Companion companion in petSheet)
+        {
+            if (!companion.Model.IsValid)
+            {
+                continue;
+            }
+
+            ModelChara? model = companion.Model.ValueNullable;
+
+            if (model == null)
+            {
+                continue;
+            }
+
+            uint companionIndex = companion.RowId;
+            int  modelID        = (int)model.Value.RowId;
+            int  legacyModelID  = model.Value.Model;
+
+            if (legacyModelID == 0)
+            {
+                continue;
+            }
+
+            string singular = companion.Singular.ExtractText();
+
+            if (singular.IsNullOrWhitespace())
+            {
+                continue;
+            }
+
+            singular = singular.ToTitleCase();
+
+            string plural        = companion.Plural.ExtractText();
+            uint   icon          = companion.Icon;
+
+            sbyte  pronoun       = companion.Pronoun;
+
+            uint   raceID        = companion.MinionRace.ValueNullable?.RowId ?? 0;
+            string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
+            string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
+
+            petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
+        }
+    }
+
+    private void SetupBattlePetSheet()
+    {
+        if (battlePetSheet == null)
+        {
+            return;
+        }
 
         foreach (Pet pet in battlePetSheet)
         {
             uint sheetSkeleton = pet.RowId;
 
-            if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton)) continue;
-            if (!petIDToAction.TryGetValue(skeleton, out uint actionID)) continue;
-            if (!battlePetToBNpcName.TryGetValue(skeleton, out uint bnpcnameId)) continue;
+            if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton))
+            {
+                continue;
+            }
+
+            if (!petIDToAction.TryGetValue(skeleton, out uint actionID))
+            {
+                continue;
+            }
+
+            if (!battlePetToBNpcName.TryGetValue(skeleton, out uint bnpcnameId))
+            {
+                continue;
+            }
 
             Action? petAction = GetAction(actionID);
-            if (petAction == null) continue;
 
-            ushort petIcon = petAction.Value.Icon;
+            if (petAction == null)
+            {
+                continue;
+            }
+
+            ushort    petIcon  = petAction.Value.Icon;
 
             BNpcName? bnpcName = GetBNPCName(bnpcnameId);
-            if (bnpcName == null) continue;
 
-            string name = StringHelper.ToTitleCase(bnpcName.Value.Singular.ExtractText());
-            string actionName = petAction.Value.Name.ExtractText();
-            uint actionRowID = petAction.Value.RowId;
+            if (bnpcName == null)
+            {
+                continue;
+            }
+
+            string name              = bnpcName.Value.Singular.ExtractText().ToTitleCase();
+            string actionName        = petAction.Value.Name.ExtractText();
+            uint   actionRowID       = petAction.Value.RowId;
 
             string cleanedActionName = StringHelper.CleanupActionName(StringHelper.CleanupString(actionName));
 
@@ -113,17 +155,35 @@ internal class SheetsWrapper : IPetSheets
         }
     }
 
-    public TextCommand? GetCommand(uint id) => textCommands?.GetRow(id);
-    public Action? GetAction(uint actionID) => actions?.GetRow(actionID);
-    public BNpcName? GetBNPCName(uint bnpcID) => bnpcNames?.GetRow(bnpcID);
+    private void SetupSheetDataCache()
+    {
+        SetupCopmanionSheet();
+
+        SetupBattlePetSheet();
+    }
+
+    public TextCommand? GetCommand(uint id) 
+        => textCommands?.GetRow(id);
+
+    public Action? GetAction(uint actionID) 
+        => actions?.GetRow(actionID);
+
+    public BNpcName? GetBNPCName(uint bnpcID) 
+        => bnpcNames?.GetRow(bnpcID);
 
     public string? GetClassName(int id)
     {
-        if (classJob == null) return null;
+        if (classJob == null)
+        {
+            return null;
+        }
 
         foreach (ClassJob cls in classJob)
         {
-            if (cls.RowId != id) continue;
+            if (cls.RowId != id)
+            {
+                continue;
+            }
 
             return cls.Name.ExtractText();
         }
@@ -133,10 +193,17 @@ internal class SheetsWrapper : IPetSheets
 
     public string? GetWorldName(ushort worldID)
     {
-        if (worlds == null) return null;
+        if (worlds == null)
+        {
+            return null;
+        }
 
         World? world = worlds.GetRow(worldID);
-        if (world == null) return null;
+
+        if (world == null)
+        {
+            return null;
+        }
 
         return world.Value.InternalName.ExtractText();
     }
@@ -145,7 +212,10 @@ internal class SheetsWrapper : IPetSheets
     {
         for (int i = 0; i < petSheetCache.Count; i++)
         {
-            if (petSheetCache[i].Model != skeletonID) continue;
+            if (petSheetCache[i].Model != skeletonID)
+            {
+                continue;
+            }
 
             return petSheetCache[i];
         }
@@ -166,9 +236,13 @@ internal class SheetsWrapper : IPetSheets
 
         for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
         {
-            if (PluginConstants.BaseSkeletons[i] != skeletonID) continue;
+            if (PluginConstants.BaseSkeletons[i] != skeletonID)
+            {
+                continue;
+            }
             
             index = i;
+
             break;
         }
 
@@ -187,7 +261,11 @@ internal class SheetsWrapper : IPetSheets
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
-            if (!pet.IsPet(name)) continue;
+
+            if (!pet.IsPet(name))
+            {
+                continue;
+            }
 
             return pet;
         }
@@ -199,15 +277,20 @@ internal class SheetsWrapper : IPetSheets
     {
         name = name.Trim();
 
-        if (name == string.Empty || name == null) return null;
+        if (name == string.Empty || name == null)
+        {
+            return null;
+        }
 
         for (int i = 0; i < nameToClass.Length; i++)
         {
             string nameToClassUnmodified = nameToClass[i];
-            string converted = StringHelper.CleanupActionName(nameToClassUnmodified);
+            string converted             = StringHelper.CleanupActionName(nameToClassUnmodified);
 
-            if (!string.Equals(nameToClassUnmodified, name, System.StringComparison.InvariantCultureIgnoreCase)  && 
-                !string.Equals(converted,             name, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+            if (!nameToClassUnmodified.InvariantEquals(name) && !converted.InvariantEquals(name))
+            {
+                continue;
+            }
             
             return i;
         }
@@ -217,39 +300,68 @@ internal class SheetsWrapper : IPetSheets
 
     public int? CastToSoftIndex(uint castId)
     {
-        if (castId == 0) return null;
+        if (castId == 0)
+        {
+            return null;
+        }
+
         for (int i = 0; i < castToIndex.Count; i++)
         {
             uint cast = castToIndex[i];
-            if (cast != castId) continue;
+
+            if (cast != castId)
+            {
+                continue;
+            }
 
             return i;
         }
+
         return null;
     }
 
     public List<IPetSheetData> GetListFromLine(string line)
     {
-        List<IPetSheetData> list = new List<IPetSheetData> ();
-        if (line == string.Empty) return list;
+        List<IPetSheetData> list = [];
+
+        if (line == string.Empty)
+        {
+            return list;
+        }
+
         foreach (IPetSheetData pet in petSheetCache)
         {
-            if (string.Equals(pet.BaseSingular, line, System.StringComparison.InvariantCultureIgnoreCase))
+            if (pet.BaseSingular.InvariantEquals(line))
             {
                 list.Add(pet);
+
                 return list;
             }
 
-            if ((!line.Contains(pet.BaseSingular, System.StringComparison.InvariantCultureIgnoreCase) || pet.BaseSingular == string.Empty)  &&
-                (!line.Contains(pet.BasePlural,   System.StringComparison.InvariantCultureIgnoreCase) || pet.BasePlural   == string.Empty)  &&
-                (!line.Contains(pet.ActionName,   System.StringComparison.InvariantCultureIgnoreCase) || pet.ActionName   == string.Empty)) continue;
+            bool hasValidValue = false;
+
+            hasValidValue |= (line.InvariantContains(pet.BaseSingular) && !pet.BaseSingular.IsNullOrWhitespace());
+            hasValidValue |= (line.InvariantContains(pet.BasePlural)   && !pet.BasePlural.IsNullOrWhitespace());
+            hasValidValue |= (line.InvariantContains(pet.ActionName)   && !pet.ActionName.IsNullOrWhitespace());
+
+            if (!hasValidValue)
+            {
+                continue;
+            }
 
             list.Add(pet);
         }
 
-        if (list.Count == 0) return list;
+        if (list.Count == 0)
+        {
+            return list;
+        }
 
-        list.Sort((i1, i2) => i1.LongestIdentifier().CompareTo(i2.LongestIdentifier()));
+        list.Sort((i1, i2) =>
+        {
+            return i1.LongestIdentifier().CompareTo(i2.LongestIdentifier());
+        });
+
         list.Reverse();
 
         return list;
@@ -258,12 +370,23 @@ internal class SheetsWrapper : IPetSheets
     public IPetSheetData? GetPetFromString(string baseString, in IPettableUser user, bool soft)
     {
         List<IPetSheetData> data = GetListFromLine(baseString);
-        if (data.Count == 0) return null;
+
+        if (data.Count == 0)
+        {
+            return null;
+        }
 
         IPetSheetData normalPetData = data[0];
-        if (normalPetData.Model > -1) return normalPetData;
 
-        if (!soft) return normalPetData;
+        if (normalPetData.Model > -1)
+        {
+            return normalPetData;
+        }
+
+        if (!soft)
+        {
+            return normalPetData;
+        }
 
         return MakeSoft(in user, in normalPetData);
     }
@@ -280,7 +403,11 @@ internal class SheetsWrapper : IPetSheets
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
-            if (pet.Icon != iconID) continue;
+
+            if (pet.Icon != iconID)
+            {
+                continue;
+            }
 
             return pet;
         }
@@ -298,12 +425,18 @@ internal class SheetsWrapper : IPetSheets
         IPetSheetData? activePet = null;
 
         int sheetCount = petSheetCache.Count;
+
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = petSheetCache[i];
-            if (!pet.IsAction(actionID)) continue;
+
+            if (!pet.IsAction(actionID))
+            {
+                continue;
+            }
 
             activePet = pet;
+
             break;
         }
 
@@ -322,10 +455,17 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData)
     {
-        if (oldData.Model >= -1) return oldData;
+        if (oldData.Model >= -1)
+        {
+            return oldData;
+        }
 
         int? softIndex = NameToSoftSkeletonIndex(oldData.BasePlural);
-        if (softIndex == null) return oldData;
+
+        if (softIndex == null)
+        {
+            return oldData;
+        }
 
         return GetFromSoftIndex(in user, in oldData, softIndex.Value);
     }
@@ -333,24 +473,38 @@ internal class SheetsWrapper : IPetSheets
     public IPetSheetData? GetFromSoftIndex(in IPettableUser user, in IPetSheetData oldData, int softIndex)
     {
         int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex);
-        if (softSkeleton == null) return oldData;
+
+        if (softSkeleton == null)
+        {
+            return oldData;
+        }
 
         IPetSheetData? softPetData = GetPet(softSkeleton.Value);
-        if (softPetData == null) return oldData;
+
+        if (softPetData == null)
+        {
+            return oldData;
+        }
 
         return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, oldData.BaseSingular, oldData.BasePlural, in DalamudServices);
     }
 
-    public bool IsValidBattlePet(int skeleton) => petIDToAction.ContainsKey(skeleton);
+    public bool IsValidBattlePet(int skeleton) 
+        => petIDToAction.ContainsKey(skeleton);
 
     public List<IPetSheetData> GetLegacyPets(int legacyModelID)
     {
-        List<IPetSheetData> legacyPets = new List<IPetSheetData>();
+        List<IPetSheetData> legacyPets = [];
 
         for (int i = 0; i < petSheetCache.Count; i++)
         {
             IPetSheetData data = petSheetCache[i];
-            if (data.LegacyModelID != legacyModelID) continue;
+
+            if (data.LegacyModelID != legacyModelID)
+            {
+                continue;
+            }
+
             legacyPets.Add(data);
         }
 
@@ -360,19 +514,31 @@ internal class SheetsWrapper : IPetSheets
     [System.Obsolete]
     public int[] GetObsoleteIDsFromClass(int classJob)
     {
-        if (battlePetToClass.TryGetValue(classJob, out int[]? id)) return id;
+        if (battlePetToClass.TryGetValue(classJob, out int[]? id))
+        {
+            return id;
+        }
+
         return System.Array.Empty<int>();  
     }
 
     public List<IPetSheetData> GetMissingPets(List<int> battlePetSkeletons)
     {
-        List<IPetSheetData> sheetData = new List<IPetSheetData>();
+        List<IPetSheetData> sheetData = [];
 
         foreach(IPetSheetData data in petSheetCache)
         {
             int model = data.Model;
-            if (model >= -1) continue;
-            if (battlePetSkeletons.Contains(model)) continue;
+
+            if (model >= -1)
+            {
+                continue;
+            }
+
+            if (battlePetSkeletons.Contains(model))
+            {
+                continue;
+            }
 
             sheetData.Add(data);
         }
@@ -474,7 +640,6 @@ internal class SheetsWrapper : IPetSheets
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
-
     public readonly IReadOnlyList<uint> castToIndex = new List<uint>()
     {
         25798,   // Summon Carbuncle
@@ -491,10 +656,10 @@ internal class SheetsWrapper : IPetSheets
     // 2 --> Titan-Egi
     // 3 --> Ifrit-Egi
     // 4 --> Eos
-    readonly string[] englishNames = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    readonly string[] germanNames = ["Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    readonly string[] frenchNames = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    readonly string[] japaneseNames = ["カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス"];
+    private readonly string[] englishNames  = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    private readonly string[] germanNames   = ["Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    private readonly string[] frenchNames   = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
+    private readonly string[] japaneseNames = ["カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス"];
 
     [System.Obsolete("Classes have been obsolete since 1.4")]
     public readonly Dictionary<int, int[]> battlePetToClass = new Dictionary<int, int[]>()

@@ -7,10 +7,11 @@ namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class LodestoneQueueHelper(LodestoneNetworker networker, IImageDatabase imageDatabase) : IUpdatable
 {
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } 
+        = true;
 
-    readonly LodestoneNetworker Networker = networker;
-    readonly IImageDatabase ImageDatabase = imageDatabase;
+    private readonly LodestoneNetworker Networker = networker;
+    private readonly IImageDatabase ImageDatabase = imageDatabase;
 
     public void OnUpdate(IFramework framework)
     {

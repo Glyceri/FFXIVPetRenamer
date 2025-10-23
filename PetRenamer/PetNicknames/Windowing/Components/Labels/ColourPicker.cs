@@ -25,8 +25,8 @@ internal static class ColourPicker
         if (colour == null)
         {
             var dl = ImGui.GetWindowDrawList();
-            dl.AddLine(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), 0xFF0000FF, 3f * ImGuiHelpers.GlobalScale);
-            dl.AddLine(ImGui.GetItemRectMin() + new Vector2(ImGui.GetItemRectSize().X, 0), ImGui.GetItemRectMin() + new Vector2(0, ImGui.GetItemRectSize().Y), 0xFF0000FF, 3f * ImGuiHelpers.GlobalScale);
+            dl.AddLine(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), 0xFF0000FF, 3f * WindowHandler.GlobalScale);
+            dl.AddLine(ImGui.GetItemRectMin() + new Vector2(ImGui.GetItemRectSize().X, 0), ImGui.GetItemRectMin() + new Vector2(0, ImGui.GetItemRectSize().Y), 0xFF0000FF, 3f * WindowHandler.GlobalScale);
         }
 
         if (ImGui.IsItemHovered())
