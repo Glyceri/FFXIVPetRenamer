@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System.Numerics;
 using Lumina.Text.ReadOnly;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -26,7 +27,7 @@ internal unsafe class SimpleTextHook : ITextHook
     private IPettableDirtyListener DirtyListener { get; set; } = null!;
 
     protected uint[] TextPos { get; set; } = Array.Empty<uint>();
-    protected Func<int, bool> AllowedToFunction = _ => false;
+    protected Func<PetSkeleton, bool> AllowedToFunction = _ => false;
 
     protected bool IsSoft;
     protected bool AllowColours;
@@ -37,7 +38,7 @@ internal unsafe class SimpleTextHook : ITextHook
     protected IPetSheetData?          CurrentPet;
     protected IPettableDatabaseEntry? CurrentDatabaseEntry;
 
-    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
+    public virtual void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string addonName, uint[] textPos, Func<PetSkeleton, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         Services            = services;
         PettableUserList    = userList;

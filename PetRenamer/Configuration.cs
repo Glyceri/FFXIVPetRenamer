@@ -13,6 +13,9 @@ namespace PetRenamer;
 internal class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
+    public const int currentSaveFileVersion = 11;
+
+    [JsonIgnore]
     private IDalamudPluginInterface? PetNicknamesPlugin;
     [JsonIgnore]
     private IPettableDatabase? Database = null;
@@ -22,12 +25,10 @@ internal class Configuration : IPluginConfiguration
     private IPetServices? PetServices = null;
     [JsonIgnore]
     private bool isSetup = false;
-    [JsonIgnore]
-    public const int currentSaveFileVersion = 10;
 
     public int Version { get; set; } = currentSaveFileVersion;
 
-    public SerializableUserV5[]? SerializableUsersV5 { get; set; } = null;
+    public SerializableUserV6[]? SerializableUsersV6 { get; set; } = null;
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
@@ -62,9 +63,9 @@ internal class Configuration : IPluginConfiguration
     public bool readFromPCP = true;
 
     // ------------------------- Debug SETTINGS --------------------------
-    public bool debugModeActive = false;
+    public bool debugModeActive        = false;
     public bool openDebugWindowOnStart = false;
-    public bool debugShowChatCode = false;
+    public bool debugShowChatCode      = false;
 
     public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {
@@ -80,9 +81,9 @@ internal class Configuration : IPluginConfiguration
         isSetup = true;
     }
 
-    void CurrentInitialise()
+    private void CurrentInitialise()
     {
-        SerializableUsersV5 ??= [];
+        SerializableUsersV6 ??= [];
     }
 
     public void Save()
@@ -94,7 +95,7 @@ internal class Configuration : IPluginConfiguration
 
         PetServices?.PetLog.LogVerbose("Pet Nicknames will now attempt to save");   // I need to add more verbose logging, pet nicknames is kind of silent.
 
-        SerializableUsersV5 = Database!.SerializeDatabase();
+        SerializableUsersV6 = Database!.SerializeDatabase();
 
 #pragma warning disable CS0618 // Oboslete (Legacy database is supposed to handle obsolete objects
         serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
@@ -128,17 +129,20 @@ internal class Configuration : IPluginConfiguration
     public SerializableUserV3[]? serializableUsersV3 = null;
     [Obsolete("Old User Save System. Very innefficient.")]
     public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
+    [Obsolete("Pre Skeleton Type Update")]
+    public SerializableUserV5[]? SerializableUsersV5 { get; set; } = null;
 
 #pragma warning restore IDE1006
 
 #pragma warning disable CS0618 // Type or member is obsolete
     void LegacyInitialise()
     {
-        users ??= Array.Empty<SerializableNickname>();
-        serializableUsers ??= Array.Empty<SerializableUser>();
-        serializableUsersV2 ??= Array.Empty<SerializableUserV2>();
-        serializableUsersV3 ??= Array.Empty<SerializableUserV3>();
-        SerializableUsersV4 ??= Array.Empty<SerializableUserV4>();
+        users               ??= [];
+        serializableUsers   ??= [];
+        serializableUsersV2 ??= [];
+        serializableUsersV3 ??= [];
+        SerializableUsersV4 ??= [];
+        SerializableUsersV5 ??= [];
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 

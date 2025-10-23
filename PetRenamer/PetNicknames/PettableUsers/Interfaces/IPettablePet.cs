@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Numerics;
 
@@ -7,7 +8,7 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 internal interface IPettablePet : IPettableEntity, IDisposable
 {
     public IPettableUser? Owner      { get; }
-    public int            SkeletonID { get; }
+    public PetSkeleton    SkeletonID { get; }
     public ulong          ObjectID   { get; }
     public ushort         Index      { get; }
     public string         Name       { get; }

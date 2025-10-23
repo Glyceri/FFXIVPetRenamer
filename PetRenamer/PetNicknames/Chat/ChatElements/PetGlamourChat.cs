@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using System.Text.RegularExpressions;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
@@ -173,19 +174,29 @@ internal class PetGlamourChat : RestrictedChatElement
         localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, sheetData.Model);
     }
 
-    void MatchReset(Match match)
+    private void MatchReset(Match match)
     {
         string basePetName = match.Groups["petname"].Value;
 
         int? classJob = GetClassJob(basePetName);
-        if (classJob == null) return;
+
+        if (classJob == null)
+        {
+            return;
+        }
 
         IPettableUser? localUser = UserList.LocalPlayer;
-        if (localUser == null) return;
 
-        int baseSkeleton = PluginConstants.BaseSkeletons[classJob.Value];
+        if (localUser == null)
+        {
+            return;
+        }
+
+        PetSkeleton baseSkeleton = PluginConstants.BaseSkeletons[classJob.Value];
+
         localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, baseSkeleton);
     }
 
-    int? GetClassJob(string basePetName) => PetServices.PetSheets.NameToSoftSkeletonIndex(basePetName);
+    private int? GetClassJob(string basePetName) 
+        => PetServices.PetSheets.NameToSoftSkeletonIndex(basePetName);
 }

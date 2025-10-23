@@ -1,7 +1,9 @@
-﻿namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+
+namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 internal interface IModernParseResult : IBaseParseResult
 {
-    ulong ContentID { get; }
-    int[] SoftSkeletons { get; }
+    public ulong         ContentID     { get; }
+    public PetSkeleton[] SoftSkeletons { get; }
 }

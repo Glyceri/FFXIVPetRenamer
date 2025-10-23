@@ -17,14 +17,15 @@ namespace PetRenamer.PetNicknames.WritingAndParsing;
 
 internal class DataParser : IDataParser
 {
-    readonly DalamudServices DalamudServices;
-    readonly IPettableUserList UserList;
-    readonly IPettableDatabase Database;
-    readonly ILegacyDatabase LegacyDatabase;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IPettableUserList  UserList;
+    private readonly IPettableDatabase  Database;
+    private readonly ILegacyDatabase    LegacyDatabase;
 
-    readonly IDataParserElement DataParserVersion1;
-    readonly IDataParserElement DataParserVersion2;
-    readonly IDataParserElement DataParserVersion3;
+    private readonly IDataParserElement DataParserVersion1;
+    private readonly IDataParserElement DataParserVersion2;
+    private readonly IDataParserElement DataParserVersion3;
+    private readonly IDataParserElement DataParserVersion4;
 
     public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
@@ -36,6 +37,7 @@ internal class DataParser : IDataParser
         DataParserVersion1 = new DataParserVersion1();
         DataParserVersion2 = new DataParserVersion2();
         DataParserVersion3 = new DataParserVersion3(petServices);
+        DataParserVersion4 = new DataParserVersion4(petServices);
     }
 
     public unsafe bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
@@ -79,17 +81,20 @@ internal class DataParser : IDataParser
             if (baseParseResult is IModernParseResult version2ParseResult)
             {
                 Database.ApplyParseResult(version2ParseResult, parseSource);
+
                 return true;
             }
 
             LegacyDatabase.ApplyParseResult(baseParseResult, parseSource);
+
             return true;
         }
 
         return true;
     }
 
-    public IDataParseResult ParseData(string data) => InternalParseData(data);
+    public IDataParseResult ParseData(string data) 
+        => InternalParseData(data);
 
     IDataParseResult InternalParseData(string data)
     {
@@ -110,40 +115,46 @@ internal class DataParser : IDataParser
 
 
         ParseVersion parseVersion = GetParseVersion(incomingData);
+
         return parseVersion switch
         {
             ParseVersion.Invalid => new InvalidParseResult("Data is not Pet Nicknames data."),
             ParseVersion.Version1 => DataParserVersion1.Parse(incomingData),
             ParseVersion.Version2 => DataParserVersion2.Parse(incomingData),
             ParseVersion.Version3 => DataParserVersion3.Parse(incomingData),
+            ParseVersion.Version4 => DataParserVersion4.Parse(incomingData),
             _ => new InvalidParseResult("Invalid Parse Version."),
         };
     }
 
-    bool TryFromBase64(string s, [NotNullWhen(true)] out byte[]? data)
+    private bool TryFromBase64(string s, [NotNullWhen(true)] out byte[]? data)
     {
         try
         {
             data = Convert.FromBase64String(s);
+
             return true;
         }
         catch 
         {
             data = null;
+
             return false;
         }
     }
 
-    bool TryGetString(byte[] data, [NotNullWhen(true)] out string? dataString)
+    private bool TryGetString(byte[] data, [NotNullWhen(true)] out string? dataString)
     {
         try
         {
             dataString = Encoding.Unicode.GetString(data);
+
             return true;
         }
         catch
         {
             dataString = null;
+
             return false;
         }
     }

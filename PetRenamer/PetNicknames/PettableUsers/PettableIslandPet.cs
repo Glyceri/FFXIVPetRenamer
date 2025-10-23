@@ -2,7 +2,9 @@
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -10,7 +12,7 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal unsafe class PettableIslandPet : IIslandPet
 {
     public nint           Address    { get; private set; }
-    public int            SkeletonID { get; private set; }
+    public PetSkeleton    SkeletonID { get; private set; }
     public ulong          ObjectID   { get; private set; }
     public ushort         Index      { get; private set; }
     public string         Name       { get; private set; } = string.Empty;
@@ -31,7 +33,7 @@ internal unsafe class PettableIslandPet : IIslandPet
 
         Address     = (nint)pet;
         Owner       = owner;
-        SkeletonID  = pet->Character.ModelContainer.ModelCharaId;
+        SkeletonID  = new PetSkeleton((uint)pet->Character.ModelContainer.ModelCharaId, SkeletonType.Minion);
         Index       = pet->Character.GameObject.ObjectIndex;
         Name        = pet->Character.GameObject.NameString;
         ObjectID    = pet->GetGameObjectId();

@@ -3,6 +3,7 @@ using Dalamud.Utility;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -74,6 +75,9 @@ internal class SheetsWrapper : IPetSheets
 
             uint companionIndex = companion.RowId;
             int  modelID        = (int)model.Value.RowId;
+
+            PetSkeleton petSkeleton = new PetSkeleton((uint)modelID, SkeletonType.Minion);
+
             int  legacyModelID  = model.Value.Model;
 
             if (legacyModelID == 0)
@@ -99,7 +103,7 @@ internal class SheetsWrapper : IPetSheets
             string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
             string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
 
-            petSheetCache.Add(new PetSheetData(modelID, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
+            petSheetCache.Add(new PetSheetData(petSkeleton, legacyModelID, icon, raceName, raceID, behaviourName, pronoun, singular, plural, singular, companionIndex, in DalamudServices));
         }
     }
 
@@ -114,7 +118,7 @@ internal class SheetsWrapper : IPetSheets
         {
             uint sheetSkeleton = pet.RowId;
 
-            if (!battlePetRemap.TryGetValue(sheetSkeleton, out int skeleton))
+            if (!battlePetRemap.TryGetValue(sheetSkeleton, out PetSkeleton skeleton))
             {
                 continue;
             }
@@ -208,7 +212,7 @@ internal class SheetsWrapper : IPetSheets
         return world.Value.InternalName.ExtractText();
     }
 
-    public IPetSheetData? GetPet(int skeletonID)
+    public IPetSheetData? GetPet(PetSkeleton skeletonID)
     {
         for (int i = 0; i < petSheetCache.Count; i++)
         {
@@ -223,7 +227,7 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public int ToSoftSkeleton(int skeletonID, int[] softSkeletons)
+    public PetSkeleton ToSoftSkeleton(PetSkeleton skeletonID, PetSkeleton[] softSkeletons)
     {
         bool canBeSoft = mutatableID.Contains(skeletonID);
 
@@ -378,7 +382,7 @@ internal class SheetsWrapper : IPetSheets
 
         IPetSheetData normalPetData = data[0];
 
-        if (normalPetData.Model > -1)
+        if (normalPetData.Model.SkeletonType != SkeletonType.BattlePet)
         {
             return normalPetData;
         }
@@ -455,7 +459,7 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData)
     {
-        if (oldData.Model >= -1)
+        if (oldData.Model.SkeletonType != SkeletonType.BattlePet)
         {
             return oldData;
         }
@@ -472,7 +476,7 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? GetFromSoftIndex(in IPettableUser user, in IPetSheetData oldData, int softIndex)
     {
-        int? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex);
+        PetSkeleton? softSkeleton = user.DataBaseEntry.GetSoftSkeleton(softIndex);
 
         if (softSkeleton == null)
         {
@@ -489,7 +493,7 @@ internal class SheetsWrapper : IPetSheets
         return new PetSheetData(softPetData.Model, softPetData.Icon, softPetData.Pronoun, oldData.BaseSingular, oldData.BasePlural, in DalamudServices);
     }
 
-    public bool IsValidBattlePet(int skeleton) 
+    public bool IsValidBattlePet(PetSkeleton skeleton) 
         => petIDToAction.ContainsKey(skeleton);
 
     public List<IPetSheetData> GetLegacyPets(int legacyModelID)
@@ -512,25 +516,25 @@ internal class SheetsWrapper : IPetSheets
     }
 
     [System.Obsolete]
-    public int[] GetObsoleteIDsFromClass(int classJob)
+    public PetSkeleton[] GetObsoleteIDsFromClass(int classJob)
     {
-        if (battlePetToClass.TryGetValue(classJob, out int[]? id))
+        if (battlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
         {
             return id;
         }
 
-        return System.Array.Empty<int>();  
+        return [];  
     }
 
-    public List<IPetSheetData> GetMissingPets(List<int> battlePetSkeletons)
+    public List<IPetSheetData> GetMissingPets(List<PetSkeleton> battlePetSkeletons)
     {
         List<IPetSheetData> sheetData = [];
 
         foreach(IPetSheetData data in petSheetCache)
         {
-            int model = data.Model;
+            PetSkeleton model = data.Model;
 
-            if (model >= -1)
+            if (model.SkeletonType != SkeletonType.BattlePet)
             {
                 continue;
             }
@@ -546,7 +550,7 @@ internal class SheetsWrapper : IPetSheets
         return sheetData;
     }
 
-    public readonly Dictionary<int, uint> battlePetToBNpcName = new Dictionary<int, uint>()
+    public readonly Dictionary<PetSkeleton, uint> battlePetToBNpcName = new Dictionary<PetSkeleton, uint>()
     {
         { PluginConstants.EmeraldCarbuncle      , 1401 },
         { PluginConstants.RubyCarbuncle         , 4149 },
@@ -570,7 +574,7 @@ internal class SheetsWrapper : IPetSheets
 
     };
 
-    public readonly Dictionary<uint, int> battlePetRemap = new Dictionary<uint, int>()
+    public readonly Dictionary<uint, PetSkeleton> battlePetRemap = new Dictionary<uint, PetSkeleton>
     {
         { 6,    PluginConstants.Eos                     }, // EOS
         { 7,    PluginConstants.Selene                  }, // Selene
@@ -597,7 +601,7 @@ internal class SheetsWrapper : IPetSheets
         { 46,   PluginConstants.SolarBahamut            }, // Solar Bahamut
     };
 
-    public readonly Dictionary<int, uint> petIDToAction = new Dictionary<int, uint>()
+    public readonly Dictionary<PetSkeleton, uint> petIDToAction = new Dictionary<PetSkeleton, uint>()
     {
         { PluginConstants.EmeraldCarbuncle      , 25804 }, // Summon Emerald
         { PluginConstants.RubyCarbuncle         , 25802 }, // Summon Ruby
@@ -620,7 +624,7 @@ internal class SheetsWrapper : IPetSheets
         { PluginConstants.SolarBahamut          , 36992 }, // Summon Solar Bahamut        
     };
 
-    public readonly List<int> mutatableID = new List<int>()
+    public readonly List<PetSkeleton> mutatableID = new List<PetSkeleton>()
     {
         PluginConstants.Eos                 , // Eos
         PluginConstants.Selene              , // Selene
@@ -662,7 +666,7 @@ internal class SheetsWrapper : IPetSheets
     private readonly string[] japaneseNames = ["カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス"];
 
     [System.Obsolete("Classes have been obsolete since 1.4")]
-    public readonly Dictionary<int, int[]> battlePetToClass = new Dictionary<int, int[]>()
+    public readonly Dictionary<int, PetSkeleton[]> battlePetToClass = new Dictionary<int, PetSkeleton[]>()
     {
         {
             PluginConstants.LegacySummonerClassID, 

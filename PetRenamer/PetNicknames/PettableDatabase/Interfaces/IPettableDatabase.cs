@@ -33,7 +33,7 @@ internal interface IPettableDatabase
     /// <returns>Whether the remove succeeded.</returns>
     void RemoveEntry(IPettableDatabaseEntry entry);
 
-    SerializableUserV5[] SerializeDatabase();
+    SerializableUserV6[] SerializeDatabase();
 
     void SetDirty();
     void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource);

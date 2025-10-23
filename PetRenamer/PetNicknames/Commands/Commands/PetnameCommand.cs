@@ -6,6 +6,8 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -191,7 +193,7 @@ internal partial class PetnameCommand : Command
 
             if (int.TryParse(customName, out int id))
             {
-                IPetSheetData? idData = PetServices.PetSheets.GetPet(id);
+                IPetSheetData? idData = PetServices.PetSheets.GetPet(PetSkeletonHelper.AsPetSkeleton(id));
 
                 if (idData == null)
                 {

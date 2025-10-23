@@ -3,7 +3,9 @@ using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -11,7 +13,7 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal unsafe abstract class BasePettablePet : IPettablePet
 {
     public nint           Address    { get; }
-    public int            SkeletonID { get; }
+    public PetSkeleton    SkeletonID { get; }
     public ulong          ObjectID   { get; }
     public ushort         Index      { get; }
     public string         Name       { get; }
@@ -26,7 +28,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
     private readonly IPettableDatabaseEntry Entry;
     private readonly ISharingDictionary     SharingDictionary;
 
-    public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, bool asBattlePet = false)
+    public BasePettablePet(Character* pet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices, SkeletonType skeletonType)
     {
         PetServices         = petServices;
         Entry               = entry;
@@ -35,12 +37,7 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         Address             = (nint)pet;
 
         Owner               = owner;
-        SkeletonID          = pet->ModelContainer.ModelCharaId;
-
-        if (asBattlePet)
-        {
-            SkeletonID = -SkeletonID;
-        }
+        SkeletonID          = new PetSkeleton((uint)pet->ModelContainer.ModelCharaId, skeletonType);
 
         Index               = pet->GameObject.ObjectIndex;
         Name                = pet->GameObject.NameString;

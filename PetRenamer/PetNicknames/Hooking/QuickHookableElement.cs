@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 
@@ -15,7 +16,7 @@ internal abstract class QuickHookableElement : HookableElement
 
     private readonly List<ITextHook> textHooks = new List<ITextHook>();
 
-    public T Hook<T>(string addonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false) where T : ITextHook, new()
+    public T Hook<T>(string addonName, uint[] textPos, Func<PetSkeleton, bool> allowedCallback, bool allowColours, bool isSoft = false) where T : ITextHook, new()
     {
         T t = new T();
         t.Setup(DalamudServices, UserList, PetServices, DirtyListener, addonName, textPos, allowedCallback, allowColours, isSoft);

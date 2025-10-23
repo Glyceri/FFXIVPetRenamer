@@ -1,9 +1,10 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PN.S;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
-using System.Collections.Generic;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PN.S;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
@@ -28,23 +29,23 @@ internal class PettableDatabase : IPettableDatabase
     {
         List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
 
-        SerializableUserV5[]? users = PetServices.Configuration.SerializableUsersV5;
+        SerializableUserV6[]? users = PetServices.Configuration.SerializableUsersV6;
 
         if (users == null)
         {
             return;
         }
 
-        foreach (SerializableUserV5 user in users)
+        foreach (SerializableUserV6 user in users)
         {
-            SerializableNameDataV2[] datas = user.SerializableNameDatas;
+            SerializableNameDataV3[] datas = user.SerializableNameDatas;
 
             if (datas.Length == 0)
             {
                 continue;
             }
 
-            newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, datas[0].IDS, datas[0].Names, datas[0].EdgeColours, datas[0].TextColours, user.SoftSkeletonData, true));
+            newEntries.Add(new PettableDataBaseEntry(PetServices, DirtyCaller, user.ContentID, user.Name, user.Homeworld, PetSkeletonHelper.AsPetSkeletons(datas[0].Ids, datas[0].SkeletonTypes), datas[0].Names, datas[0].EdgeColours, datas[0].TextColours, PetSkeletonHelper.AsPetSkeletons(user.SoftSkeletonData, user.SoftSkeletonTypes), true));
         }
         _entries = newEntries;
     }
@@ -130,9 +131,9 @@ internal class PettableDatabase : IPettableDatabase
         }
     }
 
-    public SerializableUserV5[] SerializeDatabase()
+    public SerializableUserV6[] SerializeDatabase()
     {
-        List<SerializableUserV5> users = new List<SerializableUserV5>();
+        List<SerializableUserV6> users = new List<SerializableUserV6>();
 
         int entryCount = _entries.Count;
 

@@ -7,7 +7,7 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 internal struct PetSheetData : IPetSheetData
 {
-    public int      Model         { get; private set; }
+    public PetSkeleton Model      { get; private set; }
     public uint     Icon          { get; private set; }
     public sbyte    Pronoun       { get; private set; }
 
@@ -28,7 +28,7 @@ internal struct PetSheetData : IPetSheetData
     public uint     FootstepIcon  { get; private set; } = 0;
     
 
-    public PetSheetData(int Model, int legacyModelID, uint Icon, string? raceName, uint raceID, string? behaviourName, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
+    public PetSheetData(PetSkeleton Model, int legacyModelID, uint Icon, string? raceName, uint raceID, string? behaviourName, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
         : this(Model, legacyModelID, Icon, Pronoun, Singular, Plural, actionName, actionID, in services)
     {
         RaceName      = raceName;
@@ -36,7 +36,7 @@ internal struct PetSheetData : IPetSheetData
         RaceID        = raceID;
     }
 
-    public PetSheetData(int Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
+    public PetSheetData(PetSkeleton Model, int legacyModelID, uint Icon, sbyte Pronoun, string Singular, string Plural, string actionName, uint actionID, in DalamudServices services)
         : this(Model, Icon, Pronoun, Singular, Plural, in services)
     {
         ActionID      = actionID;
@@ -44,7 +44,7 @@ internal struct PetSheetData : IPetSheetData
         LegacyModelID = legacyModelID;
     }
 
-    public PetSheetData(int model, uint icon, sbyte pronoun, string singular, string plural, in DalamudServices services)
+    public PetSheetData(PetSkeleton model, uint icon, sbyte pronoun, string singular, string plural, in DalamudServices services)
     {
         Model   = model;
         Icon    = icon;

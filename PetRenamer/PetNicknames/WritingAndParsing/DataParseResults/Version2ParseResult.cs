@@ -1,16 +1,18 @@
-﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 
 internal class Version2ParseResult : IModernParseResult
 {
-    public string UserName { get; init; }
-    public ushort Homeworld { get; init; }
-    public ulong ContentID { get; init; }
-    public int[] SoftSkeletons { get; init; }
+    public string UserName { get; }
+    public ushort Homeworld { get; }
+    public ulong ContentID { get; }
+    public PetSkeleton[] SoftSkeletons { get; }
 
-    public int[] IDs { get; init; }
+    public PetSkeleton[] IDs { get; init; }
     public string[] Names { get; init; }
     public Vector3?[] EdgeColous { get; }
     public Vector3?[] TextColours { get; }
@@ -20,8 +22,8 @@ internal class Version2ParseResult : IModernParseResult
         UserName = username;
         Homeworld = homeworld;
         ContentID = contentID;
-        SoftSkeletons = softSkeletons;
-        IDs = ids;
+        SoftSkeletons = PetSkeletonHelper.AsPetSkeletons(softSkeletons);
+        IDs = PetSkeletonHelper.AsPetSkeletons(ids);
         Names = names;
         EdgeColous = new Vector3?[ids.Length];
         TextColours = new Vector3?[ids.Length];

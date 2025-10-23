@@ -26,6 +26,8 @@ using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -301,7 +303,7 @@ internal class PetListWindow : PetWindow
                             LabledLabel.Draw("Nickname:", pet.CustomName ?? string.Empty, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
                         }
                         LabledLabel.Draw("Pet:", pet.PetSheetData.BaseSingular, new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
-                        LabledLabel.Draw("ID:", pet.PetSheetData.Model.ToString(), new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
+                        LabledLabel.Draw("ID:", pet.PetSheetData.Model.SkeletonId.ToString(), new Vector2(ImGui.GetContentRegionAvail().X, BarHeight));
 
                         Listbox.End();
                     }
@@ -514,16 +516,19 @@ internal class PetListWindow : PetWindow
         }
     }
 
-    void HandlePetMode()
+    private void HandlePetMode()
     {
-        if (ActiveEntry == null) return;
+        if (ActiveEntry == null)
+        {
+            return;
+        }
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
 
-        List<int>      validIDS         = names.IDs.ToList();
-        List<string>   validNames       = names.Names.ToList();
-        List<Vector3?> validEdgeColours = names.EdgeColours.ToList();
-        List<Vector3?> validTextColours = names.TextColours.ToList();
+        List<PetSkeleton> validIDS         = [..names.IDs];
+        List<string>      validNames       = [..names.Names];
+        List<Vector3?>    validEdgeColours = [..names.EdgeColours];
+        List<Vector3?>    validTextColours = [..names.TextColours];
 
         if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
         {
@@ -542,40 +547,53 @@ internal class PetListWindow : PetWindow
 
         for (int i = 0; i < newLength; i++)
         {
-            int ID = validIDS[i];
+            PetSkeleton ID = validIDS[i];
 
-            if (PetWindowMode.Minion == CurrentMode && ID <= -1)
+            if (PetWindowMode.Minion == CurrentMode && ID.SkeletonType != SkeletonType.Minion)
             {
                 continue;
             }
 
-            if (PetWindowMode.BattlePet == CurrentMode && ID >= -1)
+            if (PetWindowMode.BattlePet == CurrentMode && ID.SkeletonType != SkeletonType.BattlePet)
             {
                 continue;
             }
 
             IPetSheetData? petData = PetServices.PetSheets.GetPet(ID);
-            if (petData == null) continue;
+
+            if (petData == null)
+            {
+                continue;
+            }
 
             string name = validNames[i];
             Vector3? edgeColour = validEdgeColours[i];
             Vector3? textColour = validTextColours[i];
 
-            if (!(Valid(name) || Valid(ID.ToString()) || Valid(petData.BaseSingular))) continue;
+            if (!(Valid(name) || Valid(ID.SkeletonId.ToString()) || Valid(petData.BaseSingular)))
+            {
+                continue;
+            }
 
             petListDrawables.Add(new PetListPet(in DalamudServices, in petData, name, edgeColour, textColour));
         }
     }
 
-    public bool Valid(string input)
+    private bool Valid(string input)
     {
-        if (activeSearchText.IsNullOrWhitespace()) return true;
+        if (activeSearchText.IsNullOrWhitespace())
+        {
+            return true;
+        }
 
         return input.Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    void OnSave(string? newName, int skeleton, Vector3? edgeColour, Vector3? textColour)
+    private void OnSave(string? newName, PetSkeleton skeleton, Vector3? edgeColour, Vector3? textColour)
     {
-        DalamudServices.Framework.Run(() => ActiveEntry?.SetName(skeleton, newName ?? "", edgeColour, textColour));
+        _ = DalamudServices.Framework.Run(() =>
+        {
+            ActiveEntry?.SetName(skeleton, newName ?? "", edgeColour, textColour);
+        });
     }
 }

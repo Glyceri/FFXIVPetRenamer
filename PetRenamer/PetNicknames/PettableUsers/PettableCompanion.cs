@@ -3,13 +3,14 @@ using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableCompanion : BasePettablePet, IPettableCompanion
 {
     public PettableCompanion(Companion* companion, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices) 
-        : base(&companion->Character, owner, sharingDictionary, entry, petServices) { }
+        : base(&companion->Character, owner, sharingDictionary, entry, petServices, SkeletonType.Minion) { }
 
     public Companion* Companion
         => (Companion*)Address;

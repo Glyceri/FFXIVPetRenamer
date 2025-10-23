@@ -28,6 +28,13 @@ internal class StringHelperWrapper : IStringHelper
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
         => float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
 
+    public bool TryParseVector3(string? line, [NotNullWhen(true)] out Vector3? vector3)
+    {
+        vector3 = ParseVector3(line);
+
+        return (vector3 != null);
+    }
+
     public Vector3? ParseVector3(string? line)
     {
         if (line.IsNullOrWhitespace())
