@@ -190,7 +190,7 @@ internal class IpcProvider : IIpcProvider
         }
     }
 
-    public unsafe void ClearIPCDataDetour(ushort objectIndex)
+    public void ClearIPCDataDetour(ushort objectIndex)
     {
         try
         {
