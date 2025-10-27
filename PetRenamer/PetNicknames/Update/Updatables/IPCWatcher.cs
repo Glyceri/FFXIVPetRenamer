@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
@@ -41,7 +42,7 @@ internal class IPCWatcher : IUpdatable
         Verify();
     }
 
-    void Verify()
+    private void Verify()
     {
         PetServices.PetLog.LogVerbose("Verify Database");
 
@@ -67,7 +68,7 @@ internal class IPCWatcher : IUpdatable
 
             PetServices.PetLog.LogVerbose($"IPCUser: {entry.Name} {entry.HomeworldName} was not found and has been removed from the database.");
 
-            Database.RemoveEntry(entry);
+            Database.RemoveEntry(entry, ParseSource.IPC);
         }
     }
 }

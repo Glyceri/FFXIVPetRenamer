@@ -67,7 +67,7 @@ internal unsafe class PettableUser : IPettableUser
         if (legacyEntry != null)
         {
             legacyEntry.UpdateContentID(ContentID, true);
-            legacyDatabase.RemoveEntry(legacyEntry);
+            legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
             _ = legacyEntry.MoveToDataBase(dataBase);
             legacyDatabase.SetDirty();
         }
@@ -297,7 +297,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (!IsActive)
         {
-            database.RemoveEntry(DataBaseEntry);
+            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
         }
 
         foreach(IPettablePet? pet in PettablePets)

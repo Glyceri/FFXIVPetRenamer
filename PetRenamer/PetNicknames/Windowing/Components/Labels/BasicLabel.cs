@@ -16,7 +16,7 @@ internal static class BasicLabel
         ImGui.PushStyleColor(ImGuiCol.Button,        *colour);
         ImGui.PushStyleColor(ImGuiCol.ButtonActive,  *colour);
 
-        ImGui.Button(label, size);
+        _ = ImGui.Button(label, size);
 
         if (!tooltip.IsNullOrWhitespace())
         {

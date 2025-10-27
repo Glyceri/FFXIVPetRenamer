@@ -114,7 +114,7 @@ internal class PettableDatabase : IPettableDatabase
         return newEntry;
     }
 
-    public void RemoveEntry(IPettableDatabaseEntry entry)
+    public void RemoveEntry(IPettableDatabaseEntry entry, ParseSource parseSource)
     {
         for (int i = _entries.Count - 1; i >= 0; i--)
         {
@@ -125,7 +125,7 @@ internal class PettableDatabase : IPettableDatabase
                 continue;
             }
 
-            currentEntry.Clear(ParseSource.Manual);
+            currentEntry.Clear(parseSource);
 
             _entries.RemoveAt(i);
         }
