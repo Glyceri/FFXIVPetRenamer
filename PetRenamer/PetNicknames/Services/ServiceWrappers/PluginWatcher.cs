@@ -9,8 +9,8 @@ internal class PluginWatcher : IPluginWatcher
 {
     private readonly DalamudServices        DalamudServices;
 
-    private readonly List<string>           LoadedPlugins       = new List<string>();
-    private readonly List<Action<string[]>> RegisteredCallbacks = new List<Action<string[]>>();
+    private readonly List<string>           LoadedPlugins       = [];
+    private readonly List<Action<string[]>> RegisteredCallbacks = [];
 
     public PluginWatcher(DalamudServices dalamudServices)
     {

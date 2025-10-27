@@ -45,7 +45,8 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         SetDirty();
     }
 
-    protected override bool BlockedCheck() => blocked || base.BlockedCheck();
+    protected override bool BlockedCheck() 
+        => blocked || base.BlockedCheck();
 
     protected override unsafe AtkTextNode* GetTextNode(in BaseNode bNode)
     {
@@ -53,12 +54,17 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         {
             bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
         }
+
         return base.GetTextNode(in bNode);
     }
 
     protected override IPetSheetData? GetPetData(string text, in IPettableUser user)
     {
-        if (currentPet?.Owner != user) return null;
+        if (currentPet?.Owner != user)
+        {
+            return null;
+        }
+
         return currentPet?.PetData;
     }
 
@@ -66,15 +72,23 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
     {
         base.SetText(textNode, text, customName, pPet);
 
-        if (bgNode == null) return;
-        if (textNode == null) return;
+        if (bgNode == null)
+        {
+            return;
+        }
+
+        if (textNode == null)
+        {
+            return;
+        }
 
         textNode->ResizeNodeForCurrentText();
 
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    protected override IPettableUser? GetUser() => currentPet?.Owner;
+    protected override IPettableUser? GetUser() 
+        => currentPet?.Owner;
 
     public override void OnDispose()
     {

@@ -12,9 +12,4 @@ internal class PetListUser : IPetListDrawable
     {
         Entry = entry;
     }
-
-    public void Dispose()
-    {
-        
-    }
 }

@@ -40,7 +40,7 @@ internal class DataParser : IDataParser
         DataParserVersion4 = new DataParserVersion4(petServices);
     }
 
-    public unsafe bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
+    public bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
     {
         IPettableUser? localUser = UserList.LocalPlayer;
 
@@ -96,7 +96,7 @@ internal class DataParser : IDataParser
     public IDataParseResult ParseData(string data) 
         => InternalParseData(data);
 
-    IDataParseResult InternalParseData(string data)
+    private IDataParseResult InternalParseData(string data)
     {
         string incomingData = data;
 
@@ -112,7 +112,6 @@ internal class DataParser : IDataParser
         {
             return new InvalidParseResult("Incoming parse data is empty.");
         }
-
 
         ParseVersion parseVersion = GetParseVersion(incomingData);
 
@@ -159,16 +158,23 @@ internal class DataParser : IDataParser
         }
     }
 
-    ParseVersion GetParseVersion(string data)
+    private ParseVersion GetParseVersion(string data)
     {
         for(int i = (int)ParseVersion.Invalid; i < (int)ParseVersion.COUNT; i++)
         {
             ParseVersion currentVersion = (ParseVersion)i;
 
             string description = currentVersion.GetDescription();
-            if (description.IsNullOrWhitespace()) continue;
 
-            if (!data.StartsWith(description, StringComparison.InvariantCultureIgnoreCase)) continue;
+            if (description.IsNullOrWhitespace())
+            {
+                continue;
+            }
+
+            if (!data.StartsWith(description, StringComparison.InvariantCultureIgnoreCase))
+            {
+                continue;
+            }
 
             return currentVersion;
         }

@@ -1,5 +1,4 @@
 ﻿using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Utility;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -128,12 +127,12 @@ internal class PetConfigWindow : PetWindow
 
     private bool DrawThirdPartyHeader(string internalName, string? displayTitle = null)
     {
-        if (!ThirdPartySupported.ContainsKey(internalName))
+        if (!ThirdPartySupported.TryGetValue(internalName, out bool supported))
         {
             return false;
         }
 
-        if (!ThirdPartySupported[internalName])
+        if (!supported)
         {
             return false;
         }

@@ -11,9 +11,14 @@ internal class DataParserVersion2 : IDataParserElement
     public IDataParseResult Parse(string data)
     {
         string[] splitLines = data.Split('\n');
-        if (splitLines.Length < 5) return new InvalidParseResult("Splitlines was not of length < 5");
+
+        if (splitLines.Length < 5)
+        {
+            return new InvalidParseResult("Splitlines was not of length < 5");
+        }
 
         string userName = splitLines[1];
+
         if (!ushort.TryParse(splitLines[2], out ushort homeWorld))
         {
             return new InvalidParseResult("Homeworld parse failed");
@@ -25,13 +30,14 @@ internal class DataParserVersion2 : IDataParserElement
         }
 
         int[]? softSkeletonsArray = ParseSoftSkeletons(splitLines[4]);
+
         if (softSkeletonsArray == null)
         {
             return new InvalidParseResult("Soft Skeletons Array parse failed");
         }
 
-        List<int> ids = new List<int>();
-        List<string> names = new List<string>();
+        List<int>    ids   = [];
+        List<string> names = [];
 
         for (int i = 5; i < splitLines.Length; i++)
         {
@@ -40,13 +46,23 @@ internal class DataParserVersion2 : IDataParserElement
             try
             {
                 string[] splitNickname = splitLines[i].Split(PluginConstants.forbiddenCharacter);
-                if (splitNickname.Length < 1) continue;
-                if (!int.TryParse(splitNickname[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID)) continue;
+
+                if (splitNickname.Length < 1)
+                {
+                    continue;
+                }
+
+                if (!int.TryParse(splitNickname[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID))
+                {
+                    continue;
+                }
+
                 string nickname = splitNickname[1];
+
                 ids.Add(ID);
                 names.Add(nickname);
             }
-            catch { continue; }
+            catch { }
         }
 
         if (ids.Count != names.Count)
@@ -57,17 +73,19 @@ internal class DataParserVersion2 : IDataParserElement
         return new Version2ParseResult(userName, homeWorld, contentID, softSkeletonsArray, ids.ToArray(), names.ToArray());
     }
 
-    int[]? ParseSoftSkeletons(string data)
+    private int[]? ParseSoftSkeletons(string data)
     {
         data = data.Replace("[", string.Empty).Replace("]", string.Empty);
 
         string[] splitData = data.Split(",");
+
         if (splitData.Length != 5)
         {
             return null;
         }
 
-        List<int> softSkeletons = new List<int>();
+        List<int> softSkeletons = [];
+
         foreach(string s in splitData)
         {
             // Soft skeletons are ALWAYS negative!
@@ -80,6 +98,7 @@ internal class DataParserVersion2 : IDataParserElement
             {
                 return null;
             }
+
             softSkeletons.Add(id);
         }
 

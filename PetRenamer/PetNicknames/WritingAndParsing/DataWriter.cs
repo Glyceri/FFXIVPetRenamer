@@ -48,7 +48,7 @@ internal class DataWriter : IDataWriter
         INamesDatabase database = entry.ActiveDatabase;
         int length = database.Length;
 
-        List<string> petLines = new List<string>() { header, userName, homeworldID, contentID, SoftSkeletons };
+        List<string> petLines = [header, userName, homeworldID, contentID, SoftSkeletons];
 
         for (int i = 0; i < length; i++)
         {

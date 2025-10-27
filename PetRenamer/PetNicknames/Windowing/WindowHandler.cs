@@ -14,6 +14,7 @@ using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing;
 
@@ -77,6 +78,12 @@ internal class WindowHandler : IWindowHandler
 
     public static float GlobalScale
         => ImGuiHelpers.GlobalScale * FontScale;
+
+    public static float BarHeight
+        => 30 * GlobalScale;
+
+    public static Vector2 StretchingBar
+        => new Vector2(ImGui.GetContentRegionAvail().X, BarHeight);
 
     public PetWindowMode PetWindowMode
     {

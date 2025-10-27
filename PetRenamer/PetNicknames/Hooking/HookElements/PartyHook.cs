@@ -19,7 +19,10 @@ internal unsafe class PartyHook : HookableElement
 {
     private bool hasRegisteredListener = false;
 
-    public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) : base(services, userList, petServices, dirtyListener) { }
+    private ulong[] partyGroup = new ulong[8]; // a party is always 8 in size
+
+    public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
+        : base(services, userList, petServices, dirtyListener) { }
 
     public override void Init()
     {
@@ -29,17 +32,23 @@ internal unsafe class PartyHook : HookableElement
 
     protected override void Refresh()
     {
-        if (hasRegisteredListener) return;
+        if (hasRegisteredListener)
+        {
+            return;
+        }
 
         hasRegisteredListener = true;
 
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
     }
 
-    bool CanContinue(AtkUnitBase* baseD) => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
+    private bool CanContinue(AtkUnitBase* baseD) 
+        => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
 
-    void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) => Update((AtkUnitBase*)args.Addon.Address);
-    void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
+    private void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) 
+        => Update((AtkUnitBase*)args.Addon.Address);
+
+    private void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
     {
         Update((AtkUnitBase*)args.Addon.Address);
 
@@ -47,9 +56,12 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
-    void Update(AtkUnitBase* baseD)
+    private void Update(AtkUnitBase* baseD)
     {
-        if (!CanContinue(baseD)) return;
+        if (!CanContinue(baseD))
+        {
+            return;
+        }
 
         SetPetname  ((AddonPartyList*)baseD);
         SetCastlist ((AddonPartyList*)baseD);
@@ -61,134 +73,222 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
-    void SetPetname(AddonPartyList* partyNode)
+    private void SetPetname(AddonPartyList* partyNode)
     {
-        if (!PetServices.Configuration.showOnPartyList) return;
+        if (!PetServices.Configuration.showOnPartyList)
+        {
+            return;
+        }
 
         IPettableUser? localPlayer = UserList.LocalPlayer;
-        if (localPlayer == null) return;
+
+        if (localPlayer == null)
+        {
+            return;
+        }
 
         IPettablePet? pet = localPlayer.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
-        if (pet == null) return;
+
+        if (pet == null)
+        {
+            return;
+        }
 
         IPetSheetData? petData = pet.PetData;
-        if (petData == null) return;
+
+        if (petData == null)
+        {
+            return;
+        }
 
         string? lastPetname = pet.CustomName;
-        if (lastPetname == string.Empty || lastPetname == null) return;
+
+        if (lastPetname == string.Empty || lastPetname == null)
+        {
+            return;
+        }
 
         pet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
 
-        PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet.Name, lastPetname, edgeColour, textColour, petData);
+        _ = PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet.Name, lastPetname, edgeColour, textColour, petData);
     }
 
-    void SetCastlist(AddonPartyList* partyNode)
+    private void SetCastlist(AddonPartyList* partyNode)
     {
-        if (!PetServices.Configuration.showOnCastbars) return;
+        if (!PetServices.Configuration.showOnCastbars)
+        {
+            return;
+        }
+
         SetupPartyList();
 
         int index = -1;
+
         foreach (PartyListMemberStruct member in partyNode->PartyMembers)
         {
             index++;
-            if (index < 0 || index > partyGroup.Length) continue;
 
-            if (member.Name == null) continue;
-            if (member.CastingProgressBar == null) continue;
-            if (!member.CastingProgressBar->AtkResNode.IsVisible()) continue;
+            if (index < 0 || index > partyGroup.Length)
+            {
+                continue;
+            }
+
+            if (member.Name == null)
+            {
+                continue;
+            }
+
+            if (member.CastingProgressBar == null)
+            {
+                continue;
+            }
+
+            if (!member.CastingProgressBar->AtkResNode.IsVisible())
+            {
+                continue;
+            }
 
             string castString = new ReadOnlySeStringSpan(member.CastingActionName->NodeText).ExtractText();
-            if (castString == string.Empty) continue;
+
+            if (castString == string.Empty)
+            {
+                continue;
+            }
 
             ulong contentID = partyGroup[index];
+
             if (contentID == 0) // this means there is no party active
             {
                 IPettableUser? localUser = UserList.LocalPlayer;
-                if (localUser == null) return;
+                if (localUser == null)
+                {
+                    return;
+                }
 
                 contentID = localUser.ContentID;
             }
 
             IPettableUser? user = UserList.GetUserFromContentID(contentID);
-            if (user == null) continue;
+
+            if (user == null)
+            {
+                continue;
+            }
 
             IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, in user, true);
-            if (data == null) continue;
+
+            if (data == null)
+            {
+                continue;
+            }
 
             string? customName = user.DataBaseEntry.GetName(data.Model);
-            if (customName == null) continue;
 
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, null, null, data, false);
+            if (customName == null)
+            {
+                continue;
+            }
+
+            _ = PetServices.StringHelper.ReplaceATKString(member.CastingActionName, castString, customName, null, null, data, false);
         }
     }
 
-    ulong[] partyGroup = new ulong[8]; // a party is always 8 in size
-
-    void SetupPartyList()
+    private void SetupPartyList()
     {
         GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
-        if (gManager == null) return;
+
+        if (gManager == null) 
+        { 
+            return; 
+        }
 
         bool isCrossParty = IsCrossParty();
+
         partyGroup = new ulong[8];
 
         // We can assume partyGroup is 8 in length, and so is the struct with party members, Thanks SE!
         for (int i = 0; i < partyGroup.Length; i++)
         {
             PartyMember member = gManager->MainGroup.PartyMembers[i];
+
             ulong contentID = member.ContentId;
 
             int? index;
 
-            if (isCrossParty) index = GetCrossPartyIndex(contentID);
-            else index = GetNormalPartyIndex(contentID);
+            if (isCrossParty)
+            {
+                index = GetCrossPartyIndex(contentID);
+            }
+            else
+            {
+                index = GetNormalPartyIndex(contentID);
+            }
 
-            if (index == null) continue;
-            if (index < 0 || index >= partyGroup.Length) continue;
+            if (index == null)
+            {
+                continue;
+            }
+
+            if (index < 0 || index >= partyGroup.Length)
+            {
+                continue;
+            }
 
             partyGroup[index.Value] = contentID;
         }
     }
 
-    bool IsCrossParty()
+    private bool IsCrossParty()
     {
-        bool isCrossRealm       = InfoProxyCrossRealm.Instance()->IsCrossRealm;
-        bool noMembersInGroup   = GroupManager.Instance()->MainGroup.MemberCount < 1;
+        bool isCrossRealm     = InfoProxyCrossRealm.Instance()->IsCrossRealm;
+        bool noMembersInGroup = GroupManager.Instance()->MainGroup.MemberCount < 1;
 
         return isCrossRealm && noMembersInGroup;
     }
 
-    int? GetCrossPartyIndex(ulong contentID)
+    private int? GetCrossPartyIndex(ulong contentID)
     {
-        if (InfoProxyCrossRealm.Instance() == null) return null;
+        if (InfoProxyCrossRealm.Instance() == null)
+        {
+            return null;
+        }
 
         CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId(contentID);
-        if (member == null) return null;
+
+        if (member == null)
+        {
+            return null;
+        }
 
         return member->MemberIndex;
     }
 
-    int? GetNormalPartyIndex(ulong contentID)
+    private int? GetNormalPartyIndex(ulong contentID)
     {
-        int memberCount = GroupManager.Instance()->MainGroup.MemberCount;
-        bool foundSelf = false;
+        int  memberCount = GroupManager.Instance()->MainGroup.MemberCount;
+        bool foundSelf   = false;
 
         ulong localContentID = UserList.LocalPlayer?.ContentID ?? 0;
 
         for (int i = 0; i < memberCount; i++)
         {
             int actualCurrent = i;
+
             if (!foundSelf)
             {
                 actualCurrent++;
             }
 
             PartyMember* member = GroupManager.Instance()->MainGroup.GetPartyMemberByIndex(i);
-            if (member == null) continue;
+
+            if (member == null)
+            {
+                continue;
+            }
 
             if (member->ContentId == localContentID)
             {
-                foundSelf = true;
+                foundSelf     = true;
                 actualCurrent = 0;
             }
 

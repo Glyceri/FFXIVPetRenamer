@@ -46,17 +46,26 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
     {
         base.SetText(textNode, text, customName, pPet);
 
-        if (bgNode == null) return;
-        if (textNode == null) return;
+        if (bgNode == null)
+        {
+            return;
+        }
+
+        if (textNode == null)
+        {
+            return;
+        }
 
         textNode->ResizeNodeForCurrentText();
 
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    public void SetPetSheetData(IPetSheetData? petSheetData) => currentData = petSheetData;
+    public void SetPetSheetData(IPetSheetData? petSheetData) 
+        => currentData = petSheetData;
 
-    protected override IPetSheetData? GetPetData(string text, in IPettableUser user) => currentData;
+    protected override IPetSheetData? GetPetData(string text, in IPettableUser user) 
+        => currentData;
 
     public override void OnDispose()
     {

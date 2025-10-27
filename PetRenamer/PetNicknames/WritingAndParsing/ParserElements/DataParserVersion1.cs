@@ -1,7 +1,6 @@
 ﻿using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -12,16 +11,21 @@ internal class DataParserVersion1 : IDataParserElement
     public IDataParseResult Parse(string data)
     {
         string[] splitLines = data.Split('\n');
-        if (splitLines.Length < 3) return new InvalidParseResult("Splitlines was not of length < 3");
+
+        if (splitLines.Length < 3)
+        {
+            return new InvalidParseResult("Splitlines was not of length < 3");
+        }
 
         string userName = splitLines[1];
+
         if (!ushort.TryParse(splitLines[2], out ushort homeWorld))
         {
             return new InvalidParseResult("Homeworld parse failed");
         }
 
-        List<int> ids = new List<int>();
-        List<string> names = new List<string>();
+        List<int>    ids    = [];
+        List<string> names  = [];
 
         for (int i = 3; i < splitLines.Length; i++)
         {
@@ -30,13 +34,22 @@ internal class DataParserVersion1 : IDataParserElement
             try
             {
                 string[] splitNickname = splitLines[i].Split(PluginConstants.forbiddenCharacter);
-                if (splitNickname.Length < 1) continue;
-                if (!int.TryParse(splitNickname[0].Replace("ID:", ""), NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID)) continue;
+
+                if (splitNickname.Length < 1)
+                {
+                    continue;
+                }
+
+                if (!int.TryParse(splitNickname[0].Replace("ID:", ""), NumberStyles.Integer, CultureInfo.InvariantCulture, out int ID))
+                {
+                    continue;
+                }
                 string nickname = splitNickname[1].Replace("Name:", "");
+
                 ids.Add(ID);
                 names.Add(nickname);
             }
-            catch { continue; }
+            catch { }
         }
 
         if (ids.Count !=  names.Count)

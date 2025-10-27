@@ -26,7 +26,8 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
         "_NaviMap"
     ];
 
-    public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener, ITooltipHookHelper tooltipHook) : base(services, petServices, userList, dirtyListener)
+    public MapTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener, ITooltipHookHelper tooltipHook) 
+        : base(services, petServices, userList, dirtyListener)
     {
         tooltipHookMap = Hook<MapTooltipTextHook>("Tooltip", [2], Allowed, false, false);
         tooltipHookMap.Register(3);
@@ -44,16 +45,27 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
 
     private void ShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {
-        if (addonID == lastId) return;
+        if (addonID == lastId)
+        {
+            return;
+        }
 
         lastId = addonID;
 
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(addonID);
-        if (hoveredOverAddon == null) return;
-        if (!hoveredOverAddon->IsFullyLoaded()) return;
 
-        string addonName = hoveredOverAddon->NameString;
-        bool validAddonMap = allowedTooltipAddonsMap.Contains(addonName);
+        if (hoveredOverAddon == null)
+        {
+            return;
+        }
+
+        if (!hoveredOverAddon->IsFullyLoaded())
+        {
+            return;
+        }
+
+        string addonName     = hoveredOverAddon->NameString;
+        bool   validAddonMap = allowedTooltipAddonsMap.Contains(addonName);
 
         tooltipHookMap.SetBlockedState(!validAddonMap);
     }

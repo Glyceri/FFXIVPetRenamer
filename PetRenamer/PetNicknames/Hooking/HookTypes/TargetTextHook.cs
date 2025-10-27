@@ -23,7 +23,10 @@ internal unsafe class TargetTextHook : SimpleTextHook
 
     protected override bool OnTextNode(AtkTextNode* textNode, string text)
     {
-        if (!IsSoft) return NotSoftTextNode(textNode, text);
+        if (!IsSoft)
+        {
+            return NotSoftTextNode(textNode, text);
+        }
 
         return base.OnTextNode(textNode, text);
     }
@@ -31,19 +34,40 @@ internal unsafe class TargetTextHook : SimpleTextHook
     private bool NotSoftTextNode(AtkTextNode* textNode, string text)
     {
         IPettableEntity? currentEntity = callGetPet?.Invoke();
-        if (currentEntity == null) return false;
-        if (currentEntity is not IPettablePet pet) return false;
+
+        if (currentEntity == null)
+        {
+            return false;
+        }
+
+        if (currentEntity is not IPettablePet pet)
+        {
+            return false;
+        }
 
         currentActivePet = pet;
-        if (currentActivePet == null) return false; 
+
+        if (currentActivePet == null)
+        {
+            return false;
+        }
 
         IPetSheetData? petData = currentActivePet.PetData;
-        if (petData == null) return false;
+
+        if (petData == null)
+        {
+            return false;
+        }
 
         string? customName = currentActivePet.CustomName;
-        if (customName == null) return false;
+
+        if (customName == null)
+        {
+            return false;
+        }
 
         SetText(textNode, text, customName, petData);
+
         return true;
     }
 
@@ -55,5 +79,6 @@ internal unsafe class TargetTextHook : SimpleTextHook
         currentActivePet?.GetDrawColours(out edgeColour, out textColour);
     }
 
-    protected override IPettableUser? GetUser() => null;
+    protected override IPettableUser? GetUser() 
+        => null;
 }
