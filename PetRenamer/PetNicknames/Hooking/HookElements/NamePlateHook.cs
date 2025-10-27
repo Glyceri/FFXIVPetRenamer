@@ -48,7 +48,14 @@ internal class NamePlateHook : HookableElement
         {
             INamePlateUpdateHandler handler = handlers[i];
 
-            OnSpecificPlateUpdate(handler);
+            try
+            {
+                OnSpecificPlateUpdate(handler);
+            }
+            catch (Exception e)
+            {
+                DalamudServices.PluginLog.Error(e, "Exception in nameplate handler.");
+            }
         }
     }
 
