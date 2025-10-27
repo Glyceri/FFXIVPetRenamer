@@ -3,6 +3,8 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -38,7 +40,16 @@ internal class NamePlateHook : HookableElement
         for (int i = 0; i < size; i++)
         {
             INamePlateUpdateHandler handler = handlers[i];
-            OnSpecificPlateUpdate(handler);
+
+            try
+            {
+                OnSpecificPlateUpdate(handler);
+            }
+            catch(Exception e)
+            {
+                DalamudServices.PluginLog.Error(e, "Error occured when grabbing GameObject from nameplate service.");
+            }
+
         }
     }
 
