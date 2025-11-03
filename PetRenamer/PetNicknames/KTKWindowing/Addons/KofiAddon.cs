@@ -22,4 +22,7 @@ internal class KofiAddon : KTKAddon
 
     protected override bool HasPetBar
         => false;
+
+    public override string WindowTooltip
+        => "Ko-Fi Support";
 }

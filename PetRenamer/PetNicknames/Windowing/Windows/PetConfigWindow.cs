@@ -47,6 +47,7 @@ internal class PetConfigWindow : PetWindow
         {
             DrawBasicToggle(Translator.GetLine("Config.Kofi"),          ref Configuration.showKofiButton);
             DrawBasicToggle(Translator.GetLine("Config.Toggle"),        ref Configuration.quickButtonsToggle);
+            DrawBasicToggle(Translator.GetLine("Config.DrawDivider"),   ref Configuration.showDividingLine);
             DrawBasicToggle(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning);
 
             DrawMenu("List Button Type", _listIconTypes, ref Configuration.listButtonLayout);

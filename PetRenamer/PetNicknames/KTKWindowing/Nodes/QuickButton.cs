@@ -18,14 +18,14 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
     public QuickButton(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        IsVisible = true;
+        IsVisible         = true;
 
-        Button = new LightStylizedButton(PetServices)
+        Button            = new LightStylizedButton(PetServices)
         {
-            LabelText  = string.Empty,
-            IsVisible  = true,
-            IsSelected = WindowHandler.IsOpen<T>(),
-            OnClick    = () =>
+            LabelText     = string.Empty,
+            IsVisible     = true,
+            IsSelected    = WindowHandler.IsOpen<T>(),
+            OnClick       = () =>
             {
                 if (PetServices.Configuration.quickButtonsToggle )
                 {
@@ -42,6 +42,8 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
                 OnDirty();
             }
         };
+
+        Button.CollisionNode.Tooltip = windowHandler.GetAddon<T>()?.WindowTooltip ?? "If you see this something is cooked ...";
 
         AttachNode(ref Button);
     }

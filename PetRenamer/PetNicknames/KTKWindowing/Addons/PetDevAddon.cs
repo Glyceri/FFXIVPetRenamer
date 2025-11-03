@@ -22,4 +22,7 @@ internal class PetDevAddon : KTKAddon
 
     protected override bool HasPetBar
         => true;
+
+    public override string WindowTooltip
+        => "Window for the Development of Pet Nicknames c:";
 }

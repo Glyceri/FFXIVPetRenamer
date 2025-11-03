@@ -8,8 +8,6 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 
 internal abstract class StylizedListButton : TextureButtonNode
 {
-    private bool _enabled = false;
-
     protected readonly TextNode TextNode;
 
     private Vector2 disabledTextureCoordinates = Vector2.Zero;
@@ -57,7 +55,7 @@ internal abstract class StylizedListButton : TextureButtonNode
 
     private void UpdateButtonSelector()
     {
-        if (_enabled)
+        if (IsChecked)
         {
             TextureCoordinates = enabledTextureCoordinates;
         }
@@ -69,15 +67,15 @@ internal abstract class StylizedListButton : TextureButtonNode
 
     public bool IsSelected
     {
-        get => _enabled;
+        get => IsChecked;
         set
         {
-            if (_enabled == value)
+            if (IsChecked == value)
             {
                 return;
-            }    
+            }
 
-            _enabled = value;
+            IsChecked = value;
 
             UpdateButtonSelector();
         }

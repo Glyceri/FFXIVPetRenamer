@@ -46,6 +46,11 @@ internal class PetRenameNode : KTKComponent
         get => TextInputNode.SeString;
         set
         {
+            if (TextInputNode.FocusNode.IsVisible)
+            {
+                return;
+            }
+
             TextInputNode.SeString = value;
 
             // Fixes a bug where setting the string without focus doesnt clear the placeholder string

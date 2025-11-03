@@ -68,6 +68,21 @@ internal class KTKWindowHandler : IDisposable
         return false;
     }    
 
+    public KTKAddon? GetAddon<T>() where T : KTKAddon
+    {
+        foreach (KTKAddon addon in KTKWindows)
+        {
+            if (addon is not T)
+            {
+                continue;
+            }
+
+            return addon;
+        }
+
+        return null;
+    }
+
     public void Open<T>() where T : KTKAddon
     {
         foreach (KTKAddon addon in KTKWindows)

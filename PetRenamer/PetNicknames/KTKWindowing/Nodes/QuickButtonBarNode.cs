@@ -28,7 +28,7 @@ internal class QuickButtonBarNode : KTKComponent
             LabelText        = SeIconChar.ImeAlphanumeric,
             ShouldBeVisible  = () =>
             {
-                return ktkAddon is not PetRenameAddon || PetServices.Configuration.quickButtonsToggle;
+                return (ktkAddon is not PetRenameAddon) || PetServices.Configuration.quickButtonsToggle;
             }
         };
 
@@ -39,7 +39,7 @@ internal class QuickButtonBarNode : KTKComponent
             LabelText       = SeIconChar.Collectible,
             ShouldBeVisible = () =>
             {
-                return (ktkAddon is not PetListAddon) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 2);
+                return ((ktkAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 2);
             }
         };
 
@@ -50,7 +50,7 @@ internal class QuickButtonBarNode : KTKComponent
             LabelText       = SeIconChar.Glamoured,
             ShouldBeVisible = () =>
             {
-                return (ktkAddon is not PetListAddon) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 1);
+                return ((ktkAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 1);
             }
         };
 
@@ -72,7 +72,7 @@ internal class QuickButtonBarNode : KTKComponent
             LabelText       = SeIconChar.BoxedLetterK,
             ShouldBeVisible = () =>
             {
-                return (ktkAddon is not KofiAddon) && PetServices.Configuration.showKofiButton;
+                return PetServices.Configuration.showKofiButton;
             }
         };
 

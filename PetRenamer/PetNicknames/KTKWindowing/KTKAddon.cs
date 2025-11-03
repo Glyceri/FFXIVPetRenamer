@@ -1,6 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Addon;
-using KamiToolKit.Classes;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
@@ -27,6 +26,7 @@ internal abstract class KTKAddon : NativeAddon
     protected readonly IPettableDatabase      Database;
 
     protected abstract string  WindowInternalName { get; }
+    public    abstract string  WindowTooltip      { get; }
     protected abstract Vector2 WindowSize         { get; }
     protected abstract bool    HasPetBar          { get; }
 
@@ -74,6 +74,12 @@ internal abstract class KTKAddon : NativeAddon
 
         Vector2 contentRegionStartPos = ContentStartPosition;
         Vector2 contentRegionSize     = ContentSize;
+
+        WindowNode.TitleNode.SetEventFlags    = true;
+        WindowNode.SubtitleNode.SetEventFlags = true;
+
+        WindowNode.TitleNode.Tooltip    = WindowTooltip;
+        WindowNode.SubtitleNode.Tooltip = $"The current Pet Nicknames Version is: " + Subtitle.TextValue;
 
         if (HasPetBar)
         {

@@ -22,4 +22,7 @@ internal class PetListAddon : KTKAddon
 
     protected override bool HasPetBar
         => true;
+
+    public override string WindowTooltip
+        => "Pet List & Sharing";
 }

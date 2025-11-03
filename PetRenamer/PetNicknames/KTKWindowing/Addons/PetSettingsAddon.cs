@@ -21,4 +21,7 @@ internal class PetSettingsAddon : KTKAddon
 
     protected override bool HasPetBar
         => true;
+
+    public override string WindowTooltip
+        => "Settings";
 }

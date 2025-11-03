@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using KamiToolKit.Widgets;
+using KamiToolKit.Widgets.Parts;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -17,11 +19,14 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Addons;
 
 internal class PetRenameAddon : KTKAddon
 {
-    private PetImageNode?    ImageNode;
-    private PetFootstepIcon? FootstepNode;
-    private PetRenameNode?   PetRenameNode;
+    private PetImageNode?      ImageNode;
+    private PetFootstepIcon?   FootstepNode;
+    private PetRenameNode?     PetRenameNode;
 
-    private PetSkeleton?     CurrentSkeleton;
+    private PetSkeleton?       CurrentSkeleton;
+
+    private ColorPreviewNode?  TextColourPicker;
+    private ColorPreviewNode?  EdgeColourPicker;
 
     [SetsRequiredMembers]
     public PetRenameAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler) 
@@ -36,8 +41,13 @@ internal class PetRenameAddon : KTKAddon
     protected override bool HasPetBar
         => true;
 
+    public override string WindowTooltip
+        => "Pet Nicknames";
+
     protected override unsafe void OnAddonSetup(AtkUnitBase* addon)
     {
+        DirtyHandler.RegisterOnPlayerCharacterDirty(OnDirtyPlayer);
+
         ImageNode       = new PetImageNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size        = new Vector2(142, 142),
@@ -62,6 +72,30 @@ internal class PetRenameAddon : KTKAddon
         };
 
         AttachNode(ref PetRenameNode);
+
+        TextColourPicker = new ColorPreviewNode()
+        {
+            Position  = new Vector2(393, 0),
+            Size      = new Vector2(28, 28),
+            IsVisible = true,
+            Color     = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
+        };
+
+        AttachNode(ref TextColourPicker);
+
+
+        EdgeColourPicker = new ColorPreviewNode()
+        {
+            Position  = new Vector2(420, 0),
+            Size      = new Vector2(28, 28),
+            IsVisible = true,
+            Color     = new Vector4(0, 0, 0, 0.5f),
+        };
+
+        AttachNode(ref EdgeColourPicker);
+
+
+        SetData();
     }
 
     private void OnNameEditComplete(SeString finalName)
@@ -84,12 +118,12 @@ internal class PetRenameAddon : KTKAddon
         UserList.LocalPlayer.DataBaseEntry.SetName(CurrentSkeleton.Value, newCustomName, edgeColour, textColour);
     }
 
-    private void DirtyPlayerChar(IPettableUser player)
+    private void OnDirtyPlayer(IPettableUser player)
         => SetDirty();
 
     protected override unsafe void OnAddonFinalize(AtkUnitBase* addon)
     {
-        DirtyHandler.UnregisterOnPlayerCharacterDirty(DirtyPlayerChar);
+        DirtyHandler.UnregisterOnPlayerCharacterDirty(OnDirtyPlayer);
 
         ImageNode       = null;
         FootstepNode    = null;
@@ -98,6 +132,9 @@ internal class PetRenameAddon : KTKAddon
     }
 
     protected override void OnDirty()
+        => SetData();
+
+    private void SetData()
     {
         CurrentSkeleton = null;
 
@@ -135,7 +172,7 @@ internal class PetRenameAddon : KTKAddon
         }
         else
         {
-            CurrentSkeleton        = selectedPet.SkeletonID;
+            CurrentSkeleton = selectedPet.SkeletonID;
 
             IPetSheetData? petData = selectedPet.PetData;
 
@@ -144,8 +181,8 @@ internal class PetRenameAddon : KTKAddon
                 return;
             }
 
-            ImageNode.PetData    = petData;
-            FootstepNode.PetData = petData;
+            ImageNode.PetData      = petData;
+            FootstepNode.PetData   = petData;
 
             string? customNickname = UserList.LocalPlayer?.GetCustomName(petData);
 

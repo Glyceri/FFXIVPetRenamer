@@ -65,7 +65,11 @@ internal class PetBarNode : KTKComponent
         => DirtyHandler.DirtyPetMode(petMode);
 
     protected override void OnDirty()
-        => SetSelectedButton();
+    {
+        SetSelectedButton();
+
+        DividingLineNode.IsVisible = PetServices.Configuration.showDividingLine;
+    }
 
     private void SetSelectedButton()
     {
