@@ -17,7 +17,7 @@ internal class PetBarNode : KTKComponent
 
     private readonly QuickButtonBarNode      QuickButtonBarNode;
 
-    public PetBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
+    public PetBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon)
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         StylizedListButtonGroup = new StylizedListButtonGroup(petServices);
@@ -41,9 +41,11 @@ internal class PetBarNode : KTKComponent
             });
         }
 
-        QuickButtonBarNode = new QuickButtonBarNode(WindowHandler, DalamudServices, PetServices, DirtyHandler);
+        QuickButtonBarNode = new QuickButtonBarNode(WindowHandler, DalamudServices, PetServices, DirtyHandler, ktkAddon);
 
         AttachNode(ref QuickButtonBarNode);
+
+        SetSelectedButton();
 
         DividingLineNode       = new SimpleNineGridNode 
         {
@@ -63,9 +65,12 @@ internal class PetBarNode : KTKComponent
         => DirtyHandler.DirtyPetMode(petMode);
 
     protected override void OnDirty()
+        => SetSelectedButton();
+
+    private void SetSelectedButton()
     {
-        string                descriptionText = string.Empty;
-        DescriptionAttribute? description     = PetMode.GetAttribute<DescriptionAttribute>();
+        string descriptionText = string.Empty;
+        DescriptionAttribute? description = PetMode.GetAttribute<DescriptionAttribute>();
 
         if (description != null)
         {

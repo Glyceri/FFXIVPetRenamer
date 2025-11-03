@@ -18,7 +18,8 @@ internal class KTKComponent : SimpleComponentNode
 
     protected readonly NativeController NativeController;
 
-    protected PetWindowMode PetMode { get; private set; }
+    protected PetWindowMode PetMode
+        => KTKAddon.PetMode;
 
     public KTKComponent(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
     {
@@ -67,11 +68,7 @@ internal class KTKComponent : SimpleComponentNode
         => Dirty();
 
     private void HandleDirtyPetmode(PetWindowMode petMode)
-    {
-        PetMode = petMode;
-
-        Dirty();
-    }
+        => Dirty();
 
     private void HandleDirtyWindow()
         => Dirty();

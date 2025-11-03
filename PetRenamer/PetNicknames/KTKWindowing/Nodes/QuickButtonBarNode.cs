@@ -1,146 +1,135 @@
 ﻿using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit.Classes;
-using KamiToolKit.Nodes;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
-using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
 internal class QuickButtonBarNode : KTKComponent
 {
-    // PET DEV      SeIconChar.Hexagon
-    // KOFI         SeIconChar.Gil
-    // SETTINGS     SeIconChar.BoxedQuestionMark
-    // SHARE        SeIconChar.Glamoured
-    // LIST         SeIconChar.Collectable
-    // RENAME       SeIconChar.ImeAlphanumeric
+    private readonly QuickButton<PetRenameAddon>    PetRenameQuickButton;
+    private readonly QuickButton<PetListAddon>      PetListQuickButton;
+    private readonly QuickButton<PetListAddon>      SharingQuickButton;
+    private readonly QuickButton<PetSettingsAddon>  ConfigQuickButton;
+    private readonly QuickButton<KofiAddon>         KofiQuickButton;
+    private readonly QuickButton<PetDevAddon>       PetDevQuickButton;
 
-    private readonly List<StylizedListButton> _buttons = [];
+    private float widthOffset = 0;
 
-    private readonly AlignedHorizontalListNode HolderNode;
-
-    public QuickButtonBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+    public QuickButtonBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon) 
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         IsVisible     = true;
 
-        HolderNode    = new AlignedHorizontalListNode
+        PetRenameQuickButton = new QuickButton<PetRenameAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Alignment        = HorizontalListAnchor.Right,
-            ItemSpacing      = -4f,
-            FirstItemSpacing = 4f,
-            IsVisible        = true
+            LabelText        = SeIconChar.ImeAlphanumeric,
+            ShouldBeVisible  = () =>
+            {
+                return ktkAddon is not PetRenameAddon || PetServices.Configuration.quickButtonsToggle;
+            }
         };
 
-        AttachNode(ref HolderNode);
+        AttachNode(ref PetRenameQuickButton);
 
-        RefreshList();
+        PetListQuickButton  = new QuickButton<PetListAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            LabelText       = SeIconChar.Collectible,
+            ShouldBeVisible = () =>
+            {
+                return (ktkAddon is not PetListAddon) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 2);
+            }
+        };
+
+        AttachNode(ref PetListQuickButton);
+
+        SharingQuickButton  = new QuickButton<PetListAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            LabelText       = SeIconChar.Glamoured,
+            ShouldBeVisible = () =>
+            {
+                return (ktkAddon is not PetListAddon) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 1);
+            }
+        };
+
+        AttachNode(ref SharingQuickButton);
+
+        ConfigQuickButton   = new QuickButton<PetSettingsAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            LabelText       = SeIconChar.BoxedQuestionMark,
+            ShouldBeVisible = () =>
+            {
+                return (ktkAddon is not PetSettingsAddon) || PetServices.Configuration.quickButtonsToggle;
+            }
+        };
+
+        AttachNode(ref ConfigQuickButton);
+
+        KofiQuickButton     = new QuickButton<KofiAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            LabelText       = SeIconChar.BoxedLetterK,
+            ShouldBeVisible = () =>
+            {
+                return (ktkAddon is not KofiAddon) && PetServices.Configuration.showKofiButton;
+            }
+        };
+
+        AttachNode(ref KofiQuickButton);
+
+        PetDevQuickButton   = new QuickButton<PetDevAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            LabelText       = SeIconChar.Hexagon,
+            ShouldBeVisible = () =>
+            {
+                return PetServices.Configuration.debugModeActive;
+            }
+        };
+
+        AttachNode(ref PetDevQuickButton);
     }
 
-    private void ClearList()
+    private void SetPosition<T>(QuickButton<T> button) where T : KTKAddon
     {
-        HolderNode.Clear();
+        button.X     = widthOffset;
 
-        _buttons.Clear();
-    }
-
-    private void RefreshList()
-    {
-        if (!IsVisible)
+        if (!button.IsActive)
         {
             return;
         }
 
-        ClearList();
-
-        AddButton<PetRenameAddon>(SeIconChar.Hexagon);
-        AddButton<PetRenameAddon>(SeIconChar.BoxedLetterK);
-        AddButton<PetSettingsAddon>(SeIconChar.BoxedQuestionMark);
-        AddButton<PetRenameAddon>(SeIconChar.Glamoured);
-        AddButton<PetRenameAddon>(SeIconChar.Collectible);
-        AddButton<PetRenameAddon>(SeIconChar.ImeAlphanumeric);
-
-        RecalculateList();
+        widthOffset -= button.Width * 0.85f;
     }
 
-    private void AddButton<T>(SeIconChar icon) where T : KTKAddon
+    private void HandlePositions()
     {
-        StylizedListButton button = AddButton(icon.ToIconString(), () =>
-        {
-            if (PetServices.Configuration.quickButtonsToggle)
-            {
-                WindowHandler.Toggle<T>();
-            }
-            else
-            {
-                WindowHandler.Open<T>();
-            }
+        widthOffset = Width - PetRenameQuickButton.Width;
 
-            DirtyHandler.DirtyWindow();
-        });
-
-        button.IsSelected = WindowHandler.IsOpen<T>();
-    }
-
-    private void RecalculateList()
-    {
-        float size = Height * 1.3f;
-
-        int buttonCount = _buttons.Count;
-
-        for (int i = 0; i < buttonCount; i++)
-        {
-            StylizedListButton button = _buttons[i];
-
-            button.Size = new Vector2(size, Height);
-        }
-
-        HolderNode.RecalculateLayout();
-    }
-
-    private void ClickHandler(StylizedListButton button)
-    {
-
-    }
-
-    public StylizedListButton AddButton(SeString label, Action callback)
-    {
-        StylizedListButton newButton = new LightStylizedButton(PetServices)
-        {
-            LabelText = label,
-        };
-
-        newButton.AddEvent(AtkEventType.ButtonClick, () =>
-        {
-            ClickHandler(newButton);
-
-            callback();
-        });
-
-        _buttons.Add(newButton);
-
-        HolderNode.AddNode(newButton);
-
-        return newButton;
+        SetPosition(PetRenameQuickButton);
+        SetPosition(PetListQuickButton);
+        SetPosition(SharingQuickButton);
+        SetPosition(ConfigQuickButton);
+        SetPosition(KofiQuickButton);
+        SetPosition(PetDevQuickButton);
     }
 
     protected override void OnDirty()
-        => RefreshList();
+        => HandlePositions();
 
     protected override void OnSizeChanged()
     {
         base.OnSizeChanged();
 
-        HolderNode.Size = Size;
+        float width = Height * 1.3f;
 
-        RecalculateList();
+        PetRenameQuickButton.Size = new Vector2(width, Height);
+        PetListQuickButton.Size   = new Vector2(width, Height);
+        SharingQuickButton.Size   = new Vector2(width, Height);
+        ConfigQuickButton.Size    = new Vector2(width, Height);
+        KofiQuickButton.Size      = new Vector2(width, Height);
+        PetDevQuickButton.Size    = new Vector2(width, Height);
+
+        HandlePositions();
     }
 }

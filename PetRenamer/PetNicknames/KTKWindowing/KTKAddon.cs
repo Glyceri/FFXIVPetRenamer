@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Addon;
+using KamiToolKit.Classes;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
@@ -32,7 +33,7 @@ internal abstract class KTKAddon : NativeAddon
     protected virtual  string? WindowSubtitle     { get; }
 
     protected SimpleComponentNode? MainContainerNode { get; private set; }
-    protected PetWindowMode        PetMode           { get; private set; }
+    internal  static PetWindowMode PetMode           { get; private set; }
 
     private PetBarNode? PetBarNode;
 
@@ -76,7 +77,7 @@ internal abstract class KTKAddon : NativeAddon
 
         if (HasPetBar)
         {
-            PetBarNode = new PetBarNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+            PetBarNode = new PetBarNode(WindowHandler, DalamudServices, PetServices, DirtyHandler, this)
             {
                 Position  = ContentStartPosition,
                 Size      = new Vector2(ContentSize.X, PetBarOffset),
@@ -158,6 +159,8 @@ internal abstract class KTKAddon : NativeAddon
         MainContainerNode = null;
 
         OnAddonFinalize(addon);
+
+        DirtyHandler.DirtyWindow();
     }
 
     protected sealed override unsafe void OnUpdate(AtkUnitBase* addon)

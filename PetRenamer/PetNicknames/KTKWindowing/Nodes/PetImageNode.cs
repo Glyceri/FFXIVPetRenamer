@@ -41,9 +41,6 @@ internal class PetImageNode : KTKComponent
         OnDataUpdate();
     }
 
-    protected override void OnDirty()
-        => OnDataUpdate();
-
     private void OnDataUpdate()
     {
         if (_data == null)
@@ -77,11 +74,6 @@ internal class PetImageNode : KTKComponent
         get => _data;
         set
         {
-            if (_data == value)
-            {
-                return;
-            }
-
             _data = value;
 
             OnDataUpdate();

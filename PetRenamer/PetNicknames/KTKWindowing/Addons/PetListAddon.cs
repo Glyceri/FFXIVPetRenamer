@@ -7,14 +7,15 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Addons;
-internal class PetSettingsAddon : KTKAddon
+
+internal class PetListAddon : KTKAddon
 {
     [SetsRequiredMembers]
-    public PetSettingsAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
+    public PetListAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
     protected override string WindowInternalName
-        => nameof(PetSettingsAddon);
+        => nameof(PetListAddon);
 
     protected override Vector2 WindowSize
         => new Vector2(520, 200);

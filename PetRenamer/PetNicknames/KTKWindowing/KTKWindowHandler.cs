@@ -21,7 +21,11 @@ internal class KTKWindowHandler : IDisposable
 
     private readonly List<KTKAddon> KTKWindows = [];
 
-    private readonly PetRenameAddon PetRenameKTKWindow;
+    private readonly PetRenameAddon   PetRenameKTKWindow;
+    private readonly PetSettingsAddon PetSettingsAddon;
+    private readonly PetListAddon     PetListAddon;
+    private readonly KofiAddon        KofiAddon;
+    private readonly PetDevAddon      PetDevAddon;
 
     public KTKWindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase, PettableDirtyHandler dirtyHandler)
     {
@@ -33,9 +37,13 @@ internal class KTKWindowHandler : IDisposable
         DirtyHandler    = dirtyHandler;
 
         RegisterWindow(PetRenameKTKWindow = new PetRenameAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(new PetSettingsAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetSettingsAddon   = new PetSettingsAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetListAddon       = new PetListAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(KofiAddon          = new KofiAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetDevAddon        = new PetDevAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
 
         PetRenameKTKWindow.Open();
+        PetSettingsAddon.Open();
 
         dirtyHandler.DirtyPetMode(PetWindowMode.Minion);
     }
@@ -69,8 +77,10 @@ internal class KTKWindowHandler : IDisposable
                 continue;
             }
 
-            _ = DalamudServices.Framework.RunOnFrameworkThread(addon.Open);
+            addon.Open();
         }
+
+        DirtyHandler.DirtyWindow();
     }
 
     public void Close<T>() where T : KTKAddon
@@ -82,8 +92,10 @@ internal class KTKWindowHandler : IDisposable
                 continue;
             }
 
-            _ = DalamudServices.Framework.RunOnFrameworkThread(addon.Close);
+            addon.Close();
         }
+
+        DirtyHandler.DirtyWindow();
     }
 
     public void Toggle<T>() where T : KTKAddon
@@ -95,15 +107,17 @@ internal class KTKWindowHandler : IDisposable
                 continue;
             }
 
-            _ = DalamudServices.Framework.RunOnFrameworkThread(addon.Toggle);
+            addon.Toggle();
         }
+
+        DirtyHandler.DirtyWindow();
     }
 
     public void Dispose()
     {
         foreach (KTKAddon window in KTKWindows)
         {
-            _ = DalamudServices.Framework.RunOnFrameworkThread(window.Dispose);
+            window.Dispose(); 
         }
 
         KTKWindows.Clear();

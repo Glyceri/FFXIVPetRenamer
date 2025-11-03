@@ -37,7 +37,7 @@ internal class PetRenameNode : KTKComponent
     {
         base.OnSizeChanged();
 
-        TextInputNode.Size = new Vector2(Width - 5.0f, Height);
+        TextInputNode.Size     = new Vector2(Width - 5.0f, Height);
         TextInputNode.Position = new Vector2(0.0f, 0.0f);
     }
 

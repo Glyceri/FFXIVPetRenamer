@@ -28,7 +28,7 @@ internal class PetRenameAddon : KTKAddon
         : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
     protected override string WindowInternalName
-        => "PetRenameAddon";
+        => nameof(PetRenameAddon);
 
     protected override Vector2 WindowSize
         => new Vector2(520, 200);
@@ -38,8 +38,6 @@ internal class PetRenameAddon : KTKAddon
 
     protected override unsafe void OnAddonSetup(AtkUnitBase* addon)
     {
-        DirtyHandler.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
-
         ImageNode       = new PetImageNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size        = new Vector2(142, 142),
