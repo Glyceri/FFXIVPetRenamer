@@ -1,4 +1,6 @@
-﻿using PetRenamer.Legacy.LegacyStepper;
+﻿using Dalamud.Plugin;
+using KamiToolKit;
+using PetRenamer.Legacy.LegacyStepper;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers;
@@ -16,17 +18,19 @@ internal class PetServices : IPetServices
     public IPetActionHelper PetActionHelper   { get; }
     public ITargetManager   TargetManager     { get; }
     public IPluginWatcher   PluginWatcher     { get; }
+    public NativeController NativeController  { get; }
 
-    public PetServices(DalamudServices services, IPettableUserList userList) 
+    public PetServices(IDalamudPluginInterface pluginInterface, DalamudServices services, IPettableUserList userList) 
     {
-        PetLog          = new PetLogWrapper(services.PluginLog);
-        Configuration   = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
-        StringHelper    = new StringHelperWrapper(this);
-        PetSheets       = new SheetsWrapper(ref services, StringHelper);
-        PetCastHelper   = new PetCastWrapper();
-        PetActionHelper = new PetActionWrapper();
-        TargetManager   = new TargetManagerWrapper(services, userList);
-        PluginWatcher   = new PluginWatcher(services);
+        PetLog           = new PetLogWrapper(services.PluginLog);
+        Configuration    = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
+        StringHelper     = new StringHelperWrapper(this);
+        PetSheets        = new SheetsWrapper(ref services, StringHelper);
+        PetCastHelper    = new PetCastWrapper();
+        PetActionHelper  = new PetActionWrapper();
+        TargetManager    = new TargetManagerWrapper(services, userList);
+        PluginWatcher    = new PluginWatcher(services);
+        NativeController = new NativeController(pluginInterface);
 
         CheckConfigFailure();
     }
@@ -43,6 +47,7 @@ internal class PetServices : IPetServices
 
     public void Dispose()
     {
+        NativeController?.Dispose();
         PluginWatcher?.Dispose();
     }
 }

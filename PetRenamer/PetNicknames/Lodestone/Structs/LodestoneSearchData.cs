@@ -4,47 +4,52 @@ namespace PetRenamer.PetNicknames.Lodestone.Structs;
 
 public struct LodestoneSearchData
 {
-    public string? lodestoneID { get; private set; }
-    public string? imageURL { get; private set; }
-    public string? name { get; private set; }
-    public string? homeworld { get; private set; }
+    public string? LodestoneID { get; private set; }
+    public string? ImageURL    { get; private set; }
+    public string? Name        { get; private set; }
+    public string? Homeworld   { get; private set; }
 
-    public new string ToString() => $"Name: {name}\nHome World: {homeworld}\nLodestone ID: {lodestoneID}\nImage URL: {imageURL}";
-
-    public LodestoneSearchData()
+    public LodestoneSearchData(HtmlNode baseNode)
     {
-        lodestoneID = string.Empty;
-        imageURL = string.Empty;
-        name = string.Empty;
-        homeworld = string.Empty;
+        Parse(baseNode);
     }
 
-    public LodestoneSearchData(string lodestoneID, string imageURL, string name, string homeworld)
-    {
-        this.name = name;
-        this.homeworld = homeworld;
-        this.lodestoneID = lodestoneID;
-        this.imageURL = imageURL;
-    }
-
-    public LodestoneSearchData(HtmlNode baseNode) => Parse(baseNode);
-
-    void Parse(HtmlNode baseNode)
+    private void Parse(HtmlNode baseNode)
     {
         foreach (HtmlNode node in baseNode.ChildNodes)
         {
-            if (node.HasClass("entry__link")) lodestoneID = node.GetAttributeValue("href", "");
+            if (node.HasClass("entry__link"))
+            {
+                LodestoneID = node.GetAttributeValue("href", string.Empty);
+            }
+
             if (node.HasClass("entry__chara__face"))
             {
                 if (node.ChildNodes.Count != 0)
                 {
                     HtmlNode img = node.ChildNodes[0];
-                    if (img != null) imageURL = img.GetAttributeValue("src", "");
+
+                    if (img != null)
+                    {
+                        ImageURL = img.GetAttributeValue("src", string.Empty);
+                    }
                 }
             }
-            if (node.HasClass("entry__name")) name = node.InnerText;
-            if (node.HasClass("entry__world")) homeworld = node.InnerText;
+
+            if (node.HasClass("entry__name"))
+            {
+                Name = node.InnerText;
+            }
+
+            if (node.HasClass("entry__world"))
+            {
+                Homeworld = node.InnerText;
+            }
+
             Parse(node);
         }
     }
+
+    public override string ToString()
+        => $"Name: {Name}\nHome World: {Homeworld}\nLodestone ID: {LodestoneID}\nImage URL: {ImageURL}";
 }

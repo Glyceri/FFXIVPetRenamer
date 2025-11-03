@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Commands.Interfaces;
+using PetRenamer.PetNicknames.KTKWindowing;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 
@@ -7,28 +8,30 @@ namespace PetRenamer.PetNicknames.Commands.Commands.Base;
 internal abstract class Command : ICommand
 {
     public abstract string Description { get; }
-    public abstract bool ShowInHelp { get; }
+    public abstract bool   ShowInHelp { get; }
     public abstract string CommandCode { get; }
 
-    public abstract void OnCommand(string command, string args);
+    protected readonly DalamudServices  DalamudServices;
+    protected readonly IWindowHandler   WindowHandler;
+    protected readonly KTKWindowHandler KTKWindowHandler;
 
-    protected readonly DalamudServices DalamudServices;
-    protected readonly IWindowHandler WindowHandler;
-
-    public Command(DalamudServices dalamudServices, IWindowHandler windowHandler)
+    public Command(DalamudServices dalamudServices, IWindowHandler windowHandler, KTKWindowHandler ktkWindowHandler)
     {
-        DalamudServices = dalamudServices;
-        WindowHandler = windowHandler;
+        DalamudServices  = dalamudServices;
+        WindowHandler    = windowHandler;
+        KTKWindowHandler = ktkWindowHandler;
 
-        DalamudServices.CommandManager.AddHandler(CommandCode, new Dalamud.Game.Command.CommandInfo(OnCommand)
+        _ = DalamudServices.CommandManager.AddHandler(CommandCode, new Dalamud.Game.Command.CommandInfo(OnCommand)
         {
             HelpMessage = Description,
-            ShowInHelp = ShowInHelp,
+            ShowInHelp  = ShowInHelp,
         });
     }
 
+    public abstract void OnCommand(string command, string args);
+
     public void Dispose()
     {
-        DalamudServices.CommandManager.RemoveHandler(CommandCode);
+        _ = DalamudServices.CommandManager.RemoveHandler(CommandCode);
     }
 }

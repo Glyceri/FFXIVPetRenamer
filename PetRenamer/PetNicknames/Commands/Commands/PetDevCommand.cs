@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Commands.Commands.Base;
+using PetRenamer.PetNicknames.KTKWindowing;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -7,22 +8,30 @@ namespace PetRenamer.PetNicknames.Commands.Commands;
 
 internal class PetDevCommand : Command
 {
-    readonly Configuration Configuration;
+    private readonly Configuration Configuration;
 
-    public PetDevCommand(DalamudServices dalamudServices, Configuration configuration, IWindowHandler windowHandler) : base(dalamudServices, windowHandler) 
+    public PetDevCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, KTKWindowHandler ktkWindowHandler, Configuration configuration) 
+        : base(dalamudServices, windowHandler, ktkWindowHandler) 
     { 
         Configuration = configuration;
     }
 
-    public override string CommandCode { get; } = "/petdev";
-    public override string Description { get; } = "Opens the Pet Dev Window";
-    public override bool ShowInHelp { get; } = false;
+    public override string CommandCode 
+        => "/petdev";
+
+    public override string Description 
+        => "Opens the Pet Dev Window";
+
+    public override bool ShowInHelp 
+        => false;
 
     public override void OnCommand(string command, string args)
     {
-        if (Configuration.debugModeActive)
+        if (!Configuration.debugModeActive)
         {
-            WindowHandler.Open<PetDevWindow>();
+            return;
         }
+
+        WindowHandler.Open<PetDevWindow>();
     }
 }

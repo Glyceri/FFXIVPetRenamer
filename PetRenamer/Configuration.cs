@@ -12,21 +12,17 @@ namespace PetRenamer;
 [Serializable]
 internal class Configuration : IPluginConfiguration
 {
-    [JsonIgnore]
-    public const int currentSaveFileVersion = 11;
+    [JsonIgnore] public const int                 currentSaveFileVersion = 11;
 
-    [JsonIgnore]
-    private IDalamudPluginInterface? PetNicknamesPlugin;
-    [JsonIgnore]
-    private IPettableDatabase? Database = null;
-    [JsonIgnore]
-    private ILegacyDatabase? LegacyDatabase = null;
-    [JsonIgnore]
-    private IPetServices? PetServices = null;
-    [JsonIgnore]
-    private bool isSetup = false;
+    [JsonIgnore] private IDalamudPluginInterface? PetNicknamesPlugin;
+    [JsonIgnore] private IPettableDatabase?       Database               = null;
+    [JsonIgnore] private ILegacyDatabase?         LegacyDatabase         = null;
+    [JsonIgnore] private IPetServices?            PetServices            = null;
+    [JsonIgnore] private IPettableDirtyCaller?    DirtyCaller            = null;
+    [JsonIgnore] private bool                     isSetup                = false;
 
-    public int Version { get; set; } = currentSaveFileVersion;
+    public int Version { get; set; } 
+        = currentSaveFileVersion;
 
     public SerializableUserV6[]? SerializableUsersV6 { get; set; } = null;
 
@@ -52,11 +48,11 @@ internal class Configuration : IPluginConfiguration
     public bool showOnPartyList = true;
     public bool showOnIslandPets = true;
     // --------------------------- UI SETTINGS ---------------------------
-    public bool showKofiButton = true;
-    public bool quickButtonsToggle = true;
-    public int listButtonLayout = 0;
-    public int minionIconType = 1;
-    public bool showIslandWarning = true;
+    public bool showKofiButton      = true;
+    public bool quickButtonsToggle  = true;
+    public int  listButtonLayout    = 0;
+    public int  minionIconType      = 1;
+    public bool showIslandWarning   = true;
 
     // ------------------------ PENUMBRA SETTINGS ------------------------
     public bool attachToPCP = true;
@@ -67,13 +63,14 @@ internal class Configuration : IPluginConfiguration
     public bool openDebugWindowOnStart = false;
     public bool debugShowChatCode      = false;
 
-    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
+    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyCaller dirtyCaller)
     {
         this.PetNicknamesPlugin = PetNicknamesPlugin;
 
         Database        = database;
         LegacyDatabase  = legacyDatabase;
         PetServices     = petServices;
+        DirtyCaller     = dirtyCaller;
 
         LegacyInitialise();
         CurrentInitialise();
@@ -104,6 +101,8 @@ internal class Configuration : IPluginConfiguration
         try
         {
             PetNicknamesPlugin?.SavePluginConfig(this);
+
+            DirtyCaller?.DirtyConfiguration(this);
         }
         catch (Exception ex)
         {

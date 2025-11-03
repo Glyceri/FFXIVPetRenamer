@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 using PetRenamer.PetNicknames.Windowing.Components.Texture;
 using System.Numerics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.KTKWindowing.Addons;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Image;
 

@@ -25,6 +25,7 @@ using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
 using System.Reflection;
+using PetRenamer.PetNicknames.KTKWindowing;
 
 namespace PetRenamer;
 
@@ -40,6 +41,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     private readonly ILegacyDatabase        LegacyDatabase;
     private readonly IImageDatabase         ImageDatabase;
     private readonly IWindowHandler         WindowHandler;
+    private readonly KTKWindowHandler       KTKWindowHandler;
     private readonly IDataParser            DataParser;
     private readonly IDataWriter            DataWriter;
     private readonly IpcProvider            IpcProvider;
@@ -66,7 +68,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         PettableUserList            = new PettableUserList();
 
-        PetServices                 = new PetServices(DalamudServices, PettableUserList);
+        PetServices                 = new PetServices(dalamud, DalamudServices, PettableUserList);
 
         SharingDictionary           = new SharingDictionary(DalamudServices);
 
@@ -95,11 +97,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList);
 
         WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
+        KTKWindowHandler            = new KTKWindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, DirtyHandler);
 
-        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, PetServices, PettableUserList, PettableDatabase);
+        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, KTKWindowHandler, PetServices, PettableUserList);
         ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
 
-        PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
+        PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices, DirtyHandler);
     }
 
     public void Dispose()
@@ -115,6 +118,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ChatHandler?.Dispose();
         CommandHandler?.Dispose();
         WindowHandler?.Dispose();
+        KTKWindowHandler?.Dispose();
         SaveHandler.Dispose();
         PetServices?.Dispose();
     }

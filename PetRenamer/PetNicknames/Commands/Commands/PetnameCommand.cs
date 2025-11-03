@@ -1,13 +1,14 @@
 ﻿using Dalamud.Utility;
 using PetRenamer.PetNicknames.Commands.Commands.Base;
 using PetRenamer.PetNicknames.Commands.Exceptions;
+using PetRenamer.PetNicknames.KTKWindowing;
+using PetRenamer.PetNicknames.KTKWindowing.Addons;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -23,21 +24,25 @@ internal partial class PetnameCommand : Command
 {
     private readonly IPetServices      PetServices;
     private readonly IPettableUserList UserList;
-    private readonly IPettableDatabase Database;
 
     private IPettableDatabaseEntry? activeEntry;
     private IPetSheetData?          activeData;
 
-    public PetnameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, windowHandler) 
+    public PetnameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, KTKWindowHandler ktkWindowHandler, IPetServices petServices, IPettableUserList userList) 
+        : base(dalamudServices, windowHandler, ktkWindowHandler) 
     {
         PetServices = petServices;
         UserList    = userList;
-        Database    = database;
     }
 
-    public override string CommandCode  { get; }    = "/petname";
-    public override string Description  { get; }    = Translator.GetLine("Command.Petname");
-    public override bool   ShowInHelp   { get; }    = true;
+    public override string CommandCode 
+        => "/petname";
+
+    public override string Description 
+        => Translator.GetLine("Command.Petname");
+
+    public override bool ShowInHelp
+        => true;
 
     private const string        CUSTOM_TAG          = "[custom]";
     private       string        lastCommandPart     = string.Empty;
@@ -49,6 +54,8 @@ internal partial class PetnameCommand : Command
         if (args.IsNullOrWhitespace())
         {
             WindowHandler.Open<PetRenameWindow>();
+            KTKWindowHandler.Open<PetRenameAddon>();
+
             return;
         }
 

@@ -65,7 +65,7 @@ internal class ImageDownloader : IImageDownloader
     {
         try
         {
-            string? URL = searchData.imageURL;
+            string? URL = searchData.ImageURL;
             if (string.IsNullOrEmpty(URL)) throw new NullReferenceException(URL);
 
             string filePath = GetFilePath(entry);
