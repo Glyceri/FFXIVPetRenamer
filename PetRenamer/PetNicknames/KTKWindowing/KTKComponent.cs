@@ -1,6 +1,8 @@
-﻿using KamiToolKit;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using KamiToolKit;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
+using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -54,6 +56,9 @@ internal class KTKComponent : SimpleComponentNode
 
     protected virtual void OnDirty() { }
     protected virtual void OnDispose() { }
+
+    public virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+        => false;
 
     protected void AttachNode<T>(ref T node) where T : NodeBase
         => NativeController.AttachNode(node, this);

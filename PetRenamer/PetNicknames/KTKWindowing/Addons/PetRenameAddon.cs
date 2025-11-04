@@ -1,7 +1,7 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit.Widgets;
+using KamiToolKit.Nodes;
 using KamiToolKit.Widgets.Parts;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.PettableDatabase;
@@ -28,6 +28,14 @@ internal class PetRenameAddon : KTKAddon
     private ColorPreviewNode?  TextColourPicker;
     private ColorPreviewNode?  EdgeColourPicker;
 
+    private NineGridNode?      NineGridNode;
+
+    private FocusableButtonNode? FocusableButtonNode1;
+    private FocusableButtonNode? FocusableButtonNode2;
+    private FocusableButtonNode? FocusableButtonNode3;
+    private FocusableButtonNode? FocusableButtonNode4;
+    private FocusableButtonNode? FocusableButtonNode5;
+
     [SetsRequiredMembers]
     public PetRenameAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler) 
         : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
@@ -47,6 +55,24 @@ internal class PetRenameAddon : KTKAddon
     protected override unsafe void OnAddonSetup(AtkUnitBase* addon)
     {
         DirtyHandler.RegisterOnPlayerCharacterDirty(OnDirtyPlayer);
+
+
+
+        NineGridNode           = new SimpleNineGridNode
+        {
+            IsVisible          = true,
+            TexturePath        = "ui/uld/BgParts.tex",
+            Position           = new Vector2(200, 35),
+            Size               = new Vector2(200, 100),
+            TextureCoordinates = new Vector2(61, 37),
+            TextureSize        = new Vector2(16, 16),
+            TopOffset          = 6,
+            BottomOffset       = 6,
+            LeftOffset         = 6,
+            RightOffset        = 6,
+        };
+        
+        AttachNode(ref NineGridNode);
 
         ImageNode       = new PetImageNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
@@ -94,6 +120,55 @@ internal class PetRenameAddon : KTKAddon
 
         AttachNode(ref EdgeColourPicker);
 
+
+        
+
+        FocusableButtonNode1 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Index = 1,
+        };
+
+        AttachNode(ref FocusableButtonNode1);
+
+        addon->FocusNode = FocusableButtonNode1.TextureButtonNode;
+        addon->CursorTarget = FocusableButtonNode1.TextureButtonNode.CollisionNode;
+
+        FocusableButtonNode2 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(90, 0),
+            Index = 2,
+        };
+
+        AttachNode(ref FocusableButtonNode2);
+
+        FocusableButtonNode3 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(180, 0),
+            Index = 3,
+        };
+
+        AttachNode(ref FocusableButtonNode3);
+
+        FocusableButtonNode4 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(270, 0),
+            Index = 4,
+        };
+
+        AttachNode(ref FocusableButtonNode4);
+
+        FocusableButtonNode5 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(360, 0),
+            Index = 5,
+        };
+
+        AttachNode(ref FocusableButtonNode5);
 
         SetData();
     }

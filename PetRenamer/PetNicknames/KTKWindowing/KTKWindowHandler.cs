@@ -43,7 +43,7 @@ internal class KTKWindowHandler : IDisposable
         RegisterWindow(PetDevAddon        = new PetDevAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
 
         PetRenameKTKWindow.Open();
-        PetSettingsAddon.Open();
+        //PetSettingsAddon.Open();
 
         dirtyHandler.DirtyPetMode(PetWindowMode.Minion);
     }

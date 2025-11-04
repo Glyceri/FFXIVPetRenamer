@@ -1,4 +1,6 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System;
 
@@ -14,6 +16,7 @@ internal interface IPettableDirtyListener
     public void RegisterOnConfigurationDirty(Action<Configuration> configuration);
     public void RegisterOnPetModeDirty(Action<PetWindowMode> petWindowMode);
     public void RegisterOnWindowDirty(Action windowDirty);
+    public void RegisterOnDirtyNavigation(NavigationDirty dirtyNavigation);
 
     public void UnregisterOnDirtyName(Action<INamesDatabase> onNamesDatabase);
     public void UnregisterOnDirtyEntry(Action<IPettableDatabaseEntry> onEntry);
@@ -23,4 +26,8 @@ internal interface IPettableDirtyListener
     public void UnregisterOnConfigurationDirty(Action<Configuration> configuration);
     public void UnregisterOnPetModeDirty(Action<PetWindowMode> petWindowMode);
     public void UnregisterOnWindowDirty(Action windowDirty);
+    public void UnregisterOnDirtyNavigation(NavigationDirty dirtyNavigation);
+
+    public delegate bool NavigationDirty(nint atkUnitBase, NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState);
+
 }

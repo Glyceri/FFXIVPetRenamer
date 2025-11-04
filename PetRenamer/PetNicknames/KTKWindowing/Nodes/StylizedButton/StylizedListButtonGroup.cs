@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit.Nodes;
+using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.PettableDatabase;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -9,22 +11,68 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 
-internal class StylizedListButtonGroup : SimpleComponentNode
+internal class StylizedListButtonGroup : KTKComponent
 {
-    private readonly IPetServices PetServices;
-
     private readonly List<StylizedListButton> _buttons = [];
 
-    public StylizedListButtonGroup(IPetServices petServices)
+    private int currentIndex = 0;
+
+    public StylizedListButtonGroup(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        PetServices = petServices;
-        IsVisible   = true;
+        IsVisible = true;
     }
 
     public StylizedListButton[] Buttons
         => [.. _buttons];
 
-    private void RecalculateLayout()
+    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+    {
+        if (inputState != AtkEventData.AtkInputData.InputState.Down)
+        {
+            return false;
+        }
+
+        if (inputId != NavigationInputId.LB && inputId != NavigationInputId.RB) 
+        {
+            return false; 
+        }
+
+        if (_buttons.Count == 0) 
+        {
+            return false;
+        }
+
+        int newIndex = currentIndex;
+
+        if (inputId == NavigationInputId.LB)
+        {
+            newIndex--;
+        }
+        else if (inputId == NavigationInputId.RB)
+        {
+            newIndex++;
+        }
+
+        int min = 0;
+        int max = _buttons.Count - 1;
+
+        if (newIndex < min)
+        {
+            newIndex = max;
+        }
+
+        if (newIndex > max)
+        {
+            newIndex = min;
+        }
+
+        ClickButton(newIndex);
+
+        return true;
+    }
+
+    private unsafe void RecalculateLayout()
     {
         float size = Width / _buttons.Count;
 
@@ -36,10 +84,41 @@ internal class StylizedListButtonGroup : SimpleComponentNode
 
             button.Size     = new Vector2(size, Height);
             button.Position = new Vector2(i * size * 0.89f, 0);
+
+            button.CollisionNode.LinkedComponent->ComponentFlags = 1;
+            (&button.InternalComponentNode->Component->CursorNavigationInfo)->CursorType = 3;
+            (&button.InternalComponentNode->Component->CursorNavigationInfo)->Index = (byte)i;
+            (&button.InternalComponentNode->Component->CursorNavigationInfo)->RightIndex = (byte)(i + 1);
+            (&button.InternalComponentNode->Component->CursorNavigationInfo)->LeftIndex = (byte)(i - 1);
         }
     }
 
-    private void ClickHandler(StylizedListButton button)
+    public void ClickButton(int index)
+        => ClickButton(_buttons[index]);
+
+    public void ClickButton(string label)
+    {
+        foreach (StylizedListButton button in _buttons)
+        {
+            if (button.LabelText.TextValue != label)
+            {
+                continue;
+            }
+
+            ClickButton(button);
+
+            break;
+        }
+    }
+
+    public void ClickButton(StylizedListButton button)
+    {
+        ClickHandler(button);
+
+        button.OnClick?.Invoke();
+    }
+
+    public void SetButtonAsActive(StylizedListButton button)
     {
         foreach (StylizedListButton _button in _buttons)
         {
@@ -49,6 +128,11 @@ internal class StylizedListButtonGroup : SimpleComponentNode
         button.IsSelected = true;
     }
 
+    private void ClickHandler(StylizedListButton button)
+    {
+        currentIndex = _buttons.IndexOf(button);
+    }
+
     public void AddButton(SeString label, Action callback)
     {
         StylizedListButton newButton = new DarkStylizedButton(PetServices)
@@ -56,18 +140,18 @@ internal class StylizedListButtonGroup : SimpleComponentNode
             LabelText = label,
         };
 
-        newButton.AddEvent(AtkEventType.ButtonClick, () =>
+        newButton.OnClick = () =>
         {
             ClickHandler(newButton);
 
             callback();
-        });
+        };
 
         _buttons.Add(newButton);
 
         if (_buttons.Count == 1)
         {
-            newButton.IsSelected = true;
+            ClickHandler(newButton);
         }
 
         PetServices.NativeController.AttachNode(newButton, this);

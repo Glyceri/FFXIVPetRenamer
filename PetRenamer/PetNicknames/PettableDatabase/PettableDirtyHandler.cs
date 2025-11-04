@@ -1,20 +1,25 @@
-﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System;
+
+using static PetRenamer.PetNicknames.PettableDatabase.Interfaces.IPettableDirtyListener;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCaller
 {
-    private Action<IPettableDatabase>?      OnDatabase      = _  => { };
-    private Action<IPettableDatabaseEntry>? OnEntry         = _  => { };
-    private Action<IPettableDatabaseEntry>? OnClear         = _  => { };
-    private Action<INamesDatabase>?         OnName          = _  => { };
-    private Action<IPettableUser>?          OnUser          = _  => { };
-    private Action<Configuration>?          OnConfiguration = _  => { };
-    private Action<PetWindowMode>?          OnPetModeChange = _  => { };
-    private Action?                         OnWindowDirty   = () => { };
+    private event Action<IPettableDatabase>?      OnDatabase        = _  => { };
+    private event Action<IPettableDatabaseEntry>? OnEntry           = _  => { };
+    private event Action<IPettableDatabaseEntry>? OnClear           = _  => { };
+    private event Action<INamesDatabase>?         OnName            = _  => { };
+    private event Action<IPettableUser>?          OnUser            = _  => { };
+    private event Action<Configuration>?          OnConfiguration   = _  => { };
+    private event Action<PetWindowMode>?          OnPetModeChange   = _  => { };
+    private event Action?                         OnWindowDirty     = () => { };
+    private event NavigationDirty?                OnDirtyNavigation = null;
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {
@@ -39,6 +44,23 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     public void DirtyName(in INamesDatabase nameDatabase)
     {
         OnName?.Invoke(nameDatabase);
+    }
+
+    public bool DirtyNavigationInput(nint atkUnitBase, NavigationInputId inputId, AtkEventData.AtkInputData.InputState state)
+    {
+        if (OnDirtyNavigation == null)
+        {
+            return false;
+        }
+
+        bool handled = false;
+
+        foreach (NavigationDirty invocation in OnDirtyNavigation.GetInvocationList())
+        {
+            handled |= invocation.Invoke(atkUnitBase, inputId, state);
+        }
+
+        return handled;
     }
 
     public void DirtyPetMode(PetWindowMode petMode)
@@ -86,6 +108,12 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
         OnName += onNamesDatabase;
     }
 
+    public void RegisterOnDirtyNavigation(NavigationDirty dirtyNavigation)
+    {
+        OnDirtyNavigation -= dirtyNavigation;
+        OnDirtyNavigation += dirtyNavigation;
+    }
+
     public void RegisterOnPetModeDirty(Action<PetWindowMode> petWindowMode)
     {
         OnPetModeChange -= petWindowMode;
@@ -127,6 +155,11 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     public void UnregisterOnDirtyName(Action<INamesDatabase> onNamesDatabase)
     {
         OnName -= onNamesDatabase;
+    }
+
+    public void UnregisterOnDirtyNavigation(NavigationDirty dirtyNavigation)
+    {
+        OnDirtyNavigation -= dirtyNavigation;
     }
 
     public void UnregisterOnPetModeDirty(Action<PetWindowMode> petWindowMode)

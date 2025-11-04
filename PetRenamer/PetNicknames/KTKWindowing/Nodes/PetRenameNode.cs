@@ -13,7 +13,7 @@ internal class PetRenameNode : KTKComponent
 {
     private const    string        PlaceholderString = "Nickname . . .";
 
-    private readonly TextInputNode TextInputNode;
+    public readonly TextInputNode TextInputNode;
 
     public PetRenameNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
@@ -22,6 +22,7 @@ internal class PetRenameNode : KTKComponent
         {
             PlaceholderString = PlaceholderString,
             IsVisible         = true,
+            MaxCharacters     = 32,
         };
 
         AttachNode(ref TextInputNode);

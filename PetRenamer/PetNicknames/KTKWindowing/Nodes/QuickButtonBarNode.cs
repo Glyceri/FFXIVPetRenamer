@@ -1,5 +1,7 @@
 ﻿using Dalamud.Game.Text;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
+using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -9,6 +11,8 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
 internal class QuickButtonBarNode : KTKComponent
 {
+    private readonly KTKAddon KTKAddon;
+
     private readonly QuickButton<PetRenameAddon>    PetRenameQuickButton;
     private readonly QuickButton<PetListAddon>      PetListQuickButton;
     private readonly QuickButton<PetListAddon>      SharingQuickButton;
@@ -16,11 +20,15 @@ internal class QuickButtonBarNode : KTKComponent
     private readonly QuickButton<KofiAddon>         KofiQuickButton;
     private readonly QuickButton<PetDevAddon>       PetDevQuickButton;
 
+    private readonly TransientRegistration          TransientRegistration;
+
     private float widthOffset = 0;
 
     public QuickButtonBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon) 
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
+        KTKAddon      = ktkAddon;
+
         IsVisible     = true;
 
         PetRenameQuickButton = new QuickButton<PetRenameAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
@@ -88,6 +96,25 @@ internal class QuickButtonBarNode : KTKComponent
         };
 
         AttachNode(ref PetDevQuickButton);
+
+        TransientRegistration = new TransientRegistration
+        {
+            LeftTransientId    = 0,
+            LeftPoint          = OperationGuidePoint.TopRight,
+            LeftRelativePoint  = OperationGuidePoint.TopRight,
+            LeftOffsetX        = -210,
+            LeftOffsetY        = 23,
+
+            RightTransientId   = 1,
+            RightPoint         = OperationGuidePoint.TopRight,
+            RightRelativePoint = OperationGuidePoint.TopRight,
+            RightOffsetX       = 15,
+            RightOffsetY       = 23,
+
+            CallbackComponent  = this,
+        };
+
+        ktkAddon.RegisterTransient(TransientRegistration);
     }
 
     private void SetPosition<T>(QuickButton<T> button) where T : KTKAddon
@@ -112,6 +139,8 @@ internal class QuickButtonBarNode : KTKComponent
         SetPosition(ConfigQuickButton);
         SetPosition(KofiQuickButton);
         SetPosition(PetDevQuickButton);
+
+        TransientRegistration.LeftOffsetX = (short)(((short)-widthOffset) + 15);
     }
 
     protected override void OnDirty()
@@ -131,5 +160,12 @@ internal class QuickButtonBarNode : KTKComponent
         PetDevQuickButton.Size    = new Vector2(width, Height);
 
         HandlePositions();
+    }
+
+    protected override void OnDispose()
+    {
+        KTKAddon.DeregisterTransient(TransientRegistration);
+
+        base.OnDispose();
     }
 }

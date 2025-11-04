@@ -1,5 +1,7 @@
 ﻿using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Nodes;
+using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
@@ -13,14 +15,14 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 internal class PetBarNode : KTKComponent
 {
     private readonly SimpleNineGridNode      DividingLineNode;
-    private readonly StylizedListButtonGroup StylizedListButtonGroup;
+    public  readonly StylizedListButtonGroup StylizedListButtonGroup;
 
     private readonly QuickButtonBarNode      QuickButtonBarNode;
 
     public PetBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon)
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        StylizedListButtonGroup = new StylizedListButtonGroup(petServices);
+        StylizedListButtonGroup = new StylizedListButtonGroup(windowHandler, dalamudServices, petServices, dirtyHandler);
 
         AttachNode(ref StylizedListButtonGroup);
 
@@ -59,7 +61,12 @@ internal class PetBarNode : KTKComponent
         };
 
         AttachNode(ref DividingLineNode);
+
+        DividingLineNode.IsVisible = PetServices.Configuration.showDividingLine;
     }
+
+    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+        => StylizedListButtonGroup.OnCustomInput(inputId, inputState);
 
     private void OnButtonClickedForPetMode(PetWindowMode petMode)
         => DirtyHandler.DirtyPetMode(petMode);
@@ -73,17 +80,29 @@ internal class PetBarNode : KTKComponent
 
     private void SetSelectedButton()
     {
-        string descriptionText = string.Empty;
-        DescriptionAttribute? description = PetMode.GetAttribute<DescriptionAttribute>();
+        string                descriptionText = string.Empty;
+        DescriptionAttribute? description     = PetMode.GetAttribute<DescriptionAttribute>();
 
         if (description != null)
         {
             descriptionText = description.Description;
         }
 
+        if (descriptionText.IsNullOrWhitespace())
+        {
+            return;
+        }
+
         foreach (StylizedListButton button in StylizedListButtonGroup.Buttons)
         {
-            button.IsSelected = (button.LabelText.TextValue == descriptionText);
+            if (button.LabelText.TextValue != descriptionText)
+            {
+                continue;
+            }
+
+            StylizedListButtonGroup.SetButtonAsActive(button);
+
+            break;
         }
     }
 

@@ -13,6 +13,8 @@ public static class PluginConstants
     
     public const ulong InvalidId            = 0xE0000000;
 
+    public const uint PET_NICKNAMES_TRANSIENT_OFFSET          = 10000;
+
     public static readonly PetSkeleton Eos                    = new PetSkeleton(407, SkeletonType.BattlePet);
     public static readonly PetSkeleton Selene                 = new PetSkeleton(408, SkeletonType.BattlePet);
     public static readonly PetSkeleton EmeraldCarbuncle       = new PetSkeleton(409, SkeletonType.BattlePet);
