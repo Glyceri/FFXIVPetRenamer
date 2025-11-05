@@ -10,36 +10,45 @@ using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal unsafe class TransientHook : HookableElement
+internal unsafe class TransientGuideHook : HookableElement
 {
     private delegate nint RaptureTextModule_FormatAddonTransientDelegate(nint selfPtr, uint rowId, int unk3, nint unk4);
 
     [Signature("E8 ?? ?? ?? ?? 48 85 C0 74 0C 48 8D 4F 08", DetourName = nameof(RaptureTextModule_FormatAddonTransientDetour))]
     private readonly Hook<RaptureTextModule_FormatAddonTransientDelegate>? FormatAddonTransientHook = null;
 
-    private readonly Dictionary<uint, TransientString> _transientStrings = [];
+    private readonly Dictionary<uint, TransientGuideString> _transientGuideStrings = [];
 
-    public TransientHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
+    // This has to actually become a dalamud service if more and more plugins want to use native ui and more importantly TransientGuides
+    public TransientGuideHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
         : base(services, userList, petServices, dirtyListener) 
     {
-        AddTransientString(2, new SeStringBuilder()
+        AddTransientGuideString(3, new SeStringBuilder()
             .AddIcon(BitmapFontIcon.ControllerButton3)
-            .AddText(" to toggle Quick Select.").Build());
+            .AddText(" to toggle Quick Select ")
+            .AddIcon(BitmapFontIcon.ControllerButton0)
+            .AddText(" to click button.")
+            .Build());
 
-        AddTransientString(1, new SeStringBuilder()
+        AddTransientGuideString(2, new SeStringBuilder()
+            .AddIcon(BitmapFontIcon.ControllerButton3)
+            .AddText(" to toggle Quick Select.")
+            .Build());
+
+        AddTransientGuideString(1, new SeStringBuilder()
             .AddIcon(BitmapFontIcon.ControllerShoulderRight)
             .Build());
 
-        AddTransientString(0, new SeStringBuilder()
+        AddTransientGuideString(0, new SeStringBuilder()
             .AddIcon(BitmapFontIcon.ControllerShoulderLeft)
             .Build());
     }
 
-    private void AddTransientString(uint id, SeString seString)
+    private void AddTransientGuideString(uint id, SeString seString)
     {
         uint actualId = id + PluginConstants.PET_NICKNAMES_TRANSIENT_OFFSET;
 
-        _transientStrings.Add(actualId, new TransientString(seString));
+        _transientGuideStrings.Add(actualId, new TransientGuideString(seString));
     }
 
     public override void Init()
@@ -54,7 +63,7 @@ internal unsafe class TransientHook : HookableElement
             return FormatAddonTransientHook!.OriginalDisposeSafe(selfPtr, rowId, unk3, unk4);
         }
 
-        if (!_transientStrings.TryGetValue(rowId, out TransientString? transientString))
+        if (!_transientGuideStrings.TryGetValue(rowId, out TransientGuideString? transientString))
         {
             return FormatAddonTransientHook!.OriginalDisposeSafe(selfPtr, rowId, unk3, unk4);
         }

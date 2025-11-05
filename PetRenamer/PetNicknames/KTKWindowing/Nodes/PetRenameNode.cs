@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
+using KamiToolKit.Classes;
 using KamiToolKit.Nodes;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
@@ -23,6 +24,7 @@ internal class PetRenameNode : KTKComponent
             PlaceholderString = PlaceholderString,
             IsVisible         = true,
             MaxCharacters     = 32,
+            Flags             = TextInputFlags.EnableIme | TextInputFlags.AllowUpperCase | TextInputFlags.AllowLowerCase | TextInputFlags.EnableDictionary | TextInputFlags.AllowNumberInput,
         };
 
         AttachNode(ref TextInputNode);

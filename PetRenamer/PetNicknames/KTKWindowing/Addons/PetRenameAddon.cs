@@ -126,6 +126,7 @@ internal class PetRenameAddon : KTKAddon
         FocusableButtonNode1 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size = new Vector2(90, 90),
+            Position = new Vector2(0, 40),
             Index = 1,
         };
 
@@ -137,7 +138,7 @@ internal class PetRenameAddon : KTKAddon
         FocusableButtonNode2 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size = new Vector2(90, 90),
-            Position = new Vector2(90, 0),
+            Position = new Vector2(90, 40),
             Index = 2,
         };
 
@@ -146,7 +147,7 @@ internal class PetRenameAddon : KTKAddon
         FocusableButtonNode3 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size = new Vector2(90, 90),
-            Position = new Vector2(180, 0),
+            Position = new Vector2(180, 40),
             Index = 3,
         };
 
@@ -155,7 +156,7 @@ internal class PetRenameAddon : KTKAddon
         FocusableButtonNode4 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size = new Vector2(90, 90),
-            Position = new Vector2(270, 0),
+            Position = new Vector2(270, 40),
             Index = 4,
         };
 
@@ -164,7 +165,7 @@ internal class PetRenameAddon : KTKAddon
         FocusableButtonNode5 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size = new Vector2(90, 90),
-            Position = new Vector2(360, 0),
+            Position = new Vector2(360, 40),
             Index = 5,
         };
 

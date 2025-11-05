@@ -64,7 +64,7 @@ internal class HookHandler : IDisposable
         Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new UINavigationHook(DalamudServices, PetServices, PettableUserList, DirtyListener, DirtyCaller));
-        Register(new TransientHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new TransientGuideHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
 
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }

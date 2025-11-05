@@ -3,11 +3,11 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace PetRenamer.PetNicknames.Hooking.Unsafe;
 
-internal unsafe class TransientString
+internal unsafe class TransientGuideString
 {
     private readonly SeString SeString;
 
-    public TransientString(SeString seString)
+    public TransientGuideString(SeString seString)
     {
         SeString = seString;
     }

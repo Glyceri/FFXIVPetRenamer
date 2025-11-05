@@ -1,11 +1,14 @@
 ﻿using Dalamud.Game.Text;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
+using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System.Numerics;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkEventData.AtkInputData;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
@@ -20,9 +23,17 @@ internal class QuickButtonBarNode : KTKComponent
     private readonly QuickButton<KofiAddon>         KofiQuickButton;
     private readonly QuickButton<PetDevAddon>       PetDevQuickButton;
 
-    private readonly TransientRegistration          TransientRegistration;
+    private readonly GuideRegistration              GuideRegistration;
 
-    private float widthOffset = 0;
+    private float widthOffset    = 0;
+    private bool  requestRefresh = false;
+
+    private readonly HighlightableLightStylizedButton[] ButtonReferences;
+
+    private int currentIndex      = 0;
+    private int activeButtonCount = 0;
+
+    private bool requireDown = false;
 
     public QuickButtonBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon) 
         : base(windowHandler, dalamudServices, petServices, dirtyHandler)
@@ -97,36 +108,278 @@ internal class QuickButtonBarNode : KTKComponent
 
         AttachNode(ref PetDevQuickButton);
 
-        TransientRegistration = new TransientRegistration
+        ButtonReferences =
+        [
+            PetDevQuickButton.Button,
+            KofiQuickButton.Button,
+            ConfigQuickButton.Button,
+            SharingQuickButton.Button,
+            PetListQuickButton.Button,
+            PetRenameQuickButton.Button
+        ];
+
+        GuideRegistration      = new GuideRegistration
         {
-            LeftTransientId    = 0,
+            LowerGuideId       = 3,
+
+            LeftGuideId        = 0,
             LeftPoint          = OperationGuidePoint.TopRight,
             LeftRelativePoint  = OperationGuidePoint.TopRight,
             LeftOffsetX        = -210,
             LeftOffsetY        = 23,
 
-            RightTransientId   = 1,
+            RightGuideId       = 1,
             RightPoint         = OperationGuidePoint.TopRight,
             RightRelativePoint = OperationGuidePoint.TopRight,
             RightOffsetX       = 15,
             RightOffsetY       = 23,
 
+            OnSelected         = OnSelected,
+            OnUnselected       = OnUnselected,
             CallbackComponent  = this,
         };
 
-        ktkAddon.RegisterTransient(TransientRegistration);
+        ktkAddon.RegisterGuide(GuideRegistration);
+    }
+
+    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+    {
+        bool inputIsDown = (inputState == AtkEventData.AtkInputData.InputState.Down);
+
+        if (!inputIsDown && requireDown)
+        {
+            return false;
+        }
+
+        if (inputIsDown && requireDown)
+        {
+            requireDown = false;
+        }
+
+        if (!inputIsDown && inputState != AtkEventData.AtkInputData.InputState.Held)
+        {
+            return false;
+        }
+
+        if (inputId == NavigationInputId.RB)
+        {
+            AddIndex(inputState);
+
+            return true;    
+        }
+
+        if (inputId == NavigationInputId.LB)
+        {
+            RemoveIndex(inputState);
+
+            return true;
+        }
+
+        if (inputId == NavigationInputId.NintendoA)
+        {
+            return ClickIndex();
+        }
+
+        return false;
+    }
+
+    private bool ClickIndex()
+    {
+        if (currentIndex < 0)
+        {
+            return false;
+        }
+
+        if (currentIndex >= ButtonReferences.Length)
+        {
+            return false;
+        }
+
+        ButtonReferences[currentIndex].Click();
+
+        return true;
+    }
+
+    private void OnSelected()
+    {
+        ResetIndex();
+    }
+
+    private void OnUnselected()
+    {
+        ClearIndex();
+    }
+
+    private void ResetActiveButtonCount()
+        => activeButtonCount = ActiveButtonCount();
+
+    private int ActiveButtonCount()
+    {
+        int buttonCount = 0;
+
+        for (int i = 0; i < ButtonReferences.Length; i++)
+        {
+            HighlightableLightStylizedButton button = ButtonReferences[i];
+
+            if (!button.IsVisible)
+            {
+                continue;
+            }
+
+            buttonCount++;
+        }
+
+        return buttonCount;
+    }
+
+    private bool HandleInvalidIndex()
+    {
+        if (activeButtonCount <= 0)
+        {
+            currentIndex = -1;
+
+            SetHighlightedIndex();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ResetIndex()
+    {
+        PetServices.PetLog.LogFatal("RESET INDEX");
+
+        ResetActiveButtonCount();
+
+        if (HandleInvalidIndex())
+        {
+            return;
+        }
+
+        currentIndex = 0;
+
+        SetHighlightedIndex();
+    }
+
+    private void ClearIndex()
+    {
+        PetServices.PetLog.LogFatal("CLEAR INDEX");
+
+        currentIndex = -1;
+
+        SetHighlightedIndex();
+    }
+
+    private void AddIndex(InputState inputState)
+    {
+        ResetActiveButtonCount();
+
+        if (HandleInvalidIndex())
+        {
+            return;
+        }
+
+        do
+        {
+            currentIndex++;
+
+            if (currentIndex >= ButtonReferences.Length)
+            {
+                if (inputState == InputState.Held)
+                {
+                    RemoveIndex(InputState.Down);
+
+                    requireDown = true;
+                }
+                else
+                {
+                    currentIndex = 0;
+                }
+            }
+        }
+        while (!ButtonReferences[currentIndex].IsVisible && !requireDown);
+
+        SetHighlightedIndex();
+    }
+
+    private void RemoveIndex(InputState inputState)
+    {
+        ResetActiveButtonCount();
+
+        if (HandleInvalidIndex())
+        {
+            return;
+        }
+
+        do
+        {
+            currentIndex--;
+
+            if (currentIndex < 0)
+            {
+                if (inputState == InputState.Held)
+                {
+                    AddIndex(InputState.Down);
+
+                    requireDown = true;
+                }
+                else
+                {
+                    currentIndex = activeButtonCount;
+
+                    if (currentIndex >= ButtonReferences.Length)
+                    {
+                        currentIndex--;
+                    }
+                }
+            }
+        }
+        while (!ButtonReferences[currentIndex].IsVisible && !requireDown);
+
+        SetHighlightedIndex();
+    }
+
+    private void SetHighlightedIndex()
+    {
+        int buttonLength = ButtonReferences.Length;
+
+        for (int i = 0; i < buttonLength; i++)
+        {
+            HighlightableLightStylizedButton button = ButtonReferences[i];
+
+            if (i == currentIndex)
+            {
+                button.Focus();
+            }
+            else
+            {
+                button.Unfocus();
+            }
+        }
     }
 
     private void SetPosition<T>(QuickButton<T> button) where T : KTKAddon
     {
         button.X     = widthOffset;
 
-        if (!button.IsActive)
+        bool isVisible = button.IsVisible;
+
+        bool isActive  = button.IsActive;
+
+        if (isVisible != isActive)
+        {
+            PetServices.PetLog.LogVerbose("REQUEST REFRESH");
+
+            requestRefresh = true;
+        }
+
+        if (!isActive)
         {
             return;
         }
 
-        widthOffset -= button.Width * 0.85f;
+        widthOffset -= button.Width * 0.90f;
     }
 
     private void HandlePositions()
@@ -140,7 +393,14 @@ internal class QuickButtonBarNode : KTKComponent
         SetPosition(KofiQuickButton);
         SetPosition(PetDevQuickButton);
 
-        TransientRegistration.LeftOffsetX = (short)(((short)-widthOffset) + 15);
+        GuideRegistration.LeftOffsetX = (short)(-(Width - widthOffset - PetRenameQuickButton.Width));
+
+        if (requestRefresh)
+        {
+            ResetIndex();
+
+            requestRefresh = false;
+        }
     }
 
     protected override void OnDirty()
@@ -164,7 +424,7 @@ internal class QuickButtonBarNode : KTKComponent
 
     protected override void OnDispose()
     {
-        KTKAddon.DeregisterTransient(TransientRegistration);
+        KTKAddon.DeregisterTransient(GuideRegistration);
 
         base.OnDispose();
     }

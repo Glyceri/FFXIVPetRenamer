@@ -6,15 +6,20 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 
-internal abstract class StylizedListButton : TextureButtonNode
+internal abstract class StylizedListButton : NineGridButtonNode
 {
+    protected readonly IPetServices PetServices;
+
     protected readonly TextNode TextNode;
 
     private Vector2 disabledTextureCoordinates = Vector2.Zero;
     private Vector2 enabledTextureCoordinates  = Vector2.Zero;
 
     public StylizedListButton(IPetServices petServices)
+        : base(petServices)
     {
+        PetServices        = petServices;
+
         IsVisible          = true;
 
         TextNode = new TextNode
@@ -24,6 +29,11 @@ internal abstract class StylizedListButton : TextureButtonNode
         };
 
         petServices.NativeController.AttachNode(TextNode, this);
+    }
+
+    public void Click()
+    {
+        OnClick?.Invoke();
     }
 
     public required SeString LabelText
@@ -53,7 +63,7 @@ internal abstract class StylizedListButton : TextureButtonNode
         UpdateButtonSelector();
     }
 
-    private void UpdateButtonSelector()
+    protected void UpdateButtonSelector()
     {
         if (IsChecked)
         {

@@ -1,10 +1,14 @@
-﻿using Dalamud.Game.NativeWrapper;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.NativeWrapper;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Addon;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
 using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.PettableDatabase;
@@ -37,7 +41,7 @@ internal abstract class KTKAddon : NativeAddon
 
     protected virtual  string? WindowSubtitle     { get; }
 
-    private   TransientRegistration? TransientRegistration;
+    private   GuideRegistration?   TransientGuideRegistration;
     protected SimpleComponentNode? MainContainerNode { get; private set; }
     internal  static PetWindowMode PetMode           { get; private set; }
 
@@ -47,9 +51,9 @@ internal abstract class KTKAddon : NativeAddon
 
     private nint? OwnAddress = null;
 
-    private int   activeTransient = -1;
+    private int   activeGuide = -1;
 
-    private List<TransientRegistration> _transients = [];
+    private List<GuideRegistration> _guides = [];
 
     public KTKAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
     {
@@ -75,7 +79,7 @@ internal abstract class KTKAddon : NativeAddon
         }
     }
 
-    private unsafe void ClearTransient(byte index)
+    private unsafe void ClearGuide(byte index)
     {
         if (index >= 5)
         {
@@ -104,18 +108,28 @@ internal abstract class KTKAddon : NativeAddon
 
     private void SetTransientIndex(int index)
     {
-        activeTransient = index;
+        int guideCount = _guides.Count;
 
-        int transientCount = _transients.Count;
-
-        if (activeTransient >= transientCount)
+        if (activeGuide == index)
         {
-            activeTransient = 0;
+            return;
         }
 
-        if (transientCount == 0)
+        if (activeGuide >= 0 && activeGuide < guideCount)
         {
-            activeTransient = -1;
+            _guides[activeGuide]?.OnUnselected?.Invoke();
+        }
+
+        activeGuide = index;
+
+        if (activeGuide >= guideCount)
+        {
+            activeGuide = 0;
+        }
+
+        if (guideCount == 0)
+        {
+            activeGuide = -1;
         }
 
         if (OwnAddress == null)
@@ -123,57 +137,42 @@ internal abstract class KTKAddon : NativeAddon
             return;
         }
 
-        unsafe
+        if (activeGuide != -1 && activeGuide < guideCount)
         {
-            AtkUnitBase* unitBase = (AtkUnitBase*)DalamudServices.GameGui.GetAddonByName("OperationGuide").Address;
-
-            if (unitBase == null)
-            {
-                return;
-            }
-
-            AtkUnitBase* unitBase2 = (AtkUnitBase*)OwnAddress.Value;
-
-            if (unitBase2 == null)
-            {
-                return;
-            }
-
-            unitBase2->SetPosition((short)(unitBase2->X + 1), unitBase2->Y);
-            setPos = true;
-
-            unitBase->RootNode->DrawFlags = unitBase->RootNode->DrawFlags | 1;
-            unitBase2->RootNode->DrawFlags = unitBase2->RootNode->DrawFlags | 1;
+            SetLowerGuide(_guides[activeGuide]?.LowerGuideId ?? 2);
+            _guides[activeGuide]?.OnSelected?.Invoke();
         }
+
+        SetDirty();
     }
 
-    public void RegisterTransient(TransientRegistration transientRegistration)
+    public void RegisterGuide(GuideRegistration guideRegistration)
     {
-        if (_transients.Contains(transientRegistration))
+        if (_guides.Contains(guideRegistration))
         {
             return;
         }
 
-        _transients.Add(transientRegistration);
+        _guides.Add(guideRegistration);
 
         SetTransientIndex(0);
     }
 
-    public void DeregisterTransient(TransientRegistration transientRegistration)
+    public void DeregisterTransient(GuideRegistration guideRegistration)
     {
-        _ = _transients.Remove(transientRegistration);
+        _ = _guides.Remove(guideRegistration);
 
         SetTransientIndex(0);
     }
 
-    private unsafe void SetTransient(byte index, uint transientId, OperationGuidePoint point, OperationGuidePoint relativePoint, short offsetX, short offsetY)
+    private unsafe void SetGuide(byte index, uint guideId, OperationGuidePoint point, OperationGuidePoint relativePoint, short offsetX, short offsetY)
     {
         if (index >= 5)
         {
             return;
         }
 
-        ClearTransient(index);
+        ClearGuide(index);
 
         if (OwnAddress == null)
         {
@@ -190,7 +189,7 @@ internal abstract class KTKAddon : NativeAddon
         addon->OperationGuides[index].Index            = index;
         addon->OperationGuides[index].Point            = point;
         addon->OperationGuides[index].RelativePoint    = relativePoint;
-        addon->OperationGuides[index].AddonTransientId = PluginConstants.PET_NICKNAMES_TRANSIENT_OFFSET + transientId;
+        addon->OperationGuides[index].AddonTransientId = PluginConstants.PET_NICKNAMES_TRANSIENT_OFFSET + guideId;
         addon->OperationGuides[index].OffsetX          = offsetX;
         addon->OperationGuides[index].OffsetY          = offsetY;
     }
@@ -228,15 +227,15 @@ internal abstract class KTKAddon : NativeAddon
             contentRegionStartPos += new Vector2(0, PetBarOffset);
             contentRegionSize     -= new Vector2(0, PetBarOffset);
 
-            TransientRegistration = new TransientRegistration
+            TransientGuideRegistration = new GuideRegistration
             {
-                LeftTransientId    = 0,
+                LeftGuideId        = 0,
                 LeftPoint          = OperationGuidePoint.TopLeft,
                 LeftRelativePoint  = OperationGuidePoint.TopLeft,
                 LeftOffsetX        = -15,
                 LeftOffsetY        = 23,
 
-                RightTransientId   = 1,
+                RightGuideId       = 1,
                 RightPoint         = OperationGuidePoint.TopLeft,
                 RightRelativePoint = OperationGuidePoint.TopLeft,
                 RightOffsetX       = 210,
@@ -245,9 +244,7 @@ internal abstract class KTKAddon : NativeAddon
                 CallbackComponent  = PetBarNode,
             };
 
-            RegisterTransient(TransientRegistration);
-
-            SetTransient(0, 2, OperationGuidePoint.Center, OperationGuidePoint.Bottom, 0, 0);
+            RegisterGuide(TransientGuideRegistration);
 
             AttachNode(PetBarNode);
         }
@@ -264,20 +261,12 @@ internal abstract class KTKAddon : NativeAddon
         OnAddonSetup(addon);
     }
 
-    private Vector2 GetStartPosition()
+    private void SetLowerGuide(byte index)
     {
-        Vector2 startPos = ContentStartPosition;
+        SetGuide(0, index, OperationGuidePoint.Center, OperationGuidePoint.Bottom, 0, 0);
 
-        if (HasPetBar)
-        {
-            startPos += new Vector2(0, PetBarOffset);
-        }
-
-        return startPos;
+        RefreshOperationsGuide();
     }
-
-    protected Vector2 StartPosition
-        => GetStartPosition();
 
     protected virtual unsafe void OnAddonSetup(AtkUnitBase* addon) { }
     protected virtual unsafe void OnAddonUpdate(AtkUnitBase* addon) { }
@@ -299,9 +288,9 @@ internal abstract class KTKAddon : NativeAddon
             return false;
         }
 
-        SetTransientIndex(activeTransient + 1);
+        SetTransientIndex(activeGuide + 1);
 
-        PetServices.PetLog.LogWarning("Transients: " + _transients.Count + ", " + activeTransient);
+        PetServices.PetLog.LogWarning("Transients: " + _guides.Count + ", " + activeGuide);
 
         return true;
     }
@@ -329,9 +318,9 @@ internal abstract class KTKAddon : NativeAddon
 
         if (HasPetBar)
         {
-            if (activeTransient != -1)
+            if (activeGuide != -1)
             {
-                TransientRegistration registration = _transients[activeTransient];
+                GuideRegistration registration = _guides[activeGuide];
 
                 passed = registration.CallbackComponent.OnCustomInput(inputId, inputState);
             }
@@ -367,18 +356,28 @@ internal abstract class KTKAddon : NativeAddon
     private void HandleDirtyWindow()
         => SetDirty();
 
+    private unsafe void RefreshOperationsGuide()
+    {
+        PetNicknamesOperationsGuide* guide = (PetNicknamesOperationsGuide*)&AtkStage.Instance()->OperationGuide;
+
+        if ((nint)guide->UnkUnitBase1 == OwnAddress)
+        {
+            guide->Unk19 = 1;
+        }
+    }
+
     protected void SetDirty()
         => _isDirty = true;
-
+    
     protected sealed override unsafe void OnFinalize(AtkUnitBase* addon)
     {
         OwnAddress = null;
 
-        if (TransientRegistration != null)
+        if (TransientGuideRegistration != null)
         {
-            DeregisterTransient(TransientRegistration);
+            DeregisterTransient(TransientGuideRegistration);
 
-            TransientRegistration = null;
+            TransientGuideRegistration = null;
         }
 
         DirtyHandler.UnregisterOnDirtyNavigation(OnInput);
@@ -396,41 +395,19 @@ internal abstract class KTKAddon : NativeAddon
         DirtyHandler.DirtyWindow();
     }
 
-    protected override unsafe void OnDraw(AtkUnitBase* addon)
-    {
-        base.OnDraw(addon);
-
-        if (setPos)
-        {
-            setPos = false;
-
-            if (OwnAddress != null)
-            {
-                AtkUnitBase* unitBase2 = (AtkUnitBase*)OwnAddress.Value;
-
-                if (unitBase2 == null)
-                {
-                    return;
-                }
-
-                unitBase2->SetPosition((short)(unitBase2->X - 1), unitBase2->Y);
-            }
-        }
-    }
-
     protected sealed override unsafe void OnUpdate(AtkUnitBase* addon)
     {
-        if (activeTransient == -1)
+        if (activeGuide == -1)
         {
-            ClearTransient(1);
-            ClearTransient(2);
+            ClearGuide(1);
+            ClearGuide(2);
         }
         else
         {
-            TransientRegistration registration = _transients[activeTransient];
+            GuideRegistration registration = _guides[activeGuide];
 
-            SetTransient(1, registration.LeftTransientId,  registration.LeftPoint,  registration.LeftRelativePoint,  registration.LeftOffsetX,  registration.LeftOffsetY);
-            SetTransient(2, registration.RightTransientId, registration.RightPoint, registration.RightRelativePoint, registration.RightOffsetX, registration.RightOffsetY);
+            SetGuide(1, registration.LeftGuideId,  registration.LeftPoint,  registration.LeftRelativePoint,  registration.LeftOffsetX,  registration.LeftOffsetY);
+            SetGuide(2, registration.RightGuideId, registration.RightPoint, registration.RightRelativePoint, registration.RightOffsetX, registration.RightOffsetY);
         }
 
         if (_isDirty)
@@ -439,6 +416,7 @@ internal abstract class KTKAddon : NativeAddon
 
             try
             {
+                RefreshOperationsGuide();
                 OnDirty();
             }
             catch(Exception e)

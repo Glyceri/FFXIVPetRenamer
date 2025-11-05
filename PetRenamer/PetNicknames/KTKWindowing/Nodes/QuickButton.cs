@@ -9,9 +9,9 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
 internal class QuickButton<T> : KTKComponent where T : KTKAddon
 {
-    private readonly LightStylizedButton Button;
+    public readonly HighlightableLightStylizedButton Button;
 
-    private Func<bool> shouldBeVisible;
+    private Func<bool> shouldBeVisible = () => true;
 
     private SeIconChar labelText;
 
@@ -20,7 +20,7 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
     {
         IsVisible         = true;
 
-        Button            = new LightStylizedButton(PetServices)
+        Button            = new HighlightableLightStylizedButton(PetServices)
         {
             LabelText     = string.Empty,
             IsVisible     = true,
@@ -48,6 +48,9 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
         AttachNode(ref Button);
     }
 
+    public void Click()
+        => Button.OnClick?.Invoke();
+
     public required SeIconChar LabelText
     {
         get => labelText;
@@ -64,9 +67,7 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
         => IsVisible = Button.IsVisible = shouldBeVisible();
 
     protected override void OnDirty()
-    {
-        Button.IsSelected = WindowHandler.IsOpen<T>();
-    }
+        => Button.IsSelected = WindowHandler.IsOpen<T>();
 
     protected override void OnSizeChanged()
     {
