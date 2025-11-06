@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Nodes;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -15,8 +16,8 @@ internal class PetFootstepIcon : KTKComponent
 
     private IPetSheetData? _data;
 
-    public PetFootstepIcon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public PetFootstepIcon(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         IsVisible          = true;
 

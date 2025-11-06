@@ -8,6 +8,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDirtyListener
 {
+    public void RegisterOnDirtyUserList(Action<IPettableUserList> onUserList);
     public void RegisterOnDirtyName(Action<INamesDatabase> onNamesDatabase);
     public void RegisterOnDirtyEntry(Action<IPettableDatabaseEntry> onEntry);
     public void RegisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry);
@@ -18,6 +19,7 @@ internal interface IPettableDirtyListener
     public void RegisterOnWindowDirty(Action windowDirty);
     public void RegisterOnDirtyNavigation(NavigationDirty dirtyNavigation);
 
+    public void UnregisterOnDirtyUserList(Action<IPettableUserList> onUserList);
     public void UnregisterOnDirtyName(Action<INamesDatabase> onNamesDatabase);
     public void UnregisterOnDirtyEntry(Action<IPettableDatabaseEntry> onEntry);
     public void UnregisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry);

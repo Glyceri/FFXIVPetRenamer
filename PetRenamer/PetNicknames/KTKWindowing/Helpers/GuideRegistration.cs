@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using System;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Helpers;

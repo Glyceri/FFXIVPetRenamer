@@ -2,6 +2,7 @@
 using Dalamud.Utility;
 using KamiToolKit.Classes;
 using KamiToolKit.Nodes;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -16,8 +17,8 @@ internal class PetRenameNode : KTKComponent
 
     public readonly TextInputNode TextInputNode;
 
-    public PetRenameNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public PetRenameNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         TextInputNode         = new TextInputNode
         {

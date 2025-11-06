@@ -1,4 +1,6 @@
-﻿using PetRenamer.PetNicknames.KTKWindowing.Addons;
+﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.KTKWindowing.Addons;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -19,13 +21,13 @@ internal class KTKWindowHandler : IDisposable
     private readonly ILegacyDatabase      LegacyDatabase;
     private readonly PettableDirtyHandler DirtyHandler;
 
-    private readonly List<KTKAddon> KTKWindows = [];
+    private readonly List<KTKAddon>       KTKWindows = [];
 
-    private readonly PetRenameAddon   PetRenameKTKWindow;
-    private readonly PetSettingsAddon PetSettingsAddon;
-    private readonly PetListAddon     PetListAddon;
-    private readonly KofiAddon        KofiAddon;
-    private readonly PetDevAddon      PetDevAddon;
+    private readonly PetRenameAddon       PetRenameKTKWindow;
+    private readonly PetSettingsAddon     PetSettingsAddon;
+    private readonly PetListAddon         PetListAddon;
+    private readonly KofiAddon            KofiAddon;
+    private readonly PetDevAddon          PetDevAddon;
 
     public KTKWindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase, PettableDirtyHandler dirtyHandler)
     {
@@ -36,14 +38,16 @@ internal class KTKWindowHandler : IDisposable
         LegacyDatabase  = legacyDatabase;
         DirtyHandler    = dirtyHandler;
 
-        RegisterWindow(PetRenameKTKWindow = new PetRenameAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetRenameKTKWindow = new PetRenameAddon  (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
         RegisterWindow(PetSettingsAddon   = new PetSettingsAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(PetListAddon       = new PetListAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(KofiAddon          = new KofiAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(PetDevAddon        = new PetDevAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetListAddon       = new PetListAddon    (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(KofiAddon          = new KofiAddon       (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetDevAddon        = new PetDevAddon     (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
 
         PetRenameKTKWindow.Open();
         //PetSettingsAddon.Open();
+
+        DirtyHandler.RegisterOnDirtyUserList(HandleDirtyUserList);
 
         dirtyHandler.DirtyPetMode(PetWindowMode.Minion);
     }
@@ -51,6 +55,22 @@ internal class KTKWindowHandler : IDisposable
     private void RegisterWindow(KTKAddon window)
     {
         KTKWindows.Add(window);
+    }
+
+    private void HandleDirtyUserList(IPettableUserList userList)
+    {
+        if (userList.LocalPlayer != null)
+        {
+            return; 
+        }
+    }
+
+    public void MassClose()
+    {
+        foreach (KTKAddon addon in KTKWindows)
+        {
+            addon.Close();
+        }
     }
 
     public bool IsOpen<T>() where T : KTKAddon
@@ -68,16 +88,16 @@ internal class KTKWindowHandler : IDisposable
         return false;
     }    
 
-    public KTKAddon? GetAddon<T>() where T : KTKAddon
+    public T? GetAddon<T>() where T : KTKAddon
     {
         foreach (KTKAddon addon in KTKWindows)
         {
-            if (addon is not T)
+            if (addon is not T tAddon)
             {
                 continue;
             }
 
-            return addon;
+            return tAddon;
         }
 
         return null;
@@ -85,6 +105,11 @@ internal class KTKWindowHandler : IDisposable
 
     public void Open<T>() where T : KTKAddon
     {
+        if (UserList.LocalPlayer == null)
+        {
+            return;
+        }    
+
         foreach (KTKAddon addon in KTKWindows)
         {
             if (addon is not T)
@@ -130,6 +155,8 @@ internal class KTKWindowHandler : IDisposable
 
     public void Dispose()
     {
+        DirtyHandler.UnregisterOnDirtyUserList(HandleDirtyUserList);
+
         foreach (KTKAddon window in KTKWindows)
         {
             window.Dispose(); 

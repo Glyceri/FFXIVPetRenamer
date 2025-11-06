@@ -2,11 +2,12 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal unsafe interface IPettableUser : IBattleUser
+internal unsafe interface IPettableUser : IBattleUser, IDisposable
 {
     public bool IsActive        { get; }
     public bool IsLocalPlayer   { get; }
@@ -27,7 +28,6 @@ internal unsafe interface IPettableUser : IBattleUser
     public void SetCompanion(Companion* companion);
     public void RemoveCompanion(Companion* companion);
     public void RefreshCast();
-    public void Dispose(IPettableDatabase database);
 
     public IPettableUserTargetManager? TargetManager { get; }
 

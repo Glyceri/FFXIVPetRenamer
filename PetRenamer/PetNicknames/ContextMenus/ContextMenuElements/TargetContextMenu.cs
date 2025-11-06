@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.Gui.ContextMenu;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
+using PetRenamer.PetNicknames.KTKWindowing;
+using PetRenamer.PetNicknames.KTKWindowing.Addons;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Windowing.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
 
 namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
@@ -15,13 +15,13 @@ internal class TargetContextMenu : IContextMenuElement
 
     private readonly IPetServices       PetServices;
     private readonly IPettableUserList  UserList;
-    private readonly IWindowHandler     WindowHandler;
+    private readonly KTKWindowHandler   KTKWindowHandler;
 
-    public TargetContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
+    public TargetContextMenu(IPetServices petServices, IPettableUserList userList, KTKWindowHandler ktkWindowHandler)
     {
-        PetServices     = petServices;
-        UserList        = userList;
-        WindowHandler   = windowHandler;
+        PetServices      = petServices;
+        UserList         = userList;
+        KTKWindowHandler = ktkWindowHandler;
     }
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
@@ -61,7 +61,8 @@ internal class TargetContextMenu : IContextMenuElement
 
         return (a) =>
         {
-            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);
+            KTKWindowHandler.Open<PetRenameAddon>();
+            KTKWindowHandler.GetAddon<PetRenameAddon>()?.SetPetSkeleton(pet.SkeletonID);
         };
     }
 }

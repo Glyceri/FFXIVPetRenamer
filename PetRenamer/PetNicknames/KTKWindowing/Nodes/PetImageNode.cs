@@ -1,4 +1,5 @@
 ﻿using KamiToolKit.Nodes;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -15,8 +16,8 @@ internal class PetImageNode : KTKComponent
 
     private IPetSheetData? _data;
 
-    public PetImageNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public PetImageNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         IsVisible       = true;
 

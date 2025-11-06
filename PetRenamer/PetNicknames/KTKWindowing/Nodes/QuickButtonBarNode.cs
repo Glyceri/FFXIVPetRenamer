@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
@@ -14,8 +15,6 @@ namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
 internal class QuickButtonBarNode : KTKComponent
 {
-    private readonly KTKAddon KTKAddon;
-
     private readonly QuickButton<PetRenameAddon>    PetRenameQuickButton;
     private readonly QuickButton<PetListAddon>      PetListQuickButton;
     private readonly QuickButton<PetListAddon>      SharingQuickButton;
@@ -35,58 +34,54 @@ internal class QuickButtonBarNode : KTKComponent
 
     private bool requireDown = false;
 
-    public QuickButtonBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public QuickButtonBarNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        KTKAddon      = ktkAddon;
-
-        IsVisible     = true;
-
-        PetRenameQuickButton = new QuickButton<PetRenameAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        PetRenameQuickButton = new QuickButton<PetRenameAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText        = SeIconChar.ImeAlphanumeric,
             ShouldBeVisible  = () =>
             {
-                return (ktkAddon is not PetRenameAddon) || PetServices.Configuration.quickButtonsToggle;
+                return (ParentAddon is not PetRenameAddon) || PetServices.Configuration.quickButtonsToggle;
             }
         };
 
         AttachNode(ref PetRenameQuickButton);
 
-        PetListQuickButton  = new QuickButton<PetListAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        PetListQuickButton  = new QuickButton<PetListAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText       = SeIconChar.Collectible,
             ShouldBeVisible = () =>
             {
-                return ((ktkAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 2);
+                return ((ParentAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 2);
             }
         };
 
         AttachNode(ref PetListQuickButton);
 
-        SharingQuickButton  = new QuickButton<PetListAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        SharingQuickButton  = new QuickButton<PetListAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText       = SeIconChar.Glamoured,
             ShouldBeVisible = () =>
             {
-                return ((ktkAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 1);
+                return ((ParentAddon is not PetListAddon) || PetServices.Configuration.quickButtonsToggle) && (PetServices.Configuration.listButtonLayout == 0 || PetServices.Configuration.listButtonLayout == 1);
             }
         };
 
         AttachNode(ref SharingQuickButton);
 
-        ConfigQuickButton   = new QuickButton<PetSettingsAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        ConfigQuickButton   = new QuickButton<PetSettingsAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText       = SeIconChar.BoxedQuestionMark,
             ShouldBeVisible = () =>
             {
-                return (ktkAddon is not PetSettingsAddon) || PetServices.Configuration.quickButtonsToggle;
+                return (ParentAddon is not PetSettingsAddon) || PetServices.Configuration.quickButtonsToggle;
             }
         };
 
         AttachNode(ref ConfigQuickButton);
 
-        KofiQuickButton     = new QuickButton<KofiAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        KofiQuickButton     = new QuickButton<KofiAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText       = SeIconChar.BoxedLetterK,
             ShouldBeVisible = () =>
@@ -97,7 +92,7 @@ internal class QuickButtonBarNode : KTKComponent
 
         AttachNode(ref KofiQuickButton);
 
-        PetDevQuickButton   = new QuickButton<PetDevAddon>(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        PetDevQuickButton   = new QuickButton<PetDevAddon>(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             LabelText       = SeIconChar.Hexagon,
             ShouldBeVisible = () =>
@@ -139,12 +134,12 @@ internal class QuickButtonBarNode : KTKComponent
             CallbackComponent  = this,
         };
 
-        ktkAddon.RegisterGuide(GuideRegistration);
+        ParentAddon.TransientGuideHandler?.RegisterGuide(GuideRegistration);
     }
 
-    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+    public override bool OnCustomInput(NavigationInputId inputId, InputState inputState)
     {
-        bool inputIsDown = (inputState == AtkEventData.AtkInputData.InputState.Down);
+        bool inputIsDown = (inputState == InputState.Down);
 
         if (!inputIsDown && requireDown)
         {
@@ -156,7 +151,7 @@ internal class QuickButtonBarNode : KTKComponent
             requireDown = false;
         }
 
-        if (!inputIsDown && inputState != AtkEventData.AtkInputData.InputState.Held)
+        if (!inputIsDown && inputState != InputState.Held)
         {
             return false;
         }
@@ -424,7 +419,7 @@ internal class QuickButtonBarNode : KTKComponent
 
     protected override void OnDispose()
     {
-        KTKAddon.DeregisterTransient(GuideRegistration);
+        ParentAddon.TransientGuideHandler?.DeregisterGuide(GuideRegistration);
 
         base.OnDispose();
     }

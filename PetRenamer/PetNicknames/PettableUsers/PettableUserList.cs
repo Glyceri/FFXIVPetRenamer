@@ -1,18 +1,28 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal class PettableUserList : IPettableUserList
 {
     public const int PettableUserArraySize = 101;
-    public const int IslandIndex           = 100;
+    public const int IslandIndex = 100;
 
-    public IPettableUser?[] PettableUsers 
-        { get; set; } = new IPettableUser[PettableUserArraySize];
+    private readonly IPettableUser?[]     Users = new IPettableUser[PettableUserArraySize];
+    private readonly IPettableDirtyCaller DirtyCaller;
+
+    public PettableUserList(IPettableDirtyCaller dirtyCaller)
+    {
+        DirtyCaller = dirtyCaller;
+    }
+
+    public IReadOnlyList<IPettableUser?> PettableUsers
+        => Users;
 
     public IPettableUser? LocalPlayer
-        => PettableUsers[0];
+        => Users[0];
 
     public IPettablePet? GetPet(nint pet)
     {
@@ -23,7 +33,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? user = PettableUsers[i];
+            IPettableUser? user = Users[i];
 
             if (user == null)
             {
@@ -39,6 +49,7 @@ internal class PettableUserList : IPettableUserList
 
             return pPet;
         }
+
         return null;
     }
 
@@ -51,7 +62,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -79,7 +90,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -114,7 +125,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -145,7 +156,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -172,7 +183,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -199,7 +210,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -226,7 +237,7 @@ internal class PettableUserList : IPettableUserList
 
         for (int i = 0; i < PettableUserArraySize; i++)
         {
-            IPettableUser? pUser = PettableUsers[i];
+            IPettableUser? pUser = Users[i];
 
             if (pUser == null)
             {
@@ -242,5 +253,18 @@ internal class PettableUserList : IPettableUserList
         }
 
         return null;
+    }
+
+    public void SetUser(int index, in IPettableUser? user)
+    {
+        if (Users[index] != null)
+        {
+            Users[index]?.Dispose();
+            Users[index] = null;
+        }
+
+        Users[index] = user;
+
+        DirtyCaller.DirtyUserList(this);
     }
 }

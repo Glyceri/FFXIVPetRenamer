@@ -9,26 +9,27 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Enums;
 
-namespace PetRenamer.PetNicknames.KTKWindowing;
+namespace PetRenamer.PetNicknames.KTKWindowing.Base;
 
-internal class KTKComponent : SimpleComponentNode
+internal class KTKResNode : ResNode
 {
     protected readonly DalamudServices      DalamudServices;
     protected readonly IPetServices         PetServices;
     protected readonly PettableDirtyHandler DirtyHandler;
     protected readonly KTKWindowHandler     WindowHandler;
+    protected readonly NativeController     NativeController;
 
-    protected readonly NativeController NativeController;
+    protected virtual void OnDirty()   { }
+    protected virtual void OnDispose() { }
 
-    protected PetWindowMode PetMode
-        => KTKAddon.PetMode;
-
-    public KTKComponent(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
+    public KTKResNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
     {
         WindowHandler    = windowHandler;
         DalamudServices  = dalamudServices;
         PetServices      = petServices;
         DirtyHandler     = dirtyHandler;
+
+        IsVisible        = true;
 
         NativeController = petServices.NativeController;
 
@@ -39,6 +40,9 @@ internal class KTKComponent : SimpleComponentNode
         DirtyHandler.RegisterOnPetModeDirty(HandleDirtyPetmode);
         DirtyHandler.RegisterOnWindowDirty(HandleDirtyWindow);
     }
+
+    protected PetWindowMode PetMode
+       => KTKAddon.PetMode;
 
     protected sealed override void Dispose(bool disposing, bool isNativeDestructor)
     {
@@ -53,9 +57,6 @@ internal class KTKComponent : SimpleComponentNode
 
         base.Dispose(disposing, isNativeDestructor);
     }
-
-    protected virtual void OnDirty() { }
-    protected virtual void OnDispose() { }
 
     public virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
         => false;

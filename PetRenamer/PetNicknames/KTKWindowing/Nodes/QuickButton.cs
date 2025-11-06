@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.Text;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
@@ -11,12 +12,15 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
 {
     public readonly HighlightableLightStylizedButton Button;
 
-    private Func<bool> shouldBeVisible = () => true;
+    private Func<bool> shouldBeVisible = () =>
+    {
+        return true;
+    };
 
     private SeIconChar labelText;
 
-    public QuickButton(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public QuickButton(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         IsVisible         = true;
 

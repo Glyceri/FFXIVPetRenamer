@@ -1,25 +1,27 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
+using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.Unsafe;
 
-internal unsafe class TransientGuideString
+internal unsafe class TransientGuideString : IDisposable
 {
-    private readonly SeString SeString;
+    private readonly Utf8String* StringPtr;
 
     public TransientGuideString(SeString seString)
     {
-        SeString = seString;
-    }
-
-    private nint CreateString()
-    {
-        fixed (byte* byteString = SeString.EncodeWithNullTerminator())
+        fixed (byte* str = seString.EncodeWithNullTerminator())
         {
-            return (nint)Utf8String.FromSequence(byteString)->StringPtr.Value;
+            StringPtr = Utf8String.FromSequence(str);
         }
     }
-
+    
     public nint String
-        => CreateString();
+        => (nint)StringPtr->StringPtr.Value;
+
+    public void Dispose()
+    {
+        IMemorySpace.Free(StringPtr);
+    }
 }

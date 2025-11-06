@@ -11,6 +11,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCaller
 {
+    private event Action<IPettableUserList>?      OnUserlist        = _  => { };
     private event Action<IPettableDatabase>?      OnDatabase        = _  => { };
     private event Action<IPettableDatabaseEntry>? OnEntry           = _  => { };
     private event Action<IPettableDatabaseEntry>? OnClear           = _  => { };
@@ -73,6 +74,11 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
         OnUser?.Invoke(user);   
     }
 
+    public void DirtyUserList(IPettableUserList userList)
+    {
+        OnUserlist?.Invoke(userList);
+    }
+
     public void DirtyWindow()
     {
         OnWindowDirty?.Invoke();
@@ -112,6 +118,12 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     {
         OnDirtyNavigation -= dirtyNavigation;
         OnDirtyNavigation += dirtyNavigation;
+    }
+
+    public void RegisterOnDirtyUserList(Action<IPettableUserList> onUserList)
+    {
+        OnUserlist -= onUserList;
+        OnUserlist += onUserList;
     }
 
     public void RegisterOnPetModeDirty(Action<PetWindowMode> petWindowMode)
@@ -160,6 +172,11 @@ internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCall
     public void UnregisterOnDirtyNavigation(NavigationDirty dirtyNavigation)
     {
         OnDirtyNavigation -= dirtyNavigation;
+    }
+
+    public void UnregisterOnDirtyUserList(Action<IPettableUserList> onUserList)
+    {
+        OnUserlist -= onUserList;
     }
 
     public void UnregisterOnPetModeDirty(Action<PetWindowMode> petWindowMode)

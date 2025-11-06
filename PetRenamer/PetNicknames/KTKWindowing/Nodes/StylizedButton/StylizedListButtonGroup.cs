@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -17,8 +18,8 @@ internal class StylizedListButtonGroup : KTKComponent
 
     private int currentIndex = 0;
 
-    public StylizedListButtonGroup(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public StylizedListButtonGroup(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
         IsVisible = true;
     }

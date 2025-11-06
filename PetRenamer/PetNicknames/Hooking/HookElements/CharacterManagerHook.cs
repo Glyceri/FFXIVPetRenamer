@@ -192,11 +192,11 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
-            uint owner = newBattleChara->OwnerId;
+            uint owner         = newBattleChara->OwnerId;
 
-            bool gotOwner = false;
+            bool gotOwner      = false;
 
-            for (int i = 0; i < UserList.PettableUsers.Length; i++)
+            for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
             {
                 IPettableUser? user = UserList.PettableUsers[i];
 
@@ -291,7 +291,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            for (int i = 0; i < UserList.PettableUsers.Length; i++)
+            for (int i = 0; i < UserList.PettableUsers.Count; i++)
             {
                 IPettableUser? user = UserList.PettableUsers[i];
 
@@ -305,9 +305,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                     continue;
                 }
 
-                user?.Dispose(Database);
-
-                UserList.PettableUsers[i] = null;
+                UserList.SetUser(i, null);
 
                 break;
             }
@@ -369,7 +367,9 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         PettableUser newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, UserList, newBattleChara);
 
-        UserList.PettableUsers[actualIndex] = newUser;
+        UserList.SetUser(actualIndex, newUser);
+
+        DirtyCaller.DirtyUserList(UserList);
 
         AddTempPetsToUser(newUser);
 

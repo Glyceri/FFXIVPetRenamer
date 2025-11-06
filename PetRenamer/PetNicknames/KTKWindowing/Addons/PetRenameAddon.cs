@@ -3,6 +3,8 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Nodes;
 using KamiToolKit.Widgets.Parts;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
+using PetRenamer.PetNicknames.KTKWindowing.ControllerNavigation.Implementations;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -36,9 +38,18 @@ internal class PetRenameAddon : KTKAddon
     private FocusableButtonNode? FocusableButtonNode4;
     private FocusableButtonNode? FocusableButtonNode5;
 
+    private FocusableButtonNode? FocusableButtonNode6;
+    private FocusableButtonNode? FocusableButtonNode7;
+    private FocusableButtonNode? FocusableButtonNode8;
+    private FocusableButtonNode? FocusableButtonNode9;
+    private FocusableButtonNode? FocusableButtonNode10;
+
     [SetsRequiredMembers]
     public PetRenameAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
+        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) 
+    {
+        ControllerNavigator = new BasicControllerNavigation(PetServices);
+    }
 
     protected override string WindowInternalName
         => nameof(PetRenameAddon);
@@ -74,14 +85,14 @@ internal class PetRenameAddon : KTKAddon
         
         AttachNode(ref NineGridNode);
 
-        ImageNode       = new PetImageNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        ImageNode       = new PetImageNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size        = new Vector2(142, 142),
         };
 
         AttachNode(ref ImageNode);
 
-        FootstepNode    = new PetFootstepIcon(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FootstepNode    = new PetFootstepIcon(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Size        = new Vector2(142, 142),
             Position    = new Vector2(142, 0)
@@ -89,7 +100,7 @@ internal class PetRenameAddon : KTKAddon
 
         AttachNode(ref FootstepNode);
 
-        PetRenameNode = new PetRenameNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        PetRenameNode = new PetRenameNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
             Position        = new Vector2(200, 0),
             Size            = new Vector2(200, 28),
@@ -123,53 +134,143 @@ internal class PetRenameAddon : KTKAddon
 
         
 
-        FocusableButtonNode1 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FocusableButtonNode1 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(0, 40),
-            Index = 1,
+            Size     = new Vector2(90, 90),
+            Position = new Vector2(0, -15),
+            NavigationIndex    = 1,
+            RightIndex = 2,
+            LeftIndex = 5,
+            UpIndex = 6,
+            DownIndex = 6,
+            LeftStopFlag = true,
         };
 
         AttachNode(ref FocusableButtonNode1);
 
-        addon->FocusNode = FocusableButtonNode1.TextureButtonNode;
-        addon->CursorTarget = FocusableButtonNode1.TextureButtonNode.CollisionNode;
+        ControllerNavigator.SetFocus(FocusableButtonNode1);        
 
-        FocusableButtonNode2 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FocusableButtonNode2 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(90, 40),
-            Index = 2,
+            Size     = new Vector2(90, 90),
+            Position = new Vector2(90, -15),
+            NavigationIndex = 2,
+            RightIndex = 3,
+            LeftIndex = 1,
+            UpIndex = 7,
+            DownIndex = 7,
         };
 
         AttachNode(ref FocusableButtonNode2);
 
-        FocusableButtonNode3 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FocusableButtonNode3 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(180, 40),
-            Index = 3,
+            Size     = new Vector2(90, 90),
+            Position = new Vector2(180, -15),
+            NavigationIndex = 3,
+            RightIndex = 4,
+            LeftIndex = 2,
+            UpIndex = 8,
+            DownIndex = 8,
         };
 
         AttachNode(ref FocusableButtonNode3);
 
-        FocusableButtonNode4 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FocusableButtonNode4 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(270, 40),
-            Index = 4,
+            Size     = new Vector2(90, 90),
+            Position = new Vector2(270, -15),
+            NavigationIndex = 4,
+            RightIndex = 5,
+            LeftIndex = 3,
+            UpIndex = 9,
+            DownIndex = 9,
         };
 
         AttachNode(ref FocusableButtonNode4);
 
-        FocusableButtonNode5 = new FocusableButtonNode(WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FocusableButtonNode5 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(360, 40),
-            Index = 5,
+            Size     = new Vector2(90, 90),
+            Position = new Vector2(360, -15),
+            NavigationIndex = 5,
+            RightIndex = 1,
+            LeftIndex = 4,
+            UpIndex = 10,
+            DownIndex = 10,
+            RightStopFlag = true,
         };
 
         AttachNode(ref FocusableButtonNode5);
+
+
+        FocusableButtonNode6 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(0, 65),
+            NavigationIndex = 6,
+            RightIndex = 7,
+            LeftIndex = 10,
+            UpIndex = 1,
+            DownIndex = 1,
+            LeftStopFlag = true,
+        };
+
+        AttachNode(ref FocusableButtonNode6);
+
+        FocusableButtonNode7 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(90, 65),
+            NavigationIndex = 7,
+            RightIndex = 8,
+            LeftIndex = 6,
+            UpIndex = 2,
+            DownIndex = 2,
+        };
+
+        AttachNode(ref FocusableButtonNode7);
+
+        FocusableButtonNode8 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(180, 65),
+            NavigationIndex = 8,
+            RightIndex = 9,
+            LeftIndex = 7,
+            UpIndex = 3,
+            DownIndex = 3,
+        };
+
+        AttachNode(ref FocusableButtonNode8);
+
+        FocusableButtonNode9 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(270, 65),
+            NavigationIndex = 9,
+            RightIndex = 10,
+            LeftIndex = 8,
+            UpIndex = 4,
+            DownIndex = 4,
+        };
+
+        AttachNode(ref FocusableButtonNode9);
+
+        FocusableButtonNode10 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(90, 90),
+            Position = new Vector2(360, 65),
+            NavigationIndex = 10,
+            RightIndex = 6,
+            LeftIndex = 9,
+            UpIndex = 5,
+            DownIndex = 5,
+            RightStopFlag = true,
+        };
+
+        AttachNode(ref FocusableButtonNode10);
+
 
         SetData();
     }
@@ -205,6 +306,12 @@ internal class PetRenameAddon : KTKAddon
         FootstepNode    = null;
         PetRenameNode   = null;
         CurrentSkeleton = null;
+    }
+
+    // External call to set the active skeleton of the window (always bound to local player c:)
+    public void SetPetSkeleton(PetSkeleton skeleton)
+    {
+        // TODO: IMPLEMENT
     }
 
     protected override void OnDirty()

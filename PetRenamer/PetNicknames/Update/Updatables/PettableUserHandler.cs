@@ -115,14 +115,13 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     private void ClearIslandUser()
     {
-        UserList.PettableUsers[PettableUserList.IslandIndex]?.Dispose(Database);
-        UserList.PettableUsers[PettableUserList.IslandIndex] = null;
+        UserList.SetUser(PettableUserList.IslandIndex, null);
     }
 
     private void CreateIslandUser(IPettableDatabaseEntry entry)
     {
         ClearIslandUser();
 
-        UserList.PettableUsers[PettableUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
+        UserList.SetUser(PettableUserList.IslandIndex, new PettableIslandUser(PetServices, entry));
     }
 }

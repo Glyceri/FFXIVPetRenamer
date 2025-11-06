@@ -66,7 +66,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         DalamudServices             = DalamudServices.Create(dalamud, this)!;
 
-        PettableUserList            = new PettableUserList();
+        DirtyHandler                = new PettableDirtyHandler();
+
+        PettableUserList            = new PettableUserList(DirtyHandler);
 
         PetServices                 = new PetServices(dalamud, DalamudServices, PettableUserList);
 
@@ -75,8 +77,6 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         Translator.Initialise(DalamudServices, PetServices.Configuration);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
-
-        DirtyHandler                = new PettableDirtyHandler();
 
         PettableDatabase            = new PettableDatabase(PetServices, DirtyHandler);
         LegacyDatabase              = new LegacyPettableDatabase(PetServices, DirtyHandler);
@@ -100,7 +100,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         KTKWindowHandler            = new KTKWindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, DirtyHandler);
 
         CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, KTKWindowHandler, PetServices, PettableUserList);
-        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
+        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, KTKWindowHandler, HookHandler.ActionTooltipHook);
 
         PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices, DirtyHandler);
     }

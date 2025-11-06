@@ -35,6 +35,7 @@ internal unsafe class PettableUser : IPettableUser
     private readonly IPettableDirtyListener DirtyListener;
     private readonly IPettableDirtyCaller   DirtyCaller;
     private readonly ISharingDictionary     SharingDictionary;
+    private readonly IPettableDatabase      Database;
 
     public IPettableUserTargetManager? TargetManager { get; private set; }
 
@@ -44,6 +45,7 @@ internal unsafe class PettableUser : IPettableUser
         DirtyListener       = dirtyListener;
         SharingDictionary   = sharingDictionary;
         DirtyCaller         = dirtyCaller;
+        Database            = dataBase;
 
         DirtyListener.RegisterOnClearEntry(OnDirty);
         DirtyListener.RegisterOnDirtyEntry(OnDirty);
@@ -280,7 +282,7 @@ internal unsafe class PettableUser : IPettableUser
         CurrentCastID = castID;
     }
 
-    public void Dispose(IPettableDatabase database)
+    public void Dispose()
     {
 #if DEBUG
         PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
@@ -297,7 +299,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (!IsActive)
         {
-            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
+            Database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
         }
 
         foreach(IPettablePet? pet in PettablePets)

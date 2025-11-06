@@ -3,6 +3,7 @@ using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+using PetRenamer.PetNicknames.KTKWindowing;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -15,20 +16,20 @@ namespace PetRenamer.PetNicknames.ContextMenus;
 
 internal class ContextMenuHandler : IDisposable
 {
-    readonly DalamudServices DalamudServices;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList UserList;
-    readonly IWindowHandler WindowHandler;
-    readonly IActionTooltipHook ActionTooltipHook;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IPetServices       PetServices;
+    private readonly IPettableUserList  UserList;
+    private readonly KTKWindowHandler   KTKWindowHandler;
+    private readonly IActionTooltipHook ActionTooltipHook;
 
     readonly List<IContextMenuElement> ContextMenuElements = new List<IContextMenuElement>();
 
-    public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook)
+    public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, KTKWindowHandler ktkWindowHandler, IActionTooltipHook actionTooltipHook)
     {
-        DalamudServices = dalamudServices;
-        WindowHandler = windowHandler;
-        PetServices = petServices;
-        UserList = userList;
+        DalamudServices   = dalamudServices;
+        KTKWindowHandler  = ktkWindowHandler;
+        PetServices       = petServices;
+        UserList          = userList;
         ActionTooltipHook = actionTooltipHook;
 
         DalamudServices.ContextMenu.OnMenuOpened += OnOpenMenu;
@@ -38,9 +39,9 @@ internal class ContextMenuHandler : IDisposable
 
     void _Register()
     {
-        Register(new TargetContextMenu(PetServices, UserList, WindowHandler));
-        Register(new MinionNoteBookContextMenu(PetServices.PetSheets, UserList, WindowHandler, ActionTooltipHook));
-        Register(new MJIMinionNotebookContextMenu(PetServices.PetSheets, UserList, WindowHandler, ActionTooltipHook));
+        Register(new TargetContextMenu(PetServices, UserList, KTKWindowHandler));
+        Register(new MinionNoteBookContextMenu(PetServices.PetSheets, UserList, KTKWindowHandler, ActionTooltipHook));
+        Register(new MJIMinionNotebookContextMenu(PetServices.PetSheets, UserList, KTKWindowHandler, ActionTooltipHook));
     }
 
     void Register(IContextMenuElement contextMenuElement)

@@ -73,6 +73,13 @@ internal unsafe class TransientGuideHook : HookableElement
 
     protected override void OnDispose()
     {
+        foreach (TransientGuideString transientGuideString in _transientGuideStrings.Values)
+        {
+            transientGuideString.Dispose();
+        }
+
+        _transientGuideStrings.Clear();
+
         FormatAddonTransientHook?.Dispose();
     }
 }

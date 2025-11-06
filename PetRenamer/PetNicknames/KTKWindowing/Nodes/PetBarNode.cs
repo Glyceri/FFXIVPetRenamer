@@ -2,6 +2,8 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Nodes;
 using PetRenamer.PetNicknames.Hooking.Enum;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
+using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
@@ -18,11 +20,31 @@ internal class PetBarNode : KTKComponent
     public  readonly StylizedListButtonGroup StylizedListButtonGroup;
 
     private readonly QuickButtonBarNode      QuickButtonBarNode;
+    private readonly GuideRegistration       TransientGuideRegistration;
 
-    public PetBarNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler, KTKAddon ktkAddon)
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public PetBarNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        StylizedListButtonGroup = new StylizedListButtonGroup(windowHandler, dalamudServices, petServices, dirtyHandler);
+        StylizedListButtonGroup    = new StylizedListButtonGroup(ParentAddon, windowHandler, dalamudServices, petServices, dirtyHandler);
+
+        TransientGuideRegistration = new GuideRegistration
+        {
+            LeftGuideId        = 0,
+            LeftPoint          = OperationGuidePoint.TopLeft,
+            LeftRelativePoint  = OperationGuidePoint.TopLeft,
+            LeftOffsetX        = -15,
+            LeftOffsetY        = 23,
+
+            RightGuideId       = 1,
+            RightPoint         = OperationGuidePoint.TopLeft,
+            RightRelativePoint = OperationGuidePoint.TopLeft,
+            RightOffsetX       = 210,
+            RightOffsetY       = 23,
+
+            CallbackComponent  = this,
+        };
+
+        ParentAddon.TransientGuideHandler?.RegisterGuide(TransientGuideRegistration);
 
         AttachNode(ref StylizedListButtonGroup);
 
@@ -43,7 +65,7 @@ internal class PetBarNode : KTKComponent
             });
         }
 
-        QuickButtonBarNode = new QuickButtonBarNode(WindowHandler, DalamudServices, PetServices, DirtyHandler, ktkAddon);
+        QuickButtonBarNode = new QuickButtonBarNode(ParentAddon, WindowHandler, DalamudServices, PetServices, DirtyHandler);
 
         AttachNode(ref QuickButtonBarNode);
 
@@ -120,5 +142,10 @@ internal class PetBarNode : KTKComponent
         DividingLineNode.Width       = Width;
         DividingLineNode.X           = X - DividingLineNode.LeftOffset;
         DividingLineNode.Y           = baseHeight;
+    }
+
+    protected override void OnDispose()
+    {
+        ParentAddon.TransientGuideHandler?.DeregisterGuide(TransientGuideRegistration);
     }
 }

@@ -124,7 +124,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     public void OnLastCastChanged(uint cast) { } // Unused
     public void RefreshCast() { } // Unused
-    public void Dispose(IPettableDatabase d) { } // Unused
+    public void Dispose() { } // Unused
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused

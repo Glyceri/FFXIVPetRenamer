@@ -4,18 +4,17 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System.Numerics;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
-internal class FocusableButtonNode : KTKComponent
+internal class FocusableButtonNode : NavigableComponent
 {
     public readonly TextureButtonNode TextureButtonNode;
 
-    public FocusableButtonNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, dirtyHandler)
+    public FocusableButtonNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler) 
+        : base(parentAddon, windowHandler, dalamudServices, petServices, dirtyHandler)
     {
-        IsVisible = true;
-
         TextureButtonNode = new TextureButtonNode
         {
             IsVisible          = true,
@@ -25,21 +24,9 @@ internal class FocusableButtonNode : KTKComponent
             NodeFlags          = NodeFlags.Focusable | NodeFlags.Visible | NodeFlags.Enabled | NodeFlags.AnchorTop | NodeFlags.AnchorLeft | NodeFlags.AnchorBottom | NodeFlags.AnchorRight | NodeFlags.HasCollision | NodeFlags.RespondToMouse,
         };
 
-        TextureButtonNode.CollisionNode.NodeFlags = NodeFlags.Focusable | NodeFlags.Visible | NodeFlags.Enabled | NodeFlags.AnchorTop | NodeFlags.AnchorLeft | NodeFlags.AnchorBottom | NodeFlags.AnchorRight | NodeFlags.HasCollision | NodeFlags.RespondToMouse;
+        StandinNode = TextureButtonNode.CollisionNode;
 
         AttachNode(ref TextureButtonNode);
-    }
-
-    public unsafe required byte Index
-    {
-        get => TextureButtonNode.ComponentBase->CursorNavigationInfo.Index;
-        set
-        {
-            TextureButtonNode.ComponentBase->CursorNavigationInfo.Index = value;
-
-            TextureButtonNode.ComponentBase->CursorNavigationInfo.LeftIndex = (byte)(value - 1);
-            TextureButtonNode.ComponentBase->CursorNavigationInfo.RightIndex = (byte)(value + 1);
-        }
     }
 
     protected override void OnSizeChanged()
