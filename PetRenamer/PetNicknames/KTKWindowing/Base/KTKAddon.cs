@@ -4,8 +4,6 @@ using KamiToolKit.Addon;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
 using PetRenamer.PetNicknames.Hooking.Enum;
-using PetRenamer.PetNicknames.KTKWindowing.ControllerNavigation.Implementations;
-using PetRenamer.PetNicknames.KTKWindowing.ControllerNavigation.Interfaces;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.KTKWindowing.TransientGuide;
 using PetRenamer.PetNicknames.PettableDatabase;
@@ -44,13 +42,10 @@ internal abstract class KTKAddon : NativeAddon
     protected abstract bool                   HasPetBar
         { get; }
 
-    protected IControllerNavigator            ControllerNavigator
-        { get; init; }
-
     protected virtual string? WindowSubtitle     
         { get; }
 
-    protected SimpleComponentNode? MainContainerNode { get; private set; }
+    protected ResNode?             MainContainerNode { get; private set; }
     internal  static PetWindowMode PetMode           { get; private set; }
 
     protected PetBarNode? PetBarNode;
@@ -60,8 +55,6 @@ internal abstract class KTKAddon : NativeAddon
     private AtkUnitBasePtr Self;
 
     public TransientGuideHandler? TransientGuideHandler;
-
-    private readonly List<NavigableComponent> _navigableComponents = [];
 
     [SetsRequiredMembers]
     public KTKAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
@@ -86,16 +79,12 @@ internal abstract class KTKAddon : NativeAddon
         {
             Size += new Vector2(0, PetBarOffset);
         }
-
-        ControllerNavigator = new DullImplementation(PetServices);
     }
 
     protected sealed override unsafe void OnSetup(AtkUnitBase* addon)
     {
         Self                  = new AtkUnitBasePtr((nint)addon);
         TransientGuideHandler = new TransientGuideHandler(Self, PetServices);
-
-        ControllerNavigator.RegisterAddon(this);
 
         DirtyHandler.RegisterOnDirtyNavigation(OnInput);
         DirtyHandler.RegisterOnClearEntry(HandleDirtyEntry);
@@ -107,9 +96,6 @@ internal abstract class KTKAddon : NativeAddon
 
         Vector2 contentRegionStartPos = ContentStartPosition;
         Vector2 contentRegionSize     = ContentSize;
-
-        WindowNode.TitleNode.SetEventFlags    = true;
-        WindowNode.SubtitleNode.SetEventFlags = true;
 
         WindowNode.TitleNode.Tooltip    = WindowTooltip;
         WindowNode.SubtitleNode.Tooltip = $"The current Pet Nicknames Version is: " + Subtitle.TextValue;
@@ -129,7 +115,7 @@ internal abstract class KTKAddon : NativeAddon
             AttachNode(PetBarNode);
         }
 
-        MainContainerNode = new SimpleComponentNode
+        MainContainerNode = new ResNode
         {
             Position  = contentRegionStartPos,
             Size      = contentRegionSize,
@@ -176,12 +162,7 @@ internal abstract class KTKAddon : NativeAddon
             return true;
         }
 
-        if (OnCustomInput(inputId, inputState))
-        {
-            return true;
-        }
-
-        return ControllerNavigator.OnCustomInput(inputId, inputState);
+        return OnCustomInput(inputId, inputState);
     }
 
     protected virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
@@ -214,8 +195,6 @@ internal abstract class KTKAddon : NativeAddon
         Self                  = null;
         TransientGuideHandler = null;
 
-        ControllerNavigator.UnregisterAddon();
-
         DirtyHandler.UnregisterOnDirtyNavigation(OnInput);
         DirtyHandler.UnregisterOnClearEntry(HandleDirtyEntry);
         DirtyHandler.UnregisterOnDirtyEntry(HandleDirtyEntry);
@@ -229,21 +208,6 @@ internal abstract class KTKAddon : NativeAddon
         OnAddonFinalize(addon);
 
         DirtyHandler.DirtyWindow();
-    }
-
-    public NavigableComponent[] NavigableComponents
-        => [.._navigableComponents];
-
-    public void RegisterNavigableComponent(NavigableComponent navigableComponent)
-    {
-        _ = _navigableComponents.Remove(navigableComponent);
-
-        _navigableComponents.Add(navigableComponent);
-    }
-
-    public void DeregisterNavigableComponent(NavigableComponent navigableComponent)
-    {
-        _ = _navigableComponents.Remove(navigableComponent);
     }
 
     protected sealed override unsafe void OnUpdate(AtkUnitBase* addon)

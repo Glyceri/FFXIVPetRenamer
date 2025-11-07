@@ -1,8 +1,6 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit;
+﻿using KamiToolKit;
 using KamiToolKit.Nodes;
 using KamiToolKit.System;
-using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -18,16 +16,18 @@ internal class KTKResNode : ResNode
     protected readonly PettableDirtyHandler DirtyHandler;
     protected readonly KTKWindowHandler     WindowHandler;
     protected readonly NativeController     NativeController;
-
+    protected readonly KTKAddon             ParentAddon;
+    
     protected virtual void OnDirty()   { }
     protected virtual void OnDispose() { }
 
-    public KTKResNode(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
+    public KTKResNode(KTKAddon parentAddon, KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, PettableDirtyHandler dirtyHandler)
     {
         WindowHandler    = windowHandler;
         DalamudServices  = dalamudServices;
         PetServices      = petServices;
         DirtyHandler     = dirtyHandler;
+        ParentAddon      = parentAddon;
 
         IsVisible        = true;
 
@@ -57,9 +57,6 @@ internal class KTKResNode : ResNode
 
         base.Dispose(disposing, isNativeDestructor);
     }
-
-    public virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
-        => false;
 
     protected void AttachNode<T>(ref T node) where T : NodeBase
         => NativeController.AttachNode(node, this);

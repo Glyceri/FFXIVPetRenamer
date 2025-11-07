@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
-internal class PetImageNode : KTKComponent
+internal class PetImageNode : KTKResNode
 {
     private readonly IconImageNode      MinionImage;
     private readonly VerminionImageNode MinionTypeNode;

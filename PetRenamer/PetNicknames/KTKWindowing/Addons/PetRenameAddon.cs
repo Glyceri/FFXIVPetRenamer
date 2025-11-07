@@ -1,17 +1,21 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using KamiToolKit.Addons;
 using KamiToolKit.Nodes;
 using KamiToolKit.Widgets.Parts;
+using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
-using PetRenamer.PetNicknames.KTKWindowing.ControllerNavigation.Implementations;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
+using PetRenamer.PetNicknames.KTKWindowing.Nodes.FunctionalNodes;
+using PetRenamer.PetNicknames.KTKWindowing.Nodes.StyledNodes;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Diagnostics.CodeAnalysis;
@@ -32,24 +36,20 @@ internal class PetRenameAddon : KTKAddon
 
     private NineGridNode?      NineGridNode;
 
-    private FocusableButtonNode? FocusableButtonNode1;
-    private FocusableButtonNode? FocusableButtonNode2;
-    private FocusableButtonNode? FocusableButtonNode3;
-    private FocusableButtonNode? FocusableButtonNode4;
-    private FocusableButtonNode? FocusableButtonNode5;
+    private GlowyBarNode?      GlowyBarNode;
+    private SimpleOutlineNode? SimpleOutlineNode;
+    private DoubleArrowNode?   DoubleArrowNode;
+    private ColourButton?      ColourButton;
+    private ColourButton?      ColourButton2;
+    private ColourButton?      ColourButton3;
+    private ColourButton?      ColourButton4;
+    private ColourButton?      ColourButton5;
 
-    private FocusableButtonNode? FocusableButtonNode6;
-    private FocusableButtonNode? FocusableButtonNode7;
-    private FocusableButtonNode? FocusableButtonNode8;
-    private FocusableButtonNode? FocusableButtonNode9;
-    private FocusableButtonNode? FocusableButtonNode10;
+    private MaskTest? MaskTest;
 
     [SetsRequiredMembers]
     public PetRenameAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler) 
-        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) 
-    {
-        ControllerNavigator = new BasicControllerNavigation(PetServices);
-    }
+        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
     protected override string WindowInternalName
         => nameof(PetRenameAddon);
@@ -69,53 +69,176 @@ internal class PetRenameAddon : KTKAddon
 
 
 
-        NineGridNode           = new SimpleNineGridNode
+        NineGridNode = new SimpleNineGridNode
         {
-            IsVisible          = true,
-            TexturePath        = "ui/uld/BgParts.tex",
-            Position           = new Vector2(200, 35),
-            Size               = new Vector2(200, 100),
+            IsVisible = true,
+            TexturePath = "ui/uld/BgParts.tex",
+            Position = new Vector2(200, 35),
+            Size = new Vector2(200, 100),
             TextureCoordinates = new Vector2(61, 37),
-            TextureSize        = new Vector2(16, 16),
-            TopOffset          = 6,
-            BottomOffset       = 6,
-            LeftOffset         = 6,
-            RightOffset        = 6,
+            TextureSize = new Vector2(16, 16),
+            TopOffset = 6,
+            BottomOffset = 6,
+            LeftOffset = 6,
+            RightOffset = 6,
         };
-        
+
         AttachNode(ref NineGridNode);
 
-        ImageNode       = new PetImageNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        GlowyBarNode = new GlowyBarNode
         {
-            Size        = new Vector2(142, 142),
+            Position = new Vector2(300, 100),
+        };
+
+        AttachNode(GlowyBarNode);
+
+        SimpleOutlineNode = new SimpleOutlineNode
+        {
+            Position = new Vector2(412, 140),
+            Width    = 100,
+            Height   = 22,
+        };
+
+        AttachNode(SimpleOutlineNode);
+
+        DoubleArrowNode = new DoubleArrowNode
+        {
+            Position = new Vector2(300, 140),
+            ScaleX = 0.5f
+        };
+
+        AttachNode(DoubleArrowNode);
+
+
+        ColourButton = new ColourButton(WindowHandler, PetServices)
+        {
+            Position = new Vector2(200, 150),
+            Size     = new Vector2(30, 30),
+            Colour   = new Vector3(1, 0, 0),
+        };
+
+        NavigationHelper.SetNavigation(ref ColourButton, new ControllerNavigation
+        {
+            Index      = 1,
+            LeftIndex  = 5,
+            RightIndex = 2,
+            LeftStop   = true,
+        });
+
+        AttachNode(ColourButton);
+
+        ColourButton2 = new ColourButton(WindowHandler, PetServices)
+        {
+            Position = new Vector2(232, 150),
+            Size     = new Vector2(30, 30),
+            Colour   = new Vector3(1, 0, 0),
+        };
+
+        NavigationHelper.SetNavigation(ref ColourButton2, new ControllerNavigation
+        {
+            Index      = 2,
+            LeftIndex  = 1,
+            RightIndex = 3,
+        });
+
+        AttachNode(ColourButton2);
+
+
+
+        ColourButton3 = new ColourButton(WindowHandler, PetServices)
+        {
+            Position = new Vector2(264, 150),
+            Size     = new Vector2(30, 30),
+            Colour   = new Vector3(1, 0, 0),
+        };
+
+        NavigationHelper.SetNavigation(ref ColourButton3, new ControllerNavigation
+        {
+            Index      = 3,
+            LeftIndex  = 2,
+            RightIndex = 4,
+        });
+
+        AttachNode(ColourButton3);
+
+
+
+        ColourButton4 = new ColourButton(WindowHandler, PetServices)
+        {
+            Position = new Vector2(296, 150),
+            Size     = new Vector2(30, 30),
+            Colour   = new Vector3(1, 0, 0),
+        };
+
+        NavigationHelper.SetNavigation(ref ColourButton4, new ControllerNavigation
+        {
+            Index      = 4,
+            LeftIndex  = 3,
+            RightIndex = 5,
+        });
+
+        AttachNode(ColourButton4);
+
+
+
+        ColourButton5 = new ColourButton(WindowHandler, PetServices)
+        {
+            Position = new Vector2(328, 150),
+            Size     = new Vector2(30, 30),
+            Colour   = new Vector3(1, 0, 0),
+        };
+
+        NavigationHelper.SetNavigation(ref ColourButton5, new ControllerNavigation
+        {
+            Index      = 5,
+            LeftIndex  = 4,
+            RightIndex = 1,
+            RightStop  = true,
+        });
+
+        AttachNode(ColourButton5);
+
+        MaskTest = new MaskTest(DalamudServices, PetServices)
+        {
+            Size = new Vector2(50, 50),
+            Position = new Vector2(50, 80),
+            IsVisible = true,
+        };
+
+        AttachNode(MaskTest);
+
+        ImageNode = new PetImageNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        {
+            Size = new Vector2(142, 142),
+            IsVisible = false
         };
 
         AttachNode(ref ImageNode);
 
-        FootstepNode    = new PetFootstepIcon(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
+        FootstepNode = new PetFootstepIcon(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Size        = new Vector2(142, 142),
-            Position    = new Vector2(142, 0)
+            Size = new Vector2(142, 142),
+            Position = new Vector2(142, 0)
         };
 
         AttachNode(ref FootstepNode);
 
         PetRenameNode = new PetRenameNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
         {
-            Position        = new Vector2(200, 0),
-            Size            = new Vector2(200, 28),
-            IsVisible       = true,
-            OnNameComplete  = OnNameEditComplete
+            Position = new Vector2(200, 0),
+            Size = new Vector2(200, 28),
+            IsVisible = true,
+            OnNameComplete = OnNameEditComplete
         };
 
         AttachNode(ref PetRenameNode);
 
         TextColourPicker = new ColorPreviewNode()
         {
-            Position  = new Vector2(393, 0),
-            Size      = new Vector2(28, 28),
+            Position = new Vector2(393, 0),
+            Size = new Vector2(28, 28),
             IsVisible = true,
-            Color     = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
+            Color = new Vector4(0.5f, 0.5f, 0.5f, 1.0f),
         };
 
         AttachNode(ref TextColourPicker);
@@ -123,153 +246,14 @@ internal class PetRenameAddon : KTKAddon
 
         EdgeColourPicker = new ColorPreviewNode()
         {
-            Position  = new Vector2(420, 0),
-            Size      = new Vector2(28, 28),
+            Position = new Vector2(420, 0),
+            Size = new Vector2(28, 28),
             IsVisible = true,
-            Color     = new Vector4(0, 0, 0, 0.5f),
+            Color = new Vector4(0, 0, 0, 0.5f),
         };
 
         AttachNode(ref EdgeColourPicker);
 
-
-        
-
-        FocusableButtonNode1 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size     = new Vector2(90, 90),
-            Position = new Vector2(0, -15),
-            NavigationIndex    = 1,
-            RightIndex = 2,
-            LeftIndex = 5,
-            UpIndex = 6,
-            DownIndex = 6,
-            LeftStopFlag = true,
-        };
-
-        AttachNode(ref FocusableButtonNode1);
-
-        ControllerNavigator.SetFocus(FocusableButtonNode1);        
-
-        FocusableButtonNode2 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size     = new Vector2(90, 90),
-            Position = new Vector2(90, -15),
-            NavigationIndex = 2,
-            RightIndex = 3,
-            LeftIndex = 1,
-            UpIndex = 7,
-            DownIndex = 7,
-        };
-
-        AttachNode(ref FocusableButtonNode2);
-
-        FocusableButtonNode3 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size     = new Vector2(90, 90),
-            Position = new Vector2(180, -15),
-            NavigationIndex = 3,
-            RightIndex = 4,
-            LeftIndex = 2,
-            UpIndex = 8,
-            DownIndex = 8,
-        };
-
-        AttachNode(ref FocusableButtonNode3);
-
-        FocusableButtonNode4 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size     = new Vector2(90, 90),
-            Position = new Vector2(270, -15),
-            NavigationIndex = 4,
-            RightIndex = 5,
-            LeftIndex = 3,
-            UpIndex = 9,
-            DownIndex = 9,
-        };
-
-        AttachNode(ref FocusableButtonNode4);
-
-        FocusableButtonNode5 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size     = new Vector2(90, 90),
-            Position = new Vector2(360, -15),
-            NavigationIndex = 5,
-            RightIndex = 1,
-            LeftIndex = 4,
-            UpIndex = 10,
-            DownIndex = 10,
-            RightStopFlag = true,
-        };
-
-        AttachNode(ref FocusableButtonNode5);
-
-
-        FocusableButtonNode6 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(0, 65),
-            NavigationIndex = 6,
-            RightIndex = 7,
-            LeftIndex = 10,
-            UpIndex = 1,
-            DownIndex = 1,
-            LeftStopFlag = true,
-        };
-
-        AttachNode(ref FocusableButtonNode6);
-
-        FocusableButtonNode7 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(90, 65),
-            NavigationIndex = 7,
-            RightIndex = 8,
-            LeftIndex = 6,
-            UpIndex = 2,
-            DownIndex = 2,
-        };
-
-        AttachNode(ref FocusableButtonNode7);
-
-        FocusableButtonNode8 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(180, 65),
-            NavigationIndex = 8,
-            RightIndex = 9,
-            LeftIndex = 7,
-            UpIndex = 3,
-            DownIndex = 3,
-        };
-
-        AttachNode(ref FocusableButtonNode8);
-
-        FocusableButtonNode9 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(270, 65),
-            NavigationIndex = 9,
-            RightIndex = 10,
-            LeftIndex = 8,
-            UpIndex = 4,
-            DownIndex = 4,
-        };
-
-        AttachNode(ref FocusableButtonNode9);
-
-        FocusableButtonNode10 = new FocusableButtonNode(this, WindowHandler, DalamudServices, PetServices, DirtyHandler)
-        {
-            Size = new Vector2(90, 90),
-            Position = new Vector2(360, 65),
-            NavigationIndex = 10,
-            RightIndex = 6,
-            LeftIndex = 9,
-            UpIndex = 5,
-            DownIndex = 5,
-            RightStopFlag = true,
-        };
-
-        AttachNode(ref FocusableButtonNode10);
 
 
         SetData();
@@ -306,6 +290,7 @@ internal class PetRenameAddon : KTKAddon
         FootstepNode    = null;
         PetRenameNode   = null;
         CurrentSkeleton = null;
+        MaskTest = null;
     }
 
     // External call to set the active skeleton of the window (always bound to local player c:)
@@ -316,6 +301,11 @@ internal class PetRenameAddon : KTKAddon
 
     protected override void OnDirty()
         => SetData();
+
+    protected override unsafe void OnDraw(AtkUnitBase* addon)
+    {
+        MaskTest?.Draw();
+    }
 
     private void SetData()
     {

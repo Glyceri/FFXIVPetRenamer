@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
-internal class PetFootstepIcon : KTKComponent
+internal class PetFootstepIcon : KTKResNode
 {
     private readonly IconImageNode FootstepImage;
 

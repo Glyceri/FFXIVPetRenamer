@@ -11,7 +11,7 @@ using PetRenamer.PetNicknames.Windowing.Enums;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Base;
 
-internal class KTKComponent : SimpleComponentNode
+internal abstract class KTKComponent : SimpleComponentNode
 {
     protected readonly KTKAddon             ParentAddon;
     protected readonly DalamudServices      DalamudServices;
@@ -31,8 +31,8 @@ internal class KTKComponent : SimpleComponentNode
         PetServices      = petServices;
         DirtyHandler     = dirtyHandler;
 
-        CollisionNode.NodeFlags &= ~NodeFlags.Focusable;
-        IsVisible               = true;
+        IsVisible                   = true;
+        CollisionNode.IsVisible     = false;
 
         NativeController = petServices.NativeController;
 

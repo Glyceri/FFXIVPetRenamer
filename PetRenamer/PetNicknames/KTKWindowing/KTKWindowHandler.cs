@@ -1,5 +1,6 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using KamiToolKit.Addons;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
+using PetRenamer.PetNicknames.KTKWindowing.Addons.ElusiveAddons;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -29,6 +30,9 @@ internal class KTKWindowHandler : IDisposable
     private readonly KofiAddon            KofiAddon;
     private readonly PetDevAddon          PetDevAddon;
 
+    public readonly  ColourPickerAddon    ColourPicker;
+    public readonly  ColorPickerAddon     KTKColorPickerReference;
+
     public KTKWindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase, PettableDirtyHandler dirtyHandler)
     {
         PetServices     = petServices;
@@ -44,6 +48,15 @@ internal class KTKWindowHandler : IDisposable
         RegisterWindow(KofiAddon          = new KofiAddon       (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
         RegisterWindow(PetDevAddon        = new PetDevAddon     (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
 
+        ColourPicker = new ColourPickerAddon(PetServices);
+        KTKColorPickerReference = new ColorPickerAddon
+        {
+            InternalName = "PNRefColourPicker",
+            Title = "color piccker",
+            NativeController = petServices.NativeController
+        };
+
+        //PetListAddon.Open();
         PetRenameKTKWindow.Open();
         //PetSettingsAddon.Open();
 

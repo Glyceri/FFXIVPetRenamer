@@ -11,7 +11,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
-internal class PetRenameNode : KTKComponent
+internal class PetRenameNode : KTKResNode
 {
     private const    string        PlaceholderString = "Nickname . . .";
 

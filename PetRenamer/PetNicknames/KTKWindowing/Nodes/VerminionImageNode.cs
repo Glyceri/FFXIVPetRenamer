@@ -10,11 +10,11 @@ internal class VerminionImageNode : SimpleImageNode
 
     public VerminionImageNode()
     {
-        WrapMode           = WrapMode.Stretch;
-        IsVisible          = true;
-        TexturePath        = "ui/uld/iconVerminion.tex";
-        TextureSize        = new Vector2(24, 24);
-        MinionRace         = 1;
+        WrapMode    = WrapMode.Stretch;
+        IsVisible   = true;
+        TexturePath = "ui/uld/iconVerminion.tex";
+        TextureSize = new Vector2(24, 24);
+        MinionRace  = 1;
     }
 
     public uint MinionRace
