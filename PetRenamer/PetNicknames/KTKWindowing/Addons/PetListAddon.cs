@@ -20,17 +20,14 @@ internal class PetListAddon : KTKAddon
     public PetListAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
-    protected override string WindowInternalName
-        => nameof(PetListAddon);
+    public override string WindowName
+        => "Pet List";
 
     protected override Vector2 WindowSize
         => new Vector2(520, 200);
 
     protected override bool HasPetBar
         => true;
-
-    public override string WindowTooltip
-        => "Pet List & Sharing";
 
     protected override unsafe void OnAddonSetup(AtkUnitBase* addon)
     {

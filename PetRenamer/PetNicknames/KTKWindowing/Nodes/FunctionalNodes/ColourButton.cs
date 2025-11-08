@@ -21,8 +21,8 @@ internal class ColourButton : ButtonBase
         IsVisible = true;
         IsEnabled = true;
 
-        //OnClick   = windowHandler.ColourPicker.Open;
-        OnClick = windowHandler.KTKColorPickerReference.Open;
+        OnClick   = windowHandler.ColourPicker.Open;
+        //OnClick = windowHandler.KTKColorPickerReference.Open;
 
         ColourImage = new SimpleImageNode
         {

@@ -13,7 +13,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
@@ -30,19 +29,13 @@ internal abstract class KTKAddon : NativeAddon
     protected readonly PettableDirtyHandler   DirtyHandler;
     protected readonly IPettableDatabase      Database;
 
-    public abstract string                    WindowTooltip 
+    public abstract string     WindowName
         { get; }
 
-    protected abstract string                 WindowInternalName  
+    protected abstract Vector2 WindowSize          
         { get; }
 
-    protected abstract Vector2                WindowSize          
-        { get; }
-
-    protected abstract bool                   HasPetBar
-        { get; }
-
-    protected virtual string? WindowSubtitle     
+    protected abstract bool    HasPetBar
         { get; }
 
     protected ResNode?             MainContainerNode { get; private set; }
@@ -68,12 +61,12 @@ internal abstract class KTKAddon : NativeAddon
 
         NativeController    = petServices.NativeController;
 
-        InternalName        = WindowInternalName;
+        InternalName        = GetType().Name;
         Title               = "Pet Nicknames";
 
-        Subtitle            = $"v{DalamudServices.PetNicknamesPlugin.Version}";
+        Subtitle            = WindowName;
 
-        Size                = WindowSize;
+        Size = WindowSize;
 
         if (HasPetBar)
         {
@@ -81,10 +74,25 @@ internal abstract class KTKAddon : NativeAddon
         }
     }
 
+    protected override unsafe void OnShow(AtkUnitBase* addon)
+    {
+        base.OnShow(addon);
+
+        if (UserList.LocalPlayer == null)
+        {
+            _ = DalamudServices.Framework.RunOnTick(Close);
+        }
+    }
+
     protected sealed override unsafe void OnSetup(AtkUnitBase* addon)
     {
+        if (UserList.LocalPlayer == null)
+        {
+            return;
+        }
+
         Self                  = new AtkUnitBasePtr((nint)addon);
-        TransientGuideHandler = new TransientGuideHandler(Self, PetServices);
+        TransientGuideHandler = new TransientGuideHandler(Self, this, PetServices);
 
         DirtyHandler.RegisterOnDirtyNavigation(OnInput);
         DirtyHandler.RegisterOnClearEntry(HandleDirtyEntry);
@@ -94,11 +102,11 @@ internal abstract class KTKAddon : NativeAddon
         DirtyHandler.RegisterOnPetModeDirty(HandleDirtyPetmode);
         DirtyHandler.RegisterOnWindowDirty(HandleDirtyWindow);
 
-        Vector2 contentRegionStartPos = ContentStartPosition;
-        Vector2 contentRegionSize     = ContentSize;
+        Vector2 contentRegionStartPos   = ContentStartPosition;
+        Vector2 contentRegionSize       = ContentSize;
 
-        WindowNode.TitleNode.Tooltip    = WindowTooltip;
-        WindowNode.SubtitleNode.Tooltip = $"The current Pet Nicknames Version is: " + Subtitle.TextValue;
+        WindowNode.TitleNode.Tooltip    = $"Pet Nicknames Version: {DalamudServices.PetNicknamesPlugin.Version}";
+        WindowNode.SubtitleNode.Tooltip = WindowName;
 
         if (HasPetBar)
         {
@@ -157,15 +165,20 @@ internal abstract class KTKAddon : NativeAddon
             return false;
         }
 
+        if (OnCustomInput(inputId, inputState))
+        {
+            return true;
+        }
+
         if (TransientGuideHandler?.OnInput(inputId, inputState) ?? false)
         {
             return true;
         }
 
-        return OnCustomInput(inputId, inputState);
+        return false;
     }
 
-    protected virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+    public virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
         => false;
 
     private void HandleDirtyDatabase(INamesDatabase namesDatabase)

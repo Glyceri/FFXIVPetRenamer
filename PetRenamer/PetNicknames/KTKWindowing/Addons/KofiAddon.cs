@@ -15,15 +15,12 @@ internal class KofiAddon : KTKAddon
     public KofiAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler)
        : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
-    protected override string WindowInternalName
-        => nameof(KofiAddon);
+    public override string WindowName
+        => "Ko-Fi Support";
 
     protected override Vector2 WindowSize
         => new Vector2(520, 200);
 
     protected override bool HasPetBar
         => false;
-
-    public override string WindowTooltip
-        => "Ko-Fi Support";
 }

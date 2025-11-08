@@ -61,9 +61,6 @@ internal abstract class KTKComponent : SimpleComponentNode
         base.Dispose(disposing, isNativeDestructor);
     }
 
-    public virtual bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
-        => false;
-
     protected void AttachNode<T>(ref T node) where T : NodeBase
         => NativeController.AttachNode(node, this);
 

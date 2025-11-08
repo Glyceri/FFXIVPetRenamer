@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.Hooking.Structs;
+using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.Services.Interface;
 using System.Collections.Generic;
@@ -11,15 +12,17 @@ namespace PetRenamer.PetNicknames.KTKWindowing.TransientGuide;
 internal class TransientGuideHandler
 {
     private readonly IPetServices            PetServices;
+    private readonly KTKAddon                KTKAddon;
     private readonly AtkUnitBasePtr          Addon;
 
     private readonly List<GuideRegistration> _guides = [];
 
     private int activeGuide = -1;
 
-    public TransientGuideHandler(AtkUnitBasePtr addon, IPetServices petServices)
+    public TransientGuideHandler(AtkUnitBasePtr addon, KTKAddon ktkAddon, IPetServices petServices)
     {  
         Addon       = addon;
+        KTKAddon    = ktkAddon;
         PetServices = petServices;
     }
 
@@ -47,14 +50,14 @@ internal class TransientGuideHandler
 
         _guides.Add(guideRegistration);
 
-        SetTransientIndex(0);
+        SetGuideIndex(0);
     }
 
     public void DeregisterGuide(GuideRegistration guideRegistration)
     {
         _ = _guides.Remove(guideRegistration);
 
-        SetTransientIndex(0);
+        SetGuideIndex(0);
     }
 
     public void Update()
@@ -73,6 +76,16 @@ internal class TransientGuideHandler
         }
     }
 
+    public void SelectNextGuide()
+    {
+        SetGuideIndex(activeGuide + 1);
+    }
+
+    public void SelectPreviousGuide()
+    {
+        SetGuideIndex(activeGuide - 1);
+    }
+
     private bool HandleLocalInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
     {
         if (inputId != NavigationInputId.NintendoX)
@@ -85,9 +98,7 @@ internal class TransientGuideHandler
             return false;
         }
 
-        SetTransientIndex(activeGuide + 1);
-
-        PetServices.PetLog.LogWarning("Transients: " + _guides.Count + ", " + activeGuide);
+        SelectNextGuide();
 
         return true;
     }
@@ -101,7 +112,7 @@ internal class TransientGuideHandler
 
         GuideRegistration registration = _guides[activeGuide];
 
-        return registration.CallbackComponent.OnCustomInput(inputId, inputState);
+        return registration.CallbackComponent.OnCustomGuideInput(inputId, inputState);
     }
 
     public bool OnInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
@@ -139,7 +150,7 @@ internal class TransientGuideHandler
         addon->OperationGuides[index].OffsetY          = 0;
     }
 
-    public void SetTransientIndex(int index)
+    public void SetGuideIndex(int index, bool callCallbacks = true)
     {
         int guideCount = _guides.Count;
 
@@ -150,7 +161,10 @@ internal class TransientGuideHandler
 
         if (activeGuide >= 0 && activeGuide < guideCount)
         {
-            _guides[activeGuide]?.OnUnselected?.Invoke();
+            if (callCallbacks)
+            {
+                _guides[activeGuide]?.OnUnselected?.Invoke();
+            }
         }
 
         activeGuide = index;
@@ -160,15 +174,24 @@ internal class TransientGuideHandler
             activeGuide = 0;
         }
 
+        if (activeGuide < 0)
+        {
+            activeGuide = guideCount - 1;
+        }
+
         if (guideCount == 0)
         {
             activeGuide = -1;
         }
 
-        if (activeGuide != -1 && activeGuide < guideCount)
+        if (activeGuide > -1 && activeGuide < guideCount)
         {
             SetLowerGuide(_guides[activeGuide]?.LowerGuideId ?? 2);
-            _guides[activeGuide]?.OnSelected?.Invoke();
+
+            if (callCallbacks)
+            {
+                _guides[activeGuide]?.OnSelected?.Invoke();
+            }
 
             RefreshOperationsGuide();
         }
@@ -177,6 +200,21 @@ internal class TransientGuideHandler
     public void SetLowerGuide(byte index)
     {
         SetGuide(0, index, OperationGuidePoint.Center, OperationGuidePoint.Bottom, 0, 0);
+    }
+
+    public void SetGuide(GuideRegistration guide, bool callCallbacks = true)
+    {
+        for (byte i = 0; i < _guides.Count; i++)
+        {
+            if (guide != _guides[i])
+            {
+                continue;
+            }
+
+            SetGuideIndex(i, callCallbacks);
+
+            break;
+        }
     }
 
     public unsafe void SetGuide(byte index, uint guideId, OperationGuidePoint point, OperationGuidePoint relativePoint, short offsetX, short offsetY)
@@ -199,9 +237,18 @@ internal class TransientGuideHandler
         addon->OperationGuides[index].Point             = point;
         addon->OperationGuides[index].RelativePoint     = relativePoint;
         addon->OperationGuides[index].AddonTransientId  = PluginConstants.PET_NICKNAMES_TRANSIENT_OFFSET + guideId;
-        addon->OperationGuides[index].OffsetX           = offsetX;
-        addon->OperationGuides[index].OffsetY           = offsetY;
 
-        RefreshOperationsGuide();
+        if (point == OperationGuidePoint.TopLeft || point == OperationGuidePoint.TopRight)
+        {
+            addon->OperationGuides[index].OffsetX       = (short)(KTKAddon.ContentStartPosition.X + offsetX);
+            addon->OperationGuides[index].OffsetY       = (short)(KTKAddon.ContentStartPosition.Y + offsetY);
+        }
+        else
+        {
+            addon->OperationGuides[index].OffsetX       = offsetX;
+            addon->OperationGuides[index].OffsetY       = offsetY;
+        }
+
+            RefreshOperationsGuide();
     }
 }

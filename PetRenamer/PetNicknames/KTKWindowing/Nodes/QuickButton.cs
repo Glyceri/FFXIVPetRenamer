@@ -47,7 +47,7 @@ internal class QuickButton<T> : KTKComponent where T : KTKAddon
             }
         };
 
-        Button.CollisionNode.Tooltip = windowHandler.GetAddon<T>()?.WindowTooltip ?? "If you see this something is cooked ...";
+        Button.CollisionNode.Tooltip = windowHandler.GetAddon<T>()?.WindowName ?? "If you see this something is cooked ...";
 
         AttachNode(ref Button);
     }

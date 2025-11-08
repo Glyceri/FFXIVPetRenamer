@@ -1,10 +1,10 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.KTKWindowing.Base;
+using PetRenamer.PetNicknames.KTKWindowing.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Helpers;
 
-internal class GuideRegistration
+internal class GuideRegistration : IHasSelectableCallbacks
 {
     public          byte                LowerGuideId        { get; init; } = 2;
 
@@ -20,8 +20,8 @@ internal class GuideRegistration
     public required short               RightOffsetX        { get; set; }
     public required short               RightOffsetY        { get; set; }
 
-    public required KTKComponent        CallbackComponent   { get; init; }
+    public required ICustomInput        CallbackComponent   { get; init; }
 
-    public          Action?             OnSelected          { get; init; }
-    public          Action?             OnUnselected        { get; init; }
+    public          Action?             OnSelected          { get; set; }
+    public          Action?             OnUnselected        { get; set; }
 }

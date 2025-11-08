@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Addons;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
+using PetRenamer.PetNicknames.KTKWindowing.Interfaces;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
@@ -13,7 +14,7 @@ using static FFXIVClientStructs.FFXIV.Component.GUI.AtkEventData.AtkInputData;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes;
 
-internal class QuickButtonBarNode : KTKComponent
+internal class QuickButtonBarNode : KTKComponent, ICustomInput
 {
     private readonly QuickButton<PetRenameAddon>    PetRenameQuickButton;
     private readonly QuickButton<PetListAddon>      PetListQuickButton;
@@ -121,13 +122,13 @@ internal class QuickButtonBarNode : KTKComponent
             LeftPoint          = OperationGuidePoint.TopRight,
             LeftRelativePoint  = OperationGuidePoint.TopRight,
             LeftOffsetX        = -210,
-            LeftOffsetY        = 23,
+            LeftOffsetY        = -15,
 
             RightGuideId       = 1,
             RightPoint         = OperationGuidePoint.TopRight,
             RightRelativePoint = OperationGuidePoint.TopRight,
             RightOffsetX       = 15,
-            RightOffsetY       = 23,
+            RightOffsetY       = -15,
 
             OnSelected         = OnSelected,
             OnUnselected       = OnUnselected,
@@ -137,7 +138,7 @@ internal class QuickButtonBarNode : KTKComponent
         ParentAddon.TransientGuideHandler?.RegisterGuide(GuideRegistration);
     }
 
-    public override bool OnCustomInput(NavigationInputId inputId, InputState inputState)
+    public bool OnCustomGuideInput(NavigationInputId inputId, InputState inputState)
     {
         bool inputIsDown = (inputState == InputState.Down);
 
@@ -388,7 +389,7 @@ internal class QuickButtonBarNode : KTKComponent
         SetPosition(KofiQuickButton);
         SetPosition(PetDevQuickButton);
 
-        GuideRegistration.LeftOffsetX = (short)(-(Width - widthOffset - PetRenameQuickButton.Width));
+        GuideRegistration.LeftOffsetX = (short)(-(Width - widthOffset - PetRenameQuickButton.Width + 20));
 
         if (requestRefresh)
         {

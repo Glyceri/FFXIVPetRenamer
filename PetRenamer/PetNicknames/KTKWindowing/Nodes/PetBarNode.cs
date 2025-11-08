@@ -1,7 +1,6 @@
 ﻿using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit.Nodes;
-using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Helpers;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
@@ -32,16 +31,16 @@ internal class PetBarNode : KTKComponent
             LeftGuideId        = 0,
             LeftPoint          = OperationGuidePoint.TopLeft,
             LeftRelativePoint  = OperationGuidePoint.TopLeft,
-            LeftOffsetX        = -15,
-            LeftOffsetY        = 23,
+            LeftOffsetX        = -30,
+            LeftOffsetY        = -15,
 
             RightGuideId       = 1,
             RightPoint         = OperationGuidePoint.TopLeft,
             RightRelativePoint = OperationGuidePoint.TopLeft,
-            RightOffsetX       = 210,
-            RightOffsetY       = 23,
+            RightOffsetX       = 200,
+            RightOffsetY       = -15,
 
-            CallbackComponent  = this,
+            CallbackComponent  = StylizedListButtonGroup,
         };
 
         ParentAddon.TransientGuideHandler?.RegisterGuide(TransientGuideRegistration);
@@ -86,9 +85,6 @@ internal class PetBarNode : KTKComponent
 
         DividingLineNode.IsVisible = PetServices.Configuration.showDividingLine;
     }
-
-    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
-        => StylizedListButtonGroup.OnCustomInput(inputId, inputState);
 
     private void OnButtonClickedForPetMode(PetWindowMode petMode)
         => DirtyHandler.DirtyPetMode(petMode);

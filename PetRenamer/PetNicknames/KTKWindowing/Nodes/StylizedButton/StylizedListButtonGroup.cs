@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
+using PetRenamer.PetNicknames.KTKWindowing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -12,7 +13,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.KTKWindowing.Nodes.StylizedButton;
 
-internal class StylizedListButtonGroup : KTKComponent
+internal class StylizedListButtonGroup : KTKComponent, ICustomInput
 {
     private readonly List<StylizedListButton> _buttons = [];
 
@@ -27,7 +28,7 @@ internal class StylizedListButtonGroup : KTKComponent
     public StylizedListButton[] Buttons
         => [.. _buttons];
 
-    public override bool OnCustomInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
+    public bool OnCustomGuideInput(NavigationInputId inputId, AtkEventData.AtkInputData.InputState inputState)
     {
         if (inputState != AtkEventData.AtkInputData.InputState.Down)
         {

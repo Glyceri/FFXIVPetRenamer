@@ -23,6 +23,13 @@ internal unsafe class TransientGuideHook : HookableElement
     public TransientGuideHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
         : base(services, userList, petServices, dirtyListener) 
     {
+        AddTransientGuideString(4, new SeStringBuilder()
+            .AddIcon(BitmapFontIcon.ControllerButton3)
+            .AddText(" or ")
+            .AddIcon(BitmapFontIcon.ControllerDPadUpDown)
+            .AddText(" to select a colour.")
+            .Build());
+
         AddTransientGuideString(3, new SeStringBuilder()
             .AddIcon(BitmapFontIcon.ControllerButton3)
             .AddText(" to toggle Quick Select ")

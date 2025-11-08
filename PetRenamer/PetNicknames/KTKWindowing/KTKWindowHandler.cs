@@ -42,13 +42,13 @@ internal class KTKWindowHandler : IDisposable
         LegacyDatabase  = legacyDatabase;
         DirtyHandler    = dirtyHandler;
 
-        RegisterWindow(PetRenameKTKWindow = new PetRenameAddon  (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(PetSettingsAddon   = new PetSettingsAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(PetListAddon       = new PetListAddon    (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(KofiAddon          = new KofiAddon       (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-        RegisterWindow(PetDevAddon        = new PetDevAddon     (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
-
-        ColourPicker = new ColourPickerAddon(PetServices);
+        RegisterWindow(PetRenameKTKWindow = new PetRenameAddon   (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetSettingsAddon   = new PetSettingsAddon (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetListAddon       = new PetListAddon     (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(KofiAddon          = new KofiAddon        (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(PetDevAddon        = new PetDevAddon      (this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        RegisterWindow(ColourPicker       = new ColourPickerAddon(this, DalamudServices, PetServices, UserList, Database, DirtyHandler));
+        
         KTKColorPickerReference = new ColorPickerAddon
         {
             InternalName = "PNRefColourPicker",

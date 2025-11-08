@@ -1,10 +1,8 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit.Addons;
 using KamiToolKit.Nodes;
 using KamiToolKit.Widgets.Parts;
-using PetRenamer.PetNicknames.Hooking.Enum;
 using PetRenamer.PetNicknames.KTKWindowing.Base;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes;
 using PetRenamer.PetNicknames.KTKWindowing.Nodes.FunctionalNodes;
@@ -51,8 +49,8 @@ internal class PetRenameAddon : KTKAddon
     public PetRenameAddon(KTKWindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, PettableDirtyHandler dirtyHandler) 
         : base(windowHandler, dalamudServices, petServices, userList, database, dirtyHandler) { }
 
-    protected override string WindowInternalName
-        => nameof(PetRenameAddon);
+    public override string WindowName
+        => "Nickname";
 
     protected override Vector2 WindowSize
         => new Vector2(520, 200);
@@ -60,14 +58,9 @@ internal class PetRenameAddon : KTKAddon
     protected override bool HasPetBar
         => true;
 
-    public override string WindowTooltip
-        => "Pet Nicknames";
-
     protected override unsafe void OnAddonSetup(AtkUnitBase* addon)
     {
         DirtyHandler.RegisterOnPlayerCharacterDirty(OnDirtyPlayer);
-
-
 
         NineGridNode = new SimpleNineGridNode
         {
@@ -290,7 +283,18 @@ internal class PetRenameAddon : KTKAddon
         FootstepNode    = null;
         PetRenameNode   = null;
         CurrentSkeleton = null;
-        MaskTest = null;
+        TextColourPicker = null;
+        EdgeColourPicker = null;
+        NineGridNode    = null;
+        GlowyBarNode = null;
+        SimpleOutlineNode = null;
+        DoubleArrowNode = null;
+        ColourButton = null;
+        ColourButton2 = null;
+        ColourButton3 = null;
+        ColourButton4 = null;
+        ColourButton5 = null;
+        MaskTest        = null;
     }
 
     // External call to set the active skeleton of the window (always bound to local player c:)
