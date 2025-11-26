@@ -1,11 +1,12 @@
 ﻿using Dalamud.Game.Addon.Lifecycle;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services;
-using System;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -17,7 +18,7 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
 
     private IPettablePet? currentPet = null;
 
-    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
+    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<PetSkeleton, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         base.Setup(services, userList, petServices, dirtyListener, AddonName, textPos, allowedCallback, allowColours, isSoft);
 
@@ -44,7 +45,8 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         SetDirty();
     }
 
-    protected override bool BlockedCheck() => blocked || base.BlockedCheck();
+    protected override bool BlockedCheck() 
+        => blocked || base.BlockedCheck();
 
     protected override unsafe AtkTextNode* GetTextNode(in BaseNode bNode)
     {
@@ -52,12 +54,17 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
         {
             bgNode = bNode.GetNode<AtkNineGridNode>(backgroundNodePos);
         }
+
         return base.GetTextNode(in bNode);
     }
 
     protected override IPetSheetData? GetPetData(string text, in IPettableUser user)
     {
-        if (currentPet?.Owner != user) return null;
+        if (currentPet?.Owner != user)
+        {
+            return null;
+        }
+
         return currentPet?.PetData;
     }
 
@@ -65,15 +72,23 @@ internal unsafe class MapTooltipTextHook : SimpleTextHook
     {
         base.SetText(textNode, text, customName, pPet);
 
-        if (bgNode == null) return;
-        if (textNode == null) return;
+        if (bgNode == null)
+        {
+            return;
+        }
+
+        if (textNode == null)
+        {
+            return;
+        }
 
         textNode->ResizeNodeForCurrentText();
 
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    protected override IPettableUser? GetUser() => currentPet?.Owner;
+    protected override IPettableUser? GetUser() 
+        => currentPet?.Owner;
 
     public override void OnDispose()
     {

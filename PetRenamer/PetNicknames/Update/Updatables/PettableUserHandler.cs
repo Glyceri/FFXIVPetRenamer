@@ -10,7 +10,8 @@ namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal unsafe class PettableUserHandler : IUpdatable
 {
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } 
+        = true;
 
     private bool isDirty = false;
 
@@ -36,7 +37,7 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     public void OnUpdate(IFramework framework)
     {
-        for (int i = 0; i < PettableUsers.PettableUserList.PettableUserArraySize; i++)
+        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
         {
             IPettableUser? user = UserList.PettableUsers[i];
 
@@ -51,38 +52,50 @@ internal unsafe class PettableUserHandler : IUpdatable
         HandleIsland();
     }
 
-    void HandleIsland()
+    private void HandleIsland()
     {
-        if (PetServices.Configuration.showOnIslandPets)
+        if (!PetServices.Configuration.showOnIslandPets)
         {
-            IslandHook.Update();
+            return;
+        }
 
-            if (!IslandHook.IslandStatusChanged && !isDirty)
-            {
-                return;
-            }
+        IslandHook.Update();
 
-            ClearDirty();
+        if (!IslandHook.IslandStatusChanged && !isDirty)
+        {
+            return;
+        }
 
-            if (IslandHook.IsOnIsland)
-            {
-                HandleOnIsland();
-            }
-            else
-            {
-                HandleNotOnIsland();
-            }
+        ClearDirty();
+
+        if (IslandHook.IsOnIsland)
+        {
+            HandleOnIsland();
+        }
+        else
+        {
+            HandleNotOnIsland();
         }
     }
 
-    private void OnDirty(IPettableDatabase database)    => SetDirty();
-    private void OnDirty(INamesDatabase database)       => SetDirty();
-    private void OnDirty(IPettableDatabaseEntry entry)  => SetDirty();
+    private void OnDirty(IPettableDatabase database)    
+        => SetDirty();
 
-    private void SetDirty()     => isDirty = true;
-    private void ClearDirty()   => isDirty = false;
+    private void OnDirty(INamesDatabase database)       
+        => SetDirty();
 
-    private void HandleNotOnIsland() => ClearIslandUser();
+    private void OnDirty(IPettableDatabaseEntry entry)  
+        => SetDirty();
+
+    private void SetDirty()     
+        => isDirty = true;
+
+    private void ClearDirty()   
+        => isDirty = false;
+
+    private void HandleNotOnIsland() 
+        => ClearIslandUser();
+
     private void HandleOnIsland()
     {
         if (IslandHook.VisitingFor == null || IslandHook.VisitingHomeworld == null)

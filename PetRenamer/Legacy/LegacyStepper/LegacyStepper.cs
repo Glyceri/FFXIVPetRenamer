@@ -7,14 +7,14 @@ namespace PetRenamer.Legacy.LegacyStepper;
 
 internal class LegacyStepper
 {
-    readonly Configuration Configuration;
-    readonly PetServices PetServices;
+    private readonly Configuration Configuration;
+    private readonly PetServices   PetServices;
 
-    readonly List<ILegacyStepperElement> legacyStepperElements = new List<ILegacyStepperElement>();
+    private readonly List<ILegacyStepperElement> legacyStepperElements = [];
 
     public LegacyStepper(Configuration configuration, PetServices petServices)
     {
-        PetServices = petServices;
+        PetServices   = petServices;
         Configuration = configuration;
 
         if (Configuration.Version <= 2 || Configuration.Version > Configuration.currentSaveFileVersion)
@@ -24,6 +24,7 @@ internal class LegacyStepper
             // Or you edited your savefile improperly, to hell with it.
             // Let's set it to the max and hope for the best...
             Configuration.Version = Configuration.currentSaveFileVersion;
+
             return;
         }
 
@@ -36,10 +37,15 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer7(PetServices));
         legacyStepperElements.Add(new LegacyNamingVer8());
         legacyStepperElements.Add(new LegacyNamingVer9(PetServices));
+        legacyStepperElements.Add(new LegacyNamingVer10(PetServices));
 
         foreach (ILegacyStepperElement legacyStepperElement in legacyStepperElements)
         {
-            if (legacyStepperElement.OldVersion != Configuration.Version) continue;
+            if (legacyStepperElement.OldVersion != Configuration.Version)
+            {
+                continue;
+            }
+
             legacyStepperElement.Upgrade(Configuration);
         }
     }

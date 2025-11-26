@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
@@ -36,7 +37,8 @@ internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
         DalamudServices.GameGui.HoveredActionChanged += OnHoveredActionChanged;
     }
 
-    private bool Allowed(int id) => PetServices.Configuration.showOnTooltip;
+    private bool Allowed(PetSkeleton id) 
+        => PetServices.Configuration.showOnTooltip;
 
     private void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
     {

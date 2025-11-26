@@ -19,7 +19,7 @@ public class SerializableUser
     public SerializableUser(SerializableNickname[] nicknames, string username, ushort homeworld)
     {
         this.nicknames = nicknames;
-        this.username = username;
+        this.username  = username;
         this.homeworld = homeworld;
     }
 }

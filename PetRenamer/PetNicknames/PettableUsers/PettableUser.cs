@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -19,7 +18,7 @@ internal unsafe class PettableUser : IPettableUser
     public ushort   Homeworld   { get; }
     public ulong    ObjectID    { get; }
 
-    public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
+    public List<IPettablePet> PettablePets { get; } = [];
 
     public nint         Address     { get; private set; }
     public BattleChara* BattleChara { get; }
@@ -68,7 +67,7 @@ internal unsafe class PettableUser : IPettableUser
         if (legacyEntry != null)
         {
             legacyEntry.UpdateContentID(ContentID, true);
-            legacyDatabase.RemoveEntry(legacyEntry);
+            legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
             _ = legacyEntry.MoveToDataBase(dataBase);
             legacyDatabase.SetDirty();
         }
@@ -228,27 +227,29 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet pPet = PettablePets[i];
 
-            if (filter != PetFilter.None)
+            if (filter == PetFilter.None)
             {
-                if (filter != PetFilter.Minion && pPet is PettableCompanion)
-                {
-                    continue;
-                }
+                return pPet;
+            }
 
-                if (filter != PetFilter.BattlePet && filter != PetFilter.Chocobo && pPet is PettableBattlePet)
-                {
-                    continue;
-                }
+            if (filter != PetFilter.Minion && pPet is PettableCompanion)
+            {
+                continue;
+            }
 
-                if (filter == PetFilter.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
-                {
-                    continue;
-                }
+            if (filter != PetFilter.BattlePet && filter != PetFilter.Chocobo && pPet is PettableBattlePet)
+            {
+                continue;
+            }
 
-                if (filter == PetFilter.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
-                {
-                    continue;
-                }
+            if (filter == PetFilter.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
+            {
+                continue;
+            }
+
+            if (filter == PetFilter.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
+            {
+                continue;
             }
 
             return pPet;
@@ -296,7 +297,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (!IsActive)
         {
-            database.RemoveEntry(DataBaseEntry);
+            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
         }
 
         foreach(IPettablePet? pet in PettablePets)

@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using PN.S;
@@ -18,7 +19,7 @@ internal interface IPettableDatabaseEntry
     bool IsIPC { get; }
     bool IsLegacy { get; }
 
-    ImmutableArray<int> SoftSkeletons { get; }
+    ImmutableArray<PetSkeleton> SoftSkeletons { get; }
 
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
@@ -31,16 +32,16 @@ internal interface IPettableDatabaseEntry
     /// <param name="database">The database to move this entry into.</param>
     /// <returns>If the move succeeded.</returns>
     bool MoveToDataBase(IPettableDatabase database);
-    string? GetName(int skeletonID);
-    Vector3? GetEdgeColour(int skeletonID);
-    Vector3? GetTextColour(int skeletonID);
-    int? GetSoftSkeleton(int softIndex);
-    void SetSoftSkeleton(int index, int softSkeleton);
-    void SetName(int skeletonID, string name, Vector3? edgeColour, Vector3? textColour);
+    string? GetName(PetSkeleton skeletonID);
+    Vector3? GetEdgeColour(PetSkeleton skeletonID);
+    Vector3? GetTextColour(PetSkeleton skeletonID);
+    PetSkeleton? GetSoftSkeleton(int softIndex);
+    void SetSoftSkeleton(int index, PetSkeleton softSkeleton);
+    void SetName(PetSkeleton skeletonID, string name, Vector3? edgeColour, Vector3? textColour);
 
     void Clear(ParseSource parseSource);
     void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);
     void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource);
 
-    SerializableUserV5 SerializeEntry();
+    SerializableUserV6 SerializeEntry();
 }

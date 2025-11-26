@@ -7,22 +7,27 @@ namespace PetNicknames.PetNicknames.Update.Updatables;
 
 internal class IPCPreparer : IUpdatable
 {
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } 
+        = true;
 
-    readonly IPettableUserList UserList;
-    readonly IIpcProvider IIpcProvider;
+    private readonly IPettableUserList UserList;
+    private readonly IIpcProvider      IIpcProvider;
 
     public IPCPreparer(IPettableUserList userList, IIpcProvider ipcProvider)
     {
-        UserList = userList;
+        UserList     = userList;
         IIpcProvider = ipcProvider;
     }
 
     public void OnUpdate(IFramework framework)
     {
-        if (UserList.LocalPlayer == null) return;
+        if (UserList.LocalPlayer == null)
+        {
+            return;
+        }
 
         IIpcProvider.Prepare();
+
         Enabled = false;
     }
 }

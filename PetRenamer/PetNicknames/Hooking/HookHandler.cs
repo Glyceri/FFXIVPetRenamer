@@ -23,9 +23,11 @@ internal class HookHandler : IDisposable
     private readonly IPettableDirtyCaller   DirtyCaller;
     private readonly ITooltipHookHelper     TooltipHookHelper;
 
-    public IMapTooltipHook MapTooltipHook { get; private set; } = null!;
+    public IMapTooltipHook    MapTooltipHook    { get; private set; } = null!;
     public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
-    public IIslandHook IslandHook { get; private set; } = null!;
+    public IIslandHook        IslandHook        { get; private set; } = null!;
+
+    private readonly List<IHookableElement> hookableElements = [];
 
     public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller)
     {
@@ -65,11 +67,10 @@ internal class HookHandler : IDisposable
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }
 
-    private readonly List<IHookableElement> hookableElements = new List<IHookableElement>();
-
     private void Register(IHookableElement element)
     {
         hookableElements.Add(element);
+
         element?.Init();
     }
 

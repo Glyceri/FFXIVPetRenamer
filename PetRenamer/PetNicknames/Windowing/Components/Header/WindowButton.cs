@@ -7,12 +7,17 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
 internal static class WindowButton
 {
-    public static float Width => GetWidth();
+    public static float Width
+        => ImGui.GetContentRegionAvail().Y;
 
     public static void Draw<T>(in WindowHandler handler, in Configuration configuration, FontAwesomeIcon icon, string tooltip) where T : PetWindow
-    { 
+    {
         T? window = handler.GetWindow<T>();
-        if (window == null) return;
+
+        if (window == null)
+        {
+            return;
+        }
 
         bool isActive = window.IsOpen;
 
@@ -23,8 +28,9 @@ internal static class WindowButton
         ImGui.PushFont(UiBuilder.IconFont);
 
         // Hehe sex
+        TextAligner.Align(TextAlignment.Right);
         bool shouldDoWindow = ImGui.Button($"{icon.ToIconString()}##quickButton_{WindowHandler.InternalCounter}", new Vector2(size, size));
-
+        TextAligner.PopAlignment();
 
         ImGui.PopFont();
 
@@ -35,7 +41,10 @@ internal static class WindowButton
 
         ImGui.EndDisabled();
 
-        if (!shouldDoWindow) return;
+        if (!shouldDoWindow)
+        {
+            return;
+        }
 
         if (configuration.quickButtonsToggle)
         {
@@ -45,12 +54,5 @@ internal static class WindowButton
         {
             window.Open();
         }
-    }
-
-    static float GetWidth()
-    {
-        float height = ImGui.GetContentRegionAvail().Y;
-
-        return height;
     }
 }

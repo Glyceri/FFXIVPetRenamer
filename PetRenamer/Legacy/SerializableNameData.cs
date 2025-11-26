@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 
 // Keep save file size shorter ....
@@ -26,12 +25,6 @@ internal class SerializableNameData
         }
         IDS = ids;
         Names = names;
-    }
-
-    public SerializableNameData(in INamesDatabase namesDatabase)
-    {
-        IDS = namesDatabase.IDs; 
-        Names = namesDatabase.Names;
     }
 }
 

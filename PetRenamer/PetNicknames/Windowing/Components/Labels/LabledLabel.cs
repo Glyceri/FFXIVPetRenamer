@@ -11,7 +11,7 @@ internal static class LabledLabel
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
+        float actualWidth = labelWidth * WindowHandler.GlobalScale;
 
         TextAligner.Align(TextAlignment.Left);
         BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);
@@ -28,7 +28,7 @@ internal static class LabledLabel
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
+        float actualWidth = labelWidth * WindowHandler.GlobalScale;
 
         TextAligner.Align(TextAlignment.Left);
         BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);

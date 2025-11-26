@@ -3,24 +3,28 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
 internal class IPCWatcher : IUpdatable
 {
-    public bool Enabled { get; set; } = false;  // This system doesn't work as I intended it to yet... this is extremely problematic as it causes double references and stale references and teehee heehee's all around
+    // This system doesn't work as I intended it to yet... this is extremely problematic as it causes double references and stale references and teehee heehee's all around
+    public bool Enabled { get; set; } 
+        = false;  
 
-    readonly IPettableUserList UserList;
-    readonly IPettableDatabase Database;
-    readonly IPetServices PetServices;
+    private readonly IPettableUserList UserList;
+    private readonly IPettableDatabase Database;
+    private readonly IPetServices      PetServices;
 
-    double counter = 0;
-    const int CheckDelay = 300; // 5 minutes
+    private double counter = 0;
+
+    private const int CheckDelay = 300; // 5 minutes
 
     public IPCWatcher(IPettableUserList userList, IPettableDatabase database, IPetServices petServices)
     {
-        UserList = userList;
-        Database = database;
+        UserList    = userList;
+        Database    = database;
         PetServices = petServices;
     }
 
@@ -28,28 +32,43 @@ internal class IPCWatcher : IUpdatable
     {
         counter += framework.UpdateDelta.TotalSeconds;
 
-        if (counter < CheckDelay) return;
+        if (counter < CheckDelay)
+        {
+            return;
+        }
 
         counter -= CheckDelay;
 
         Verify();
     }
 
-    void Verify()
+    private void Verify()
     {
         PetServices.PetLog.LogVerbose("Verify Database");
 
         foreach (IPettableDatabaseEntry entry in Database.DatabaseEntries)
         {
-            if (!entry.IsActive) continue;
-            if (!entry.IsIPC) continue;
+            if (!entry.IsActive)
+            {
+                continue;
+            }
+
+            if (!entry.IsIPC)
+            {
+                continue;
+            }
 
             IPettableUser? user = UserList.GetUserFromContentID(entry.ContentID);
-            if (user != null) continue; // User exists so its fine to keep this IPC user
+
+            // User exists so its fine to keep this IPC user
+            if (user != null)
+            {
+                continue;
+            }
 
             PetServices.PetLog.LogVerbose($"IPCUser: {entry.Name} {entry.HomeworldName} was not found and has been removed from the database.");
 
-            Database.RemoveEntry(entry);
+            Database.RemoveEntry(entry, ParseSource.IPC);
         }
     }
 }

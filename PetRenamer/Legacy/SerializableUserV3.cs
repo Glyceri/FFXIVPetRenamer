@@ -20,11 +20,12 @@ public class SerializableUserV3
 
     public SerializableUserV3(string username, ushort homeworld)
     {
-        this.username = username;
+        this.username  = username;
         this.homeworld = homeworld;
     }
 
-    public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) : this(username, homeworld)
+    public SerializableUserV3(string username, ushort homeworld, int[] mainSkeletons, int[] softSkeletons) 
+        : this(username, homeworld)
     {
         if (mainSkeletons?.Length == 5) this.mainSkeletons = mainSkeletons;
         if (softSkeletons?.Length == 5) this.softSkeletons = softSkeletons;

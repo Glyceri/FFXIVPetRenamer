@@ -2,5 +2,5 @@
 
 internal interface IPettableEntity
 {
-    nint Address { get; }
+    public nint Address { get; }
 }

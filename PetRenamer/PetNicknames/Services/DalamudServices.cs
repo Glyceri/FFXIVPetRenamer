@@ -25,16 +25,16 @@ internal class DalamudServices
     [PluginService] internal IPartyList                      PartyList                   { get; private set; } = null!;
     [PluginService] internal IContextMenu                    ContextMenu                 { get; private set; } = null!;
     [PluginService] internal INotificationManager            NotificationManager         { get; private set; } = null!;
-    [PluginService] internal INamePlateGui                   NameplateGUI                { get; private set; } = null!;
     [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
 
     public static DalamudServices Create(IDalamudPluginInterface plugin, PetRenamerPlugin petNicknames)
     {
-        DalamudServices service = new DalamudServices();
-        plugin.Inject(service);
+        DalamudServices service    = new DalamudServices();
+
+        _ = plugin.Inject(service);
 
         service.PetNicknamesPlugin = petNicknames;
-        service.DalamudPlugin = plugin;
+        service.DalamudPlugin      = plugin;
 
         return service;
     }

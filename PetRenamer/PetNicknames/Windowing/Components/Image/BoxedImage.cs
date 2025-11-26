@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 using PetRenamer.PetNicknames.Windowing.Components.Texture;
 using System.Numerics;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Image;
 
@@ -31,7 +32,7 @@ internal static class BoxedImage
         float framePaddingX = stylePtr.FramePadding.X;
         float framePaddingY = stylePtr.FramePadding.Y;
 
-        if (data.Model <= -1) 
+        if (data.Model.SkeletonType == SkeletonType.BattlePet) 
         {
             textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon).GetWrapOrEmpty(); 
         }

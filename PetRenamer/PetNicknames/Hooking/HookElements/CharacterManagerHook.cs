@@ -8,6 +8,8 @@ using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -252,7 +254,9 @@ internal unsafe class CharacterManagerHook : HookableElement
             return false;
         }
 
-        if (PetServices.PetSheets.GetPet(newBattleChara->ModelContainer.ModelCharaId) == null)
+        PetSkeleton temporaryPetSkeleton = new PetSkeleton((uint)newBattleChara->ModelContainer.ModelCharaId, SkeletonType.Minion);
+
+        if (PetServices.PetSheets.GetPet(temporaryPetSkeleton) == null)
         {
             return false;
         }

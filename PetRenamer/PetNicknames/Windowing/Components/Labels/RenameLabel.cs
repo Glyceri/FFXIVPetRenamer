@@ -13,8 +13,8 @@ internal static class RenameLabel
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
-        float height = size.Y;
+        float actualWidth = labelWidth * WindowHandler.GlobalScale;
+        float height      = size.Y;
 
         TextAligner.Align(TextAlignment.Left);
         BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);

@@ -29,8 +29,6 @@ internal class PetDevWindow : PetWindow
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 400);
     protected override bool HasModeToggle { get; } = true;
 
-    float BarSize = 30 * ImGuiHelpers.GlobalScale;
-
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
@@ -148,7 +146,7 @@ internal class PetDevWindow : PetWindow
 
     unsafe void DrawIPCTester()
     {
-        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale);
+        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
         if (LabledLabel.DrawButton("Recollect Data", "Click here##recollectButton", size))
         {
@@ -203,65 +201,61 @@ internal class PetDevWindow : PetWindow
 
         LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
 
-        //if (hasTarget)
+        if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
         {
+            Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
-            if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
+            LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
+
+            BattleChara* bChara = (BattleChara*)player.Address;
+
+            if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
             {
-                Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale);
+                ClearIPC(bChara->ObjectIndex);
+            }
 
-                LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
+            if (hasTarget)
+            {
+                string startString = "[PetNicknames(2)]\n";
+                startString += bChara->NameString + "\n";
+                startString += bChara->HomeWorld + "\n";
+                startString += bChara->ContentId + "\n";
+                startString += "[-411,-417,-416,-415,-407]";
 
-                BattleChara* bChara = (BattleChara*)player.Address;
 
-                if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
+                BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
+                if (bPet != null)
                 {
-                    ClearIPC(bChara->ObjectIndex);
+                    RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+                    if (clicked)
+                    {
+                        int id = -bPet->Character.ModelContainer.ModelCharaId;
+                        startString += $"\n{id}^{targetBattlePetName}";
+                    }
                 }
 
-                if (hasTarget)
+                Character* minion = &bChara->CompanionObject->Character;
+                if (minion != null)
                 {
-                    string startString = "[PetNicknames(2)]\n";
-                    startString += bChara->NameString + "\n";
-                    startString += bChara->HomeWorld + "\n";
-                    startString += bChara->ContentId + "\n";
-                    startString += "[-411,-417,-416,-415,-407]";
-
-
-                    BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
-                    if (bPet != null)
-                    {
-                        RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
-                        if (clicked)
-                        {
-                            int id = -bPet->Character.ModelContainer.ModelCharaId;
-                            startString += $"\n{id}^{targetBattlePetName}";
-                        }
-                    }
-
-                    Character* minion = &bChara->CompanionObject->Character;
-                    if (minion != null)
-                    {
-                        RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
-
-                        if (clicked)
-                        {
-                            int id = minion->ModelContainer.ModelCharaId;
-                            startString += $"\n{id}^{targetMinionName}";
-                        }
-                    }
+                    RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
 
                     if (clicked)
                     {
-                        DalamudServices.PluginLog.Debug(startString);
-                        SendAll(startString);
+                        int id = minion->ModelContainer.ModelCharaId;
+                        startString += $"\n{id}^{targetMinionName}";
                     }
-
-                    clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
                 }
 
-                Listbox.End();
+                if (clicked)
+                {
+                    DalamudServices.PluginLog.Debug(startString);
+                    SendAll(startString);
+                }
+
+                clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
             }
+
+            Listbox.End();
         }
     }
 
@@ -387,8 +381,8 @@ internal class PetDevWindow : PetWindow
             }
         }
 
-        LabledLabel.Draw("Accurate Battle Pet Count: ", $"{battlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize), labelWidth: 400);
-        LabledLabel.Draw("My calculated Battle Pet Count (These should be equal): ", $"{glyceriEstematedBattlePetCount}", new Vector2(ImGui.GetContentRegionAvail().X, BarSize), labelWidth: 400);
+        LabledLabel.Draw("Accurate Battle Pet Count: ", $"{battlePetCount}", WindowHandler.StretchingBar, labelWidth: 400);
+        LabledLabel.Draw("My calculated Battle Pet Count (These should be equal): ", $"{glyceriEstematedBattlePetCount}", WindowHandler.StretchingBar, labelWidth: 400);
     }
 
     void NewDrawUser(IPettableUser user)

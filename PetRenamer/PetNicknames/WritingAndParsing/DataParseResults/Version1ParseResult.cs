@@ -1,30 +1,32 @@
-﻿using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
-using System;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 
 internal class Version1ParseResult : IBaseParseResult
 {
-    public string UserName { get; init; }
-    public ushort Homeworld { get; init; }
+    public string UserName  { get; }
+    public ushort Homeworld { get; }
 
-    public int[] IDs { get; init; } = Array.Empty<int>();
-    public string[] Names { get; init; } = Array.Empty<string>();
-    public Vector3?[] EdgeColous { get; init; } = Array.Empty<Vector3?>();
-    public Vector3?[] TextColours { get; init; } = Array.Empty<Vector3?>();
+    public PetSkeleton[] IDs         { get; } = [];
+    public string[]      Names       { get; } = [];
+    public Vector3?[]    EdgeColous  { get; } = [];
+    public Vector3?[]    TextColours { get; } = [];
 
     public Version1ParseResult(string userName, ushort homeworld)
     {
-        UserName = userName;
+        UserName  = userName;
         Homeworld = homeworld;
     }
 
-    public Version1ParseResult(string userName, ushort homeworld, int[] ids, string[] names) : this(userName, homeworld)
+    public Version1ParseResult(string userName, ushort homeworld, int[] ids, string[] names) 
+        : this(userName, homeworld)
     {
-        IDs = ids;
-        Names = names;
-        EdgeColous = new Vector3?[ids.Length];
+        IDs         = PetSkeletonHelper.AsPetSkeletons(ids);
+        Names       = names;
+        EdgeColous  = new Vector3?[ids.Length];
         TextColours = new Vector3?[ids.Length];
     }
 }

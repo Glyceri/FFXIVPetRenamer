@@ -4,7 +4,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using System;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -89,13 +89,13 @@ internal unsafe class TargetBarHook : QuickHookableElement
         return returner;
     }
 
-    private bool Allowed(int id)              
+    private bool Allowed(PetSkeleton id)              
         => PetServices.Configuration.showOnTargetBars;
 
-    private bool AllowedCastbar(int id)       
+    private bool AllowedCastbar(PetSkeleton id)       
         => PetServices.Configuration.showOnCastbars;
 
-    private bool AllowedNotebook(int id)      
+    private bool AllowedNotebook(PetSkeleton id)      
         => PetServices.Configuration.showNamesInMinionBook;
 
     private void OnTargetChanged()

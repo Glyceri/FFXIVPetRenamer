@@ -31,9 +31,9 @@ internal interface IPettableDatabase
     /// </summary>
     /// <param name="entry">Entry to remove.</param>
     /// <returns>Whether the remove succeeded.</returns>
-    void RemoveEntry(IPettableDatabaseEntry entry);
+    void RemoveEntry(IPettableDatabaseEntry entry, ParseSource parseSource);
 
-    SerializableUserV5[] SerializeDatabase();
+    SerializableUserV6[] SerializeDatabase();
 
     void SetDirty();
     void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource);

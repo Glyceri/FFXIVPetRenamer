@@ -1,11 +1,12 @@
 ﻿using Dalamud.Game.Addon.Lifecycle;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookTypes;
 
@@ -16,7 +17,7 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
 
     private IPetSheetData? currentData = null;
 
-    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<int, bool> allowedCallback, bool allowColours, bool isSoft = false)
+    public override void Setup(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, string AddonName, uint[] textPos, Func<PetSkeleton, bool> allowedCallback, bool allowColours, bool isSoft = false)
     {
         base.Setup(services, userList, petServices, dirtyListener, AddonName, textPos, allowedCallback, allowColours, isSoft);
 
@@ -45,17 +46,26 @@ internal unsafe class ActionTooltipTextHook : SimpleTextHook
     {
         base.SetText(textNode, text, customName, pPet);
 
-        if (bgNode == null) return;
-        if (textNode == null) return;
+        if (bgNode == null)
+        {
+            return;
+        }
+
+        if (textNode == null)
+        {
+            return;
+        }
 
         textNode->ResizeNodeForCurrentText();
 
         bgNode->AtkResNode.SetWidth((ushort)(textNode->AtkResNode.Width + 18));
     }
 
-    public void SetPetSheetData(IPetSheetData? petSheetData) => currentData = petSheetData;
+    public void SetPetSheetData(IPetSheetData? petSheetData) 
+        => currentData = petSheetData;
 
-    protected override IPetSheetData? GetPetData(string text, in IPettableUser user) => currentData;
+    protected override IPetSheetData? GetPetData(string text, in IPettableUser user) 
+        => currentData;
 
     public override void OnDispose()
     {
