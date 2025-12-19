@@ -47,6 +47,7 @@ internal static class Translator
         { "UserListElement.WarningIPC", "This user is temporarily added via an\nexternal plugin and will not be saved." },
         { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },
         { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." },
+        { "IslandWarning", "Pet Nicknames was unable to resolve the owner of this island. Please rejoin this island." },
 
         { "ShareWindow.Export", "Export to Clipboard" },
         { "ShareWindow.Import", "Import from Clipboard" },
@@ -77,6 +78,7 @@ internal static class Translator
         { "Config.Targetbar", "Show nicknames for Targets." },
         { "Config.Partylist", "Show nicknames on the Party List." },
         { "Config.ContextMenu", "Allow Context Menus." },
+        { "Config.ShowNotification", "Show Notifications." },
         { "Config.IslandWarning", "Show a warning upon unresolved Island Owner." },
         { "Config.IslandPets", "Show names on Island Pets." },
         { "Config.Penumbra.AttachToPCP", "Attach Pet Nicknames data to Penumbra .pcp files." },

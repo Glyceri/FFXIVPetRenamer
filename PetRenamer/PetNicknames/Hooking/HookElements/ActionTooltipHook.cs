@@ -1,4 +1,6 @@
-﻿using Dalamud.Game.Gui;
+﻿using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookTypes;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -7,66 +9,129 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
+internal  class ActionTooltipHook : QuickHookableElement, IActionTooltipHook
 {
-    private readonly ActionTooltipTextHook tooltipHook = null!;
-    private readonly ActionTooltipTextHook actionTooltipHook = null!;
-    private readonly ITooltipHookHelper TooltipHook;
+    public IPetSheetData? CurrentlyHoveredPet { get; private set; }
 
-    public uint LastActionID { get; private set; } = 0;
+    private readonly ActionTooltipTextHook TooltipTextHook;
+    private readonly ActionTooltipTextHook ActionTooltipTextHook;
 
-    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener, ITooltipHookHelper tooltipHookHelper) : base(services, petServices, userList, dirtyListener)
+    public ActionTooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
+        : base(services, petServices, userList, dirtyListener) 
     {
-        TooltipHook = tooltipHookHelper;
+        TooltipTextHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, false, true);
+        TooltipTextHook.Register(3);
 
-        tooltipHook = Hook<ActionTooltipTextHook>("Tooltip", [2], Allowed, false, true);
-        tooltipHook.Register(3);
-
-        actionTooltipHook = Hook<ActionTooltipTextHook>("ActionDetail", [5], Allowed, false, true);
-        actionTooltipHook.Register();
+        ActionTooltipTextHook = Hook<ActionTooltipTextHook>("ActionDetail", [5], Allowed, false, true);
+        ActionTooltipTextHook.Register();
     }
 
     public override void Init()
     {
-        TooltipHook?.RegisterCallback(OnShowTooltipDetour);
-
-        DalamudServices.GameGui.HoveredActionChanged += OnHoveredActionChanged;
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, OnEvent);
     }
 
-    private bool Allowed(PetSkeleton id) 
+    private bool Allowed(PetSkeleton id)
         => PetServices.Configuration.showOnTooltip;
 
-    private void OnShowTooltipDetour(nint tooltip, AtkTooltipType tooltipType, ushort addonID, nint a4, nint a5, nint a6, bool a7, bool a8)
+    private unsafe void OnEvent(AddonEvent type, AddonArgs args)
     {
-        tooltipHook.SetPetSheetData(null);
-        actionTooltipHook.SetPetSheetData(null);
-    }
+        CurrentlyHoveredPet = null;
 
-    private void OnHoveredActionChanged(object? sender, HoveredAction e)
-    {
-        IPettableUser? localUser = UserList.LocalPlayer;
-        if (localUser == null) return;
+        AtkStage* atkStage = AtkStage.Instance();
 
-        uint action = e.ActionID;
-        if (action != 0)
+        if (atkStage == null)
         {
-            LastActionID = action;
+            return;
         }
 
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(action, in localUser, true);
+        AtkCollisionManager* collisionManager = AtkStage.Instance()->AtkCollisionManager;
 
-        tooltipHook.SetPetSheetData(petData);
-        actionTooltipHook.SetPetSheetData(petData);
+        if (collisionManager == null)
+        {
+            return;
+        }
+
+        AtkCollisionNode* collisionNode = collisionManager->IntersectingCollisionNode;
+
+        if (collisionNode == null)
+        {
+            return;
+        }
+
+        AtkResNode* resNode = &collisionNode->AtkResNode;
+
+        if (resNode == null)
+        {
+            return;
+        }
+
+        AtkResNode* parentNode = resNode->ParentNode;
+
+        if (parentNode == null)
+        {
+            return;
+        }
+
+        if (parentNode->GetNodeType() != NodeType.Component)
+        {
+            return;
+        }
+
+        AtkComponentNode* componentNode = parentNode->GetAsAtkComponentNode();
+
+        if (componentNode == null)
+        {
+            return;
+        }
+
+        AtkComponentBase* componentBase = componentNode->Component;
+
+        if (componentBase == null)
+        {
+            return;
+        }
+
+        if (componentBase->GetComponentType() != ComponentType.DragDrop)
+        {
+            return;
+        }
+
+        AtkComponentDragDrop* dragDropComponent = parentNode->GetAsAtkComponentDragDrop();
+
+        if (dragDropComponent == null)
+        {
+            return;
+        }
+
+        AtkComponentIcon* componentIcon = dragDropComponent->AtkComponentIcon;
+
+        if (componentIcon == null)
+        {
+            return;
+        }
+
+        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromIcon(componentIcon->IconId);
+
+        if (petSheetData == null)
+        {
+            return;
+        }
+
+        CurrentlyHoveredPet = petSheetData;
+
+        TooltipTextHook.SetPetSheetData(CurrentlyHoveredPet);
+        ActionTooltipTextHook.SetPetSheetData(CurrentlyHoveredPet);
     }
 
     protected override void OnQuickDispose()
     {
-        TooltipHook?.DeregisterCallback(OnShowTooltipDetour);
+        TooltipTextHook?.Dispose();
+        ActionTooltipTextHook?.Dispose();
 
-        DalamudServices.GameGui.HoveredActionChanged -= OnHoveredActionChanged;
+        DalamudServices.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, OnEvent);
     }
 }

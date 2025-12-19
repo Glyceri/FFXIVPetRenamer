@@ -5,11 +5,11 @@ using PetRenamer.PetNicknames.Windowing.Interfaces;
 
 namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 
-internal class MJIMinionNotebookContextMenu : PetActionContextMenu
+internal class QuickPanelContextMenu : PetActionContextMenu
 {
-    public MJIMinionNotebookContextMenu(IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook) 
-        : base(userList, windowHandler, actionTooltipHook) { }
+    public QuickPanelContextMenu(IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook)
+        :base(userList, windowHandler, actionTooltipHook) { }
 
     public override string? AddonName
-        => "MJIMinionNoteBook";
+        => "QuickPanel";
 }

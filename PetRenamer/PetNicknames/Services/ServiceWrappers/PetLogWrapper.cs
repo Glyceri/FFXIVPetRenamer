@@ -7,17 +7,14 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class PetLogWrapper : IPetLog
 {
-#if DEBUG
     public static IPetLog Instance;
-#endif
 
     private readonly IPluginLog PluginLog;
 
     public PetLogWrapper(IPluginLog pluginLog) 
     {
-#if DEBUG
         Instance  = this;
-#endif
+
         PluginLog = pluginLog;
     }
 

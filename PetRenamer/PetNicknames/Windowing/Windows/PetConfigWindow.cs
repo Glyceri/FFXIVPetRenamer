@@ -45,9 +45,20 @@ internal class PetConfigWindow : PetWindow
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
         {
-            DrawBasicToggle(Translator.GetLine("Config.Kofi"),          ref Configuration.showKofiButton);
-            DrawBasicToggle(Translator.GetLine("Config.Toggle"),        ref Configuration.quickButtonsToggle);
-            DrawBasicToggle(Translator.GetLine("Config.IslandWarning"), ref Configuration.showIslandWarning);
+            DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref Configuration.showKofiButton);
+            DrawBasicToggle(Translator.GetLine("Config.Toggle"),            ref Configuration.quickButtonsToggle);
+
+            ImGui.NewLine();
+
+            DrawBasicToggle(Translator.GetLine("Config.ShowNotification"),  ref Configuration.showNotifications);
+
+            ImGui.BeginDisabled(!Configuration.showNotifications);
+
+            DrawBasicToggle(Translator.GetLine("Config.IslandWarning"),     ref Configuration.showIslandWarning);
+
+            ImGui.EndDisabled();
+
+            ImGui.NewLine();
 
             DrawMenu("List Button Type", _listIconTypes, ref Configuration.listButtonLayout);
             DrawMenu("Icon Type",        _iconMenuTypes, ref Configuration.minionIconType);

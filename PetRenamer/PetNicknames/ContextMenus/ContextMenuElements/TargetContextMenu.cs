@@ -10,9 +10,6 @@ namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 
 internal class TargetContextMenu : IContextMenuElement
 {
-    // Null means context menu didn't come from an addon
-    public string? AddonName { get; } = null;
-
     private readonly IPetServices       PetServices;
     private readonly IPettableUserList  UserList;
     private readonly IWindowHandler     WindowHandler;
@@ -23,6 +20,10 @@ internal class TargetContextMenu : IContextMenuElement
         UserList        = userList;
         WindowHandler   = windowHandler;
     }
+
+    // Null means context menu didn't come from an addon
+    public string? AddonName
+        => null;
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
     {

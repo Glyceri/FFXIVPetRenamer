@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
+using ITargetManager = PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces.ITargetManager;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 

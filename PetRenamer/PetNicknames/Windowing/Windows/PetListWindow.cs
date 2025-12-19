@@ -177,19 +177,11 @@ internal class PetListWindow : PetWindow
 
                     if (data.IsNullOrWhitespace())
                     {
-                        _ = DalamudServices.NotificationManager.AddNotification(new Notification()
-                        {
-                            Type = NotificationType.Warning,
-                            Content = Translator.GetLine("ShareWindow.ExportError"),
-                        });
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ExportError"));
                     }
                     else
                     {
-                        _ = DalamudServices.NotificationManager.AddNotification(new Notification()
-                        {
-                            Type = NotificationType.Success,
-                            Content = Translator.GetLine("ShareWindow.ExportSuccess"),
-                        });
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ExportSuccess"));
 
                         ImGui.SetClipboardText(data);
                     }
@@ -218,11 +210,7 @@ internal class PetListWindow : PetWindow
                             error = invalidParseResult.Reason;
                         }
 
-                        _ = DalamudServices.NotificationManager.AddNotification(new Notification()
-                        {
-                            Type = NotificationType.Warning,
-                            Content = string.Format(Translator.GetLine("ShareWindow.ImportError"), error)
-                        });
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, string.Format(Translator.GetLine("ShareWindow.ImportError"), error));
                     }
                     else
                     {
@@ -235,11 +223,7 @@ internal class PetListWindow : PetWindow
 
                         StartDisabledTimer();
 
-                        _ = DalamudServices.NotificationManager.AddNotification(new Notification()
-                        {
-                            Type = NotificationType.Success,
-                            Content = string.Format(Translator.GetLine("ShareWindow.ImportSuccess"), username)
-                        });
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, string.Format(Translator.GetLine("ShareWindow.ImportSuccess"), username));
                     }
                 }
 
@@ -638,7 +622,7 @@ internal class PetListWindow : PetWindow
     {
         _ = DalamudServices.Framework.Run(() =>
         {
-            ActiveEntry?.SetName(skeleton, newName ?? "", edgeColour, textColour);
+            ActiveEntry?.SetName(skeleton, newName ?? string.Empty, edgeColour, textColour);
         });
     }
 }
