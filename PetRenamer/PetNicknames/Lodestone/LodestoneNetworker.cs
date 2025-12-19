@@ -5,10 +5,12 @@ using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Lodestone.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -16,69 +18,107 @@ namespace PetRenamer.PetNicknames.Lodestone;
 
 internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
 {
-    readonly HttpClient Client = new HttpClient();
-
     // Lodestone rate limter is about 1 second
-    const double queueIntervalTimer = 1.1f;
+    private const double QueueIntervalTimer = 1.1f;
 
-    List<LodestoneQueueElement> _queueElements = new List<LodestoneQueueElement>();
+    private double queueTimer = 0;
+
+    private readonly List<LodestoneQueueElement> _queueElements = [];
+    private readonly List<HtmlNode>              _nodes         = [];
+
+    private readonly HttpClient              Client;
+    private readonly PetServices             PetServices;
+    private readonly CancellationTokenSource CancellationTokenSource;
+
+    public LodestoneNetworker(PetServices petServices)
+    {
+        PetServices             = petServices;
+        CancellationTokenSource = new CancellationTokenSource();
+        Client                  = new HttpClient();
+    }
 
     public ILodestoneQueueElement SearchCharacter(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure)
     {
-        LodestoneQueueElement queueElement = new LodestoneQueueElement(in entry, in success, in failure);
+        LodestoneQueueElement queueElement = new LodestoneQueueElement(PetServices, entry, success, failure);
+
         _queueElements.Add(queueElement);
         queueElement.SetState(LodestoneQueueState.Queued);
+
         return queueElement;
     }
-
-    double queueTimer = 0;
 
     public void Update(IFramework framework)
     {
         queueTimer += framework.UpdateDelta.TotalSeconds;
 
-        if (queueTimer >= queueIntervalTimer)
+        if (queueTimer >= QueueIntervalTimer)
         {
-            queueTimer -= queueIntervalTimer;
+            queueTimer -= QueueIntervalTimer;
+
             for (int i = 0; i < _queueElements.Count; i++)
             {
                 LodestoneQueueElement element = _queueElements[i];
-                if (element.CurrentState != LodestoneQueueState.Queued) continue;
+
+                if (element.CurrentState != LodestoneQueueState.Queued)
+                {
+                    continue;
+                }
+
                 MoveToObtain(element);
+
                 break;
             }
 
             for (int i = _queueElements.Count - 1; i >= 0; i--)
             {
                 LodestoneQueueElement queueElement = _queueElements[i];
-                if (queueElement.CurrentState != LodestoneQueueState.Error && queueElement.CurrentState != LodestoneQueueState.Succeeded) continue;
+
+                if (queueElement.CurrentState != LodestoneQueueState.Error && queueElement.CurrentState != LodestoneQueueState.Succeeded)
+                {
+                    continue;
+                }
+
                 queueElement.Dispose();
             }
 
             for (int i = _queueElements.Count - 1; i >= 0; i--)
             {
                 LodestoneQueueElement queueElement = _queueElements[i];
-                if (queueElement.CurrentState != LodestoneQueueState.Disposed) continue;
+
+                if (queueElement.CurrentState != LodestoneQueueState.Disposed)
+                {
+                    continue;
+                }
+
                 _queueElements.RemoveAt(i);
             }
         }
     }
 
-    void MoveToObtain(LodestoneQueueElement lodestoneQueueElement)
+    private void MoveToObtain(LodestoneQueueElement lodestoneQueueElement)
     {
         lodestoneQueueElement.SetState(LodestoneQueueState.Obtaining);
+
         string URL = $"https://na.finalfantasyxiv.com/lodestone/character/?q={HttpUtility.UrlEncode(lodestoneQueueElement.Entry.Name.Replace(" ", "+"))}&worldname={lodestoneQueueElement.Entry.HomeworldName}";
+
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, URL);
+
         if (lodestoneQueueElement.Cancelled)
         {
             lodestoneQueueElement.SetState(LodestoneQueueState.TimedOut);
             lodestoneQueueElement.Failure?.Invoke(new Exception());
+
             return;
         }
-        Task.Run(async () => await Execute(request, lodestoneQueueElement));
+
+        _ = Task.Run(async () =>
+        {
+            await Execute(request, lodestoneQueueElement);
+        }, 
+        CancellationTokenSource.Token);
     }
 
-    async Task Execute(HttpRequestMessage request, LodestoneQueueElement element)
+    private async Task Execute(HttpRequestMessage request, LodestoneQueueElement element)
     {
         HttpResponseMessage? response = null;
 
@@ -86,18 +126,21 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.TimedOut);
             element.Failure?.Invoke(new Exception());
+
             return;
         }
 
         try
         {
             response = await Client.SendAsync(request, element.CancellationToken);
-            response.EnsureSuccessStatusCode(); 
+
+            _ = response.EnsureSuccessStatusCode(); 
         }
         catch(Exception ex)
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(ex);
+
             return;
         }
 
@@ -105,6 +148,7 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(new Exception("Response not found."));
+
             return;
         }
 
@@ -112,25 +156,30 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(new Exception("Response is null."));
+
             return;
         }
 
         await CreateDocument(response, element);
     }
 
-    async Task CreateDocument(HttpResponseMessage responseMessage, LodestoneQueueElement element)
+    private async Task CreateDocument(HttpResponseMessage responseMessage, LodestoneQueueElement element)
     {
         element.SetState(LodestoneQueueState.LoadDocument);
+
         try
         {
             HtmlDocument document = new HtmlDocument();
+
             document.LoadHtml(await responseMessage.Content.ReadAsStringAsync(element.CancellationToken));
+
             ParseDocument(document, element);
         }
         catch (Exception e)
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(e);
+
             return;
         }
     }
@@ -145,26 +194,33 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.TimedOut);
             element.Failure?.Invoke(new Exception());
+
             return;
         }
 
         try
         {
             HtmlNode? listNode = GetNode(rootNode, "ldst__window");
+
             if (listNode == null)
             {
                 element.SetState(LodestoneQueueState.Error);
                 element.Failure?.Invoke(new Exception("List Node is not found in HTML document."));
+
                 return;
             }
             HtmlNode? entryNode = GetNode(listNode, "entry");
+
             if (entryNode == null)
             {
                 element.SetState(LodestoneQueueState.Error);
                 element.Failure?.Invoke(new Exception("Entry Node is not found in HTML document."));
+
                 return;
             }
+
             LodestoneSearchData data;
+
             try
             {
                 data = new LodestoneSearchData(entryNode);
@@ -173,6 +229,7 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
             {
                 element.SetState(LodestoneQueueState.Error);
                 element.Failure?.Invoke(new Exception("Search Data unable to be made: " + e.Message));
+
                 return;
             }
 
@@ -182,48 +239,52 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(new Exception("Search Data unable to be made: " + e.Message));
+
             return;
         }
     }
 
-    void Succeed(LodestoneSearchData searchData, LodestoneQueueElement element)
+    private void Succeed(LodestoneSearchData searchData, LodestoneQueueElement element)
     {
         element.SetState(LodestoneQueueState.Succeeded);
         element.Success?.Invoke(element.Entry, searchData);
     }
 
-    HtmlNode? GetNode(HtmlNode baseNode, string nodeName)
+    private HtmlNode? GetNode(HtmlNode baseNode, string nodeName)
     {
         foreach (HtmlNode childNode in baseNode.ChildNodes)
         {
             HtmlNode gottenNode = GetNode(childNode, nodeName)!;
-            if (gottenNode != null) return gottenNode;
-            if (!childNode.HasClass(nodeName)) continue;
+
+            if (gottenNode != null)
+            {
+                return gottenNode;
+            }
+
+            if (!childNode.HasClass(nodeName))
+            {
+                continue;
+            }
+
             return childNode;
         }
 
         return null;
-    }
+    }   
 
-    List<HtmlNode> nodes = new List<HtmlNode>();
-
-    void GetNodesRecursive(HtmlNode baseNode, string nodeName)
+    private void GetNodesRecursive(HtmlNode baseNode, string nodeName)
     {
         foreach (HtmlNode childNode in baseNode.ChildNodes)
         {
             GetNodesRecursive(childNode, nodeName);
-            if (!childNode.HasClass(nodeName)) continue;
-            nodes.Add(childNode);
-        }
-    }
 
-    public void Dispose()
-    {
-        foreach(LodestoneQueueElement queueElement in _queueElements)
-        {
-            queueElement.Dispose();
+            if (!childNode.HasClass(nodeName))
+            {
+                continue;
+            }
+
+            _nodes.Add(childNode);
         }
-        _queueElements.Clear();
     }
 
     public bool IsBeingDownloaded(IPettableDatabaseEntry entry)
@@ -231,11 +292,33 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         for (int i = 0; i < _queueElements.Count; i++)
         {
             LodestoneQueueElement element = _queueElements[i];
-            if (element.Entry.Homeworld != entry.Homeworld) continue;
-            if (element.Entry.Name != entry.Name) continue;
+
+            if (element.Entry.Homeworld != entry.Homeworld)
+            {
+                continue;
+            }
+
+            if (element.Entry.Name != entry.Name)
+            {
+                continue;
+            }
 
             return true;
         }
+
         return false;
+    }
+
+    public void Dispose()
+    {
+        CancellationTokenSource.Cancel();
+        CancellationTokenSource.Dispose();
+
+        foreach (LodestoneQueueElement queueElement in _queueElements)
+        {
+            queueElement.Dispose();
+        }
+
+        _queueElements.Clear();
     }
 }

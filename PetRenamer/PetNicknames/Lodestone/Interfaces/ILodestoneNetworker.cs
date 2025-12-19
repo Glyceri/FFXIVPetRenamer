@@ -6,6 +6,6 @@ namespace PetRenamer.PetNicknames.Lodestone.Interfaces;
 
 internal interface ILodestoneNetworker
 {
-    ILodestoneQueueElement SearchCharacter(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure);
-    bool IsBeingDownloaded(IPettableDatabaseEntry entry);
+    public ILodestoneQueueElement SearchCharacter(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure);
+    public bool IsBeingDownloaded(IPettableDatabaseEntry entry);
 }

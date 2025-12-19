@@ -14,7 +14,7 @@ using System;
 namespace PetRenamer;
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 
-internal unsafe class PenumbraIPC : IPenumbraIPC
+internal class PenumbraIPC : IPenumbraIPC
 {
     private const uint      CurrentPCPVersion   = 1;
     private const string    PCPIdentifier       = "PetNicknames";

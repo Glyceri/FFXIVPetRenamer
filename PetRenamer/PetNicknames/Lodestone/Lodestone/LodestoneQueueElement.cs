@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Lodestone.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services;
 using System;
 using System.Threading;
 
@@ -9,23 +10,36 @@ namespace PetRenamer.PetNicknames.Lodestone.Lodestone;
 
 internal class LodestoneQueueElement : ILodestoneQueueElement, IDisposable
 {
-    public LodestoneQueueState CurrentState { get; protected set; } = LodestoneQueueState.Cooking;
-    public DateTime ElementStarted { get; } = DateTime.Now;
-    public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
-    public CancellationToken CancellationToken { get => CancellationTokenSource.Token; }
+    public LodestoneQueueState CurrentState 
+        { get; protected set; } = LodestoneQueueState.Cooking;
 
-    public IPettableDatabaseEntry Entry { get; private set; }
-    public bool Cancelled { get => CancellationToken.IsCancellationRequested; }
+    public DateTime ElementStarted 
+        { get; } = DateTime.Now;
+
+    public CancellationTokenSource CancellationTokenSource 
+        { get; } = new CancellationTokenSource();
+
+    public IPettableDatabaseEntry Entry 
+        { get; private set; }
+
+    private readonly PetServices PetServices;
 
     public readonly Action<IPettableDatabaseEntry, LodestoneSearchData>? Success;
     public readonly Action<Exception>? Failure;
 
-    public LodestoneQueueElement(in IPettableDatabaseEntry entry, in Action<IPettableDatabaseEntry, LodestoneSearchData> success, in Action<Exception> failure)
+    public LodestoneQueueElement(PetServices petServices, IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure)
     {
-        Entry = entry;
-        Success = success;
-        Failure = failure;
+        PetServices = petServices;
+        Entry       = entry;
+        Success     = success;
+        Failure     = failure;
     }
+
+    public CancellationToken CancellationToken 
+        => CancellationTokenSource.Token;
+
+    public bool Cancelled 
+        => CancellationToken.IsCancellationRequested;
 
     public void Cancel()
     {
@@ -33,18 +47,27 @@ internal class LodestoneQueueElement : ILodestoneQueueElement, IDisposable
         {
             CancellationTokenSource.Cancel();
         }
-        catch { }
+        catch(Exception e) 
+        {
+            PetServices.PetLog.LogException(e);
+        }
     }
     
-    public void Dispose() {
+    public void Dispose() 
+    {
         Cancel();
+
         CancellationTokenSource?.Dispose();
         CurrentState = LodestoneQueueState.Disposed;
     }
 
     public void SetState(LodestoneQueueState state)
     {
-        if (CurrentState == LodestoneQueueState.Disposed) return;
+        if (CurrentState == LodestoneQueueState.Disposed)
+        {
+            return;
+        }
+
         CurrentState = state;
     }
 }

@@ -12,7 +12,7 @@ internal class SharingDictionary : ISharingDictionary
     private readonly DalamudServices DalamudServices;
 
     // Data Sharing
-    private readonly Dictionary<ulong, string> PetNicknameDict = new Dictionary<ulong, string>();
+    private readonly Dictionary<ulong, string> PetNicknameDict = [];
 
     public SharingDictionary(DalamudServices dalamudServices)
     {
@@ -21,7 +21,7 @@ internal class SharingDictionary : ISharingDictionary
         try
         {
             // Data sharing
-            PetNicknameDict = DalamudServices.DalamudPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
+            PetNicknameDict = DalamudServices.DalamudPlugin.GetOrCreateData($"PetRenamer.GameObjectRenameDict", CreateDictionary);
         }
         catch(Exception e) 
         {
@@ -29,14 +29,21 @@ internal class SharingDictionary : ISharingDictionary
         }
     }
 
+    private Dictionary<ulong, string> CreateDictionary()
+    {
+        return new Dictionary<ulong, string>();
+    }
+
     public void Set(GameObjectId gameObjectID, string? customName)
     {
         _ = PetNicknameDict.Remove(gameObjectID);
 
-        if (!customName.IsNullOrWhitespace())
+        if (customName.IsNullOrWhitespace())
         {
-            PetNicknameDict.Add(gameObjectID, customName);
+            return;   
         }
+
+        PetNicknameDict.Add(gameObjectID, customName);
     }
 
     public void Dispose()
