@@ -49,7 +49,7 @@ internal class HookHandler : IDisposable
     {
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
 
-        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, TooltipHookHelper);
+        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
         Register(ActionTooltipHook);
 
         MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, TooltipHookHelper);

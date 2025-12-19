@@ -22,8 +22,8 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetRenameWindow : PetWindow
 {
-    private readonly IPettableUserList UserList;
-    private readonly IPetServices PetServices;
+    private readonly IPettableUserList      UserList;
+    private readonly IPetServices           PetServices;
     private readonly IPettableDirtyListener DirtyListener;
 
     protected override Vector2 MinSize     { get; } = new Vector2(570, 250);
@@ -48,8 +48,8 @@ internal class PetRenameWindow : PetWindow
     public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
         : base(windowHandler, dalamudServices, petServices.Configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        UserList = userList;
-        PetServices = petServices;
+        UserList      = userList;
+        PetServices   = petServices;
         DirtyListener = dirtyListener;
 
         DirtyListener.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
@@ -63,6 +63,9 @@ internal class PetRenameWindow : PetWindow
     public void SetRenameWindow(PetSkeleton forSkeleton, bool open)
     {
         activeSkeleton = forSkeleton;
+        isContextOpen  = true;
+        ActiveUser     = UserList.LocalPlayer;
+        lastContentID  = ActiveUser?.ContentID ?? 0;
 
         if (open)
         {
@@ -77,10 +80,6 @@ internal class PetRenameWindow : PetWindow
         {
             SetPetMode(PetWindowMode.BattlePet);
         }
-
-        isContextOpen  = true;
-        activeSkeleton = forSkeleton;
-        ActiveUser     = UserList.LocalPlayer;
 
         SetNewNode();
     }

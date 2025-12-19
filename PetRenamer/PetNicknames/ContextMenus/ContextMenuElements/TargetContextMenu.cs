@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
@@ -10,9 +11,6 @@ namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 
 internal class TargetContextMenu : IContextMenuElement
 {
-    // Null means context menu didn't come from an addon
-    public string? AddonName { get; } = null;
-
     private readonly IPetServices       PetServices;
     private readonly IPettableUserList  UserList;
     private readonly IWindowHandler     WindowHandler;
@@ -23,6 +21,10 @@ internal class TargetContextMenu : IContextMenuElement
         UserList        = userList;
         WindowHandler   = windowHandler;
     }
+
+    // Null means context menu didn't come from an addon
+    public string? AddonName
+        => null;
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
     {
@@ -55,6 +57,11 @@ internal class TargetContextMenu : IContextMenuElement
         }
 
         if (pet == null)
+        {
+            return null;
+        }
+
+        if (PetServices.PetSheets.GetPet(pet.SkeletonID) == null)
         {
             return null;
         }

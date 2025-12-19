@@ -28,7 +28,10 @@ internal unsafe class NamePlateHook : HookableElement
     private readonly Hook<UpdateNameplateNpcDelegate>? NameplateMinionHook = null;
 
     public NamePlateHook(DalamudServices services, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener) 
-        : base(services, pettableUserList, petServices, dirtyListener) { }
+        : base(services, pettableUserList, petServices, dirtyListener) 
+    {
+
+    }
 
     public override void Init()
     {

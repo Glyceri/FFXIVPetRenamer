@@ -8,25 +8,27 @@ namespace PetRenamer.PetNicknames.Services;
 
 internal class PetServices : IPetServices
 {
-    public IPetLog          PetLog            { get; }
-    public Configuration    Configuration     { get; }
-    public IPetSheets       PetSheets         { get; }
-    public IStringHelper    StringHelper      { get; }
-    public IPetCastHelper   PetCastHelper     { get; }
-    public IPetActionHelper PetActionHelper   { get; }
-    public ITargetManager   TargetManager     { get; }
-    public IPluginWatcher   PluginWatcher     { get; }
+    public IPetLog              PetLog              { get; }
+    public Configuration        Configuration       { get; }
+    public IPetSheets           PetSheets           { get; }
+    public IStringHelper        StringHelper        { get; }
+    public IPetCastHelper       PetCastHelper       { get; }
+    public IPetActionHelper     PetActionHelper     { get; }
+    public ITargetManager       TargetManager       { get; }
+    public IPluginWatcher       PluginWatcher       { get; }
+    public INotificationService NotificationService { get; }
 
     public PetServices(DalamudServices services, IPettableUserList userList) 
     {
-        PetLog          = new PetLogWrapper(services.PluginLog);
-        Configuration   = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
-        StringHelper    = new StringHelperWrapper(this);
-        PetSheets       = new SheetsWrapper(ref services, StringHelper);
-        PetCastHelper   = new PetCastWrapper();
-        PetActionHelper = new PetActionWrapper();
-        TargetManager   = new TargetManagerWrapper(services, userList);
-        PluginWatcher   = new PluginWatcher(services);
+        PetLog              = new PetLogWrapper(services.PluginLog);
+        Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
+        StringHelper        = new StringHelperWrapper(this);
+        PetSheets           = new SheetsWrapper(ref services, StringHelper);
+        PetCastHelper       = new PetCastWrapper();
+        PetActionHelper     = new PetActionWrapper();
+        TargetManager       = new TargetManagerWrapper(services, userList);
+        PluginWatcher       = new PluginWatcher(services);
+        NotificationService = new NotificationService(services, Configuration);
 
         CheckConfigFailure();
     }
