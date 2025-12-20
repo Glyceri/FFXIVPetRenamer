@@ -5,7 +5,7 @@ using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Lodestone.Lodestone;
 using PetRenamer.PetNicknames.Lodestone.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -27,10 +27,10 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
     private readonly List<HtmlNode>              _nodes         = [];
 
     private readonly HttpClient              Client;
-    private readonly PetServices             PetServices;
+    private readonly IPetServices            PetServices;
     private readonly CancellationTokenSource CancellationTokenSource;
 
-    public LodestoneNetworker(PetServices petServices)
+    public LodestoneNetworker(IPetServices petServices)
     {
         PetServices             = petServices;
         CancellationTokenSource = new CancellationTokenSource();

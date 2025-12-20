@@ -2,7 +2,7 @@
 using PetRenamer.PetNicknames.Lodestone.Interfaces;
 using PetRenamer.PetNicknames.Lodestone.Structs;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Threading;
 
@@ -22,12 +22,12 @@ internal class LodestoneQueueElement : ILodestoneQueueElement, IDisposable
     public IPettableDatabaseEntry Entry 
         { get; private set; }
 
-    private readonly PetServices PetServices;
+    private readonly IPetServices PetServices;
 
     public readonly Action<IPettableDatabaseEntry, LodestoneSearchData>? Success;
     public readonly Action<Exception>? Failure;
 
-    public LodestoneQueueElement(PetServices petServices, IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure)
+    public LodestoneQueueElement(IPetServices petServices, IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, LodestoneSearchData> success, Action<Exception> failure)
     {
         PetServices = petServices;
         Entry       = entry;

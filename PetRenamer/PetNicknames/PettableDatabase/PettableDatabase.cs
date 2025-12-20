@@ -10,9 +10,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDatabase : IPettableDatabase
 {
-    protected List<IPettableDatabaseEntry> _entries = new List<IPettableDatabaseEntry>();
-
-    public IPettableDatabaseEntry[] DatabaseEntries { get => [.. _entries]; }
+    protected List<IPettableDatabaseEntry> _entries = [];
 
     protected readonly IPetServices         PetServices;
     protected readonly IPettableDirtyCaller DirtyCaller;
@@ -25,9 +23,12 @@ internal class PettableDatabase : IPettableDatabase
         Setup();
     }
 
+    public IPettableDatabaseEntry[] DatabaseEntries 
+        => [.. _entries];
+
     protected virtual void Setup()
     {
-        List<IPettableDatabaseEntry> newEntries = new List<IPettableDatabaseEntry>();
+        List<IPettableDatabaseEntry> newEntries = [];
 
         SerializableUserV6[]? users = PetServices.Configuration.SerializableUsersV6;
 

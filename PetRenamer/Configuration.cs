@@ -29,6 +29,7 @@ internal class Configuration : IPluginConfiguration
     public int Version { get; set; } = currentSaveFileVersion;
 
     public SerializableUserV6[]? SerializableUsersV6 { get; set; } = null;
+    public SerializableUserV3[]? serializableUsersV3 = null;
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
@@ -85,6 +86,7 @@ internal class Configuration : IPluginConfiguration
     private void CurrentInitialise()
     {
         SerializableUsersV6 ??= [];
+        serializableUsersV3 ??= [];
     }
 
     public void Save()
@@ -126,8 +128,6 @@ internal class Configuration : IPluginConfiguration
     public SerializableUser[]? serializableUsers { get; set; } = null;
     [Obsolete("Old User Save System. Very innefficient.")]
     public SerializableUserV2[]? serializableUsersV2 { get; set; } = null;
-    [Obsolete("Old User Save System. Very innefficient. Please... OH PLEASE")]
-    public SerializableUserV3[]? serializableUsersV3 = null;
     [Obsolete("Old User Save System. Very innefficient.")]
     public SerializableUserV4[]? SerializableUsersV4 { get; set; } = null;
     [Obsolete("Pre Skeleton Type Update")]
@@ -141,7 +141,6 @@ internal class Configuration : IPluginConfiguration
         users               ??= [];
         serializableUsers   ??= [];
         serializableUsersV2 ??= [];
-        serializableUsersV3 ??= [];
         SerializableUsersV4 ??= [];
         SerializableUsersV5 ??= [];
     }

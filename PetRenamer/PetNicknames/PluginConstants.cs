@@ -6,12 +6,12 @@ namespace PetRenamer.PetNicknames;
 
 public static class PluginConstants
 {
-    public const string pluginName = "Pet Nicknames";
+    public const string pluginName         = "Pet Nicknames";
 
-    public const int ffxivNameSize = 32;
-    public const char forbiddenCharacter = '^';
+    public const int    ffxivNameSize      = 32;
+    public const char   forbiddenCharacter = '^';
     
-    public const ulong InvalidId            = 0xE0000000;
+    public const ulong  InvalidId          = 0xE0000000;
 
     public static readonly PetSkeleton Eos                    = new PetSkeleton(407, SkeletonType.BattlePet);
     public static readonly PetSkeleton Selene                 = new PetSkeleton(408, SkeletonType.BattlePet);

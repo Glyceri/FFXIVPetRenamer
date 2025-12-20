@@ -7,7 +7,8 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class PetLogWrapper : IPetLog
 {
-    public static IPetLog Instance;
+    // For debug purposes
+    public static IPetLog? Instance;
 
     private readonly IPluginLog PluginLog;
 

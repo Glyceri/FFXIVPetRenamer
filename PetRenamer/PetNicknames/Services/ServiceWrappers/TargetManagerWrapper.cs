@@ -7,7 +7,7 @@ using ITargetManager = PetRenamer.PetNicknames.Services.ServiceWrappers.Interfac
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
-internal unsafe class TargetManagerWrapper : ITargetManager
+internal class TargetManagerWrapper : ITargetManager
 {
     public bool Enabled { get; set; } = true;
 

@@ -17,14 +17,13 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public bool IsActive        { get; private set; }
 
     public ulong ContentID      { get; private set; }
-    public string Name          { get; private set; } = "";
+    public string Name          { get; private set; } = string.Empty;
     public ushort Homeworld     { get; private set; }
-    public string HomeworldName { get; private set; } = "";
+    public string HomeworldName { get; private set; } = string.Empty;
 
-    public ImmutableArray<PetSkeleton> SoftSkeletons { get; private set; } = new ImmutableArray<PetSkeleton>();
+    public ImmutableArray<PetSkeleton> SoftSkeletons { get; private set; } = [];
 
     public INamesDatabase ActiveDatabase { get; }
-    public INamesDatabase[] AllDatabases { get => [ActiveDatabase]; }
 
     public bool IsIPC       { get; private set; } = false;
     public bool IsLegacy    { get; private set; } = false;
@@ -48,6 +47,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetActiveDatabase(ids, names, edgeColours, textColours);
         SetHomeworld(homeworld);
     }
+
+    public INamesDatabase[] AllDatabases 
+        => [ActiveDatabase];
 
     public void UpdateEntry(IPettableUser pettableUser)
     {
@@ -180,7 +182,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        IsIPC = parseSource == ParseSource.IPC;
+        IsIPC = (parseSource == ParseSource.IPC);
 
         MarkDirty();        
     }
@@ -188,6 +190,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public void Clear(ParseSource parseSource)
     {
         SetActiveDatabase([], [], [], []);
+
         IsActive = false;
         IsLegacy = false;
 
