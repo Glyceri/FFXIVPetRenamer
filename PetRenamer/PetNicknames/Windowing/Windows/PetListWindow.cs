@@ -27,6 +27,7 @@ using PetRenamer.PetNicknames.Windowing.Windows.PetList;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using Dalamud.Interface.Utility.Raii;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -122,13 +123,13 @@ internal class PetListWindow : PetWindow
 
     private void DrawHeader()
     {
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
+        if (Listbox.Begin($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
             PlayerImage.Draw(ActiveEntry, in ImageDatabase);
 
             ImGui.SameLine();
 
-            if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
+            if (Listbox.Begin($"##ListboxNametags_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
             {
                 TextAligner.Align(TextAlignment.Left);
 
@@ -136,6 +137,7 @@ internal class PetListWindow : PetWindow
                 {
                     _ = DalamudServices.Framework.Run(ToggleUserMode);
                 }
+
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
                 {
                     if (!inUserMode)
@@ -152,6 +154,7 @@ internal class PetListWindow : PetWindow
                 BasicLabel.Draw(ActiveEntry?.ActiveDatabase.Length.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
 
                 TextAligner.PopAlignment();
+
                 Listbox.End();
             }
 
@@ -241,29 +244,38 @@ internal class PetListWindow : PetWindow
         }
     }
 
-    void DrawSearchbar()
+    private void DrawSearchbar()
     {
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale)))
+        ImGuiStylePtr style = ImGui.GetStyle();
+
+        using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(style.ItemSpacing.X, 0)))
         {
-            ImGuiStylePtr style = ImGui.GetStyle();
-            float buttSize = ImGui.GetContentRegionAvail().Y;
+            float buttSize = WindowHandler.BarHeight;
 
             bool clicked = false;
 
-            if (ImGui.InputTextMultiline($"##InputText_{WindowHandler.InternalCounter}", ref SearchText, 64, new Vector2(ImGui.GetContentRegionAvail().X - buttSize - style.FramePadding.X, buttSize), ImGuiInputTextFlags.CtrlEnterForNewLine | ImGuiInputTextFlags.EnterReturnsTrue))
+            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttSize - style.FramePadding.X);
+
+            using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(10, (buttSize - ImGui.GetTextLineHeight()) * 0.5f)))
             {
-                clicked |= true;
+                if (ImGui.InputTextWithHint($"##InputText_{WindowHandler.InternalCounter}", ". . .", ref SearchText, 64))
+                {
+                    clicked |= true;
+                }
             }
 
-            SearchText = SearchText.Replace("\n", string.Empty);
+            SearchText = SearchText.Replace(Environment.NewLine, string.Empty);
 
             ImGui.SameLine();
 
             ImGui.PushFont(UiBuilder.IconFont);
 
-            if (ImGui.Button($"{FontAwesomeIcon.Search.ToIconString()}##Search_{WindowHandler.InternalCounter}", new Vector2(buttSize, buttSize)))
+            using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(style.FramePadding.X, (buttSize - ImGui.GetTextLineHeight()) * 0.3f)))
             {
-                clicked |= true;
+                if (ImGui.Button($"{FontAwesomeIcon.Search.ToIconString()}##Search_{WindowHandler.InternalCounter}", new Vector2(buttSize, buttSize)))
+                {
+                    clicked |= true;
+                }
             }
 
             ImGui.PopFont();
@@ -278,16 +290,14 @@ internal class PetListWindow : PetWindow
                 activeSearchText = SearchText;
 
                 _ = DalamudServices.Framework.Run(() =>
-                { 
-                    SetUser(ActiveEntry); 
+                {
+                    SetUser(ActiveEntry);
                 });
             }
-
-            Listbox.End();
         }
     }
 
-    unsafe void DrawList()
+    private unsafe void DrawList()
     {
         if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
         {

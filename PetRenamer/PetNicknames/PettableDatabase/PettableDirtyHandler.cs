@@ -6,11 +6,11 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCaller
 {
-    Action<IPettableDatabase>? OnDatabase = _ => { };
-    Action<IPettableDatabaseEntry>? OnEntry = _ => { };
-    Action<IPettableDatabaseEntry>? OnClear = _ => { };
-    Action<INamesDatabase>? OnName = _ => { };
-    Action<IPettableUser>? OnUser = _ => { };
+    Action<IPettableDatabase>?      OnDatabase  = _ => { };
+    Action<IPettableDatabaseEntry>? OnEntry     = _ => { };
+    Action<IPettableDatabaseEntry>? OnClear     = _ => { };
+    Action<INamesDatabase>?         OnName      = _ => { };
+    Action<IPettableUser>?          OnUser      = _ => { };
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {

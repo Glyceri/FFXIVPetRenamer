@@ -39,6 +39,7 @@ internal class PettableUserList : IPettableUserList
 
             return pPet;
         }
+
         return null;
     }
 
@@ -67,6 +68,7 @@ internal class PettableUserList : IPettableUserList
 
             return pPet;
         }
+
         return null;
     }
 
@@ -133,6 +135,7 @@ internal class PettableUserList : IPettableUserList
 
             return pUser;
         }
+
         return null;
     }
 

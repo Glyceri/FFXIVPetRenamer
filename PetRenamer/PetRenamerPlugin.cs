@@ -28,6 +28,8 @@ using System.Reflection;
 
 namespace PetRenamer;
 
+// I went through basically every file to see how this plugin actually works and...
+// this plugin is SUCH a mess
 public sealed class PetRenamerPlugin : IDalamudPlugin
 {
     public readonly string Version;
@@ -44,18 +46,14 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     private readonly IDataWriter            DataWriter;
     private readonly IpcProvider            IpcProvider;
     private readonly IPenumbraIPC           PenumbraIPC;
-
-    // As long as no other module needs one, they won't be interfaced
+    private readonly ILodestoneNetworker    LodestoneNetworkerInterface;
     private readonly ContextMenuHandler     ContextMenuHandler;
     private readonly UpdateHandler          UpdateHandler;
     private readonly HookHandler            HookHandler;
     private readonly ChatHandler            ChatHandler;
     private readonly CommandHandler         CommandHandler;
     private readonly LodestoneNetworker     LodestoneNetworker;
-    private readonly ILodestoneNetworker    LodestoneNetworkerInterface;
-
     private readonly PettableDirtyHandler   DirtyHandler;
-
     private readonly SaveHandler            SaveHandler;
 
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
@@ -72,7 +70,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         Translator.Initialise(DalamudServices, PetServices.Configuration);
 
-        LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker();
+        LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker(PetServices);
 
         DirtyHandler                = new PettableDirtyHandler();
 

@@ -18,38 +18,7 @@ namespace PetRenamer;
 
 internal class IpcProvider : IIpcProvider
 {
-    public bool Enabled { get; set; } = false;
-
-    private const string ApiNamespace       = "PetRenamer.";
-    private const uint   MajorVersion       = 4;
-    private const uint   MinorVersion       = 0;
-    private const float  ReleaseInterval    = 8.0f;    // A minimum of 8 seconds has to pass to release data.
-
-    private string  lastData                = "[unprepared]";
-    private float   releaseTimer            = ReleaseInterval;
-    private bool    hasDataChange           = false;
-
-    private readonly DalamudServices    DalamudServices;
-    private readonly IDataWriter        DataWriter;
-    private readonly IDataParser        DataReader;
-
-
-    // Notifications
-    private readonly ICallGateProvider<object>          Ready;
-    private readonly ICallGateProvider<object>          Disposing;
-    private readonly ICallGateProvider<string, object>  PlayerDataChanged;
-
-    // Functions
-    private readonly ICallGateProvider<bool>            EnabledFunction;
-    private readonly ICallGateProvider<(uint, uint)>?   ApiVersion;
-    private readonly ICallGateProvider<string>          GetPlayerData;
-
-    // Actions
-    private readonly ICallGateProvider<string, object>  SetPlayerData;
-    private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
-
-
-    /* ------------------------ READ ME ------------------------
+     /* ------------------------ READ ME ------------------------
      * 
      * {ApiNamespace} = "PetRenamer."
      * 
@@ -89,25 +58,55 @@ internal class IpcProvider : IIpcProvider
      * ----------------------END READ ME -----------------------
      */
 
+    public bool Enabled { get; set; } = false;
+
+    private const string ApiNamespace       = "PetRenamer.";
+    private const uint   MajorVersion       = 4;
+    private const uint   MinorVersion       = 0;
+    private const float  ReleaseInterval    = 8.0f;    // A minimum of 8 seconds has to pass to release data.
+
+    private string  lastData                = "[unprepared]";
+    private float   releaseTimer            = ReleaseInterval;
+    private bool    hasDataChange           = false;
+
+    private readonly DalamudServices                    DalamudServices;
+    private readonly IDataWriter                        DataWriter;
+    private readonly IDataParser                        DataReader;
+
+
+    // Notifications
+    private readonly ICallGateProvider<object>          Ready;
+    private readonly ICallGateProvider<object>          Disposing;
+    private readonly ICallGateProvider<string, object>  PlayerDataChanged;
+
+    // Functions
+    private readonly ICallGateProvider<bool>            EnabledFunction;
+    private readonly ICallGateProvider<(uint, uint)>?   ApiVersion;
+    private readonly ICallGateProvider<string>          GetPlayerData;
+
+    // Actions
+    private readonly ICallGateProvider<string, object>  SetPlayerData;
+    private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
+
     public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter)
     {
-        DalamudServices = dalamudServices;
-        DataReader      = dataReader;
-        DataWriter      = dataWriter;
+        DalamudServices    = dalamudServices;
+        DataReader         = dataReader;
+        DataWriter         = dataWriter;
 
         // Notifiers
-        Ready                   = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnReady");
-        Disposing               = petNicknamesPlugin.GetIpcProvider<object>                                 ($"{ApiNamespace}OnDisposing");
-        PlayerDataChanged       = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}OnPlayerDataChanged");
+        Ready              = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
+        Disposing          = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged  = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
-        ApiVersion              = petNicknamesPlugin.GetIpcProvider<(uint, uint)>                           ($"{ApiNamespace}ApiVersion");
-        EnabledFunction         = petNicknamesPlugin.GetIpcProvider<bool>                                   ($"{ApiNamespace}IsEnabled");
-        GetPlayerData           = petNicknamesPlugin.GetIpcProvider<string>                                 ($"{ApiNamespace}GetPlayerData");
+        ApiVersion         = petNicknamesPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
+        EnabledFunction    = petNicknamesPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
+        GetPlayerData      = petNicknamesPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData           = petNicknamesPlugin.GetIpcProvider<string, object>                         ($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData      = petNicknamesPlugin.GetIpcProvider<ushort, object>                         ($"{ApiNamespace}ClearPlayerData");
+        SetPlayerData      = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData = petNicknamesPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
     }
 
     public void OnUpdate(IFramework framework)
@@ -267,7 +266,10 @@ internal class IpcProvider : IIpcProvider
         {
             PlayerDataChanged?.SendMessage(lastData);
         }
-        catch { }
+        catch(Exception e)
+        {
+            DalamudServices.PluginLog.Error(e, "An error occurred when messaging that data changed.");
+        }
     }
 
     // Interface Functions
@@ -290,7 +292,7 @@ internal class IpcProvider : IIpcProvider
     {
         lock (lastData)
         {
-            lastData = "";
+            lastData = string.Empty;
         }
     }
 

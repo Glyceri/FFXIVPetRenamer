@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS0618 // Type or member is obsolete. By nature of Legacy Support they are always obsolete.
-
-using PetRenamer.Core.Serialization;
+﻿using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
@@ -21,13 +19,23 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
     protected override void Setup()
     {
         SerializableUserV3[]? serializableUsers = PetServices.Configuration.serializableUsersV3;
+
         _entries.Clear();
-        if (serializableUsers == null) return;
-        if (serializableUsers.Length == 0) return;
+
+        if (serializableUsers == null)
+        {
+            return;
+        }
+
+        if (serializableUsers.Length == 0)
+        {
+            return;
+        }
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
             IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, PetSkeletonHelper.AsPetSkeletons(userV3.ids), userV3.names, new Vector3?[userV3.ids.Length], new Vector3?[userV3.ids.Length], PetSkeletonHelper.AsPetSkeletons(userV3.softSkeletons), false, true);
+            
             _entries.Add(newEntry);
         }
     }
@@ -48,14 +56,20 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
     public SerializableUserV3[] SerializeLegacyDatabase()
     {
-        List<SerializableUserV3> users = new List<SerializableUserV3>();
+        List<SerializableUserV3> users   = [];
         IPettableDatabaseEntry[] entries = DatabaseEntries;
+
         int entriesCount = entries.Length;
+
         for (int i = 0; i < entriesCount; i++)
         {
-            IPettableDatabaseEntry entry = entries[i];
-            INamesDatabase nameDatabase = entry.ActiveDatabase;
-            if (nameDatabase.Length == 0) continue;
+            IPettableDatabaseEntry entry        = entries[i];
+            INamesDatabase         nameDatabase = entry.ActiveDatabase;
+
+            if (nameDatabase.Length == 0)
+            {
+                continue;
+            }
 
             PetSkeleton[] tempSoftSkeletonArray = entry.SoftSkeletons.ToArray();
 
@@ -64,8 +78,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
             users.Add(new SerializableUserV3(legacyIdsArray, nameDatabase.Names, entry.Name, entry.Homeworld, legacySoftSkeletonArray, legacySoftSkeletonArray));
         }
-        return users.ToArray();
+
+        return [.. users];
     }
 }
-
-#pragma warning restore CS0618
