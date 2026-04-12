@@ -4,5 +4,5 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal interface INotificationService
 {
-    public IActiveNotification? ShowNotification(NotificationType notificationType, string title);
+    public IActiveNotification? ShowNotification(NotificationType notificationType, string title, string notificationContent, int duration);
 }

@@ -180,11 +180,15 @@ internal class PetListWindow : PetWindow
 
                     if (data.IsNullOrWhitespace())
                     {
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ExportError"));
+                        string notification = Translator.GetLine("ShareWindow.ExportError");
+
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, notification, Translator.GetLine("ShareWindow.ExportError"), 8);
                     }
                     else
                     {
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ExportSuccess"));
+                        string notification = Translator.GetLine("ShareWindow.ExportSuccess");
+
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, notification, Translator.GetLine("ShareWindow.ExportSuccess"), 5);
 
                         ImGui.SetClipboardText(data);
                     }
@@ -213,7 +217,7 @@ internal class PetListWindow : PetWindow
                             error = invalidParseResult.Reason;
                         }
 
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, string.Format(Translator.GetLine("ShareWindow.ImportError"), error));
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ImportErrorGlobal"), string.Format(Translator.GetLine("ShareWindow.ImportError"), error), 8);
                     }
                     else
                     {
@@ -226,7 +230,7 @@ internal class PetListWindow : PetWindow
 
                         StartDisabledTimer();
 
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, string.Format(Translator.GetLine("ShareWindow.ImportSuccess"), username));
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ImportSuccessGlobal"), string.Format(Translator.GetLine("ShareWindow.ImportSuccess"), username), 5);
                     }
                 }
 
