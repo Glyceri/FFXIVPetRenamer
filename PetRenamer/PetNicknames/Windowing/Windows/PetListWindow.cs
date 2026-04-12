@@ -180,15 +180,11 @@ internal class PetListWindow : PetWindow
 
                     if (data.IsNullOrWhitespace())
                     {
-                        string notification = Translator.GetLine("ShareWindow.ExportError");
-
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, notification, Translator.GetLine("ShareWindow.ExportError"), 8);
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ExportErrorGlobal"), Translator.GetLine("ShareWindow.ExportError"), 8);
                     }
                     else
                     {
-                        string notification = Translator.GetLine("ShareWindow.ExportSuccess");
-
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, notification, Translator.GetLine("ShareWindow.ExportSuccess"), 5);
+                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ExportSuccessGlobal"), Translator.GetLine("ShareWindow.ExportSuccess"), 5);
 
                         ImGui.SetClipboardText(data);
                     }
