@@ -79,10 +79,8 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
     }
 
     public override void Init()
-    {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
-    }
-
+        => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
+    
     private void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs)
         => Update((AtkUnitBase*)addonArgs.Addon.Address);
 
@@ -120,7 +118,7 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
                 return;
             }
 
-            _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("IslandWarning"));
+            _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("IslandWarningGlobal"), Translator.GetLine("IslandWarning"), 10);
         }
     }
 
@@ -224,7 +222,5 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
     }
 
     protected override void OnDispose()
-    {
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
-    }
+        => DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
 }

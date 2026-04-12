@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using PetRenamer.PetNicknames.Services;
+using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.TranslatorSystem;
@@ -48,13 +49,20 @@ internal static class Translator
         { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },
         { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." },
         { "IslandWarning", "Pet Nicknames was unable to resolve the owner of this island. Please rejoin this island." },
+        { "IslandWarningGlobal", "No Island Owner Found" },
 
         { "ShareWindow.Export", "Export to Clipboard" },
         { "ShareWindow.Import", "Import from Clipboard" },
-        { "ShareWindow.ExportError", "No data available.\nYou need to log in to a character to export your data." },
-        { "ShareWindow.ExportSuccess", "Data successfully copied." },
-        { "ShareWindow.ImportError", "Failed to import data:\n{0}" },
+
+        { "ShareWindow.ExportError", $"No data available.{Environment.NewLine}You need to log in to a character to export your data." },
+        { "ShareWindow.ExportSuccess", $"Data successfully exported to your clipboard.{Environment.NewLine}Make sure to paste this data elsewhere."},
+        { "ShareWindow.ExportErrorGlobal", "No Data Available" },
+        { "ShareWindow.ExportSuccessGlobal", "Data Successfully Exported" },
+
+        { "ShareWindow.ImportError", "Failed to import data: {0}" },
         { "ShareWindow.ImportSuccess", "Successfully imported data from {0}" },
+        { "ShareWindow.ImportErrorGlobal", "Failed to Import Data" },
+        { "ShareWindow.ImportSuccessGlobal", "Successfully Imported Data" },
 
         { "Config.Title", "Settings" },
         { "Config.Header.GeneralSettings", "General Settings" },

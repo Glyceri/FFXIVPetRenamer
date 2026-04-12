@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface.ImGuiNotification;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
@@ -14,12 +15,15 @@ internal class NotificationService : INotificationService
         Configuration   = configuration;
     }
 
-    public IActiveNotification? ShowNotification(NotificationType notificationType, string title)
+    public IActiveNotification? ShowNotification(NotificationType notificationType, string title, string notificationContent, int duration)
     {
         Notification notification = new Notification
         {
-            Title = title,
-            Type  = notificationType,
+            Title           = title,
+            Content         = notificationContent,
+            MinimizedText   = notificationContent,
+            Type            = notificationType,
+            InitialDuration = TimeSpan.FromSeconds(duration),
         };
 
         DalamudServices.PluginLog.Verbose($"Just created a notification of the type: [{notificationType}] with the text: '{title}'.");
