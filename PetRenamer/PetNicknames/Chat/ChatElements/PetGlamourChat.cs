@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.Chat.Base;
@@ -59,41 +60,41 @@ internal class PetGlamourChat : RestrictedChatElement
 
     // LogKind = 57
 
-    readonly Regex fullRegexEn = new(@"Pet glamour settings", RegexOptions.Compiled);
-    readonly Regex fullRegexJp = new(@"ペットの見た目の設定状態", RegexOptions.Compiled);
-    readonly Regex fullRegexDe = new(@"Momentanes Aussehen deiner Familiare:", RegexOptions.Compiled);
-    readonly Regex fullRegexFr = new(@"Apparences de vos familiers", RegexOptions.Compiled);
+    private readonly Regex fullRegexEn = new(@"Pet glamour settings", RegexOptions.Compiled);
+    private readonly Regex fullRegexJp = new(@"ペットの見た目の設定状態", RegexOptions.Compiled);
+    private readonly Regex fullRegexDe = new(@"Momentanes Aussehen deiner Familiare:", RegexOptions.Compiled);
+    private readonly Regex fullRegexFr = new(@"Apparences de vos familiers", RegexOptions.Compiled);
 
     // Change is in LogMessage at 3840
 
-    readonly Regex changeRegexEn = new(@"^The next (?<petname>.+) summoned will appear glamoured as (?<petname2>.+)\.$", RegexOptions.Compiled);
-    readonly Regex changeRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を「(?<petname2>.+)」に変更しました\。$", RegexOptions.Compiled);
-    readonly Regex changeRegexDe = new(@"^(?<petname>.+) wird nächstes Mal als (?<petname2>.+) erscheinen\.$", RegexOptions.Compiled);
-    readonly Regex changeRegexFr = new(@"^(?<petname>.+) aura l'apparence de (?<petname2>.+) lors de sa prochaine invocation\.$", RegexOptions.Compiled);
+    private readonly Regex changeRegexEn = new(@"^The next (?<petname>.+) summoned will appear glamoured as (?<petname2>.+)\.$", RegexOptions.Compiled);
+    private readonly Regex changeRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を「(?<petname2>.+)」に変更しました\。$", RegexOptions.Compiled);
+    private readonly Regex changeRegexDe = new(@"^(?<petname>.+) wird nächstes Mal als (?<petname2>.+) erscheinen\.$", RegexOptions.Compiled);
+    private readonly Regex changeRegexFr = new(@"^(?<petname>.+) aura l'apparence de (?<petname2>.+) lors de sa prochaine invocation\.$", RegexOptions.Compiled);
 
     // Reset is in LogMessage at index 3841
 
-    readonly Regex resetRegexEn = new(@"^The next (?<petname>.+) summoned will appear unglamoured\.$", RegexOptions.Compiled);
-    readonly Regex resetRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を元に戻しました\。$", RegexOptions.Compiled);
-    readonly Regex resetRegexDe = new(@"^(?<petname>.+) wird nächstes Mal unverwandelt erscheinen\.$", RegexOptions.Compiled);
-    readonly Regex resetRegexFr = new(@"^(?<petname>.+) reprendra son apparence d'origine lors de sa prochaine invocation\.$", RegexOptions.Compiled);
+    private readonly Regex resetRegexEn = new(@"^The next (?<petname>.+) summoned will appear unglamoured\.$", RegexOptions.Compiled);
+    private readonly Regex resetRegexJp = new(@"^次に召喚する「(?<petname>.+)」の姿を元に戻しました\。$", RegexOptions.Compiled);
+    private readonly Regex resetRegexDe = new(@"^(?<petname>.+) wird nächstes Mal unverwandelt erscheinen\.$", RegexOptions.Compiled);
+    private readonly Regex resetRegexFr = new(@"^(?<petname>.+) reprendra son apparence d'origine lors de sa prochaine invocation\.$", RegexOptions.Compiled);
 
-    readonly Regex changeRegex;
-    readonly Regex resetRegex;
-    readonly Regex fullRegex;
-    readonly Regex spacingRegex = new(@"^(?<petname>.+)  (?<petname2>.+)");
+    private readonly Regex changeRegex;
+    private readonly Regex resetRegex;
+    private readonly Regex fullRegex;
+    private readonly Regex spacingRegex = new(@"^(?<petname>.+)  (?<petname2>.+)");
 
-    int nextRow = 0;
+    private int nextRow = 0;
 
-    readonly DalamudServices DalamudServices;
-    readonly IPettableUserList UserList;
-    readonly IPetServices PetServices;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IPettableUserList  UserList;
+    private readonly IPetServices       PetServices;
 
     public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
     {
         DalamudServices = dalamudServices;
-        UserList = userList;
-        PetServices = petServices;
+        UserList        = userList;
+        PetServices     = petServices;
 
         RegisterChat(XivChatType.SystemMessage);
 
@@ -125,51 +126,80 @@ internal class PetGlamourChat : RestrictedChatElement
         };
     }
 
-    internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    protected override void OnRestrictedChatMessage(IHandleableChatMessage chatMessage)
     {
         if(nextRow > 0)
         {
-            MatchChange(spacingRegex.Match(message.TextValue));
+            MatchChange(spacingRegex.Match(chatMessage.Message.TextValue));
+            
             return;
         }
 
-        Match match = changeRegex.Match(message.TextValue);
-        if (match.Success) MatchRemap(match);
+        Match match = changeRegex.Match(chatMessage.Message.TextValue);
+        
+        if (match.Success)
+        {
+            MatchRemap(match);
+        }
 
-        Match match2 = resetRegex.Match(message.TextValue);
-        if (match2.Success) MatchReset(match2);
+        Match match2 = resetRegex.Match(chatMessage.Message.TextValue);
+        
+        if (match2.Success)
+        {
+            MatchReset(match2);
+        }
 
-        Match match3 = fullRegex.Match(message.TextValue);
-        if (match3.Success) MatchFull();
+        Match match3 = fullRegex.Match(chatMessage.Message.TextValue);
+        
+        if (match3.Success)
+        {
+            MatchFull();
+        }
     }
 
-    void MatchFull() => nextRow = 5;
+    private void MatchFull() 
+        => nextRow = 5;
 
-    void MatchChange(Match match)
+    private void MatchChange(Match match)
     {
-        if (nextRow > 0) nextRow--;
+        if (nextRow > 0)
+        {
+            nextRow--;
+        }
 
         MatchRemap(match);
     }
 
-    void MatchRemap(Match match)
+    private void MatchRemap(Match match)
     {
-        string basePetName = match.Groups["petname"].Value;
+        string basePetName    = match.Groups["petname"].Value;
         string changedPetName = match.Groups["petname2"].Value;
 
         Remap(basePetName, changedPetName);
     }
 
-    void Remap(string basePetName, string changedPetName)
+    private void Remap(string basePetName, string changedPetName)
     {
         int? classJob = GetClassJob(basePetName);
-        if (classJob == null) return;
+        
+        if (classJob == null)
+        {
+            return;
+        }
 
         IPetSheetData? sheetData = PetServices.PetSheets.GetPetFromName(changedPetName);
-        if (sheetData == null) return;
+        
+        if (sheetData == null)
+        {
+            return;
+        }
 
         IPettableUser? localUser = UserList.LocalPlayer;
-        if (localUser == null) return;
+        
+        if (localUser == null)
+        {
+            return;
+        }
 
         localUser.DataBaseEntry.SetSoftSkeleton(classJob.Value, sheetData.Model);
     }

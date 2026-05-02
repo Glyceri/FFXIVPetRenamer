@@ -181,81 +181,86 @@ internal class PetDevWindow : PetWindow
             SetBaseNames();
         }
 
-        IPlayerCharacter? player = target as IPlayerCharacter;
-
-        bool hasTarget = player != null;
-
-        if (hasTarget)
+        
+        if (target != null)
         {
-            hasTarget = player!.ObjectIndex != 0;
-        }
+            
+            IPlayerCharacter? player = target as IPlayerCharacter;
+            
+            bool hasTarget = player != null;
 
-        if (hasTarget)
-        {
-            IPettableUser? user = UserList.GetUser(player!.Address);
-            if (user != null)
+            if (hasTarget)
             {
-                hasTarget = !user.DataBaseEntry.IsActive;
-            }
-        }
-
-        LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
-
-        if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
-        {
-            Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
-
-            LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
-
-            BattleChara* bChara = (BattleChara*)player.Address;
-
-            if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
-            {
-                ClearIPC(bChara->ObjectIndex);
+                hasTarget = player!.ObjectIndex != 0;
             }
 
             if (hasTarget)
             {
-                string startString = "[PetNicknames(2)]\n";
-                startString += bChara->NameString + "\n";
-                startString += bChara->HomeWorld + "\n";
-                startString += bChara->ContentId + "\n";
-                startString += "[-411,-417,-416,-415,-407]";
-
-
-                BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
-                if (bPet != null)
+                IPettableUser? user = UserList.GetUser(player!.Address);
+                if (user != null)
                 {
-                    RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
-                    if (clicked)
-                    {
-                        int id = -bPet->Character.ModelContainer.ModelCharaId;
-                        startString += $"\n{id}^{targetBattlePetName}";
-                    }
+                    hasTarget = !user.DataBaseEntry.IsActive;
                 }
-
-                Character* minion = &bChara->CompanionObject->Character;
-                if (minion != null)
-                {
-                    RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
-
-                    if (clicked)
-                    {
-                        int id = minion->ModelContainer.ModelCharaId;
-                        startString += $"\n{id}^{targetMinionName}";
-                    }
-                }
-
-                if (clicked)
-                {
-                    DalamudServices.PluginLog.Debug(startString);
-                    SendAll(startString);
-                }
-
-                clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
             }
 
-            Listbox.End();
+            LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
+
+            if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
+            {
+                Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
+
+                LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
+
+                BattleChara* bChara = (BattleChara*)player.Address;
+
+                if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
+                {
+                    ClearIPC(bChara->ObjectIndex);
+                }
+
+                if (hasTarget)
+                {
+                    string startString = "[PetNicknames(2)]\n";
+                    startString += bChara->NameString + "\n";
+                    startString += bChara->HomeWorld + "\n";
+                    startString += bChara->ContentId + "\n";
+                    startString += "[-411,-417,-416,-415,-407]";
+
+
+                    BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
+                    if (bPet != null)
+                    {
+                        RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+                        if (clicked)
+                        {
+                            int id = -bPet->Character.ModelContainer.ModelCharaId;
+                            startString += $"\n{id}^{targetBattlePetName}";
+                        }
+                    }
+
+                    Character* minion = &bChara->CompanionObject->Character;
+                    if (minion != null)
+                    {
+                        RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+
+                        if (clicked)
+                        {
+                            int id = minion->ModelContainer.ModelCharaId;
+                            startString += $"\n{id}^{targetMinionName}";
+                        }
+                    }
+
+                    if (clicked)
+                    {
+                        DalamudServices.PluginLog.Debug(startString);
+                        SendAll(startString);
+                    }
+
+                    clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
+                }
+
+                Listbox.End();
+            }
         }
     }
 

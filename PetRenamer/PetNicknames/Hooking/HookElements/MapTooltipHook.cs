@@ -7,8 +7,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
-using System.Linq;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkTooltipManager;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -17,7 +15,7 @@ internal unsafe class MapTooltipHook : QuickHookableElement, IMapTooltipHook
     private ushort lastId = ushort.MaxValue;
 
     // This one gets set in the 2nd constructor
-    private readonly MapTooltipTextHook tooltipHookMap = null!;
+    private readonly MapTooltipTextHook tooltipHookMap;
     private readonly ITooltipHookHelper TooltipHook;
 
     private readonly string[] allowedTooltipAddonsMap = 

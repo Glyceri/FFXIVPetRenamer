@@ -14,7 +14,7 @@ internal class FlyTextHook : HookableElement
 {
     private delegate void AddToScreenLogWithLogMessageId(nint a1, nint a2, int a3, char a4, int a5, int a6, int a7, int a8);
     private delegate nint LogMethod(nint a1, int a2, nint a3, nint a4);
-
+    
     [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B9 9E 64 00 00", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     private readonly Hook<AddToScreenLogWithLogMessageId>? addToScreenLogWithLogMessageId = null;
 

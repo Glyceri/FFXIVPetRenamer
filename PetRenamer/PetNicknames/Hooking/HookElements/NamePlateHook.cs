@@ -18,19 +18,14 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class NamePlateHook : HookableElement
 {
-    private delegate nint UpdateNameplateDelegate(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex);
-    private delegate nint UpdateNameplateNpcDelegate(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, GameObject* gameObject, int numArrayIndex, int stringArrayIndex);
-
-    [Signature("40 53 55 57 41 56 48 81 EC ?? ?? ?? ?? 48 8B 84 24", DetourName = nameof(UpdateNameplateDetour))]
-    private readonly Hook<UpdateNameplateDelegate>? NameplateHook = null;
-
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 4C 89 44 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 7C 24", DetourName = nameof(UpdateNameplateNpcDetour))]
-    private readonly Hook<UpdateNameplateNpcDelegate>? NameplateMinionHook = null;
+    private readonly Hook<RaptureAtkModule.Delegates.UpdateBattleCharaNameplates>? NameplateHook;
+    private readonly Hook<RaptureAtkModule.Delegates.UpdateNpcNameplates>?         NameplateMinionHook;
 
     public NamePlateHook(DalamudServices services, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener) 
         : base(services, pettableUserList, petServices, dirtyListener) 
     {
-
+         NameplateHook       = DalamudServices.Hooking.HookFromAddress<RaptureAtkModule.Delegates.UpdateBattleCharaNameplates>((nint)RaptureAtkModule.MemberFunctionPointers.UpdateBattleCharaNameplates, UpdateNameplateDetour);
+         NameplateMinionHook = DalamudServices.Hooking.HookFromAddress<RaptureAtkModule.Delegates.UpdateNpcNameplates>        ((nint)RaptureAtkModule.MemberFunctionPointers.UpdateNpcNameplates,         UpdateNameplateNpcDetour);
     }
 
     public override void Init()
@@ -64,7 +59,7 @@ internal unsafe class NamePlateHook : HookableElement
         addonNamePlate->DoFullUpdate = 1;
     }
 
-    private nint UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
+    private int UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
         try
         {
@@ -78,7 +73,7 @@ internal unsafe class NamePlateHook : HookableElement
         return NameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
     }
 
-    public nint UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
+    public int UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
         try
         {
