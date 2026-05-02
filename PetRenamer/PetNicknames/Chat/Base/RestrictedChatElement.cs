@@ -1,5 +1,5 @@
-﻿using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
+﻿using Dalamud.Game.Chat;
+using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using System.Collections.Generic;
 
@@ -7,26 +7,39 @@ namespace PetRenamer.PetNicknames.Chat.Base;
 
 internal abstract class RestrictedChatElement : IChatElement
 {
-    readonly HashSet<int> ChatTypes = new HashSet<int>();
+    private readonly HashSet<int> ChatTypes = [];
 
-    internal void RegisterChat(int chatType) => ChatTypes.Add(chatType);
-    internal void RegisterChat(XivChatType chatType) => ChatTypes.Add((int)chatType);
+    internal void RegisterChat(int chatType) 
+        => ChatTypes.Add(chatType);
+    
+    internal void RegisterChat(XivChatType chatType) 
+        => ChatTypes.Add((int)chatType);
+    
     internal void RegisterChat(params int[] chats)
     {
         for (int i = 0; i < chats.Length; i++)
+        {
             ChatTypes.Add(chats[i]);
+        }
     }
+    
     internal void RegisterChat(params XivChatType[] chats)
     {
         for (int i = 0; i < chats.Length; i++)
+        {
             ChatTypes.Add((int)chats[i]);
+        }
     }
 
-    public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
-        if (!ChatTypes.Contains((int)type)) return;
-        OnRestrictedChatMessage(type, timestamp, ref sender, ref message, ref isHandled);
+        if (!ChatTypes.Contains((int)chatMessage.LogKind))
+        {
+            return;
+        }
+        
+        OnRestrictedChatMessage(chatMessage);
     }
 
-    internal abstract void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled);
+    protected abstract void OnRestrictedChatMessage(IHandleableChatMessage chatMessage);
 }

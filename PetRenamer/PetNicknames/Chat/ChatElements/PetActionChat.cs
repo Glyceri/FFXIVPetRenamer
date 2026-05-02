@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Text;
+﻿using Dalamud.Game.Chat;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using PetRenamer.PetNicknames.Chat.Base;
@@ -21,7 +21,7 @@ internal class PetActionChat : RestrictedChatElement
         RegisterChat(2105, 2106);
     }
 
-    internal override void OnRestrictedChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    protected override void OnRestrictedChatMessage(IHandleableChatMessage chatMessage)
     {
         if (!PetServices.PetActionHelper.LastValid)
         {
@@ -73,6 +73,10 @@ internal class PetActionChat : RestrictedChatElement
             return;
         }
 
+        SeString message = chatMessage.Message;
+        
         PetServices.StringHelper.ReplaceSeString(ref message, customName, petData, true);
+        
+        chatMessage.Message = message;
     }
 }

@@ -37,6 +37,7 @@ internal class ChatHandler : IDisposable
     void Register(IChatElement chatElement)
     {
         _chatElements.Add(chatElement);
+        
         DalamudServices.ChatGui.ChatMessage += chatElement.OnChatMessage;
     }
 

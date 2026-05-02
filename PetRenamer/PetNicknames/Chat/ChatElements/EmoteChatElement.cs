@@ -2,6 +2,7 @@
 using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using Dalamud.Game;
+using Dalamud.Game.Chat;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -9,7 +10,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
-internal unsafe class EmoteChatElement : IChatElement
+internal class EmoteChatElement : IChatElement
 {
     private readonly DalamudServices   DalamudServices;
     private readonly IPettableUserList UserList;
@@ -25,9 +26,9 @@ internal unsafe class EmoteChatElement : IChatElement
     private bool LanguageIsJapanese
         => DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese;
 
-    public void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
-        if (type != XivChatType.StandardEmote)
+        if (chatMessage.LogKind != XivChatType.StandardEmote)
         {
             return;
         }
@@ -37,11 +38,11 @@ internal unsafe class EmoteChatElement : IChatElement
             return;
         }
 
-        IPettableUser? senderUser = UserList.GetUser(sender.TextValue);
+        IPettableUser? senderUser = UserList.GetUser(chatMessage.Sender.TextValue);
 
         if (senderUser == null)
         {
-            PetServices.PetLog.LogVerbose($"Sender User is NULL [{sender.TextValue}].");
+            PetServices.PetLog.LogVerbose($"Sender User is NULL [{chatMessage.Sender.TextValue}].");
 
             return;
         }
@@ -50,7 +51,7 @@ internal unsafe class EmoteChatElement : IChatElement
 
         if (target == null)
         {
-            PetServices.PetLog.LogVerbose($"Target is NULL [{sender.TextValue}].");
+            PetServices.PetLog.LogVerbose($"Target is NULL [{chatMessage.Sender.TextValue}].");
 
             return;
         }
@@ -96,7 +97,11 @@ internal unsafe class EmoteChatElement : IChatElement
             return;
         }
 
+        SeString message = chatMessage.Message;
+        
         PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !LanguageIsJapanese);
+        
+        chatMessage.Message = message;
     }
 }
 
