@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -34,25 +33,30 @@ internal class PetConfigWindow : PetWindow
         PluginWatcher = pluginWatcher;
 
         PluginWatcher.RegisterListener(OnPluginChanged);
-        
-        IsOpen = true;
     }
 
     protected override void OnDraw()
     {
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
         {
+            ImGui.Spacing();
+            
             DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures);
             
             DrawEnumMenu("Name Colours", _colourDisplay, ref Configuration.SelectedColourMode);
+            
+            ImGui.Spacing();
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
         {
+            ImGui.Spacing();
             DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref Configuration.showKofiButton);
             DrawBasicToggle(Translator.GetLine("Config.Toggle"),            ref Configuration.quickButtonsToggle);
-
-            ImGui.NewLine();
+            
+            ImGui.Separator();
+            
+            ImGui.Spacing();
 
             DrawBasicToggle(Translator.GetLine("Config.ShowNotification"),  ref Configuration.showNotifications);
 
@@ -61,11 +65,15 @@ internal class PetConfigWindow : PetWindow
             DrawBasicToggle(Translator.GetLine("Config.IslandWarning"),     ref Configuration.showIslandWarning);
 
             ImGui.EndDisabled();
-
-            ImGui.NewLine();
+            
+            ImGui.Separator();
+            
+            ImGui.Spacing();
 
             DrawMenu("List Button Type", _listIconTypes, ref Configuration.listButtonLayout);
             DrawMenu("Icon Type",        _iconMenuTypes, ref Configuration.minionIconType);
+            
+            ImGui.Spacing();
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
@@ -83,16 +91,24 @@ internal class PetConfigWindow : PetWindow
             
             DrawBasicToggle (Translator.GetLine("Config.IslandPets"),   ref Configuration.showOnIslandPets);
             DrawBasicToggle (Translator.GetLine("Config.ContextMenu"),  ref Configuration.useContextMenus);
+            
+            ImGui.Spacing();
         }
 
         if (DrawThirdPartyHeader("Penumbra"))
         {
+            ImGui.Spacing();
+            
             DrawBasicToggle(Translator.GetLine("Config.Penumbra.AttachToPCP"), ref Configuration.attachToPCP);
             DrawBasicToggle(Translator.GetLine("Config.Penumbra.ReadFromPCP"), ref Configuration.readFromPCP);
+            
+            ImGui.Spacing();
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Debug")))
         {
+            ImGui.Spacing();
+            
             bool keyComboPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl) && ImGui.IsKeyDown(ImGuiKey.LeftShift);
 
             ImGui.BeginDisabled(!keyComboPressed && !Configuration.debugModeActive);
@@ -102,6 +118,8 @@ internal class PetConfigWindow : PetWindow
             DrawBasicToggle("Show chat code.",              ref Configuration.debugShowChatCode);
 
             ImGui.EndDisabled();
+            
+            ImGui.Spacing();
         }
     }
 
