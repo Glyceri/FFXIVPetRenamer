@@ -17,7 +17,6 @@ internal class SheetsWrapper : IPetSheets
 {
     private readonly DalamudServices DalamudServices;
     private readonly IStringHelper   StringHelper;
-    private readonly INameService    NameService;
 
     private readonly List<IPetSheetData>      petSheetCache = [];
     private readonly string[]                 nameToClass   = [];
@@ -30,11 +29,10 @@ internal class SheetsWrapper : IPetSheets
     private readonly ExcelSheet<TextCommand>? textCommands;
     private readonly ExcelSheet<BNpcName>?    bnpcNames;
 
-    public SheetsWrapper(DalamudServices dalamudServices, IStringHelper helper, INameService nameService)
+    public SheetsWrapper(DalamudServices dalamudServices, IStringHelper helper)
     {
         DalamudServices = dalamudServices;
         StringHelper    = helper;
-        NameService     = nameService;
 
         petSheet        = dalamudServices.DataManager.GetExcelSheet<Companion>();
         worlds          = dalamudServices.DataManager.GetExcelSheet<World>();

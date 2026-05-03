@@ -614,7 +614,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            petListDrawables.Add(new PetListPet(in DalamudServices, in petData, name, edgeColour, textColour));
+            petListDrawables.Add(new PetListPet(in petData, name, edgeColour, textColour));
         }
     }
 

@@ -9,28 +9,9 @@ internal abstract class RestrictedChatElement : IChatElement
 {
     private readonly HashSet<int> ChatTypes = [];
 
-    protected void RegisterChat(int chatType) 
-        => ChatTypes.Add(chatType);
-    
     protected void RegisterChat(XivChatType chatType) 
         => ChatTypes.Add((int)chatType);
     
-    protected void RegisterChat(params int[] chats)
-    {
-        for (int i = 0; i < chats.Length; i++)
-        {
-            ChatTypes.Add(chats[i]);
-        }
-    }
-    
-    protected void RegisterChat(params XivChatType[] chats)
-    {
-        for (int i = 0; i < chats.Length; i++)
-        {
-            ChatTypes.Add((int)chats[i]);
-        }
-    }
-
     public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
         if (!ChatTypes.Contains((int)chatMessage.LogKind))
