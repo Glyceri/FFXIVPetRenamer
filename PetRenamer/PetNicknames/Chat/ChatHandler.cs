@@ -1,5 +1,7 @@
-﻿using PetRenamer.PetNicknames.Chat.ChatElements;
+﻿using Lumina.Excel.Sheets;
+using PetRenamer.PetNicknames.Chat.ChatElements;
 using PetRenamer.PetNicknames.Chat.Interfaces;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -13,15 +15,17 @@ internal class ChatHandler : IDisposable
     private readonly DalamudServices    DalamudServices;
     private readonly IPetServices       PetServices;
     private readonly IPettableUserList  PettableUserList;
+    private readonly IPronounHook       PronounHook;
 
     private readonly List<IChatElement> _chatElements = [];
     
-    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList)
+    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPronounHook pronounHook)
     {
-        DalamudServices  = dalamudServices;
-        PetServices      = petServices;
-        PettableUserList = pettableUserList;
-
+        DalamudServices   = dalamudServices;
+        PetServices       = petServices;
+        PettableUserList  = pettableUserList;
+        PronounHook       = pronounHook;
+        
         _Register();
     }
 
@@ -31,6 +35,7 @@ internal class ChatHandler : IDisposable
         Register(new EmoteChatElement(PetServices, PettableUserList));
         Register(new BattleChatElement(PetServices));
         Register(new DebugChatCode(PetServices.Configuration));
+        Register(new SystemChatElement(DalamudServices, PetServices, PronounHook, PettableUserList));
     }
 
     private void Register(IChatElement chatElement)

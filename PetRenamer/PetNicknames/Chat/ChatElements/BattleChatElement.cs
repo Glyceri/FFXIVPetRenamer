@@ -10,13 +10,13 @@ namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal class BattleChatElement : RestrictedChatElement
 {
-    private readonly IPetServices       PetServices;
+    private readonly IPetServices PetServices;
 
     public BattleChatElement(IPetServices petServices)
     {
         PetServices = petServices;
         
-        RegisterChat(XivChatType.Action, XivChatType.SystemMessage, XivChatType.SystemError);
+        RegisterChat(XivChatType.Action);
     }
     
     private void HandleAsPet(IHandleableChatMessage chatMessage, IPettablePet pet)

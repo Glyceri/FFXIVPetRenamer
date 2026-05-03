@@ -90,7 +90,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         SaveHandler                 = new SaveHandler(PetServices, PettableUserList, IpcProvider, DirtyHandler);
 
         UpdateHandler               = new UpdateHandler(DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase, SaveHandler);
-        ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList);
+        ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList, HookHandler.PronounHook);
 
         WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
 
