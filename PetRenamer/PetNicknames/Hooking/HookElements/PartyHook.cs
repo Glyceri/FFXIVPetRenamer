@@ -12,6 +12,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using System.Numerics;
 using Lumina.Text.ReadOnly;
+using PetRenamer.PetNicknames.Hooking.Structs;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -63,7 +64,7 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
 
-        SetPetname  ((AddonPartyList*)baseD);
+        SetPetname  ((PetNicknamesAddonPartyList*)baseD);
         SetCastlist ((AddonPartyList*)baseD);
     }
 
@@ -73,7 +74,7 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
-    private void SetPetname(AddonPartyList* partyNode)
+    private void SetPetname(PetNicknamesAddonPartyList* partyNode)
     {
         if (!PetServices.Configuration.showOnPartyList)
         {
