@@ -25,7 +25,7 @@ internal class PetServices : IPetServices
         PetLog              = new PetLogWrapper(services.PluginLog);
         Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         StringHelper        = new StringHelperWrapper(this, userList);
-        NameService         = new NameService();
+        NameService         = new NameService(StringHelper);
         PetSheets           = new SheetsWrapper(services, StringHelper);
         PetCastHelper       = new PetCastWrapper(userList);
         PetActionHelper     = new PetActionWrapper(userList);

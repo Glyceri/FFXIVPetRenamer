@@ -62,8 +62,8 @@ internal class HookHandler : IDisposable
         
         PetServices.NameService.RegisterPronounHook(PronounHook);
         
+        Register(new CastHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));

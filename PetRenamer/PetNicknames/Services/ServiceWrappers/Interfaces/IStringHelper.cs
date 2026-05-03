@@ -14,9 +14,6 @@ internal unsafe interface IStringHelper
     void ReplaceChat(IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     void ReplaceChat(IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType);
     
-    void ReplaceSeString(ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
-    void ReplaceSeString(ref SeString seString, IPettablePet? pettablePet, NameType nameType);
-    
     void ReplaceATKString(AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     void ReplaceATKString(AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
     

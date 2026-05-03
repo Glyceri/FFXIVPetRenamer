@@ -125,8 +125,6 @@ internal class StringHelperWrapper : IStringHelper
         
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
         
-        //regString = $"\\b" + regString + "\\b";
-        
         nodeText = Regex.Replace(nodeText, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
         
         string[] splitStrings = Regex.Split(nodeText, @$"(\{PluginConstants.forbiddenCharacter}+)");
@@ -207,7 +205,7 @@ internal class StringHelperWrapper : IStringHelper
         chatMessage.Message = seString;
     }
     
-    public void ReplaceSeString(ref SeString seString, IPettablePet? pettablePet, NameType nameType)
+    private void ReplaceSeString(ref SeString seString, IPettablePet? pettablePet, NameType nameType)
     {
         if (pettablePet == null)
         {
@@ -220,7 +218,7 @@ internal class StringHelperWrapper : IStringHelper
         ReplaceSeString(ref seString, petData, nameType, owner);
     }
     
-    public void ReplaceSeString(ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    private void ReplaceSeString(ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (petData == null)
         {
