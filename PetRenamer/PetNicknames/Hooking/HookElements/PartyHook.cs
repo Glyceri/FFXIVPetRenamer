@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
@@ -11,7 +10,6 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using System.Numerics;
 using Lumina.Text.ReadOnly;
 using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -78,11 +76,6 @@ internal unsafe class PartyHook : HookableElement
 
     private void SetPetName(PetNicknamesAddonPartyList* partyNode)
     {
-        if (!PetServices.Configuration.showOnPartyList)
-        {
-            return;
-        }
-
         IPettableUser? localPlayer = UserList.LocalPlayer;
 
         if (localPlayer == null)
@@ -97,12 +90,12 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet, NameType.Raw);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnPartyListColour, partyNode->Pet.Name, pet, NameType.Raw);
     }
 
     private void SetCastlist(AddonPartyList* partyNode)
     {
-        if (!PetServices.Configuration.showOnCastbars)
+        if (!PetServices.Configuration.ShowOnCastbarsColour.Enabled)
         {
             return;
         }
@@ -170,7 +163,7 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, data, NameType.Action, user);
+            PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
         }
     }
 

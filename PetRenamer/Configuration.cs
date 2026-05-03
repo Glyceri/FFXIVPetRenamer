@@ -13,7 +13,7 @@ namespace PetRenamer;
 internal class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 11;
+    public const int currentSaveFileVersion = 12;
 
     [JsonIgnore]
     private IDalamudPluginInterface? PetNicknamesPlugin;
@@ -34,25 +34,26 @@ internal class Configuration : IPluginConfiguration
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
     public int languageSettings = 0;
-    // 0 == All
-    // 1 == Only yourself
-    // 2 == No colours
-    public int showColours = 0;
     public bool showCommandFeedback = true;
     public bool showNotifications = true;
+    
+    public ColourMode SelectedColourMode = ColourMode.All;
     // ------------------------------- Pet -------------------------------
-    public bool showOnNameplates = true;
-    public bool showOnCastbars = true;
-    public bool showInBattleChat = true;
-    public bool showOnFlyout = true;
-    public bool showOnEmotes = true;
-    public bool showOnTooltip = true;
-    public bool showNamesInMinionBook = true;
-    public bool showNamesInActionLog = true;
-    public bool useContextMenus = true;
-    public bool showOnTargetBars = true;
-    public bool showOnPartyList = true;
+    
+    public ColourConfig ShowOnNameplatesColour      = new ColourConfig();
+    public ColourConfig ShowOnCastbarsColour        = new ColourConfig();
+    public ColourConfig ShowInBattleChatColour      = new ColourConfig();
+    public ColourConfig ShowOnFlyoutColour          = new ColourConfig();
+    public ColourConfig ShowOnEmotesColour          = new ColourConfig();
+    public ColourConfig ShowOnTooltipColour         = new ColourConfig();
+    public ColourConfig ShowNamesInMinionBookColour = new ColourConfig();
+    public ColourConfig ShowNamesInActionLogColour  = new ColourConfig();
+    public ColourConfig ShowOnTargetBarsColour      = new ColourConfig();
+    public ColourConfig ShowOnPartyListColour       = new ColourConfig();
+    
     public bool showOnIslandPets = true;
+    public bool useContextMenus  = true;
+    
     // --------------------------- UI SETTINGS ---------------------------
     public bool showKofiButton = true;
     public bool quickButtonsToggle = true;
@@ -133,6 +134,32 @@ internal class Configuration : IPluginConfiguration
     [Obsolete("Pre Skeleton Type Update")]
     public SerializableUserV5[]? SerializableUsersV5 { get; set; } = null;
 
+    // 0 == All
+    // 1 == Only yourself
+    // 2 == No colours
+    [Obsolete]
+    public int showColours = 0;
+    [Obsolete]
+    public bool showOnNameplates = true;
+    [Obsolete]
+    public bool showOnCastbars = true;
+    [Obsolete]
+    public bool showInBattleChat = true;
+    [Obsolete]
+    public bool showOnFlyout = true;
+    [Obsolete]
+    public bool showOnEmotes = true;
+    [Obsolete]
+    public bool showOnTooltip = true;
+    [Obsolete]
+    public bool showNamesInMinionBook = true;
+    [Obsolete]
+    public bool showNamesInActionLog = true;
+    [Obsolete]
+    public bool showOnTargetBars = true;
+    [Obsolete]
+    public bool showOnPartyList = true;
+    
 #pragma warning restore IDE1006
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -147,4 +174,30 @@ internal class Configuration : IPluginConfiguration
 #pragma warning restore CS0618 // Type or member is obsolete
 
     #endregion
+    
+    [Serializable]
+    public struct ColourConfig
+    {
+        public bool       Enabled            = true;
+        public bool       OverrideColourMode = false;
+        public ColourMode ColourMode         = ColourMode.All;
+        
+        public ColourConfig()
+            { }
+        
+        public ColourConfig(bool enabled, bool overrideColourMode, ColourMode colourMode)
+        {
+            Enabled            = enabled;
+            OverrideColourMode = overrideColourMode;
+            ColourMode         = colourMode;
+        }
+    }
+    
+    [Serializable]
+    public enum ColourMode
+    {
+        All      = 0,
+        Personal = 1,
+        None     = 2,
+    }
 }

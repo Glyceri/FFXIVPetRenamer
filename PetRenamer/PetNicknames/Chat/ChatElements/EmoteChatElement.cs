@@ -24,12 +24,7 @@ internal class EmoteChatElement : IChatElement
         {
             return;
         }
-
-        if (!PetServices.Configuration.showOnEmotes)
-        {
-            return;
-        }
-
+        
         IPettableUser? senderUser = UserList.GetUser(chatMessage.Sender.TextValue);
 
         if (senderUser == null)
@@ -55,7 +50,7 @@ internal class EmoteChatElement : IChatElement
             return;
         }
 
-        PetServices.StringHelper.ReplaceChat(chatMessage, pet, NameType.Pronoun);
+        PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowOnEmotesColour, chatMessage, pet, NameType.Pronoun);
     }
 }
 

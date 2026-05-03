@@ -44,25 +44,17 @@ internal unsafe class PettableIslandPet : IIslandPet
         CustomName = Entry.GetName(SkeletonID);
     }
 
-    public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour)
+    public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;
         textColour = null;
-
-        int colourSetting = PetServices.Configuration.showColours;
-
-        if (colourSetting >= 2)
+        
+        if (Owner == null || PetData == null)
         {
             return;
         }
 
-        if (colourSetting == 1 && (Owner?.IsLocalPlayer ?? false))
-        {
-            return;
-        }
-
-        edgeColour = Entry.GetEdgeColour(SkeletonID);
-        textColour = Entry.GetTextColour(SkeletonID);
+        Owner.GetDrawColours(PetData, colourConfig, out edgeColour, out textColour);
     }
 
     public bool IsActive

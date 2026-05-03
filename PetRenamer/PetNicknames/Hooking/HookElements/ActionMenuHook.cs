@@ -518,13 +518,8 @@ internal unsafe class ActionMenuHook : HookableElement
         {
             return;
         }
-
-        if (!PetServices.Configuration.showNamesInActionLog)
-        {
-            return;
-        }
         
-        PetServices.StringHelper.ReplaceATKString(textNode, softData, NameType.Action);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowNamesInActionLogColour, textNode, softData, NameType.Action);
     }
 
     protected override void OnDispose()

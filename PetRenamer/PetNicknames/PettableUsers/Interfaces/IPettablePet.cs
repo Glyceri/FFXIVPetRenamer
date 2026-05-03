@@ -17,5 +17,5 @@ internal interface IPettablePet : IPettableEntity, IDisposable
     bool           IsActive   { get; }
     
     void Recalculate();
-    void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+    void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
 }

@@ -68,30 +68,16 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         SharingDictionary.Set(ObjectID, null);
     }
 
-    public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour)
+    public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;
         textColour = null;
-
-        // This should NEVER be the case
-        if (Owner == null)
+        
+        if (Owner == null || PetData == null)
         {
             return;
         }
 
-        int colourSetting = PetServices.Configuration.showColours;
-
-        if (colourSetting >= 2)
-        {
-            return;
-        }
-
-        if (colourSetting == 1 && !Owner.IsLocalPlayer)
-        {
-            return;
-        }
-
-        edgeColour = Entry.GetEdgeColour(SkeletonID);
-        textColour = Entry.GetTextColour(SkeletonID);
+        Owner.GetDrawColours(PetData, colourConfig, out edgeColour, out textColour);
     }
 }

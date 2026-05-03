@@ -130,19 +130,24 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused
     
-    public void GetDrawColours(IPetSheetData sheetData, out Vector3? edgeColour, out Vector3? textColour)
+    public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;
         textColour = null;
 
-        int colourSetting = PetServices.Configuration.showColours;
+        Configuration.ColourMode colourSetting = PetServices.Configuration.SelectedColourMode;
 
-        if (colourSetting >= 2)
+        if (colourConfig.OverrideColourMode)
+        {
+            colourSetting = colourConfig.ColourMode;
+        }
+        
+        if (colourSetting == Configuration.ColourMode.None)
         {
             return;
         }
 
-        if (colourSetting == 1 && !IsLocalPlayer)
+        if (colourSetting == Configuration.ColourMode.Personal && !IsLocalPlayer)
         {
             return;
         }

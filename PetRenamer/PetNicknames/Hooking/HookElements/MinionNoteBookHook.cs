@@ -37,11 +37,6 @@ internal unsafe class MinionNoteBookHook : HookableElement
     
     private void HandleBook(AtkUnitBase* atkUnitBase, uint textNodeIndex)
     {
-        if (!PetServices.Configuration.showNamesInMinionBook)
-        {
-            return;
-        }
-        
         if (atkUnitBase == null)
         {
             return;
@@ -61,7 +56,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        PetServices.StringHelper.ReplaceATKString(textNode, petData, NameType.Pronoun);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NameType.Pronoun);
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)

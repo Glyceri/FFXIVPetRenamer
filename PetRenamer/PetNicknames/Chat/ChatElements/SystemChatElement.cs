@@ -83,11 +83,6 @@ internal class SystemChatElement : IChatElement
         
         expectedLogCount--;
         
-        if (!PetServices.Configuration.showNamesInActionLog)
-        {
-            return;
-        }
-        
         if (UserList.LocalPlayer == null)
         {
             return;
@@ -100,6 +95,6 @@ internal class SystemChatElement : IChatElement
             return;
         }
 
-        PetServices.StringHelper.ReplaceChat(chatMessage, pettablePet, NameType.Raw);
+        PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowNamesInActionLogColour, chatMessage, pettablePet, NameType.Raw);
     }
 }

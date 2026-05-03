@@ -71,12 +71,7 @@ internal unsafe class TooltipHook : HookableElement
             return;
         }
         
-        if (!PetServices.Configuration.showOnTooltip)
-        {
-            return;
-        }
-        
-        PetServices.StringHelper.ReplaceATKString(textNode, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnTooltipColour, textNode, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType);
         
         if (backgroundNode == null)
         {

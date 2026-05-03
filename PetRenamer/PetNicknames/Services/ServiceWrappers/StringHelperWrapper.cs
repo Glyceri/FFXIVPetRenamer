@@ -72,12 +72,6 @@ internal class StringHelperWrapper : IStringHelper
         {
             return SeString.Empty;
         }
-        
-        if (PetServices.Configuration.showColours == 2)
-        {
-            edgeColor = null;
-            textColor = null;
-        }
 
         LSeStringBuilder builder = new LSeStringBuilder();
 
@@ -163,49 +157,49 @@ internal class StringHelperWrapper : IStringHelper
         return true;
     }
     
-    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public unsafe void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {
             return;
         }
         
-        ReplaceSeString(ref seString, petData, nameType, user);
+        ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
 
         atkNode->SetText(seString.EncodeWithNullTerminator());
     }
     
-    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    public unsafe void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {
             return;
         }
         
-        ReplaceSeString(ref seString, pettablePet, nameType);
+        ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
 
         atkNode->SetText(seString.EncodeWithNullTerminator());
     }
 
-    public void ReplaceChat(IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
+    public void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
     {
         SeString seString = chatMessage.Message;
         
-        ReplaceSeString(ref seString, pettablePet, nameType);
+        ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
         
         chatMessage.Message = seString;
     }
     
-    public void ReplaceChat(IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         SeString seString = chatMessage.Message;
         
-        ReplaceSeString(ref seString, petData, nameType, user);
+        ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
         
         chatMessage.Message = seString;
     }
     
-    private void ReplaceSeString(ref SeString seString, IPettablePet? pettablePet, NameType nameType)
+    private void ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPettablePet? pettablePet, NameType nameType)
     {
         if (pettablePet == null)
         {
@@ -215,12 +209,17 @@ internal class StringHelperWrapper : IStringHelper
         IPettableUser? owner    = pettablePet.Owner;
         IPetSheetData? petData  = pettablePet.PetData;
         
-        ReplaceSeString(ref seString, petData, nameType, owner);
+        ReplaceSeString(colourConfig, ref seString, petData, nameType, owner);
     }
     
-    private void ReplaceSeString(ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    private void ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (petData == null)
+        {
+            return;
+        }
+        
+        if (!colourConfig.Enabled)
         {
             return;
         }
@@ -246,7 +245,7 @@ internal class StringHelperWrapper : IStringHelper
             return;
         }
         
-        user.GetDrawColours(petData, out Vector3? edgeColour, out Vector3? textColour);
+        user.GetDrawColours(petData, colourConfig, out Vector3? edgeColour, out Vector3? textColour);
         
         ReplaceSeString(ref seString, baseName, customName, edgeColour, textColour);
     }

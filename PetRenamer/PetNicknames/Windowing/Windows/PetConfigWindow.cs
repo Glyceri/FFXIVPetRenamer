@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -27,11 +28,14 @@ internal class PetConfigWindow : PetWindow
 
     private readonly IPluginWatcher PluginWatcher;
 
-    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher) : base(windowHandler, dalamudServices, configuration, "Pet Config Window", ImGuiWindowFlags.None)
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher) 
+        : base(windowHandler, dalamudServices, configuration, "Pet Config Window")
     {
         PluginWatcher = pluginWatcher;
 
         PluginWatcher.RegisterListener(OnPluginChanged);
+        
+        IsOpen = true;
     }
 
     protected override void OnDraw()
@@ -39,8 +43,8 @@ internal class PetConfigWindow : PetWindow
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
         {
             DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures);
-
-            DrawMenu("Name Colours", _colourDisplay, ref Configuration.showColours);
+            
+            DrawEnumMenu("Name Colours", _colourDisplay, ref Configuration.SelectedColourMode);
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
@@ -66,18 +70,19 @@ internal class PetConfigWindow : PetWindow
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
-            DrawBasicToggle(Translator.GetLine("Config.Nameplate"),     ref Configuration.showOnNameplates);
-            DrawBasicToggle(Translator.GetLine("Config.Castbar"),       ref Configuration.showOnCastbars);
-            DrawBasicToggle(Translator.GetLine("Config.BattleChat"),    ref Configuration.showInBattleChat);
-            DrawBasicToggle(Translator.GetLine("Config.Emote"),         ref Configuration.showOnEmotes);
-            DrawBasicToggle(Translator.GetLine("Config.Tooltip"),       ref Configuration.showOnTooltip);
-            DrawBasicToggle(Translator.GetLine("Config.Flyout"),        ref Configuration.showOnFlyout);
-            DrawBasicToggle(Translator.GetLine("Config.Notebook"),      ref Configuration.showNamesInMinionBook);
-            DrawBasicToggle(Translator.GetLine("Config.ActionLog"),     ref Configuration.showNamesInActionLog);
-            DrawBasicToggle(Translator.GetLine("Config.Targetbar"),     ref Configuration.showOnTargetBars);
-            DrawBasicToggle(Translator.GetLine("Config.Partylist"),     ref Configuration.showOnPartyList);
-            DrawBasicToggle(Translator.GetLine("Config.IslandPets"),    ref Configuration.showOnIslandPets);
-            DrawBasicToggle(Translator.GetLine("Config.ContextMenu"),   ref Configuration.useContextMenus);
+            DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref Configuration.ShowOnNameplatesColour);
+            DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref Configuration.ShowOnCastbarsColour);
+            DrawColourConfig(Translator.GetLine("Config.BattleChat"),   ref Configuration.ShowInBattleChatColour);
+            DrawColourConfig(Translator.GetLine("Config.Emote"),        ref Configuration.ShowOnEmotesColour);
+            DrawColourConfig(Translator.GetLine("Config.Tooltip"),      ref Configuration.ShowOnTooltipColour);
+            DrawColourConfig(Translator.GetLine("Config.Flyout"),       ref Configuration.ShowOnFlyoutColour);
+            DrawColourConfig(Translator.GetLine("Config.Notebook"),     ref Configuration.ShowNamesInMinionBookColour);
+            DrawColourConfig(Translator.GetLine("Config.ActionLog"),    ref Configuration.ShowNamesInActionLogColour);
+            DrawColourConfig(Translator.GetLine("Config.Targetbar"),    ref Configuration.ShowOnTargetBarsColour);
+            DrawColourConfig(Translator.GetLine("Config.Partylist"),    ref Configuration.ShowOnPartyListColour);
+            
+            DrawBasicToggle (Translator.GetLine("Config.IslandPets"),   ref Configuration.showOnIslandPets);
+            DrawBasicToggle (Translator.GetLine("Config.ContextMenu"),  ref Configuration.useContextMenus);
         }
 
         if (DrawThirdPartyHeader("Penumbra"))
@@ -135,6 +140,37 @@ internal class PetConfigWindow : PetWindow
             ImGui.EndCombo();
         }
     }
+    
+    private void DrawEnumMenu(string title, string[] elements, ref Configuration.ColourMode enumValue, float width = 150) 
+    {
+        if (width <= 0)
+        {
+            width = ImGui.GetContentRegionAvail().X;
+        }
+        else
+        {
+            width = width * WindowHandler.GlobalScale;
+        }
+        
+        ImGui.SetNextItemWidth(width);
+
+        if (ImGui.BeginCombo(title, elements[(int)enumValue], ImGuiComboFlags.PopupAlignLeft))
+        {
+            for (int i = 0; i < elements.Length; i++)
+            {
+                bool elementIsCurrent = i == (int)enumValue;
+
+                if (ImGui.Selectable(elements[i], elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
+                {
+                    enumValue = (Configuration.ColourMode)i;
+
+                    Configuration.Save();
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+    }
 
     private bool DrawThirdPartyHeader(string internalName, string? displayTitle = null)
     {
@@ -161,6 +197,29 @@ internal class PetConfigWindow : PetWindow
         }
 
         Configuration.Save();
+    }
+    
+    private void DrawColourConfig(string title, ref Configuration.ColourConfig colourConfig)
+    {
+        ImGui.Spacing();
+        
+        DrawBasicToggle(title, ref colourConfig.Enabled);
+
+        ImGui.BeginDisabled(!colourConfig.Enabled);
+        
+        DrawBasicToggle(Translator.GetLine("Config.Label.OverrideColour") + $"###BOOL{title}", ref colourConfig.OverrideColourMode);
+        
+        ImGui.SameLine();
+        
+        ImGui.BeginDisabled(!colourConfig.OverrideColourMode);
+        
+        DrawEnumMenu(Translator.GetLine("Config.Label.OverrideColourLabel") + $"###COLOUR{title}", _colourDisplay, ref colourConfig.ColourMode);
+        
+        ImGui.EndDisabled();
+        
+        ImGui.EndDisabled();
+        
+        ImGui.Separator();
     }
 
     private void OnPluginChanged(string[] internalPlugins)

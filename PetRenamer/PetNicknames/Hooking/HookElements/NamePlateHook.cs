@@ -89,7 +89,7 @@ internal unsafe class NamePlateHook : HookableElement
 
     private void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
-        if (!PetServices.Configuration.showOnNameplates)
+        if (!PetServices.Configuration.ShowOnNameplatesColour.Enabled)
         {
             return;
         }
@@ -108,7 +108,7 @@ internal unsafe class NamePlateHook : HookableElement
             return;
         }
 
-        pPet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+        pPet.GetDrawColours(PetServices.Configuration.ShowOnNameplatesColour, out Vector3? edgeColour, out Vector3? textColour);
 
         SeString colouredPetName = PetServices.StringHelper.WrapInColor(customPetName, edgeColour, textColour);
 

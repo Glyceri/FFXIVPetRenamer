@@ -26,7 +26,7 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceChat(chatMessage, pet, NameType.Pronoun);
+        PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowInBattleChatColour, chatMessage, pet, NameType.Pronoun);
     }
     
     private void HandleAsUser(IHandleableChatMessage chatMessage, IPettableUser user)
@@ -43,16 +43,11 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceChat(chatMessage, petData, NameType.Action, user);
+        PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowInBattleChatColour, chatMessage, petData, NameType.Action, user);
     }
 
     protected override void OnRestrictedChatMessage(IHandleableChatMessage chatMessage)
     {
-        if (!PetServices.Configuration.showInBattleChat)
-        {
-            return;
-        }
-
         if (PetServices.PetCastHelper.LastCastDealer is IPettablePet pet)
         {
             HandleAsPet(chatMessage, pet);

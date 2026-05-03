@@ -79,14 +79,9 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
-        if (!PetServices.Configuration.showOnCastbars)
-        {
-            return;
-        }
-        
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, user);
         
-        PetServices.StringHelper.ReplaceATKString(textNode, petData, NameType.Action, user);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, textNode, petData, NameType.Action, user);
     }
     
     private AtkUnitBase* GetAtkUnitBase(AddonArgs args)
@@ -112,12 +107,7 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
-        if (!PetServices.Configuration.showOnTargetBars)
-        {
-            return;
-        }
-        
-        PetServices.StringHelper.ReplaceATKString(textNode, pettablePet, NameType.Raw);
+        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnTargetBarsColour, textNode, pettablePet, NameType.Raw);
     }
     
     private void OnTargetInfo(AddonEvent addonEvent, AddonArgs args)
