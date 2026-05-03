@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
@@ -128,4 +129,25 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused
+    
+    public void GetDrawColours(IPetSheetData sheetData, out Vector3? edgeColour, out Vector3? textColour)
+    {
+        edgeColour = null;
+        textColour = null;
+
+        int colourSetting = PetServices.Configuration.showColours;
+
+        if (colourSetting >= 2)
+        {
+            return;
+        }
+
+        if (colourSetting == 1 && !IsLocalPlayer)
+        {
+            return;
+        }
+
+        edgeColour = DataBaseEntry.GetEdgeColour(sheetData.Model);
+        textColour = DataBaseEntry.GetTextColour(sheetData.Model);
+    }
 }

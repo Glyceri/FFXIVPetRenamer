@@ -73,43 +73,21 @@ internal unsafe class TooltipHook : HookableElement
             return;
         }
         
-        string? baseString = PetServices.NameService.GetName(PetServices.HoverService.CurrentNameType, PetServices.HoverService.CurrentlyHoveredPet);
-        
-        if (baseString == null)
-        {
-            return;
-        }
-        
-        if (UserList.LocalPlayer == null)
-        {
-            return;
-        }
-        
-        PetSkeleton selectedPet = PetServices.HoverService.CurrentlyHoveredPet.Model;
-        
-        string? customName = UserList.LocalPlayer.DataBaseEntry.GetName(selectedPet);
-        
-        if (customName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        Vector3? edgeColour = UserList.LocalPlayer.DataBaseEntry.GetEdgeColour(selectedPet);
-        Vector3? textColour = UserList.LocalPlayer.DataBaseEntry.GetTextColour(selectedPet);
-        
         if (!PetServices.Configuration.showOnTooltip)
         {
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(textNode, baseString, customName, edgeColour, textColour);
+        PetServices.StringHelper.ReplaceATKString(textNode, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType);
         
-        if (backgroundNode != null)
+        if (backgroundNode == null)
         {
-            textNode->ResizeNodeForCurrentText();
-            
-            backgroundNode->AtkResNode.SetWidth((ushort)(textNode->Width + 18));
+            return;
         }
+        
+        textNode->ResizeNodeForCurrentText();
+        
+        backgroundNode->AtkResNode.SetWidth((ushort)(textNode->Width + 18));
     }
     
     private void OnTooltipPreDraw(AddonEvent addonEvent, AddonArgs addonArgs)

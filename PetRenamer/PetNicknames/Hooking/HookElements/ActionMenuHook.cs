@@ -7,7 +7,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -520,29 +519,12 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        string? customName = user.DataBaseEntry.GetName(softData.Model);
-        
-        if (customName == null)
-        {
-            return;
-        }
-
         if (!PetServices.Configuration.showNamesInActionLog)
         {
             return;
         }
-
-        string? baseName = PetServices.NameService.GetName(NameType.Action, softData);
         
-        if (baseName == null)
-        {
-            return;
-        }
-        
-        Vector3? edgeColour = user.DataBaseEntry.GetEdgeColour(softData.Model);
-        Vector3? textColour = user.DataBaseEntry.GetTextColour(softData.Model);
-        
-        PetServices.StringHelper.ReplaceATKString(textNode, baseName, customName, edgeColour, textColour);
+        PetServices.StringHelper.ReplaceATKString(textNode, softData, NameType.Action);
     }
 
     protected override void OnDispose()

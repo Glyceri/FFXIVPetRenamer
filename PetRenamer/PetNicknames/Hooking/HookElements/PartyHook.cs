@@ -96,24 +96,8 @@ internal unsafe class PartyHook : HookableElement
         {
             return;
         }
-
-        IPetSheetData? petData = pet.PetData;
-
-        if (petData == null)
-        {
-            return;
-        }
-
-        string? customName = pet.CustomName;
-
-        if (customName.IsNullOrWhitespace())
-        {
-            return;
-        }
-
-        pet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
-
-        PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet.Name, customName, edgeColour, textColour);
+        
+        PetServices.StringHelper.ReplaceATKString(partyNode->Pet.Name, pet, NameType.Raw);
     }
 
     private void SetCastlist(AddonPartyList* partyNode)
@@ -158,51 +142,35 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            ulong contentID = partyGroup[index];
+            ulong contentId = partyGroup[index];
 
-            if (contentID == 0) // this means there is no party active
+            if (contentId == 0) // this means there is no party active
             {
                 IPettableUser? localUser = UserList.LocalPlayer;
+                
                 if (localUser == null)
                 {
                     return;
                 }
 
-                contentID = localUser.ContentID;
+                contentId = localUser.ContentID;
             }
 
-            IPettableUser? user = UserList.GetUserFromContentId(contentID);
+            IPettableUser? user = UserList.GetUserFromContentId(contentId);
 
             if (user == null)
             {
                 continue;
             }
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, in user, true);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, in user);
 
             if (data == null)
             {
                 continue;
             }
 
-            string? customName = user.DataBaseEntry.GetName(data.Model);
-
-            if (customName == null)
-            {
-                continue;
-            }
-            
-            string? actionName = PetServices.NameService.GetName(NameType.Action, data);
-            
-            if (actionName == null)
-            {
-                continue;
-            }
-            
-            Vector3? edgeColour = user.DataBaseEntry.GetEdgeColour(data.Model);
-            Vector3? textColour = user.DataBaseEntry.GetTextColour(data.Model);
-            
-            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, actionName, customName, edgeColour, textColour);
+            PetServices.StringHelper.ReplaceATKString(member.CastingActionName, data, NameType.Action, user);
         }
     }
 
@@ -224,17 +192,17 @@ internal unsafe class PartyHook : HookableElement
         {
             PartyMember member = gManager->MainGroup.PartyMembers[i];
 
-            ulong contentID = member.ContentId;
+            ulong contentId = member.ContentId;
 
             int? index;
 
             if (isCrossParty)
             {
-                index = GetCrossPartyIndex(contentID);
+                index = GetCrossPartyIndex(contentId);
             }
             else
             {
-                index = GetNormalPartyIndex(contentID);
+                index = GetNormalPartyIndex(contentId);
             }
 
             if (index == null)
@@ -247,7 +215,7 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            partyGroup[index.Value] = contentID;
+            partyGroup[index.Value] = contentId;
         }
     }
 

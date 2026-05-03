@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -25,6 +26,8 @@ internal unsafe class TargetHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfo",           OnTargetInfo);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfoMainTarget", OnTargetInfoMainTarget);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_FocusTargetInfo",      OnFocusTargetInfo);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_CastBar",              OnCastBar);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfoCastBar",    OnTargetInfoCastBar);
     }
     
     protected override void OnDispose()
@@ -34,6 +37,8 @@ internal unsafe class TargetHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfo);
         DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfoMainTarget);
         DalamudServices.AddonLifecycle.UnregisterListener(OnFocusTargetInfo);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnCastBar);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfoCastBar);
     }
     
     private void HandleTarget(AddonArgs args, uint textNodeIndex, IPettableEntity? target)
@@ -46,6 +51,42 @@ internal unsafe class TargetHook : HookableElement
         }
         
         HandleTargetTextNode(GetAtkTextNode(atkUnitBase, textNodeIndex), target);
+    }
+    
+    private void HandleTargetCastbar(AddonArgs args, uint textNodeIndex, IPettableEntity? target)
+    {
+        AtkUnitBase* atkUnitBase = GetAtkUnitBase(args);
+        
+        if (atkUnitBase == null)
+        {
+            return;
+        }
+        
+        if (target is not IPettableUser user)
+        {
+            return;
+        }
+        
+        AtkTextNode* textNode = GetAtkTextNode(atkUnitBase, textNodeIndex);
+        
+        if (textNode == null)
+        {
+            return;
+        }
+        
+        if (!textNode->IsVisible())
+        {
+            return;
+        }
+        
+        if (!PetServices.Configuration.showOnCastbars)
+        {
+            return;
+        }
+        
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, user);
+        
+        PetServices.StringHelper.ReplaceATKString(textNode, petData, NameType.Action, user);
     }
     
     private AtkUnitBase* GetAtkUnitBase(AddonArgs args)
@@ -61,6 +102,11 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
+        if (!textNode->IsVisible())
+        {
+            return;
+        }
+        
         if (target is not IPettablePet pettablePet)
         {
             return;
@@ -71,34 +117,14 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
-        if (pettablePet.PetData == null)
-        {
-            return;
-        }
-        
-        string? baseName = PetServices.NameService.GetName(NameType.Raw, pettablePet.PetData);
-        
-        if (baseName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        string? customName = pettablePet.CustomName;
-        
-        if (customName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        pettablePet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
-        
-        PetServices.StringHelper.ReplaceATKString(textNode, baseName, customName, edgeColour, textColour);
+        PetServices.StringHelper.ReplaceATKString(textNode, pettablePet, NameType.Raw);
     }
     
     private void OnTargetInfo(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTarget(args, 17, Target());
-        HandleTarget(args, 7,  TargetOfTarget());
+        HandleTarget       (args, 17, Target());
+        HandleTarget       (args, 7,  TargetOfTarget());
+        HandleTargetCastbar(args, 12, Target());
     }
     
     private void OnTargetInfoMainTarget(AddonEvent addonEvent, AddonArgs args)
@@ -109,7 +135,18 @@ internal unsafe class TargetHook : HookableElement
     
     private void OnFocusTargetInfo(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTarget(args, 10, FocusTarget());
+        HandleTarget       (args, 10, FocusTarget());
+        HandleTargetCastbar(args, 5, FocusTarget());
+    }
+    
+    private void OnCastBar(AddonEvent addonEvent, AddonArgs args)
+    {
+        HandleTargetCastbar(args, 4, Target());
+    }
+    
+    private void OnTargetInfoCastBar(AddonEvent addonEvent, AddonArgs args)
+    {
+        HandleTargetCastbar(args, 4, UserList.LocalPlayer);
     }
     
     [Conditional("DEBUG")]
@@ -162,5 +199,7 @@ internal unsafe class TargetHook : HookableElement
     private void OnTargetChanged()
     {
         PetServices.PetLog.LogVerbose("Received target status changed.");
+        
+        // TODO: Make target text change c:
     }
 }

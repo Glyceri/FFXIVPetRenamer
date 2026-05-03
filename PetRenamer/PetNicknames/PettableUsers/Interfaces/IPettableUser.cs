@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
@@ -29,7 +30,8 @@ internal unsafe interface IPettableUser : IBattleUser
     void RemoveCompanion(Companion* companion);
     void RefreshCast();
     void Dispose(IPettableDatabase database);
-
+    void GetDrawColours(IPetSheetData sheetData, out Vector3? edgeColour, out Vector3? textColour);
+    
     IPettableUserTargetManager? TargetManager { get; }
 
     enum PetFilter

@@ -61,26 +61,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        if (petData == null)
-        {
-            return;
-        }
-        
-        string? baseName = PetServices.NameService.GetName(NameType.Pronoun, petData);
-        
-        if (baseName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        string? customName = UserList.LocalPlayer.DataBaseEntry.GetName(petData.Model);
-        
-        if (customName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        PetServices.StringHelper.ReplaceATKString(textNode, baseName, customName, null, null);
+        PetServices.StringHelper.ReplaceATKString(textNode, petData, NameType.Pronoun);
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)

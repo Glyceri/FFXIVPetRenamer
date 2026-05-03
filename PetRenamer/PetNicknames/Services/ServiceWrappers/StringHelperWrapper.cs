@@ -2,18 +2,16 @@
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Text.ReadOnly;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using LSeStringBuilder = Lumina.Text.SeStringBuilder;
 
@@ -23,11 +21,13 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 // I have no idea, but throughout all my testing it has honestly worked... just fine c:
 internal class StringHelperWrapper : IStringHelper
 {
-    private readonly IPetServices PetServices;
+    private readonly IPetServices      PetServices;
+    private readonly IPettableUserList UserList;
 
-    public StringHelperWrapper(IPetServices petServices) 
+    public StringHelperWrapper(IPetServices petServices, IPettableUserList pettableUserList) 
     { 
         PetServices = petServices;
+        UserList    = pettableUserList;
     }
 
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
@@ -90,6 +90,13 @@ internal class StringHelperWrapper : IStringHelper
         {
             return SeString.Empty;
         }
+        
+        // Failsafe... im quite sure the current implementation is a tad bugged :/
+        if (PetServices.Configuration.showColours == 2)
+        {
+            edgeColor = null;
+            textColor = null;
+        }
 
         LSeStringBuilder builder = new LSeStringBuilder();
 
@@ -117,54 +124,12 @@ internal class StringHelperWrapper : IStringHelper
 
         return builder.ToReadOnlySeString().ToDalamudString();
     }
-
-    public unsafe string ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor, IPetSheetData petData, bool checkForEmptySpace = true)
-    {
-        if (atkNode == null)
-        {
-            return baseString;
-        }
-
-        SeString newString     = ReplaceStringPart(baseString, replaceString, petData, checkForEmptySpace, edgeColor, textColor);
-
-        byte[]   encodedString = newString.EncodeWithNullTerminator();
-
-        atkNode->SetText(encodedString);
-
-        return newString.TextValue;
-    }
-    
-    private SeString BuildSeString(string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
-    {
-        SeString newSeString = new SeString();
-        
-        string[] splitParts = Regex.Split(baseString, @$"(\{PluginConstants.forbiddenCharacter}+)");
-
-        foreach (string str in splitParts)
-        {
-            if (str.IsNullOrWhitespace())
-            {
-                continue;
-            }
-
-            if (!str.Contains(PluginConstants.forbiddenCharacter))
-            {
-                _ = newSeString.Append(new TextPayload(str));
-            }
-            else
-            {
-                _ = newSeString.Append(WrapInColor(replaceString, edgeColor, textColor));
-            }
-        }
-
-        return newSeString;
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TextPayload CreateNewTextPayload(string text) 
         => new TextPayload(text);
     
-    private List<Payload> CreatePayloadsFromReplace(string? baseString, string toReplace, string replaceWith, Vector3? edgeColor, Vector3? textColor, bool checkForEmptySpace = true)
+    private List<Payload> CreatePayloadsFromReplace(string? baseString, string toReplace, string replaceWith, Vector3? edgeColor, Vector3? textColor)
     {
         List<Payload> newPayloads = [];
         
@@ -179,10 +144,7 @@ internal class StringHelperWrapper : IStringHelper
         
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
         
-        if (checkForEmptySpace)
-        {
-            regString = $"\\b" + regString + "\\b";
-        }
+        regString = $"\\b" + regString + "\\b";
         
         nodeText = Regex.Replace(nodeText, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
         
@@ -208,7 +170,84 @@ internal class StringHelperWrapper : IStringHelper
         return newPayloads;
     }
     
-    public unsafe void ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor, bool checkForEmptySpace = true)
+    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    {
+        if (atkNode == null)
+        {
+            return;
+        }
+        
+        if (petData == null)
+        {
+            return;
+        }
+        
+        user ??= UserList.LocalPlayer;
+        
+        if (user == null)
+        {
+            return;
+        }
+        
+        string? baseName = PetServices.NameService.GetName(nameType, petData);
+        
+        if (baseName.IsNullOrWhitespace())
+        {
+            return;
+        }
+        
+        string? customName = user.GetCustomName(petData);
+        
+        if (customName.IsNullOrWhitespace())
+        {
+            return;
+        }
+        
+        user.GetDrawColours(petData, out Vector3? edgeColour, out Vector3? textColour);
+        
+        ReplaceATKString(atkNode, baseName, customName, edgeColour, textColour);
+    }
+    
+    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    {
+        if (atkNode == null)
+        {
+            return;
+        }
+        
+        if (pettablePet == null)
+        {
+            return;
+        }
+        
+        IPettableUser? owner    = pettablePet.Owner;
+        IPetSheetData? petData  = pettablePet.PetData;
+        
+        if (owner == null || petData == null)
+        {
+            return;
+        }
+        
+        string? baseName = PetServices.NameService.GetName(nameType, petData);
+        
+        if (baseName.IsNullOrWhitespace())
+        {
+            return;
+        }
+        
+        string? customName = pettablePet.CustomName;
+        
+        if (customName.IsNullOrWhitespace())
+        {
+            return;
+        }
+        
+        pettablePet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+        
+        ReplaceATKString(atkNode, baseName, customName, edgeColour, textColour);
+    }
+    
+    public unsafe void ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
     {
         if (atkNode == null)
         {
@@ -233,7 +272,7 @@ internal class StringHelperWrapper : IStringHelper
                 continue;
             }
 
-            List<Payload> newPayloads = CreatePayloadsFromReplace(textPayload.Text, baseString, replaceString, edgeColor, textColor, checkForEmptySpace);
+            List<Payload> newPayloads = CreatePayloadsFromReplace(textPayload.Text, baseString, replaceString, edgeColor, textColor);
             
             payloads.RemoveAt(i);
             
@@ -265,64 +304,11 @@ internal class StringHelperWrapper : IStringHelper
 
             string curString = tPayload.Text!.ToString();
 
-            newPayloads.AddRange(ReplaceStringPart(curString, replaceString, petData, checkForEmptySpace, edgeColor, textColor).Payloads);
+            newPayloads.AddRange(ReplaceStringPart(curString, replaceString, edgeColor, textColor, checkForEmptySpace).Payloads);
         }
 
         message.Payloads.Clear();
         message.Payloads.AddRange(newPayloads);
-    }
-
-    public SeString ReplaceStringPart(string baseString, string replaceString, IPetSheetData petData, bool checkForEmptySpaces = true, Vector3? edgeColor = null, Vector3? textColor = null)
-    {
-        if (replaceString.IsNullOrWhitespace())
-        {
-            return new SeString(new TextPayload(baseString));
-        }
-
-        SeString newSeString = new SeString();
-        
-        int smallerCounter = 0;
-
-        string? part = PetServices.NameService.GetName(NameType.Raw, petData);
-        
-        if (part == string.Empty)
-        {
-            return newSeString;
-        }
-
-        smallerCounter++;
-
-        part = part.Replace("[", @"^\[").Replace("]", @"^\]\");
-
-        string regString = part;
-
-        if (checkForEmptySpaces)
-        {
-            regString = $"\\b" + regString + "\\b";
-        }
-
-        baseString = Regex.Replace(baseString, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
-
-        string[] splitted = Regex.Split(baseString, @$"(\{PluginConstants.forbiddenCharacter}+)");
-
-        foreach (string s in splitted)
-        {
-            if (s.IsNullOrWhitespace())
-            {
-                continue;
-            }
-
-            if (!s.Contains(PluginConstants.forbiddenCharacter))
-            {
-                _ = newSeString.Append(new TextPayload(s));
-            }
-            else
-            {
-                _ = newSeString.Append(WrapInColor(replaceString, edgeColor, textColor));
-            }
-        }
-
-        return newSeString;
     }
     
     public SeString ReplaceStringPart(string baseString, string replaceString, Vector3? edgeColor = null, Vector3? textColor = null, bool checkForEmptySpaces = true)

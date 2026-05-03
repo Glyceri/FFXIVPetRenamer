@@ -31,6 +31,8 @@ internal class HoverHook : HookableElement
         
         if (lastIconId == componentIcon->IconId)
         {
+            lastIconId = 0;
+            
             return;
         }
         

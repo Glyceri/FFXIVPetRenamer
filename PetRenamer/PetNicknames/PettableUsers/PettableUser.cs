@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
+using System.Numerics;
 using static PetRenamer.PetNicknames.PettableUsers.Interfaces.IPettableUser;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -375,5 +376,26 @@ internal unsafe class PettableUser : IPettableUser
 
         pCompanion.Dispose();
         PettablePets.RemoveAt(0);
+    }
+    
+    public void GetDrawColours(IPetSheetData sheetData, out Vector3? edgeColour, out Vector3? textColour)
+    {
+        edgeColour = null;
+        textColour = null;
+
+        int colourSetting = PetServices.Configuration.showColours;
+
+        if (colourSetting >= 2)
+        {
+            return;
+        }
+
+        if (colourSetting == 1 && !IsLocalPlayer)
+        {
+            return;
+        }
+
+        edgeColour = DataBaseEntry.GetEdgeColour(sheetData.Model);
+        textColour = DataBaseEntry.GetTextColour(sheetData.Model);
     }
 }
