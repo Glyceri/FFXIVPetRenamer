@@ -20,8 +20,6 @@ internal unsafe class PettableIslandPet : IIslandPet
     public IPetSheetData? PetData    { get; private set; }
     public IPettableUser? Owner      { get; private set; }
     public BattleChara*   BattlePet  { get; private set; }
-    public Vector3?       EdgeColour { get; private set; }
-    public Vector3?       TextColour { get; private set; }
 
     private readonly IPettableDatabaseEntry Entry;
     private readonly IPetServices           PetServices;
@@ -44,8 +42,6 @@ internal unsafe class PettableIslandPet : IIslandPet
     public void Recalculate()
     {
         CustomName = Entry.GetName(SkeletonID);
-        EdgeColour = Entry.GetEdgeColour(SkeletonID);
-        TextColour = Entry.GetTextColour(SkeletonID);
     }
 
     public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour)
@@ -65,9 +61,12 @@ internal unsafe class PettableIslandPet : IIslandPet
             return;
         }
 
-        edgeColour = EdgeColour;
-        textColour = TextColour;
+        edgeColour = Entry.GetEdgeColour(SkeletonID);
+        textColour = Entry.GetTextColour(SkeletonID);
     }
+
+    public bool IsActive
+        => (Owner?.IsActive ?? false);
 
     public void Dispose() { }
 }

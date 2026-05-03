@@ -46,8 +46,7 @@ internal class FlyTextHook : HookableElement
             return;
         }
 
-        nint lastCastDealer = PetServices.PetCastHelper.LastCastDealer;
-
+        /*
         IPettablePet? casterPet = UserList.GetPet(lastCastDealer);
 
         if (casterPet == null)
@@ -68,9 +67,9 @@ internal class FlyTextHook : HookableElement
         {
             return;
         }
-
-        PetServices.StringHelper.ReplaceSeString(ref text1, customName, sheetData);
-        PetServices.StringHelper.ReplaceSeString(ref text2, customName, sheetData);
+*/
+        //PetServices.StringHelper.ReplaceSeString(ref text1, customName, sheetData);
+        //PetServices.StringHelper.ReplaceSeString(ref text2, customName, sheetData);
     }
 
     private void AddToScreenLogWithLogMessageIdDetour(nint target, nint castDealer, int unknownCastFlag, char a4, int castId, int a6, int a7, int a8)

@@ -13,10 +13,9 @@ internal interface IPettablePet : IPettableEntity, IDisposable
     ushort         Index      { get; }
     string         Name       { get; }
     string?        CustomName { get; }
-    Vector3?       EdgeColour { get; }
-    Vector3?       TextColour { get; }
     IPetSheetData? PetData    { get; }
-
+    bool           IsActive   { get; }
+    
     void Recalculate();
     void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
 }

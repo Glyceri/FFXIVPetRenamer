@@ -47,6 +47,20 @@ internal class HoverHook : HookableElement
             return;
         }
         
+        if (UserList.LocalPlayer == null)
+        {
+            return;
+        }
+        
+        petSheetData = PetServices.PetSheets.MakeSoft(UserList.LocalPlayer, petSheetData);
+            
+        if (petSheetData == null)
+        {
+            PetServices.HoverService.SetHoveredPet(null);
+            
+            return;
+        }
+        
         NameType setNameType = NameType.Pronoun;
 
         if (petSheetData.Model.SkeletonType == SkeletonType.BattlePet)

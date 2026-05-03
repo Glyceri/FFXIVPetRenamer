@@ -21,8 +21,6 @@ internal abstract unsafe class BasePettablePet : IPettablePet
     public IPettableUser? Owner      { get; }
 
     public string?        CustomName { get; private set; }
-    public Vector3?       EdgeColour { get; private set; }
-    public Vector3?       TextColour { get; private set; }
 
     private readonly IPetServices           PetServices;
     private readonly IPettableDatabaseEntry Entry;
@@ -51,11 +49,12 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         Recalculate();
     }
 
+    public bool IsActive
+        => (Owner?.IsActive ?? false);
+
     public void Recalculate()
     {
         CustomName = Entry.GetName(SkeletonID);
-        EdgeColour = Entry.GetEdgeColour(SkeletonID);
-        TextColour = Entry.GetTextColour(SkeletonID);
 
         SharingDictionary.Set(ObjectID, CustomName);
     }
@@ -92,7 +91,7 @@ internal abstract unsafe class BasePettablePet : IPettablePet
             return;
         }
 
-        edgeColour = EdgeColour;
-        textColour = TextColour;
+        edgeColour = Entry.GetEdgeColour(SkeletonID);
+        textColour = Entry.GetTextColour(SkeletonID);
     }
 }

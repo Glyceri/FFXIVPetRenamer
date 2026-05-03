@@ -1,31 +1,23 @@
 ﻿using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.Chat.Interfaces;
-using Dalamud.Game;
 using Dalamud.Game.Chat;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal class EmoteChatElement : IChatElement
 {
-    private readonly DalamudServices   DalamudServices;
     private readonly IPettableUserList UserList;
     private readonly IPetServices      PetServices;
 
-    public EmoteChatElement(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList) 
+    public EmoteChatElement(IPetServices petServices, IPettableUserList userList) 
     {
-        DalamudServices = dalamudServices;
-        UserList        = userList;
-        PetServices     = petServices;
+        UserList    = userList;
+        PetServices = petServices;
     }
-
-    private bool LanguageIsJapanese
-        => DalamudServices.ClientState.ClientLanguage == ClientLanguage.Japanese;
-
+    
     public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
         if (chatMessage.LogKind != XivChatType.StandardEmote)
@@ -63,45 +55,7 @@ internal class EmoteChatElement : IChatElement
             return;
         }
 
-        IPettableUser? petOwner = pet.Owner;
-
-        if (petOwner == null)
-        {
-            PetServices.PetLog.LogVerbose($"Target doesnt have an owner {target.Address}.");
-
-            return;
-        }
-
-        if (!petOwner.IsActive)
-        {
-            PetServices.PetLog.LogVerbose($"Pet Owner is NOT an active user.");
-
-            return;
-        }
-
-        string? customName = pet.CustomName;
-
-        if (customName == null)
-        {
-            PetServices.PetLog.LogVerbose($"Pet Owner is NOT an active user.");
-
-            return;
-        }
-
-        IPetSheetData? data = pet.PetData;
-
-        if (data == null)
-        {
-            PetServices.PetLog.LogVerbose($"Pet Data is NULL.");
-
-            return;
-        }
-
-        SeString message = chatMessage.Message;
-        
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, data, !LanguageIsJapanese);
-        
-        chatMessage.Message = message;
+        PetServices.StringHelper.ReplaceChat(chatMessage, pet, NameType.Pronoun);
     }
 }
 

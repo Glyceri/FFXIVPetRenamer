@@ -1,10 +1,11 @@
-﻿namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
-internal unsafe interface IPetCastHelper
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+
+internal interface IPetCastHelper
 {
-    public nint LastCastTarget { get; }
-    public nint LastCastDealer { get; }
-    public int  LastCastID     { get; }
+    IPettableEntity? LastCastDealer { get; }
+    int              LastCastId     { get; }
 
-    public void SetLatestCast(nint target, nint dealer, int lastCastID);
+    void SetLatestCast(nint target, nint dealer, int lastCastId);
 }

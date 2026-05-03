@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.Text.SeStringHandling;
+﻿using Dalamud.Game.Chat;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -17,8 +18,6 @@ using LSeStringBuilder = Lumina.Text.SeStringBuilder;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
-// I am probably breaking around 10000000 SeString rules or w/e O.O
-// I have no idea, but throughout all my testing it has honestly worked... just fine c:
 internal class StringHelperWrapper : IStringHelper
 {
     private readonly IPetServices      PetServices;
@@ -32,13 +31,6 @@ internal class StringHelperWrapper : IStringHelper
 
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
         => float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
-
-    public bool TryParseVector3(string? line, [NotNullWhen(true)] out Vector3? vector3)
-    {
-        vector3 = ParseVector3(line);
-
-        return (vector3 != null);
-    }
 
     public Vector3? ParseVector3(string? line)
     {
@@ -66,22 +58,12 @@ internal class StringHelperWrapper : IStringHelper
             return null;
         }
 
-        if (!GetFloat(numbers[0], out float X))
+        if (!GetFloat(numbers[0], out float x) || !GetFloat(numbers[1], out float y) || !GetFloat(numbers[2], out float z))
         {
             return null;
         }
-
-        if (!GetFloat(numbers[1], out float Y))
-        {
-            return null;
-        }
-
-        if (!GetFloat(numbers[2], out float Z))
-        {
-            return null;
-        }
-
-        return new Vector3(X, Y, Z);
+        
+        return new Vector3(x, y, z);
     }
 
     public SeString WrapInColor(string text, Vector3? edgeColor = null, Vector3? textColor = null)
@@ -91,7 +73,6 @@ internal class StringHelperWrapper : IStringHelper
             return SeString.Empty;
         }
         
-        // Failsafe... im quite sure the current implementation is a tad bugged :/
         if (PetServices.Configuration.showColours == 2)
         {
             edgeColor = null;
@@ -144,7 +125,7 @@ internal class StringHelperWrapper : IStringHelper
         
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
         
-        regString = $"\\b" + regString + "\\b";
+        //regString = $"\\b" + regString + "\\b";
         
         nodeText = Regex.Replace(nodeText, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
         
@@ -170,13 +151,77 @@ internal class StringHelperWrapper : IStringHelper
         return newPayloads;
     }
     
+    private unsafe bool MakeSeString(AtkTextNode* atkNode, [NotNullWhen(true)] out SeString? seString)
+    {
+        seString = null;
+        
+        if (atkNode == null)
+        {
+            return false;
+        }
+        
+        seString = atkNode->NodeText.AsDalamudSeString();
+        
+        return true;
+    }
+    
     public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
-        if (atkNode == null)
+        if (!MakeSeString(atkNode, out SeString? seString))
         {
             return;
         }
         
+        ReplaceSeString(ref seString, petData, nameType, user);
+
+        atkNode->SetText(seString.EncodeWithNullTerminator());
+    }
+    
+    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    {
+        if (!MakeSeString(atkNode, out SeString? seString))
+        {
+            return;
+        }
+        
+        ReplaceSeString(ref seString, pettablePet, nameType);
+
+        atkNode->SetText(seString.EncodeWithNullTerminator());
+    }
+
+    public void ReplaceChat(IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
+    {
+        SeString seString = chatMessage.Message;
+        
+        ReplaceSeString(ref seString, pettablePet, nameType);
+        
+        chatMessage.Message = seString;
+    }
+    
+    public void ReplaceChat(IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    {
+        SeString seString = chatMessage.Message;
+        
+        ReplaceSeString(ref seString, petData, nameType, user);
+        
+        chatMessage.Message = seString;
+    }
+    
+    public void ReplaceSeString(ref SeString seString, IPettablePet? pettablePet, NameType nameType)
+    {
+        if (pettablePet == null)
+        {
+            return;
+        }
+        
+        IPettableUser? owner    = pettablePet.Owner;
+        IPetSheetData? petData  = pettablePet.PetData;
+        
+        ReplaceSeString(ref seString, petData, nameType, owner);
+    }
+    
+    public void ReplaceSeString(ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    {
         if (petData == null)
         {
             return;
@@ -205,62 +250,14 @@ internal class StringHelperWrapper : IStringHelper
         
         user.GetDrawColours(petData, out Vector3? edgeColour, out Vector3? textColour);
         
-        ReplaceATKString(atkNode, baseName, customName, edgeColour, textColour);
+        ReplaceSeString(ref seString, baseName, customName, edgeColour, textColour);
     }
     
-    public unsafe void ReplaceATKString(AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    private void ReplaceSeString(ref SeString seString, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
     {
-        if (atkNode == null)
+        for (int i = 0; i < seString.Payloads.Count; i++)
         {
-            return;
-        }
-        
-        if (pettablePet == null)
-        {
-            return;
-        }
-        
-        IPettableUser? owner    = pettablePet.Owner;
-        IPetSheetData? petData  = pettablePet.PetData;
-        
-        if (owner == null || petData == null)
-        {
-            return;
-        }
-        
-        string? baseName = PetServices.NameService.GetName(nameType, petData);
-        
-        if (baseName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        string? customName = pettablePet.CustomName;
-        
-        if (customName.IsNullOrWhitespace())
-        {
-            return;
-        }
-        
-        pettablePet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
-        
-        ReplaceATKString(atkNode, baseName, customName, edgeColour, textColour);
-    }
-    
-    public unsafe void ReplaceATKString(AtkTextNode* atkNode, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
-    {
-        if (atkNode == null)
-        {
-            return;
-        }
-        
-        SeString seString = atkNode->NodeText.AsDalamudSeString();
-        
-        List<Payload> payloads = seString.Payloads;
-        
-        for (int i = 0; i < payloads.Count; i++)
-        {
-            Payload payload = payloads[i];
+            Payload payload = seString.Payloads[i];
             
             if (payload.Type != PayloadType.RawText)
             {
@@ -274,83 +271,10 @@ internal class StringHelperWrapper : IStringHelper
 
             List<Payload> newPayloads = CreatePayloadsFromReplace(textPayload.Text, baseString, replaceString, edgeColor, textColor);
             
-            payloads.RemoveAt(i);
+            seString.Payloads.RemoveAt(i);
             
-            payloads.InsertRange(i, newPayloads);
+            seString.Payloads.InsertRange(i, newPayloads);
         }
-        
-        SeString finalSeString = new SeString(payloads);
-        
-        atkNode->SetText(finalSeString.EncodeWithNullTerminator());
-    }
-
-    public void ReplaceSeString(ref SeString message, string replaceString, IPetSheetData petData, bool checkForEmptySpace = true, Vector3? edgeColor = null, Vector3? textColor = null)
-    {
-        if (message == null || message.Payloads.Count == 0)
-        {
-            return;
-        }
-
-        List<Payload> newPayloads = new List<Payload>();
-
-        for (int i = 0; i < message.Payloads.Count; i++)
-        {
-            if (message.Payloads[i] is not TextPayload tPayload)
-            {
-                newPayloads.Add(message.Payloads[i]);
-
-                continue;
-            }
-
-            string curString = tPayload.Text!.ToString();
-
-            newPayloads.AddRange(ReplaceStringPart(curString, replaceString, edgeColor, textColor, checkForEmptySpace).Payloads);
-        }
-
-        message.Payloads.Clear();
-        message.Payloads.AddRange(newPayloads);
-    }
-    
-    public SeString ReplaceStringPart(string baseString, string replaceString, Vector3? edgeColor = null, Vector3? textColor = null, bool checkForEmptySpaces = true)
-    {
-        if (replaceString.IsNullOrWhitespace())
-        {
-            return new SeString(new TextPayload(baseString));
-        }
-
-        SeString newSeString = new SeString();
-        
-        string regString = replaceString.Replace("[", @"^\[").Replace("]", @"^\]\");
-
-        PetServices.PetLog.LogVerbose(regString);
-        
-        if (checkForEmptySpaces)
-        {
-            regString = $"\\b" + regString + "\\b";
-        }
-        
-        baseString = Regex.Replace(baseString, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
-        
-        string[] splitted = Regex.Split(baseString, @$"(\{PluginConstants.forbiddenCharacter}+)");
-
-        foreach (string s in splitted)
-        {
-            if (s.IsNullOrWhitespace())
-            {
-                continue;
-            }
-
-            if (!s.Contains(PluginConstants.forbiddenCharacter))
-            {
-                _ = newSeString.Append(new TextPayload(s));
-            }
-            else
-            {
-                _ = newSeString.Append(WrapInColor(replaceString, edgeColor, textColor));
-            }
-        }
-
-        return newSeString;
     }
 
     public string CleanupString(string str)

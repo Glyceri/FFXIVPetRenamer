@@ -141,7 +141,7 @@ internal unsafe class TargetHook : HookableElement
     
     private void OnCastBar(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTargetCastbar(args, 4, Target());
+        HandleTargetCastbar(args, 4, UserList.LocalPlayer);
     }
     
     private void OnTargetInfoCastBar(AddonEvent addonEvent, AddonArgs args)

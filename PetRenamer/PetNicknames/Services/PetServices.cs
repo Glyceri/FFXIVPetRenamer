@@ -27,8 +27,8 @@ internal class PetServices : IPetServices
         StringHelper        = new StringHelperWrapper(this, userList);
         NameService         = new NameService();
         PetSheets           = new SheetsWrapper(services, StringHelper, NameService);
-        PetCastHelper       = new PetCastWrapper();
-        PetActionHelper     = new PetActionWrapper();
+        PetCastHelper       = new PetCastWrapper(userList);
+        PetActionHelper     = new PetActionWrapper(userList);
         TargetManager       = new TargetManagerWrapper(services, userList);
         PluginWatcher       = new PluginWatcher(services);
         NotificationService = new NotificationService(services, Configuration);

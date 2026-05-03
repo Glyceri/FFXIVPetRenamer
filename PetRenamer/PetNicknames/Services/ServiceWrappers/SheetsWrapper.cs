@@ -411,7 +411,7 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public IPetSheetData? GetPetFromAction(uint actionId, in IPettableUser user, bool isSoft)
+    public IPetSheetData? GetPetFromAction(uint actionId, in IPettableUser user, bool isSoft = true)
     {
         if (actionId == 0 || actionId == uint.MaxValue)
         {

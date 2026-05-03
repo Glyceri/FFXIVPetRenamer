@@ -8,10 +8,8 @@ internal class DebugChatCode : IChatElement
 {
     private readonly Configuration Configuration;
 
-    public DebugChatCode(Configuration configuration)
-    {
-        Configuration = configuration;
-    }
+    public DebugChatCode(Configuration configuration) 
+        => Configuration = configuration;
 
     public void OnChatMessage(IHandleableChatMessage chatMessage)
     {

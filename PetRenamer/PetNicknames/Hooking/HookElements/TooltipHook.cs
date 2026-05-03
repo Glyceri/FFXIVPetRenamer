@@ -11,9 +11,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
-using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 

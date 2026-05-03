@@ -1,24 +1,49 @@
 ﻿using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal class BattleChatElement : RestrictedChatElement
 {
-    private readonly IPettableUserList  UserList;
     private readonly IPetServices       PetServices;
 
-    public BattleChatElement(IPetServices petServices, IPettableUserList userList)
+    public BattleChatElement(IPetServices petServices)
     {
-        UserList    = userList;
         PetServices = petServices;
         
         RegisterChat(XivChatType.Action, XivChatType.SystemMessage, XivChatType.SystemError);
+    }
+    
+    private void HandleAsPet(IHandleableChatMessage chatMessage, IPettablePet pet)
+    {
+        if (!pet.IsActive)
+        {
+            return;
+        }
+        
+        PetServices.StringHelper.ReplaceChat(chatMessage, pet, NameType.Pronoun);
+    }
+    
+    private void HandleAsUser(IHandleableChatMessage chatMessage, IPettableUser user)
+    {
+        if (!user.IsActive)
+        {
+            return;
+        }
+        
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId, in user);
+        
+        if (petData == null)
+        {
+            return;
+        }
+        
+        PetServices.StringHelper.ReplaceChat(chatMessage, petData, NameType.Action, user);
     }
 
     protected override void OnRestrictedChatMessage(IHandleableChatMessage chatMessage)
@@ -27,47 +52,15 @@ internal class BattleChatElement : RestrictedChatElement
         {
             return;
         }
-        
-        IPettableUser? user = UserList.GetUser(PetServices.PetCastHelper.LastCastDealer);
-        
-        if (user == null)
-        {
-            return;
-        }
-        
-        if (!user.IsActive)
-        {
-            return;
-        }
 
-        IPetSheetData? petData;
-        IPettablePet?  battlePet = UserList.GetPet(PetServices.PetCastHelper.LastCastDealer);
-
-        if (battlePet == null)
+        if (PetServices.PetCastHelper.LastCastDealer is IPettablePet pet)
         {
-            petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastID, in user);
-        }
-        else
-        {
-            petData = battlePet.PetData;
+            HandleAsPet(chatMessage, pet);
         }
         
-        if (petData == null)
+        if (PetServices.PetCastHelper.LastCastDealer is IPettableUser user)
         {
-            return;
+            HandleAsUser(chatMessage,  user);
         }
-
-        string? customName = user.GetCustomName(petData);
-        
-        if (customName == null)
-        {
-            return;
-        }
-
-        SeString message = chatMessage.Message;
-        
-        PetServices.StringHelper.ReplaceSeString(ref message, customName, petData);
-        
-        chatMessage.Message = message;
     }
 }

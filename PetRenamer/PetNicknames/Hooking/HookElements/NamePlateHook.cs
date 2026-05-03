@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using System;
 using System.Numerics;
 
@@ -99,7 +100,7 @@ internal unsafe class NamePlateHook : HookableElement
         {
             return;
         }
-
+        
         string? customPetName = pPet.CustomName;
 
         if (customPetName.IsNullOrWhitespace())
