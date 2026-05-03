@@ -18,7 +18,7 @@ internal class BattleChatElement : RestrictedChatElement
         UserList    = userList;
         PetServices = petServices;
         
-        RegisterChat((int)XivChatType.Action, (int)XivChatType.SystemMessage, (int)XivChatType.SystemError);
+        RegisterChat(XivChatType.Action, XivChatType.SystemMessage, XivChatType.SystemError);
     }
 
     protected override void OnRestrictedChatMessage(IHandleableChatMessage chatMessage)
@@ -27,10 +27,6 @@ internal class BattleChatElement : RestrictedChatElement
         {
             return;
         }
-
-        int lastCastID = PetServices.PetCastHelper.LastCastID;
-
-        PetServices.PetLog.LogVerbose(lastCastID);
         
         IPettableUser? user = UserList.GetUser(PetServices.PetCastHelper.LastCastDealer);
         
@@ -44,12 +40,12 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
 
-        IPetSheetData? petData   = null;
+        IPetSheetData? petData;
         IPettablePet?  battlePet = UserList.GetPet(PetServices.PetCastHelper.LastCastDealer);
 
         if (battlePet == null)
         {
-            petData = PetServices.PetSheets.GetPetFromAction((uint)lastCastID, in user);
+            petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastID, in user);
         }
         else
         {
@@ -68,8 +64,6 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
 
-        PetServices.PetLog.LogVerbose(customName);
-        
         SeString message = chatMessage.Message;
         
         PetServices.StringHelper.ReplaceSeString(ref message, customName, petData);

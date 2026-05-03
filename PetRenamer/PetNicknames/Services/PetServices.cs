@@ -17,18 +17,22 @@ internal class PetServices : IPetServices
     public ITargetManager       TargetManager       { get; }
     public IPluginWatcher       PluginWatcher       { get; }
     public INotificationService NotificationService { get; }
+    public INameService         NameService         { get; }
+    public IHoverService        HoverService        { get; }
 
     public PetServices(DalamudServices services, IPettableUserList userList) 
     {
         PetLog              = new PetLogWrapper(services.PluginLog);
         Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         StringHelper        = new StringHelperWrapper(this);
-        PetSheets           = new SheetsWrapper(ref services, StringHelper);
+        NameService         = new NameService();
+        PetSheets           = new SheetsWrapper(services, StringHelper, NameService);
         PetCastHelper       = new PetCastWrapper();
         PetActionHelper     = new PetActionWrapper();
         TargetManager       = new TargetManagerWrapper(services, userList);
         PluginWatcher       = new PluginWatcher(services);
         NotificationService = new NotificationService(services, Configuration);
+        HoverService        = new HoverService();
 
         CheckConfigFailure();
     }

@@ -34,16 +34,16 @@ internal class SharingDictionary : ISharingDictionary
         return new Dictionary<ulong, string>();
     }
 
-    public void Set(GameObjectId gameObjectID, string? customName)
+    public void Set(GameObjectId gameObjectId, string? customName)
     {
-        _ = PetNicknameDict.Remove(gameObjectID);
+        _ = PetNicknameDict.Remove(gameObjectId);
 
         if (customName.IsNullOrWhitespace())
         {
             return;   
         }
 
-        PetNicknameDict.Add(gameObjectID, customName);
+        PetNicknameDict.Add(gameObjectId, customName);
     }
 
     public void Dispose()

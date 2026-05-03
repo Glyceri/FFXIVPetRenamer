@@ -113,7 +113,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.IsIPC ? "O" : "X");
 
         ImGui.TableSetColumnIndex(4);
-        ImGui.TextUnformatted(UserList.GetUserFromContentID(user.ContentID) != null ? "O" : "X");
+        ImGui.TextUnformatted(UserList.GetUserFromContentId(user.ContentID) != null ? "O" : "X");
 
         ImGui.EndTable();
     }
@@ -392,7 +392,7 @@ internal class PetDevWindow : PetWindow
 
     void NewDrawUser(IPettableUser user)
     {
-        if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+        if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
             return;
 
         ImGui.TableNextRow();
@@ -423,9 +423,6 @@ internal class PetDevWindow : PetWindow
             ImGui.TextUnformatted(pet.PetData?.BaseSingular);
 
             ImGui.TableSetColumnIndex(3);
-            ImGui.TextUnformatted(pet.PetData?.BasePlural);
-
-            ImGui.TableSetColumnIndex(4);
             ImGui.TextUnformatted(pet.Index.ToString());
         }
 

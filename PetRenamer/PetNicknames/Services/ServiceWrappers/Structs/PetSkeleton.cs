@@ -3,7 +3,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
-public readonly struct PetSkeleton
+public readonly struct PetSkeleton : IEquatable<PetSkeleton>
 {
     public readonly uint         SkeletonId;
     public readonly SkeletonType SkeletonType;

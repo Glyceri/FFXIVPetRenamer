@@ -10,42 +10,43 @@ namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
 internal class LegacyNamingVer9 : ILegacyStepperElement
 {
-    readonly IPetServices PetServices;
+    private readonly IPetServices PetServices;
 
-    public int OldVersion { get; } = 9;
-
-    public LegacyNamingVer9(IPetServices petServices)
-    {
-        PetServices = petServices;
-    }
+    public LegacyNamingVer9(IPetServices petServices) 
+        => PetServices = petServices;
+    
+    public int OldVersion
+        => 9;
 
     public void Upgrade(Configuration configuration)
     {
-
-        if (configuration.SerializableUsersV4 != null)
+        configuration.Version = 10;
+        
+        if (configuration.SerializableUsersV4 == null)
         {
-            List<SerializableUserV5> newSerializableUsers = new List<SerializableUserV5>();
+            return;
+        }
+        
+        List<SerializableUserV5> newSerializableUsers = [];
 
-            foreach (SerializableUserV4 user in configuration.SerializableUsersV4)
-            {
-                newSerializableUsers.Add(new SerializableUserV5(user.ContentID, user.Name, user.Homeworld, user.SoftSkeletonData, Create(user.SerializableNameDatas)));
-            }
-
-            configuration.SerializableUsersV5 = newSerializableUsers.ToArray();
-            configuration.SerializableUsersV4 = [];
+        foreach (SerializableUserV4 user in configuration.SerializableUsersV4)
+        {
+            newSerializableUsers.Add(new SerializableUserV5(user.ContentID, user.Name, user.Homeworld, user.SoftSkeletonData, Create(user.SerializableNameDatas)));
         }
 
-        configuration.Version = 10;
+        configuration.SerializableUsersV5 = newSerializableUsers.ToArray();
+        configuration.SerializableUsersV4 = [];
     }
 
-    SerializableNameDataV2[] Create(SerializableNameData[] oldData)
+    private SerializableNameDataV2[] Create(SerializableNameData[] oldData)
     {
-        List<SerializableNameDataV2> newData = new List<SerializableNameDataV2>();
+        List<SerializableNameDataV2> newData = [];
 
         foreach (SerializableNameData old in oldData)
         {
             newData.Add(new SerializableNameDataV2(old));
         }
+        
         return newData.ToArray();
     }
 }

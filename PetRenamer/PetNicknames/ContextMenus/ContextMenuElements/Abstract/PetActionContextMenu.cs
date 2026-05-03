@@ -1,7 +1,7 @@
 ﻿using Dalamud.Game.Gui.ContextMenu;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -13,15 +13,17 @@ internal abstract class PetActionContextMenu : IContextMenuElement
 {
     public abstract string? AddonName { get; }
 
+    private readonly IPetServices       PetServices;
     private readonly IPettableUserList  UserList;
     private readonly IWindowHandler     WindowHandler;
-    private readonly IActionTooltipHook ActionTooltipHook;
+    private readonly IHoverService      HoverService;
 
-    public PetActionContextMenu(IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook)
+    public PetActionContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
     {
+        PetServices       = petServices;
         UserList          = userList;
         WindowHandler     = windowHandler;
-        ActionTooltipHook = actionTooltipHook;
+        HoverService      = petServices.HoverService;
     }
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
@@ -33,7 +35,7 @@ internal abstract class PetActionContextMenu : IContextMenuElement
             return null;
         }
 
-        IPetSheetData? petData = ActionTooltipHook.CurrentlyHoveredPet;
+        IPetSheetData? petData = HoverService.CurrentlyHoveredPet;
 
         if (petData == null)
         {

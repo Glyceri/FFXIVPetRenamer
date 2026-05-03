@@ -166,7 +166,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromContentID(ulong contentID)
+    public IPettableUser? GetUserFromContentId(ulong contentID)
     {
         if (contentID == 0)
         {
@@ -220,7 +220,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromOwnerID(uint ownerID)
+    public IPettableUser? GetUserFromOwnerId(uint ownerID)
     {
         if (ownerID == 0)
         {

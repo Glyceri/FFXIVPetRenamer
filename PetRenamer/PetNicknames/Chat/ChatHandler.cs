@@ -10,20 +10,22 @@ namespace PetRenamer.PetNicknames.Chat;
 
 internal class ChatHandler : IDisposable
 {
-    readonly DalamudServices DalamudServices;
-    readonly IPetServices PetServices;
-    readonly IPettableUserList PettableUserList;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IPetServices       PetServices;
+    private readonly IPettableUserList  PettableUserList;
 
+    private readonly List<IChatElement> _chatElements = [];
+    
     public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList)
     {
-        DalamudServices = dalamudServices;
-        PetServices = petServices;
+        DalamudServices  = dalamudServices;
+        PetServices      = petServices;
         PettableUserList = pettableUserList;
 
         _Register();
     }
 
-    void _Register()
+    private void _Register()
     {
         Register(new PetGlamourChat(DalamudServices, PetServices, PettableUserList));
         Register(new EmoteChatElement(DalamudServices, PetServices, PettableUserList));
@@ -32,9 +34,7 @@ internal class ChatHandler : IDisposable
         Register(new DebugChatCode(PetServices.Configuration));
     }
 
-    readonly List<IChatElement> _chatElements = new List<IChatElement>(); 
-
-    void Register(IChatElement chatElement)
+    private void Register(IChatElement chatElement)
     {
         _chatElements.Add(chatElement);
         

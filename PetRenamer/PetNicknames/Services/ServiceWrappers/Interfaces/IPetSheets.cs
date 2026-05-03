@@ -18,7 +18,7 @@ internal interface IPetSheets
     PetSkeleton ToSoftSkeleton(PetSkeleton skeletonID, PetSkeleton[] softSkeletons);
     IPetSheetData? GetPetFromName(string name);
     IPetSheetData? GetPetFromIcon(uint iconID);
-    IPetSheetData? GetPetFromAction(uint actionID, in IPettableUser user, bool IsSoft = true);
+    IPetSheetData? GetPetFromAction(uint actionId, in IPettableUser user, bool IsSoft = true);
     IPetSheetData? GetPetFromString(string text, in IPettableUser user, bool IsSoft = false);
     IPetSheetData? MakeSoft(in IPettableUser user, in IPetSheetData oldData);
     int? NameToSoftSkeletonIndex(string name);

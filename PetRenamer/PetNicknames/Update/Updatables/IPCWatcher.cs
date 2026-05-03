@@ -58,7 +58,7 @@ internal class IPCWatcher : IUpdatable
                 continue;
             }
 
-            IPettableUser? user = UserList.GetUserFromContentID(entry.ContentID);
+            IPettableUser? user = UserList.GetUserFromContentId(entry.ContentID);
 
             // User exists so its fine to keep this IPC user
             if (user != null)

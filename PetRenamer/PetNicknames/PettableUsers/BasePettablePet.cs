@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
-internal unsafe abstract class BasePettablePet : IPettablePet
+internal abstract unsafe class BasePettablePet : IPettablePet
 {
     public nint           Address    { get; }
     public PetSkeleton    SkeletonID { get; }

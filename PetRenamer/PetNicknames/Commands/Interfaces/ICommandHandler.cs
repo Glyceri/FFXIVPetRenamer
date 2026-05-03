@@ -2,6 +2,4 @@
 
 namespace PetRenamer.PetNicknames.Commands.Interfaces;
 
-internal interface ICommandHandler : IDisposable
-{
-}
+internal interface ICommandHandler : IDisposable;

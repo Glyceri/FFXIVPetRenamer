@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game;
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;

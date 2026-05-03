@@ -7,7 +7,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -19,36 +18,41 @@ using System.Text.RegularExpressions;
 namespace PetRenamer.PetNicknames.Commands.Commands;
 
 // This shit SUCKS
-internal partial class PetnameCommand : Command
+internal partial class PetNameCommand : Command
 {
     private readonly IPetServices      PetServices;
     private readonly IPettableUserList UserList;
-    private readonly IPettableDatabase Database;
 
     private IPettableDatabaseEntry? activeEntry;
     private IPetSheetData?          activeData;
-
-    public PetnameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices, IPettableUserList userList, IPettableDatabase database) : base(dalamudServices, windowHandler) 
-    {
-        PetServices = petServices;
-        UserList    = userList;
-        Database    = database;
-    }
-
-    public override string CommandCode  { get; }    = "/petname";
-    public override string Description  { get; }    = Translator.GetLine("Command.Petname");
-    public override bool   ShowInHelp   { get; }    = true;
 
     private const string        CUSTOM_TAG          = "[custom]";
     private       string        lastCommandPart     = string.Empty;
     private       List<string>  matchedArguments    = [];
     private       int           customCounter       = 0;
+    
+    public PetNameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices, IPettableUserList userList) 
+        : base(dalamudServices, windowHandler) 
+    {
+        PetServices = petServices;
+        UserList    = userList;
+    }
+
+    public override string CommandCode
+        => "/petname";
+    
+    public override string Description
+        => Translator.GetLine("Command.Petname");
+    
+    public override bool ShowInHelp
+        => true;
 
     public override void OnCommand(string command, string args)
     {
         if (args.IsNullOrWhitespace())
         {
             WindowHandler.Open<PetRenameWindow>();
+            
             return;
         }
 
@@ -90,6 +94,7 @@ internal partial class PetnameCommand : Command
         else if (currentState == CommandState.Help)
         {
             PrintHelp();
+            
             return;
         }
 
@@ -117,11 +122,11 @@ internal partial class PetnameCommand : Command
 
         if (currentState == CommandState.Set)
         {
-            HandleSet(commandArgs, targetState);
+            HandleSet(commandArgs);
         }
         else if (currentState == CommandState.Clear)
         {
-            HandleClear(commandArgs, targetState);
+            HandleClear();
         }
     }
 
@@ -222,7 +227,7 @@ internal partial class PetnameCommand : Command
         return false;
     }
 
-    private void HandleSet(string[] commandArgs, TargetState targetState)
+    private void HandleSet(string[] commandArgs)
     {
         if (activeEntry == null)
         {
@@ -279,7 +284,7 @@ internal partial class PetnameCommand : Command
         activeEntry!.ActiveDatabase.SetName(activeData!.Model, currentName, currentEdgeColour, currentTextColour);
     }
 
-    private void HandleClear(string[] commandArgs, TargetState targetState)
+    private void HandleClear()
     {
         if (activeEntry == null)
         {

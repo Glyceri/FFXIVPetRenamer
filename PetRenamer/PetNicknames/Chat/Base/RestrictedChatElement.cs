@@ -9,13 +9,13 @@ internal abstract class RestrictedChatElement : IChatElement
 {
     private readonly HashSet<int> ChatTypes = [];
 
-    internal void RegisterChat(int chatType) 
+    protected void RegisterChat(int chatType) 
         => ChatTypes.Add(chatType);
     
-    internal void RegisterChat(XivChatType chatType) 
+    protected void RegisterChat(XivChatType chatType) 
         => ChatTypes.Add((int)chatType);
     
-    internal void RegisterChat(params int[] chats)
+    protected void RegisterChat(params int[] chats)
     {
         for (int i = 0; i < chats.Length; i++)
         {
@@ -23,7 +23,7 @@ internal abstract class RestrictedChatElement : IChatElement
         }
     }
     
-    internal void RegisterChat(params XivChatType[] chats)
+    protected void RegisterChat(params XivChatType[] chats)
     {
         for (int i = 0; i < chats.Length; i++)
         {

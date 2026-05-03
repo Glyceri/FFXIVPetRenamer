@@ -94,8 +94,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
 
-        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, PetServices, PettableUserList, PettableDatabase);
-        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
+        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, PetServices, PettableUserList);
+        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler);
 
         PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
     }

@@ -18,6 +18,9 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class CharacterManagerHook : HookableElement
 {
+    private const uint PlayerMaxInObjectTable = 100;
+    private const byte IslandPetSubKind       = 10;
+    
     private readonly Hook<Companion.Delegates.OnInitialize>?    OnInitializeCompanionHook;
     private readonly Hook<Companion.Delegates.Terminate>?       OnTerminateCompanionHook;
     private readonly Hook<BattleChara.Delegates.OnInitialize>?  OnInitializeBattleCharaHook;
@@ -30,9 +33,10 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly IPettableDirtyCaller   DirtyCaller;
     private readonly IIslandHook            IslandHook;
 
-    private readonly List<nint> temporaryPets = new List<nint>();
+    private readonly List<nint> temporaryPets = [];
 
-    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) : base(services, userList, petServices, dirtyListener)
+    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) 
+        : base(services, userList, petServices, dirtyListener)
     {
         Database            = database;
         LegacyDatabase      = legacyDatabase;
@@ -60,7 +64,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void FloodInitialList()
     {
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < PlayerMaxInObjectTable; i++)
         {
             BattleChara* bChara = CharacterManager.Instance()->BattleCharas[i];
 
@@ -173,7 +177,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return null;
         }
 
-        return UserList.GetUserFromOwnerID(companion->CompanionOwnerId);
+        return UserList.GetUserFromOwnerId(companion->CompanionOwnerId);
     }
 
     private void HandleAsCreated(BattleChara* newBattleChara)
@@ -234,7 +238,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return false;
         }
 
-        if (newBattleChara->SubKind != 10)
+        if (newBattleChara->SubKind != IslandPetSubKind)
         {
             return false;
         }
@@ -362,7 +366,7 @@ internal unsafe class CharacterManagerHook : HookableElement
     {
         int actualIndex = CreateActualIndex(newBattleChara->ObjectIndex);
 
-        if (actualIndex < 0 || actualIndex >= 100)
+        if (actualIndex < 0 || actualIndex >= PlayerMaxInObjectTable)
         {
             return null;
         }
