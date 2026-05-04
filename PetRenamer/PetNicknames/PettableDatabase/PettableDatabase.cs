@@ -134,7 +134,7 @@ internal class PettableDatabase : IPettableDatabase
 
     public SerializableUserV6[] SerializeDatabase()
     {
-        List<SerializableUserV6> users = new List<SerializableUserV6>();
+        List<SerializableUserV6> users = [];
 
         int entryCount = _entries.Count;
 

@@ -220,14 +220,14 @@ internal unsafe class PartyHook : HookableElement
         return (isCrossRealm && noMembersInGroup);
     }
 
-    private int? GetCrossPartyIndex(ulong contentID)
+    private int? GetCrossPartyIndex(ulong contentId)
     {
         if (InfoProxyCrossRealm.Instance() == null)
         {
             return null;
         }
 
-        CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId(contentID);
+        CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId(contentId);
 
         if (member == null)
         {

@@ -5,5 +5,5 @@ namespace PetRenamer.PetNicknames.IPC.Interfaces;
 
 internal interface ISharingDictionary : IDisposable
 {
-    void Set(GameObjectId gameObjectID, string? customName);
+    void Set(GameObjectId gameObjectId, string? customName);
 }

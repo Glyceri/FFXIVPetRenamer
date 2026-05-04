@@ -133,15 +133,8 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
         {
             return;
         }
-
-        BaseNode yesNoBox = new BaseNode(addon);
-
-        if (yesNoBox == null)
-        {
-            return;
-        }
-
-        AtkTextNode* tNode = yesNoBox.GetNode<AtkTextNode>(2);
+        
+        AtkTextNode* tNode = addon->GetTextNodeById(2);
 
         if (tNode == null)
         {

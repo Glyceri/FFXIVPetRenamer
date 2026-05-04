@@ -183,11 +183,7 @@ internal unsafe class MapHook : HookableElement
 
     private AtkUldManager? GetUldManager(AtkUnitBase* unitBase, uint slot)
     {
-        BaseNode node = new BaseNode(unitBase);
-        
-        ComponentNode cNode1 = node.GetComponentNode(slot);
-
-        AtkComponentNode* atkComponentNode = cNode1.GetPointer();
+        AtkComponentNode* atkComponentNode = (AtkComponentNode*)unitBase->GetNodeById(slot);
         
         if (atkComponentNode == null)
         {

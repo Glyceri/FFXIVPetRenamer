@@ -32,12 +32,12 @@ internal class IpcProvider : IIpcProvider
      *      - OnDisposing:
      *          This triggers when the plugin disables. When subscribed, receiving this message means the plugin is inactive.
      *          
-     *      - OnPlayerDataChanged (string):
+     *      - OnPlayerDataChanged <string>:
      *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
      *
      * Functions:
      *      - IsEnabled <bool>:
-     *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
+     *          Call this function to see if the plugin is enabled. If it errors out, or you receive a false value it means the plugins IPC is not ready.
      *          
      *      - ApiVersion <(uint, uint)>:
      *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).

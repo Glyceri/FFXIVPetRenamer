@@ -31,13 +31,13 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     private readonly IPetServices         PetServices;
     private readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentId, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices    = petServices;
         DirtyCaller    = dirtyCaller;
         ActiveDatabase = new PettableNameDatabase([], [], [], [], DirtyCaller);
 
-        ContentID      = contentID;
+        ContentID      = contentId;
         IsActive       = active;
         IsIPC          = !IsActive;
         IsLegacy       = isLegacy;
@@ -109,9 +109,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
     }
 
-    public void UpdateContentID(ulong contentID, bool removeIPCStatus = false)
+    public void UpdateContentID(ulong contentId, bool removeIPCStatus = false)
     {
-        ContentID = contentID;
+        ContentID = contentId;
         IsActive  = true;
 
         if (removeIPCStatus)
@@ -120,17 +120,17 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         }
     }
 
-    public string? GetName(PetSkeleton skeletonID)
-        => ActiveDatabase.GetName(skeletonID);
+    public string? GetName(PetSkeleton skeletonId)
+        => ActiveDatabase.GetName(skeletonId);
 
-    public Vector3? GetEdgeColour(PetSkeleton skeletonID)
-        => ActiveDatabase.GetEdgeColour(skeletonID);
+    public Vector3? GetEdgeColour(PetSkeleton skeletonId)
+        => ActiveDatabase.GetEdgeColour(skeletonId);
 
-    public Vector3? GetTextColour(PetSkeleton skeletonID)
-        => ActiveDatabase?.GetTextColour(skeletonID);
+    public Vector3? GetTextColour(PetSkeleton skeletonId)
+        => ActiveDatabase?.GetTextColour(skeletonId);
 
-    public void SetName(PetSkeleton skeletonID, string? name, Vector3? edgeColour, Vector3? textColour)
-        => ActiveDatabase.SetName(skeletonID, name, edgeColour, textColour);
+    public void SetName(PetSkeleton skeletonId, string? name, Vector3? edgeColour, Vector3? textColour)
+        => ActiveDatabase.SetName(skeletonId, name, edgeColour, textColour);
     
 
     public PetSkeleton? GetSoftSkeleton(int softIndex)

@@ -1,6 +1,5 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -9,7 +8,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
@@ -53,7 +51,7 @@ internal unsafe class TargetHook : HookableElement
         HandleTargetTextNode(GetAtkTextNode(atkUnitBase, textNodeIndex), target);
     }
     
-    private void HandleTargetCastbar(AddonArgs args, uint textNodeIndex, IPettableEntity? target)
+    private void HandleTargetCastBar(AddonArgs args, uint textNodeIndex, IPettableEntity? target)
     {
         AtkUnitBase* atkUnitBase = GetAtkUnitBase(args);
         
@@ -114,7 +112,7 @@ internal unsafe class TargetHook : HookableElement
     {
         HandleTarget       (args, 17, Target());
         HandleTarget       (args, 7,  TargetOfTarget());
-        HandleTargetCastbar(args, 12, Target());
+        HandleTargetCastBar(args, 12, Target());
     }
     
     private void OnTargetInfoMainTarget(AddonEvent addonEvent, AddonArgs args)
@@ -126,17 +124,17 @@ internal unsafe class TargetHook : HookableElement
     private void OnFocusTargetInfo(AddonEvent addonEvent, AddonArgs args)
     {
         HandleTarget       (args, 10, FocusTarget());
-        HandleTargetCastbar(args, 5, FocusTarget());
+        HandleTargetCastBar(args, 5, FocusTarget());
     }
     
     private void OnCastBar(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTargetCastbar(args, 4, UserList.LocalPlayer);
+        HandleTargetCastBar(args, 4, UserList.LocalPlayer);
     }
     
     private void OnTargetInfoCastBar(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTargetCastbar(args, 4, UserList.LocalPlayer);
+        HandleTargetCastBar(args, 4, UserList.LocalPlayer);
     }
     
     [Conditional("DEBUG")]

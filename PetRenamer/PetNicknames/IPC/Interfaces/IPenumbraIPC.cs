@@ -2,7 +2,4 @@
 
 namespace PetRenamer.PetNicknames.IPC.Interfaces;
 
-internal interface IPenumbraIPC : IDisposable
-{
-
-}
+internal interface IPenumbraIPC : IDisposable;
