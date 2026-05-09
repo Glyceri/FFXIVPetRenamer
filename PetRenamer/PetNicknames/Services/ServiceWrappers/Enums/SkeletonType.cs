@@ -3,7 +3,9 @@
 public enum SkeletonType
 {
     Invalid     = 0,
+    None        = 0,
     Minion      = 1,
     BattlePet   = 2,
     BeastMaster = 3,    // Future proofing c:
+    Chocobo     = 4,
 }

@@ -13,8 +13,8 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal abstract unsafe class BasePettablePet : IPettablePet
 {
     public nint           Address    { get; }
-    public PetSkeleton    SkeletonID { get; }
-    public ulong          ObjectID   { get; }
+    public PetSkeleton    SkeletonId { get; }
+    public ulong          ObjectId   { get; }
     public ushort         Index      { get; }
     public string         Name       { get; }
     public IPetSheetData? PetData    { get; }
@@ -35,15 +35,26 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         Address             = (nint)pet;
 
         Owner               = owner;
-        SkeletonID          = new PetSkeleton((uint)pet->ModelContainer.ModelCharaId, skeletonType);
 
         Index               = pet->GameObject.ObjectIndex;
         Name                = pet->GameObject.NameString;
-        ObjectID            = pet->GetGameObjectId();
-        PetData             = petServices.PetSheets.GetPet(SkeletonID);
+        ObjectId            = pet->GetGameObjectId();
+        PetData             = petServices.PetSheets.GetPet(SkeletonId);
 
+        
+        uint skeletonId     = (uint)pet->ModelContainer.ModelCharaId;
+        
+        if (skeletonType == SkeletonType.BattlePet && skeletonId == 1)
+        {
+            SkeletonId      = new PetSkeleton(skeletonId, SkeletonType.Chocobo);
+        }
+        else
+        {
+            SkeletonId      = new PetSkeleton((uint)pet->ModelContainer.ModelCharaId, skeletonType);
+        }
+        
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectID}");
+        PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");
 #endif
 
         Recalculate();
@@ -54,18 +65,18 @@ internal abstract unsafe class BasePettablePet : IPettablePet
 
     public void Recalculate()
     {
-        CustomName = Entry.GetName(SkeletonID);
+        CustomName = Entry.GetName(SkeletonId);
 
-        SharingDictionary.Set(ObjectID, CustomName);
+        SharingDictionary.Set(ObjectId, CustomName);
     }
 
     public void Dispose()
     {
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectID}");
+        PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectId}");
 #endif
 
-        SharingDictionary.Set(ObjectID, null);
+        SharingDictionary.Set(ObjectId, null);
     }
 
     public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)

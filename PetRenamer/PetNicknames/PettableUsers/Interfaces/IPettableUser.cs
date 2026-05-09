@@ -1,6 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 using System.Numerics;
@@ -18,7 +19,7 @@ internal unsafe interface IPettableUser : IBattleUser
 
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);
-    IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
+    IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None);
 
     string? GetCustomName(IPetSheetData sheetData);
 
@@ -32,12 +33,4 @@ internal unsafe interface IPettableUser : IBattleUser
     void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
     
     IPettableUserTargetManager? TargetManager { get; }
-
-    enum PetFilter
-    {
-        None,
-        Minion,
-        BattlePet,
-        Chocobo
-    }
 }

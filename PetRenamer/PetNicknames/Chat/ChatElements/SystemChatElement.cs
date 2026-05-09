@@ -88,7 +88,7 @@ internal class SystemChatElement : IChatElement
             return;
         }
         
-        IPettablePet? pettablePet = UserList.LocalPlayer.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
+        IPettablePet? pettablePet = UserList.LocalPlayer.GetYoungestPet(SkeletonType.BattlePet);
         
         if (pettablePet == null)
         {

@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -163,7 +164,7 @@ internal partial class PetNameCommand : Command
         }
         else if (targetState == TargetState.Minion)
         {
-            IPettablePet? pet = localUser!.GetYoungestPet(IPettableUser.PetFilter.Minion);
+            IPettablePet? pet = localUser!.GetYoungestPet(SkeletonType.Minion);
 
             if (pet == null)
             {
@@ -176,7 +177,7 @@ internal partial class PetNameCommand : Command
         }
         else if (targetState == TargetState.BattlePet)
         {
-            IPettablePet? pet = localUser!.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
+            IPettablePet? pet = localUser!.GetYoungestPet(SkeletonType.BattlePet);
 
             if (pet == null)
             {

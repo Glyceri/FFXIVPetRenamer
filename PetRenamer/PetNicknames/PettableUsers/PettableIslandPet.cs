@@ -12,8 +12,8 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal unsafe class PettableIslandPet : IIslandPet
 {
     public nint           Address    { get; private set; }
-    public PetSkeleton    SkeletonID { get; private set; }
-    public ulong          ObjectID   { get; private set; }
+    public PetSkeleton    SkeletonId { get; private set; }
+    public ulong          ObjectId   { get; private set; }
     public ushort         Index      { get; private set; }
     public string         Name       { get; private set; } = string.Empty;
     public string?        CustomName { get; private set; }
@@ -31,17 +31,17 @@ internal unsafe class PettableIslandPet : IIslandPet
 
         Address     = (nint)pet;
         Owner       = owner;
-        SkeletonID  = new PetSkeleton((uint)pet->Character.ModelContainer.ModelCharaId, SkeletonType.Minion);
+        SkeletonId  = new PetSkeleton((uint)pet->Character.ModelContainer.ModelCharaId, SkeletonType.Minion);
         Index       = pet->Character.GameObject.ObjectIndex;
         Name        = pet->Character.GameObject.NameString;
-        ObjectID    = pet->GetGameObjectId();
-        CustomName  = entry.GetName(SkeletonID);
-        PetData     = petServices.PetSheets.GetPet(SkeletonID);
+        ObjectId    = pet->GetGameObjectId();
+        CustomName  = entry.GetName(SkeletonId);
+        PetData     = petServices.PetSheets.GetPet(SkeletonId);
     }
 
     public void Recalculate()
     {
-        CustomName = Entry.GetName(SkeletonID);
+        CustomName = Entry.GetName(SkeletonId);
     }
 
     public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)

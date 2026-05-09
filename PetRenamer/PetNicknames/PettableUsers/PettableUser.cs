@@ -4,11 +4,11 @@ using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
 using System.Numerics;
-using static PetRenamer.PetNicknames.PettableUsers.Interfaces.IPettableUser;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
@@ -131,14 +131,14 @@ internal unsafe class PettableUser : IPettableUser
 
         int sIndex = softIndex.Value;
 
-        IPettablePet? youngestPet = GetYoungestPet(PetFilter.BattlePet);
+        IPettablePet? youngestPet = GetYoungestPet(SkeletonType.BattlePet);
 
         if (youngestPet == null)
         {
             return;
         }
 
-        DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonID);
+        DataBaseEntry.SetSoftSkeleton(sIndex, youngestPet.SkeletonId);
     }
 
     private void OnDirty(INamesDatabase database)
@@ -172,7 +172,7 @@ internal unsafe class PettableUser : IPettableUser
     private void CreateNewPet(IPettablePet pet, int index = -1)
     {
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectID} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
 #endif
 
         if (index == -1)
@@ -214,7 +214,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             IPettablePet pPet = PettablePets[i];
 
-            if (pPet.ObjectID == (ulong)gameObjectId)
+            if (pPet.ObjectId == (ulong)gameObjectId)
             {
                 return pPet;
             }
@@ -223,34 +223,33 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
-    public IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None)
+    public IPettablePet? GetYoungestPet(SkeletonType skeletonType)
     {
-        // The last pet  in the list is always the youngest
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
             IPettablePet pPet = PettablePets[i];
 
-            if (filter == PetFilter.None)
+            if ((int)skeletonType == 0)
             {
                 return pPet;
             }
 
-            if (filter != PetFilter.Minion && pPet is PettableCompanion)
+            if (skeletonType != SkeletonType.Minion && pPet is PettableCompanion)
             {
                 continue;
             }
 
-            if (filter != PetFilter.BattlePet && filter != PetFilter.Chocobo && pPet is PettableBattlePet)
+            if (skeletonType != SkeletonType.BattlePet && skeletonType != SkeletonType.Chocobo && pPet is PettableBattlePet)
             {
                 continue;
             }
 
-            if (filter == PetFilter.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
+            if (skeletonType == SkeletonType.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonId))
             {
                 continue;
             }
 
-            if (filter == PetFilter.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonID))
+            if (skeletonType == SkeletonType.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonId))
             {
                 continue;
             }
@@ -261,28 +260,9 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
-    public string? GetCustomName(IPetSheetData sheetData)
-    {
-        return DataBaseEntry.GetName(sheetData.Model);
-    }
-
-    public void RefreshCast()
-    {
-        if (BattleChara == null)
-        {
-            return;
-        }
-
-        uint castID = BattleChara->GetCastInfo()->ActionId;
-
-        if (castID == 0)
-        {
-            return;
-        }
-
-        CurrentCastId = castID;
-    }
-
+    public string? GetCustomName(IPetSheetData sheetData) 
+        => DataBaseEntry.GetName(sheetData.Model);
+    
     public void Dispose(IPettableDatabase database)
     {
 #if DEBUG
@@ -303,9 +283,9 @@ internal unsafe class PettableUser : IPettableUser
             database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
         }
 
-        foreach(IPettablePet? pet in PettablePets)
+        foreach(IPettablePet pet in PettablePets)
         {
-            pet?.Dispose();
+            pet.Dispose();
         }
     }
 
@@ -313,12 +293,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
-            IPettablePet? pet = PettablePets[i];
-
-            if (pet == null)
-            {
-                continue;
-            }
+            IPettablePet pet = PettablePets[i];
 
             if (pet.Address != (nint)pointer)
             {
@@ -340,19 +315,14 @@ internal unsafe class PettableUser : IPettableUser
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
-            IPettablePet? pet = PettablePets[i];
-
-            if (pet == null)
-            {
-                continue;
-            }
-
+            IPettablePet pet = PettablePets[i];
+            
             if (pet.Address != (nint)pointer)
             {
                 continue;
             }
 
-            pet?.Dispose();
+            pet.Dispose();
             PettablePets.RemoveAt(i);
         }
     }

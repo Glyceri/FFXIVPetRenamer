@@ -161,7 +161,7 @@ internal class PetDevWindow : PetWindow
     }
     
     private string GetPetText(IPettablePet? pet)
-        => pet == null ? "No Pet" : $"{pet.Name}] [{pet.CustomName}";
+        => pet == null ? "No Pet" : $"{pet.SkeletonId}] [{pet.Name}] [{pet.CustomName}";
     
     private string GetUserText(IPettableUser? user)
         => user == null ? "No Player" : $"{user.Name}@{PetServices.PetSheets.GetWorldName(user.Homeworld)}] [{user.PettablePets.Count}";
@@ -654,7 +654,7 @@ internal class PetDevWindow : PetWindow
             ImGui.TableNextRow();
 
             ImGui.TableSetColumnIndex(0);
-            ImGui.TextUnformatted($"{pet.SkeletonID}");
+            ImGui.TextUnformatted($"{pet.SkeletonId}");
 
             ImGui.TableSetColumnIndex(1);
             ImGui.TextUnformatted(pet.Name);

@@ -80,7 +80,7 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
 
-        IPettablePet? pet = localPlayer.GetYoungestPet(IPettableUser.PetFilter.BattlePet);
+        IPettablePet? pet = localPlayer.GetYoungestPet(SkeletonType.BattlePet);
 
         if (pet == null)
         {

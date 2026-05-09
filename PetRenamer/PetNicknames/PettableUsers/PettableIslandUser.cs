@@ -3,6 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
 using System.Numerics;
@@ -63,7 +64,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         {
             IPettablePet pet = PettablePets[i];
 
-            if (pet.ObjectID != pointer->GetGameObjectId())
+            if (pet.ObjectId != pointer->GetGameObjectId())
             {
                 continue;
             }
@@ -99,7 +100,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         {
             IPettablePet pPet = PettablePets[i];
 
-            if (pPet.ObjectID != (ulong)gameObjectId)
+            if (pPet.ObjectId != (ulong)gameObjectId)
             {
                 continue;
             }
@@ -113,7 +114,7 @@ internal unsafe class PettableIslandUser : IIslandUser
     public string? GetCustomName(IPetSheetData sheetData) 
         => DataBaseEntry.GetName(sheetData.Model);
 
-    public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None)
+    public IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None)
         => null;
 
     public void OnLastCastChanged(uint cast) { } // Unused

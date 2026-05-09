@@ -8,8 +8,8 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 internal interface IPettablePet : IPettableEntity, IDisposable
 {
     IPettableUser? Owner      { get; }
-    PetSkeleton    SkeletonID { get; }
-    ulong          ObjectID   { get; }
+    PetSkeleton    SkeletonId { get; }
+    ulong          ObjectId   { get; }
     ushort         Index      { get; }
     string         Name       { get; }
     string?        CustomName { get; }
