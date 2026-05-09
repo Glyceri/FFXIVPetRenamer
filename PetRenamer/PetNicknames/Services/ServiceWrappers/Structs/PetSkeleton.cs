@@ -34,4 +34,7 @@ public readonly struct PetSkeleton : IEquatable<PetSkeleton>
 
     public override int GetHashCode()
         => HashCode.Combine(SkeletonId, SkeletonType);
+
+    public override string ToString()
+        => $"{SkeletonType}: [{SkeletonId}]";
 }

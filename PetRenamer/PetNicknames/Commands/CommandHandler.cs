@@ -33,7 +33,7 @@ internal class CommandHandler : ICommandHandler
         RegisterCommand(new PetSettingsCommand  (DalamudServices, WindowHandler));
         RegisterCommand(new PetSharingCommand   (DalamudServices, WindowHandler));
         RegisterCommand(new PetListCommand      (DalamudServices, WindowHandler));
-        RegisterCommand(new PetDevCommand       (DalamudServices, PetServices.Configuration, WindowHandler));
+        RegisterCommand(new PetDevCommand       (DalamudServices, WindowHandler));
     }
 
     private void RegisterCommand(ICommand command)

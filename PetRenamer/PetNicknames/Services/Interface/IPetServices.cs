@@ -9,11 +9,11 @@ internal interface IPetServices : IDisposable
     IPetSheets           PetSheets           { get; }
     IStringHelper        StringHelper        { get; }
     IPetCastHelper       PetCastHelper       { get; }
-    IPetActionHelper     PetActionHelper     { get; }
     Configuration        Configuration       { get; }
     ITargetManager       TargetManager       { get; }
     IPluginWatcher       PluginWatcher       { get; }
     INotificationService NotificationService { get; }
     INameService         NameService         { get; }
     IHoverService        HoverService        { get; }
+    IParty               Party               { get; }
 }

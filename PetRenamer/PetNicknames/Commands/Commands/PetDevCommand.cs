@@ -7,13 +7,8 @@ namespace PetRenamer.PetNicknames.Commands.Commands;
 
 internal class PetDevCommand : Command
 {
-    private readonly Configuration Configuration;
-
-    public PetDevCommand(DalamudServices dalamudServices, Configuration configuration, IWindowHandler windowHandler) 
-        : base(dalamudServices, windowHandler) 
-    { 
-        Configuration = configuration;
-    }
+    public PetDevCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) 
+        : base(dalamudServices, windowHandler) { }
 
     public override string CommandCode 
         => "/petdev";
@@ -25,12 +20,5 @@ internal class PetDevCommand : Command
         => false;
 
     public override void OnCommand(string command, string args)
-    {
-        if (!Configuration.debugModeActive)
-        {
-            return;
-        }
-        
-        WindowHandler.Open<PetDevWindow>();
-    }
+        => WindowHandler.Open<PetDevWindow>();
 }

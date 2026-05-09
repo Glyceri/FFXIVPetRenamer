@@ -174,6 +174,8 @@ internal class IpcProvider : IIpcProvider
     // Actions
     public void SetPlayerDataDetour(string data)
     {
+        DalamudServices.PluginLog.Debug("[IPC] Set Player Data: " + data);
+        
         try
         {
             _ = DalamudServices.Framework.Run(() =>
@@ -191,6 +193,8 @@ internal class IpcProvider : IIpcProvider
 
     public void ClearIPCDataDetour(ushort objectIndex)
     {
+        DalamudServices.PluginLog.Debug("[IPC] Clear Player Data: " + objectIndex);
+        
         try
         {
             _ = DalamudServices.Framework.Run(() =>

@@ -14,6 +14,7 @@ using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.Hooking;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing;
@@ -97,7 +98,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetConfigWindow(this, DalamudServices, Configuration, PetServices.PluginWatcher));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));
-        AddWindow(new PetDevWindow(this, DalamudServices, Configuration, UserList, Database));
+        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Configuration, UserList, Database));
     }
 
     private void AddWindow(PetWindow window)

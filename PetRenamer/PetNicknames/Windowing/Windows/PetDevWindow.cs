@@ -1,4 +1,8 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿// ReSharper disable All
+// like... this file is PURELY to test and is actually hot garbage...
+#pragma warning disable
+
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Ipc;
@@ -6,9 +10,13 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.ClientState.Conditions;
+using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -23,6 +31,7 @@ internal class PetDevWindow : PetWindow
 {
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
+    readonly IPetServices      PetServices;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -32,19 +41,24 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database) : base(windowHandler, dalamudServices, configuration, "Pet Dev Window", ImGuiWindowFlags.None)
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database) 
+        : base(windowHandler, dalamudServices, configuration, "Pet Dev Window")
     {
-        UserList = userList;
-        Database = database;
-
+        UserList    = userList;
+        Database    = database;
+        PetServices = petServices;
+        
         if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
         {
             Open();
         }
 
-        devStructList.Add(new DevStruct("User List", DrawUserList));
+        devStructList.Add(new DevStruct("User List",  DrawUserList));
+        devStructList.Add(new DevStruct("Party",      DrawParty));
+        devStructList.Add(new DevStruct("Cast",       DrawCasts));
+        devStructList.Add(new DevStruct("Targeting",  DrawTargeting));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
-        devStructList.Add(new DevStruct("Database", DrawDatabase));
+        devStructList.Add(new DevStruct("Database",   DrawDatabase));
     }
 
     public override void OnOpen()
@@ -93,6 +107,8 @@ internal class PetDevWindow : PetWindow
         }
     }
 
+   
+    
     void DrawDatabaseUser(IPettableDatabaseEntry user)
     {
         if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
@@ -143,7 +159,239 @@ internal class PetDevWindow : PetWindow
         targetEdgeColour = null;
         targetTextColour = null;
     }
+    
+    private string GetPetText(IPettablePet? pet)
+        => pet == null ? "No Pet" : $"{pet.Name}] [{pet.CustomName}";
+    
+    private string GetUserText(IPettableUser? user)
+        => user == null ? "No Player" : $"{user.Name}@{PetServices.PetSheets.GetWorldName(user.Homeworld)}] [{user.PettablePets.Count}";
+    
+    private string GetTargetText(IPettableEntity? target)
+    {
+        if (target is IPettableUser user) return GetUserText(user);
+        if (target is IPettablePet pet) return GetPetText(pet);
+        
+        return string.Empty;
+    }
+    
+    bool HasTarget(IPettableUser user, out int targetCount, out int realTargetCount)
+    {
+        targetCount = 0;
+        realTargetCount = 0;
+        
+        bool hasTarget = false;
+        
+        if (user.TargetManager.GetLeadingTarget() != null)
+        {
+            if (showLeadingTargets) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetLeadingTargetOfLeadingTarget() != null)
+        {
+            if (showLeadingTargetOfLeadingTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetSoftTarget() != null)
+        {
+            if (showSoftTargets) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetTarget() != null)
+        {
+            if (showTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetSoftTargetOfLeadingTarget() != null)
+        {
+            if (showSoftTargetOfLeadingTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetTargetOfLeadingTarget() != null)
+        {
+            if (showTargetOfLeadingTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetTargetOfTarget() != null)
+        {
+            if (showTargetOfTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetSoftTargetOfTarget() != null)
+        {
+            if (showSoftTargetOfTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetTargetOfSoftTarget() != null)
+        {
+            if (showTargetOfSoftTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
+        if (user.TargetManager.GetSoftTargetOfSoftTarget() != null)
+        {
+            if (showSoftTargetOfSoftTarget) targetCount++;
+            realTargetCount++;
+            hasTarget = true;
+        }
 
+        return hasTarget;
+    }
+    
+    bool showLeadingTargets = true;
+    bool showLeadingTargetOfLeadingTarget = true;
+    bool showSoftTargets = true;
+    bool showTarget = true;
+    bool showSoftTargetOfLeadingTarget = true;
+    bool showTargetOfLeadingTarget = true;
+    bool showTargetOfTarget = true;
+    bool showSoftTargetOfTarget = true;
+    bool showTargetOfSoftTarget = true;
+    bool showSoftTargetOfSoftTarget = true;
+    
+    private void DrawToggle(ref bool value, string title)
+        => ImGui.Checkbox(title, ref value);
+    
+    private bool CanDrawDebugMenu()
+    {
+        #if DEBUG
+        return true;
+        #endif
+        
+        if (DalamudServices.Condition[ConditionFlag.BoundByDuty]) return false;
+        if (DalamudServices.Condition[ConditionFlag.BoundByDuty56]) return false;
+        if (DalamudServices.Condition[ConditionFlag.BoundByDuty95]) return false;
+        if (DalamudServices.Condition[ConditionFlag.InCombat]) return false;
+        if (DalamudServices.Condition[ConditionFlag.InDeepDungeon])return false;
+        if (DalamudServices.Condition[ConditionFlag.InDuelingArea]) return false;
+        if (DalamudServices.ClientState.IsPvP) return false;
+        
+        return true;
+    }
+    
+    unsafe void DrawTargeting()
+    {
+        if (!CanDrawDebugMenu())
+        {
+            return;
+        }
+        
+        DrawToggle(ref showLeadingTargets, nameof(showLeadingTargets));
+        DrawToggle(ref showLeadingTargetOfLeadingTarget, nameof(showLeadingTargetOfLeadingTarget));
+        DrawToggle(ref showSoftTargets, nameof(showSoftTargets));
+        DrawToggle(ref showTarget, nameof(showTarget));
+        DrawToggle(ref showSoftTargetOfLeadingTarget, nameof(showSoftTargetOfLeadingTarget));
+        DrawToggle(ref showTargetOfLeadingTarget, nameof(showTargetOfLeadingTarget));
+        DrawToggle(ref showTargetOfTarget, nameof(showTargetOfTarget));
+        DrawToggle(ref showSoftTargetOfTarget, nameof(showSoftTargetOfTarget));
+        DrawToggle(ref showTargetOfSoftTarget, nameof(showTargetOfSoftTarget));
+        DrawToggle(ref showSoftTargetOfSoftTarget, nameof(showSoftTargetOfSoftTarget));
+        
+        ImGui.NewLine();
+        ImGui.NewLine();
+        
+        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
+        {
+            IPettableUser? user = UserList.PettableUsers[i];
+            if (user == null) continue;
+            
+            if (!HasTarget(user, out int targetCount, out int realTargetCount)) continue;
+            if (targetCount == 0) continue;
+            
+            ImGui.BulletText($"[{realTargetCount}]    [{GetUserText(user)}]");
+            
+            ImGui.Indent();
+            
+            if (showLeadingTargets) if (user.TargetManager.GetLeadingTarget() != null) ImGui.BulletText($"[Leading Target]: [{GetTargetText(user.TargetManager.GetLeadingTarget())}]");
+            if (showLeadingTargetOfLeadingTarget) if (user.TargetManager.GetLeadingTargetOfLeadingTarget() != null) ImGui.BulletText($"[Leading Target of Leading Target]: [{GetTargetText(user.TargetManager.GetLeadingTargetOfLeadingTarget())}]");    
+            if (showSoftTargets) if (user.TargetManager.GetSoftTarget() != null) ImGui.BulletText($"[Soft Target]: [{GetTargetText(user.TargetManager.GetSoftTarget())}]");
+            if (showTarget) if (user.TargetManager.GetTarget() != null)  ImGui.BulletText($"[Target]: [{GetTargetText(user.TargetManager.GetTarget())}]");    
+            if (showSoftTargetOfLeadingTarget) if (user.TargetManager.GetSoftTargetOfLeadingTarget() != null) ImGui.BulletText($"[Soft Target of Leading Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfLeadingTarget())}]");
+            if (showTargetOfLeadingTarget) if (user.TargetManager.GetTargetOfLeadingTarget() != null) ImGui.BulletText($"[Target of Leading Target]: [{GetTargetText(user.TargetManager.GetTargetOfLeadingTarget())}]");    
+            if (showTargetOfTarget) if (user.TargetManager.GetTargetOfTarget() != null) ImGui.BulletText($"[Target of Target]: [{GetTargetText(user.TargetManager.GetTargetOfTarget())}]");
+            if (showSoftTargetOfTarget) if (user.TargetManager.GetSoftTargetOfTarget() != null) ImGui.BulletText($"[Soft Target of Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfTarget())}]");
+            if (showTargetOfSoftTarget) if (user.TargetManager.GetTargetOfSoftTarget() != null) ImGui.BulletText($"[Target of Soft Target]: [{GetTargetText(user.TargetManager.GetTargetOfSoftTarget())}]");
+            if (showSoftTargetOfSoftTarget) if (user.TargetManager.GetSoftTargetOfSoftTarget() != null) ImGui.BulletText($"[Soft Target of Soft Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfSoftTarget())}]");
+            
+            ImGui.Unindent();
+            
+            ImGui.Spacing();
+        }
+    }
+    
+    unsafe void DrawCasts()
+    {
+        if (!CanDrawDebugMenu())
+        {
+            return;
+        }
+        
+        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
+        {
+            IPettableUser? user =  UserList.PettableUsers[i];
+            
+            if (user == null)
+            {
+                continue;
+            }
+            
+            if (user.CurrentCastId == 0)
+            {
+                continue;
+            }
+            
+            float curCastTime   = user.BattleChara->CastInfo.CurrentCastTime;
+            float totalCastTime = user.BattleChara->CastInfo.TotalCastTime;
+            
+            try
+            {
+                ImGui.BulletText($"[{GetUserText(user)}]      [{PetServices.PetSheets.GetAction(user.CurrentCastId)?.Name}] [{(int)((curCastTime / totalCastTime) * 100)}%]");
+            }
+            catch {}
+        }
+    }
+    
+    void DrawParty()
+    {
+        int index = 0;
+        
+        ImGui.Text("Total Party Size: " + PetServices.Party.Length);
+        
+        foreach (IPettableUser? user in PetServices.Party)
+        {
+            if (user == null)
+            {
+                ImGui.BulletText($"[{index}] [{GetUserText(user)}]");
+            }
+            else
+            {
+                ImGui.BulletText($"[{index}] [{GetUserText(user)}]");
+                
+                ImGui.Indent();
+                
+                int petIndex = 0;
+                
+                foreach (IPettablePet pet in user.PettablePets)
+                {
+                    ImGui.BulletText($"[{petIndex}] [{GetPetText(pet)}]");
+                    
+                    petIndex++;
+                }
+                
+                ImGui.Unindent();
+            }
+            
+            index++;
+        }
+    }
+    
     unsafe void DrawIPCTester()
     {
         Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
@@ -184,82 +432,74 @@ internal class PetDevWindow : PetWindow
         
         if (target != null)
         {
-            
-            IPlayerCharacter? player = target as IPlayerCharacter;
-            
-            bool hasTarget = player != null;
-
-            if (hasTarget)
+            if (target is IPlayerCharacter player)
             {
-                hasTarget = player!.ObjectIndex != 0;
-            }
-
-            if (hasTarget)
-            {
+                bool hasTarget = true;
+                
                 IPettableUser? user = UserList.GetUser(player!.Address);
                 if (user != null)
                 {
                     hasTarget = !user.DataBaseEntry.IsActive;
                 }
-            }
 
-            LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
+                LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
 
-            if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
-            {
-                Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
-
-                LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
-
-                BattleChara* bChara = (BattleChara*)player.Address;
-
-                if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
+                if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
                 {
-                    ClearIPC(bChara->ObjectIndex);
-                }
+                    Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
-                if (hasTarget)
-                {
-                    string startString = "[PetNicknames(2)]\n";
-                    startString += bChara->NameString + "\n";
-                    startString += bChara->HomeWorld + "\n";
-                    startString += bChara->ContentId + "\n";
-                    startString += "[-411,-417,-416,-415,-407]";
+                    LabledLabel.Draw("Target", player!.Name.TextValue, sizeIn);
 
+                    BattleChara* bChara = (BattleChara*)player.Address;
 
-                    BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
-                    if (bPet != null)
+                    if (LabledLabel.DrawButton("Clear Data", "Click here##clearIPCTarget", sizeIn))
                     {
-                        RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+                        ClearIPC(bChara->ObjectIndex);
+                    }
+
+                    if (hasTarget)
+                    {
+                        string startString = "[PetNicknames(2)]\n";
+                        startString += bChara->NameString + "\n";
+                        startString += bChara->HomeWorld + "\n";
+                        startString += bChara->ContentId + "\n";
+                        startString += "[-411,-417,-416,-415,-407]";
+
+
+                        BattleChara* bPet = CharacterManager.Instance()->LookupPetByOwnerObject(bChara);
+                        if (bPet != null)
+                        {
+                            RenameLabel.Draw($"Has Battle Pet [{bPet->NameString}]", true, ref targetBattlePetName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+                            if (clicked)
+                            {
+                                int id = -bPet->Character.ModelContainer.ModelCharaId;
+                                startString += $"\n{id}^{targetBattlePetName}";
+                            }
+                        }
+
+                        Character* minion = &bChara->CompanionObject->Character;
+                        if (minion != null)
+                        {
+                            RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
+
+                            if (clicked)
+                            {
+                                int id = minion->ModelContainer.ModelCharaId;
+                                startString += $"\n{id}^{targetMinionName}";
+                            }
+                        }
+
                         if (clicked)
                         {
-                            int id = -bPet->Character.ModelContainer.ModelCharaId;
-                            startString += $"\n{id}^{targetBattlePetName}";
+                            DalamudServices.PluginLog.Debug(startString);
+                            SendAll(startString);
                         }
+
+                        clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
                     }
 
-                    Character* minion = &bChara->CompanionObject->Character;
-                    if (minion != null)
-                    {
-                        RenameLabel.Draw($"Has Minion [{minion->NameString}]", true, ref targetMinionName, ref targetEdgeColour, ref targetTextColour, sizeIn, labelWidth: 300);
-
-                        if (clicked)
-                        {
-                            int id = minion->ModelContainer.ModelCharaId;
-                            startString += $"\n{id}^{targetMinionName}";
-                        }
-                    }
-
-                    if (clicked)
-                    {
-                        DalamudServices.PluginLog.Debug(startString);
-                        SendAll(startString);
-                    }
-
-                    clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
+                    Listbox.End();
                 }
-
-                Listbox.End();
             }
         }
     }
@@ -448,3 +688,6 @@ readonly struct DevStruct
         this.requestUpdate = requestUpdate;
     }
 }
+
+#pragma warning enable
+// ReSharper restore All

@@ -64,15 +64,15 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         PettableUserList            = new PettableUserList();
 
-        PetServices                 = new PetServices(DalamudServices, PettableUserList);
+        DirtyHandler                = new PettableDirtyHandler();
+        
+        PetServices                 = new PetServices(DalamudServices, PettableUserList, DirtyHandler);
 
         SharingDictionary           = new SharingDictionary(DalamudServices);
 
         Translator.Initialise(DalamudServices, PetServices.Configuration);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker(PetServices);
-
-        DirtyHandler                = new PettableDirtyHandler();
 
         PettableDatabase            = new PettableDatabase(PetServices, DirtyHandler);
         LegacyDatabase              = new LegacyPettableDatabase(PetServices, DirtyHandler);

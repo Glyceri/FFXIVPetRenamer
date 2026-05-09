@@ -99,16 +99,16 @@ internal class PettableDatabase : IPettableDatabase
         return null;
     }
 
-    public IPettableDatabaseEntry GetEntry(ulong contentID)
+    public IPettableDatabaseEntry GetEntry(ulong contentId)
     {
-        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentID);
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentId);
 
         if (entry != null)
         {
             return entry;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentId, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
 
         _entries.Add(newEntry);
 

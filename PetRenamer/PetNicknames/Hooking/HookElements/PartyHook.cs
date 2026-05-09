@@ -18,9 +18,7 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 internal unsafe class PartyHook : HookableElement
 {
     private bool hasRegisteredListener = false;
-
-    private readonly IPettableUser?[] Party = new IPettableUser?[8];
-
+    
     public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
         : base(services, userList, petServices, dirtyListener) { }
 
@@ -99,18 +97,11 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
 
-        SetupPartyList();
-
         int index = -1;
 
         foreach (PartyListMemberStruct member in partyNode->PartyMembers)
         {
             index++;
-
-            if (index < 0 || index > Party.Length)
-            {
-                continue;
-            }
 
             if (member.Name == null)
             {
@@ -134,7 +125,7 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
             
-            IPettableUser? user = Party[index];
+            IPettableUser? user = PetServices.Party[index];
 
             if (user == null)
             {
@@ -149,18 +140,6 @@ internal unsafe class PartyHook : HookableElement
             }
 
             PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
-        }
-    }
-    
-    private void SetupPartyList()
-    {
-        for (int i = 0; i < PartyListNumberArray.Instance()->PartyListCount; i++)
-        {
-            PartyListNumberArray.PartyListMemberNumberArray partyMember = PartyListNumberArray.Instance()->PartyMembers[i];
-            
-            // ContentId is actually a uint EntityId,
-            // I PR´d a fix to ClientStructs already.
-            Party[i] = UserList.GetUserFromEntityId((uint)partyMember.ContentId);
         }
     }
 }
