@@ -123,7 +123,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ObjectID != userId)
+            if (pUser.ObjectId != userId)
             {
                 continue;
             }
@@ -155,7 +155,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ShortObjectID != objectId)
+            if (pUser.ShortObjectId != objectId)
             {
                 continue;
             }
@@ -182,7 +182,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ContentID != contentID)
+            if (pUser.ContentId != contentID)
             {
                 continue;
             }
@@ -193,6 +193,28 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
+    public IPettableUser? GetUserFromEntityId(uint entityId)
+    {
+        for (int i = 0; i < PettableUserArraySize; i++)
+        {
+            IPettableUser? pUser = PettableUsers[i];
+
+            if (pUser == null)
+            {
+                continue;
+            }
+
+            if (pUser.EntityId != entityId)
+            {
+                continue;
+            }
+
+            return pUser;
+        }
+
+        return null;
+    }
+    
     public IPettableUser? GetUser(string username)
     {
         if (username == null || username == string.Empty)
@@ -236,7 +258,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ShortObjectID != ownerID)
+            if (pUser.ShortObjectId != ownerID)
             {
                 continue;
             }

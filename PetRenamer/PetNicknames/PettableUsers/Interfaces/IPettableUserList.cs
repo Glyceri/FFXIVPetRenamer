@@ -12,5 +12,6 @@ internal interface IPettableUserList
     IPettableUser? GetUserFromObjectId(uint objectId);
     IPettableUser? GetUserFromOwnerId(uint ownerId);
     IPettableUser? GetUserFromContentId(ulong contentId);
+    IPettableUser? GetUserFromEntityId(uint entityId);
     IPettableUser? GetUser(string username);
 }

@@ -15,9 +15,9 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal unsafe class PettableUser : IPettableUser
 {
     public string   Name        { get; } = string.Empty;
-    public ulong    ContentID   { get; }
+    public ulong    ContentId   { get; }
     public ushort   Homeworld   { get; }
-    public ulong    ObjectID    { get; }
+    public ulong    ObjectId    { get; }
 
     public List<IPettablePet> PettablePets { get; } = [];
 
@@ -26,8 +26,9 @@ internal unsafe class PettableUser : IPettableUser
 
     public IPettableDatabaseEntry DataBaseEntry { get; }
 
-    public uint ShortObjectID { get; }
-    public uint CurrentCastID { get; private set; }
+    public uint EntityId      { get; }
+    public uint ShortObjectId { get; }
+    public uint CurrentCastId { get; private set; }
     public bool IsLocalPlayer { get; }
 
     private uint _lastCast;
@@ -37,7 +38,7 @@ internal unsafe class PettableUser : IPettableUser
     private readonly IPettableDirtyCaller   DirtyCaller;
     private readonly ISharingDictionary     SharingDictionary;
 
-    public IPettableUserTargetManager? TargetManager { get; private set; }
+    public IPettableUserTargetManager? TargetManager { get; }
 
     public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, IPettableUserList userList, BattleChara* battleChara)
     {
@@ -55,34 +56,35 @@ internal unsafe class PettableUser : IPettableUser
 
         IsLocalPlayer   = BattleChara->ObjectIndex == 0;
         Name            = BattleChara->NameString;
-        ContentID       = BattleChara->ContentId;
+        ContentId       = BattleChara->ContentId;
         Homeworld       = BattleChara->HomeWorld;
 
-        ObjectID        = BattleChara->GetGameObjectId();
-        ShortObjectID   = BattleChara->GetGameObjectId().ObjectId;
-
+        ObjectId        = BattleChara->GetGameObjectId();
+        ShortObjectId   = BattleChara->GetGameObjectId().ObjectId;
+        EntityId        = BattleChara->EntityId;
+        
         TargetManager   = new PettableUserTargetManager(this, userList);
 
         IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(Name, Homeworld, false);
 
         if (legacyEntry != null)
         {
-            legacyEntry.UpdateContentID(ContentID, true);
+            legacyEntry.UpdateContentID(ContentId, true);
             legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
             _ = legacyEntry.MoveToDataBase(dataBase);
             legacyDatabase.SetDirty();
         }
 
-        DataBaseEntry = dataBase.GetEntry(ContentID);
+        DataBaseEntry = dataBase.GetEntry(ContentId);
         DataBaseEntry.UpdateEntry(this);
 
         if (IsLocalPlayer)
         {
-            DataBaseEntry.UpdateContentID(ContentID, true);
+            DataBaseEntry.UpdateContentID(ContentId, true);
         }
 
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+        PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
 #endif
     }
 
@@ -91,11 +93,11 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Update()
     {
-        CurrentCastID = BattleChara->CastInfo.ActionId;
+        CurrentCastId = BattleChara->CastInfo.ActionId;
 
-        if (_lastCast != CurrentCastID)
+        if (_lastCast != CurrentCastId)
         {
-            OnLastCastChanged(CurrentCastID);
+            OnLastCastChanged(CurrentCastId);
         }
     }
 
@@ -106,18 +108,18 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
-        CurrentCastID = cast;
+        CurrentCastId = cast;
 
-        if (_lastCast == CurrentCastID)
+        if (_lastCast == CurrentCastId)
         {
             return;
         }
 
         int? softIndex = PetServices.PetSheets.CastToSoftIndex(_lastCast);
 
-        _lastCast = CurrentCastID;
+        _lastCast = CurrentCastId;
 
-        if (CurrentCastID != 0)
+        if (CurrentCastId != 0)
         {
             return;
         }
@@ -170,7 +172,7 @@ internal unsafe class PettableUser : IPettableUser
     private void CreateNewPet(IPettablePet pet, int index = -1)
     {
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectID} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectID} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
 #endif
 
         if (index == -1)
@@ -278,13 +280,13 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
-        CurrentCastID = castID;
+        CurrentCastId = castID;
     }
 
     public void Dispose(IPettableDatabase database)
     {
 #if DEBUG
-        PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentID}");
+        PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
 #endif
 
         DirtyListener.UnregisterOnClearEntry(OnDirty);

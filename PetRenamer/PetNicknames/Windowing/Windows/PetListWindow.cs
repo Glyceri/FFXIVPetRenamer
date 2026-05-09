@@ -344,7 +344,7 @@ internal class PetListWindow : PetWindow
 
                     if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
                     {
-                        if (user.Entry.ContentID == UserList.LocalPlayer?.ContentID)
+                        if (user.Entry.ContentID == UserList.LocalPlayer?.ContentId)
                         {
                             if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
                             {
@@ -518,7 +518,7 @@ internal class PetListWindow : PetWindow
     {
         if (UserList.LocalPlayer != null && entry != null)
         {
-            return UserList.LocalPlayer.ContentID == entry.ContentID;
+            return UserList.LocalPlayer.ContentId == entry.ContentID;
         }
         else
         {

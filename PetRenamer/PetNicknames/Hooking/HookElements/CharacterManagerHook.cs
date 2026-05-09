@@ -209,7 +209,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                     continue;
                 }
 
-                if (user.ShortObjectID != owner)
+                if (user.ShortObjectId != owner)
                 {
                     continue;
                 }
@@ -334,7 +334,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void AddTempPetsToUser(IPettableUser user)
     {
-        uint userID = user.ShortObjectID;
+        uint userID = user.ShortObjectId;
 
         for (int i = temporaryPets.Count - 1; i >= 0; i--)
         {

@@ -4,12 +4,11 @@ using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using FFXIVClientStructs.FFXIV.Client.Game.Group;
-using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using Lumina.Text.ReadOnly;
 using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -20,7 +19,7 @@ internal unsafe class PartyHook : HookableElement
 {
     private bool hasRegisteredListener = false;
 
-    private ulong[] partyGroup = new ulong[8]; // a party is always 8 in size
+    private readonly IPettableUser?[] Party = new IPettableUser?[8];
 
     public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
         : base(services, userList, petServices, dirtyListener) { }
@@ -108,7 +107,7 @@ internal unsafe class PartyHook : HookableElement
         {
             index++;
 
-            if (index < 0 || index > partyGroup.Length)
+            if (index < 0 || index > Party.Length)
             {
                 continue;
             }
@@ -134,29 +133,15 @@ internal unsafe class PartyHook : HookableElement
             {
                 continue;
             }
-
-            ulong contentId = partyGroup[index];
-
-            if (contentId == 0) // this means there is no party active
-            {
-                IPettableUser? localUser = UserList.LocalPlayer;
-                
-                if (localUser == null)
-                {
-                    return;
-                }
-
-                contentId = localUser.ContentID;
-            }
-
-            IPettableUser? user = UserList.GetUserFromContentId(contentId);
+            
+            IPettableUser? user = Party[index];
 
             if (user == null)
             {
                 continue;
             }
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastID, in user);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId, in user);
 
             if (data == null)
             {
@@ -166,111 +151,16 @@ internal unsafe class PartyHook : HookableElement
             PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
         }
     }
-
+    
     private void SetupPartyList()
     {
-        GroupManager* gManager = (GroupManager*)DalamudServices.PartyList.GroupManagerAddress;
-
-        if (gManager == null) 
-        { 
-            return; 
-        }
-
-        bool isCrossParty = IsCrossParty();
-
-        partyGroup = new ulong[8];
-
-        // We can assume partyGroup is 8 in length, and so is the struct with party members, Thanks SE!
-        for (int i = 0; i < partyGroup.Length; i++)
+        for (int i = 0; i < PartyListNumberArray.Instance()->PartyListCount; i++)
         {
-            PartyMember member = gManager->MainGroup.PartyMembers[i];
-
-            ulong contentId = member.ContentId;
-
-            int? index;
-
-            if (isCrossParty)
-            {
-                index = GetCrossPartyIndex(contentId);
-            }
-            else
-            {
-                index = GetNormalPartyIndex(contentId);
-            }
-
-            if (index == null)
-            {
-                continue;
-            }
-
-            if (index < 0 || index >= partyGroup.Length)
-            {
-                continue;
-            }
-
-            partyGroup[index.Value] = contentId;
+            PartyListNumberArray.PartyListMemberNumberArray partyMember = PartyListNumberArray.Instance()->PartyMembers[i];
+            
+            // ContentId is actually a uint EntityId,
+            // I PR´d a fix to ClientStructs already.
+            Party[i] = UserList.GetUserFromEntityId((uint)partyMember.ContentId);
         }
-    }
-
-    private bool IsCrossParty()
-    {
-        bool isCrossRealm     = InfoProxyCrossRealm.Instance()->IsCrossRealm;
-        bool noMembersInGroup = GroupManager.Instance()->MainGroup.MemberCount < 1;
-
-        return (isCrossRealm && noMembersInGroup);
-    }
-
-    private int? GetCrossPartyIndex(ulong contentId)
-    {
-        if (InfoProxyCrossRealm.Instance() == null)
-        {
-            return null;
-        }
-
-        CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId(contentId);
-
-        if (member == null)
-        {
-            return null;
-        }
-
-        return member->MemberIndex;
-    }
-
-    private int? GetNormalPartyIndex(ulong contentId)
-    {
-        int   memberCount    = GroupManager.Instance()->MainGroup.MemberCount;
-        bool  foundSelf      = false;
-        ulong localContentId = UserList.LocalPlayer?.ContentID ?? 0;
-
-        for (int i = 0; i < memberCount; i++)
-        {
-            int actualCurrent = i;
-
-            if (!foundSelf)
-            {
-                actualCurrent++;
-            }
-
-            PartyMember* member = GroupManager.Instance()->MainGroup.GetPartyMemberByIndex(i);
-
-            if (member == null)
-            {
-                continue;
-            }
-
-            if (member->ContentId == localContentId)
-            {
-                foundSelf     = true;
-                actualCurrent = 0;
-            }
-
-            if (contentId == member->ContentId)
-            {
-                return actualCurrent;
-            }
-        }
-
-        return null;
     }
 }

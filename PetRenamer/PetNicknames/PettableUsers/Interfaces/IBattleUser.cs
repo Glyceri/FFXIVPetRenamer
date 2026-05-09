@@ -5,10 +5,11 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 internal unsafe interface IBattleUser : IPettableEntity
 {
     string       Name          { get; }
-    ulong        ContentID     { get; }
+    ulong        ContentId     { get; }
     ushort       Homeworld     { get; }
-    ulong        ObjectID      { get; }
-    uint         ShortObjectID { get; }
-    uint         CurrentCastID { get; }
+    ulong        ObjectId      { get; }
+    uint         EntityId      { get; }
+    uint         ShortObjectId { get; }
+    uint         CurrentCastId { get; }
     BattleChara* BattleChara   { get; }
 }

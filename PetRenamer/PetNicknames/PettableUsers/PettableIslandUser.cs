@@ -11,17 +11,20 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableIslandUser : IIslandUser
 {
+    public string       Name      { get; }
+    public ulong        ContentId { get; }
+    public ushort       Homeworld { get; }
+    public uint         EntityId  { get; }
+    
+    public BattleChara* BattleChara   { get; } = null;
+    public ulong        ObjectId      { get; } = 0;
+    public uint         ShortObjectId { get; } = 0;
+    public uint         CurrentCastId { get; } = 0;
+    public nint         Address       { get; } = 0;
+    
     public IPettableDatabaseEntry DataBaseEntry { get; }
-    public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
-    public string Name { get; }
-    public ulong ContentID { get; }
-    public ushort Homeworld { get; }
-    public ulong ObjectID { get; } = 0;
-    public uint ShortObjectID { get; } = 0;
-    public uint CurrentCastID { get; } = 0;
-    public nint Address { get; } = 0;
-    public unsafe BattleChara* BattleChara { get; } = null;
-
+    public List<IPettablePet>     PettablePets  { get; } = [];
+    
     private readonly IPetServices PetServices;
 
     public PettableIslandUser(IPetServices petServices, IPettableDatabaseEntry entry)
@@ -30,17 +33,15 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         DataBaseEntry   = entry;
         Name            = entry.Name;
-        ContentID       = entry.ContentID;
+        ContentId       = entry.ContentID;
         Homeworld       = entry.Homeworld;
+        EntityId        = (uint)PluginConstants.InvalidId;
     }
 
     public bool IsActive
         => true;
 
     public bool IsLocalPlayer
-        => false;
-
-    public bool IsDirty
         => false;
 
     public IPettableUserTargetManager? TargetManager
@@ -60,12 +61,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
-            IPettablePet? pet = PettablePets[i];
-
-            if (pet == null)
-            {
-                continue;
-            }
+            IPettablePet pet = PettablePets[i];
 
             if (pet.ObjectID != pointer->GetGameObjectId())
             {
@@ -113,10 +109,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         return null;
     }
-
-    public IPettableEntity? GetTarget(IPettableUserList userList)
-        => null;
-
+    
     public string? GetCustomName(IPetSheetData sheetData) 
         => DataBaseEntry.GetName(sheetData.Model);
 
@@ -124,7 +117,6 @@ internal unsafe class PettableIslandUser : IIslandUser
         => null;
 
     public void OnLastCastChanged(uint cast) { } // Unused
-    public void RefreshCast() { } // Unused
     public void Dispose(IPettableDatabase d) { } // Unused
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
