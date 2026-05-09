@@ -39,8 +39,6 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         Index               = pet->GameObject.ObjectIndex;
         Name                = pet->GameObject.NameString;
         ObjectId            = pet->GetGameObjectId();
-        PetData             = petServices.PetSheets.GetPet(SkeletonId);
-
         
         uint skeletonId     = (uint)pet->ModelContainer.ModelCharaId;
         
@@ -50,8 +48,10 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         }
         else
         {
-            SkeletonId      = new PetSkeleton((uint)pet->ModelContainer.ModelCharaId, skeletonType);
+            SkeletonId      = new PetSkeleton(skeletonId, skeletonType);
         }
+        
+        PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
 #if DEBUG
         PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");

@@ -223,7 +223,7 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
-    public IPettablePet? GetYoungestPet(SkeletonType skeletonType)
+    public IPettablePet? GetYoungestPet(SkeletonType skeletonType = SkeletonType.None)
     {
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
@@ -233,6 +233,13 @@ internal unsafe class PettableUser : IPettableUser
             {
                 return pPet;
             }
+            
+            if (pPet.SkeletonId.SkeletonType != skeletonType)
+            {
+                continue;
+            }
+            
+            return pPet;
 
             if (skeletonType != SkeletonType.Minion && pPet is PettableCompanion)
             {

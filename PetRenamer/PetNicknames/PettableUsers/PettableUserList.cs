@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
@@ -9,7 +10,7 @@ internal class PettableUserList : IPettableUserList
     public const int IslandIndex           = 100;
 
     public IPettableUser?[] PettableUsers 
-        { get; set; } = new IPettableUser[PettableUserArraySize];
+        { get; } = new IPettableUser[PettableUserArraySize];
 
     public IPettableUser? LocalPlayer
         => PettableUsers[0];
@@ -24,13 +25,7 @@ internal class PettableUserList : IPettableUserList
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? user = PettableUsers[i];
-
-            if (user == null)
-            {
-                continue;
-            }
-
-            IPettablePet? pPet = user.GetPet(pet);
+            IPettablePet?  pPet = user?.GetPet(pet);
 
             if (pPet == null)
             {
@@ -53,13 +48,7 @@ internal class PettableUserList : IPettableUserList
         for (int i = 0; i < PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
-
-            if (pUser == null)
-            {
-                continue;
-            }
-
-            IPettablePet? pPet = pUser.GetPet(petId);
+            IPettablePet?  pPet  = pUser?.GetPet(petId);
 
             if (pPet == null)
             {
@@ -166,9 +155,9 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromContentId(ulong contentID)
+    public IPettableUser? GetUserFromContentId(ulong contentId)
     {
-        if (contentID == 0)
+        if (contentId == 0)
         {
             return null;
         }
@@ -182,7 +171,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ContentId != contentID)
+            if (pUser.ContentId != contentId)
             {
                 continue;
             }
@@ -217,7 +206,7 @@ internal class PettableUserList : IPettableUserList
     
     public IPettableUser? GetUser(string username)
     {
-        if (username == null || username == string.Empty)
+        if (username.IsNullOrWhitespace())
         {
             return null;
         }
@@ -242,9 +231,9 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUserFromOwnerId(uint ownerID)
+    public IPettableUser? GetUserFromOwnerId(uint ownerId)
     {
-        if (ownerID == 0)
+        if (ownerId == 0)
         {
             return null;
         }
@@ -258,7 +247,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ShortObjectId != ownerID)
+            if (pUser.ShortObjectId != ownerId)
             {
                 continue;
             }
