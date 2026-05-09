@@ -48,15 +48,15 @@ internal class ImageDownloader : IImageDownloader
     void OnSuccess(IPettableDatabaseEntry entry, LodestoneSearchData searchData, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure)
     {
         CancellationTokenSource tokenSource = new CancellationTokenSource();
-        cancellationTokes.Add(entry.ContentID, tokenSource);
+        cancellationTokes.Add(entry.ContentId, tokenSource);
         CancellationToken token = tokenSource.Token;
         Task.Run(async () => await Download(entry, searchData, (entry, wrap) =>
         {
-            cancellationTokes.Remove(entry.ContentID);
+            cancellationTokes.Remove(entry.ContentId);
             success?.Invoke(entry, wrap);
         }, (e) =>
         {
-            cancellationTokes.Remove(entry.ContentID);
+            cancellationTokes.Remove(entry.ContentId);
             failure?.Invoke(e);
         }, token), token);
     }
@@ -198,7 +198,7 @@ internal class ImageDownloader : IImageDownloader
         if (Networker.IsBeingDownloaded(entry)) return true;
         foreach (ulong id in cancellationTokes.Keys)
         {
-            if (id != entry.ContentID) continue;
+            if (id != entry.ContentId) continue;
             return true;
         }
         return false;

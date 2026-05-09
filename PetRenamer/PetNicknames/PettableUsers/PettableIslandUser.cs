@@ -34,7 +34,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         DataBaseEntry   = entry;
         Name            = entry.Name;
-        ContentId       = entry.ContentID;
+        ContentId       = entry.ContentId;
         Homeworld       = entry.Homeworld;
         EntityId        = (uint)PluginConstants.InvalidId;
     }
@@ -122,7 +122,8 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused
-    
+    public void Recalculate() { } // unused
+
     public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;

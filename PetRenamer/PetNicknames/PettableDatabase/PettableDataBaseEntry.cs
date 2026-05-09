@@ -14,9 +14,9 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
-    public bool IsActive        { get; private set; }
+    public bool   IsActive      { get; private set; }
 
-    public ulong ContentID      { get; private set; }
+    public ulong  ContentId     { get; private set; }
     public string Name          { get; private set; } = string.Empty;
     public ushort Homeworld     { get; private set; }
     public string HomeworldName { get; private set; } = string.Empty;
@@ -37,7 +37,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         DirtyCaller    = dirtyCaller;
         ActiveDatabase = new PettableNameDatabase([], [], [], [], DirtyCaller);
 
-        ContentID      = contentId;
+        ContentId      = contentId;
         IsActive       = active;
         IsIPC          = !IsActive;
         IsLegacy       = isLegacy;
@@ -71,7 +71,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public bool MoveToDataBase(IPettableDatabase database)
     {
-        IPettableDatabaseEntry entry = database.GetEntry(ContentID);
+        IPettableDatabaseEntry entry = database.GetEntry(ContentId);
 
         if (entry is not PettableDataBaseEntry pEntry)
         {
@@ -82,7 +82,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
-        pEntry.UpdateContentID(ContentID, !IsIPC);
+        pEntry.UpdateContentID(ContentId, !IsIPC);
         pEntry.MarkDirty();
 
         return true;
@@ -111,7 +111,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public void UpdateContentID(ulong contentId, bool removeIPCStatus = false)
     {
-        ContentID = contentId;
+        ContentId = contentId;
         IsActive  = true;
 
         if (removeIPCStatus)

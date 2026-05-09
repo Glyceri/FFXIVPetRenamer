@@ -14,4 +14,6 @@ internal interface IPettableUserList
     IPettableUser? GetUserFromContentId(ulong contentId);
     IPettableUser? GetUserFromEntityId(uint entityId);
     IPettableUser? GetUser(string username);
+    
+    void Recalculate();
 }

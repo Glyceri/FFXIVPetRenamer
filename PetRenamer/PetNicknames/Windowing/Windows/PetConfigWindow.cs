@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -25,13 +26,15 @@ internal class PetConfigWindow : PetWindow
         { "Penumbra", false },
     };
 
-    private readonly IPluginWatcher PluginWatcher;
-
-    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher) 
+    private readonly IPluginWatcher    PluginWatcher;
+    private readonly IPettableUserList UserList;
+    
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher, IPettableUserList userList) 
         : base(windowHandler, dalamudServices, configuration, "Pet Config Window")
     {
         PluginWatcher = pluginWatcher;
-
+        UserList      = userList;
+        
         PluginWatcher.RegisterListener(OnPluginChanged);
     }
 
@@ -151,7 +154,7 @@ internal class PetConfigWindow : PetWindow
                 {
                     configurationInt = i;
 
-                    Configuration.Save();
+                    SavePlugin();
                 }
             }
 
@@ -182,7 +185,7 @@ internal class PetConfigWindow : PetWindow
                 {
                     enumValue = (Configuration.ColourMode)i;
 
-                    Configuration.Save();
+                    SavePlugin();
                 }
             }
 
@@ -214,7 +217,7 @@ internal class PetConfigWindow : PetWindow
             return;
         }
 
-        Configuration.Save();
+        SavePlugin();
     }
     
     private void DrawColourConfig(string title, ref Configuration.ColourConfig colourConfig)
@@ -258,6 +261,12 @@ internal class PetConfigWindow : PetWindow
 
             ThirdPartySupported[plugin] = true;
         }
+    }
+    
+    private void SavePlugin()
+    {
+        UserList.Recalculate();
+        Configuration.Save();
     }
 
     protected override void OnDispose()

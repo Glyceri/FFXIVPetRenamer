@@ -257,4 +257,12 @@ internal class PettableUserList : IPettableUserList
 
         return null;
     }
+    
+    public void Recalculate()
+    {
+        foreach (IPettableUser? user in PettableUsers)
+        {
+            user?.Recalculate();
+        }
+    }
 }

@@ -14,14 +14,14 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableUser : IPettableUser
 {
-    public string   Name        { get; } = string.Empty;
+    public string   Name        { get; }
     public ulong    ContentId   { get; }
     public ushort   Homeworld   { get; }
     public ulong    ObjectId    { get; }
 
     public List<IPettablePet> PettablePets { get; } = [];
 
-    public nint         Address     { get; private set; }
+    public nint         Address     { get; }
     public BattleChara* BattleChara { get; }
 
     public IPettableDatabaseEntry DataBaseEntry { get; }
@@ -83,9 +83,10 @@ internal unsafe class PettableUser : IPettableUser
             DataBaseEntry.UpdateContentID(ContentId, true);
         }
 
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
-#endif
+        if (petServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+        }
     }
 
     public bool IsActive
@@ -95,10 +96,12 @@ internal unsafe class PettableUser : IPettableUser
     {
         CurrentCastId = BattleChara->CastInfo.ActionId;
 
-        if (_lastCast != CurrentCastId)
+        if (_lastCast == CurrentCastId)
         {
-            OnLastCastChanged(CurrentCastId);
+            return;
         }
+        
+        OnLastCastChanged(CurrentCastId);
     }
 
     public void OnLastCastChanged(uint cast)
@@ -161,7 +164,7 @@ internal unsafe class PettableUser : IPettableUser
         Recalculate();
     }
 
-    private void Recalculate()
+    public void Recalculate()
     {
         foreach (IPettablePet pet in PettablePets)
         {
@@ -171,9 +174,10 @@ internal unsafe class PettableUser : IPettableUser
 
     private void CreateNewPet(IPettablePet pet, int index = -1)
     {
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+        }
 
         if (index == -1)
         {
@@ -240,28 +244,6 @@ internal unsafe class PettableUser : IPettableUser
             }
             
             return pPet;
-
-            if (skeletonType != SkeletonType.Minion && pPet is PettableCompanion)
-            {
-                continue;
-            }
-
-            if (skeletonType != SkeletonType.BattlePet && skeletonType != SkeletonType.Chocobo && pPet is PettableBattlePet)
-            {
-                continue;
-            }
-
-            if (skeletonType == SkeletonType.BattlePet && !PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonId))
-            {
-                continue;
-            }
-
-            if (skeletonType == SkeletonType.Chocobo && PetServices.PetSheets.IsValidBattlePet(pPet.SkeletonId))
-            {
-                continue;
-            }
-
-            return pPet;
         }
 
         return null;
@@ -272,9 +254,10 @@ internal unsafe class PettableUser : IPettableUser
     
     public void Dispose(IPettableDatabase database)
     {
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+        }
 
         DirtyListener.UnregisterOnClearEntry(OnDirty);
         DirtyListener.UnregisterOnDirtyEntry(OnDirty);

@@ -31,31 +31,18 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         PetServices         = petServices;
         Entry               = entry;
         SharingDictionary   = sharingDictionary;
-
         Address             = (nint)pet;
-
         Owner               = owner;
-
         Index               = pet->GameObject.ObjectIndex;
         Name                = pet->GameObject.NameString;
         ObjectId            = pet->GetGameObjectId();
-        
-        uint skeletonId     = (uint)pet->ModelContainer.ModelCharaId;
-        
-        if (skeletonType == SkeletonType.BattlePet && skeletonId == 1)
-        {
-            SkeletonId      = new PetSkeleton(skeletonId, SkeletonType.Chocobo);
-        }
-        else
-        {
-            SkeletonId      = new PetSkeleton(skeletonId, skeletonType);
-        }
-        
+        SkeletonId          = new PetSkeleton(pet->ModelContainer.ModelCharaId, skeletonType);
         PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");
+        }
 
         Recalculate();
     }
@@ -67,14 +54,26 @@ internal abstract unsafe class BasePettablePet : IPettablePet
     {
         CustomName = Entry.GetName(SkeletonId);
 
-        SharingDictionary.Set(ObjectId, CustomName);
+        Configuration.ColourMode colourMode = PetServices.Configuration.SelectedColourMode;
+        
+        Vector3? edgeColour = null;
+        Vector3? textColour = null;
+        
+        if ((colourMode == Configuration.ColourMode.All) || (colourMode == Configuration.ColourMode.Personal && (Owner?.IsLocalPlayer ?? false)))
+        {
+            edgeColour = Entry.GetEdgeColour(SkeletonId);
+            textColour = Entry.GetTextColour(SkeletonId);
+        }
+        
+        SharingDictionary.Set(ObjectId, CustomName, Address, edgeColour, textColour);
     }
 
     public void Dispose()
     {
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectId}");
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectId}");
+        }
 
         SharingDictionary.Set(ObjectId, null);
     }

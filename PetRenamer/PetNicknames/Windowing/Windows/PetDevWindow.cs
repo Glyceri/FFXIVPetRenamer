@@ -12,6 +12,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
 using PetRenamer.PetNicknames.Hooking;
+using PetRenamer.PetNicknames.IPC;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -32,6 +34,7 @@ internal class PetDevWindow : PetWindow
     readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
     readonly IPetServices      PetServices;
+    readonly ISharingDictionary SharingDictionary;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -41,12 +44,13 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database) 
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database, ISharingDictionary sharingDictionary) 
         : base(windowHandler, dalamudServices, configuration, "Pet Dev Window")
     {
         UserList    = userList;
         Database    = database;
         PetServices = petServices;
+        SharingDictionary = sharingDictionary;
         
         if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
         {
@@ -57,6 +61,7 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Party",      DrawParty));
         devStructList.Add(new DevStruct("Cast",       DrawCasts));
         devStructList.Add(new DevStruct("Targeting",  DrawTargeting));
+        devStructList.Add(new DevStruct("Sharing Dict",  DrawSharing));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
         devStructList.Add(new DevStruct("Database",   DrawDatabase));
     }
@@ -129,7 +134,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.IsIPC ? "O" : "X");
 
         ImGui.TableSetColumnIndex(4);
-        ImGui.TextUnformatted(UserList.GetUserFromContentId(user.ContentID) != null ? "O" : "X");
+        ImGui.TextUnformatted(UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X");
 
         ImGui.EndTable();
     }
@@ -158,6 +163,36 @@ internal class PetDevWindow : PetWindow
         targetBattlePetName = baseName.ToString();
         targetEdgeColour = null;
         targetTextColour = null;
+    }
+    
+    void DrawSharing()
+    {
+        GameObjectId[]  shareObjectIds   = SharingDictionary.GetGameObjectIds();
+        nint[]          shareAddresses   = SharingDictionary.GetAddresses();
+        string[]        shareCustomNames = SharingDictionary.GetCustomNames();
+        Vector3?[]      shareEdgeColours = SharingDictionary.GetEdgeColours();
+        Vector3?[]      shareTextColours = SharingDictionary.GetTextColours();
+        
+        ImGui.Text("Sharing:");
+        
+        for (int i = 0; i < shareAddresses.Length; i++)
+        {
+            ImGui.Text($"[{i}] [(ID){shareObjectIds[i].Id}, (ADDRESS){shareAddresses[i]}, (CUSTOM NAME){shareCustomNames[i]}, (EDGE COLOUR){(shareEdgeColours[i]?.ToString() ?? "<null>")}, (TEXT COLOUR){(shareTextColours[i]?.ToString() ?? "<null>")}]");
+        }
+        
+        
+        ImGui.Separator();
+        
+        ImGui.Text("LEGACY");
+        ImGui.Spacing();
+        
+        ulong[]  skeletons   = SharingDictionary.GetLegacySkeletons();
+        string[] customNames = SharingDictionary.GetLegacyCustomNames();
+        
+        for (int i = 0; i < skeletons.Length; i++)
+        {
+            ImGui.BulletText($"{skeletons[i]} {customNames[i]}");
+        }
     }
     
     private string GetPetText(IPettablePet? pet)

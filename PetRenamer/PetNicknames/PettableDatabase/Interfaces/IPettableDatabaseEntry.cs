@@ -10,7 +10,7 @@ namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDatabaseEntry
 {
-    ulong ContentID { get; }
+    ulong ContentId { get; }
     string Name { get; }
     ushort Homeworld { get; }
     string HomeworldName { get; }
@@ -24,7 +24,7 @@ internal interface IPettableDatabaseEntry
     INamesDatabase ActiveDatabase { get; }
     INamesDatabase[] AllDatabases { get; }
 
-    void UpdateContentID(ulong contentID, bool removeIPCStatus = false);
+    void UpdateContentID(ulong contentId, bool removeIPCStatus = false);
     void UpdateEntry(IPettableUser pettableUser);
     /// <summary>
     /// Moves this entry into the new database.
@@ -32,12 +32,12 @@ internal interface IPettableDatabaseEntry
     /// <param name="database">The database to move this entry into.</param>
     /// <returns>If the move succeeded.</returns>
     bool MoveToDataBase(IPettableDatabase database);
-    string? GetName(PetSkeleton skeletonID);
-    Vector3? GetEdgeColour(PetSkeleton skeletonID);
-    Vector3? GetTextColour(PetSkeleton skeletonID);
+    string? GetName(PetSkeleton skeletonId);
+    Vector3? GetEdgeColour(PetSkeleton skeletonId);
+    Vector3? GetTextColour(PetSkeleton skeletonId);
     PetSkeleton? GetSoftSkeleton(int softIndex);
     void SetSoftSkeleton(int index, PetSkeleton softSkeleton);
-    void SetName(PetSkeleton skeletonID, string name, Vector3? edgeColour, Vector3? textColour);
+    void SetName(PetSkeleton skeletonId, string name, Vector3? edgeColour, Vector3? textColour);
 
     void Clear(ParseSource parseSource);
     void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);

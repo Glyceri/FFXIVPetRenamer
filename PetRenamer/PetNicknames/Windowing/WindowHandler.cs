@@ -15,6 +15,7 @@ using System.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.Hooking;
+using PetRenamer.PetNicknames.IPC.Interfaces;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing;
@@ -36,22 +37,23 @@ internal class WindowHandler : IWindowHandler
     private readonly IDataParser            DataParser;
     private readonly IDataWriter            DataWriter;
     private readonly WindowSystem           WindowSystem;
+    private readonly ISharingDictionary     SharingDictionary;
 
     private bool isDirty = false;
 
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IPettableDirtyListener dirtyListener, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary)
     {
-        DalamudServices = dalamudServices;
-        Configuration   = petServices.Configuration;
-        PetServices     = petServices;
-        UserList        = userList;
-        Database        = pettableDatabase;
-        LegacyDatabase  = legacyDatabase;
-        ImageDatabase   = imageDatabase;
-        DirtyListener   = dirtyListener;
-
-        DataParser      = dataParser;
-        DataWriter      = dataWriter;
+        DalamudServices     = dalamudServices;
+        Configuration       = petServices.Configuration;
+        PetServices         = petServices;
+        UserList            = userList;
+        Database            = pettableDatabase;
+        LegacyDatabase      = legacyDatabase;
+        ImageDatabase       = imageDatabase;
+        DirtyListener       = dirtyListener;
+        DataParser          = dataParser;
+        DataWriter          = dataWriter;
+        SharingDictionary   = sharingDictionary;
 
         DirtyListener.RegisterOnClearEntry(HandleDirty);
         DirtyListener.RegisterOnDirtyEntry(HandleDirty);
@@ -95,10 +97,10 @@ internal class WindowHandler : IWindowHandler
     private void Register()
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices, UserList, DirtyListener));
-        AddWindow(new PetConfigWindow(this, DalamudServices, Configuration, PetServices.PluginWatcher));
+        AddWindow(new PetConfigWindow(this, DalamudServices, Configuration, PetServices.PluginWatcher, UserList));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, UserList, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, Configuration));
-        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Configuration, UserList, Database));
+        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Configuration, UserList, Database, SharingDictionary));
     }
 
     private void AddWindow(PetWindow window)

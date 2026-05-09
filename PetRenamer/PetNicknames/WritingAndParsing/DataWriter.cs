@@ -42,7 +42,7 @@ internal class DataWriter : IDataWriter
 
         string userName      = entry.Name;
         string homeworldID   = entry.Homeworld.ToString();
-        string contentID     = entry.ContentID.ToString();
+        string contentID     = entry.ContentId.ToString();
         string SoftSkeletons = $"[{GetStringFromPetSkeleton(entry.SoftSkeletons[0])},{GetStringFromPetSkeleton(entry.SoftSkeletons[1])},{GetStringFromPetSkeleton(entry.SoftSkeletons[2])},{GetStringFromPetSkeleton(entry.SoftSkeletons[3])},{GetStringFromPetSkeleton(entry.SoftSkeletons[4])}]";
 
         INamesDatabase database = entry.ActiveDatabase;

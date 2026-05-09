@@ -180,9 +180,10 @@ internal class PenumbraIPC : IPenumbraIPC
 
         PetServices.PetLog.LogInfo("Pet Nicknames has successfully added data to the PCP JsonObject.");
 
-#if DEBUG
-        PetServices.PetLog.LogVerbose(jsonObject.ToString());
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose(jsonObject.ToString());
+        }
     }
 
     public void Dispose()

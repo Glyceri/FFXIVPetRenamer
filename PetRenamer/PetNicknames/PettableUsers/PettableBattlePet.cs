@@ -10,8 +10,11 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 internal unsafe class PettableBattlePet : BasePettablePet, IPettableBattlePet
 {
     public PettableBattlePet(BattleChara* battlePet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices)
-        : base(&battlePet->Character, owner, sharingDictionary, entry, petServices, SkeletonType.BattlePet) { }
-
+        : base(&battlePet->Character, owner, sharingDictionary, entry, petServices, GetSkeletonType(battlePet->ModelContainer.ModelCharaId)) { }
+    
     public BattleChara* BattlePet
         => (BattleChara*)Address;
+    
+    private static SkeletonType GetSkeletonType(int skeletonId)
+        => skeletonId == 1 ? SkeletonType.Chocobo : SkeletonType.BattlePet;
 }

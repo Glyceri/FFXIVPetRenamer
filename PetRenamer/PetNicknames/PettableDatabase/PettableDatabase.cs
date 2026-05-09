@@ -88,7 +88,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry entry = _entries[i];
 
-            if (entry.ContentID != contentID)
+            if (entry.ContentId != contentID)
             {
                 continue;
             }
@@ -121,7 +121,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry currentEntry = _entries[i];
 
-            if (currentEntry.ContentID != entry.ContentID)
+            if (currentEntry.ContentId != entry.ContentId)
             {
                 continue;
             }
