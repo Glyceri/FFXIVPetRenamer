@@ -49,6 +49,11 @@ internal class ChatHandler : IDisposable
     {
         foreach(IChatElement chatElement in _chatElements)
         {
+            if (chatElement is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            
             DalamudServices.ChatGui.ChatMessage -= chatElement.OnChatMessage;
         }
     }

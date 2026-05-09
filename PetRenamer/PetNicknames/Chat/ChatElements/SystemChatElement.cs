@@ -1,72 +1,37 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.Chat.Interfaces;
+using Dalamud.Utility;
+using PetRenamer.PetNicknames.Chat.Base;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using System;
 
 namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
-internal class SystemChatElement : IChatElement
+internal class SystemChatElement : LogChatElement
 {
-    private readonly DalamudServices   DalamudServices;
     private readonly IPetServices      PetServices;
     private readonly IPronounHook      PronounHook;
     private readonly IPettableUserList UserList;
-    
-    private uint expectedLogCount = 0;
-    
-    private static readonly uint[] ProperLogMessages = 
-    [
-        640,    // <head(<denoun(BNpcName,5,lnum1,1,1,1)>)> wurde fortgeschickt.
-        642,    // Du hast <denoun(BNpcName,5,lnum1,1,3,1)> den Befehl „<sheet(PetAction,lnum2,0)>“ gegeben.
-        3840,   // <string(lstr1)> wird nächstes Mal als <string(lstr2)> erscheinen.
-        3841,   // <string(lstr1)> wird nächstes Mal unverwandelt erscheinen.
-    ];
-    
+
     public SystemChatElement(DalamudServices dalamudServices, IPetServices petServices, IPronounHook pronounHook, IPettableUserList userList)
+        : base(dalamudServices)
     {
-        DalamudServices = dalamudServices;
         PetServices     = petServices;
         PronounHook     = pronounHook;
         UserList        = userList;
         
-        DalamudServices.ChatGui.LogMessage += OnLogMessage;
+        Register(new LogChatMessage(640,  XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer)); // <head(<denoun(BNpcName,5,lnum1,1,1,1)>)> wurde fortgeschickt.
+        Register(new LogChatMessage(642,  XivChatType.SystemError,   XivChatRelationKind.LocalPlayer)); // Du hast <denoun(BNpcName,5,lnum1,1,3,1)> den Befehl „<sheet(PetAction,lnum2,0)>“ gegeben.
+        Register(new LogChatMessage(3840, XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer)); // <string(lstr1)> wird nächstes Mal als <string(lstr2)> erscheinen.
+        Register(new LogChatMessage(3841, XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer)); // <string(lstr1)> wird nächstes Mal unverwandelt erscheinen.
     }
     
-    public void Dispose()
+    protected override void OnValidChatMessage(IHandleableChatMessage chatMessage)
     {
-        DalamudServices.ChatGui.LogMessage -= OnLogMessage;
-    }
-    
-    // Een queue van messages?
-    // Dit werkt opzich maar is natuurlijk niet erg robuust. 
-    private void OnLogMessage(ILogMessage message)
-    {
-        if (!ProperLogMessages.Contains(message.LogMessageId))
-        {
-            return;
-        }
-        
-        expectedLogCount++;
-    }
-
-    public void OnChatMessage(IHandleableChatMessage chatMessage)
-    {
-        if (chatMessage.LogKind != XivChatType.SystemMessage && chatMessage.LogKind != XivChatType.SystemError)
-        {
-            return;
-        }
-        
-        if (chatMessage.SourceKind != XivChatRelationKind.LocalPlayer)
-        {
-            return;
-        }
-        
-        if (PronounHook.LastGottenPronoun == null)
+        if (PronounHook.LastGottenPronoun.IsNullOrWhitespace())
         {
             return;
         }
@@ -76,19 +41,7 @@ internal class SystemChatElement : IChatElement
             return;
         }
         
-        if (expectedLogCount == 0)
-        {
-            return;
-        }
-        
-        expectedLogCount--;
-        
-        if (UserList.LocalPlayer == null)
-        {
-            return;
-        }
-        
-        IPettablePet? pettablePet = UserList.LocalPlayer.GetYoungestPet(SkeletonType.BattlePet);
+        IPettablePet? pettablePet = UserList.LocalPlayer?.GetYoungestPet(SkeletonType.BattlePet);
         
         if (pettablePet == null)
         {
