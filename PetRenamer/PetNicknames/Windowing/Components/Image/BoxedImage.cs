@@ -50,7 +50,7 @@ internal static class BoxedImage
             }
 
             textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon + adder).GetWrapOrEmpty();
-            raceIcon = RaceIconHelper.GetFromRaceID(data?.RaceID ?? 0);
+            raceIcon = RaceIconHelper.GetFromRaceID(data?.RaceId ?? 0);
         }
 
         

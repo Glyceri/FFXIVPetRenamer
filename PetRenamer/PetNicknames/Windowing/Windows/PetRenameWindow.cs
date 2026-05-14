@@ -65,7 +65,7 @@ internal class PetRenameWindow : PetWindow
         activeSkeleton = forSkeleton;
         isContextOpen  = true;
         ActiveUser     = UserList.LocalPlayer;
-        lastContentID  = ActiveUser?.ContentID ?? 0;
+        lastContentID  = ActiveUser?.ContentId ?? 0;
 
         if (open)
         {
@@ -132,9 +132,9 @@ internal class PetRenameWindow : PetWindow
     {
         ActiveUser = UserList.LocalPlayer;
 
-        if (lastContentID != ActiveUser?.ContentID)
+        if (lastContentID != ActiveUser?.ContentId)
         {
-            lastContentID = ActiveUser?.ContentID ?? 0;
+            lastContentID = ActiveUser?.ContentId ?? 0;
             isContextOpen = false;
 
             GetActiveSkeleton();
@@ -150,7 +150,7 @@ internal class PetRenameWindow : PetWindow
             return;
         }
 
-        IPettablePet? pet = ActiveUser.GetYoungestPet(CurrentMode == PetWindowMode.Minion ? IPettableUser.PetFilter.Minion : IPettableUser.PetFilter.BattlePet);
+        IPettablePet? pet = ActiveUser.GetYoungestPet(CurrentMode == PetWindowMode.Minion ? SkeletonType.Minion : SkeletonType.BattlePet);
         
         if (pet == null)
         {
@@ -171,7 +171,7 @@ internal class PetRenameWindow : PetWindow
             return;
         }
 
-        bool dirty         = activeSkeleton != pet.SkeletonID;
+        bool dirty         = activeSkeleton != pet.SkeletonId;
 
         string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
 
@@ -181,7 +181,7 @@ internal class PetRenameWindow : PetWindow
             dirty          = true;
         }
 
-        activeSkeleton = pet.SkeletonID;
+        activeSkeleton = pet.SkeletonId;
 
         if (dirty)
         {

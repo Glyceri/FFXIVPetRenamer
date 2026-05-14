@@ -7,17 +7,15 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal interface IPettablePet : IPettableEntity, IDisposable
 {
-    public IPettableUser? Owner      { get; }
-    public PetSkeleton    SkeletonID { get; }
-    public ulong          ObjectID   { get; }
-    public ushort         Index      { get; }
-    public string         Name       { get; }
-    public string?        CustomName { get; }
-    public Vector3?       EdgeColour { get; }
-    public Vector3?       TextColour { get; }
-    public IPetSheetData? PetData    { get; }
-
-    public void Recalculate();
-
-    public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+    IPettableUser? Owner      { get; }
+    PetSkeleton    SkeletonId { get; }
+    ulong          ObjectId   { get; }
+    ushort         Index      { get; }
+    string         Name       { get; }
+    string?        CustomName { get; }
+    IPetSheetData? PetData    { get; }
+    bool           IsActive   { get; }
+    
+    void Recalculate();
+    void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
 }

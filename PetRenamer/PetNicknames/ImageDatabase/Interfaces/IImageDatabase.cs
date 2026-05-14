@@ -6,12 +6,10 @@ namespace PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 
 internal interface IImageDatabase : IDisposable
 {
-    bool IsDirty { get; }
-
     void Redownload(IPettableDatabaseEntry entry, Action<bool>? callback = null);
+    void Cancel(IPettableDatabaseEntry entry);
     IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry);
     bool IsBeingDownloaded(IPettableDatabaseEntry? databaseEntry);
-    void OnSuccess(IPettableDatabaseEntry entry, IDalamudTextureWrap textureWrap);
 
     void Update();
 }

@@ -2,7 +2,6 @@ using Dalamud.Game.NativeWrapper;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility;
-using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -40,7 +39,7 @@ internal unsafe class NamePlateHook : HookableElement
         NameplateMinionHook?.Dispose();
     }
 
-    protected override void Refresh()
+    public override void Refresh()
     {
         AtkUnitBasePtr namePlateAddon = DalamudServices.GameGui.GetAddonByName("NamePlate");
 
@@ -73,7 +72,7 @@ internal unsafe class NamePlateHook : HookableElement
         return NameplateHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, battleChara, numArrayIndex, stringArrayIndex);
     }
 
-    public int UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
+    public int UpdateNameplateNpcDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, GameObject* gameObject, int numArrayIndex, int stringArrayIndex)
     {
         try
         {
@@ -89,7 +88,7 @@ internal unsafe class NamePlateHook : HookableElement
 
     private void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
-        if (!PetServices.Configuration.showOnNameplates)
+        if (!PetServices.Configuration.ShowOnNameplatesColour.Enabled)
         {
             return;
         }
@@ -100,7 +99,7 @@ internal unsafe class NamePlateHook : HookableElement
         {
             return;
         }
-
+        
         string? customPetName = pPet.CustomName;
 
         if (customPetName.IsNullOrWhitespace())
@@ -108,7 +107,7 @@ internal unsafe class NamePlateHook : HookableElement
             return;
         }
 
-        pPet.GetDrawColours(out Vector3? edgeColour, out Vector3? textColour);
+        pPet.GetDrawColours(PetServices.Configuration.ShowOnNameplatesColour, out Vector3? edgeColour, out Vector3? textColour);
 
         SeString colouredPetName = PetServices.StringHelper.WrapInColor(customPetName, edgeColour, textColour);
 

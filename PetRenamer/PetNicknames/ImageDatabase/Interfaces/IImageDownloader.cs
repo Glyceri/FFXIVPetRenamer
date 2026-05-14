@@ -9,4 +9,5 @@ internal interface IImageDownloader : IDisposable
     void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure, bool comesFromAutomation = false);
     void RedownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure);
     bool IsBeingDownloaded(IPettableDatabaseEntry entry);
+    void Cancel(IPettableDatabaseEntry entry);
 }

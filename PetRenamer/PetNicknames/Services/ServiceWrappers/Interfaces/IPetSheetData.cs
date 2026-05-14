@@ -4,29 +4,25 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal interface IPetSheetData
 {
-    public PetSkeleton Model         { get;  }
-    public uint        Icon          { get; }
-    public sbyte       Pronoun       { get; }
+    PetSkeleton Model         { get; }
+    uint        Icon          { get; }
 
-    public string[]    Singular      { get; }
-    public string[]    Plural        { get; }
+    string      BaseSingular  { get; }
+    string      BasePlural    { get; }
 
-    public string      BaseSingular  { get; }
-    public string      BasePlural    { get;  }
+    sbyte       Pronoun       { get; }
+    
+    uint        RaceId        { get; }
+    string?     RaceName      { get; }
+    string?     BehaviourName { get; }
 
-    public uint        RaceID        { get; }
-    public string?     RaceName      { get; }
-    public string?     BehaviourName { get; }
+    string      ActionName    { get; }
+    uint        ActionId      { get; }
 
-    public string      ActionName    { get;  }
-    public uint        ActionID      { get; }
+    int         LegacyModelId { get; }
 
-    public int         LegacyModelID { get; }
+    bool        IsPet(string name);
+    bool        IsAction(uint action);
 
-    public bool        IsPet(string name);
-    public bool        IsAction(string action);
-    public bool        IsAction(uint action);
-    public bool        Contains(string line);
-
-    public string      LongestIdentifier();
+    string      LongestIdentifier();
 }

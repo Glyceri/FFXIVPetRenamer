@@ -2,18 +2,18 @@
 
 internal interface IPettableUserTargetManager
 {
-    public IPettableEntity? GetLeadingTarget();
-    public IPettableEntity? GetLeadingTargetOfLeadingTarget();
+    IPettableEntity? GetLeadingTarget();
+    IPettableEntity? GetLeadingTargetOfLeadingTarget();
 
-    public IPettableEntity? GetSoftTarget();
-    public IPettableEntity? GetTarget();
+    IPettableEntity? GetSoftTarget();
+    IPettableEntity? GetTarget();
 
-    public IPettableEntity? GetSoftTargetOfLeadingTarget();
-    public IPettableEntity? GetTargetOfLeadingTarget();
+    IPettableEntity? GetSoftTargetOfLeadingTarget();
+    IPettableEntity? GetTargetOfLeadingTarget();
 
-    public IPettableEntity? GetTargetOfTarget();
-    public IPettableEntity? GetSoftTargetOfTarget();
+    IPettableEntity? GetTargetOfTarget();
+    IPettableEntity? GetSoftTargetOfTarget();
 
-    public IPettableEntity? GetTargetOfSoftTarget();
-    public IPettableEntity? GetSoftTargetOfSoftTarget();
+    IPettableEntity? GetTargetOfSoftTarget();
+    IPettableEntity? GetSoftTargetOfSoftTarget();
 }

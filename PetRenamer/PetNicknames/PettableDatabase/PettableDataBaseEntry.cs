@@ -14,9 +14,9 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
-    public bool IsActive        { get; private set; }
+    public bool   IsActive      { get; private set; }
 
-    public ulong ContentID      { get; private set; }
+    public ulong  ContentId     { get; private set; }
     public string Name          { get; private set; } = string.Empty;
     public ushort Homeworld     { get; private set; }
     public string HomeworldName { get; private set; } = string.Empty;
@@ -31,13 +31,13 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     private readonly IPetServices         PetServices;
     private readonly IPettableDirtyCaller DirtyCaller;
 
-    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentID, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentId, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices    = petServices;
         DirtyCaller    = dirtyCaller;
         ActiveDatabase = new PettableNameDatabase([], [], [], [], DirtyCaller);
 
-        ContentID      = contentID;
+        ContentId      = contentId;
         IsActive       = active;
         IsIPC          = !IsActive;
         IsLegacy       = isLegacy;
@@ -71,7 +71,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public bool MoveToDataBase(IPettableDatabase database)
     {
-        IPettableDatabaseEntry entry = database.GetEntry(ContentID);
+        IPettableDatabaseEntry entry = database.GetEntry(ContentId);
 
         if (entry is not PettableDataBaseEntry pEntry)
         {
@@ -82,7 +82,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
-        pEntry.UpdateContentID(ContentID, !IsIPC);
+        pEntry.UpdateContentID(ContentId, !IsIPC);
         pEntry.MarkDirty();
 
         return true;
@@ -109,9 +109,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
     }
 
-    public void UpdateContentID(ulong contentID, bool removeIPCStatus = false)
+    public void UpdateContentID(ulong contentId, bool removeIPCStatus = false)
     {
-        ContentID = contentID;
+        ContentId = contentId;
         IsActive  = true;
 
         if (removeIPCStatus)
@@ -120,17 +120,17 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         }
     }
 
-    public string? GetName(PetSkeleton skeletonID)
-        => ActiveDatabase.GetName(skeletonID);
+    public string? GetName(PetSkeleton skeletonId)
+        => ActiveDatabase.GetName(skeletonId);
 
-    public Vector3? GetEdgeColour(PetSkeleton skeletonID)
-        => ActiveDatabase.GetEdgeColour(skeletonID);
+    public Vector3? GetEdgeColour(PetSkeleton skeletonId)
+        => ActiveDatabase.GetEdgeColour(skeletonId);
 
-    public Vector3? GetTextColour(PetSkeleton skeletonID)
-        => ActiveDatabase?.GetTextColour(skeletonID);
+    public Vector3? GetTextColour(PetSkeleton skeletonId)
+        => ActiveDatabase?.GetTextColour(skeletonId);
 
-    public void SetName(PetSkeleton skeletonID, string? name, Vector3? edgeColour, Vector3? textColour)
-        => ActiveDatabase.SetName(skeletonID, name, edgeColour, textColour);
+    public void SetName(PetSkeleton skeletonId, string? name, Vector3? edgeColour, Vector3? textColour)
+        => ActiveDatabase.SetName(skeletonId, name, edgeColour, textColour);
     
 
     public PetSkeleton? GetSoftSkeleton(int softIndex)

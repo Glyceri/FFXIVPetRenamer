@@ -64,15 +64,15 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         PettableUserList            = new PettableUserList();
 
-        PetServices                 = new PetServices(DalamudServices, PettableUserList);
+        DirtyHandler                = new PettableDirtyHandler();
+        
+        PetServices                 = new PetServices(DalamudServices, PettableUserList, DirtyHandler);
 
         SharingDictionary           = new SharingDictionary(DalamudServices);
 
         Translator.Initialise(DalamudServices, PetServices.Configuration);
 
         LodestoneNetworkerInterface = LodestoneNetworker = new LodestoneNetworker(PetServices);
-
-        DirtyHandler                = new PettableDirtyHandler();
 
         PettableDatabase            = new PettableDatabase(PetServices, DirtyHandler);
         LegacyDatabase              = new LegacyPettableDatabase(PetServices, DirtyHandler);
@@ -90,12 +90,12 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         SaveHandler                 = new SaveHandler(PetServices, PettableUserList, IpcProvider, DirtyHandler);
 
         UpdateHandler               = new UpdateHandler(DalamudServices, PettableUserList, LodestoneNetworker, IpcProvider, ImageDatabase, PetServices, HookHandler.IslandHook, DirtyHandler, PettableDatabase, SaveHandler);
-        ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList);
+        ChatHandler                 = new ChatHandler(DalamudServices, PetServices, PettableUserList, HookHandler.PronounHook);
 
-        WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter);
+        WindowHandler               = new WindowHandler(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase, ImageDatabase, DirtyHandler, DataParser, DataWriter, SharingDictionary);
 
-        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, PetServices, PettableUserList, PettableDatabase);
-        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler, HookHandler.ActionTooltipHook);
+        CommandHandler              = new CommandHandler(DalamudServices, WindowHandler, PetServices, PettableUserList);
+        ContextMenuHandler          = new ContextMenuHandler(DalamudServices, PetServices, PettableUserList, WindowHandler);
 
         PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
     }

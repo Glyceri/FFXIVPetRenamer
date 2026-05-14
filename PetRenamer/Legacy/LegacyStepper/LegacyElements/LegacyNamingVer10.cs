@@ -2,7 +2,6 @@
 #pragma warning disable CS0612 // Type or member is obsolete
 
 using PetRenamer.Legacy.LegacyStepper.LegacyElements.Interfaces;
-using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PN.S;
@@ -12,35 +11,31 @@ namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
 internal class LegacyNamingVer10 : ILegacyStepperElement
 {
-    private readonly IPetServices PetServices;
-
-    public int OldVersion { get; } = 10;
-
-    public LegacyNamingVer10(IPetServices petServices)
-    {
-        PetServices = petServices;
-    }
-
+    public int OldVersion 
+        => 10;
+    
     public void Upgrade(Configuration configuration)
     {
-        if (configuration.SerializableUsersV5 != null)
+        configuration.Version = 11;
+
+        if (configuration.SerializableUsersV5 == null)
         {
-            List<SerializableUserV6> newSerializableUsers = [];
-
-            foreach (SerializableUserV5 user in configuration.SerializableUsersV5)
-            {
-                PetSkeleton[] petSkeletons = PetSkeletonHelper.AsPetSkeletons(user.SoftSkeletonData);
-
-                PetSkeletonHelper.AsMappedArray(petSkeletons, out int[] ids, out int[] skeletonTypes);
-
-                newSerializableUsers.Add(new SerializableUserV6(user.ContentID, user.Name, user.Homeworld, ids, skeletonTypes, Create(user.SerializableNameDatas)));
-            }
-
-            configuration.SerializableUsersV6 = newSerializableUsers.ToArray();
-            configuration.SerializableUsersV5 = [];
+            return;
         }
 
-        configuration.Version = 11;
+        List<SerializableUserV6> newSerializableUsers = [];
+
+        foreach (SerializableUserV5 user in configuration.SerializableUsersV5)
+        {
+            PetSkeleton[] petSkeletons = user.SoftSkeletonData.AsPetSkeletons();
+
+            petSkeletons.AsMappedArray(out int[] ids, out int[] skeletonTypes);
+
+            newSerializableUsers.Add(new SerializableUserV6(user.ContentID, user.Name, user.Homeworld, ids, skeletonTypes, Create(user.SerializableNameDatas)));
+        }
+
+        configuration.SerializableUsersV6 = newSerializableUsers.ToArray();
+        configuration.SerializableUsersV5 = [];
     }
 
     private SerializableNameDataV3[] Create(SerializableNameDataV2[] oldData)

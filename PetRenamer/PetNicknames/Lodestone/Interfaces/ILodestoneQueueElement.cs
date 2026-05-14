@@ -7,11 +7,12 @@ namespace PetRenamer.PetNicknames.Lodestone.Interfaces;
 
 internal interface ILodestoneQueueElement 
 {
-    public LodestoneQueueState CurrentState { get; }
-    public DateTime ElementStarted { get; }
-    public CancellationTokenSource CancellationTokenSource { get; }
-    public CancellationToken CancellationToken { get; }
-    public IPettableDatabaseEntry Entry { get; }
-    public bool Cancelled { get; }
-    public void Cancel();
+    LodestoneQueueState     CurrentState            { get; }
+    DateTime                ElementStarted          { get; }
+    CancellationTokenSource CancellationTokenSource { get; }
+    CancellationToken       CancellationToken       { get; }
+    IPettableDatabaseEntry  Entry                   { get; }
+    bool                    Cancelled               { get; }
+    
+    void Cancel();
 }

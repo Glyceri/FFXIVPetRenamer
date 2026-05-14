@@ -10,56 +10,59 @@ namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
 internal class LegacyNamingVer6 : ILegacyStepperElement
 {
-    readonly PetServices petServices;
+    private readonly PetServices PetServices;
 
-    public int OldVersion { get; } = 6;
-
-    public LegacyNamingVer6(PetServices petServices)
-    {
-        this.petServices = petServices;
-    }
-
+    public LegacyNamingVer6(PetServices petServices) 
+        => PetServices = petServices;
+    
+    public int OldVersion 
+        => 6;
+    
     // This one maps old Model.value.Model to Model.value.RowID as this is a uniqute identifier for ALL minions
     // Also this one was bugged in 1.0 since a later version.....
     // I'm just adding it back because I like to think in the back of my mind that everyone should be able to use the plugin with any save at any point
     // This is because back in the day I had to rewrite how I stored data a LOT
     public void Upgrade(Configuration configuration)
     {
-        if (configuration.serializableUsersV3 != null)
+        configuration.Version = 7;
+        
+        if (configuration.serializableUsersV3 == null)
         {
-            List<SerializableUserV3> newSerializableUsers = new List<SerializableUserV3>();
+            return;
+        }
+        
+        List<SerializableUserV3> newSerializableUsers = [];
 
-            foreach (SerializableUserV3 user in configuration.serializableUsersV3)
+        foreach (SerializableUserV3 user in configuration.serializableUsersV3)
+        {
+            List<int>    newIDs   = [];
+            List<string> newnames = [];
+            
+            for (int i = 0; i < user.ids.Length; i++)
             {
-                List<int> newIDs = new List<int>();
-                List<string> newnames = new List<string>();
-                for (int i = 0; i < user.ids.Length; i++)
+                if (user.ids[i] < -1)
                 {
-                    if (user.ids[i] < -1)
-                    {
-                        newIDs.Add(user.ids[i]);
-                        newnames.Add(user.names[i]);
-                        continue;
-                    }
-
-                    List<IPetSheetData> legacyPets = petServices.PetSheets.GetLegacyPets(user.ids[i]);
-
-                    foreach(IPetSheetData legacyPetsData in legacyPets)
-                    {
-                        PetSkeletonHelper.AsLegacy(legacyPetsData.Model, out int Id);
-
-                        newIDs.Add(Id);
-                        newnames.Add(user.names[i]);
-                    }
+                    newIDs.Add(user.ids[i]);
+                    newnames.Add(user.names[i]);
+                    
+                    continue;
                 }
 
-                newSerializableUsers.Add(new SerializableUserV3(newIDs.ToArray(), newnames.ToArray(), user.username, user.homeworld, user.mainSkeletons, user.softSkeletons));
+                List<IPetSheetData> legacyPets = PetServices.PetSheets.GetLegacyPets(user.ids[i]);
+
+                foreach(IPetSheetData legacyPetsData in legacyPets)
+                {
+                    legacyPetsData.Model.AsLegacy(out int id);
+
+                    newIDs.Add(id);
+                    newnames.Add(user.names[i]);
+                }
             }
 
-            configuration.serializableUsersV3 = newSerializableUsers.ToArray();
+            newSerializableUsers.Add(new SerializableUserV3(newIDs.ToArray(), newnames.ToArray(), user.username, user.homeworld, user.mainSkeletons, user.softSkeletons));
         }
 
-        configuration.Version = 7;
+        configuration.serializableUsersV3 = newSerializableUsers.ToArray();
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete

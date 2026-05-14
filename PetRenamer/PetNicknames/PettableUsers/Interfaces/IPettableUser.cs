@@ -1,41 +1,37 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal unsafe interface IPettableUser : IBattleUser
 {
-    public bool IsActive        { get; }
-    public bool IsLocalPlayer   { get; }
+    bool IsActive        { get; }
+    bool IsLocalPlayer   { get; }
 
-    public IPettableDatabaseEntry DataBaseEntry { get; }
-    public List<IPettablePet> PettablePets { get; }
+    IPettableDatabaseEntry DataBaseEntry { get; }
+    
+    List<IPettablePet> PettablePets { get; }
 
-    public IPettablePet? GetPet(nint pet);
-    public IPettablePet? GetPet(GameObjectId gameObjectId);
-    public IPettablePet? GetYoungestPet(PetFilter filter = PetFilter.None);
+    IPettablePet? GetPet(nint pet);
+    IPettablePet? GetPet(GameObjectId gameObjectId);
+    IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None);
 
-    public string? GetCustomName(IPetSheetData sheetData);
+    string? GetCustomName(IPetSheetData sheetData);
 
-    public void OnLastCastChanged(uint cast);
-    public void Update();
-    public void SetBattlePet(BattleChara* battlePet);
-    public void RemoveBattlePet(BattleChara* battlePet);
-    public void SetCompanion(Companion* companion);
-    public void RemoveCompanion(Companion* companion);
-    public void RefreshCast();
-    public void Dispose(IPettableDatabase database);
-
-    public IPettableUserTargetManager? TargetManager { get; }
-
-    public enum PetFilter
-    {
-        None,
-        Minion,
-        BattlePet,
-        Chocobo
-    }
+    void OnLastCastChanged(uint cast);
+    void Update();
+    void SetBattlePet(BattleChara* battlePet);
+    void RemoveBattlePet(BattleChara* battlePet);
+    void SetCompanion(Companion* companion);
+    void RemoveCompanion(Companion* companion);
+    void Dispose(IPettableDatabase database);
+    void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
+    void Recalculate();
+    
+    IPettableUserTargetManager? TargetManager { get; }
 }

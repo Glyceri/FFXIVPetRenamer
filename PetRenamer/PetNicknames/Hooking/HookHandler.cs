@@ -21,11 +21,9 @@ internal class HookHandler : IDisposable
     private readonly ILegacyDatabase        LegacyDatabase;
     private readonly ISharingDictionary     SharingDictionary;
     private readonly IPettableDirtyCaller   DirtyCaller;
-    private readonly ITooltipHookHelper     TooltipHookHelper;
 
-    public IMapTooltipHook    MapTooltipHook    { get; private set; } = null!;
-    public IActionTooltipHook ActionTooltipHook { get; private set; } = null!;
     public IIslandHook        IslandHook        { get; private set; } = null!;
+    public IPronounHook       PronounHook       { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
@@ -40,30 +38,34 @@ internal class HookHandler : IDisposable
         SharingDictionary   = sharingDictionary;
         DirtyCaller         = dirtyCaller;
 
-        TooltipHookHelper   = new TooltipHookHelper(DalamudServices);
-
         _Register();
     }
 
     private void _Register()
     {
+        Register(new HoverHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        
+        MapHook mapHook = new MapHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        Register(mapHook);
+        
+        PronounHook = new PronounHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        Register(PronounHook);
+        
+        Register(new TooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, mapHook, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-
-        ActionTooltipHook = new ActionTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
-        Register(ActionTooltipHook);
-
-        MapTooltipHook = new MapTooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, TooltipHookHelper);
-        Register(MapTooltipHook);
-
+        Register(new MinionNoteBookHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        
+        Register(new TargetHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        
         IslandHook = new IslandHook(DalamudServices, PettableUserList, PetServices, DirtyListener);
         Register(IslandHook);
-
-        Register(new MapHook(DalamudServices, PetServices, PettableUserList, MapTooltipHook, DirtyListener));
+        
+        PetServices.NameService.RegisterPronounHook(PronounHook);
+        
+        Register(new CastHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new TargetBarHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new FlyTextHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
         Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-
+        
         Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
     }
 
@@ -80,7 +82,5 @@ internal class HookHandler : IDisposable
         {
             hookableElement.Dispose();
         }
-
-        TooltipHookHelper.Dispose();
     }
 }

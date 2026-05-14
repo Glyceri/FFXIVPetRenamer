@@ -7,27 +7,30 @@ namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
 internal class LegacyNamingVer3 : ILegacyStepperElement
 {
-    public int OldVersion { get; } = 3;
+    public int OldVersion 
+        => 3;
 
     public void Upgrade(Configuration configuration)
     {
-        List<SerializableUserV2> newUsers = new List<SerializableUserV2>();
+        List<SerializableUserV2> newUsers = [];
 
         foreach(SerializableUser oldUser in configuration.serializableUsers!)
         {
-            List<int> ids = new List<int>();
-            List<string> names = new List<string>();
+            List<int>    ids   = [];
+            List<string> names = [];
+            
             foreach(SerializableNickname nickname in oldUser.nicknames)
             {
                 ids.Add(nickname.ID);
                 names.Add(nickname.Name);
             }
+            
             newUsers.Add(new SerializableUserV2(ids.ToArray(), names.ToArray(), oldUser.username, oldUser.homeworld));
         }
 
         configuration.serializableUsersV2 = newUsers.ToArray();
-        configuration.serializableUsers = null;
-        configuration.Version = 4;
+        configuration.serializableUsers   = null;
+        configuration.Version             = 4;
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete

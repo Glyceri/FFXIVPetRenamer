@@ -88,7 +88,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry entry = _entries[i];
 
-            if (entry.ContentID != contentID)
+            if (entry.ContentId != contentID)
             {
                 continue;
             }
@@ -99,16 +99,16 @@ internal class PettableDatabase : IPettableDatabase
         return null;
     }
 
-    public IPettableDatabaseEntry GetEntry(ulong contentID)
+    public IPettableDatabaseEntry GetEntry(ulong contentId)
     {
-        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentID);
+        IPettableDatabaseEntry? entry = GetEntryNoCreate(contentId);
 
         if (entry != null)
         {
             return entry;
         }
 
-        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentID, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
+        IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, contentId, "[UNKNOWN]", 0, [], [], [], [], PluginConstants.BaseSkeletons, false);
 
         _entries.Add(newEntry);
 
@@ -121,7 +121,7 @@ internal class PettableDatabase : IPettableDatabase
         {
             IPettableDatabaseEntry currentEntry = _entries[i];
 
-            if (currentEntry.ContentID != entry.ContentID)
+            if (currentEntry.ContentId != entry.ContentId)
             {
                 continue;
             }
@@ -134,7 +134,7 @@ internal class PettableDatabase : IPettableDatabase
 
     public SerializableUserV6[] SerializeDatabase()
     {
-        List<SerializableUserV6> users = new List<SerializableUserV6>();
+        List<SerializableUserV6> users = [];
 
         int entryCount = _entries.Count;
 

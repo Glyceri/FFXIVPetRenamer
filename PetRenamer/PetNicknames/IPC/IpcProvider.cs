@@ -19,44 +19,46 @@ namespace PetRenamer;
 internal class IpcProvider : IIpcProvider
 {
      /* ------------------------ READ ME ------------------------
-     * 
-     * {ApiNamespace} = "PetRenamer."
-     * 
-     * Pet Nicknames data is tied to the PLAYER not to a pet. 
-     * (I don't even want to list the billion reasons as to why that is the ONLY way to make this plugin work.)
-     * 
-     * Notifications:
-     *      - OnReady:
-     *          This triggers when the plugin enables. When subscribed, receiving this message means the plugin is active.
-     *          
-     *      - OnDisposing:
-     *          This triggers when the plugin disables. When subscribed, receiving this message means the plugin is inactive.
-     *          
-     *      - OnPlayerDataChanged (string):
-     *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
-     *
-     * Functions:
-     *      - IsEnabled <bool>:
-     *          Call this function to see if the plugin is enabled. If it errors out or you receive a false value it means the plugins IPC is not ready.
-     *          
-     *      - ApiVersion <(uint, uint)>:
-     *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).
-     *          For this release it should be (4, 0).
-     *
-     *      - GetPlayerData <string>:
-     *          Call this function to receive the local players pet data. This data is in the form of a string and will return [string.empty] when no local player is found.
-     *          (This is not an expensive function, but please use it sparingly.)
-     *          
-     * Actions:
-     *      - SetPlayerData <string>:
-     *          Send the exported data from the GetPlayerData function or the OnPlayerDataChanged callback to add it to the database.
-     *          (You can never set the data of the current active local player.)
-     *          
-     *      - ClearPlayerData <ushort>:
-     *          Call this action to clear the IPC data of the given ObjectIndex.
-     *          
-     * ----------------------END READ ME -----------------------
-     */
+      * 
+      * {ApiNamespace} = "PetRenamer."
+      * 
+      * Pet Nicknames data is tied to the PLAYER not to a pet. 
+      * (I don't even want to list the billion reasons as to why that is the ONLY way to make this plugin work.)
+      * 
+      * Notifications:
+      *      - OnReady:
+      *          This triggers when the plugin enables. When subscribed, receiving this message means the plugin is active.
+      *          
+      *      - OnDisposing:
+      *          This triggers when the plugin disables. When subscribed, receiving this message means the plugin is inactive.
+      *          
+      *      - OnPlayerDataChanged <string>:
+      *          This triggers when the local player data has changed. When subscribed, you receive a string with all the data of this player.
+      *
+      * Functions:
+      *      - IsEnabled <bool>:
+      *          Call this function to see if the plugin is enabled. If it errors out, or you receive a false value it means the plugins IPC is not ready.
+      *          
+      *      - ApiVersion <(uint, uint)>:
+      *          Call this function to receive back the current IPC API version. (<uint> Majour Version, <uint> Minor Version).
+      *          For this release it should be (4, 0).
+      *
+      *      - GetPlayerData <string>:
+      *          Call this function to receive the local players pet data. This data is in the form of a string and will return [string.empty] when no local player is found.
+      *          (This is not an expensive function, but please use it sparingly.)
+      *          
+      * Actions:
+      *      - SetPlayerData <string>:
+      *          Send the exported data from the GetPlayerData function or the OnPlayerDataChanged callback to add it to the database.
+      *          (You can never set the data of the current active local player.)
+      *          
+      *      - ClearPlayerData <ushort>:
+      *          Call this action to clear the IPC data of the given ObjectIndex.
+      *
+      * Also take a look in SharingDictionary.cs to see if that file contains what you need.
+      * 
+      * ----------------------END READ ME -----------------------
+      */
 
     public bool Enabled { get; set; } = false;
 
@@ -174,6 +176,8 @@ internal class IpcProvider : IIpcProvider
     // Actions
     public void SetPlayerDataDetour(string data)
     {
+        DalamudServices.PluginLog.Debug("[IPC] Set Player Data: " + data);
+        
         try
         {
             _ = DalamudServices.Framework.Run(() =>
@@ -191,6 +195,8 @@ internal class IpcProvider : IIpcProvider
 
     public void ClearIPCDataDetour(ushort objectIndex)
     {
+        DalamudServices.PluginLog.Debug("[IPC] Clear Player Data: " + objectIndex);
+        
         try
         {
             _ = DalamudServices.Framework.Run(() =>

@@ -5,13 +5,15 @@ namespace PetRenamer.PetNicknames.Services.Interface;
 
 internal interface IPetServices : IDisposable
 {
-    public IPetLog              PetLog              { get; }
-    public IPetSheets           PetSheets           { get; }
-    public IStringHelper        StringHelper        { get; }
-    public IPetCastHelper       PetCastHelper       { get; }
-    public IPetActionHelper     PetActionHelper     { get; }
-    public Configuration        Configuration       { get; }
-    public ITargetManager       TargetManager       { get; }
-    public IPluginWatcher       PluginWatcher       { get; }
-    public INotificationService NotificationService { get; }
+    IPetLog              PetLog              { get; }
+    IPetSheets           PetSheets           { get; }
+    IStringHelper        StringHelper        { get; }
+    IPetCastHelper       PetCastHelper       { get; }
+    Configuration        Configuration       { get; }
+    ITargetManager       TargetManager       { get; }
+    IPluginWatcher       PluginWatcher       { get; }
+    INotificationService NotificationService { get; }
+    INameService         NameService         { get; }
+    IHoverService        HoverService        { get; }
+    IParty               Party               { get; }
 }

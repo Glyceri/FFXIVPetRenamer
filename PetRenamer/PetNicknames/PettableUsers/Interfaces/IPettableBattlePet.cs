@@ -4,5 +4,5 @@ namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal unsafe interface IPettableBattlePet : IPettablePet
 {
-    public BattleChara* BattlePet { get; }
+    BattleChara* BattlePet { get; }
 }

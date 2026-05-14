@@ -91,6 +91,8 @@ internal static class Translator
         { "Config.IslandPets", "Show names on Island Pets." },
         { "Config.Penumbra.AttachToPCP", "Attach Pet Nicknames data to Penumbra .pcp files." },
         { "Config.Penumbra.ReadFromPCP", "Read Pet Nicknames data from Penumbra .pcp files." },
+        { "Config.Label.OverrideColour", "Override Colour" },
+        { "Config.Label.OverrideColourLabel", "Colour Mode" },
 
         { "Kofi.Title", "Ko-fi" },
         { "Kofi.Line1", "This is about real life money." },

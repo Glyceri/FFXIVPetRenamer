@@ -20,8 +20,7 @@ internal class TargetContextMenu : IContextMenuElement
         UserList        = userList;
         WindowHandler   = windowHandler;
     }
-
-    // Null means context menu didn't come from an addon
+    
     public string? AddonName
         => null;
 
@@ -60,14 +59,14 @@ internal class TargetContextMenu : IContextMenuElement
             return null;
         }
 
-        if (PetServices.PetSheets.GetPet(pet.SkeletonID) == null)
+        if (PetServices.PetSheets.GetPet(pet.SkeletonId) == null)
         {
             return null;
         }
 
         return (a) =>
         {
-            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonID, true);
+            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId, true);
         };
     }
 }

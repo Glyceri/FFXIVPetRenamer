@@ -2,15 +2,18 @@
 
 internal interface IPettableUserList
 {
-    public IPettableUser?[] PettableUsers { get; }
-    public IPettableUser?   LocalPlayer   { get; }
+    IPettableUser?[] PettableUsers { get; }
+    IPettableUser?   LocalPlayer   { get; }
 
-    public IPettablePet?  GetPet(nint pet);
-    public IPettableUser? GetUser(nint user, bool petMeansOwner = true);
-    public IPettablePet?  GetPet(ulong petId);
-    public IPettableUser? GetUser(ulong userId);
-    public IPettableUser? GetUserFromObjectId(uint objectId);
-    public IPettableUser? GetUserFromOwnerID(uint ownerID);
-    public IPettableUser? GetUserFromContentID(ulong contentID);
-    public IPettableUser? GetUser(string username);
+    IPettablePet?  GetPet(nint pet);
+    IPettableUser? GetUser(nint user, bool petMeansOwner = true);
+    IPettablePet?  GetPet(ulong petId);
+    IPettableUser? GetUser(ulong userId);
+    IPettableUser? GetUserFromObjectId(uint objectId);
+    IPettableUser? GetUserFromOwnerId(uint ownerId);
+    IPettableUser? GetUserFromContentId(ulong contentId);
+    IPettableUser? GetUserFromEntityId(uint entityId);
+    IPettableUser? GetUser(string username);
+    
+    void Recalculate();
 }

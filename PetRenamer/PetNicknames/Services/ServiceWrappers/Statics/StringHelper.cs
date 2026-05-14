@@ -40,21 +40,6 @@ public static class StringHelper
     public static bool InvariantContains(this string baseString, string shouldContain)
         => baseString.Contains(shouldContain, StringComparison.InvariantCultureIgnoreCase);
 
-    public static bool InvariantContains(this string baseString, string[] shouldContain)
-    {
-        for (int i = 0; i < shouldContain.Length; i++)
-        {
-            if (!baseString.Contains(shouldContain[i], StringComparison.InvariantCultureIgnoreCase))
-            {
-                continue;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     public static string InvariantReplace(this string baseString, string marker, string toReplace)
         => baseString.Replace(marker, toReplace, StringComparison.InvariantCultureIgnoreCase);
 }

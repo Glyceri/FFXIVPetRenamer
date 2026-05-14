@@ -7,23 +7,17 @@ namespace PetRenamer.Legacy.LegacyStepper;
 
 internal class LegacyStepper
 {
-    private readonly Configuration Configuration;
-    private readonly PetServices   PetServices;
-
     private readonly List<ILegacyStepperElement> legacyStepperElements = [];
 
     public LegacyStepper(Configuration configuration, PetServices petServices)
     {
-        PetServices   = petServices;
-        Configuration = configuration;
-
-        if (Configuration.Version <= 2 || Configuration.Version > Configuration.currentSaveFileVersion)
+        if (configuration.Version <= 2 || configuration.Version > Configuration.currentSaveFileVersion)
         {
             // Actually hopeless to try and update...
             // You actually used this plogon on day one (I know you didn't)
             // Or you edited your savefile improperly, to hell with it.
             // Let's set it to the max and hope for the best...
-            Configuration.Version = Configuration.currentSaveFileVersion;
+            configuration.Version = Configuration.currentSaveFileVersion;
 
             return;
         }
@@ -33,20 +27,21 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer3());
         legacyStepperElements.Add(new LegacyNamingVer4());
         legacyStepperElements.Add(new LegacyNamingVer5());
-        legacyStepperElements.Add(new LegacyNamingVer6(PetServices));
-        legacyStepperElements.Add(new LegacyNamingVer7(PetServices));
+        legacyStepperElements.Add(new LegacyNamingVer6(petServices));
+        legacyStepperElements.Add(new LegacyNamingVer7(petServices));
         legacyStepperElements.Add(new LegacyNamingVer8());
-        legacyStepperElements.Add(new LegacyNamingVer9(PetServices));
-        legacyStepperElements.Add(new LegacyNamingVer10(PetServices));
+        legacyStepperElements.Add(new LegacyNamingVer9(petServices));
+        legacyStepperElements.Add(new LegacyNamingVer10());
+        legacyStepperElements.Add(new LegacyNamingVer11());
 
         foreach (ILegacyStepperElement legacyStepperElement in legacyStepperElements)
         {
-            if (legacyStepperElement.OldVersion != Configuration.Version)
+            if (legacyStepperElement.OldVersion != configuration.Version)
             {
                 continue;
             }
 
-            legacyStepperElement.Upgrade(Configuration);
+            legacyStepperElement.Upgrade(configuration);
         }
     }
 }

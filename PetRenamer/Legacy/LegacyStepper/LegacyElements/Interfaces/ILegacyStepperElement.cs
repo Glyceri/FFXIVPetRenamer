@@ -3,5 +3,6 @@
 internal interface ILegacyStepperElement
 {
     int OldVersion { get; }
+    
     void Upgrade(Configuration configuration);
 }

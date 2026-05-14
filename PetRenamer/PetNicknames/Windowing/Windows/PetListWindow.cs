@@ -125,7 +125,7 @@ internal class PetListWindow : PetWindow
     {
         if (Listbox.Begin($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
-            PlayerImage.Draw(ActiveEntry, in ImageDatabase);
+            PlayerImage.Draw(ActiveEntry, ImageDatabase);
 
             ImGui.SameLine();
 
@@ -338,13 +338,13 @@ internal class PetListWindow : PetWindow
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
 
-                    PlayerImage.Draw(user.Entry, in ImageDatabase);
+                    PlayerImage.Draw(user.Entry, ImageDatabase);
 
                     ImGui.SameLine();
 
                     if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
                     {
-                        if (user.Entry.ContentID == UserList.LocalPlayer?.ContentID)
+                        if (user.Entry.ContentId == UserList.LocalPlayer?.ContentId)
                         {
                             if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
                             {
@@ -518,7 +518,7 @@ internal class PetListWindow : PetWindow
     {
         if (UserList.LocalPlayer != null && entry != null)
         {
-            return UserList.LocalPlayer.ContentID == entry.ContentID;
+            return UserList.LocalPlayer.ContentId == entry.ContentId;
         }
         else
         {
@@ -541,7 +541,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentID.ToString())))
+            if (!(Valid(entry.Name) || Valid(entry.HomeworldName) || Valid(entry.ContentId.ToString())))
             {
                 continue;
             }
@@ -614,7 +614,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            petListDrawables.Add(new PetListPet(in DalamudServices, in petData, name, edgeColour, textColour));
+            petListDrawables.Add(new PetListPet(in petData, name, edgeColour, textColour));
         }
     }
 

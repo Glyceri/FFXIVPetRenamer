@@ -3,24 +3,29 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableIslandUser : IIslandUser
 {
+    public string       Name      { get; }
+    public ulong        ContentId { get; }
+    public ushort       Homeworld { get; }
+    public uint         EntityId  { get; }
+    
+    public BattleChara* BattleChara   { get; } = null;
+    public ulong        ObjectId      { get; } = 0;
+    public uint         ShortObjectId { get; } = 0;
+    public uint         CurrentCastId { get; } = 0;
+    public nint         Address       { get; } = 0;
+    
     public IPettableDatabaseEntry DataBaseEntry { get; }
-    public List<IPettablePet> PettablePets { get; } = new List<IPettablePet>();
-    public string Name { get; }
-    public ulong ContentID { get; }
-    public ushort Homeworld { get; }
-    public ulong ObjectID { get; } = 0;
-    public uint ShortObjectID { get; } = 0;
-    public uint CurrentCastID { get; } = 0;
-    public nint Address { get; } = 0;
-    public unsafe BattleChara* BattleChara { get; } = null;
-
+    public List<IPettablePet>     PettablePets  { get; } = [];
+    
     private readonly IPetServices PetServices;
 
     public PettableIslandUser(IPetServices petServices, IPettableDatabaseEntry entry)
@@ -29,17 +34,15 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         DataBaseEntry   = entry;
         Name            = entry.Name;
-        ContentID       = entry.ContentID;
+        ContentId       = entry.ContentId;
         Homeworld       = entry.Homeworld;
+        EntityId        = (uint)PluginConstants.InvalidId;
     }
 
     public bool IsActive
         => true;
 
     public bool IsLocalPlayer
-        => false;
-
-    public bool IsDirty
         => false;
 
     public IPettableUserTargetManager? TargetManager
@@ -59,14 +62,9 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
-            IPettablePet? pet = PettablePets[i];
+            IPettablePet pet = PettablePets[i];
 
-            if (pet == null)
-            {
-                continue;
-            }
-
-            if (pet.ObjectID != pointer->GetGameObjectId())
+            if (pet.ObjectId != pointer->GetGameObjectId())
             {
                 continue;
             }
@@ -102,7 +100,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         {
             IPettablePet pPet = PettablePets[i];
 
-            if (pPet.ObjectID != (ulong)gameObjectId)
+            if (pPet.ObjectId != (ulong)gameObjectId)
             {
                 continue;
             }
@@ -112,20 +110,43 @@ internal unsafe class PettableIslandUser : IIslandUser
 
         return null;
     }
-
-    public IPettableEntity? GetTarget(IPettableUserList userList)
-        => null;
-
+    
     public string? GetCustomName(IPetSheetData sheetData) 
         => DataBaseEntry.GetName(sheetData.Model);
 
-    public IPettablePet? GetYoungestPet(IPettableUser.PetFilter filter = IPettableUser.PetFilter.None)
+    public IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None)
         => null;
 
     public void OnLastCastChanged(uint cast) { } // Unused
-    public void RefreshCast() { } // Unused
     public void Dispose(IPettableDatabase d) { } // Unused
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion(Companion* companion) { } // Unused
+    public void Recalculate() { } // unused
+
+    public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
+    {
+        edgeColour = null;
+        textColour = null;
+
+        Configuration.ColourMode colourSetting = PetServices.Configuration.SelectedColourMode;
+
+        if (colourConfig.OverrideColourMode)
+        {
+            colourSetting = colourConfig.ColourMode;
+        }
+        
+        if (colourSetting == Configuration.ColourMode.None)
+        {
+            return;
+        }
+
+        if (colourSetting == Configuration.ColourMode.Personal && !IsLocalPlayer)
+        {
+            return;
+        }
+
+        edgeColour = DataBaseEntry.GetEdgeColour(sheetData.Model);
+        textColour = DataBaseEntry.GetTextColour(sheetData.Model);
+    }
 }

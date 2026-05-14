@@ -10,19 +10,17 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames.PettableUsers;
 
-internal unsafe abstract class BasePettablePet : IPettablePet
+internal abstract unsafe class BasePettablePet : IPettablePet
 {
     public nint           Address    { get; }
-    public PetSkeleton    SkeletonID { get; }
-    public ulong          ObjectID   { get; }
+    public PetSkeleton    SkeletonId { get; }
+    public ulong          ObjectId   { get; }
     public ushort         Index      { get; }
     public string         Name       { get; }
     public IPetSheetData? PetData    { get; }
     public IPettableUser? Owner      { get; }
 
     public string?        CustomName { get; private set; }
-    public Vector3?       EdgeColour { get; private set; }
-    public Vector3?       TextColour { get; private set; }
 
     private readonly IPetServices           PetServices;
     private readonly IPettableDatabaseEntry Entry;
@@ -33,66 +31,63 @@ internal unsafe abstract class BasePettablePet : IPettablePet
         PetServices         = petServices;
         Entry               = entry;
         SharingDictionary   = sharingDictionary;
-
         Address             = (nint)pet;
-
         Owner               = owner;
-        SkeletonID          = new PetSkeleton((uint)pet->ModelContainer.ModelCharaId, skeletonType);
-
         Index               = pet->GameObject.ObjectIndex;
         Name                = pet->GameObject.NameString;
-        ObjectID            = pet->GetGameObjectId();
-        PetData             = petServices.PetSheets.GetPet(SkeletonID);
-
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectID}");
-#endif
+        ObjectId            = pet->GetGameObjectId();
+        SkeletonId          = new PetSkeleton(pet->ModelContainer.ModelCharaId, skeletonType);
+        PetData             = petServices.PetSheets.GetPet(SkeletonId);
+        
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");
+        }
 
         Recalculate();
     }
 
+    public bool IsActive
+        => (Owner?.IsActive ?? false);
+
     public void Recalculate()
     {
-        CustomName = Entry.GetName(SkeletonID);
-        EdgeColour = Entry.GetEdgeColour(SkeletonID);
-        TextColour = Entry.GetTextColour(SkeletonID);
+        CustomName = Entry.GetName(SkeletonId);
 
-        SharingDictionary.Set(ObjectID, CustomName);
+        Configuration.ColourMode colourMode = PetServices.Configuration.SelectedColourMode;
+        
+        Vector3? edgeColour = null;
+        Vector3? textColour = null;
+        
+        if ((colourMode == Configuration.ColourMode.All) || (colourMode == Configuration.ColourMode.Personal && (Owner?.IsLocalPlayer ?? false)))
+        {
+            edgeColour = Entry.GetEdgeColour(SkeletonId);
+            textColour = Entry.GetTextColour(SkeletonId);
+        }
+        
+        SharingDictionary.Set(ObjectId, CustomName, Address, edgeColour, textColour);
     }
 
     public void Dispose()
     {
-#if DEBUG
-        PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectID}");
-#endif
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectId}");
+        }
 
-        SharingDictionary.Set(ObjectID, null);
+        SharingDictionary.Set(ObjectId, null);
     }
 
-    public void GetDrawColours(out Vector3? edgeColour, out Vector3? textColour)
+    public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;
         textColour = null;
-
-        // This should NEVER be the case
-        if (Owner == null)
+        
+        if (Owner == null || PetData == null)
         {
             return;
         }
 
-        int colourSetting = PetServices.Configuration.showColours;
-
-        if (colourSetting >= 2)
-        {
-            return;
-        }
-
-        if (colourSetting == 1 && !Owner.IsLocalPlayer)
-        {
-            return;
-        }
-
-        edgeColour = EdgeColour;
-        textColour = TextColour;
+        Owner.GetDrawColours(PetData, colourConfig, out edgeColour, out textColour);
     }
 }

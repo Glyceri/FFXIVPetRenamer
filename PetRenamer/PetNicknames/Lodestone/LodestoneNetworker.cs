@@ -179,12 +179,10 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(e);
-
-            return;
         }
     }
 
-    void ParseDocument(HtmlDocument document, LodestoneQueueElement element)
+    private void ParseDocument(HtmlDocument document, LodestoneQueueElement element)
     {
         element.SetState(LodestoneQueueState.Parsing);
 
@@ -209,38 +207,38 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
 
                 return;
             }
-            HtmlNode? entryNode = GetNode(listNode, "entry");
+            
+            List<HtmlNode> entryNodes = GetNodes(listNode, "entry");
 
-            if (entryNode == null)
+            if (entryNodes.Count == 0)
             {
                 element.SetState(LodestoneQueueState.Error);
-                element.Failure?.Invoke(new Exception("Entry Node is not found in HTML document."));
-
+                element.Failure?.Invoke(new Exception("No entries in list"));
+                
                 return;
             }
-
-            LodestoneSearchData data;
-
-            try
+            
+            foreach (HtmlNode entryNode in entryNodes)
             {
-                data = new LodestoneSearchData(entryNode);
-            }
-            catch (Exception e)
-            {
-                element.SetState(LodestoneQueueState.Error);
-                element.Failure?.Invoke(new Exception("Search Data unable to be made: " + e.Message));
-
+                LodestoneSearchData data = new LodestoneSearchData(entryNode);
+                
+                if (!string.Equals(data.name, element.Entry.Name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+                
+                Succeed(data, element);
+                
                 return;
             }
-
-            Succeed(data, element);
+            
+            element.SetState(LodestoneQueueState.Error);
+            element.Failure?.Invoke(new Exception("No user found"));
         }
         catch (Exception e)
         {
             element.SetState(LodestoneQueueState.Error);
             element.Failure?.Invoke(new Exception("Search Data unable to be made: " + e.Message));
-
-            return;
         }
     }
 
@@ -254,7 +252,7 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
     {
         foreach (HtmlNode childNode in baseNode.ChildNodes)
         {
-            HtmlNode gottenNode = GetNode(childNode, nodeName)!;
+            HtmlNode? gottenNode = GetNode(childNode, nodeName)!;
 
             if (gottenNode != null)
             {
@@ -271,20 +269,26 @@ internal class LodestoneNetworker : ILodestoneNetworker, IDisposable
 
         return null;
     }   
-
-    private void GetNodesRecursive(HtmlNode baseNode, string nodeName)
+    
+    private List<HtmlNode> GetNodes(HtmlNode baseNode, string nodeName)
     {
+        List<HtmlNode> nodes = [];
+
         foreach (HtmlNode childNode in baseNode.ChildNodes)
         {
-            GetNodesRecursive(childNode, nodeName);
-
+            List<HtmlNode> newNodes = GetNodes(childNode, nodeName);
+            
+            nodes.AddRange(newNodes);
+            
             if (!childNode.HasClass(nodeName))
             {
                 continue;
             }
-
-            _nodes.Add(childNode);
+            
+            nodes.Add(childNode);
         }
+
+        return nodes;
     }
 
     public bool IsBeingDownloaded(IPettableDatabaseEntry entry)

@@ -32,11 +32,11 @@ internal class PettableNameDatabase : INamesDatabase
     public int Length 
         => IDs.Length; 
 
-    private int GetIndex(PetSkeleton ID)
+    private int GetIndex(PetSkeleton id)
     {
         for (int i = 0; i < Length; i++)
         {
-            if (IDs[i] != ID)
+            if (IDs[i] != id)
             {
                 continue;
             }
@@ -47,9 +47,9 @@ internal class PettableNameDatabase : INamesDatabase
         return -1;
     }
 
-    public string? GetName(PetSkeleton ID)
+    public string? GetName(PetSkeleton id)
     {
-        int index = GetIndex(ID);
+        int index = GetIndex(id);
 
         if (index == -1)
         {
@@ -59,9 +59,9 @@ internal class PettableNameDatabase : INamesDatabase
         return Names[index];
     }
 
-    public Vector3? GetEdgeColour(PetSkeleton ID)
+    public Vector3? GetEdgeColour(PetSkeleton id)
     {
-        int index = GetIndex(ID);
+        int index = GetIndex(id);
 
         if (index == -1)
         {
@@ -71,9 +71,9 @@ internal class PettableNameDatabase : INamesDatabase
         return EdgeColours[index];
     }
 
-    public Vector3? GetTextColour(PetSkeleton ID)
+    public Vector3? GetTextColour(PetSkeleton id)
     {
-        int index = GetIndex(ID);
+        int index = GetIndex(id);
 
         if (index == -1)
         {
@@ -83,16 +83,16 @@ internal class PettableNameDatabase : INamesDatabase
         return TextColours[index];
     }
 
-    public void SetName(PetSkeleton ID, string? name, Vector3? edgeColour, Vector3? textColour)
+    public void SetName(PetSkeleton id, string? name, Vector3? edgeColour, Vector3? textColour)
     {
-        if (ID.SkeletonType == SkeletonType.Invalid)
+        if (id.SkeletonType == SkeletonType.Invalid)
         {
             return;
         }
 
         string? validName = MakeNameValid(name);
 
-        int index = IndexOf(ID);
+        int index = IndexOf(id);
 
         if (index != -1)
         {
@@ -109,17 +109,17 @@ internal class PettableNameDatabase : INamesDatabase
         }
         else if (validName != null)
         {
-            Add(ID, validName, edgeColour, textColour);
+            Add(id, validName, edgeColour, textColour);
         }
 
         SetDirty();
     }
 
-    private int IndexOf(PetSkeleton ID)
+    private int IndexOf(PetSkeleton id)
     {
         for (int i = 0; i < Length; i++)
         {
-            if (IDs[i] != ID)
+            if (IDs[i] != id)
             {
                 continue;
             }
@@ -132,38 +132,38 @@ internal class PettableNameDatabase : INamesDatabase
 
     private void RemoveAtIndex(int index)
     {
-        List<PetSkeleton> newIds      = [..IDs];
-        List<string>      newNames    = [..Names];
-        List<Vector3?>    edgeColours = [..EdgeColours];
-        List<Vector3?>    textColours = [..TextColours];
+        List<PetSkeleton> newIds      = [.. IDs];
+        List<string>      newNames    = [.. Names];
+        List<Vector3?>    edgeColours = [.. EdgeColours];
+        List<Vector3?>    textColours = [.. TextColours];
 
         newIds.RemoveAt(index);
         newNames.RemoveAt(index);
         edgeColours.RemoveAt(index);
         textColours.RemoveAt(index);
 
-        IDs         = [..newIds];
-        Names       = [..newNames];
-        EdgeColours = [..edgeColours];
-        TextColours = [..textColours];
+        IDs         = [.. newIds];
+        Names       = [.. newNames];
+        EdgeColours = [.. edgeColours];
+        TextColours = [.. textColours];
     }
 
     private void Add(PetSkeleton id, string name, Vector3? edgeColour, Vector3? textColour)
     {
-        List<PetSkeleton> newIds      = [..IDs];
-        List<string>      newNames    = [..Names];
-        List<Vector3?>    edgeColours = [..EdgeColours];
-        List<Vector3?>    textColours = [..TextColours];
+        List<PetSkeleton> newIds      = [.. IDs];
+        List<string>      newNames    = [.. Names];
+        List<Vector3?>    edgeColours = [.. EdgeColours];
+        List<Vector3?>    textColours = [.. TextColours];
 
         newIds.Add(id);
         newNames.Add(name);
         edgeColours.Add(edgeColour);
         textColours.Add(textColour);
 
-        IDs         = [..newIds];
-        Names       = [..newNames];
-        EdgeColours = [..edgeColours];
-        TextColours = [..textColours];
+        IDs         = [.. newIds];
+        Names       = [.. newNames];
+        EdgeColours = [.. edgeColours];
+        TextColours = [.. textColours];
     }
      
     public SerializableNameDataV3 SerializeData() 
@@ -176,7 +176,7 @@ internal class PettableNameDatabase : INamesDatabase
             return;
         }
 
-        List<string> newNames = new List<string>();
+        List<string> newNames = [];
 
         for (int i = 0; i < names.Length; i++)
         {
@@ -185,9 +185,9 @@ internal class PettableNameDatabase : INamesDatabase
         }
 
         IDs         = ids;
-        Names       = [..newNames];
-        EdgeColours = [..edgeColours];
-        TextColours = [..textColours];
+        Names       = [.. newNames];
+        EdgeColours = [.. edgeColours];
+        TextColours = [.. textColours];
     }
 
     private void SetDirty()

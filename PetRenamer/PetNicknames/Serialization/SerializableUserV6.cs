@@ -33,7 +33,7 @@ internal class SerializableUserV6
 
     public SerializableUserV6(in IPettableDatabaseEntry entry)
     {
-        ContentID         = entry.ContentID;
+        ContentID         = entry.ContentId;
         Name              = entry.Name;
         Homeworld         = entry.Homeworld;
 

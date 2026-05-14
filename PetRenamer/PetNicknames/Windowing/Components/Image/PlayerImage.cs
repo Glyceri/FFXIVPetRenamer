@@ -9,7 +9,33 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Image;
 
 internal static class PlayerImage
 {
-    public static void Draw(IPettableDatabaseEntry? entry, in IImageDatabase imageDatabase)
+    private static void DrawRedownload(Vector2 buttonSize, IPettableDatabaseEntry entry, IImageDatabase imageDatabase)
+    {
+        if (ImGui.Button(SeIconChar.QuestSync.ToIconString() + $"##RedownloadButton_{WindowHandler.InternalCounter}", buttonSize))
+        {
+            imageDatabase.Redownload(entry);
+        }
+        
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Redownload Profile Picture");
+        }
+    }
+    
+    private static void DrawCancel(Vector2 buttonSize, IPettableDatabaseEntry entry, IImageDatabase imageDatabase)
+    {
+        if (ImGui.Button(SeIconChar.BoxedLetterX.ToIconString() + $"##CancelRedownloadButton_{WindowHandler.InternalCounter}", buttonSize))
+        {
+            imageDatabase.Cancel(entry);
+        }
+        
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Cancel Download");
+        }
+    }
+    
+    public static void Draw(IPettableDatabaseEntry? entry, IImageDatabase imageDatabase)
     {
         IDalamudTextureWrap? tWrap = imageDatabase.GetWrapFor(entry);
 
@@ -36,26 +62,21 @@ internal static class PlayerImage
             return;
         }
 
-        ImGui.BeginDisabled(imageDatabase.IsBeingDownloaded(entry));
-
         Vector2 buttonSize = new Vector2(24, 24) * WindowHandler.GlobalScale;
 
         ImGui.SameLine(0, 0);
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(buttonSize.X + framePaddingX, -(size - buttonSize.Y - framePaddingY)));
-
-        if (ImGui.Button(SeIconChar.QuestSync.ToIconString() + $"##RedownloadButton_{WindowHandler.InternalCounter}", buttonSize))
+        
+        if (!imageDatabase.IsBeingDownloaded(entry))
         {
-            imageDatabase.Redownload(entry);
+            DrawRedownload(buttonSize, entry, imageDatabase);
+        }
+        else
+        {
+            DrawCancel(buttonSize, entry, imageDatabase);
         }
 
         ImGui.SameLine(0, 0);
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Redownload profile Picture");
-        }
-
-        ImGui.EndDisabled();
 
         ImGui.SetCursorPos(finalCursorPos);
     }

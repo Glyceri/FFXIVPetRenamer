@@ -11,57 +11,61 @@ namespace PetRenamer.Legacy.LegacyStepper.LegacyElements;
 
 internal class LegacyNamingVer7 : ILegacyStepperElement
 {
-    readonly PetServices petServices;
+    private readonly PetServices PetServices;
 
-    public int OldVersion { get; } = 7;
+    public LegacyNamingVer7(PetServices petServices) 
+        => PetServices = petServices;
+    
 
-    public LegacyNamingVer7(PetServices petServices)
-    {
-        this.petServices = petServices;
-    }
-
+    public int OldVersion 
+        => 7;
+    
     // For the LONGEST TIME in pet nicknames you could only set 1 nickname per job, this all changed in ... idk, but savefile version  8!
     public void Upgrade(Configuration configuration)
     {
+        List<SerializableUserV3> newSerializableUsers = [];
 
-        List<SerializableUserV3> newSerializableUsers = new List<SerializableUserV3>();
-
-        if (configuration.serializableUsersV3 != null)
+        configuration.Version = 8;
+        
+        if (configuration.serializableUsersV3 == null)
         {
-            foreach (SerializableUserV3 oldUser in configuration.serializableUsersV3)
+            return;
+        }
+        
+        foreach (SerializableUserV3 oldUser in configuration.serializableUsersV3)
+        {
+            List<int>    newIDS   = [];
+            List<string> newNames = [];
+            
+            for (int i = 0; i < oldUser.ids.Length; i++) 
             {
-                List<int> newIDS = new List<int>();
-                List<string> newNames = new List<string>();
-                for (int i = 0; i < oldUser.ids.Length; i++) 
-                {
-                    int id = oldUser.ids[i];
-                    string name = oldUser.names[i];
+                int    id   = oldUser.ids[i];
+                string name = oldUser.names[i];
 
-                    if (id > -1) 
-                    { 
-                        newIDS.Add(id); 
-                        newNames.Add(name);
-                        continue;
-                    }
-
-
-                    PetSkeleton[] remappedIds = petServices.PetSheets.GetObsoleteIDsFromClass(id);
-
-                    foreach(PetSkeleton remappedId in remappedIds)
-                    {
-                        PetSkeletonHelper.AsLegacy(remappedId, out int Id);
-
-                        newIDS.Add(Id);
-                        newNames.Add(name);
-                    }
+                if (id > -1) 
+                { 
+                    newIDS.Add(id); 
+                    newNames.Add(name);
+                    
+                    continue;
                 }
-                newSerializableUsers.Add(new SerializableUserV3(newIDS.ToArray(), newNames.ToArray(), oldUser.username, oldUser.homeworld, oldUser.mainSkeletons, oldUser.softSkeletons));
+
+
+                PetSkeleton[] remappedIds = PetServices.PetSheets.GetObsoleteIDsFromClass(id);
+
+                foreach(PetSkeleton remappedId in remappedIds)
+                {
+                    remappedId.AsLegacy(out int legacyId);
+
+                    newIDS.Add(legacyId);
+                    newNames.Add(name);
+                }
             }
+            
+            newSerializableUsers.Add(new SerializableUserV3(newIDS.ToArray(), newNames.ToArray(), oldUser.username, oldUser.homeworld, oldUser.mainSkeletons, oldUser.softSkeletons));
         }
 
         configuration.serializableUsersV3 = newSerializableUsers.ToArray();
-
-        configuration.Version = 8;
     }
 }
 #pragma warning restore CS0612 // Type or member is obsolete

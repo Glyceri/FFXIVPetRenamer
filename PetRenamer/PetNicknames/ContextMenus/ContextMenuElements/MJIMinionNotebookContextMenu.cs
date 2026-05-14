@@ -1,14 +1,14 @@
 ﻿using PetRenamer.PetNicknames.ContextMenus.ContextMenuElements.Abstract;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 
 namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 
 internal class MJIMinionNotebookContextMenu : PetActionContextMenu
 {
-    public MJIMinionNotebookContextMenu(IPettableUserList userList, IWindowHandler windowHandler, IActionTooltipHook actionTooltipHook) 
-        : base(userList, windowHandler, actionTooltipHook) { }
+    public MJIMinionNotebookContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
+        : base(petServices, userList, windowHandler) { }
 
     public override string? AddonName
         => "MJIMinionNoteBook";

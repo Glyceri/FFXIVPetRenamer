@@ -8,10 +8,10 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal abstract class HookableElement : IHookableElement
 {
-    public readonly DalamudServices         DalamudServices;
-    public readonly IPettableUserList       UserList;
-    public readonly IPetServices            PetServices;
-    public readonly IPettableDirtyListener  DirtyListener;
+    protected readonly DalamudServices         DalamudServices;
+    protected readonly IPettableUserList       UserList;
+    protected readonly IPetServices            PetServices;
+    protected readonly IPettableDirtyListener  DirtyListener;
 
     public HookableElement(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener)
     {
@@ -47,7 +47,7 @@ internal abstract class HookableElement : IHookableElement
     protected virtual void OnPlayerDirty(IPettableUser user)                           
         => Refresh();
 
-    protected virtual void Refresh() { }
+    public virtual void Refresh() { }
 
     public void Dispose()
     {
