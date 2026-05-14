@@ -125,7 +125,7 @@ internal class PetListWindow : PetWindow
     {
         if (Listbox.Begin($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
-            PlayerImage.Draw(ActiveEntry, in ImageDatabase);
+            PlayerImage.Draw(ActiveEntry, ImageDatabase);
 
             ImGui.SameLine();
 
@@ -338,7 +338,7 @@ internal class PetListWindow : PetWindow
                 {
                     float size = ImGui.GetContentRegionAvail().Y;
 
-                    PlayerImage.Draw(user.Entry, in ImageDatabase);
+                    PlayerImage.Draw(user.Entry, ImageDatabase);
 
                     ImGui.SameLine();
 

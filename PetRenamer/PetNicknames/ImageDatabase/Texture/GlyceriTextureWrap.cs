@@ -8,32 +8,12 @@ namespace PetRenamer.PetNicknames.ImageDatabase.Texture;
 internal class GlyceriTextureWrap : IGlyceriTextureWrap
 {
     // After 5 seconds a texture is OLD
-    const float TimeToOld = 5.0f;
+    private const float TimeToOld = 5.0f;
 
-    IDalamudTextureWrap? textureWrap = null;
-
-    public IDalamudTextureWrap? TextureWrap
-    {
-        get => textureWrap; 
-        set
-        {
-            textureWrap?.Dispose();
-            textureWrap = value;
-        }
-    }
-    public bool IsOld { get; private set; } = false;
-    public PetUser User { get; }
-
-    DateTime timeSinceLastAccess = DateTime.Now;
+    private DateTime timeSinceLastAccess = DateTime.Now;
 
     public GlyceriTextureWrap(in PetUser user)
     {
-        User = user;
-    }
-
-    public GlyceriTextureWrap(in IDalamudTextureWrap? textureWrap, in PetUser user)
-    {
-        this.textureWrap = textureWrap;
         User = user;
     }
 
@@ -43,10 +23,30 @@ internal class GlyceriTextureWrap : IGlyceriTextureWrap
         TextureWrap = null;
     }
 
+    public IDalamudTextureWrap? TextureWrap
+    {
+        get; 
+        set
+        {
+            field?.Dispose();
+            field = value;
+        }
+    }
+    
+    public bool IsOld 
+        { get; private set; }
+    
+    public PetUser User 
+        { get; }
+    
     public void Update()
     {
         TimeSpan timeSpan = DateTime.Now - timeSinceLastAccess;
-        if (timeSpan.TotalSeconds < TimeToOld) return;
+        
+        if (timeSpan.TotalSeconds < TimeToOld)
+        {
+            return;
+        }
 
         IsOld = true;
     }

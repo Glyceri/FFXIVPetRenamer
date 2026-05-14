@@ -11,7 +11,7 @@ internal abstract class LogChatElement : IChatElement, IDisposable
 {
     protected readonly DalamudServices DalamudServices;
     
-    private readonly List<LogChatMessage> chatMessages = [];
+    private readonly HashSet<LogChatMessage> chatMessages = [];
     
     private int expectedLogCount = 0;
     
