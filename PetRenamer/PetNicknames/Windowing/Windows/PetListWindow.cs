@@ -60,7 +60,8 @@ internal class PetListWindow : PetWindow
     private double internalDisabledTimer = 0;
     private DateTime lastTime = DateTime.Now;
 
-    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter) : base(windowHandler, dalamudServices, petServices.Configuration, "Pet List Window", ImGuiWindowFlags.None)
+    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
+        : base(windowHandler, dalamudServices, petServices.Configuration, "Pet List Window")
     {
         UserList        = userList;
         Database        = database;

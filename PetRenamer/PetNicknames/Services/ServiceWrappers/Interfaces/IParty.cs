@@ -6,7 +6,7 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal interface IParty : IDisposable, IEnumerable<IPettableUser?>
 {
-    const int MaxPartyLength = 8;
+    const int MaxPartyLength = 10;
     
     int Length { get; }
     
