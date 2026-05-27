@@ -11,6 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -393,7 +394,7 @@ internal class PetDevWindow : PetWindow
         }
     }
     
-    void DrawParty()
+    private void DrawPartyLeft()
     {
         int index = 0;
         
@@ -424,6 +425,37 @@ internal class PetDevWindow : PetWindow
             }
             
             index++;
+        }
+    }
+    
+    private unsafe void DrawPartyRight()
+    {
+        AgentHUD* agentChud = AgentHUD.Instance();
+        
+        int index = 0;
+        
+        foreach (HudPartyMember partyMember in agentChud->PartyMembers)
+        {
+            ImGui.BulletText($"[{index++}] [{partyMember.Name}, {partyMember.ContentId}]");
+        }
+    }
+    
+    void DrawParty()
+    {
+        if (ImGui.BeginListBox("###PET_NICKNAMES_DEV_PARTY_LISTBOX_LEFT", ImGui.GetContentRegionAvail() * new Vector2(0.5f, 1.0f)))
+        {
+            DrawPartyLeft();
+            
+            ImGui.EndListBox();
+        }
+        
+        ImGui.SameLine();
+        
+        if (ImGui.BeginListBox("###PET_NICKNAMES_DEV_PARTY_LISTBOX_RIGHT", ImGui.GetContentRegionAvail()))
+        {
+            DrawPartyRight();
+            
+            ImGui.EndListBox();
         }
     }
     
