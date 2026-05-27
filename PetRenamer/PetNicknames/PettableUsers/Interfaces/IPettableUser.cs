@@ -28,7 +28,7 @@ internal unsafe interface IPettableUser : IBattleUser
     void SetBattlePet(BattleChara* battlePet);
     void RemoveBattlePet(BattleChara* battlePet);
     void SetCompanion(Companion* companion);
-    void RemoveCompanion(Companion* companion);
+    void RemoveCompanion();
     void Dispose(IPettableDatabase database);
     void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
     void Recalculate();

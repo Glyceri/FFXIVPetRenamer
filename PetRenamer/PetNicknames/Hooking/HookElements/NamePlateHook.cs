@@ -100,7 +100,12 @@ internal unsafe class NamePlateHook : HookableElement
             return;
         }
         
-        string? customPetName = pPet.CustomName;
+        if (pPet.Owner == null)
+        {
+            return;
+        }
+        
+        string? customPetName = pPet.Owner.DataBaseEntry.GetName(pPet.SkeletonId);
 
         if (customPetName.IsNullOrWhitespace())
         {

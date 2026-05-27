@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -168,7 +169,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void HandleAsDeletedCompanion(Companion* companion)
-        => GetOwner(companion)?.RemoveCompanion(companion);
+        => GetOwner(companion)?.RemoveCompanion();
 
     private IPettableUser? GetOwner(Companion* companion)
     {
@@ -177,7 +178,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return null;
         }
 
-        return UserList.GetUserFromOwnerId(companion->CompanionOwnerId);
+        return UserList.GetUserFromObjectId(companion->CompanionOwnerId);
     }
 
     private void HandleAsCreated(BattleChara* newBattleChara)
@@ -209,7 +210,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                     continue;
                 }
 
-                if (user.ShortObjectId != owner)
+                if (user.ObjectId.ObjectId != owner)
                 {
                     continue;
                 }
@@ -321,7 +322,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         {
             _ = temporaryPets.Remove(addressChara);
 
-            IPettableUser? user = UserList.GetUser(addressChara);
+            IPettableUser? user = UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
 
             if (user == null)
             {
@@ -334,8 +335,6 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void AddTempPetsToUser(IPettableUser user)
     {
-        uint userID = user.ShortObjectId;
-
         for (int i = temporaryPets.Count - 1; i >= 0; i--)
         {
             nint tempPetPtr = temporaryPets[i];
@@ -352,7 +351,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                 continue;
             }
 
-            if (tempPet->OwnerId != userID)
+            if (tempPet->OwnerId != user.ObjectId.ObjectId)
             {
                 continue;
             }

@@ -7,7 +7,7 @@ namespace PetRenamer.PetNicknames.Windowing.Windows.PetList;
 internal class PetListPet : IPetListDrawable
 {
     public readonly IPetSheetData PetSheetData;
-    public          string        CustomName;
+    public readonly string        CustomName;
     public          string        TempName;
     public          Vector3?      EdgeColour;
     public          Vector3?      TextColour;

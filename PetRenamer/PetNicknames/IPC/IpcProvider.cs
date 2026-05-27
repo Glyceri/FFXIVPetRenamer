@@ -10,6 +10,8 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
@@ -55,6 +57,9 @@ internal class IpcProvider : IIpcProvider
       *      - ClearPlayerData <ushort>:
       *          Call this action to clear the IPC data of the given ObjectIndex.
       *
+      *      - ClearPlayerDataV2 <nint>:
+      *          Call this action to clear the IPC data of the given nint battleChara pointer of the player to clear.
+      *
       * Also take a look in SharingDictionary.cs to see if that file contains what you need.
       * 
       * ----------------------END READ ME -----------------------
@@ -74,6 +79,7 @@ internal class IpcProvider : IIpcProvider
     private readonly DalamudServices                    DalamudServices;
     private readonly IDataWriter                        DataWriter;
     private readonly IDataParser                        DataReader;
+    private readonly IPettableUserList                  UserList;
 
 
     // Notifications
@@ -83,32 +89,52 @@ internal class IpcProvider : IIpcProvider
 
     // Functions
     private readonly ICallGateProvider<bool>            EnabledFunction;
-    private readonly ICallGateProvider<(uint, uint)>?   ApiVersion;
+    private readonly ICallGateProvider<(uint, uint)>    ApiVersion;
     private readonly ICallGateProvider<string>          GetPlayerData;
 
     // Actions
     private readonly ICallGateProvider<string, object>  SetPlayerData;
     private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
-
-    public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter)
+    private readonly ICallGateProvider<nint, object>    ClearPlayerIPCDataV2;
+    
+    public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter, IPettableUserList userList)
     {
-        DalamudServices    = dalamudServices;
-        DataReader         = dataReader;
-        DataWriter         = dataWriter;
+        DalamudServices      = dalamudServices;
+        DataReader           = dataReader;
+        DataWriter           = dataWriter;
+        UserList             = userList;
 
         // Notifiers
-        Ready              = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
-        Disposing          = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
-        PlayerDataChanged  = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
+        Ready                = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
+        Disposing            = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged    = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
-        ApiVersion         = petNicknamesPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
-        EnabledFunction    = petNicknamesPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
-        GetPlayerData      = petNicknamesPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
+        ApiVersion           = petNicknamesPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
+        EnabledFunction      = petNicknamesPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
+        GetPlayerData        = petNicknamesPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData      = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData = petNicknamesPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
+        SetPlayerData        = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData   = petNicknamesPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
+        ClearPlayerIPCDataV2 = petNicknamesPlugin.GetIpcProvider<nint, object>  ($"{ApiNamespace}ClearPlayerDataV2");
+    }
+    
+    public void Dispose()
+    {
+        Enabled = false;
+
+        NotifyDisposing();
+
+        // Actions
+        SetPlayerData.UnregisterAction();
+        ClearPlayerIPCData.UnregisterAction();
+        ClearPlayerIPCDataV2.UnregisterAction();
+
+        // Functions
+        ApiVersion.UnregisterFunc();
+        EnabledFunction.UnregisterFunc();
+        GetPlayerData.UnregisterFunc();
     }
 
     public void OnUpdate(IFramework framework)
@@ -162,19 +188,20 @@ internal class IpcProvider : IIpcProvider
 
     private void RegsterActions()
     {
-        SetPlayerData!.RegisterAction(SetPlayerDataDetour);
-        ClearPlayerIPCData!.RegisterAction(ClearIPCDataDetour);
+        SetPlayerData.RegisterAction(SetPlayerDataDetour);
+        ClearPlayerIPCData.RegisterAction(ClearIPCDataDetour);
+        ClearPlayerIPCDataV2.RegisterAction(ClearIPCDataV2Detour);
     }
 
     private void RegisterFunctions()
     {
-        ApiVersion!.RegisterFunc(VersionDetour);
-        EnabledFunction!.RegisterFunc(EnabledDetour);
-        GetPlayerData!.RegisterFunc(GetPlayerDataDetour);
+        ApiVersion.RegisterFunc(VersionDetour);
+        EnabledFunction.RegisterFunc(EnabledDetour);
+        GetPlayerData.RegisterFunc(GetPlayerDataDetour);
     }
 
     // Actions
-    public void SetPlayerDataDetour(string data)
+    private void SetPlayerDataDetour(string data)
     {
         DalamudServices.PluginLog.Debug("[IPC] Set Player Data: " + data);
         
@@ -193,7 +220,7 @@ internal class IpcProvider : IIpcProvider
         }
     }
 
-    public void ClearIPCDataDetour(ushort objectIndex)
+    private void ClearIPCDataDetour(ushort objectIndex)
     {
         DalamudServices.PluginLog.Debug("[IPC] Clear Player Data: " + objectIndex);
         
@@ -219,19 +246,36 @@ internal class IpcProvider : IIpcProvider
             DalamudServices.PluginLog.Error(e, "Error in clear IPC");
         }
     }
+    
+    private void ClearIPCDataV2Detour(nint character)
+    {
+        IPettableUser? user = UserList.GetUser(character, UserListFindType.Direct);
+        
+        if (user == null)
+        {
+            return;
+        }
+        
+        if (!user.DataBaseEntry.IsIPC)
+        {
+            return;
+        }
+        
+        user.DataBaseEntry.Clear(ParseSource.IPC);
+    }
 
     // Functions
-    public (uint, uint) VersionDetour()
+    private (uint, uint) VersionDetour()
     {
         return (MajorVersion, MinorVersion);
     }
 
-    public bool EnabledDetour()
+    private bool EnabledDetour()
     {
         return Enabled;
     }
 
-    public string GetPlayerDataDetour()
+    private string GetPlayerDataDetour()
     {
         if (lastData.IsNullOrWhitespace())
         {
@@ -246,7 +290,7 @@ internal class IpcProvider : IIpcProvider
     {
         try
         {
-            Ready?.SendMessage();
+            Ready.SendMessage();
         }
         catch (Exception e)
         {
@@ -258,7 +302,7 @@ internal class IpcProvider : IIpcProvider
     {
         try
         {
-            Disposing?.SendMessage();
+            Disposing.SendMessage();
         }
         catch(Exception e) 
         {
@@ -270,7 +314,7 @@ internal class IpcProvider : IIpcProvider
     {
         try
         {
-            PlayerDataChanged?.SendMessage(lastData);
+            PlayerDataChanged.SendMessage(lastData);
         }
         catch(Exception e)
         {
@@ -286,14 +330,6 @@ internal class IpcProvider : IIpcProvider
         hasDataChange = true;
     }
 
-    private void RefreshLastData()
-    {
-        lock (lastData)
-        {
-            lastData = DataWriter.WriteData();
-        }
-    }
-
     public void ClearCachedData()
     {
         lock (lastData)
@@ -302,19 +338,11 @@ internal class IpcProvider : IIpcProvider
         }
     }
 
-    public void Dispose()
+    private void RefreshLastData()
     {
-        Enabled = false;
-
-        NotifyDisposing();
-
-        // Actions
-        SetPlayerData.UnregisterAction();
-        ClearPlayerIPCData?.UnregisterAction();
-
-        // Functions
-        ApiVersion?.UnregisterFunc();
-        EnabledFunction?.UnregisterFunc();
-        GetPlayerData?.UnregisterFunc();
+        lock (lastData)
+        {
+            lastData = DataWriter.WriteData();
+        }
     }
 }

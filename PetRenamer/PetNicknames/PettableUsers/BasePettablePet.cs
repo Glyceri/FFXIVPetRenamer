@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -14,13 +15,9 @@ internal abstract unsafe class BasePettablePet : IPettablePet
 {
     public nint           Address    { get; }
     public PetSkeleton    SkeletonId { get; }
-    public ulong          ObjectId   { get; }
-    public ushort         Index      { get; }
-    public string         Name       { get; }
+    public GameObjectId   ObjectId   { get; }
     public IPetSheetData? PetData    { get; }
     public IPettableUser? Owner      { get; }
-
-    public string?        CustomName { get; private set; }
 
     private readonly IPetServices           PetServices;
     private readonly IPettableDatabaseEntry Entry;
@@ -33,15 +30,13 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         SharingDictionary   = sharingDictionary;
         Address             = (nint)pet;
         Owner               = owner;
-        Index               = pet->GameObject.ObjectIndex;
-        Name                = pet->GameObject.NameString;
         ObjectId            = pet->GetGameObjectId();
         SkeletonId          = new PetSkeleton(pet->ModelContainer.ModelCharaId, skeletonType);
         PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, Index: {Index}, Name: {Name}, and the ObjectID: {ObjectId}");
+            PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");
         }
 
         Recalculate();
@@ -52,8 +47,6 @@ internal abstract unsafe class BasePettablePet : IPettablePet
 
     public void Recalculate()
     {
-        CustomName = Entry.GetName(SkeletonId);
-
         Configuration.ColourMode colourMode = PetServices.Configuration.SelectedColourMode;
         
         Vector3? edgeColour = null;
@@ -65,14 +58,14 @@ internal abstract unsafe class BasePettablePet : IPettablePet
             textColour = Entry.GetTextColour(SkeletonId);
         }
         
-        SharingDictionary.Set(ObjectId, CustomName, Address, edgeColour, textColour);
+        SharingDictionary.Set(ObjectId, Entry.GetName(SkeletonId), Address, edgeColour, textColour);
     }
 
     public void Dispose()
     {
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Just removed the Pet: {Name}, Address: {Address}, Index: {Index}, and the ObjectID: {ObjectId}");
+            PetServices.PetLog.LogVerbose($"Just removed the pet at Address: {Address}, and the ObjectID: {ObjectId}");
         }
 
         SharingDictionary.Set(ObjectId, null);

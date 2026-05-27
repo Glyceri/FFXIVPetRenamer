@@ -1,6 +1,7 @@
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -40,7 +41,7 @@ internal class CastHook : HookableElement
             return;
         }
 
-        IPettableUser? user = UserList.GetUser(castDealer);
+        IPettableUser? user = UserList.GetUser(castDealer, UserListFindType.PetMeansOwner);
 
         user?.OnLastCastChanged((uint)castId);
     }

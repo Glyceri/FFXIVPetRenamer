@@ -24,9 +24,7 @@ internal class SharingDictionary : ISharingDictionary
     // PetRenamer.GameObjectRenameDict
     private readonly Dictionary<ulong, string> PetNicknameDict             = [];
     
-    
-    
-    private readonly DalamudServices DalamudServices;
+    private readonly DalamudServices           DalamudServices;
     
     public SharingDictionary(DalamudServices dalamudServices)
     {

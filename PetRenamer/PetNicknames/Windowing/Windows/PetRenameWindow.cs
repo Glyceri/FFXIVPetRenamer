@@ -305,7 +305,6 @@ internal class PetRenameWindow : PetWindow
             if (searchTexture != null)
             {
                 BoxedImage.Draw(searchTexture, size);
-                
             }
         }
         else if (ActivePetData != null)

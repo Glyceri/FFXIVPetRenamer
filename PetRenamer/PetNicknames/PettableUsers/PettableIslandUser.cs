@@ -18,8 +18,7 @@ internal unsafe class PettableIslandUser : IIslandUser
     public uint         EntityId  { get; }
     
     public BattleChara* BattleChara   { get; } = null;
-    public ulong        ObjectId      { get; } = 0;
-    public uint         ShortObjectId { get; } = 0;
+    public GameObjectId ObjectId      { get; } = 0;
     public uint         CurrentCastId { get; } = 0;
     public nint         Address       { get; } = 0;
     
@@ -50,7 +49,7 @@ internal unsafe class PettableIslandUser : IIslandUser
 
     public void SetBattlePet(BattleChara* pointer)
     {
-        PettablePets.Add(new PettableIslandPet(pointer, this, DataBaseEntry, PetServices));
+        PettablePets.Add(new PettableIslandPet(pointer, this, PetServices));
     }
 
     public void RemoveBattlePet(BattleChara* pointer)
@@ -121,7 +120,7 @@ internal unsafe class PettableIslandUser : IIslandUser
     public void Dispose(IPettableDatabase d) { } // Unused
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
-    public void RemoveCompanion(Companion* companion) { } // Unused
+    public void RemoveCompanion() { } // Unused
     public void Recalculate() { } // unused
 
     public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)

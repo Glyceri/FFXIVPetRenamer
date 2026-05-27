@@ -21,30 +21,15 @@ internal unsafe class PettableUserTargetManager : IPettableUserTargetManager
             return null;
         }
 
-        IPettablePet? finalPet = UserList.GetPet(targetId.Id);
+        IPettableEntity? entity = UserList.GetPet(targetId);
+        
+        entity ??= UserList.GetUserFromObjectId(targetId);
 
-        if (finalPet != null)
-        {
-            return finalPet;
-        }
-
-        IPettableUser? finalUser = UserList.GetUserFromObjectId(targetId.ObjectId);
-
-        if (finalUser != null)
-        {
-            return finalUser;
-        }
-
-        return null;
+        return entity;
     }
 
     private IPettableUser? AsUser(IPettableEntity? entity)
     {
-        if (entity == null)
-        {
-            return null;
-        }
-
         if (entity is not IPettableUser user)
         {
             return null;

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ internal class TargetManagerWrapper : ITargetManager
 
     private IPettableEntity? GetEntity(nint address)
     {
-        IPettableEntity? entity = UserList.GetUser(address, false);
+        IPettableEntity? entity = UserList.GetUser(address, UserListFindType.Direct);
 
         if (entity != null)
         {

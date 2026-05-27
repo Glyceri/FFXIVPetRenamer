@@ -4,6 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections;
@@ -93,7 +94,7 @@ internal class PartyService : IParty
                 continue;
             }
             
-            IPettableUser? user = UserList.GetUser((nint)partyChara, false);
+            IPettableUser? user = UserList.GetUser((nint)partyChara, UserListFindType.Direct);
             
             if (user == null)
             {

@@ -1,4 +1,6 @@
 ﻿using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
@@ -38,7 +40,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettablePet? GetPet(ulong petId)
+    public IPettablePet? GetPet(GameObjectId petId)
     {
         if (petId == 0)
         {
@@ -61,7 +63,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUser(nint user, bool petMeansOwner = true)
+    public IPettableUser? GetUser(nint user, UserListFindType findType)
     {
         if (user == nint.Zero)
         {
@@ -82,7 +84,7 @@ internal class PettableUserList : IPettableUserList
                 return pUser;
             }
 
-            if (petMeansOwner)
+            if (findType == UserListFindType.PetMeansOwner)
             {
                 if (pUser.GetPet(user) == null)
                 {
@@ -96,39 +98,7 @@ internal class PettableUserList : IPettableUserList
         return null;
     }
 
-    public IPettableUser? GetUser(ulong userId)
-    {
-        if (userId == 0)
-        {
-            return null;
-        }
-
-        for (int i = 0; i < PettableUserArraySize; i++)
-        {
-            IPettableUser? pUser = PettableUsers[i];
-
-            if (pUser == null)
-            {
-                continue;
-            }
-
-            if (pUser.ObjectId != userId)
-            {
-                continue;
-            }
-
-            if (pUser.GetPet(userId) == null)
-            {
-                continue;
-            }
-
-            return pUser;
-        }
-
-        return null;
-    }
-
-    public IPettableUser? GetUserFromObjectId(uint objectId)
+    public IPettableUser? GetUserFromObjectId(GameObjectId objectId)
     {
         if (objectId == 0)
         {
@@ -144,7 +114,7 @@ internal class PettableUserList : IPettableUserList
                 continue;
             }
 
-            if (pUser.ShortObjectId != objectId)
+            if (pUser.ObjectId != objectId)
             {
                 continue;
             }
@@ -181,28 +151,6 @@ internal class PettableUserList : IPettableUserList
 
         return null;
     }
-
-    public IPettableUser? GetUserFromEntityId(uint entityId)
-    {
-        for (int i = 0; i < PettableUserArraySize; i++)
-        {
-            IPettableUser? pUser = PettableUsers[i];
-
-            if (pUser == null)
-            {
-                continue;
-            }
-
-            if (pUser.EntityId != entityId)
-            {
-                continue;
-            }
-
-            return pUser;
-        }
-
-        return null;
-    }
     
     public IPettableUser? GetUser(string username)
     {
@@ -221,33 +169,6 @@ internal class PettableUserList : IPettableUserList
             }
 
             if (!pUser.Name.InvariantEquals(username))
-            {
-                continue;
-            }
-
-            return pUser;
-        }
-
-        return null;
-    }
-
-    public IPettableUser? GetUserFromOwnerId(uint ownerId)
-    {
-        if (ownerId == 0)
-        {
-            return null;
-        }
-
-        for (int i = 0; i < PettableUserArraySize; i++)
-        {
-            IPettableUser? pUser = PettableUsers[i];
-
-            if (pUser == null)
-            {
-                continue;
-            }
-
-            if (pUser.ShortObjectId != ownerId)
             {
                 continue;
             }

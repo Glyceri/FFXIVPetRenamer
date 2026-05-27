@@ -17,6 +17,7 @@ using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -197,7 +198,7 @@ internal class PetDevWindow : PetWindow
     }
     
     private string GetPetText(IPettablePet? pet)
-        => pet == null ? "No Pet" : $"{pet.SkeletonId}] [{pet.Name}] [{pet.CustomName}";
+        => pet == null ? "No Pet" : $"{pet.SkeletonId}] [{pet.Address}";
     
     private string GetUserText(IPettableUser? user)
         => user == null ? "No Player" : $"{user.Name}@{PetServices.PetSheets.GetWorldName(user.Homeworld)}] [{user.PettablePets.Count}";
@@ -503,7 +504,7 @@ internal class PetDevWindow : PetWindow
             {
                 bool hasTarget = true;
                 
-                IPettableUser? user = UserList.GetUser(player!.Address);
+                IPettableUser? user = UserList.GetUser(player!.Address, UserListFindType.PetMeansOwner);
                 if (user != null)
                 {
                     hasTarget = !user.DataBaseEntry.IsActive;
@@ -697,7 +698,7 @@ internal class PetDevWindow : PetWindow
         LabledLabel.Draw("My calculated Battle Pet Count (These should be equal): ", $"{glyceriEstematedBattlePetCount}", WindowHandler.StretchingBar, labelWidth: 400);
     }
 
-    void NewDrawUser(IPettableUser user)
+    unsafe void NewDrawUser(IPettableUser user)
     {
         if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
             return;
@@ -724,13 +725,10 @@ internal class PetDevWindow : PetWindow
             ImGui.TextUnformatted($"{pet.SkeletonId}");
 
             ImGui.TableSetColumnIndex(1);
-            ImGui.TextUnformatted(pet.Name);
+            ImGui.TextUnformatted( ((BattleChara*)pet.Address)->NameString);
 
             ImGui.TableSetColumnIndex(2);
             ImGui.TextUnformatted(pet.PetData?.BaseSingular);
-
-            ImGui.TableSetColumnIndex(3);
-            ImGui.TextUnformatted(pet.Index.ToString());
         }
 
         ImGui.EndTable();

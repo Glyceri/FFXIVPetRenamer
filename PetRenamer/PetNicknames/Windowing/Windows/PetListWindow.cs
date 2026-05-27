@@ -249,188 +249,202 @@ internal class PetListWindow : PetWindow
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(style.ItemSpacing.X, 0)))
+        //using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(style.ItemSpacing.X, 0)));
+        
+        float buttSize = WindowHandler.BarHeight;
+        bool  clicked  = false;
+
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttSize - style.FramePadding.X);
+
+        using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(10, (buttSize - ImGui.GetTextLineHeight()) * 0.5f)))
         {
-            float buttSize = WindowHandler.BarHeight;
-
-            bool clicked = false;
-
-            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttSize - style.FramePadding.X);
-
-            using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(10, (buttSize - ImGui.GetTextLineHeight()) * 0.5f)))
+            if (ImGui.InputTextWithHint($"##InputText_{WindowHandler.InternalCounter}", ". . .", ref SearchText, 64))
             {
-                if (ImGui.InputTextWithHint($"##InputText_{WindowHandler.InternalCounter}", ". . .", ref SearchText, 64))
+                clicked = true;
+            }
+        }
+
+        SearchText = SearchText.Replace(Environment.NewLine, string.Empty);
+
+        ImGui.SameLine();
+
+        ImGui.PushFont(UiBuilder.IconFont);
+
+        using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(style.FramePadding.X, (buttSize - ImGui.GetTextLineHeight()) * 0.3f)))
+        {
+            if (ImGui.Button($"{FontAwesomeIcon.Search.ToIconString()}##Search_{WindowHandler.InternalCounter}", new Vector2(buttSize, buttSize)))
+            {
+                clicked = true;
+            }
+        }
+
+        ImGui.PopFont();
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(Translator.GetLine("Search"));
+        }
+
+        if (!clicked)
+        {
+            return;
+        }
+        
+        activeSearchText = SearchText;
+
+        _ = DalamudServices.Framework.Run(() =>
+        {
+            SetUser(ActiveEntry);
+        });
+    }
+
+    private void DrawPetListPetList()
+    {
+        foreach (PetListPet pet in petListDrawables.OfType<PetListPet>())
+        {
+            using ImRaii.ListBoxDisposable listBox = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale));
+            
+            if (!listBox.Success)
+            {
+                continue;
+            }
+            
+            float size = ImGui.GetContentRegionAvail().Y;
+            
+            BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
+
+            using ImRaii.ListBoxDisposable listBox2 = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail());
+            
+            if (!listBox2.Success)
+            {
+                continue;
+            }
+            
+            if (isLocalEntry) 
+            {
+                if (RenameLabel.Draw($"Nickname:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, ref pet.EdgeColour, ref pet.TextColour, WindowHandler.StretchingBar))
                 {
-                    clicked |= true;
+                    OnSave(pet.TempName, pet.PetSheetData.Model, pet.EdgeColour, pet.TextColour);
                 }
             }
+            else
+            {
+                LabledLabel.Draw("Nickname:", pet.CustomName, WindowHandler.StretchingBar);
+            }
 
-            SearchText = SearchText.Replace(Environment.NewLine, string.Empty);
+            LabledLabel.Draw("Pet:", pet.PetSheetData.BaseSingular, WindowHandler.StretchingBar);
+            LabledLabel.Draw("ID:", pet.PetSheetData.Model.SkeletonId.ToString(), WindowHandler.StretchingBar);
+        }
+    }
+    
+    private unsafe void DrawPetListUser()
+    {
+        foreach (PetListUser user in petListDrawables.OfType<PetListUser>())
+        {
+            using ImRaii.ListBoxDisposable listBox = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale));
+
+            if (!listBox.Success)
+            {
+                continue;
+            }
+            
+            PlayerImage.Draw(user.Entry, ImageDatabase);
 
             ImGui.SameLine();
 
-            ImGui.PushFont(UiBuilder.IconFont);
-
-            using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(style.FramePadding.X, (buttSize - ImGui.GetTextLineHeight()) * 0.3f)))
+            using ImRaii.ListBoxDisposable listBox2 = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail());
+            
+            if (!listBox2.Success)
             {
-                if (ImGui.Button($"{FontAwesomeIcon.Search.ToIconString()}##Search_{WindowHandler.InternalCounter}", new Vector2(buttSize, buttSize)))
+                continue;
+            }
+
+            if (user.Entry.ContentId == UserList.LocalPlayer?.ContentId)
+            {
+                if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
                 {
-                    clicked |= true;
+                    _ = DalamudServices.Framework.Run(() =>
+                    {
+                        ToggleUserMode();
+                        SetUser(user.Entry);
+                    });
+                }
+            }
+            else
+            {
+                bool  isLegacy    = user.Entry.IsLegacy;
+                bool  isIPC       = user.Entry.IsIPC;
+                bool  isSpecial   = isLegacy || isIPC;
+                int   buttonCount = isSpecial ? 2 : 1;
+                float buttonSize  = WindowHandler.BarHeight;
+
+                ImGuiStylePtr style = ImGui.GetStyle();
+
+                if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), WindowHandler.BarHeight)))
+                {
+                    _ = DalamudServices.Framework.Run(() =>
+                    {
+                        ToggleUserMode();
+                        SetUser(user.Entry);
+                    });
+                }
+
+                if (isSpecial)
+                {
+                    ImGui.SameLine();
+                    
+                    Vector4* colour = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
+
+                    using (ImRaii.PushColor(ImGuiCol.ButtonHovered, *colour))
+                    using (ImRaii.PushColor(ImGuiCol.ButtonHovered, *colour))
+                    using (ImRaii.PushColor(ImGuiCol.ButtonHovered, *colour))
+                    {
+                        using (ImRaii.PushFont(UiBuilder.IconFont))
+                        {
+                            _ = ImGui.Button($"{FontAwesomeIcon.Exclamation.ToIconString()}##Exlemation_{WindowHandler.InternalCounter}", new Vector2(buttonSize, buttonSize));
+                        }
+                        
+                        if (ImGui.IsItemHovered())
+                        {
+                            if (isLegacy)
+                            {
+                                ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningOldUser"));
+                            }
+                            else if (isIPC)
+                            {
+                                ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningIPC"));
+                            }
+                        }
+                    }
+                }
+
+                ImGui.SameLine();
+
+                if (EraserButton.Draw(new Vector2(buttonSize, buttonSize), Translator.GetLine("ClearButton.Label"), Translator.GetLine("PetRenameNode.Clear")))
+                {
+                    _ = DalamudServices.Framework.Run(() =>
+                    {
+                        user.Entry.Clear(ParseSource.Manual);
+                    });
                 }
             }
 
-            ImGui.PopFont();
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip(Translator.GetLine("Search"));
-            }
-
-            if (clicked)
-            {
-                activeSearchText = SearchText;
-
-                _ = DalamudServices.Framework.Run(() =>
-                {
-                    SetUser(ActiveEntry);
-                });
-            }
+            LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, WindowHandler.StretchingBar);
+            LabledLabel.Draw("Pet Count:", user.Entry.ActiveDatabase.Length.ToString(), WindowHandler.StretchingBar);
         }
     }
-
-    private unsafe void DrawList()
+    
+    private void DrawList()
     {
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
+        using ImRaii.ListBoxDisposable listBox = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail());
+
+        if (!listBox.Success)
         {
-            foreach (PetListPet pet in petListDrawables.Where(v => v is PetListPet))
-            {
-                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
-                {
-                    float size = ImGui.GetContentRegionAvail().Y;
-                    BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
-
-                    if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
-                    {
-                        if (isLocalEntry) {
-
-                            if (RenameLabel.Draw($"Nickname:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, ref pet.EdgeColour, ref pet.TextColour, WindowHandler.StretchingBar))
-                            {
-                                OnSave(pet.TempName, pet.PetSheetData.Model, pet.EdgeColour, pet.TextColour);
-                            }
-                        }
-                        else
-                        {
-                            LabledLabel.Draw("Nickname:", pet.CustomName ?? string.Empty, WindowHandler.StretchingBar);
-                        }
-
-                        LabledLabel.Draw("Pet:", pet.PetSheetData.BaseSingular, WindowHandler.StretchingBar);
-                        LabledLabel.Draw("ID:", pet.PetSheetData.Model.SkeletonId.ToString(), WindowHandler.StretchingBar);
-
-                        Listbox.End();
-                    }
-
-                    Listbox.End();
-                }
-            }
-
-            foreach (PetListUser user in petListDrawables.Where(v => v is PetListUser))
-            {
-                if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
-                {
-                    float size = ImGui.GetContentRegionAvail().Y;
-
-                    PlayerImage.Draw(user.Entry, ImageDatabase);
-
-                    ImGui.SameLine();
-
-                    if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
-                    {
-                        if (user.Entry.ContentId == UserList.LocalPlayer?.ContentId)
-                        {
-                            if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
-                            {
-                                _ = DalamudServices.Framework.Run(() =>
-                                {
-                                    ToggleUserMode();
-                                    SetUser(user.Entry);
-                                });
-                            }
-                        }
-                        else
-                        {
-                            bool isLegacy = user.Entry.IsLegacy;
-                            bool isIPC = user.Entry.IsIPC;
-
-                            bool isSpecial = isLegacy || isIPC;
-
-                            int buttonCount = isSpecial ? 2 : 1;
-
-                            float buttonSize = WindowHandler.BarHeight;
-
-                            ImGuiStylePtr style = ImGui.GetStyle();
-
-                            if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), WindowHandler.BarHeight)))
-                            {
-                                _ = DalamudServices.Framework.Run(() =>
-                                {
-                                    ToggleUserMode();
-                                    SetUser(user.Entry);
-                                });
-                            }
-
-                            if (isSpecial)
-                            {
-                                ImGui.SameLine();
-
-                                Vector4* colour = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
-
-                                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, *colour);
-                                ImGui.PushStyleColor(ImGuiCol.Button, *colour);
-                                ImGui.PushStyleColor(ImGuiCol.ButtonActive, *colour);
-
-                                ImGui.PushFont(UiBuilder.IconFont);
-                                _ = ImGui.Button($"{FontAwesomeIcon.Exclamation.ToIconString()}##Exlemation_{WindowHandler.InternalCounter}", new Vector2(buttonSize, buttonSize));
-                                ImGui.PopFont();
-
-                                if (ImGui.IsItemHovered())
-                                {
-                                    if (isLegacy)
-                                    {
-                                        ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningOldUser"));
-                                    }
-                                    else if (isIPC)
-                                    {
-                                        ImGui.SetTooltip(Translator.GetLine("UserListElement.WarningIPC"));
-                                    }
-                                }
-
-                                ImGui.PopStyleColor(3);
-
-                            }
-
-                            ImGui.SameLine();
-
-                            if (EraserButton.Draw(new Vector2(buttonSize, buttonSize), Translator.GetLine("ClearButton.Label"), Translator.GetLine("PetRenameNode.Clear")))
-                            {
-                                _ = DalamudServices.Framework.Run(() =>
-                                {
-                                    user.Entry.Clear(ParseSource.Manual);
-                                });
-                            }
-                        }
-
-                        LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, WindowHandler.StretchingBar);
-                        LabledLabel.Draw("Pet Count:", user.Entry.ActiveDatabase.Length.ToString(), WindowHandler.StretchingBar);
-
-                        Listbox.End();
-                    }
-
-                    Listbox.End();
-                }
-            }
-
-            Listbox.End();
+            return;
         }
+        
+        DrawPetListPetList();
+        DrawPetListUser();
     }
 
     private void ClearSearchBar()

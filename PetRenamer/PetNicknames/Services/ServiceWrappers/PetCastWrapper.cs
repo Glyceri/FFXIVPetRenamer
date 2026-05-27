@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableUsers.Enums;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
@@ -15,7 +16,7 @@ internal class PetCastWrapper : IPetCastHelper
         
     public void SetLatestCast(nint target, nint dealer, int lastCastId)
     {
-        LastCastDealer   = UserList.GetUser(dealer, false);
+        LastCastDealer   = UserList.GetUser(dealer, UserListFindType.Direct);
         LastCastDealer ??= UserList.GetPet(dealer);
         LastCastId       = lastCastId;
     }

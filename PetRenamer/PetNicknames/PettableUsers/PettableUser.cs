@@ -14,10 +14,10 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableUser : IPettableUser
 {
-    public string   Name        { get; }
-    public ulong    ContentId   { get; }
-    public ushort   Homeworld   { get; }
-    public ulong    ObjectId    { get; }
+    public string       Name        { get; }
+    public ulong        ContentId   { get; }
+    public ushort       Homeworld   { get; }
+    public GameObjectId ObjectId    { get; }
 
     public List<IPettablePet> PettablePets { get; } = [];
 
@@ -27,7 +27,6 @@ internal unsafe class PettableUser : IPettableUser
     public IPettableDatabaseEntry DataBaseEntry { get; }
 
     public uint EntityId      { get; }
-    public uint ShortObjectId { get; }
     public uint CurrentCastId { get; private set; }
     public bool IsLocalPlayer { get; }
 
@@ -60,7 +59,6 @@ internal unsafe class PettableUser : IPettableUser
         Homeworld       = BattleChara->HomeWorld;
 
         ObjectId        = BattleChara->GetGameObjectId();
-        ShortObjectId   = BattleChara->GetGameObjectId().ObjectId;
         EntityId        = BattleChara->EntityId;
         
         TargetManager   = new PettableUserTargetManager(this, userList);
@@ -176,7 +174,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, Index: {pet.Index}, Name: {pet.Name}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
         }
 
         if (index == -1)
@@ -319,12 +317,12 @@ internal unsafe class PettableUser : IPettableUser
 
     public void SetCompanion(Companion* companion)
     {
-        RemoveCompanion(companion);
+        RemoveCompanion();
 
         CreateNewPet(new PettableCompanion(companion, this, SharingDictionary, DataBaseEntry, PetServices), 0);
     }
 
-    public void RemoveCompanion(Companion* companion)
+    public void RemoveCompanion()
     {
         if (PettablePets.Count == 0)
         {

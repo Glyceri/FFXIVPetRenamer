@@ -1,4 +1,7 @@
-﻿namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using PetRenamer.PetNicknames.PettableUsers.Enums;
+
+namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal interface IPettableUserList
 {
@@ -6,13 +9,11 @@ internal interface IPettableUserList
     IPettableUser?   LocalPlayer   { get; }
 
     IPettablePet?  GetPet(nint pet);
-    IPettableUser? GetUser(nint user, bool petMeansOwner = true);
-    IPettablePet?  GetPet(ulong petId);
-    IPettableUser? GetUser(ulong userId);
-    IPettableUser? GetUserFromObjectId(uint objectId);
-    IPettableUser? GetUserFromOwnerId(uint ownerId);
+    IPettablePet?  GetPet(GameObjectId petId);
+    
+    IPettableUser? GetUser(nint user, UserListFindType findType);
+    IPettableUser? GetUserFromObjectId(GameObjectId objectId);
     IPettableUser? GetUserFromContentId(ulong contentId);
-    IPettableUser? GetUserFromEntityId(uint entityId);
     IPettableUser? GetUser(string username);
     
     void Recalculate();

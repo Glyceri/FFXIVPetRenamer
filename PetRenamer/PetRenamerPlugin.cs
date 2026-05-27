@@ -24,7 +24,6 @@ using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
-using System.Reflection;
 
 namespace PetRenamer;
 
@@ -58,9 +57,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
     public PetRenamerPlugin(IDalamudPluginInterface dalamud)
     {
-        Version                     = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown Version";
+        Version                     = dalamud.Manifest.AssemblyVersion.ToString();
 
-        DalamudServices             = DalamudServices.Create(dalamud, this)!;
+        DalamudServices             = DalamudServices.Create(dalamud, this);
 
         PettableUserList            = new PettableUserList();
 
@@ -82,7 +81,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         DataWriter                  = new DataWriter(PettableUserList);
         DataParser                  = new DataParser(DalamudServices, PetServices, PettableUserList, PettableDatabase, LegacyDatabase);
 
-        IpcProvider                 = new IpcProvider(DalamudServices, DalamudServices.DalamudPlugin, DataParser, DataWriter);
+        IpcProvider                 = new IpcProvider(DalamudServices, DalamudServices.DalamudPlugin, DataParser, DataWriter, PettableUserList);
         PenumbraIPC                 = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
 
         HookHandler                 = new HookHandler(DalamudServices, PetServices, PettableUserList, DirtyHandler, PettableDatabase, LegacyDatabase, SharingDictionary, DirtyHandler);
