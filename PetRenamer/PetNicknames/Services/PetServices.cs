@@ -1,6 +1,6 @@
 ﻿using PetRenamer.Legacy.LegacyStepper;
 using PetRenamer.PetNicknames.PettableDatabase;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -9,8 +9,10 @@ namespace PetRenamer.PetNicknames.Services;
 
 internal class PetServices : IPetServices
 {
+    public string               Version             { get; }
     public IPetLog              PetLog              { get; }
     public Configuration        Configuration       { get; }
+    public IUserList            UserList            { get; }
     public IPetSheets           PetSheets           { get; }
     public IStringHelper        StringHelper        { get; }
     public IPetCastHelper       PetCastHelper       { get; }
@@ -19,21 +21,29 @@ internal class PetServices : IPetServices
     public INotificationService NotificationService { get; }
     public INameService         NameService         { get; }
     public IHoverService        HoverService        { get; }
+    public IDirtyCaller         DirtyCaller         { get; }
+    public IDirtyListener       DirtyListener       { get; }
     public IParty               Party               { get; }
 
-    public PetServices(DalamudServices services, IPettableUserList userList, PettableDirtyHandler dirtyHandler) 
+    private readonly DirtyHandler DirtyHandler = new DirtyHandler();
+    
+    public PetServices(DalamudServices services) 
     {
+        Version             = services.DalamudPlugin.Manifest.AssemblyVersion.ToString();
         PetLog              = new PetLogWrapper(services.PluginLog);
         Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
-        StringHelper        = new StringHelperWrapper(this, userList);
+        UserList            = new UserList();
+        StringHelper        = new StringHelperWrapper(this, UserList);
         NameService         = new NameService(StringHelper);
         PetSheets           = new SheetsWrapper(services, StringHelper);
-        PetCastHelper       = new PetCastWrapper(userList);
-        TargetManager       = new TargetManagerWrapper(services, userList);
+        PetCastHelper       = new PetCastWrapper(UserList);
+        TargetManager       = new TargetManagerWrapper(services, UserList);
         PluginWatcher       = new PluginWatcher(services);
         NotificationService = new NotificationService(services, Configuration);
         HoverService        = new HoverService();
-        Party               = new PartyService(userList, services, dirtyHandler);
+        DirtyCaller         = DirtyHandler;
+        DirtyListener       = DirtyHandler;
+        Party               = new PartyService(UserList, services, DirtyListener);
         
         CheckConfigFailure();
     }

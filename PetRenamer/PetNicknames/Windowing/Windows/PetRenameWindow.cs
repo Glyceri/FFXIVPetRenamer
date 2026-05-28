@@ -1,7 +1,6 @@
 ﻿using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -22,10 +21,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetRenameWindow : PetWindow
 {
-    private readonly IPettableUserList      UserList;
-    private readonly IPetServices           PetServices;
-    private readonly IPettableDirtyListener DirtyListener;
-
     protected override Vector2 MinSize     { get; } = new Vector2(570, 250);
     protected override Vector2 MaxSize     { get; } = new Vector2(1500, 250);
     protected override Vector2 DefaultSize { get; } = new Vector2(570, 250);
@@ -45,26 +40,22 @@ internal class PetRenameWindow : PetWindow
     private IPetSheetData?           ActivePetData;
     private ISharedImmediateTexture? ActivePetTexture;
 
-    public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(windowHandler, dalamudServices, petServices.Configuration, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
+        : base(windowHandler, dalamudServices, petServices, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        UserList      = userList;
-        PetServices   = petServices;
-        DirtyListener = dirtyListener;
-
-        DirtyListener.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
+        PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
     }
 
     protected override void OnDispose()
     {
-        DirtyListener.UnregisterOnPlayerCharacterDirty(DirtyPlayerChar);
+        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(DirtyPlayerChar);
     }
 
     public void SetRenameWindow(PetSkeleton forSkeleton, bool open)
     {
         activeSkeleton = forSkeleton;
         isContextOpen  = true;
-        ActiveUser     = UserList.LocalPlayer;
+        ActiveUser     = PetServices.UserList.LocalPlayer;
         lastContentID  = ActiveUser?.ContentId ?? 0;
 
         if (open)
@@ -130,7 +121,7 @@ internal class PetRenameWindow : PetWindow
 
     private void Handle()
     {
-        ActiveUser = UserList.LocalPlayer;
+        ActiveUser = PetServices.UserList.LocalPlayer;
 
         if (lastContentID != ActiveUser?.ContentId)
         {
@@ -311,7 +302,7 @@ internal class PetRenameWindow : PetWindow
         {
             if (Listbox.Begin("##image", size))
             {
-                BoxedImage.DrawMinion(ActivePetData, in DalamudServices, in Configuration, ImGui.GetContentRegionAvail());
+                BoxedImage.DrawMinion(ActivePetData, DalamudServices, PetServices.Configuration, ImGui.GetContentRegionAvail());
 
                 Listbox.End();
             }

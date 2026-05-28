@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
 
@@ -8,8 +9,8 @@ namespace PetRenamer.PetNicknames.TranslatorSystem;
 // Trying to stay away from statics, but in this case it just made MUCH more sense.
 internal static class Translator
 {
-    static DalamudServices DalamudServices = null!;
-    static Configuration Configuration = null!;
+    private static DalamudServices? DalamudServices = null;
+    private static IPetServices?    PetServices     = null;
 
     static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
     {
@@ -150,28 +151,32 @@ internal static class Translator
        
     };
 
-    internal static void Initialise(DalamudServices dalamudServices, Configuration configuration)
+    internal static void Initialise(DalamudServices dalamudServices, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
-        Configuration = configuration;
+        PetServices     = petServices;
     }
 
     internal static string GetLine(string identifier)
     {
-        ClientLanguage language = DalamudServices.ClientState.ClientLanguage;
+        ClientLanguage?       language  = DalamudServices?.ClientState.ClientLanguage;
+        PetNicknamesLanguage? pLanguage = (PetNicknamesLanguage?)PetServices?.Configuration.languageSettings;
 
-        PetNicknamesLanguage Language = (PetNicknamesLanguage)Configuration.languageSettings;
-
-        if (Language != PetNicknamesLanguage.Default)
+        if (language == null)
         {
-            if (Language == PetNicknamesLanguage.English) language = ClientLanguage.English;
-            else if (Language == PetNicknamesLanguage.German) language = ClientLanguage.German;
-            else if (Language == PetNicknamesLanguage.French) language = ClientLanguage.French;
-            else if (Language == PetNicknamesLanguage.Japanese) language = ClientLanguage.Japanese;
+            return GetTranslation(ref EnglishTranslations, identifier);
+        }
+        
+        if (pLanguage != PetNicknamesLanguage.Default)
+        {
+            if      (pLanguage == PetNicknamesLanguage.English)  language = ClientLanguage.English;
+            else if (pLanguage == PetNicknamesLanguage.German)   language = ClientLanguage.German;
+            else if (pLanguage == PetNicknamesLanguage.French)   language = ClientLanguage.French;
+            else if (pLanguage == PetNicknamesLanguage.Japanese) language = ClientLanguage.Japanese;
         }
 
-        if (language == ClientLanguage.German) return GetTranslation(ref GermanTranslations, identifier);
-        if (language == ClientLanguage.French) return GetTranslation(ref FrenchTranslations, identifier);
+        if (language == ClientLanguage.German)   return GetTranslation(ref GermanTranslations, identifier);
+        if (language == ClientLanguage.French)   return GetTranslation(ref FrenchTranslations, identifier);
         if (language == ClientLanguage.Japanese) return GetTranslation(ref JapaneseTranslations, identifier);
 
         return GetTranslation(ref EnglishTranslations, identifier);

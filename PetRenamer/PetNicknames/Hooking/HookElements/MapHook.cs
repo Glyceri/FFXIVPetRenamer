@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.Structs;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -27,8 +26,8 @@ internal unsafe class MapHook : HookableElement
     private int current      = 0;
     private int foundCurrent = -1;
 
-    public MapHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    public MapHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {
@@ -308,7 +307,7 @@ internal unsafe class MapHook : HookableElement
             return;
         }
 
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
         
         if (localUser == null)
         {
@@ -379,7 +378,7 @@ internal unsafe class MapHook : HookableElement
     {
         foreach (PartyMember member in members)
         {
-            IPettableUser? user = UserList.GetUserFromContentId(member.ContentId);
+            IPettableUser? user = PetServices.UserList.GetUserFromContentId(member.ContentId);
             
             if (user == null)
             {
@@ -404,12 +403,12 @@ internal unsafe class MapHook : HookableElement
                 continue;
             }
             
-            if (bPet.BattlePet == null)
+            if (bPet.BattleChara == null)
             {
                 continue;
             }
             
-            if (!bPet.BattlePet->GetIsTargetable())
+            if (!bPet.BattleChara->GetIsTargetable())
             {
                 continue;
             }

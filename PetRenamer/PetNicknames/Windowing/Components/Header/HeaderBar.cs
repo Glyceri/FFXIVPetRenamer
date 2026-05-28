@@ -1,7 +1,6 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
-using Dalamud.Interface.Utility;
-using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Windows;
@@ -14,7 +13,7 @@ internal static class HeaderBar
     private const float HEADER_BAR_HEIGHT = 35;
     public static float HeaderBarWidth = 0;
 
-    public static void Draw(DalamudServices dalamudServices, WindowHandler windowHandler, Configuration configuration, PetWindow petWindow)
+    public static void Draw(IPetServices petServices, WindowHandler windowHandler, PetWindow petWindow)
     {
         Vector2 contentSize = ImGui.GetContentRegionAvail();
 
@@ -33,7 +32,7 @@ internal static class HeaderBar
 
         Vector2 currentCursorPos = ImGui.GetCursorPos();
 
-        string version = dalamudServices.PetNicknamesPlugin.Version;
+        string version = petServices.Version;
 
         ImGui.Text($"v{version}");
 
@@ -41,12 +40,12 @@ internal static class HeaderBar
 
         HeaderBarWidth = 0;
 
-        WindowStruct<PetDevWindow>    petDevWindow        = new WindowStruct<PetDevWindow>(in windowHandler, in configuration, FontAwesomeIcon.Biohazard, "Pet Dev", configuration.debugModeActive);
-        WindowStruct<KofiWindow>      kofiWindow          = new WindowStruct<KofiWindow>(in windowHandler, in configuration, FontAwesomeIcon.Coffee, Translator.GetLine("Kofi.Title"), configuration.showKofiButton && petWindow is not KofiWindow);
-        WindowStruct<PetConfigWindow> petConfigWindow     = new WindowStruct<PetConfigWindow>(in windowHandler, in configuration, FontAwesomeIcon.Cogs, Translator.GetLine("Config.Title"), petWindow is not PetConfigWindow || configuration.quickButtonsToggle);
-        WindowStruct<PetListWindow>   petListWindow       = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"), (petWindow is not PetListWindow) && (configuration.listButtonLayout == 0 || configuration.listButtonLayout == 1));
-        WindowStruct<PetListWindow>   actualPetListWindow = new WindowStruct<PetListWindow>(in windowHandler, in configuration, FontAwesomeIcon.List, Translator.GetLine("PetList.Title"), (petWindow is not PetListWindow) && (configuration.listButtonLayout == 0 || configuration.listButtonLayout == 2));
-        WindowStruct<PetRenameWindow> petRenameWindow     = new WindowStruct<PetRenameWindow>(in windowHandler, in configuration, FontAwesomeIcon.PenSquare, Translator.GetLine("ContextMenu.Rename"), petWindow is not PetRenameWindow || configuration.quickButtonsToggle);
+        WindowStruct<PetDevWindow>    petDevWindow        = new WindowStruct<PetDevWindow>   (windowHandler, petServices.Configuration, FontAwesomeIcon.Biohazard,  "Pet Dev",                                petServices.Configuration.debugModeActive);
+        WindowStruct<KofiWindow>      kofiWindow          = new WindowStruct<KofiWindow>     (windowHandler, petServices.Configuration, FontAwesomeIcon.Coffee,     Translator.GetLine("Kofi.Title"),         petServices.Configuration.showKofiButton && petWindow is not KofiWindow);
+        WindowStruct<PetConfigWindow> petConfigWindow     = new WindowStruct<PetConfigWindow>(windowHandler, petServices.Configuration, FontAwesomeIcon.Cogs,       Translator.GetLine("Config.Title"),       petWindow is not PetConfigWindow || petServices.Configuration.quickButtonsToggle);
+        WindowStruct<PetListWindow>   petListWindow       = new WindowStruct<PetListWindow>  (windowHandler, petServices.Configuration, FontAwesomeIcon.FileExport, Translator.GetLine("PetList.Sharing"),    petWindow is not PetListWindow && (petServices.Configuration.listButtonLayout == 0 || petServices.Configuration.listButtonLayout == 1));
+        WindowStruct<PetListWindow>   actualPetListWindow = new WindowStruct<PetListWindow>  (windowHandler, petServices.Configuration, FontAwesomeIcon.List,       Translator.GetLine("PetList.Title"),      petWindow is not PetListWindow && (petServices.Configuration.listButtonLayout == 0 || petServices.Configuration.listButtonLayout == 2));
+        WindowStruct<PetRenameWindow> petRenameWindow     = new WindowStruct<PetRenameWindow>(windowHandler, petServices.Configuration, FontAwesomeIcon.PenSquare,  Translator.GetLine("ContextMenu.Rename"), petWindow is not PetRenameWindow || petServices.Configuration.quickButtonsToggle);
 
         float availableWidth = ImGui.GetContentRegionAvail().X;
 
@@ -73,7 +72,7 @@ readonly ref struct WindowStruct<T> where T : PetWindow
     private readonly string          Tooltip;
     private readonly bool            Active;
 
-    public WindowStruct(in WindowHandler handler, in Configuration configuration, FontAwesomeIcon icon, string tooltip, bool active = true)
+    public WindowStruct(WindowHandler handler, Configuration configuration, FontAwesomeIcon icon, string tooltip, bool active = true)
     {
         Active = active;
 

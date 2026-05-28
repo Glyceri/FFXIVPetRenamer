@@ -32,23 +32,17 @@ internal unsafe class PettableUser : IPettableUser
 
     private uint _lastCast;
 
-    private readonly IPetServices           PetServices;
-    private readonly IPettableDirtyListener DirtyListener;
-    private readonly IPettableDirtyCaller   DirtyCaller;
-    private readonly ISharingDictionary     SharingDictionary;
+    private readonly IPetServices       PetServices;
+    private readonly ISharingDictionary SharingDictionary;
 
-    public IPettableUserTargetManager? TargetManager { get; }
-
-    public PettableUser(ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDirtyCaller dirtyCaller, IPettableUserList userList, BattleChara* battleChara)
+    public PettableUser(IPetServices petServices, ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, BattleChara* battleChara)
     {
-        PetServices         = petServices;
-        DirtyListener       = dirtyListener;
-        SharingDictionary   = sharingDictionary;
-        DirtyCaller         = dirtyCaller;
+        PetServices       = petServices;
+        SharingDictionary = sharingDictionary;
 
-        DirtyListener.RegisterOnClearEntry(OnDirty);
-        DirtyListener.RegisterOnDirtyEntry(OnDirty);
-        DirtyListener.RegisterOnDirtyName(OnDirty);
+        PetServices.DirtyListener.RegisterOnClearEntry(OnDirty);
+        PetServices.DirtyListener.RegisterOnDirtyEntry(OnDirty);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnDirty);
 
         BattleChara     = battleChara;
         Address         = (nint)BattleChara;
@@ -60,8 +54,6 @@ internal unsafe class PettableUser : IPettableUser
 
         ObjectId        = BattleChara->GetGameObjectId();
         EntityId        = BattleChara->EntityId;
-        
-        TargetManager   = new PettableUserTargetManager(this, userList);
 
         IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(Name, Homeworld, false);
 
@@ -186,7 +178,7 @@ internal unsafe class PettableUser : IPettableUser
             PettablePets.Insert(index, pet);
         }
 
-        DirtyCaller.DirtyPlayer(this);
+        PetServices.DirtyCaller.DirtyPlayer(this);
     }
 
     public IPettablePet? GetPet(nint pet)
@@ -257,9 +249,9 @@ internal unsafe class PettableUser : IPettableUser
             PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
         }
 
-        DirtyListener.UnregisterOnClearEntry(OnDirty);
-        DirtyListener.UnregisterOnDirtyEntry(OnDirty);
-        DirtyListener.UnregisterOnDirtyName(OnDirty);
+        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirty);
+        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirty);
+        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirty);
 
         if (DataBaseEntry.IsIPC)
         {

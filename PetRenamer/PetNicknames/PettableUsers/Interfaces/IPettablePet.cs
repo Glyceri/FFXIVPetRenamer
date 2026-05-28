@@ -1,5 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Numerics;
@@ -10,7 +9,6 @@ internal interface IPettablePet : IPettableEntity, IDisposable
 {
     IPettableUser? Owner      { get; }
     PetSkeleton    SkeletonId { get; }
-    GameObjectId   ObjectId   { get; }
     IPetSheetData? PetData    { get; }
     bool           IsActive   { get; }
     

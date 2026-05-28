@@ -14,28 +14,24 @@ internal class SaveHandler : IUpdatable, IDisposable
 
     public bool Enabled { get; set; } = true;
 
-    private readonly Configuration          Configuration;
-    private readonly IPettableUserList      UserList;
-    private readonly IIpcProvider           IpcProvider;
-    private readonly IPettableDirtyListener DirtyListener;
-    private readonly IPetServices           PetServices;
+    private readonly Configuration Configuration;
+    private readonly IIpcProvider  IpcProvider;
+    private readonly IPetServices  PetServices;
 
     private double  throttleCounter     = THROTTLE_DELAY;
     private bool    hasPassedThrottle   = false;
     private bool    readyToSave         = false;
 
-    public SaveHandler(IPetServices petServices, IPettableUserList userList, IIpcProvider ipcProvider, IPettableDirtyListener dirtyListener)
+    public SaveHandler(IPetServices petServices, IIpcProvider ipcProvider)
     {
-        PetServices     = petServices;
-        Configuration   = PetServices.Configuration;
-        UserList        = userList;
-        IpcProvider     = ipcProvider;
-        DirtyListener   = dirtyListener;
+        PetServices   = petServices;
+        Configuration = PetServices.Configuration;
+        IpcProvider   = ipcProvider;
 
-        DirtyListener.RegisterOnDirtyName(OnDirtyName);
-        DirtyListener.RegisterOnDirtyDatabase(OnDirtyDatabase);
-        DirtyListener.RegisterOnDirtyEntry(OnDirtyEntry);
-        DirtyListener.RegisterOnClearEntry(OnDirtyEntry);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnDirtyName);
+        PetServices.DirtyListener.RegisterOnDirtyDatabase(OnDirtyDatabase);
+        PetServices.DirtyListener.RegisterOnDirtyEntry(OnDirtyEntry);
+        PetServices.DirtyListener.RegisterOnClearEntry(OnDirtyEntry);
     }
 
     public void OnUpdate(IFramework framework)
@@ -62,7 +58,7 @@ internal class SaveHandler : IUpdatable, IDisposable
     {
         Save();
 
-        IPettableUser? user = UserList.LocalPlayer;
+        IPettableUser? user = PetServices.UserList.LocalPlayer;
 
         if (user == null)
         {
@@ -81,7 +77,7 @@ internal class SaveHandler : IUpdatable, IDisposable
     {
         Save();
 
-        IPettableUser? user = UserList.LocalPlayer;
+        IPettableUser? user = PetServices.UserList.LocalPlayer;
 
         if (user == null)
         {
@@ -123,9 +119,9 @@ internal class SaveHandler : IUpdatable, IDisposable
 
     public void Dispose()
     {
-        DirtyListener.UnregisterOnDirtyName(OnDirtyName);
-        DirtyListener.UnregisterOnDirtyDatabase(OnDirtyDatabase);
-        DirtyListener.UnregisterOnDirtyEntry(OnDirtyEntry);
-        DirtyListener.UnregisterOnClearEntry(OnDirtyEntry);
+        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirtyName);
+        PetServices.DirtyListener.UnregisterOnDirtyDatabase(OnDirtyDatabase);
+        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirtyEntry);
+        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirtyEntry);
     }
 }

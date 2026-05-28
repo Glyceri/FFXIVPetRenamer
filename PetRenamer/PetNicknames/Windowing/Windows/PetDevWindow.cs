@@ -21,6 +21,7 @@ using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -33,7 +34,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetDevWindow : PetWindow
 {
-    readonly IPettableUserList UserList;
     readonly IPettableDatabase Database;
     readonly IPetServices      PetServices;
     readonly ISharingDictionary SharingDictionary;
@@ -46,15 +46,14 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, Configuration configuration, IPettableUserList userList, IPettableDatabase database, ISharingDictionary sharingDictionary) 
-        : base(windowHandler, dalamudServices, configuration, "Pet Dev Window")
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary) 
+        : base(windowHandler, dalamudServices, petServices, "Pet Dev Window")
     {
-        UserList    = userList;
         Database    = database;
         PetServices = petServices;
         SharingDictionary = sharingDictionary;
         
-        if (configuration.debugModeActive && configuration.openDebugWindowOnStart)
+        if (PetServices.Configuration.debugModeActive && PetServices.Configuration.openDebugWindowOnStart)
         {
             Open();
         }
@@ -136,7 +135,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.IsIPC ? "O" : "X");
 
         ImGui.TableSetColumnIndex(4);
-        ImGui.TextUnformatted(UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X");
+        ImGui.TextUnformatted(PetServices.UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X");
 
         ImGui.EndTable();
     }
@@ -218,61 +217,61 @@ internal class PetDevWindow : PetWindow
         
         bool hasTarget = false;
         
-        if (user.TargetManager.GetLeadingTarget() != null)
+        if (PetServices.TargetManager.GetLeadingTarget(user) != null)
         {
             if (showLeadingTargets) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetLeadingTargetOfLeadingTarget() != null)
+        if (PetServices.TargetManager.GetLeadingTargetOfLeadingTarget(user) != null)
         {
             if (showLeadingTargetOfLeadingTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetSoftTarget() != null)
+        if (PetServices.TargetManager.GetSoftTarget(user) != null)
         {
             if (showSoftTargets) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetTarget() != null)
+        if (PetServices.TargetManager.GetTarget(user) != null)
         {
             if (showTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetSoftTargetOfLeadingTarget() != null)
+        if (PetServices.TargetManager.GetSoftTargetOfLeadingTarget(user) != null)
         {
             if (showSoftTargetOfLeadingTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetTargetOfLeadingTarget() != null)
+        if (PetServices.TargetManager.GetTargetOfLeadingTarget(user) != null)
         {
             if (showTargetOfLeadingTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetTargetOfTarget() != null)
+        if (PetServices.TargetManager.GetTargetOfTarget(user) != null)
         {
             if (showTargetOfTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetSoftTargetOfTarget() != null)
+        if (PetServices.TargetManager.GetSoftTargetOfTarget(user) != null)
         {
             if (showSoftTargetOfTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetTargetOfSoftTarget() != null)
+        if (PetServices.TargetManager.GetTargetOfSoftTarget(user) != null)
         {
             if (showTargetOfSoftTarget) targetCount++;
             realTargetCount++;
             hasTarget = true;
         }
-        if (user.TargetManager.GetSoftTargetOfSoftTarget() != null)
+        if (PetServices.TargetManager.GetSoftTargetOfSoftTarget(user) != null)
         {
             if (showSoftTargetOfSoftTarget) targetCount++;
             realTargetCount++;
@@ -334,9 +333,8 @@ internal class PetDevWindow : PetWindow
         ImGui.NewLine();
         ImGui.NewLine();
         
-        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
+        foreach (IPettableUser? user in PetServices.UserList)
         {
-            IPettableUser? user = UserList.PettableUsers[i];
             if (user == null) continue;
             
             if (!HasTarget(user, out int targetCount, out int realTargetCount)) continue;
@@ -346,16 +344,16 @@ internal class PetDevWindow : PetWindow
             
             ImGui.Indent();
             
-            if (showLeadingTargets) if (user.TargetManager.GetLeadingTarget() != null) ImGui.BulletText($"[Leading Target]: [{GetTargetText(user.TargetManager.GetLeadingTarget())}]");
-            if (showLeadingTargetOfLeadingTarget) if (user.TargetManager.GetLeadingTargetOfLeadingTarget() != null) ImGui.BulletText($"[Leading Target of Leading Target]: [{GetTargetText(user.TargetManager.GetLeadingTargetOfLeadingTarget())}]");    
-            if (showSoftTargets) if (user.TargetManager.GetSoftTarget() != null) ImGui.BulletText($"[Soft Target]: [{GetTargetText(user.TargetManager.GetSoftTarget())}]");
-            if (showTarget) if (user.TargetManager.GetTarget() != null)  ImGui.BulletText($"[Target]: [{GetTargetText(user.TargetManager.GetTarget())}]");    
-            if (showSoftTargetOfLeadingTarget) if (user.TargetManager.GetSoftTargetOfLeadingTarget() != null) ImGui.BulletText($"[Soft Target of Leading Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfLeadingTarget())}]");
-            if (showTargetOfLeadingTarget) if (user.TargetManager.GetTargetOfLeadingTarget() != null) ImGui.BulletText($"[Target of Leading Target]: [{GetTargetText(user.TargetManager.GetTargetOfLeadingTarget())}]");    
-            if (showTargetOfTarget) if (user.TargetManager.GetTargetOfTarget() != null) ImGui.BulletText($"[Target of Target]: [{GetTargetText(user.TargetManager.GetTargetOfTarget())}]");
-            if (showSoftTargetOfTarget) if (user.TargetManager.GetSoftTargetOfTarget() != null) ImGui.BulletText($"[Soft Target of Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfTarget())}]");
-            if (showTargetOfSoftTarget) if (user.TargetManager.GetTargetOfSoftTarget() != null) ImGui.BulletText($"[Target of Soft Target]: [{GetTargetText(user.TargetManager.GetTargetOfSoftTarget())}]");
-            if (showSoftTargetOfSoftTarget) if (user.TargetManager.GetSoftTargetOfSoftTarget() != null) ImGui.BulletText($"[Soft Target of Soft Target]: [{GetTargetText(user.TargetManager.GetSoftTargetOfSoftTarget())}]");
+            if (showLeadingTargets)                 if (PetServices.TargetManager.GetLeadingTarget(user) != null)                   ImGui.BulletText($"[Leading Target]: [{GetTargetText(PetServices.TargetManager.GetLeadingTarget(user))}]");
+            if (showLeadingTargetOfLeadingTarget)   if (PetServices.TargetManager.GetLeadingTargetOfLeadingTarget(user) != null)    ImGui.BulletText($"[Leading Target of Leading Target]: [{GetTargetText(PetServices.TargetManager.GetLeadingTargetOfLeadingTarget(user))}]");    
+            if (showSoftTargets)                    if (PetServices.TargetManager.GetSoftTarget(user) != null)                      ImGui.BulletText($"[Soft Target]: [{GetTargetText(PetServices.TargetManager.GetSoftTarget(user))}]");
+            if (showTarget)                         if (PetServices.TargetManager.GetTarget(user) != null)                          ImGui.BulletText($"[Target]: [{GetTargetText(PetServices.TargetManager.GetTarget(user))}]");    
+            if (showSoftTargetOfLeadingTarget)      if (PetServices.TargetManager.GetSoftTargetOfLeadingTarget(user) != null)       ImGui.BulletText($"[Soft Target of Leading Target]: [{GetTargetText(PetServices.TargetManager.GetSoftTargetOfLeadingTarget(user))}]");
+            if (showTargetOfLeadingTarget)          if (PetServices.TargetManager.GetTargetOfLeadingTarget(user) != null)           ImGui.BulletText($"[Target of Leading Target]: [{GetTargetText(PetServices.TargetManager.GetTargetOfLeadingTarget(user))}]");    
+            if (showTargetOfTarget)                 if (PetServices.TargetManager.GetTargetOfTarget(user) != null)                  ImGui.BulletText($"[Target of Target]: [{GetTargetText(PetServices.TargetManager.GetTargetOfTarget(user))}]");
+            if (showSoftTargetOfTarget)             if (PetServices.TargetManager.GetSoftTargetOfTarget(user) != null)              ImGui.BulletText($"[Soft Target of Target]: [{GetTargetText(PetServices.TargetManager.GetSoftTargetOfTarget(user))}]");
+            if (showTargetOfSoftTarget)             if (PetServices.TargetManager.GetTargetOfSoftTarget(user) != null)              ImGui.BulletText($"[Target of Soft Target]: [{GetTargetText(PetServices.TargetManager.GetTargetOfSoftTarget(user))}]");
+            if (showSoftTargetOfSoftTarget)         if (PetServices.TargetManager.GetSoftTargetOfSoftTarget(user) != null)          ImGui.BulletText($"[Soft Target of Soft Target]: [{GetTargetText(PetServices.TargetManager.GetSoftTargetOfSoftTarget(user))}]");
             
             ImGui.Unindent();
             
@@ -370,10 +368,8 @@ internal class PetDevWindow : PetWindow
             return;
         }
         
-        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
+        foreach (IPettableUser? user in PetServices.UserList)
         {
-            IPettableUser? user =  UserList.PettableUsers[i];
-            
             if (user == null)
             {
                 continue;
@@ -504,7 +500,7 @@ internal class PetDevWindow : PetWindow
             {
                 bool hasTarget = true;
                 
-                IPettableUser? user = UserList.GetUser(player!.Address, UserListFindType.PetMeansOwner);
+                IPettableUser? user = PetServices.UserList.GetUser(player!.Address, UserListFindType.PetMeansOwner);
                 if (user != null)
                 {
                     hasTarget = !user.DataBaseEntry.IsActive;
@@ -649,7 +645,8 @@ internal class PetDevWindow : PetWindow
     void DrawUserList()
     {
         DrawBattlePetCount();
-        foreach (IPettableUser? user in UserList.PettableUsers)
+        
+        foreach (IPettableUser? user in PetServices.UserList)
         {
             if (user == null) continue;
             NewDrawUser(user);
@@ -682,7 +679,7 @@ internal class PetDevWindow : PetWindow
 
         for (int i = 0; i < 100; i++)
         {
-            IPettableUser? user = UserList.PettableUsers[i];
+            IPettableUser? user = PetServices.UserList[i];
             if (user == null) continue;
 
             foreach(IPettablePet? pet in user.PettablePets)

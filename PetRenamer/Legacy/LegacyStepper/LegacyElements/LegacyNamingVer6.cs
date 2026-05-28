@@ -48,7 +48,7 @@ internal class LegacyNamingVer6 : ILegacyStepperElement
                     continue;
                 }
 
-                List<IPetSheetData> legacyPets = PetServices.PetSheets.GetLegacyPets(user.ids[i]);
+                IPetSheetData[] legacyPets = PetServices.PetSheets.GetLegacyPets(user.ids[i]);
 
                 foreach(IPetSheetData legacyPetsData in legacyPets)
                 {

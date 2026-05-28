@@ -32,6 +32,4 @@ internal unsafe interface IPettableUser : IBattleUser
     void Dispose(IPettableDatabase database);
     void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
     void Recalculate();
-    
-    IPettableUserTargetManager? TargetManager { get; }
 }

@@ -2,21 +2,26 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using System.Collections;
+using System.Collections.Generic;
 
-namespace PetRenamer.PetNicknames.PettableUsers;
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
-internal class PettableUserList : IPettableUserList
+internal class UserList : IUserList
 {
-    public const int PettableUserArraySize = 101;
-    public const int IslandIndex           = 100;
+    private readonly IPettableUser?[] PettableUsers = new IPettableUser?[IUserList.PettableUserArraySize];
 
-    public IPettableUser?[] PettableUsers 
-        { get; } = new IPettableUser[PettableUserArraySize];
-
+    public IPettableUser? this[int index]
+    {
+        get => PettableUsers[index];
+        set => PettableUsers[index] = value;
+    }
+    
     public IPettableUser? LocalPlayer
         => PettableUsers[0];
-
+    
     public IPettablePet? GetPet(nint pet)
     {
         if (pet == nint.Zero)
@@ -24,7 +29,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? user = PettableUsers[i];
             IPettablePet?  pPet = user?.GetPet(pet);
@@ -47,7 +52,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
             IPettablePet?  pPet  = pUser?.GetPet(petId);
@@ -70,7 +75,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
 
@@ -105,7 +110,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
 
@@ -132,7 +137,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
 
@@ -159,7 +164,7 @@ internal class PettableUserList : IPettableUserList
             return null;
         }
 
-        for (int i = 0; i < PettableUserArraySize; i++)
+        for (int i = 0; i < IUserList.PettableUserArraySize; i++)
         {
             IPettableUser? pUser = PettableUsers[i];
 
@@ -186,4 +191,10 @@ internal class PettableUserList : IPettableUserList
             user?.Recalculate();
         }
     }
+    
+    public IEnumerator<IPettableUser?> GetEnumerator()
+        => ((IEnumerable<IPettableUser?>)PettableUsers).GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 }

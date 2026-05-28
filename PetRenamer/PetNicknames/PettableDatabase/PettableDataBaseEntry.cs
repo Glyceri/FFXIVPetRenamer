@@ -25,17 +25,15 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public INamesDatabase ActiveDatabase { get; }
 
-    public bool IsIPC       { get; private set; } = false;
-    public bool IsLegacy    { get; private set; } = false;
+    public bool IsIPC       { get; private set; }
+    public bool IsLegacy    { get; private set; }
 
-    private readonly IPetServices         PetServices;
-    private readonly IPettableDirtyCaller DirtyCaller;
+    private readonly IPetServices PetServices;
 
-    public PettableDataBaseEntry(IPetServices petServices, IPettableDirtyCaller dirtyCaller, ulong contentId, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
+    public PettableDataBaseEntry(IPetServices petServices, ulong contentId, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices    = petServices;
-        DirtyCaller    = dirtyCaller;
-        ActiveDatabase = new PettableNameDatabase([], [], [], [], DirtyCaller);
+        ActiveDatabase = new PettableNameDatabase(PetServices, [], [], [], []);
 
         ContentId      = contentId;
         IsActive       = active;
@@ -78,7 +76,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
             return false;
         }
 
-        pEntry.SetActiveDatabase(ActiveDatabase.IDs, ActiveDatabase.Names, ActiveDatabase.EdgeColours, ActiveDatabase.TextColours);
+        pEntry.SetActiveDatabase(ActiveDatabase.Ids, ActiveDatabase.Names, ActiveDatabase.EdgeColours, ActiveDatabase.TextColours);
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
@@ -101,7 +99,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     private void SetActiveDatabase(PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours)
     {
-        ActiveDatabase.Update(ids, names, edgeColours, textColours, DirtyCaller);
+        ActiveDatabase.Update(ids, names, edgeColours, textColours);
     }
 
     private void SetSoftSkeletons(PetSkeleton[] softSkeletons)
@@ -151,7 +149,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         }
 
         PetSkeleton[] temporaryArray = SoftSkeletons.ToArray();
-        PetSkeleton oldSkeleton      = temporaryArray[index];
+        PetSkeleton   oldSkeleton    = temporaryArray[index];
 
         if (oldSkeleton == softSkeleton)
         {
@@ -160,7 +158,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         temporaryArray[index] = softSkeleton;
 
-        SoftSkeletons = ImmutableArray.Create(temporaryArray);
+        SoftSkeletons = [..temporaryArray];
 
         MarkDirty();
     }
@@ -206,11 +204,11 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     private void MarkCleared()
     {
-        DirtyCaller.ClearEntry(this);
+        PetServices.DirtyCaller.ClearEntry(this);
     }
 
     private void MarkDirty()
     {
-        DirtyCaller.DirtyEntry(this);
+        PetServices.DirtyCaller.DirtyEntry(this);
     }
 }

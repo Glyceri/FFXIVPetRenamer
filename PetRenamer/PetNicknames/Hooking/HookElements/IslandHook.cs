@@ -8,8 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Text.ReadOnly;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -56,8 +54,8 @@ internal unsafe class IslandHook : HookableElement, IIslandHook
     private readonly Regex activeRegex;
     private readonly Regex activeVisitRegex;
 
-    public IslandHook(in DalamudServices services, in IPettableUserList userList, in IPetServices petServices, in IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener)
+    public IslandHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices)
     {
         activeRegex = DalamudServices.ClientState.ClientLanguage switch
         {

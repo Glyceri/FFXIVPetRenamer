@@ -22,16 +22,13 @@ internal class NameService : INameService
         => StringHelper.CleanupString(petData.ActionName);
     
     public string? GetName(NameType nameType, IPetSheetData petData)
-    {
-        switch (nameType)
+        => nameType switch
         {
-            case NameType.Raw:     return GetRawName(petData);
-            case NameType.Pronoun: return GetPronoun(); 
-            case NameType.Action:  return GetActionName(petData);
-        }
-        
-        return null;
-    }
+            NameType.Raw     => GetRawName(petData),
+            NameType.Pronoun => GetPronoun(),
+            NameType.Action  => GetActionName(petData),
+            _                => null
+        };
 
     public void RegisterPronounHook(IPronounHook pronounHook) 
         => PronounHook = pronounHook;

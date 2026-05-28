@@ -22,7 +22,7 @@ internal static class BoxedImage
         }
     }
 
-    public static void DrawMinion(in IPetSheetData data, in DalamudServices dalamudServices, in Configuration configuration, Vector2 size)
+    public static void DrawMinion(IPetSheetData data, DalamudServices dalamudServices, Configuration configuration, Vector2 size)
     {
         IDalamudTextureWrap textureWrap;
 

@@ -1,32 +1,23 @@
 ﻿using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update.Interfaces;
 
-namespace PetNicknames.PetNicknames.Update.Updatables;
+namespace PetRenamer.PetNicknames.Update.Updatables;
 
-internal class IPCPreparer : IUpdatable
+internal class IPCPreparer(IPetServices petServices, IIpcProvider ipcProvider) : IUpdatable
 {
-    public bool Enabled { get; set; } 
+    public bool Enabled { get; private set; } 
         = true;
-
-    private readonly IPettableUserList UserList;
-    private readonly IIpcProvider      IIpcProvider;
-
-    public IPCPreparer(IPettableUserList userList, IIpcProvider ipcProvider)
-    {
-        UserList     = userList;
-        IIpcProvider = ipcProvider;
-    }
 
     public void OnUpdate(IFramework framework)
     {
-        if (UserList.LocalPlayer == null)
+        if (petServices.UserList.LocalPlayer == null)
         {
             return;
         }
 
-        IIpcProvider.Prepare();
+        ipcProvider.Prepare();
 
         Enabled = false;
     }

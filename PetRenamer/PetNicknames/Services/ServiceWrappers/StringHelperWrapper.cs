@@ -21,12 +21,12 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 internal class StringHelperWrapper : IStringHelper
 {
     private readonly IPetServices      PetServices;
-    private readonly IPettableUserList UserList;
+    private readonly IUserList UserList;
 
-    public StringHelperWrapper(IPetServices petServices, IPettableUserList pettableUserList) 
+    public StringHelperWrapper(IPetServices petServices, IUserList userList) 
     { 
         PetServices = petServices;
-        UserList    = pettableUserList;
+        UserList    = userList;
     }
 
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
@@ -157,7 +157,7 @@ internal class StringHelperWrapper : IStringHelper
         return true;
     }
     
-    public unsafe void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public unsafe void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {
@@ -169,7 +169,7 @@ internal class StringHelperWrapper : IStringHelper
         atkNode->SetText(seString.EncodeWithNullTerminator());
     }
     
-    public unsafe void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    public unsafe void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {

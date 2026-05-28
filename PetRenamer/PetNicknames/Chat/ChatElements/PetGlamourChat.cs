@@ -86,13 +86,11 @@ internal class PetGlamourChat : RestrictedChatElement
     private int nextRow = 0;
 
     private readonly DalamudServices    DalamudServices;
-    private readonly IPettableUserList  UserList;
     private readonly IPetServices       PetServices;
 
-    public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList)
+    public PetGlamourChat(DalamudServices dalamudServices, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
-        UserList        = userList;
         PetServices     = petServices;
 
         RegisterChat(XivChatType.SystemMessage);
@@ -193,7 +191,7 @@ internal class PetGlamourChat : RestrictedChatElement
             return;
         }
 
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
         
         if (localUser == null)
         {
@@ -214,7 +212,7 @@ internal class PetGlamourChat : RestrictedChatElement
             return;
         }
 
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (localUser == null)
         {

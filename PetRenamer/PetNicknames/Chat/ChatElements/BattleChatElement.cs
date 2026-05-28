@@ -36,7 +36,7 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
         
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId, in user);
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId, user);
         
         if (petData == null)
         {

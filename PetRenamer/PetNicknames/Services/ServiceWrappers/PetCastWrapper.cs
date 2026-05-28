@@ -9,9 +9,9 @@ internal class PetCastWrapper : IPetCastHelper
     public IPettableEntity? LastCastDealer { get; private set; }
     public int              LastCastId     { get; private set; }
 
-    private readonly IPettableUserList UserList;
+    private readonly IUserList UserList;
     
-    public PetCastWrapper(IPettableUserList userList) 
+    public PetCastWrapper(IUserList userList) 
         => UserList = userList;
         
     public void SetLatestCast(nint target, nint dealer, int lastCastId)

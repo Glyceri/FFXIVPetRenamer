@@ -1,21 +1,28 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class HoverHook : HookableElement
 {
-    private uint lastIconId = 0;
+    private uint lastIconId;
     
-    public HoverHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    private static readonly NameTypeFactory HoverNameType = new NameTypeFactory()
+    {
+        EnglishNameType  = NameType.Raw,
+        GermanNameType   = NameType.Pronoun,
+        FrenchNameType   = NameType.Raw,
+        JapaneseNameType = NameType.Raw,
+    };
+    
+    public HoverHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
     
     public override void Init()
     {
@@ -36,7 +43,7 @@ internal class HoverHook : HookableElement
             return;
         }
         
-        lastIconId =  componentIcon->IconId;
+        lastIconId = componentIcon->IconId;
 
         IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromIcon(componentIcon->IconId);
 
@@ -47,21 +54,14 @@ internal class HoverHook : HookableElement
             return;
         }
         
-        if (UserList.LocalPlayer == null)
+        if (PetServices.UserList.LocalPlayer == null)
         {
             return;
         }
         
-        petSheetData = PetServices.PetSheets.MakeSoft(UserList.LocalPlayer, petSheetData);
-            
-        if (petSheetData == null)
-        {
-            PetServices.HoverService.SetHoveredPet(null);
-            
-            return;
-        }
+        petSheetData = PetServices.PetSheets.MakeSoft(PetServices.UserList.LocalPlayer, petSheetData);
         
-        NameType setNameType = NameType.Pronoun;
+        NameType setNameType = HoverNameType;
 
         if (petSheetData.Model.SkeletonType == SkeletonType.BattlePet)
         {
@@ -112,13 +112,7 @@ internal class HoverHook : HookableElement
             return;
         }
 
-        AtkResNode* resNode = &collisionNode->AtkResNode;
-
-        if (resNode == null)
-        {
-            return;
-        }
-
+        AtkResNode* resNode    = &collisionNode->AtkResNode;
         AtkResNode* parentNode = resNode->ParentNode;
 
         if (parentNode == null)

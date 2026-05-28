@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
@@ -13,60 +12,54 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal class HookHandler : IDisposable
 {
-    private readonly DalamudServices        DalamudServices;
-    private readonly IPetServices           PetServices;
-    private readonly IPettableUserList      PettableUserList;
-    private readonly IPettableDirtyListener DirtyListener;
-    private readonly IPettableDatabase      Database;
-    private readonly ILegacyDatabase        LegacyDatabase;
-    private readonly ISharingDictionary     SharingDictionary;
-    private readonly IPettableDirtyCaller   DirtyCaller;
+    private readonly DalamudServices    DalamudServices;
+    private readonly IPetServices       PetServices;
+    private readonly IPettableDatabase  Database;
+    private readonly ILegacyDatabase    LegacyDatabase;
+    private readonly ISharingDictionary SharingDictionary;
 
-    public IIslandHook        IslandHook        { get; private set; } = null!;
-    public IPronounHook       PronounHook       { get; private set; } = null!;
+    public IIslandHook  IslandHook        { get; private set; } = null!;
+    public IPronounHook PronounHook       { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary)
     {
-        DalamudServices     = dalamudServices;
-        PetServices         = petServices;
-        PettableUserList    = pettableUserList;
-        DirtyListener       = dirtyListener;
-        Database            = database;
-        LegacyDatabase      = legacyDatabase;
-        SharingDictionary   = sharingDictionary;
-        DirtyCaller         = dirtyCaller;
+        DalamudServices   = dalamudServices;
+        PetServices       = petServices;
+        Database          = database;
+        LegacyDatabase    = legacyDatabase;
+        SharingDictionary = sharingDictionary;
 
         _Register();
     }
 
     private void _Register()
     {
-        Register(new HoverHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new HoverHook(DalamudServices, PetServices));
         
-        MapHook mapHook = new MapHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        MapHook mapHook = new MapHook(DalamudServices, PetServices);
         Register(mapHook);
         
-        PronounHook = new PronounHook(DalamudServices, PetServices, PettableUserList, DirtyListener);
+        PronounHook = new PronounHook(DalamudServices, PetServices);
         Register(PronounHook);
         
-        Register(new TooltipHook(DalamudServices, PetServices, PettableUserList, DirtyListener, mapHook, PronounHook));
-        Register(new ActionMenuHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new MinionNoteBookHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new TooltipHook(DalamudServices, PetServices, mapHook, PronounHook));
+        Register(new ActionMenuHook(DalamudServices, PetServices));
+        Register(new MinionNoteBookHook(DalamudServices, PetServices));
         
-        Register(new TargetHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new TargetHook(DalamudServices, PetServices));
         
-        IslandHook = new IslandHook(DalamudServices, PettableUserList, PetServices, DirtyListener);
+        IslandHook = new IslandHook(DalamudServices, PetServices);
         Register(IslandHook);
         
         PetServices.NameService.RegisterPronounHook(PronounHook);
         
-        Register(new CastHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new NamePlateHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
-        Register(new PartyHook(DalamudServices, PetServices, PettableUserList, DirtyListener));
+        Register(new CastHook(DalamudServices, PetServices));
+        Register(new NamePlateHook(DalamudServices, PetServices));
+        Register(new PartyHook(DalamudServices, PetServices));
         
-        Register(new CharacterManagerHook(DalamudServices, PettableUserList, PetServices, DirtyListener, Database, LegacyDatabase, SharingDictionary, DirtyCaller, IslandHook));
+        Register(new CharacterManagerHook(DalamudServices, PetServices, Database, LegacyDatabase, SharingDictionary, IslandHook));
     }
 
     private void Register(IHookableElement element)

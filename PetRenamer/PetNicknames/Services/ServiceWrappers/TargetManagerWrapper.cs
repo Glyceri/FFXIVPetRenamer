@@ -1,55 +1,54 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
 using ITargetManager = PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces.ITargetManager;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
-internal class TargetManagerWrapper : ITargetManager
+internal unsafe class TargetManagerWrapper : ITargetManager
 {
     public bool Enabled { get; set; } = true;
 
-    private readonly DalamudServices   DalamudServices;
-    private readonly IPettableUserList UserList;
-
-    private readonly List<Action>      _callbacks = [];
+    private readonly DalamudServices DalamudServices;
+    private readonly IUserList       UserList;
+    
+    private readonly List<Action>    _callbacks = [];
 
     private nint? LastTarget;
     private nint? LastSoftTarget;
     private nint? LastFocusTarget;
 
-    public TargetManagerWrapper(DalamudServices dalamudServices, IPettableUserList userList)
+    public TargetManagerWrapper(DalamudServices dalamudServices, IUserList userList)
     {
         DalamudServices = dalamudServices;
         UserList        = userList;
     }
-
-    private IPettableUserTargetManager? TargetManager
-        => UserList.LocalPlayer?.TargetManager;
-
+    
     public IPettableEntity? SoftTarget
-        => TargetManager?.GetSoftTarget();
+        => GetSoftTarget(UserList.LocalPlayer);
 
     public IPettableEntity? Target                   
-        => TargetManager?.GetTarget();
+        => GetTarget(UserList.LocalPlayer);
 
     public IPettableEntity? LeadingTarget
-        => TargetManager?.GetLeadingTarget();
+        => GetLeadingTarget(UserList.LocalPlayer);
 
     public IPettableEntity? TargetOfTarget
-        => TargetManager?.GetTargetOfTarget();
+        => GetTargetOfTarget(UserList.LocalPlayer);
 
     public IPettableEntity? LeadingTargetOfTarget
-        => TargetManager?.GetTargetOfLeadingTarget();
+        => GetTargetOfLeadingTarget(UserList.LocalPlayer);
 
     public IPettableEntity? LeadingTargetOfLeadingTarget
-        => TargetManager?.GetLeadingTargetOfLeadingTarget();
+        => GetLeadingTargetOfLeadingTarget(UserList.LocalPlayer);
 
     public IPettableEntity? TargetOfLeadingTarget
-        => TargetManager?.GetTargetOfLeadingTarget();
+        => GetTargetOfLeadingTarget(UserList.LocalPlayer);
 
     public IPettableEntity? FocusTarget              
         => GetEntity(DalamudServices.TargetManager.FocusTarget);
@@ -127,6 +126,61 @@ internal class TargetManagerWrapper : ITargetManager
             callback?.Invoke();
         }
     }
+    
+    
+    private IPettableEntity? PettableEntityFromTargetId(GameObjectId targetId)
+    {
+        if (targetId == PluginConstants.InvalidId)
+        {
+            return null;
+        }
+
+        IPettableEntity? entity = UserList.GetPet(targetId);
+        
+        entity ??= UserList.GetUserFromObjectId(targetId);
+
+        return entity;
+    }
+
+    private IPettableBattleEntity? AsBattleEntity(IPettableEntity? entity)
+    {
+        if (entity is not IPettableBattleEntity battleEntity)
+        {
+            return null;
+        }
+
+        return battleEntity;
+    }
+
+    public IPettableEntity? GetLeadingTarget(IPettableBattleEntity? battleEntity)
+        => GetSoftTarget(battleEntity) ?? GetTarget(battleEntity);
+
+    public IPettableEntity? GetSoftTarget(IPettableBattleEntity? battleEntity)
+        => battleEntity != null ? PettableEntityFromTargetId(battleEntity.BattleChara->GetSoftTargetId()) : null;
+
+    public IPettableEntity? GetTarget(IPettableBattleEntity? battleEntity)
+        => battleEntity != null ? PettableEntityFromTargetId(battleEntity.BattleChara->GetTargetId()) : null;
+
+    public IPettableEntity? GetLeadingTargetOfLeadingTarget(IPettableBattleEntity? battleEntity)
+        => GetLeadingTarget(AsBattleEntity(GetLeadingTarget(battleEntity)));
+
+    public IPettableEntity? GetSoftTargetOfLeadingTarget(IPettableBattleEntity? battleEntity)
+        => GetSoftTarget(AsBattleEntity(GetLeadingTarget(battleEntity)));
+
+    public IPettableEntity? GetTargetOfLeadingTarget(IPettableBattleEntity? battleEntity)
+        => GetTarget(AsBattleEntity(GetLeadingTarget(battleEntity)));
+
+    public IPettableEntity? GetTargetOfTarget(IPettableBattleEntity? battleEntity)
+        => GetTarget(AsBattleEntity(GetTarget(battleEntity)));
+
+    public IPettableEntity? GetSoftTargetOfTarget(IPettableBattleEntity? battleEntity)
+        => GetSoftTarget(AsBattleEntity(GetTarget(battleEntity)));
+
+    public IPettableEntity? GetTargetOfSoftTarget(IPettableBattleEntity? battleEntity)
+        => GetTarget(AsBattleEntity(GetSoftTarget(battleEntity)));
+
+    public IPettableEntity? GetSoftTargetOfSoftTarget(IPettableBattleEntity? battleEntity)
+        => GetSoftTarget(AsBattleEntity(GetSoftTarget(battleEntity)));
 
     public void RegisterTargetChangedListener(Action callback)
     {

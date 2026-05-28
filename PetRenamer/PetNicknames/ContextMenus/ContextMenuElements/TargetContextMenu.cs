@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System;
@@ -10,14 +11,12 @@ namespace PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 
 internal class TargetContextMenu : IContextMenuElement
 {
-    private readonly IPetServices       PetServices;
-    private readonly IPettableUserList  UserList;
-    private readonly IWindowHandler     WindowHandler;
+    private readonly IPetServices   PetServices;
+    private readonly IWindowHandler WindowHandler;
 
-    public TargetContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
+    public TargetContextMenu(IPetServices petServices, IWindowHandler windowHandler)
     {
         PetServices     = petServices;
-        UserList        = userList;
         WindowHandler   = windowHandler;
     }
     
@@ -26,7 +25,7 @@ internal class TargetContextMenu : IContextMenuElement
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
     {
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (localUser == null)
         {
@@ -44,7 +43,7 @@ internal class TargetContextMenu : IContextMenuElement
 
         if (pet == null)
         {
-            IPettableUser? islandUser = UserList.PettableUsers[PettableUsers.PettableUserList.IslandIndex];
+            IPettableUser? islandUser = PetServices.UserList[IUserList.IslandIndex];
 
             if (islandUser == null)
             {
@@ -64,7 +63,7 @@ internal class TargetContextMenu : IContextMenuElement
             return null;
         }
 
-        return (a) =>
+        return _ =>
         {
             WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId, true);
         };

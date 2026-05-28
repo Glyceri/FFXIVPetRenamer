@@ -12,16 +12,14 @@ namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal class SystemChatElement : LogChatElement
 {
-    private readonly IPetServices      PetServices;
-    private readonly IPronounHook      PronounHook;
-    private readonly IPettableUserList UserList;
+    private readonly IPetServices PetServices;
+    private readonly IPronounHook PronounHook;
 
-    public SystemChatElement(DalamudServices dalamudServices, IPetServices petServices, IPronounHook pronounHook, IPettableUserList userList)
+    public SystemChatElement(DalamudServices dalamudServices, IPetServices petServices, IPronounHook pronounHook)
         : base(dalamudServices)
     {
         PetServices     = petServices;
         PronounHook     = pronounHook;
-        UserList        = userList;
         
         Register(new LogChatMessage(640,  XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer)); // <head(<denoun(BNpcName,5,lnum1,1,1,1)>)> wurde fortgeschickt.
         Register(new LogChatMessage(642,  XivChatType.SystemError,   XivChatRelationKind.LocalPlayer)); // Du hast <denoun(BNpcName,5,lnum1,1,3,1)> den Befehl „<sheet(PetAction,lnum2,0)>“ gegeben.
@@ -41,7 +39,7 @@ internal class SystemChatElement : LogChatElement
             return;
         }
         
-        IPettablePet? pettablePet = UserList.LocalPlayer?.GetYoungestPet(SkeletonType.BattlePet);
+        IPettablePet? pettablePet = PetServices.UserList.LocalPlayer?.GetYoungestPet(SkeletonType.BattlePet);
         
         if (pettablePet == null)
         {

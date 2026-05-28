@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
 using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
@@ -15,11 +16,11 @@ namespace PetRenamer.PetNicknames.ReadingAndParsing;
 
 internal class DataWriter : IDataWriter
 {
-    private readonly IPettableUserList UserList;
+    private readonly IPetServices PetServices;
 
-    public DataWriter(IPettableUserList userList)
+    public DataWriter(IPetServices petServices)
     {
-        UserList = userList;
+        PetServices = petServices;
     }
 
     private string GetStringFromPetSkeleton(PetSkeleton petSkeleton)
@@ -27,7 +28,7 @@ internal class DataWriter : IDataWriter
 
     public string WriteData()
     {
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (localUser == null)
         {
@@ -53,7 +54,7 @@ internal class DataWriter : IDataWriter
         for (int i = 0; i < length; i++)
         {
             string name       = database.Names[i];
-            PetSkeleton id    = database.IDs[i];
+            PetSkeleton id    = database.Ids[i];
             string edgeColour = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
             string textColour = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
 

@@ -9,12 +9,10 @@ namespace PetRenamer.PetNicknames.Chat.ChatElements;
 
 internal class EmoteChatElement : IChatElement
 {
-    private readonly IPettableUserList UserList;
-    private readonly IPetServices      PetServices;
+    private readonly IPetServices PetServices;
 
-    public EmoteChatElement(IPetServices petServices, IPettableUserList userList) 
+    public EmoteChatElement(IPetServices petServices) 
     {
-        UserList    = userList;
         PetServices = petServices;
     }
     
@@ -25,28 +23,11 @@ internal class EmoteChatElement : IChatElement
             return;
         }
         
-        IPettableUser? senderUser = UserList.GetUser(chatMessage.Sender.TextValue);
-
-        if (senderUser == null)
+        IPettableUser?   senderUser = PetServices.UserList.GetUser(chatMessage.Sender.TextValue);
+        IPettableEntity? target     = PetServices.TargetManager.GetLeadingTarget(senderUser);
+        
+        if (target is not IPettablePet pet) 
         {
-            PetServices.PetLog.LogVerbose($"Sender User is NULL [{chatMessage.Sender.TextValue}].");
-
-            return;
-        }
-
-        IPettableEntity? target = senderUser.TargetManager?.GetLeadingTarget();
-
-        if (target == null)
-        {
-            PetServices.PetLog.LogVerbose($"Target is NULL [{chatMessage.Sender.TextValue}].");
-
-            return;
-        }
-
-        if (target is not IPettablePet pet)
-        {
-            PetServices.PetLog.LogVerbose($"Target is NOT IPettablePet [{target.GetType().Name}].");
-
             return;
         }
 

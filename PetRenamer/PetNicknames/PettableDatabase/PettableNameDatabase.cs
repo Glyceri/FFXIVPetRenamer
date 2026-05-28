@@ -1,9 +1,9 @@
 ﻿using Dalamud.Utility;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using PN.S;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -12,31 +12,32 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableNameDatabase : INamesDatabase
 {
-    public PetSkeleton[] IDs   { get; private set; }
-    public string[]      Names { get; private set; }
+    private static readonly Regex urlRegex = new Regex(@"\b(?:(?:https?|ftp):\/\/)?(?:(?:[a-z0-9\-]+\.)+[a-z]{2,}|localhost)(?::\d{1,5})?(?:\/[^\s]*)?\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     
-    public Vector3?[] EdgeColours { get; private set; }
-    public Vector3?[] TextColours { get; private set; }
+    public PetSkeleton[] Ids         { get; private set; }
+    public string[]      Names       { get; private set; }
+    public Vector3?[]    EdgeColours { get; private set; }
+    public Vector3?[]    TextColours { get; private set; }
 
-    private readonly IPettableDirtyCaller? DirtyCaller = null;
+    private readonly IPetServices PetServices;
 
-    public PettableNameDatabase(PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, IPettableDirtyCaller dirtyCaller)
+    public PettableNameDatabase(IPetServices petServices, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours)
     {
         Names       = names;
-        IDs         = ids;
+        Ids         = ids;
         EdgeColours = edgeColours;
         TextColours = textColours;
-        DirtyCaller = dirtyCaller;
+        PetServices = petServices;
     }
 
     public int Length 
-        => IDs.Length; 
+        => Ids.Length; 
 
     private int GetIndex(PetSkeleton id)
     {
         for (int i = 0; i < Length; i++)
         {
-            if (IDs[i] != id)
+            if (Ids[i] != id)
             {
                 continue;
             }
@@ -47,41 +48,26 @@ internal class PettableNameDatabase : INamesDatabase
         return -1;
     }
 
-    public string? GetName(PetSkeleton id)
+    private T? GetElement<T>(T[] array, PetSkeleton id)
     {
         int index = GetIndex(id);
 
         if (index == -1)
         {
-            return null;
+            return default;
         }
         
-        return Names[index];
+        return array[index];
     }
+    
+    public string? GetName(PetSkeleton id)
+        => GetElement(Names, id);
 
     public Vector3? GetEdgeColour(PetSkeleton id)
-    {
-        int index = GetIndex(id);
-
-        if (index == -1)
-        {
-            return null;
-        }
-
-        return EdgeColours[index];
-    }
+        => GetElement(EdgeColours, id);
 
     public Vector3? GetTextColour(PetSkeleton id)
-    {
-        int index = GetIndex(id);
-
-        if (index == -1)
-        {
-            return null;
-        }
-
-        return TextColours[index];
-    }
+        => GetElement(TextColours, id);
 
     public void SetName(PetSkeleton id, string? name, Vector3? edgeColour, Vector3? textColour)
     {
@@ -92,7 +78,7 @@ internal class PettableNameDatabase : INamesDatabase
 
         string? validName = MakeNameValid(name);
 
-        int index = IndexOf(id);
+        int index = GetIndex(id);
 
         if (index != -1)
         {
@@ -115,24 +101,9 @@ internal class PettableNameDatabase : INamesDatabase
         SetDirty();
     }
 
-    private int IndexOf(PetSkeleton id)
-    {
-        for (int i = 0; i < Length; i++)
-        {
-            if (IDs[i] != id)
-            {
-                continue;
-            }
-            
-            return i;
-        }
-
-        return -1;
-    }
-
     private void RemoveAtIndex(int index)
     {
-        List<PetSkeleton> newIds      = [.. IDs];
+        List<PetSkeleton> newIds      = [.. Ids];
         List<string>      newNames    = [.. Names];
         List<Vector3?>    edgeColours = [.. EdgeColours];
         List<Vector3?>    textColours = [.. TextColours];
@@ -142,7 +113,7 @@ internal class PettableNameDatabase : INamesDatabase
         edgeColours.RemoveAt(index);
         textColours.RemoveAt(index);
 
-        IDs         = [.. newIds];
+        Ids         = [.. newIds];
         Names       = [.. newNames];
         EdgeColours = [.. edgeColours];
         TextColours = [.. textColours];
@@ -150,7 +121,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     private void Add(PetSkeleton id, string name, Vector3? edgeColour, Vector3? textColour)
     {
-        List<PetSkeleton> newIds      = [.. IDs];
+        List<PetSkeleton> newIds      = [.. Ids];
         List<string>      newNames    = [.. Names];
         List<Vector3?>    edgeColours = [.. EdgeColours];
         List<Vector3?>    textColours = [.. TextColours];
@@ -160,16 +131,13 @@ internal class PettableNameDatabase : INamesDatabase
         edgeColours.Add(edgeColour);
         textColours.Add(textColour);
 
-        IDs         = [.. newIds];
+        Ids         = [.. newIds];
         Names       = [.. newNames];
         EdgeColours = [.. edgeColours];
         TextColours = [.. textColours];
     }
-     
-    public SerializableNameDataV3 SerializeData() 
-        => new SerializableNameDataV3(this);
-
-    public void Update(PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, IPettableDirtyCaller dirtyCaller)
+    
+    public void Update(PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours)
     {
         if (ids.Length != names.Length)
         {
@@ -180,11 +148,10 @@ internal class PettableNameDatabase : INamesDatabase
 
         for (int i = 0; i < names.Length; i++)
         {
-            // I feel like this should actually remove the name, not add it back as empty :erm:
             newNames.Add(MakeNameValid(names[i]) ?? string.Empty);
         }
 
-        IDs         = ids;
+        Ids         = ids;
         Names       = [.. newNames];
         EdgeColours = [.. edgeColours];
         TextColours = [.. textColours];
@@ -192,7 +159,7 @@ internal class PettableNameDatabase : INamesDatabase
 
     private void SetDirty()
     {
-        DirtyCaller?.DirtyName(this);
+        PetServices.DirtyCaller.DirtyName(this);
     }
 
     private string? MakeNameValid(string? name)
@@ -224,13 +191,4 @@ internal class PettableNameDatabase : INamesDatabase
 
         return name;
     }
-
-    // wish I commented on what this was, because I have no idea
-    //
-    // nvm I remember c:
-    // This is to dissallow urls or weird names
-    private static readonly Regex urlRegex = new Regex(
-        @"\b(?:(?:https?|ftp):\/\/)?(?:(?:[a-z0-9\-]+\.)+[a-z]{2,}|localhost)(?::\d{1,5})?(?:\/[^\s]*)?\b",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
 }

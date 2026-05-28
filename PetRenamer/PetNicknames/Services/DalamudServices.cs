@@ -6,7 +6,6 @@ namespace PetRenamer.PetNicknames.Services;
 
 internal class DalamudServices
 {
-                    internal PetRenamerPlugin                PetNicknamesPlugin          { get; private set; } = null!;
                     internal IDalamudPluginInterface         DalamudPlugin               { get; private set; } = null!;
     [PluginService] internal ICommandManager                 CommandManager              { get; private set; } = null!;
     [PluginService] internal IFramework                      Framework                   { get; private set; } = null!;
@@ -27,14 +26,13 @@ internal class DalamudServices
     [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
     [PluginService] internal ICondition                      Condition                   { get; private set; } = null!;
 
-    public static DalamudServices Create(IDalamudPluginInterface plugin, PetRenamerPlugin petNicknames)
+    public static DalamudServices Create(IDalamudPluginInterface plugin)
     {
-        DalamudServices service    = new DalamudServices();
+        DalamudServices service = new DalamudServices();
 
         _ = plugin.Inject(service);
-
-        service.PetNicknamesPlugin = petNicknames;
-        service.DalamudPlugin      = plugin;
+        
+        service.DalamudPlugin = plugin;
 
         return service;
     }

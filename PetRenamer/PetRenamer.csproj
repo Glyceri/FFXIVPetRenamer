@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Glyceri</Authors>
     <Company></Company>
-    <Version>2.10.0.2</Version>
+    <Version>2.10.1.0</Version>
     <Description>A pet nickname plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Glyceri/FFXIVPetRenamer</PackageProjectUrl>
@@ -23,6 +23,7 @@
   
    <ItemGroup>
      <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
+     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
    </ItemGroup>
 
 </Project>

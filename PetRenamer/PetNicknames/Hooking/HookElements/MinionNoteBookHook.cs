@@ -2,19 +2,26 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class MinionNoteBookHook : HookableElement
 {
-    public MinionNoteBookHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    private static readonly NameTypeFactory NoteBookNameType = new NameTypeFactory()
+    {
+        EnglishNameType  = NameType.Raw,
+        GermanNameType   = NameType.Pronoun,
+        FrenchNameType   = NameType.Raw,
+        JapaneseNameType = NameType.Raw,
+    };
+    
+    public MinionNoteBookHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {
@@ -41,7 +48,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
             return;
         }
         
-        if (UserList.LocalPlayer == null)
+        if (PetServices.UserList.LocalPlayer == null)
         {
             return;
         }
@@ -55,7 +62,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NameType.Pronoun);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType);
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)

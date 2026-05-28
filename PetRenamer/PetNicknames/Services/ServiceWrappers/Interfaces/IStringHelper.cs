@@ -9,13 +9,13 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal unsafe interface IStringHelper
 {
-    SeString WrapInColor(string petName, Vector3? edgeColor = null, Vector3? textColor= null);
+    SeString WrapInColor(string petName, Vector3? edgeColor = null, Vector3? textColor = null);
     
     void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType);
     
-    void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
-    void ReplaceATKString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
+    void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
+    void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
     
     string CleanupString(string str);
     string CleanupActionName(string str);

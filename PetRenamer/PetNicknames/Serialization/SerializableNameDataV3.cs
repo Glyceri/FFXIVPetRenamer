@@ -47,7 +47,7 @@ internal class SerializableNameDataV3
 
     public SerializableNameDataV3(in INamesDatabase namesDatabase)
     {
-        PetSkeletonHelper.AsMappedArray(namesDatabase.IDs, out int[] newIds, out int[] newSkeletonTypes);
+        PetSkeletonHelper.AsMappedArray(namesDatabase.Ids, out int[] newIds, out int[] newSkeletonTypes);
 
         Ids             = newIds;
         SkeletonTypes   = newSkeletonTypes;

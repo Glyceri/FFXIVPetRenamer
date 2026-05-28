@@ -5,48 +5,38 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
-internal unsafe class PettableUserHandler : IUpdatable
+internal class PettableUserHandler : IUpdatable
 {
-    public bool Enabled { get; set; } 
-        = true;
+    private bool isDirty;
+    
+    private readonly IPetServices      PetServices;
+    private readonly IIslandHook       IslandHook;
+    private readonly IPettableDatabase Database;
 
-    private bool isDirty = false;
-
-    private readonly IPettableUserList      UserList;
-    private readonly IPetServices           PetServices;
-    private readonly IIslandHook            IslandHook;
-    private readonly IPettableDirtyListener DirtyListener;
-    private readonly IPettableDatabase      Database;
-
-    public PettableUserHandler(IPettableUserList userList, IPetServices petServices, IIslandHook islandHook, IPettableDirtyListener dirtyListener, IPettableDatabase database)
+    public PettableUserHandler(IPetServices petServices, IIslandHook islandHook, IPettableDatabase database)
     {
-        UserList        = userList;
         PetServices     = petServices;
         IslandHook      = islandHook;
-        DirtyListener   = dirtyListener;
         Database        = database;
 
-        DirtyListener.RegisterOnClearEntry(OnDirty);
-        DirtyListener.RegisterOnDirtyDatabase(OnDirty);
-        DirtyListener.RegisterOnDirtyEntry(OnDirty);
-        DirtyListener.RegisterOnDirtyName(OnDirty);
+        PetServices.DirtyListener.RegisterOnClearEntry(OnDirty);
+        PetServices.DirtyListener.RegisterOnDirtyDatabase(OnDirty);
+        PetServices.DirtyListener.RegisterOnDirtyEntry(OnDirty);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnDirty);
     }
 
+    public bool Enabled 
+        => true;
+    
     public void OnUpdate(IFramework framework)
     {
-        for (int i = 0; i < PettableUserList.PettableUserArraySize; i++)
+        foreach (IPettableUser? user in PetServices.UserList)
         {
-            IPettableUser? user = UserList.PettableUsers[i];
-
-            if (user == null)
-            {
-                continue;
-            }
-
-            user.Update();
+            user?.Update();
         }
 
         HandleIsland();
@@ -115,14 +105,14 @@ internal unsafe class PettableUserHandler : IUpdatable
 
     private void ClearIslandUser()
     {
-        UserList.PettableUsers[PettableUserList.IslandIndex]?.Dispose(Database);
-        UserList.PettableUsers[PettableUserList.IslandIndex] = null;
+        PetServices.UserList[IUserList.IslandIndex]?.Dispose(Database);
+        PetServices.UserList[IUserList.IslandIndex] = null;
     }
 
     private void CreateIslandUser(IPettableDatabaseEntry entry)
     {
         ClearIslandUser();
 
-        UserList.PettableUsers[PettableUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
+        PetServices.UserList[IUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
     }
 }

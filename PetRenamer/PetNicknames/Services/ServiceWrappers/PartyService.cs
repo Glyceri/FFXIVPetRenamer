@@ -16,13 +16,13 @@ internal class PartyService : IParty
 {
     private const string PARTY_ADDON_NAME = "_PartyList";
     
-    private readonly IPettableUserList      UserList;
+    private readonly IUserList      UserList;
     private readonly DalamudServices        DalamudServices;
-    private readonly IPettableDirtyListener DirtyListener;
+    private readonly IDirtyListener DirtyListener;
     
     private readonly IPettableUser?[]       Party = new IPettableUser?[IParty.MaxPartyLength];
     
-    public PartyService(IPettableUserList userList, DalamudServices dalamudServices, IPettableDirtyListener dirtyListener)
+    public PartyService(IUserList userList, DalamudServices dalamudServices, IDirtyListener dirtyListener)
     {
         DalamudServices = dalamudServices;
         UserList        = userList;

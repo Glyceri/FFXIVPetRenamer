@@ -4,7 +4,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
-internal class PettableDirtyHandler : IPettableDirtyListener, IPettableDirtyCaller
+internal class DirtyHandler : IDirtyListener, IDirtyCaller
 {
     Action<IPettableDatabase>?      OnDatabase  = _ => { };
     Action<IPettableDatabaseEntry>? OnEntry     = _ => { };

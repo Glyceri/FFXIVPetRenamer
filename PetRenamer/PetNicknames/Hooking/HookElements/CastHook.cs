@@ -1,6 +1,5 @@
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -17,8 +16,8 @@ internal class CastHook : HookableElement
     [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B9 9E 64 00 00", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
     private readonly Hook<AddToScreenLogWithLogMessageIdDelegate>? AddToScreenLogWithLogMessageIdHook = null;
     
-    public CastHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    public CastHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {
@@ -41,7 +40,7 @@ internal class CastHook : HookableElement
             return;
         }
 
-        IPettableUser? user = UserList.GetUser(castDealer, UserListFindType.PetMeansOwner);
+        IPettableUser? user = PetServices.UserList.GetUser(castDealer, UserListFindType.PetMeansOwner);
 
         user?.OnLastCastChanged((uint)castId);
     }

@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Utility;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -12,6 +11,8 @@ using System;
 using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
@@ -64,9 +65,9 @@ internal class IpcProvider : IIpcProvider
       * 
       * ----------------------END READ ME -----------------------
       */
-
-    public bool Enabled { get; set; } = false;
-
+    
+    public bool Enabled { get; set; }
+     
     private const string ApiNamespace       = "PetRenamer.";
     private const uint   MajorVersion       = 4;
     private const uint   MinorVersion       = 0;
@@ -74,12 +75,12 @@ internal class IpcProvider : IIpcProvider
 
     private string  lastData                = "[unprepared]";
     private float   releaseTimer            = ReleaseInterval;
-    private bool    hasDataChange           = false;
+    private bool    hasDataChange;
 
     private readonly DalamudServices                    DalamudServices;
     private readonly IDataWriter                        DataWriter;
     private readonly IDataParser                        DataReader;
-    private readonly IPettableUserList                  UserList;
+    private readonly IPetServices                       PetServices;
 
 
     // Notifications
@@ -97,27 +98,27 @@ internal class IpcProvider : IIpcProvider
     private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
     private readonly ICallGateProvider<nint, object>    ClearPlayerIPCDataV2;
     
-    public IpcProvider(DalamudServices dalamudServices, IDalamudPluginInterface petNicknamesPlugin, IDataParser dataReader, IDataWriter dataWriter, IPettableUserList userList)
+    public IpcProvider(DalamudServices dalamudServices, IPetServices petServices, IDataParser dataReader, IDataWriter dataWriter)
     {
         DalamudServices      = dalamudServices;
+        PetServices          = petServices;
         DataReader           = dataReader;
         DataWriter           = dataWriter;
-        UserList             = userList;
 
         // Notifiers
-        Ready                = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
-        Disposing            = petNicknamesPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
-        PlayerDataChanged    = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
+        Ready                = dalamudServices.DalamudPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
+        Disposing            = dalamudServices.DalamudPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged    = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
-        ApiVersion           = petNicknamesPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
-        EnabledFunction      = petNicknamesPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
-        GetPlayerData        = petNicknamesPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
+        ApiVersion           = dalamudServices.DalamudPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
+        EnabledFunction      = dalamudServices.DalamudPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
+        GetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData        = petNicknamesPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData   = petNicknamesPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
-        ClearPlayerIPCDataV2 = petNicknamesPlugin.GetIpcProvider<nint, object>  ($"{ApiNamespace}ClearPlayerDataV2");
+        SetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
+        ClearPlayerIPCData   = dalamudServices.DalamudPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
+        ClearPlayerIPCDataV2 = dalamudServices.DalamudPlugin.GetIpcProvider<nint, object>  ($"{ApiNamespace}ClearPlayerDataV2");
     }
     
     public void Dispose()
@@ -249,7 +250,7 @@ internal class IpcProvider : IIpcProvider
     
     private void ClearIPCDataV2Detour(nint character)
     {
-        IPettableUser? user = UserList.GetUser(character, UserListFindType.Direct);
+        IPettableUser? user = PetServices.UserList.GetUser(character, UserListFindType.Direct);
         
         if (user == null)
         {
@@ -328,14 +329,6 @@ internal class IpcProvider : IIpcProvider
         RefreshLastData();
 
         hasDataChange = true;
-    }
-
-    public void ClearCachedData()
-    {
-        lock (lastData)
-        {
-            lastData = string.Empty;
-        }
     }
 
     private void RefreshLastData()

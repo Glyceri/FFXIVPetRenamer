@@ -11,16 +11,16 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableIslandPet : IIslandPet
 {
-    public nint           Address    { get; }
-    public PetSkeleton    SkeletonId { get; }
-    public GameObjectId   ObjectId   { get; }
-    public IPetSheetData? PetData    { get; }
-    public IPettableUser? Owner      { get; }
-    public BattleChara*   BattlePet  { get; }
+    public nint           Address     { get; }
+    public PetSkeleton    SkeletonId  { get; }
+    public GameObjectId   ObjectId    { get; }
+    public IPetSheetData? PetData     { get; }
+    public IPettableUser? Owner       { get; }
+    public BattleChara*   BattleChara { get; }
 
     public PettableIslandPet(BattleChara* pet, IPettableUser owner, IPetServices petServices)
     {
-        BattlePet   = pet;
+        BattleChara = pet;
         Address     = (nint)pet;
         Owner       = owner;
         SkeletonId  = new PetSkeleton((uint)pet->Character.ModelContainer.ModelCharaId, SkeletonType.Minion);

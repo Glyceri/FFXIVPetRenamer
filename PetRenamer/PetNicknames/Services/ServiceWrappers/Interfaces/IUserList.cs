@@ -1,12 +1,18 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
+using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using System.Collections.Generic;
 
-namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
-internal interface IPettableUserList
+internal interface IUserList : IEnumerable<IPettableUser?>
 {
-    IPettableUser?[] PettableUsers { get; }
-    IPettableUser?   LocalPlayer   { get; }
+    const int PettableUserArraySize = 101;
+    const int IslandIndex           = 100;
+    
+    IPettableUser? this[int index] { get; set; }
+    
+    IPettableUser? LocalPlayer { get; }
 
     IPettablePet?  GetPet(nint pet);
     IPettablePet?  GetPet(GameObjectId petId);

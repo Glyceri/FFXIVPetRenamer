@@ -8,23 +8,19 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal abstract class HookableElement : IHookableElement
 {
-    protected readonly DalamudServices         DalamudServices;
-    protected readonly IPettableUserList       UserList;
-    protected readonly IPetServices            PetServices;
-    protected readonly IPettableDirtyListener  DirtyListener;
+    protected readonly DalamudServices DalamudServices;
+    protected readonly IPetServices    PetServices;
 
-    public HookableElement(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener)
+    protected HookableElement(DalamudServices services, IPetServices petServices)
     {
         DalamudServices = services;
-        UserList        = userList;
         PetServices     = petServices;
-        DirtyListener   = dirtyListener;
 
-        DirtyListener.RegisterOnDirtyDatabase(OnPettableDatabaseChange);
-        DirtyListener.RegisterOnClearEntry(OnPettableEntryClear);
-        DirtyListener.RegisterOnDirtyEntry(OnPettableEntryChange);
-        DirtyListener.RegisterOnDirtyName(OnNameDatabaseChange);
-        DirtyListener.RegisterOnPlayerCharacterDirty(OnPlayerDirty);
+        PetServices.DirtyListener.RegisterOnDirtyDatabase(OnPettableDatabaseChange);
+        PetServices.DirtyListener.RegisterOnClearEntry(OnPettableEntryClear);
+        PetServices.DirtyListener.RegisterOnDirtyEntry(OnPettableEntryChange);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnNameDatabaseChange);
+        PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(OnPlayerDirty);
 
         DalamudServices.Hooking.InitializeFromAttributes(this);
     }
@@ -51,11 +47,11 @@ internal abstract class HookableElement : IHookableElement
 
     public void Dispose()
     {
-        DirtyListener.UnregisterOnDirtyDatabase(OnPettableDatabaseChange);
-        DirtyListener.UnregisterOnClearEntry(OnPettableEntryClear);
-        DirtyListener.UnregisterOnDirtyEntry(OnPettableEntryChange);
-        DirtyListener.UnregisterOnDirtyName(OnNameDatabaseChange);
-        DirtyListener.UnregisterOnPlayerCharacterDirty(OnPlayerDirty);
+        PetServices.DirtyListener.UnregisterOnDirtyDatabase(OnPettableDatabaseChange);
+        PetServices.DirtyListener.UnregisterOnClearEntry(OnPettableEntryClear);
+        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnPettableEntryChange);
+        PetServices.DirtyListener.UnregisterOnDirtyName(OnNameDatabaseChange);
+        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(OnPlayerDirty);
 
         OnDispose();
     }

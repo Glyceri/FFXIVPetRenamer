@@ -5,8 +5,6 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -45,8 +43,8 @@ internal unsafe class TooltipHook : HookableElement
     private string?  lastPreviousPronoun;
     private string?  lastCurrentPronoun;
     
-    public TooltipHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener, HookableElement mapHook, IPronounHook pronounHook) 
-        : base(services, userList, petServices, dirtyListener)
+    public TooltipHook(DalamudServices services, IPetServices petServices, HookableElement mapHook, IPronounHook pronounHook) 
+        : base(services, petServices)
     {
         MapHook     = mapHook;
         PronounHook = pronounHook;
@@ -71,7 +69,7 @@ internal unsafe class TooltipHook : HookableElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnTooltipColour, textNode, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnTooltipColour, textNode, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType);
         
         if (backgroundNode == null)
         {

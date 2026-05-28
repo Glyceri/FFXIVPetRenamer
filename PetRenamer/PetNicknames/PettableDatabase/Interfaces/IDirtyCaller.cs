@@ -2,7 +2,7 @@
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
-internal interface IPettableDirtyCaller
+internal interface IDirtyCaller
 {
     void DirtyName(in INamesDatabase nameDatabase);
     void DirtyEntry(in IPettableDatabaseEntry entry);

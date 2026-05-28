@@ -1,7 +1,6 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -14,8 +13,8 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class TargetHook : HookableElement
 {
-    public TargetHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener)
-        : base(services, userList, petServices, dirtyListener) { }
+    public TargetHook(DalamudServices services, IPetServices petServices)
+        : base(services, petServices) { }
     
     public override void Init()
     {
@@ -79,7 +78,7 @@ internal unsafe class TargetHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId, user);
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, textNode, petData, NameType.Action, user);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnCastbarsColour, textNode, petData, NameType.Action, user);
     }
     
     private AtkUnitBase* GetAtkUnitBase(AddonArgs args)
@@ -105,7 +104,7 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnTargetBarsColour, textNode, pettablePet, NameType.Raw);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnTargetBarsColour, textNode, pettablePet, NameType.Raw);
     }
     
     private void OnTargetInfo(AddonEvent addonEvent, AddonArgs args)
@@ -129,12 +128,12 @@ internal unsafe class TargetHook : HookableElement
     
     private void OnCastBar(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTargetCastBar(args, 4, UserList.LocalPlayer);
+        HandleTargetCastBar(args, 4, PetServices.UserList.LocalPlayer);
     }
     
     private void OnTargetInfoCastBar(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTargetCastBar(args, 4, UserList.LocalPlayer);
+        HandleTargetCastBar(args, 4, PetServices.UserList.LocalPlayer);
     }
     
     [Conditional("DEBUG")]

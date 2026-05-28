@@ -33,17 +33,15 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetListWindow : PetWindow
 {
-    private readonly IPettableUserList UserList;
     private readonly IPettableDatabase Database;
     private readonly IPettableDatabase LegacyDatabase;
-    private readonly IPetServices      PetServices;
     private readonly IImageDatabase    ImageDatabase;
 
     private readonly IDataParser DataParser;
     private readonly IDataWriter DataWriter;
 
-    private bool inUserMode     = false;
-    private bool lastInUserMode = false;
+    private bool inUserMode;
+    private bool lastInUserMode;
 
     private IPettableDatabaseEntry? ActiveEntry;
     private IPettableUser?          lastUser;
@@ -51,22 +49,21 @@ internal class PetListWindow : PetWindow
     private string SearchText       = string.Empty;
     private string activeSearchText = string.Empty;
 
-    private bool isLocalEntry = false;
+    private bool isLocalEntry;
 
     private readonly List<IPetListDrawable> petListDrawables = [];
 
-    private bool importDisabled = false;
+    private bool importDisabled;
 
-    private double internalDisabledTimer = 0;
+    private double internalDisabledTimer;
+    
     private DateTime lastTime = DateTime.Now;
 
-    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
-        : base(windowHandler, dalamudServices, petServices.Configuration, "Pet List Window")
+    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
+        : base(windowHandler, dalamudServices, petServices, "Pet List Window")
     {
-        UserList        = userList;
         Database        = database;
         LegacyDatabase  = legacyDatabase;
-        PetServices     = petServices;
         ImageDatabase   = imageDatabase;
         DataParser      = dataParser;
         DataWriter      = dataWriter;
@@ -88,7 +85,7 @@ internal class PetListWindow : PetWindow
     {
         ClearSearchBar();
 
-        SetUser(UserList.LocalPlayer?.DataBaseEntry);
+        SetUser(PetServices.UserList.LocalPlayer?.DataBaseEntry);
     }
 
     protected override void OnDraw()
@@ -110,9 +107,9 @@ internal class PetListWindow : PetWindow
             importDisabled = false;
         }
 
-        if (lastUser != UserList.LocalPlayer)
+        if (lastUser != PetServices.UserList.LocalPlayer)
         {
-            lastUser = UserList.LocalPlayer;
+            lastUser = PetServices.UserList.LocalPlayer;
 
             SetUser(lastUser?.DataBaseEntry);
         }
@@ -311,7 +308,7 @@ internal class PetListWindow : PetWindow
             
             float size = ImGui.GetContentRegionAvail().Y;
             
-            BoxedImage.DrawMinion(in pet.PetSheetData, in DalamudServices, in Configuration, new Vector2(size, size));
+            BoxedImage.DrawMinion(pet.PetSheetData, DalamudServices, PetServices.Configuration, new Vector2(size, size));
 
             using ImRaii.ListBoxDisposable listBox2 = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail());
             
@@ -359,7 +356,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            if (user.Entry.ContentId == UserList.LocalPlayer?.ContentId)
+            if (user.Entry.ContentId == PetServices.UserList.LocalPlayer?.ContentId)
             {
                 if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
                 {
@@ -462,7 +459,7 @@ internal class PetListWindow : PetWindow
     {
         if ((!ActiveEntry?.IsActive) ?? true)
         {
-            ActiveEntry = UserList.LocalPlayer?.DataBaseEntry;
+            ActiveEntry = PetServices.UserList.LocalPlayer?.DataBaseEntry;
         }
 
         _ = DalamudServices.Framework.Run(() =>
@@ -490,9 +487,9 @@ internal class PetListWindow : PetWindow
     {
         inUserMode = !inUserMode;
 
-        if (!inUserMode && UserList.LocalPlayer != null)
+        if (!inUserMode && PetServices.UserList.LocalPlayer != null)
         {
-            ActiveEntry = UserList.LocalPlayer?.DataBaseEntry;
+            ActiveEntry = PetServices.UserList.LocalPlayer?.DataBaseEntry;
         }
 
         SetUser(ActiveEntry);
@@ -531,9 +528,9 @@ internal class PetListWindow : PetWindow
 
     private bool HandleIfLocalEntry(IPettableDatabaseEntry? entry)
     {
-        if (UserList.LocalPlayer != null && entry != null)
+        if (PetServices.UserList.LocalPlayer != null && entry != null)
         {
-            return UserList.LocalPlayer.ContentId == entry.ContentId;
+            return PetServices.UserList.LocalPlayer.ContentId == entry.ContentId;
         }
         else
         {
@@ -561,12 +558,12 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            if (entry.ActiveDatabase.Length == 0 && !Configuration.debugModeActive)
+            if (entry.ActiveDatabase.Length == 0 && !PetServices.Configuration.debugModeActive)
             {
                 continue;
             }
 
-            petListDrawables.Add(new PetListUser(in DalamudServices, in entry));
+            petListDrawables.Add(new PetListUser(entry));
         }
     }
 
@@ -579,29 +576,29 @@ internal class PetListWindow : PetWindow
 
         INamesDatabase names = ActiveEntry.ActiveDatabase;
 
-        List<PetSkeleton> validIDS         = [..names.IDs];
+        List<PetSkeleton> validIds         = [..names.Ids];
         List<string>      validNames       = [..names.Names];
         List<Vector3?>    validEdgeColours = [..names.EdgeColours];
         List<Vector3?>    validTextColours = [..names.TextColours];
 
         if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
         {
-            List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIDS);
+            List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIds);
 
             foreach (IPetSheetData p in data)
             {
-                validIDS.Add(p.Model);
+                validIds.Add(p.Model);
                 validNames.Add("");
                 validEdgeColours.Add(null);
                 validTextColours.Add(null);
             }
         }
 
-        int newLength = validIDS.Count;
+        int newLength = validIds.Count;
 
         for (int i = 0; i < newLength; i++)
         {
-            PetSkeleton ID = validIDS[i];
+            PetSkeleton ID = validIds[i];
 
             if (PetWindowMode.Minion == CurrentMode && ID.SkeletonType != SkeletonType.Minion)
             {

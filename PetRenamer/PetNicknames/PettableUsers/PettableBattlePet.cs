@@ -12,7 +12,7 @@ internal unsafe class PettableBattlePet : BasePettablePet, IPettableBattlePet
     public PettableBattlePet(BattleChara* battlePet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices)
         : base(&battlePet->Character, owner, sharingDictionary, entry, petServices, GetSkeletonType(battlePet->ModelContainer.ModelCharaId)) { }
     
-    public BattleChara* BattlePet
+    public BattleChara* BattleChara
         => (BattleChara*)Address;
     
     private static SkeletonType GetSkeletonType(int skeletonId)

@@ -1,7 +1,6 @@
 ﻿using Dalamud.Bindings.ImGui;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using System.Collections.Generic;
@@ -25,17 +24,11 @@ internal class PetConfigWindow : PetWindow
     {
         { "Penumbra", false },
     };
-
-    private readonly IPluginWatcher    PluginWatcher;
-    private readonly IPettableUserList UserList;
     
-    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration, IPluginWatcher pluginWatcher, IPettableUserList userList) 
-        : base(windowHandler, dalamudServices, configuration, "Pet Config Window")
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
+        : base(windowHandler, dalamudServices, petServices, "Pet Config Window")
     {
-        PluginWatcher = pluginWatcher;
-        UserList      = userList;
-        
-        PluginWatcher.RegisterListener(OnPluginChanged);
+        PetServices.PluginWatcher.RegisterListener(OnPluginChanged);
     }
 
     protected override void OnDraw()
@@ -44,9 +37,9 @@ internal class PetConfigWindow : PetWindow
         {
             ImGui.Spacing();
             
-            DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref Configuration.downloadProfilePictures);
+            DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref PetServices.Configuration.downloadProfilePictures);
             
-            DrawEnumMenu("Name Colours", _colourDisplay, ref Configuration.SelectedColourMode);
+            DrawEnumMenu("Name Colours", _colourDisplay, ref PetServices.Configuration.SelectedColourMode);
             
             ImGui.Spacing();
         }
@@ -54,18 +47,18 @@ internal class PetConfigWindow : PetWindow
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
         {
             ImGui.Spacing();
-            DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref Configuration.showKofiButton);
-            DrawBasicToggle(Translator.GetLine("Config.Toggle"),            ref Configuration.quickButtonsToggle);
+            DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref PetServices.Configuration.showKofiButton);
+            DrawBasicToggle(Translator.GetLine("Config.Toggle"),            ref PetServices.Configuration.quickButtonsToggle);
             
             ImGui.Separator();
             
             ImGui.Spacing();
 
-            DrawBasicToggle(Translator.GetLine("Config.ShowNotification"),  ref Configuration.showNotifications);
+            DrawBasicToggle(Translator.GetLine("Config.ShowNotification"),  ref PetServices.Configuration.showNotifications);
 
-            ImGui.BeginDisabled(!Configuration.showNotifications);
+            ImGui.BeginDisabled(!PetServices.Configuration.showNotifications);
 
-            DrawBasicToggle(Translator.GetLine("Config.IslandWarning"),     ref Configuration.showIslandWarning);
+            DrawBasicToggle(Translator.GetLine("Config.IslandWarning"),     ref PetServices.Configuration.showIslandWarning);
 
             ImGui.EndDisabled();
             
@@ -73,27 +66,27 @@ internal class PetConfigWindow : PetWindow
             
             ImGui.Spacing();
 
-            DrawMenu("List Button Type", _listIconTypes, ref Configuration.listButtonLayout);
-            DrawMenu("Icon Type",        _iconMenuTypes, ref Configuration.minionIconType);
+            DrawMenu("List Button Type", _listIconTypes, ref PetServices.Configuration.listButtonLayout);
+            DrawMenu("Icon Type",        _iconMenuTypes, ref PetServices.Configuration.minionIconType);
             
             ImGui.Spacing();
         }
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
-            DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref Configuration.ShowOnNameplatesColour);
-            DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref Configuration.ShowOnCastbarsColour);
-            DrawColourConfig(Translator.GetLine("Config.BattleChat"),   ref Configuration.ShowInBattleChatColour);
-            DrawColourConfig(Translator.GetLine("Config.Emote"),        ref Configuration.ShowOnEmotesColour);
-            DrawColourConfig(Translator.GetLine("Config.Tooltip"),      ref Configuration.ShowOnTooltipColour);
-            DrawColourConfig(Translator.GetLine("Config.Flyout"),       ref Configuration.ShowOnFlyoutColour);
-            DrawColourConfig(Translator.GetLine("Config.Notebook"),     ref Configuration.ShowNamesInMinionBookColour);
-            DrawColourConfig(Translator.GetLine("Config.ActionLog"),    ref Configuration.ShowNamesInActionLogColour);
-            DrawColourConfig(Translator.GetLine("Config.Targetbar"),    ref Configuration.ShowOnTargetBarsColour);
-            DrawColourConfig(Translator.GetLine("Config.Partylist"),    ref Configuration.ShowOnPartyListColour);
+            DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref PetServices.Configuration.ShowOnNameplatesColour);
+            DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref PetServices.Configuration.ShowOnCastbarsColour);
+            DrawColourConfig(Translator.GetLine("Config.BattleChat"),   ref PetServices.Configuration.ShowInBattleChatColour);
+            DrawColourConfig(Translator.GetLine("Config.Emote"),        ref PetServices.Configuration.ShowOnEmotesColour);
+            DrawColourConfig(Translator.GetLine("Config.Tooltip"),      ref PetServices.Configuration.ShowOnTooltipColour);
+            DrawColourConfig(Translator.GetLine("Config.Flyout"),       ref PetServices.Configuration.ShowOnFlyoutColour);
+            DrawColourConfig(Translator.GetLine("Config.Notebook"),     ref PetServices.Configuration.ShowNamesInMinionBookColour);
+            DrawColourConfig(Translator.GetLine("Config.ActionLog"),    ref PetServices.Configuration.ShowNamesInActionLogColour);
+            DrawColourConfig(Translator.GetLine("Config.Targetbar"),    ref PetServices.Configuration.ShowOnTargetBarsColour);
+            DrawColourConfig(Translator.GetLine("Config.Partylist"),    ref PetServices.Configuration.ShowOnPartyListColour);
             
-            DrawBasicToggle (Translator.GetLine("Config.IslandPets"),   ref Configuration.showOnIslandPets);
-            DrawBasicToggle (Translator.GetLine("Config.ContextMenu"),  ref Configuration.useContextMenus);
+            DrawBasicToggle (Translator.GetLine("Config.IslandPets"),   ref PetServices.Configuration.showOnIslandPets);
+            DrawBasicToggle (Translator.GetLine("Config.ContextMenu"),  ref PetServices.Configuration.useContextMenus);
             
             ImGui.Spacing();
         }
@@ -102,8 +95,8 @@ internal class PetConfigWindow : PetWindow
         {
             ImGui.Spacing();
             
-            DrawBasicToggle(Translator.GetLine("Config.Penumbra.AttachToPCP"), ref Configuration.attachToPCP);
-            DrawBasicToggle(Translator.GetLine("Config.Penumbra.ReadFromPCP"), ref Configuration.readFromPCP);
+            DrawBasicToggle(Translator.GetLine("Config.Penumbra.AttachToPCP"), ref PetServices.Configuration.attachToPCP);
+            DrawBasicToggle(Translator.GetLine("Config.Penumbra.ReadFromPCP"), ref PetServices.Configuration.readFromPCP);
             
             ImGui.Spacing();
         }
@@ -114,11 +107,11 @@ internal class PetConfigWindow : PetWindow
             
             bool keyComboPressed = ImGui.IsKeyDown(ImGuiKey.LeftCtrl) && ImGui.IsKeyDown(ImGuiKey.LeftShift);
 
-            ImGui.BeginDisabled(!keyComboPressed && !Configuration.debugModeActive);
+            ImGui.BeginDisabled(!keyComboPressed && !PetServices.Configuration.debugModeActive);
 
-            DrawBasicToggle("Enable Debug Mode.",           ref Configuration.debugModeActive);
-            DrawBasicToggle("Open Debug Window On Start.",  ref Configuration.openDebugWindowOnStart);
-            DrawBasicToggle("Show chat code.",              ref Configuration.debugShowChatCode);
+            DrawBasicToggle("Enable Debug Mode.",           ref PetServices.Configuration.debugModeActive);
+            DrawBasicToggle("Open Debug Window On Start.",  ref PetServices.Configuration.openDebugWindowOnStart);
+            DrawBasicToggle("Show chat code.",              ref PetServices.Configuration.debugShowChatCode);
 
             ImGui.EndDisabled();
             
@@ -265,12 +258,12 @@ internal class PetConfigWindow : PetWindow
     
     private void SavePlugin()
     {
-        UserList.Recalculate();
-        Configuration.Save();
+        PetServices.UserList.Recalculate();
+        PetServices.Configuration.Save();
     }
 
     protected override void OnDispose()
     {
-        PluginWatcher.DeregisterListener(OnPluginChanged);
+        PetServices.PluginWatcher.DeregisterListener(OnPluginChanged);
     }
 }

@@ -2,6 +2,7 @@
 using Dalamud.Interface.Windowing;
 using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Components.Header;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
@@ -26,7 +27,7 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 
     protected readonly DalamudServices DalamudServices;
     protected readonly WindowHandler   WindowHandler;
-    protected readonly Configuration   Configuration;
+    protected readonly IPetServices    PetServices;
 
     public bool RequestsModeChange { get; set; }
 
@@ -35,11 +36,11 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 
     private float lastGlobalScale = 0;
 
-    protected PetWindow(in WindowHandler windowHandler, in DalamudServices dalamudServices, in Configuration configuration, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
+    protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
     {
         WindowHandler   = windowHandler;
         DalamudServices = dalamudServices;
-        Configuration   = configuration;
+        PetServices     = petServices;
 
         SizeCondition   = ImGuiCond.FirstUseEver;
         Size            = DefaultSize;
@@ -106,7 +107,7 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     {
         if (HasModeToggle)
         {
-            HeaderBar.Draw(DalamudServices, WindowHandler, Configuration, this);
+            HeaderBar.Draw(PetServices, WindowHandler, this);
         }
 
         OnDraw();

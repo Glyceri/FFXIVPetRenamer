@@ -1,6 +1,7 @@
 ﻿using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -16,8 +17,8 @@ internal class KofiWindow : PetWindow
 
     protected override bool HasModeToggle  { get; } = false;
 
-    public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, Configuration configuration) 
-        : base(windowHandler, dalamudServices, configuration, "Pet Nicknames Kofi-Window", ImGuiWindowFlags.None) { }
+    public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
+        : base(windowHandler, dalamudServices, petServices, "Pet Nicknames Kofi-Window") { }
 
     protected override void OnDraw()
     {

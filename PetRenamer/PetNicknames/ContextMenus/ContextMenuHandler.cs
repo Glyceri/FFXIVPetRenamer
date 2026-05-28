@@ -2,8 +2,6 @@
 using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ContextMenus.ContextMenuElements;
 using PetRenamer.PetNicknames.ContextMenus.Interfaces;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -17,16 +15,14 @@ internal class ContextMenuHandler : IDisposable
 {
     private readonly DalamudServices            DalamudServices;
     private readonly IPetServices               PetServices;
-    private readonly IPettableUserList          UserList;
     private readonly IWindowHandler             WindowHandler;
     private readonly List<IContextMenuElement>  ContextMenuElements = [];
 
-    public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
+    public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IWindowHandler windowHandler)
     {
         DalamudServices   = dalamudServices;
         WindowHandler     = windowHandler;
         PetServices       = petServices;
-        UserList          = userList;
 
         DalamudServices.ContextMenu.OnMenuOpened += OnOpenMenu;
 
@@ -35,10 +31,10 @@ internal class ContextMenuHandler : IDisposable
 
     private void _Register()
     {
-        Register(new TargetContextMenu           (PetServices, UserList, WindowHandler));
-        Register(new MinionNoteBookContextMenu   (PetServices, UserList, WindowHandler));
-        Register(new MJIMinionNotebookContextMenu(PetServices, UserList, WindowHandler));
-        Register(new QuickPanelContextMenu       (PetServices, UserList, WindowHandler));
+        Register(new TargetContextMenu           (PetServices, WindowHandler));
+        Register(new MinionNoteBookContextMenu   (PetServices, WindowHandler));
+        Register(new MJIMinionNotebookContextMenu(PetServices, WindowHandler));
+        Register(new QuickPanelContextMenu       (PetServices, WindowHandler));
     }
 
     private void Register(IContextMenuElement contextMenuElement)

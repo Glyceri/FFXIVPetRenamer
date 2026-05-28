@@ -14,21 +14,19 @@ internal abstract class PetActionContextMenu : IContextMenuElement
     public abstract string? AddonName { get; }
 
     private readonly IPetServices       PetServices;
-    private readonly IPettableUserList  UserList;
     private readonly IWindowHandler     WindowHandler;
     private readonly IHoverService      HoverService;
 
-    public PetActionContextMenu(IPetServices petServices, IPettableUserList userList, IWindowHandler windowHandler)
+    protected PetActionContextMenu(IPetServices petServices, IWindowHandler windowHandler)
     {
         PetServices       = petServices;
-        UserList          = userList;
         WindowHandler     = windowHandler;
         HoverService      = petServices.HoverService;
     }
 
     public Action<IMenuItemClickedArgs>? OnOpenMenu(IMenuOpenedArgs args)
     {
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (localUser == null)
         {
@@ -42,7 +40,7 @@ internal abstract class PetActionContextMenu : IContextMenuElement
             return null;
         }
 
-        return (a) =>
+        return _ =>
         {
             WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(petData.Model, true);
         };

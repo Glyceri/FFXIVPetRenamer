@@ -5,15 +5,14 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class ActionMenuHook : HookableElement
 {
-    public ActionMenuHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    public ActionMenuHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {
@@ -50,7 +49,7 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        IPettableUser? user = UserList.LocalPlayer;
+        IPettableUser? user = PetServices.UserList.LocalPlayer;
         
         if (user == null)
         {
@@ -212,7 +211,7 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        IPettableUser? user = UserList.LocalPlayer;
+        IPettableUser? user = PetServices.UserList.LocalPlayer;
         
         if (user == null)
         {
@@ -301,7 +300,7 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        IPettableUser? user = UserList.LocalPlayer;
+        IPettableUser? user = PetServices.UserList.LocalPlayer;
         
         if (user == null)
         {
@@ -512,14 +511,14 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        IPetSheetData? softData = PetServices.PetSheets.MakeSoft(in user, in petSheet);
+        IPetSheetData? softData = PetServices.PetSheets.MakeSoft(user, petSheet);
         
         if (softData == null)
         {
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowNamesInActionLogColour, textNode, softData, NameType.Action);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInActionLogColour, textNode, softData, NameType.Action);
     }
 
     protected override void OnDispose()

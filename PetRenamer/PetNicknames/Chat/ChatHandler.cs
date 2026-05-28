@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -14,16 +15,14 @@ internal class ChatHandler : IDisposable
 {
     private readonly DalamudServices    DalamudServices;
     private readonly IPetServices       PetServices;
-    private readonly IPettableUserList  PettableUserList;
     private readonly IPronounHook       PronounHook;
 
     private readonly List<IChatElement> _chatElements = [];
     
-    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList pettableUserList, IPronounHook pronounHook)
+    public ChatHandler(DalamudServices dalamudServices, IPetServices petServices, IPronounHook pronounHook)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
-        PettableUserList  = pettableUserList;
         PronounHook       = pronounHook;
         
         _Register();
@@ -31,11 +30,11 @@ internal class ChatHandler : IDisposable
 
     private void _Register()
     {
-        Register(new PetGlamourChat(DalamudServices, PetServices, PettableUserList));
-        Register(new EmoteChatElement(PetServices, PettableUserList));
+        Register(new PetGlamourChat(DalamudServices, PetServices));
+        Register(new EmoteChatElement(PetServices));
         Register(new BattleChatElement(PetServices));
-        Register(new DebugChatCode(PetServices.Configuration));
-        Register(new SystemChatElement(DalamudServices, PetServices, PronounHook, PettableUserList));
+        Register(new DebugChatCode(PetServices));
+        Register(new SystemChatElement(DalamudServices, PetServices, PronounHook));
     }
 
     private void Register(IChatElement chatElement)

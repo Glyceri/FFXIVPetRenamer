@@ -9,7 +9,7 @@ internal class HoverService : IHoverService
         { get; private set; } = NameType.Raw;
 
     public IPetSheetData? CurrentlyHoveredPet 
-        { get; private set; } = null;
+        { get; private set; }
     
     public void SetHoveredPet(IPetSheetData? currentlyHoveredPet) 
         => CurrentlyHoveredPet = currentlyHoveredPet;

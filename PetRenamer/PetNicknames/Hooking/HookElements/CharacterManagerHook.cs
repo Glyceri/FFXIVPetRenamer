@@ -10,6 +10,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
@@ -28,22 +29,20 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly Hook<BattleChara.Delegates.Terminate>?     OnTerminateBattleCharaHook;
     private readonly Hook<BattleChara.Delegates.Dtor>?          OnDestroyBattleCharaHook;
 
-    private readonly IPettableDatabase      Database;
-    private readonly ILegacyDatabase        LegacyDatabase;
-    private readonly ISharingDictionary     SharingDictionary;
-    private readonly IPettableDirtyCaller   DirtyCaller;
-    private readonly IIslandHook            IslandHook;
+    private readonly IPettableDatabase  Database;
+    private readonly ILegacyDatabase    LegacyDatabase;
+    private readonly ISharingDictionary SharingDictionary;
+    private readonly IIslandHook        IslandHook;
 
     private readonly List<nint> temporaryPets = [];
 
-    public CharacterManagerHook(DalamudServices services, IPettableUserList userList, IPetServices petServices, IPettableDirtyListener dirtyListener, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IPettableDirtyCaller dirtyCaller, IIslandHook islandHook) 
-        : base(services, userList, petServices, dirtyListener)
+    public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IIslandHook islandHook) 
+        : base(services, petServices)
     {
-        Database            = database;
-        LegacyDatabase      = legacyDatabase;
-        SharingDictionary   = sharingDictionary;
-        DirtyCaller         = dirtyCaller;
-        IslandHook          = islandHook;
+        Database          = database;
+        LegacyDatabase    = legacyDatabase;
+        SharingDictionary = sharingDictionary;
+        IslandHook        = islandHook;
 
         OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
         OnTerminateCompanionHook    = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.Terminate>        ((nint)Companion.StaticVirtualTablePointer->Terminate,          TerminateCompanion);
@@ -178,7 +177,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return null;
         }
 
-        return UserList.GetUserFromObjectId(companion->CompanionOwnerId);
+        return PetServices.UserList.GetUserFromObjectId(companion->CompanionOwnerId);
     }
 
     private void HandleAsCreated(BattleChara* newBattleChara)
@@ -201,10 +200,8 @@ internal unsafe class CharacterManagerHook : HookableElement
 
             bool gotOwner = false;
 
-            for (int i = 0; i < UserList.PettableUsers.Length; i++)
+            foreach (IPettableUser? user in PetServices.UserList)
             {
-                IPettableUser? user = UserList.PettableUsers[i];
-
                 if (user == null)
                 {
                     continue;
@@ -266,7 +263,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return false;
         }
 
-        IPettableUser? user = UserList.PettableUsers[PettableUserList.IslandIndex];
+        IPettableUser? user = PetServices.UserList[IUserList.IslandIndex];
 
         if (user == null)
         {
@@ -296,10 +293,12 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            for (int i = 0; i < UserList.PettableUsers.Length; i++)
+            int index = -1;
+            
+            foreach (IPettableUser? user in PetServices.UserList)
             {
-                IPettableUser? user = UserList.PettableUsers[i];
-
+                index++;
+                
                 if (user == null)
                 {
                     continue;
@@ -310,9 +309,9 @@ internal unsafe class CharacterManagerHook : HookableElement
                     continue;
                 }
 
-                user?.Dispose(Database);
-
-                UserList.PettableUsers[i] = null;
+                user.Dispose(Database);
+                
+                PetServices.UserList[index] = null;
 
                 break;
             }
@@ -322,7 +321,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         {
             _ = temporaryPets.Remove(addressChara);
 
-            IPettableUser? user = UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
+            IPettableUser? user = PetServices.UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
 
             if (user == null)
             {
@@ -370,9 +369,9 @@ internal unsafe class CharacterManagerHook : HookableElement
             return null;
         }
 
-        PettableUser newUser = new PettableUser(SharingDictionary, Database, LegacyDatabase, PetServices, DirtyListener, DirtyCaller, UserList, newBattleChara);
+        PettableUser newUser = new PettableUser(PetServices, SharingDictionary, Database, LegacyDatabase, newBattleChara);
 
-        UserList.PettableUsers[actualIndex] = newUser;
+        PetServices.UserList[actualIndex] = newUser;
 
         AddTempPetsToUser(newUser);
 

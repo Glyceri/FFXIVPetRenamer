@@ -21,8 +21,7 @@ namespace PetRenamer.PetNicknames.Commands.Commands;
 // This shit SUCKS
 internal partial class PetNameCommand : Command
 {
-    private readonly IPetServices      PetServices;
-    private readonly IPettableUserList UserList;
+    private readonly IPetServices PetServices;
 
     private IPettableDatabaseEntry? activeEntry;
     private IPetSheetData?          activeData;
@@ -32,11 +31,10 @@ internal partial class PetNameCommand : Command
     private       List<string>  matchedArguments    = [];
     private       int           customCounter       = 0;
     
-    public PetNameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices, IPettableUserList userList) 
+    public PetNameCommand(DalamudServices dalamudServices, IWindowHandler windowHandler, IPetServices petServices) 
         : base(dalamudServices, windowHandler) 
     {
         PetServices = petServices;
-        UserList    = userList;
     }
 
     public override string CommandCode
@@ -133,7 +131,7 @@ internal partial class PetNameCommand : Command
 
     private bool GetEntry(TargetState targetState)
     {
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (localUser == null)
         {

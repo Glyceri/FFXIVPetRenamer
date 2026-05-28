@@ -1,4 +1,5 @@
 ﻿using Dalamud.Utility;
+using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -12,14 +13,15 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 
 internal class DataParser : IDataParser
 {
     private readonly DalamudServices    DalamudServices;
-    private readonly IPettableUserList  UserList;
     private readonly IPettableDatabase  Database;
+    private readonly IPetServices       PetServices;
     private readonly ILegacyDatabase    LegacyDatabase;
 
     private readonly IDataParserElement DataParserVersion1;
@@ -27,10 +29,10 @@ internal class DataParser : IDataParser
     private readonly IDataParserElement DataParserVersion3;
     private readonly IDataParserElement DataParserVersion4;
 
-    public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableUserList userList, IPettableDatabase database, ILegacyDatabase legacyDatabase)
+    public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
         DalamudServices = dalamudServices;
-        UserList        = userList;
+        PetServices     = petServices;
         Database        = database;
         LegacyDatabase  = legacyDatabase;
 
@@ -42,7 +44,7 @@ internal class DataParser : IDataParser
 
     public bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
     {
-        IPettableUser? localUser = UserList.LocalPlayer;
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
         if (result is InvalidParseResult invalidParseResult)
         {
@@ -86,8 +88,6 @@ internal class DataParser : IDataParser
             }
 
             LegacyDatabase.ApplyParseResult(baseParseResult, parseSource);
-
-            return true;
         }
 
         return true;
@@ -117,12 +117,12 @@ internal class DataParser : IDataParser
 
         return parseVersion switch
         {
-            ParseVersion.Invalid => new InvalidParseResult("Data is not Pet Nicknames data."),
+            ParseVersion.Invalid  => new InvalidParseResult("Data is not Pet Nicknames data."),
             ParseVersion.Version1 => DataParserVersion1.Parse(incomingData),
             ParseVersion.Version2 => DataParserVersion2.Parse(incomingData),
             ParseVersion.Version3 => DataParserVersion3.Parse(incomingData),
             ParseVersion.Version4 => DataParserVersion4.Parse(incomingData),
-            _ => new InvalidParseResult("Invalid Parse Version."),
+            _                     => new InvalidParseResult("Invalid Parse Version."),
         };
     }
 

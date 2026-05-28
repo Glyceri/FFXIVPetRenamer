@@ -3,8 +3,6 @@ using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 
@@ -20,8 +18,8 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
     [Signature("40 55 53 56 57 41 54 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 48 8B 85 ?? ?? ?? ?? 48 8B F9", DetourName = nameof(ProcessNounDetour))]
     private readonly Hook<ProcessNounDelegate>? ProcessNounHook = null!;
     
-    public PronounHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    public PronounHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {

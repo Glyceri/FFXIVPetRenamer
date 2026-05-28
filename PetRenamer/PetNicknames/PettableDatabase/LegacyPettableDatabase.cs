@@ -13,14 +13,14 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 {
-    public LegacyPettableDatabase(IPetServices petServices, IPettableDirtyCaller dirtyCaller) 
-        : base(petServices, dirtyCaller) { }
+    public LegacyPettableDatabase(IPetServices petServices) 
+        : base(petServices) { }
 
     protected override void Setup()
     {
         SerializableUserV3[]? serializableUsers = PetServices.Configuration.serializableUsersV3;
 
-        _entries.Clear();
+        Entries.Clear();
 
         if (serializableUsers == null)
         {
@@ -34,9 +34,9 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
 
         foreach (SerializableUserV3 userV3 in serializableUsers)
         {
-            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, DirtyCaller, 0, userV3.username, userV3.homeworld, PetSkeletonHelper.AsPetSkeletons(userV3.ids), userV3.names, new Vector3?[userV3.ids.Length], new Vector3?[userV3.ids.Length], PetSkeletonHelper.AsPetSkeletons(userV3.softSkeletons), false, true);
+            IPettableDatabaseEntry newEntry = new PettableDataBaseEntry(PetServices, 0, userV3.username, userV3.homeworld, PetSkeletonHelper.AsPetSkeletons(userV3.ids), userV3.names, new Vector3?[userV3.ids.Length], new Vector3?[userV3.ids.Length], PetSkeletonHelper.AsPetSkeletons(userV3.softSkeletons), false, true);
             
-            _entries.Add(newEntry);
+            Entries.Add(newEntry);
         }
     }
 
@@ -74,7 +74,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
             PetSkeleton[] tempSoftSkeletonArray = entry.SoftSkeletons.ToArray();
 
             PetSkeletonHelper.AsLegacyArray(tempSoftSkeletonArray, out int[] legacySoftSkeletonArray);
-            PetSkeletonHelper.AsLegacyArray(nameDatabase.IDs,      out int[] legacyIdsArray);
+            PetSkeletonHelper.AsLegacyArray(nameDatabase.Ids,      out int[] legacyIdsArray);
 
             users.Add(new SerializableUserV3(legacyIdsArray, nameDatabase.Names, entry.Name, entry.Homeworld, legacySoftSkeletonArray, legacySoftSkeletonArray));
         }

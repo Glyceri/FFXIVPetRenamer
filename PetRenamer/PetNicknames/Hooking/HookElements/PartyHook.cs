@@ -4,11 +4,9 @@ using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using Lumina.Text.ReadOnly;
 using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -17,10 +15,10 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class PartyHook : HookableElement
 {
-    private bool hasRegisteredListener = false;
+    private bool hasRegisteredListener;
     
-    public PartyHook(DalamudServices services, IPetServices petServices, IPettableUserList userList, IPettableDirtyListener dirtyListener) 
-        : base(services, userList, petServices, dirtyListener) { }
+    public PartyHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) { }
 
     public override void Init()
     {
@@ -73,7 +71,7 @@ internal unsafe class PartyHook : HookableElement
 
     private void SetPetName(PetNicknamesAddonPartyList* partyNode)
     {
-        IPettableUser? localPlayer = UserList.LocalPlayer;
+        IPettableUser? localPlayer = PetServices.UserList.LocalPlayer;
 
         if (localPlayer == null)
         {
@@ -87,7 +85,7 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnPartyListColour, partyNode->Pet.Name, pet, NameType.Raw);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnPartyListColour, partyNode->Pet.Name, pet, NameType.Raw);
     }
 
     private void SetCastlist(AddonPartyList* partyNode)
@@ -132,14 +130,14 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId, in user);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId, user);
 
             if (data == null)
             {
                 continue;
             }
 
-            PetServices.StringHelper.ReplaceATKString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
+            PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
         }
     }
 }

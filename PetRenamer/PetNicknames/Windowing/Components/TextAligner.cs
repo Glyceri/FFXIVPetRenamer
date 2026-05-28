@@ -9,7 +9,7 @@ internal static class TextAligner
     {
         Vector2 basicAlign = new Vector2(0.5f, 0.5f);
 
-        if (alignment == TextAlignment.Left) basicAlign = new Vector2(0, 0.5f);
+        if (alignment == TextAlignment.Left)  basicAlign = new Vector2(0, 0.5f);
         if (alignment == TextAlignment.Right) basicAlign = new Vector2(1, 0.5f);
 
         ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, basicAlign);

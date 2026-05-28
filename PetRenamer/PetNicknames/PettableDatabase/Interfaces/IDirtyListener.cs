@@ -3,7 +3,7 @@ using System;
 
 namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
-internal interface IPettableDirtyListener
+internal interface IDirtyListener
 {
     void RegisterOnDirtyName(Action<INamesDatabase> onNamesDatabase);
     void RegisterOnDirtyEntry(Action<IPettableDatabaseEntry> onEntry);

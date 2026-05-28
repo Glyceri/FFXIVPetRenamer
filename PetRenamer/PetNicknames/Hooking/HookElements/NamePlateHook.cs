@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -20,8 +19,8 @@ internal unsafe class NamePlateHook : HookableElement
     private readonly Hook<RaptureAtkModule.Delegates.UpdateBattleCharaNameplates>? NameplateHook;
     private readonly Hook<RaptureAtkModule.Delegates.UpdateNpcNameplates>?         NameplateMinionHook;
 
-    public NamePlateHook(DalamudServices services, IPetServices petServices, IPettableUserList pettableUserList, IPettableDirtyListener dirtyListener) 
-        : base(services, pettableUserList, petServices, dirtyListener) 
+    public NamePlateHook(DalamudServices services, IPetServices petServices) 
+        : base(services, petServices) 
     {
          NameplateHook       = DalamudServices.Hooking.HookFromAddress<RaptureAtkModule.Delegates.UpdateBattleCharaNameplates>((nint)RaptureAtkModule.MemberFunctionPointers.UpdateBattleCharaNameplates, UpdateNameplateDetour);
          NameplateMinionHook = DalamudServices.Hooking.HookFromAddress<RaptureAtkModule.Delegates.UpdateNpcNameplates>        ((nint)RaptureAtkModule.MemberFunctionPointers.UpdateNpcNameplates,         UpdateNameplateNpcDetour);
@@ -93,7 +92,7 @@ internal unsafe class NamePlateHook : HookableElement
             return;
         }
 
-        IPettablePet? pPet = UserList.GetPet(obj);
+        IPettablePet? pPet = PetServices.UserList.GetPet(obj);
 
         if (pPet == null)
         {
