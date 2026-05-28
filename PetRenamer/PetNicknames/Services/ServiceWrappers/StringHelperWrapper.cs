@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -266,7 +267,7 @@ internal class StringHelperWrapper : IStringHelper
                 continue;
             }
             
-            if (textPayload.Text?.Contains(replaceString) ?? true)
+            if (textPayload.Text?.Contains(replaceString, StringComparison.InvariantCultureIgnoreCase) ?? true)
             {
                 continue;
             }
