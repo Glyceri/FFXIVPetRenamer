@@ -114,7 +114,7 @@ internal class StringHelperWrapper : IStringHelper
         }
         
         PetServices.PetLog.LogVerbose($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
-        
+
         string nodeText = baseString;
         
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
@@ -265,12 +265,19 @@ internal class StringHelperWrapper : IStringHelper
             {
                 continue;
             }
-
+            
+            if (textPayload.Text?.Contains(replaceString) ?? true)
+            {
+                continue;
+            }
+            
             List<Payload> newPayloads = CreatePayloadsFromReplace(textPayload.Text, baseString, replaceString, edgeColor, textColor);
             
             seString.Payloads.RemoveAt(i);
             
             seString.Payloads.InsertRange(i, newPayloads);
+            
+            i += newPayloads.Count;
         }
     }
 
