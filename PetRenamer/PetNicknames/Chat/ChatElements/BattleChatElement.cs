@@ -36,12 +36,14 @@ internal class BattleChatElement : RestrictedChatElement
             return;
         }
         
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId, user);
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId);
         
         if (petData == null)
         {
             return;
         }
+        
+        petData = PetServices.PetSheets.MakeSoft(user, petData);
         
         PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowInBattleChatColour, chatMessage, petData, NameType.Action, user);
     }

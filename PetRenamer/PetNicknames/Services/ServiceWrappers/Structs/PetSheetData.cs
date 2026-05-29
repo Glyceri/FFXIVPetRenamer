@@ -12,7 +12,7 @@ internal struct PetSheetData : IPetSheetData
     public PetSkeleton  Model         { get; }
     public uint         Icon          { get; }
     
-    public string       Singular  { get; }
+    public string       Singular      { get; }
 
     public sbyte        Pronoun       { get; }
     

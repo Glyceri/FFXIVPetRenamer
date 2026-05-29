@@ -34,15 +34,15 @@ internal class CastHook : HookableElement
         {
             return;
         }
-        
-        if (PetServices.PetSheets.CastToSoftIndex((uint)castId) == null)
-        {
-            return;
-        }
 
         IPettableUser? user = PetServices.UserList.GetUser(castDealer, UserListFindType.PetMeansOwner);
 
-        user?.OnLastCastChanged((uint)castId);
+        if (user == null)
+        {
+            return;
+        }
+        
+        user.OnLastCastChanged((uint)castId);
     }
 
     protected override void OnDispose()

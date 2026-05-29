@@ -171,11 +171,6 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? GetPetFromIcon(uint iconId)
     {
-        if (iconId == 0 || iconId == uint.MaxValue)
-        {
-            return null;
-        }
-
         int sheetCount = PetSheetCache.Count;
 
         for (int i = 0; i < sheetCount; i++)
@@ -193,15 +188,8 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public IPetSheetData? GetPetFromAction(uint actionId, IPettableUser user, bool isSoft = true)
+    public IPetSheetData? GetPetFromAction(uint actionId)
     {
-        if (actionId == 0 || actionId == uint.MaxValue)
-        {
-            return null;
-        }
-
-        IPetSheetData? activePet = null;
-
         int sheetCount = PetSheetCache.Count;
 
         for (int i = 0; i < sheetCount; i++)
@@ -213,29 +201,10 @@ internal class SheetsWrapper : IPetSheets
                 continue;
             }
 
-            activePet = pet;
-
-            break;
+            return pet;
         }
 
-        if (activePet == null)
-        {
-            return null;
-        }
-
-        if (!isSoft)
-        {
-            return activePet;
-        }
-        
-        int? softIndex = CastToSoftIndex(actionId);
-        
-        if (softIndex == null)
-        {
-            return activePet;
-        }
-        
-        return GetFromSoftIndex(user, activePet, softIndex.Value);
+        return null;
     }
 
     public IPetSheetData MakeSoft(IPettableUser user, IPetSheetData oldData)
@@ -288,7 +257,7 @@ internal class SheetsWrapper : IPetSheets
         return [];  
     }
 
-    public List<IPetSheetData> GetMissingPets(List<PetSkeleton> battlePetSkeletons)
+    public List<IPetSheetData> GetMissingBattlePets(List<PetSkeleton> battlePetSkeletons)
     {
         List<IPetSheetData> sheetData = [];
 

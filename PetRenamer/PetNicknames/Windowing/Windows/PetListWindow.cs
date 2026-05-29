@@ -583,7 +583,7 @@ internal class PetListWindow : PetWindow
 
         if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
         {
-            List<IPetSheetData> data = PetServices.PetSheets.GetMissingPets(validIds);
+            List<IPetSheetData> data = PetServices.PetSheets.GetMissingBattlePets(validIds);
 
             foreach (IPetSheetData p in data)
             {

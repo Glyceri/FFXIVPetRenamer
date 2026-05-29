@@ -27,11 +27,7 @@ internal static class BoxedImage
         IDalamudTextureWrap textureWrap;
 
         UldIcon? raceIcon = null;
-
-        ImGuiStylePtr stylePtr = ImGui.GetStyle();
-        float framePaddingX = stylePtr.FramePadding.X;
-        float framePaddingY = stylePtr.FramePadding.Y;
-
+        
         if (data.Model.SkeletonType == SkeletonType.BattlePet) 
         {
             textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon).GetWrapOrEmpty(); 
@@ -50,7 +46,7 @@ internal static class BoxedImage
             }
 
             textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon + adder).GetWrapOrEmpty();
-            raceIcon = RaceIconHelper.GetFromRaceID(data?.RaceId ?? 0);
+            raceIcon    = RaceIconHelper.GetFromRaceID(data?.RaceId ?? 0);
         }
 
         

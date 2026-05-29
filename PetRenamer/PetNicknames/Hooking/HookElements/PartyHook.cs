@@ -130,12 +130,14 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId, user);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId);
 
             if (data == null)
             {
                 continue;
             }
+            
+            data = PetServices.PetSheets.MakeSoft(user, data);
 
             PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
         }

@@ -107,7 +107,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             return;
         }
-
+        
         int? softIndex = PetServices.PetSheets.CastToSoftIndex(_lastCast);
 
         _lastCast = CurrentCastId;

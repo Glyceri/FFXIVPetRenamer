@@ -14,10 +14,10 @@ internal interface IPetSheets
     string?             GetWorldName(ushort worldId);
     IPetSheetData?      GetPet(PetSkeleton skeletonId);
     IPetSheetData[]     GetLegacyPets(int legacyModelId);
-    List<IPetSheetData> GetMissingPets(List<PetSkeleton> battlePetSkeletons);
+    List<IPetSheetData> GetMissingBattlePets(List<PetSkeleton> battlePetSkeletons);
     IPetSheetData?      GetPetFromName(string name);
     IPetSheetData?      GetPetFromIcon(uint iconId);
-    IPetSheetData?      GetPetFromAction(uint actionId, IPettableUser user, bool isSoft = true);
+    IPetSheetData?      GetPetFromAction(uint actionId);
     IPetSheetData       MakeSoft(IPettableUser user, IPetSheetData oldData);
     int?                CastToSoftIndex(uint castId);
     PetMirage?          GetPetMirage(uint petMirageId);
