@@ -2,6 +2,7 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -153,7 +154,9 @@ internal class StringHelperWrapper : IStringHelper
             return false;
         }
         
-        seString = atkNode->NodeText.AsDalamudSeString();
+        using Utf8String utf8String = new Utf8String(atkNode->OriginalTextPointer);
+        
+        seString = utf8String.AsDalamudSeString();
         
         return true;
     }

@@ -25,7 +25,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public INamesDatabase ActiveDatabase { get; }
 
-    public bool IsIPC       { get; private set; }
+    public bool IsIpc       { get; private set; }
     public bool IsLegacy    { get; private set; }
 
     private readonly IPetServices PetServices;
@@ -37,7 +37,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         ContentId      = contentId;
         IsActive       = active;
-        IsIPC          = !IsActive;
+        IsIpc          = !IsActive;
         IsLegacy       = isLegacy;
 
         SetName(name);
@@ -80,7 +80,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         pEntry.SetName(Name);
         pEntry.SetHomeworld(Homeworld);
         pEntry.SetSoftSkeletons(SoftSkeletons.ToArray());
-        pEntry.UpdateContentID(ContentId, !IsIPC);
+        pEntry.UpdateContentId(ContentId, !IsIpc);
         pEntry.MarkDirty();
 
         return true;
@@ -88,7 +88,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     private void SetHomeworld(ushort homeworld)
     {
-        Homeworld = homeworld;
+        Homeworld     = homeworld;
         HomeworldName = PetServices.PetSheets.GetWorldName(Homeworld) ?? Translator.GetLine("...");
     }
 
@@ -107,14 +107,14 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
     }
 
-    public void UpdateContentID(ulong contentId, bool removeIPCStatus = false)
+    public void UpdateContentId(ulong contentId, bool removeIPCStatus = false)
     {
         ContentId = contentId;
         IsActive  = true;
 
         if (removeIPCStatus)
         {
-            IsIPC = false;
+            IsIpc = false;
         }
     }
 
@@ -171,7 +171,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         UpdateEntryBase(parseResult, parseSource);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
-        UpdateContentID(parseResult.ContentID);
+        UpdateContentId(parseResult.ContentID);
     }
 
     public void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource)
@@ -180,7 +180,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        IsIPC = (parseSource == ParseSource.IPC);
+        IsIpc = (parseSource == ParseSource.IPC);
 
         MarkDirty();        
     }

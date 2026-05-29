@@ -59,7 +59,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (legacyEntry != null)
         {
-            legacyEntry.UpdateContentID(ContentId, true);
+            legacyEntry.UpdateContentId(ContentId, true);
             legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
             _ = legacyEntry.MoveToDataBase(dataBase);
             legacyDatabase.SetDirty();
@@ -70,7 +70,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (IsLocalPlayer)
         {
-            DataBaseEntry.UpdateContentID(ContentId, true);
+            DataBaseEntry.UpdateContentId(ContentId, true);
         }
 
         if (petServices.Configuration.debugModeActive)
@@ -253,7 +253,7 @@ internal unsafe class PettableUser : IPettableUser
         PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirty);
         PetServices.DirtyListener.UnregisterOnDirtyName(OnDirty);
 
-        if (DataBaseEntry.IsIPC)
+        if (DataBaseEntry.IsIpc)
         {
             DataBaseEntry.Clear(ParseSource.IPC);
         }

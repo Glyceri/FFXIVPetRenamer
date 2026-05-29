@@ -10,21 +10,21 @@ namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDatabaseEntry
 {
-    ulong ContentId { get; }
-    string Name { get; }
-    ushort Homeworld { get; }
+    ulong  ContentId     { get; }
+    string Name          { get; }
+    ushort Homeworld     { get; }
     string HomeworldName { get; }
-
+    
     bool IsActive { get; }
-    bool IsIPC { get; }
+    bool IsIpc    { get; }
     bool IsLegacy { get; }
 
     ImmutableArray<PetSkeleton> SoftSkeletons { get; }
 
-    INamesDatabase ActiveDatabase { get; }
-    INamesDatabase[] AllDatabases { get; }
+    INamesDatabase   ActiveDatabase { get; }
+    INamesDatabase[] AllDatabases   { get; }
 
-    void UpdateContentID(ulong contentId, bool removeIPCStatus = false);
+    void UpdateContentId(ulong contentId, bool removeIpcStatus = false);
     void UpdateEntry(IPettableUser pettableUser);
     /// <summary>
     /// Moves this entry into the new database.

@@ -145,7 +145,7 @@ internal class PettableDatabase : IPettableDatabase
                 continue;
             }
 
-            if (entry.IsIPC)
+            if (entry.IsIpc)
             {
                 continue;
             }

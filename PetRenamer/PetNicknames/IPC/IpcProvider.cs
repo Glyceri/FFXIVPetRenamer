@@ -257,7 +257,7 @@ internal class IpcProvider : IIpcProvider
             return;
         }
         
-        if (!user.DataBaseEntry.IsIPC)
+        if (!user.DataBaseEntry.IsIpc)
         {
             return;
         }

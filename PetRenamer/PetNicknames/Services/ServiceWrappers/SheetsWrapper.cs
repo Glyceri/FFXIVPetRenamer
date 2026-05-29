@@ -38,7 +38,13 @@ internal class SheetsWrapper : IPetSheets
         SetupSheetDataCache();
     }
 
-    private void SetupCopmanionSheet()
+    private void SetupSheetDataCache()
+    {
+        SetupCompanionSheet();
+        SetupBattlePetSheet();
+    }
+    
+    private void SetupCompanionSheet()
     {
         foreach (Companion companion in PetSheet)
         {
@@ -67,13 +73,6 @@ internal class SheetsWrapper : IPetSheets
             PetSheetCache.Add(petSheetData);
         }
     }
-
-    private void SetupSheetDataCache()
-    {
-        SetupCopmanionSheet();
-
-        SetupBattlePetSheet();
-    }
     
     public Action? GetAction(uint actionId) 
         => ActionSheet.GetRow(actionId);
@@ -88,19 +87,7 @@ internal class SheetsWrapper : IPetSheets
         => WorldSheet.GetRow(worldId).InternalName.ExtractText();
 
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
-    {
-        for (int i = 0; i < PetSheetCache.Count; i++)
-        {
-            if (PetSheetCache[i].Model != skeletonId)
-            {
-                continue;
-            }
-
-            return PetSheetCache[i];
-        }
-
-        return null;
-    }
+        => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);
 
     public IPetSheetData? GetPetFromName(string name)
     {

@@ -12,6 +12,7 @@ namespace PN.S;
 [Serializable]
 internal class SerializableUserV6
 {
+    // ReSharper disable once InconsistentNaming
     public readonly ulong          ContentID;
     public readonly string         Name;
     public readonly ushort         Homeworld;

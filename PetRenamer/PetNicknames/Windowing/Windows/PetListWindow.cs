@@ -370,7 +370,7 @@ internal class PetListWindow : PetWindow
             else
             {
                 bool  isLegacy    = user.Entry.IsLegacy;
-                bool  isIPC       = user.Entry.IsIPC;
+                bool  isIPC       = user.Entry.IsIpc;
                 bool  isSpecial   = isLegacy || isIPC;
                 int   buttonCount = isSpecial ? 2 : 1;
                 float buttonSize  = WindowHandler.BarHeight;

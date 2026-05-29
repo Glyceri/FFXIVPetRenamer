@@ -132,7 +132,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.Homeworld.ToString());
 
         ImGui.TableSetColumnIndex(3);
-        ImGui.TextUnformatted(user.IsIPC ? "O" : "X");
+        ImGui.TextUnformatted(user.IsIpc ? "O" : "X");
 
         ImGui.TableSetColumnIndex(4);
         ImGui.TextUnformatted(PetServices.UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X");
