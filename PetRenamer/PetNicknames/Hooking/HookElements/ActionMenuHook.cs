@@ -183,8 +183,8 @@ internal unsafe class ActionMenuHook : HookableElement
 
         uint iconId2 = icon2->IconId;
 
-        Rename(textNode, in user, iconId);
-        Rename(textNode2, in user, iconId2);
+        Rename(textNode, user, iconId);
+        Rename(textNode2, user, iconId2);
     }
 
     private void UpdateReplaceMenu(AtkUnitBase* baseD)
@@ -284,7 +284,7 @@ internal unsafe class ActionMenuHook : HookableElement
 
             uint iconId = icon->IconId;
 
-            Rename(tNode, in user, iconId);
+            Rename(tNode, user, iconId);
         }
     }
 
@@ -358,16 +358,16 @@ internal unsafe class ActionMenuHook : HookableElement
                 continue;
             }
 
-            if (TryAsDragAndDropNode(atkNode, in user))
+            if (TryAsDragAndDropNode(atkNode, user))
             {
                 continue;
             }
             
-            TryAsFlatNode(atkNode, in user);
+            TryAsFlatNode(atkNode, user);
         }
     }
 
-    private bool TryAsDragAndDropNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsDragAndDropNode(AtkComponentBase* atkNode, IPettableUser user)
     {
         if (atkNode->UldManager.LoadedState != AtkLoadState.Loaded)
         {
@@ -450,12 +450,12 @@ internal unsafe class ActionMenuHook : HookableElement
             return false;
         }
 
-        Rename(tNode, in user, iconId);
+        Rename(tNode, user, iconId);
         
         return true;
     }
 
-    private bool TryAsFlatNode(AtkComponentBase* atkNode, in IPettableUser user)
+    private bool TryAsFlatNode(AtkComponentBase* atkNode, IPettableUser user)
     {
         AtkTextNode* tNode = (AtkTextNode*)atkNode->GetTextNodeById(10);
         
@@ -497,12 +497,12 @@ internal unsafe class ActionMenuHook : HookableElement
             return false;
         }
 
-        Rename(tNode, in user, iconId);
+        Rename(tNode, user, iconId);
         
         return true;
     }
 
-    private void Rename(AtkTextNode* textNode, in IPettableUser user, uint iconId)
+    private void Rename(AtkTextNode* textNode, IPettableUser user, uint iconId)
     {
         IPetSheetData? petSheet = PetServices.PetSheets.GetPetFromIcon(iconId);
         
@@ -511,12 +511,7 @@ internal unsafe class ActionMenuHook : HookableElement
             return;
         }
 
-        IPetSheetData? softData = PetServices.PetSheets.MakeSoft(user, petSheet);
-        
-        if (softData == null)
-        {
-            return;
-        }
+        IPetSheetData softData = PetServices.PetSheets.MakeSoft(user, petSheet);
         
         PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInActionLogColour, textNode, softData, NameType.Action);
     }

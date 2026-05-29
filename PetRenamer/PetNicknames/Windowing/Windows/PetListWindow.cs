@@ -329,7 +329,7 @@ internal class PetListWindow : PetWindow
                 LabledLabel.Draw("Nickname:", pet.CustomName, WindowHandler.StretchingBar);
             }
 
-            LabledLabel.Draw("Pet:", pet.PetSheetData.BaseSingular, WindowHandler.StretchingBar);
+            LabledLabel.Draw("Pet:", pet.PetSheetData.Singular, WindowHandler.StretchingBar);
             LabledLabel.Draw("ID:", pet.PetSheetData.Model.SkeletonId.ToString(), WindowHandler.StretchingBar);
         }
     }
@@ -621,7 +621,7 @@ internal class PetListWindow : PetWindow
             Vector3? edgeColour = validEdgeColours[i];
             Vector3? textColour = validTextColours[i];
 
-            if (!(Valid(name) || Valid(ID.SkeletonId.ToString()) || Valid(petData.BaseSingular)))
+            if (!(Valid(name) || Valid(ID.SkeletonId.ToString()) || Valid(petData.Singular)))
             {
                 continue;
             }

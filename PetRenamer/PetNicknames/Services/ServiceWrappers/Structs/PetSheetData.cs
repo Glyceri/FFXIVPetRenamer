@@ -4,7 +4,6 @@ using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
@@ -13,8 +12,7 @@ internal struct PetSheetData : IPetSheetData
     public PetSkeleton  Model         { get; }
     public uint         Icon          { get; }
     
-    public string       BaseSingular  { get; }
-    public string       BasePlural    { get; }
+    public string       Singular  { get; }
 
     public sbyte        Pronoun       { get; }
     
@@ -29,23 +27,23 @@ internal struct PetSheetData : IPetSheetData
     
     private static readonly string[] pronounList = ["er", "e", "es", "en"];
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string plural, string actionName, uint actionId, DalamudServices services)
-        : this(model, legacyModelId, icon, pronoun, singular, plural, actionName, actionId, services)
+    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
+        : this(model, legacyModelId, icon, pronoun, singular, actionName, actionId, services)
     {
         RaceName      = raceName;
         BehaviourName = behaviourName;
         RaceId        = raceId;
     }
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string plural, string actionName, uint actionId, DalamudServices services)
-        : this(model, icon, pronoun, singular, plural, services)
+    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
+        : this(model, icon, pronoun, singular, services)
     {
         ActionId      = actionId;
         ActionName    = actionName;
         LegacyModelId = legacyModelId;
     }
 
-    private PetSheetData(PetSkeleton model, uint icon, sbyte pronoun, string singular, string plural, DalamudServices services)
+    private PetSheetData(PetSkeleton model, uint icon, sbyte pronoun, string singular, DalamudServices services)
     {
         Model   = model;
         Icon    = icon;
@@ -55,13 +53,11 @@ internal struct PetSheetData : IPetSheetData
 
         if (clientLanguage == ClientLanguage.German)
         {
-            BaseSingular = GermanReplace(singular, pronoun);
-            BasePlural   = GermanReplace(plural, pronoun);
+            Singular = GermanReplace(singular, pronoun);
         }
         else
         {
-            BaseSingular = singular;
-            BasePlural   = plural;
+            Singular = singular;
         }
     }
     
@@ -104,24 +100,24 @@ internal struct PetSheetData : IPetSheetData
         string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
         string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
         
-        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, plural, singular, companionIndex, dalamudServices);
+        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, companionIndex, dalamudServices);
     }
     
-    public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, IStringHelper stringHelper, DalamudServices dalamudServices, Pet pet)
+    public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, DalamudServices dalamudServices, Pet pet)
     {
         uint sheetSkeleton = pet.RowId;
 
-        if (!IPetSheets.BattlePetRemap.TryGetValue(sheetSkeleton, out PetSkeleton skeleton))
+        if (!PluginConstants.BattlePetRemap.TryGetValue(sheetSkeleton, out PetSkeleton skeleton))
         {
             return null;
         }
 
-        if (!IPetSheets.PetIdToAction.TryGetValue(skeleton, out uint actionId))
+        if (!PluginConstants.PetIdToAction.TryGetValue(skeleton, out uint actionId))
         {
             return null;
         }
 
-        if (!IPetSheets.BattlePetToBNpcName.TryGetValue(skeleton, out uint bnpcNameId))
+        if (!PluginConstants.BattlePetToBNpcName.TryGetValue(skeleton, out uint bnpcNameId))
         {
             return null;
         }
@@ -144,9 +140,8 @@ internal struct PetSheetData : IPetSheetData
         string name              = bnpcName.Value.Singular.ExtractText().ToTitleCase();
         string actionName        = petAction.Value.Name.ExtractText();
         uint   actionRowId       = petAction.Value.RowId;
-        string cleanedActionName = stringHelper.CleanupActionName(stringHelper.CleanupString(actionName));
         
-        return new PetSheetData(skeleton, -1, petIcon, bnpcName.Value.Pronoun, name, cleanedActionName, actionName, actionRowId, dalamudServices);
+        return new PetSheetData(skeleton, -1, petIcon, bnpcName.Value.Pronoun, name, actionName, actionRowId, dalamudServices);
     }
     
     private readonly string GermanReplace(string baseString, sbyte pronoun)
@@ -163,24 +158,7 @@ internal struct PetSheetData : IPetSheetData
     }
 
     public readonly bool IsPet(string name)
-        => BaseSingular.InvariantEquals(name);
-
-    public readonly string LongestIdentifier()
-    {
-        string curIdentifier = BaseSingular;
-
-        if (curIdentifier.Length < BasePlural.Length)
-        {
-            curIdentifier = BasePlural;
-        }
-
-        if (curIdentifier.Length < ActionName.Length)
-        {
-            curIdentifier = ActionName;
-        }
-
-        return curIdentifier;
-    }
+        => Singular.InvariantEquals(name);
 
     public readonly bool IsAction(uint action) 
         => (ActionId == action);

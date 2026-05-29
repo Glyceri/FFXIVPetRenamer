@@ -35,7 +35,7 @@ internal class PetServices : IPetServices
         UserList            = new UserList();
         StringHelper        = new StringHelperWrapper(this, UserList);
         NameService         = new NameService(StringHelper);
-        PetSheets           = new SheetsWrapper(services, StringHelper);
+        PetSheets           = new SheetsWrapper(services);
         PetCastHelper       = new PetCastWrapper(UserList);
         TargetManager       = new TargetManagerWrapper(services, UserList);
         PluginWatcher       = new PluginWatcher(services);
@@ -60,7 +60,7 @@ internal class PetServices : IPetServices
 
     public void Dispose()
     {
-        Party?.Dispose();
-        PluginWatcher?.Dispose();
+        Party.Dispose();
+        PluginWatcher.Dispose();
     }
 }

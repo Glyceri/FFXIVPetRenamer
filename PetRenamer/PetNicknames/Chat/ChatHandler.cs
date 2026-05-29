@@ -1,11 +1,8 @@
-﻿using Lumina.Excel.Sheets;
-using PetRenamer.PetNicknames.Chat.ChatElements;
+﻿using PetRenamer.PetNicknames.Chat.ChatElements;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -30,7 +27,6 @@ internal class ChatHandler : IDisposable
 
     private void _Register()
     {
-        Register(new PetGlamourChat(DalamudServices, PetServices));
         Register(new EmoteChatElement(PetServices));
         Register(new BattleChatElement(PetServices));
         Register(new DebugChatCode(PetServices));

@@ -15,7 +15,6 @@ internal class DalamudServices
     [PluginService] internal ITargetManager                  TargetManager               { get; private set; } = null!;
     [PluginService] internal IObjectTable                    ObjectTable                 { get; private set; } = null!;
     [PluginService] internal IChatGui                        ChatGui                     { get; private set; } = null!;
-    [PluginService] internal IFlyTextGui                     FlyTextGui                  { get; private set; } = null!;
     [PluginService] internal ITextureProvider                TextureProvider             { get; private set; } = null!;
     [PluginService] internal IPluginLog                      PluginLog                   { get; private set; } = null!;
     [PluginService] internal IGameInteropProvider            Hooking                     { get; private set; } = null!;
@@ -25,6 +24,7 @@ internal class DalamudServices
     [PluginService] internal INotificationManager            NotificationManager         { get; private set; } = null!;
     [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
     [PluginService] internal ICondition                      Condition                   { get; private set; } = null!;
+    [PluginService] internal IGameConfig                     GameConfig                  { get; private set; } = null!;
 
     public static DalamudServices Create(IDalamudPluginInterface plugin)
     {

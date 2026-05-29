@@ -272,7 +272,7 @@ internal class PetRenameWindow : PetWindow
 
     private void DrawPetData()
     {
-        LabledLabel.Draw($"{Translator.GetLine(CurrentMode == PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", ActivePetData?.BaseSingular ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine(CurrentMode == PetWindowMode.Minion ? "PetRenameNode.Species" : "PetRenameNode.Species2")}:", ActivePetData?.Singular ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
         LabledLabel.Draw("ID:", ActivePetData?.Model.SkeletonId.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData?.RaceName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);

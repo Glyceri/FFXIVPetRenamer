@@ -13,7 +13,7 @@ internal class NameService : INameService
         => StringHelper = stringHelper;
         
     private string GetRawName(IPetSheetData petData)
-        => petData.BaseSingular;
+        => petData.Singular;
     
     private string? GetPronoun()
         => PronounHook?.LastGottenPronoun;

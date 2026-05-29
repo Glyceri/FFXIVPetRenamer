@@ -725,7 +725,7 @@ internal class PetDevWindow : PetWindow
             ImGui.TextUnformatted( ((BattleChara*)pet.Address)->NameString);
 
             ImGui.TableSetColumnIndex(2);
-            ImGui.TextUnformatted(pet.PetData?.BaseSingular);
+            ImGui.TextUnformatted(pet.PetData?.Singular);
         }
 
         ImGui.EndTable();

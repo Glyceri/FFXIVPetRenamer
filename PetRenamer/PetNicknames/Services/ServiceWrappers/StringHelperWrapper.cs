@@ -290,17 +290,6 @@ internal class StringHelperWrapper : IStringHelper
                 "Invocation ", 
                 "-Beschwörung"
             ]);
-
-    public string CleanupActionName(string str)
-        => str.CleanString(
-            [
-                "カーバンクル・", 
-                "・エギ", 
-                "-Egi", 
-                " Carbuncle", 
-                "Carbuncle ", 
-                "-Karfunkel"
-            ]);  
     
     public string ToVector3String(Vector3 vector)
         => vector.ToString("G", CultureInfo.InvariantCulture) ?? "null";

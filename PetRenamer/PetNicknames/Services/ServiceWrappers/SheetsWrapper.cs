@@ -1,11 +1,8 @@
-﻿using Dalamud.Game;
-using Dalamud.Utility;
-using Lumina.Excel;
+﻿using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
@@ -17,42 +14,28 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 internal class SheetsWrapper : IPetSheets
 {
     private readonly DalamudServices         DalamudServices;
-    private readonly IStringHelper           StringHelper;
 
     private readonly List<IPetSheetData>     PetSheetCache = [];
-    private readonly string[]                NameToClass;
 
     private readonly ExcelSheet<Companion>   PetSheet;
     private readonly ExcelSheet<Pet>         BattlePetSheet;
     private readonly ExcelSheet<World>       WorldSheet;
-    private readonly ExcelSheet<ClassJob>    ClassJobSheet;
     private readonly ExcelSheet<Action>      ActionSheet;
-    private readonly ExcelSheet<TextCommand> TextCommandSheet;
     private readonly ExcelSheet<BNpcName>    BNpcNameSheet;
+    private readonly ExcelSheet<PetMirage>   PetMirageSheet;
 
-    public SheetsWrapper(DalamudServices dalamudServices, IStringHelper helper)
+    public SheetsWrapper(DalamudServices dalamudServices)
     {
         DalamudServices  = dalamudServices;
-        StringHelper     = helper;
 
         PetSheet         = dalamudServices.DataManager.GetExcelSheet<Companion>();
         WorldSheet       = dalamudServices.DataManager.GetExcelSheet<World>();
-        ClassJobSheet    = dalamudServices.DataManager.GetExcelSheet<ClassJob>();
         BattlePetSheet   = dalamudServices.DataManager.GetExcelSheet<Pet>();
         ActionSheet      = dalamudServices.DataManager.GetExcelSheet<Action>();
-        TextCommandSheet = dalamudServices.DataManager.GetExcelSheet<TextCommand>();
         BNpcNameSheet    = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
+        PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
 
         SetupSheetDataCache();
-
-        NameToClass = DalamudServices.ClientState.ClientLanguage switch
-        {
-            ClientLanguage.Japanese => JapaneseNames,
-            ClientLanguage.English  => EnglishNames,
-            ClientLanguage.German   => GermanNames,
-            ClientLanguage.French   => FrenchNames,
-            _                       => EnglishNames,
-        };
     }
 
     private void SetupCopmanionSheet()
@@ -74,7 +57,7 @@ internal class SheetsWrapper : IPetSheets
     {
         foreach (Pet pet in BattlePetSheet)
         {
-            IPetSheetData? petSheetData = PetSheetData.CreatePetSheetData(this, StringHelper, DalamudServices, pet);
+            IPetSheetData? petSheetData = PetSheetData.CreatePetSheetData(this, DalamudServices, pet);
             
             if (petSheetData == null)
             {
@@ -91,30 +74,15 @@ internal class SheetsWrapper : IPetSheets
 
         SetupBattlePetSheet();
     }
-
-    public TextCommand? GetCommand(uint id) 
-        => TextCommandSheet.GetRow(id);
-
+    
     public Action? GetAction(uint actionId) 
         => ActionSheet.GetRow(actionId);
 
     public BNpcName? GetBNpcName(uint bnpcId) 
         => BNpcNameSheet.GetRow(bnpcId);
 
-    public string? GetClassName(int id)
-    {
-        foreach (ClassJob cls in ClassJobSheet)
-        {
-            if (cls.RowId != id)
-            {
-                continue;
-            }
-
-            return cls.Name.ExtractText();
-        }
-
-        return null;
-    }
+    public PetMirage? GetPetMirage(uint petMirageId)
+        => petMirageId != 0 ? PetMirageSheet.GetRow(petMirageId) : null;
 
     public string GetWorldName(ushort worldId) 
         => WorldSheet.GetRow(worldId).InternalName.ExtractText();
@@ -132,37 +100,6 @@ internal class SheetsWrapper : IPetSheets
         }
 
         return null;
-    }
-
-    public PetSkeleton ToSoftSkeleton(PetSkeleton skeletonId, PetSkeleton[] softSkeletons)
-    {
-        bool canBeSoft = MutatableIds.Contains(skeletonId);
-
-        if (!canBeSoft)
-        {
-            return skeletonId;
-        }
-
-        int index = -1;
-
-        for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
-        {
-            if (PluginConstants.BaseSkeletons[i] != skeletonId)
-            {
-                continue;
-            }
-            
-            index = i;
-
-            break;
-        }
-
-        if (index >= 0 && index < softSkeletons.Length)
-        {
-            return softSkeletons[index];
-        }
-
-        return skeletonId;
     }
 
     public IPetSheetData? GetPetFromName(string name)
@@ -184,31 +121,25 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public int? NameToSoftSkeletonIndex(string name)
+    private int? ToSoftIndex(PetSkeleton petSkeleton)
     {
-        name = name.Trim();
-
-        if (name.IsNullOrWhitespace())
+        int? index = null;
+        
+        for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
         {
-            return null;
-        }
-
-        for (int i = 0; i < NameToClass.Length; i++)
-        {
-            string nameToClassUnmodified = NameToClass[i];
-            string converted             = StringHelper.CleanupActionName(nameToClassUnmodified);
-
-            if (!nameToClassUnmodified.InvariantEquals(name) && !converted.InvariantEquals(name))
+            if (PluginConstants.BaseSkeletons[i] != petSkeleton)
             {
                 continue;
             }
             
-            return i;
+            index = i;
+            
+            break;
         }
-
-        return null;
+        
+        return index;
     }
-
+    
     public int? CastToSoftIndex(uint castId)
     {
         if (castId == 0)
@@ -216,86 +147,26 @@ internal class SheetsWrapper : IPetSheets
             return null;
         }
 
-        for (int i = 0; i < CastToIndex.Length; i++)
+        PetSkeleton? foundSkeleton = null;
+        
+        foreach (KeyValuePair<PetSkeleton, uint> keyValuePair in PluginConstants.PetIdToAction)
         {
-            uint cast = CastToIndex[i];
-
-            if (cast != castId)
+            if (keyValuePair.Value != castId)
             {
                 continue;
             }
-
-            return i;
+             
+            foundSkeleton = keyValuePair.Key;
+            
+            break;
         }
-
-        return null;
-    }
-
-    private List<IPetSheetData> GetListFromLine(string line)
-    {
-        List<IPetSheetData> list = [];
-
-        if (line == string.Empty)
-        {
-            return list;
-        }
-
-        foreach (IPetSheetData pet in PetSheetCache)
-        {
-            if (pet.BaseSingular.InvariantEquals(line))
-            {
-                list.Add(pet);
-
-                return list;
-            }
-
-            bool hasValidValue = false;
-
-            hasValidValue |= (line.InvariantContains(pet.BaseSingular) && !pet.BaseSingular.IsNullOrWhitespace());
-            hasValidValue |= (line.InvariantContains(pet.ActionName)   && !pet.ActionName.IsNullOrWhitespace());
-
-            if (!hasValidValue)
-            {
-                continue;
-            }
-
-            list.Add(pet);
-        }
-
-        if (list.Count == 0)
-        {
-            return list;
-        }
-
-        list.Sort((i1, i2) => string.Compare(i1.LongestIdentifier(), i2.LongestIdentifier(), StringComparison.Ordinal));
-
-        list.Reverse();
-
-        return list;
-    }
-
-    public IPetSheetData? GetPetFromString(string baseString, IPettableUser user, bool soft)
-    {
-        List<IPetSheetData> data = GetListFromLine(baseString);
-
-        if (data.Count == 0)
+        
+        if (foundSkeleton == null)
         {
             return null;
         }
-
-        IPetSheetData normalPetData = data[0];
-
-        if (normalPetData.Model.SkeletonType != SkeletonType.BattlePet)
-        {
-            return normalPetData;
-        }
-
-        if (!soft)
-        {
-            return normalPetData;
-        }
-
-        return MakeSoft(user, normalPetData);
+        
+        return ToSoftIndex(foundSkeleton.Value);
     }
 
     public IPetSheetData? GetPetFromIcon(uint iconId)
@@ -374,7 +245,7 @@ internal class SheetsWrapper : IPetSheets
             return oldData;
         }
 
-        int? softIndex = NameToSoftSkeletonIndex(oldData.BasePlural);
+        int? softIndex = ToSoftIndex(oldData.Model);
         
         if (softIndex == null)
         {
@@ -400,11 +271,8 @@ internal class SheetsWrapper : IPetSheets
             return oldData;
         }
 
-        return new PetSheetData(softPetData.Model, softPetData.LegacyModelId, softPetData.Icon, softPetData.Pronoun, oldData.BaseSingular, oldData.BasePlural, oldData.ActionName, oldData.ActionId, DalamudServices);
+        return new PetSheetData(softPetData.Model, softPetData.LegacyModelId, softPetData.Icon, softPetData.Pronoun, oldData.Singular, oldData.ActionName, oldData.ActionId, DalamudServices);
     }
-
-    public bool IsValidBattlePet(PetSkeleton skeleton) 
-        => IPetSheets.PetIdToAction.ContainsKey(skeleton);
 
     public IPetSheetData[] GetLegacyPets(int legacyModelId)
         => PetSheetCache.Where(data => data.LegacyModelId == legacyModelId).ToArray();
@@ -412,7 +280,7 @@ internal class SheetsWrapper : IPetSheets
     [Obsolete]
     public PetSkeleton[] GetObsoleteIDsFromClass(int classJob)
     {
-        if (battlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
+        if (PluginConstants.BattlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
         {
             return id;
         }
@@ -443,89 +311,4 @@ internal class SheetsWrapper : IPetSheets
 
         return sheetData;
     }
-
-    private static readonly PetSkeleton[] MutatableIds =
-    [
-        PluginConstants.Eos                 , // Eos
-        PluginConstants.Selene              , // Selene
-        PluginConstants.EmeraldCarbuncle    , // Emerald Carbuncle
-        PluginConstants.RubyCarbuncle       , // Ruby Carbuncle
-        PluginConstants.Carbuncle           , // Carbuncle
-        PluginConstants.TopazCarbuncle      , // Topaz Carbuncle
-        PluginConstants.IfritEgi            , // Ifrit-Egi
-        PluginConstants.TitanEgi            , // Titan-Egi
-        PluginConstants.GarudaEgi             // Garuda-Egi
-    ];
-
-    // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
-    // Soft Mapping is the most hardcoded thing in this plogon :c
-    // 0 --> Karfunkel
-    // 1 --> Garuda-Egi
-    // 2 --> Titan-Egi
-    // 3 --> Ifrit-Egi
-    // 4 --> Eos
-    private static readonly uint[] CastToIndex =
-    [
-        25798,   // Summon Carbuncle
-        25807,   // Summon Garuda
-        25806,   // Summon Titan
-        25805,   // Summon Ifrit
-        17215,   // Summon Eos
-    ];
-
-    // Hardcoded now
-    // This command hasn't changed in a while, and if it does well... I'll have to rework the system anyways
-    // 0 --> Carbuncle
-    // 1 --> Garuda-Egi
-    // 2 --> Titan-Egi
-    // 3 --> Ifrit-Egi
-    // 4 --> Eos
-    private static readonly string[] EnglishNames  = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    private static readonly string[] GermanNames   = ["Karfunkel", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    private static readonly string[] FrenchNames   = ["Carbuncle", "Garuda-Egi", "Titan-Egi", "Ifrit-Egi", "Eos"];
-    private static readonly string[] JapaneseNames = ["カーバンクル", "ガルーダ・エギ", "タイタン・エギ", "イフリート・エギ", "フェアリー・エオス"];
-
-    [Obsolete("Classes have been obsolete since 1.4")]
-    private static readonly Dictionary<int, PetSkeleton[]> battlePetToClass = new Dictionary<int, PetSkeleton[]>()
-    {
-        {
-            PluginConstants.LegacySummonerClassID, 
-            [
-                PluginConstants.Carbuncle,
-                PluginConstants.RubyCarbuncle,
-                PluginConstants.TopazCarbuncle,
-                PluginConstants.EmeraldCarbuncle,
-                PluginConstants.IfritEgi,
-                PluginConstants.TitanEgi,
-                PluginConstants.GarudaEgi,
-                PluginConstants.IffritII,
-                PluginConstants.GarudaII,
-                PluginConstants.TitanII,
-                PluginConstants.Phoenix,
-                PluginConstants.Bahamut,
-                PluginConstants.SolarBahamut
-            ]
-        },
-        {
-            PluginConstants.LegacyScholarClassID, 
-            [
-                PluginConstants.Eos,
-                PluginConstants.Selene,
-                PluginConstants.Seraph
-            ]
-        },
-        {
-            PluginConstants.LegacyMachinistClassID,
-            [
-                PluginConstants.RookAutoTurret,
-                PluginConstants.AutomatonQueen,
-            ]
-        },
-        {
-            PluginConstants.LegacyDarkKnightClassID,
-            [
-                PluginConstants.LivingShadow
-            ]
-        }
-    };
 }

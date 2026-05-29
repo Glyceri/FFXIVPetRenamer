@@ -210,7 +210,7 @@ internal partial class PetNameCommand : Command
             }
             else
             {
-                IPetSheetData? idData = PetServices.PetSheets.GetPetFromString(customName, localUser);
+                IPetSheetData? idData = PetServices.PetSheets.GetPetFromName(customName);
 
                 if (idData == null)
                 {

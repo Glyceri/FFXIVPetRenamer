@@ -7,8 +7,7 @@ internal interface IPetSheetData
     PetSkeleton Model         { get; }
     uint        Icon          { get; }
 
-    string      BaseSingular  { get; }
-    string      BasePlural    { get; }
+    string      Singular  { get; }
 
     sbyte       Pronoun       { get; }
     
@@ -23,6 +22,4 @@ internal interface IPetSheetData
 
     bool        IsPet(string name);
     bool        IsAction(uint action);
-
-    string      LongestIdentifier();
 }

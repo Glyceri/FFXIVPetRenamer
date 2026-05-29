@@ -18,7 +18,6 @@ internal unsafe interface IStringHelper
     void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
     
     string CleanupString(string str);
-    string CleanupActionName(string str);
     
     Vector3? ParseVector3(string? line);
     string ToVector3String(Vector3 vector);

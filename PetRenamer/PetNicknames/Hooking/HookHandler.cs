@@ -36,6 +36,7 @@ internal class HookHandler : IDisposable
 
     private void _Register()
     {
+        Register(new MirageHook(DalamudServices, PetServices));
         Register(new HoverHook(DalamudServices, PetServices));
         
         MapHook mapHook = new MapHook(DalamudServices, PetServices);
