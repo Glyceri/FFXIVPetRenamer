@@ -1,17 +1,19 @@
 using Dalamud.Hooking;
+using Dalamud.Utility;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using DalamudSeString = Dalamud.Game.Text.SeStringHandling.SeString;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class PronounHook : HookableElement, IPronounHook
 {
-    public string? LastGottenPronoun         { get; private set; }
-    public string? PreviousLastGottenPronoun { get; private set; }
+    public DalamudSeString? LastGottenPronoun         { get; private set; }
+    public DalamudSeString? PreviousLastGottenPronoun { get; private set; }
     
     private delegate uint ProcessNounDelegate(RaptureTextModule* self, byte *a2, int a3, ulong a4, char a5, int a6, Utf8String* outputString);
     
@@ -32,11 +34,11 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
         
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"ProcessNounDetour: {outputString->ToString()}");
+            PetServices.PetLog.LogInfo($"ProcessNounDetour: {outputString->ToString()}");
         }
         
         PreviousLastGottenPronoun = LastGottenPronoun;
-        LastGottenPronoun         = outputString->ToString();
+        LastGottenPronoun         = outputString->StringPtr.AsDalamudSeString();
 
         return returner;
     }

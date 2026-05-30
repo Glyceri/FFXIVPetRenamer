@@ -1,5 +1,6 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -29,24 +30,8 @@ internal class HoverHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, OnEvent);
     }
     
-    private unsafe void HandleAsComponentIcon(AtkComponentIcon* componentIcon)
+    private void HandlePetSheetData(IPetSheetData? petSheetData)
     {
-        if (componentIcon == null)
-        {
-            return;
-        }
-        
-        if (lastIconId == componentIcon->IconId)
-        {
-            lastIconId = 0;
-            
-            return;
-        }
-        
-        lastIconId = componentIcon->IconId;
-
-        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromIcon(componentIcon->IconId);
-
         if (petSheetData == null)
         {
             PetServices.HoverService.SetHoveredPet(null);
@@ -72,21 +57,84 @@ internal class HoverHook : HookableElement
         PetServices.HoverService.SetHoveredPet(petSheetData);
     }
     
-    private unsafe void HandleAsDragDropNode(AtkResNode* parentNode, AtkComponentBase* componentBase)
+    private unsafe void HandleAsComponentIcon(AtkComponentIcon* componentIcon)
+    {
+        if (componentIcon == null)
+        {
+            return;
+        }
+        
+        if (lastIconId == componentIcon->IconId)
+        {
+            lastIconId = 0;
+            
+            return;
+        }
+        
+        lastIconId = componentIcon->IconId;
+
+        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromIcon(componentIcon->IconId);
+      
+        HandlePetSheetData(petSheetData);
+    }
+    
+    private unsafe bool HandleAsDragDropNode(AtkResNode* parentNode, AtkComponentBase* componentBase)
     {
         if (componentBase->GetComponentType() != ComponentType.DragDrop)
         {
-            return;
+            return false;
         }
 
         AtkComponentDragDrop* dragDropComponent = parentNode->GetAsAtkComponentDragDrop();
 
         if (dragDropComponent == null)
         {
-            return;
+            return false;
         }
 
         HandleAsComponentIcon(dragDropComponent->AtkComponentIcon);
+        
+        return true;
+    }
+    
+    private unsafe bool HandleAsListItemRenderedNode(AtkResNode* parentNode, AtkComponentBase* componentBase)
+    {
+        if (componentBase->GetComponentType() != ComponentType.ListItemRenderer)
+        {
+            return false;
+        }
+        
+        AtkComponentListItemRenderer* listItemRenderer = parentNode->GetAsAtkComponentListItemRenderer();
+        
+        if (listItemRenderer == null)
+        {
+            return false;
+        }
+        
+        AtkResNode* resNode = listItemRenderer->GetNodeById(6);
+        
+        if (resNode == null)
+        {
+            return false;
+        }
+        
+        AtkTextNode* atkTextNode = listItemRenderer->GetTextNodeById(6);
+        
+        if (atkTextNode == null)
+        {
+            return false;
+        }
+       
+        if (!atkTextNode->OriginalTextPointer.HasValue)
+        {
+            return false;   
+        }
+        
+        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromName(atkTextNode->OriginalTextPointer.AsDalamudSeString().TextValue);
+        
+        HandlePetSheetData(petSheetData);
+        
+        return true;
     }
     
     private unsafe void OnEvent(AddonEvent type, AddonArgs args)
@@ -139,7 +187,12 @@ internal class HoverHook : HookableElement
             return;
         }
 
-        HandleAsDragDropNode(parentNode, componentBase);
+        if (HandleAsDragDropNode(parentNode, componentBase))
+        {
+            return;
+        }
+        
+        _ = HandleAsListItemRenderedNode(parentNode, componentBase);
     }
 
     protected override void OnDispose()

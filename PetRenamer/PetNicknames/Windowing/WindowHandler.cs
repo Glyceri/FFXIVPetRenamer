@@ -13,6 +13,7 @@ using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using System.Numerics;
 
@@ -33,10 +34,11 @@ internal class WindowHandler : IWindowHandler
     private readonly IDataWriter        DataWriter;
     private readonly WindowSystem       WindowSystem;
     private readonly ISharingDictionary SharingDictionary;
+    private readonly IPronounHook       PronounHook;
 
     private bool isDirty;
 
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
@@ -46,6 +48,7 @@ internal class WindowHandler : IWindowHandler
         DataParser        = dataParser;
         DataWriter        = dataWriter;
         SharingDictionary = sharingDictionary;
+        PronounHook       = pronounHook;
 
         PetServices.DirtyListener.RegisterOnClearEntry(HandleDirty);
         PetServices.DirtyListener.RegisterOnDirtyEntry(HandleDirty);
@@ -92,7 +95,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetConfigWindow(this, DalamudServices, PetServices));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetDevWindow(this, DalamudServices, PetServices,Database, SharingDictionary));
+        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
     }
 
     private void AddWindow(PetWindow window)

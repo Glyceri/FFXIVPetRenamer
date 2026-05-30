@@ -69,10 +69,11 @@ internal class Configuration : IPluginConfiguration
     public bool debugModeActive        = false;
     public bool openDebugWindowOnStart = false;
     public bool debugShowChatCode      = false;
+    public int  lastDebugTab           = 0;
 
-    public void Initialise(IDalamudPluginInterface PetNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
+    public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {
-        this.PetNicknamesPlugin = PetNicknamesPlugin;
+        PetNicknamesPlugin = petNicknamesPlugin;
 
         Database        = database;
         LegacyDatabase  = legacyDatabase;

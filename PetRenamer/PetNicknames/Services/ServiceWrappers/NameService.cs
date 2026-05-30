@@ -16,7 +16,7 @@ internal class NameService : INameService
         => petData.Singular;
     
     private string? GetPronoun()
-        => PronounHook?.LastGottenPronoun;
+        => PronounHook?.LastGottenPronoun?.TextValue;
     
     private string GetActionName(IPetSheetData petData)
         => StringHelper.CleanupString(petData.ActionName);

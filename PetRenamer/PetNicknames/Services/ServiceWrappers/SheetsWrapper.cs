@@ -89,6 +89,9 @@ internal class SheetsWrapper : IPetSheets
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
         => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);
 
+    public IPetSheetData[] AllPets
+        => PetSheetCache.ToArray();
+    
     public IPetSheetData? GetPetFromName(string name)
     {
         int sheetCount = PetSheetCache.Count;

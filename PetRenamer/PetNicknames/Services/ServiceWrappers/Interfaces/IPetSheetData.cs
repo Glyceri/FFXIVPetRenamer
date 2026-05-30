@@ -7,7 +7,7 @@ internal interface IPetSheetData
     PetSkeleton Model         { get; }
     uint        Icon          { get; }
 
-    string      Singular  { get; }
+    string      Singular      { get; }
 
     sbyte       Pronoun       { get; }
     

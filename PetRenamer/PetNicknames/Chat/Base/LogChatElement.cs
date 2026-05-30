@@ -1,7 +1,9 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
+using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using System;
 using System.Collections.Generic;
 
@@ -62,9 +64,7 @@ internal abstract class LogChatElement : IChatElement, IDisposable
             
             return;
         }
-        
-        bool hasFoundValidChat = false;
-        
+
         foreach (LogChatMessage logMessage in chatMessages)
         {
             if (logMessage.LogKind != chatMessage.LogKind || logMessage.SourceKind != chatMessage.SourceKind)
@@ -72,27 +72,19 @@ internal abstract class LogChatElement : IChatElement, IDisposable
                 continue;
             }
             
-            hasFoundValidChat = true;
+            expectedLogCount--;
+            
+            logMessage.Callback(chatMessage);
             
             break;
         }
-        
-        if (!hasFoundValidChat)
-        {
-            return;
-        }
-        
-        expectedLogCount--;
-        
-        OnValidChatMessage(chatMessage);
     }
-    
-    protected abstract void OnValidChatMessage(IHandleableChatMessage chatMessage);
-    
-    protected struct LogChatMessage(uint logId, XivChatType logKind, XivChatRelationKind sourceKind)
+
+    protected struct LogChatMessage(uint logId, XivChatType logKind, XivChatRelationKind sourceKind, Action<IHandleableChatMessage> callback)
     {
-        public readonly uint                LogId      = logId;
-        public readonly XivChatRelationKind SourceKind = sourceKind;
-        public readonly XivChatType         LogKind    = logKind;
+        public readonly uint                           LogId      = logId;
+        public readonly XivChatRelationKind            SourceKind = sourceKind;
+        public readonly XivChatType                    LogKind    = logKind;
+        public readonly Action<IHandleableChatMessage> Callback   = callback;
     }
 }

@@ -154,9 +154,15 @@ internal class StringHelperWrapper : IStringHelper
             return false;
         }
         
-        using Utf8String utf8String = new Utf8String(atkNode->OriginalTextPointer);
-        
-        seString = utf8String.AsDalamudSeString();
+        if (atkNode->OriginalTextPointer.HasValue)
+        {
+            // This is so text that gets cut off like Emerald Carbu... gets a chance to replace properly still.
+            seString = atkNode->OriginalTextPointer.AsDalamudSeString();
+        }
+        else
+        {
+            seString = atkNode->NodeText.AsDalamudSeString();
+        }
         
         return true;
     }

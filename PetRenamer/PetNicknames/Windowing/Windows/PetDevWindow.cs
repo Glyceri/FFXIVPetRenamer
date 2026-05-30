@@ -11,8 +11,11 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Interface;
+using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.Hooking;
+using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -22,6 +25,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -37,6 +41,7 @@ internal class PetDevWindow : PetWindow
     readonly IPettableDatabase Database;
     readonly IPetServices      PetServices;
     readonly ISharingDictionary SharingDictionary;
+    readonly IPronounHook PronounHook;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
@@ -46,12 +51,13 @@ internal class PetDevWindow : PetWindow
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary) 
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary, IPronounHook pronounHook) 
         : base(windowHandler, dalamudServices, petServices, "Pet Dev Window")
     {
         Database    = database;
         PetServices = petServices;
         SharingDictionary = sharingDictionary;
+        PronounHook = pronounHook;
         
         if (PetServices.Configuration.debugModeActive && PetServices.Configuration.openDebugWindowOnStart)
         {
@@ -65,11 +71,21 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Sharing Dict",  DrawSharing));
         devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
         devStructList.Add(new DevStruct("Database",   DrawDatabase));
+        devStructList.Add(new DevStruct("Sheets",     DrawSheets));
+        devStructList.Add(new DevStruct("Hover",      DrawHover));
+        devStructList.Add(new DevStruct("Pronoun",    DrawPronoun));
+        
+        currentActive = PetServices.Configuration.lastDebugTab;
     }
 
     public override void OnOpen()
     {
-        if (devStructList.Count <= currentActive) return;
+        if (devStructList.Count <= currentActive)
+        {
+            currentActive = 0;
+            
+            return;
+        }
 
         devStructList[currentActive].requestUpdate?.Invoke(true);
     }
@@ -91,9 +107,17 @@ internal class PetDevWindow : PetWindow
         for (int i = 0; i < devStructList.Count; i++)
         {
             if (!ImGui.TabItemButton(devStructList[i].title)) continue;
+            
             int lastActive = currentActive;
+            
             if (lastActive == i) continue;
+            
             currentActive = i;
+            ClearSearchBar();
+            
+            PetServices.Configuration.lastDebugTab = i;
+            PetServices.Configuration.Save();
+            
             devStructList[lastActive].requestUpdate?.Invoke(false);
             devStructList[currentActive].requestUpdate?.Invoke(true);
         }
@@ -113,6 +137,138 @@ internal class PetDevWindow : PetWindow
         }
     }
 
+    private void DrawPronoun()
+    {
+        ImGui.Text("Current Pronoun: ");
+        ImGui.SameLine();
+        
+        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PronounHook.LastGottenPronoun}].");
+        
+        ImGui.Text($"Last Pronoun: ");
+        ImGui.SameLine();
+        
+        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PronounHook.PreviousLastGottenPronoun}].");
+    }
+    
+    private void DrawHover()
+    {
+        ImGui.Text("Currently Hovered Pet: ");
+        ImGui.SameLine();
+        
+        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PetServices.HoverService.CurrentlyHoveredPet?.Model}, {PetServices.HoverService.CurrentlyHoveredPet?.Singular}].");
+        
+        ImGui.Text($"Currently Hovered Nametype: ");
+        ImGui.SameLine();
+        
+        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PetServices.HoverService.CurrentNameType}].");
+    }
+    
+    private string SearchText = string.Empty;
+    private string activeSearchText = string.Empty;
+    
+    private void ClearSearchBar()
+    {
+        SearchText       = string.Empty;
+        activeSearchText = string.Empty;
+    }
+    
+    private void DrawSearchbar()
+    {
+        ImGuiStylePtr style = ImGui.GetStyle();
+
+        //using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(style.ItemSpacing.X, 0)));
+        
+        float buttSize = WindowHandler.BarHeight;
+        bool  clicked  = false;
+
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttSize - style.FramePadding.X);
+
+        using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(10, (buttSize - ImGui.GetTextLineHeight()) * 0.5f)))
+        {
+            if (ImGui.InputTextWithHint($"##InputText_{WindowHandler.InternalCounter}", ". . .", ref SearchText, 64))
+            {
+                clicked = true;
+            }
+        }
+
+        SearchText = SearchText.Replace(Environment.NewLine, string.Empty);
+
+        ImGui.SameLine();
+
+        ImGui.PushFont(UiBuilder.IconFont);
+
+        using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(style.FramePadding.X, (buttSize - ImGui.GetTextLineHeight()) * 0.3f)))
+        {
+            if (ImGui.Button($"{FontAwesomeIcon.Search.ToIconString()}##Search_{WindowHandler.InternalCounter}", new Vector2(buttSize, buttSize)))
+            {
+                clicked = true;
+            }
+        }
+
+        ImGui.PopFont();
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(Translator.GetLine("Search"));
+        }
+
+        if (!clicked)
+        {
+            return;
+        }
+        
+        activeSearchText = SearchText;
+    }
+    
+    private bool PassesSearch(IPetSheetData pet)
+    {
+        if (pet.Singular.Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return true;
+        }
+        
+        if (pet.Model.SkeletonId.ToString().Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private void DrawSheets()
+    {
+        DrawSearchbar();
+        
+        if (!ImGui.BeginTable($"##petTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+            return;
+        
+        foreach (IPetSheetData pet in PetServices.PetSheets.AllPets)
+        {
+            if (!activeSearchText.IsNullOrWhitespace())
+            {
+                if (!PassesSearch(pet))
+                {
+                    continue;
+                }
+            }
+            
+            ImGui.TableNextRow();
+            
+            ImGui.TableSetColumnIndex(0);
+            ImGui.Text(pet.Model.ToString());
+            
+            ImGui.TableSetColumnIndex(1);
+            ImGui.Text(pet.Singular);
+            
+            ImGui.TableSetColumnIndex(2);
+            ImGui.Text(pet.ActionName);
+            
+            ImGui.TableSetColumnIndex(3);
+            ImGui.Text(pet.Icon.ToString());
+        }
+        
+        ImGui.EndTable();
+    }
    
     
     void DrawDatabaseUser(IPettableDatabaseEntry user)

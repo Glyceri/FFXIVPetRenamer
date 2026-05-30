@@ -116,7 +116,7 @@ internal unsafe class TargetHook : HookableElement
     
     private void OnTargetInfo(AddonEvent addonEvent, AddonArgs args)
     {
-        HandleTarget       (args, 17, Target());
+        HandleTarget       (args, 16, Target());
         HandleTarget       (args, 7,  TargetOfTarget());
         HandleTargetCastBar(args, 12, Target());
     }

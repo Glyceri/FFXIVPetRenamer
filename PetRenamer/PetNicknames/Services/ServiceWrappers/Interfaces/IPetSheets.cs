@@ -22,5 +22,11 @@ internal interface IPetSheets
     int?                CastToSoftIndex(uint castId);
     PetMirage?          GetPetMirage(uint petMirageId);
 
+    /// <summary>
+    /// CALL FOR DEBUG PURPOSES ONLY, IF YOU EVER USE THIS IN THE ACTUAL PLUGIN, YOU ARE DOING IT WRONG!
+    /// </summary>
+    /// <returns>All Registered Pets</returns>
+    IPetSheetData[]     AllPets { get; }
+    
     [Obsolete] PetSkeleton[] GetObsoleteIDsFromClass(int classJob);
 }

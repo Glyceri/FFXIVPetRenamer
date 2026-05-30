@@ -7,7 +7,7 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 public static class StringHelper
 {
     public static string ToTitleCase(this string baseString)
-        => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(baseString.ToLower());
+        => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(baseString);
 
     public static string CleanString(this string baseString, string toBeCleaned)
         => baseString.Replace(toBeCleaned, string.Empty, StringComparison.InvariantCultureIgnoreCase);

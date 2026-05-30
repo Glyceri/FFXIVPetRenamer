@@ -1,5 +1,6 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -37,11 +38,11 @@ internal unsafe class TooltipHook : HookableElement
     private readonly HookableElement MapHook;
     private readonly IPronounHook    PronounHook;
     
-    private string?  previousPronoun;
-    private string?  currentPronoun;
+    private SeString?  previousPronoun;
+    private SeString?  currentPronoun;
     
-    private string?  lastPreviousPronoun;
-    private string?  lastCurrentPronoun;
+    private SeString?  lastPreviousPronoun;
+    private SeString?  lastCurrentPronoun;
     
     public TooltipHook(DalamudServices services, IPetServices petServices, HookableElement mapHook, IPronounHook pronounHook) 
         : base(services, petServices)
@@ -135,12 +136,12 @@ internal unsafe class TooltipHook : HookableElement
                 return;
             }
             
-            if (lastCurrentPronoun.IsNullOrWhitespace() || lastPreviousPronoun.IsNullOrWhitespace())
+            if (lastCurrentPronoun == null || lastPreviousPronoun == null)
             {
                 return;
             }
             
-            IPetSheetData? petData =  PetServices.PetSheets.GetPetFromName(lastCurrentPronoun);
+            IPetSheetData? petData =  PetServices.PetSheets.GetPetFromName(lastCurrentPronoun.TextValue);
             
             if (petData == null)
             {
