@@ -169,10 +169,10 @@ internal class PetListWindow : PetWindow
                 float contentAvailableX = ImGui.GetContentRegionAvail().X;
                 Vector2 barSize = WindowHandler.StretchingBar;
 
-                BasicLabel.Draw("You can export all your pet names to your clipboard and send those to a friend.", barSize);
-                BasicLabel.Draw("A friend can import your code to see your names.", barSize);
+                BasicLabel.Draw(Translator.GetLine("ShareWindow.Explain1"), barSize);
+                BasicLabel.Draw(Translator.GetLine("ShareWindow.Explain2"), barSize);
 
-                if (ImGui.Button($"Export to Clipboard##clipboardExport{WindowHandler.InternalCounter}", new Vector2(contentAvailableX / 2, barSize.Y)))
+                if (ImGui.Button($"{Translator.GetLine("ShareWindow.Export")}##clipboardExport{WindowHandler.InternalCounter}", new Vector2(contentAvailableX / 2, barSize.Y)))
                 {
                     string data = DataWriter.WriteData();
 
@@ -196,7 +196,7 @@ internal class PetListWindow : PetWindow
 
                 ImGui.BeginDisabled(importDisabled);
 
-                if (ImGui.Button($"Import from Clipboard##clipboardExport{WindowHandler.InternalCounter}", new Vector2(contentAvailableX / 2, barSize.Y)))
+                if (ImGui.Button($"{Translator.GetLine("ShareWindow.Import")}##clipboardExport{WindowHandler.InternalCounter}", new Vector2(contentAvailableX / 2, barSize.Y)))
                 {
                     StartDisabledTimer();
 
@@ -319,18 +319,18 @@ internal class PetListWindow : PetWindow
             
             if (isLocalEntry) 
             {
-                if (RenameLabel.Draw($"Nickname:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, ref pet.EdgeColour, ref pet.TextColour, WindowHandler.StretchingBar))
+                if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:##NicknameInput_{WindowHandler.InternalCounter}", pet.CustomName == pet.TempName, ref pet.TempName, ref pet.EdgeColour, ref pet.TextColour, WindowHandler.StretchingBar))
                 {
                     OnSave(pet.TempName, pet.PetSheetData.Model, pet.EdgeColour, pet.TextColour);
                 }
             }
             else
             {
-                LabledLabel.Draw("Nickname:", pet.CustomName, WindowHandler.StretchingBar);
+                LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", pet.CustomName, WindowHandler.StretchingBar);
             }
 
-            LabledLabel.Draw("Pet:", pet.PetSheetData.Singular, WindowHandler.StretchingBar);
-            LabledLabel.Draw("ID:", pet.PetSheetData.Model.SkeletonId.ToString(), WindowHandler.StretchingBar);
+            LabledLabel.Draw($"{SpeciesLine}:", pet.PetSheetData.Singular, WindowHandler.StretchingBar);
+            LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:", pet.PetSheetData.Model.ToString(), WindowHandler.StretchingBar);
         }
     }
     
@@ -358,7 +358,7 @@ internal class PetListWindow : PetWindow
 
             if (user.Entry.ContentId == PetServices.UserList.LocalPlayer?.ContentId)
             {
-                if (LabledLabel.DrawButton("Username:", user.Entry.Name, WindowHandler.StretchingBar))
+                if (LabledLabel.DrawButton($"{Translator.GetLine("Name")}:", user.Entry.Name, WindowHandler.StretchingBar))
                 {
                     _ = DalamudServices.Framework.Run(() =>
                     {
@@ -377,7 +377,7 @@ internal class PetListWindow : PetWindow
 
                 ImGuiStylePtr style = ImGui.GetStyle();
 
-                if (LabledLabel.DrawButton("Username:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), WindowHandler.BarHeight)))
+                if (LabledLabel.DrawButton($"{Translator.GetLine("Name")}:", user.Entry.Name, new Vector2(ImGui.GetContentRegionAvail().X - (buttonSize * buttonCount) - ((style.ItemSpacing.X * (buttonCount + 1))), WindowHandler.BarHeight)))
                 {
                     _ = DalamudServices.Framework.Run(() =>
                     {
@@ -426,8 +426,8 @@ internal class PetListWindow : PetWindow
                 }
             }
 
-            LabledLabel.Draw("Homeworld:", user.Entry.HomeworldName, WindowHandler.StretchingBar);
-            LabledLabel.Draw("Pet Count:", user.Entry.ActiveDatabase.Length.ToString(), WindowHandler.StretchingBar);
+            LabledLabel.Draw($"{Translator.GetLine("Homeworld")}:", user.Entry.HomeworldName, WindowHandler.StretchingBar);
+            LabledLabel.Draw($"{Translator.GetLine("Petcount")}:", user.Entry.ActiveDatabase.Length.ToString(), WindowHandler.StretchingBar);
         }
     }
     

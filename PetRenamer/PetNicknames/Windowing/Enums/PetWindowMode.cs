@@ -2,6 +2,7 @@
 
 internal enum PetWindowMode
 {
-    Minion,
-    BattlePet
+    Minion      = 1,
+    BattlePet   = 2,
+    BeastMaster = 3,
 }

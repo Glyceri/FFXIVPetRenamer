@@ -1,8 +1,11 @@
 ﻿using Dalamud.Game;
+using Newtonsoft.Json;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.TranslatorSystem;
 
@@ -12,182 +15,145 @@ internal static class Translator
     private static DalamudServices? DalamudServices = null;
     private static IPetServices?    PetServices     = null;
 
-    static Dictionary<string, string> EnglishTranslations = new Dictionary<string, string>()
-    {
-        { "...", "..." },
-        { "Name", "Username" },
-        { "Homeworld", "Homeworld" },
-        { "Petcount", "Nicknames" },
-        { "Search", "Search" },
-        { "DateTime.Unkown", "Date Unknown" },
-        { "Version.Unkown", "Version Unknown" },
-        { "ContextMenu.Rename", "Give Nickname" },
-        { "PetRenameNode.Species", "Minion" },
-        { "PetRenameNode.Species2", "Battle Pet" },
-        { "PetRenameNode.Race", "Type" },
-        { "PetRenameNode.Behaviour", "Behaviour" },
-        { "PetRenameNode.Nickname", "Nickname" },
-        { "PetRenameNode.Edit", "Edit" },
-        { "PetRenameNode.Clear", "Clear" },
-        { "PetRenameNode.Save", "Save" },
-        { "PetRenameNode.Cancel", "Cancel" },
-        { "PetRenameNode.PleaseSummonWarningLabel", "Warning" },
-        { "PetRenameNode.PleaseSummonWarning", "Please summon a pet" },
-        { "WindowHandler.Title", "Pet Passport" },
-        { "PetList.Title", "Pet List" },
-        { "PetList.Navigation", "Navigation" },
-        { "PetList.UserList", "User List" },
-        { "PetList.MyList", "My List" },
-        { "PetList.Sharing", "Sharing" },
-        { "PetListWindow.ListHeaderPersonalMinion", "Your Minions" },
-        { "PetListWindow.ListHeaderPersonalBattlePet", "Your Battle Pets" },
-        { "PetListWindow.ListHeaderOtherMinion", "{0}'s Minions" },
-        { "PetListWindow.ListHeaderOtherBattlePet", "{0}'s Battle Pets" },
-        { "ClearButton.Label", "Hold \"Left Ctrl\" + \"Left Shift\" to delete an entry." },
-        { "ClearButton.ColourLabel", "Hold \"Left Ctrl\" + \"Left Shift\" to clear the colour." },
-        { "UserListElement.WarningClear", "You cannot clear yourself." },
-        { "UserListElement.WarningIPC", "This user is temporarily added via an\nexternal plugin and will not be saved." },
-        { "UserListElement.WarningOldUser", "This user is from your old save file.\nPlease meet them in game so it can update." },
-        { "PVPWarning", "Pet Nicknames is disabled in PVP zones excluding the Wolves'Den Pier." },
-        { "IslandWarning", "Pet Nicknames was unable to resolve the owner of this island. Please rejoin this island." },
-        { "IslandWarningGlobal", "No Island Owner Found" },
-
-        { "ShareWindow.Export", "Export to Clipboard" },
-        { "ShareWindow.Import", "Import from Clipboard" },
-
-        { "ShareWindow.ExportError", $"No data available.{Environment.NewLine}You need to log in to a character to export your data." },
-        { "ShareWindow.ExportSuccess", $"Data successfully exported to your clipboard.{Environment.NewLine}Make sure to paste this data elsewhere."},
-        { "ShareWindow.ExportErrorGlobal", "No Data Available" },
-        { "ShareWindow.ExportSuccessGlobal", "Data Successfully Exported" },
-
-        { "ShareWindow.ImportError", "Failed to import data: {0}" },
-        { "ShareWindow.ImportSuccess", "Successfully imported data from {0}" },
-        { "ShareWindow.ImportErrorGlobal", "Failed to Import Data" },
-        { "ShareWindow.ImportSuccessGlobal", "Successfully Imported Data" },
-
-        { "Config.Title", "Settings" },
-        { "Config.Header.GeneralSettings", "General Settings" },
-        { "Config.Header.UISettings", "UI Settings" },
-        { "Config.Header.NativeSettings", "Native Settings" },
-        { "Config.PVPMessage", "Disable PVP warning message." },
-        { "Config.ProfilePictures", "Automatically download profile pictures." },
-        { "Config.UISettings.UIScale.Header.Title", "Custom UI Scale" },
-        { "Config.Toggle", "Quick Buttons toggle instead of open." },
-        { "Config.Kofi", "Show Ko-fi Button." },
-        { "Config.TransparentBackground", "Background goes transparent on inactivity." },
-        { "Config.UIFlare", "Show extra UI decorations." },
-        { "Config.Nameplate", "Show nicknames on Nameplates." },
-        { "Config.Castbar", "Show nicknames on Cast bars." },
-        { "Config.BattleChat", "Show nicknames in the Battle Chat." },
-        { "Config.Emote", "Show nicknames for Emotes." },
-        { "Config.Flyout", "Show nicknames on Flyout Text." },
-        { "Config.Tooltip", "Show nicknames on Tooltips." },
-        { "Config.Notebook", "Show nicknames in the Minion Notebook." },
-        { "Config.ActionLog", "Show nicknames in the Action List." },
-        { "Config.Targetbar", "Show nicknames for Targets." },
-        { "Config.Partylist", "Show nicknames on the Party List." },
-        { "Config.ContextMenu", "Allow Context Menus." },
-        { "Config.ShowNotification", "Show Notifications." },
-        { "Config.IslandWarning", "Show a warning upon unresolved Island Owner." },
-        { "Config.IslandPets", "Show names on Island Pets." },
-        { "Config.Penumbra.AttachToPCP", "Attach Pet Nicknames data to Penumbra .pcp files." },
-        { "Config.Penumbra.ReadFromPCP", "Read Pet Nicknames data from Penumbra .pcp files." },
-        { "Config.Label.OverrideColour", "Override Colour" },
-        { "Config.Label.OverrideColourLabel", "Colour Mode" },
-
-        { "Kofi.Title", "Ko-fi" },
-        { "Kofi.Line1", "This is about real life money." },
-        { "Kofi.Line2", "It will be used to my cat toys!" },
-        { "Kofi.TakeMe", "Take me" },
-
-        { "Command.Petname", "Opens the Pet Rename window.\n        Type /petname help for information on naming via command." },
-        { "Command.Petlist", "Opens the Pet List window." },
-        { "Command.PetSettings", "Opens the Settings window." },
-        { "Command.PetSharing", "Opens the Sharing window." },
-        { "Command.PetTheme", "Opens the Colour Editor window." },
-
-        { "Style.Title.Default", "Default" },
-
-        { "ColourEditorWindow.Name", "Name" },
-        { "ColourEditorWindow.Author", "Author" },
-
-        { "ColourSetting.Outline", "Outlines" },
-        { "ColourSetting.Outline:Fade", "Outline Fade" },
-        { "ColourSetting.Window.Background", "Window Background" },
-        { "ColourSetting.Window.BackgroundLight", "Faded Window Background" },
-        { "ColourSetting.BackgroundImageColour", "Window Background Image Colour" },
-        { "ColourSetting.SearchBarBackground", "Search Bar" },
-        { "ColourSetting.ListElementBackground", "List Element Background" },
-        { "ColourSetting.Window.TextLight", "Text" },
-        { "ColourSetting.Window.TextOutline", "Text Outline" },
-        { "ColourSetting.Window.Text", "Text Disabled" },
-        { "ColourSetting.Window.TextOutlineButton", "Text Outline Disabled" },
-        { "ColourSetting.WindowBorder:Active", "Border Active" },
-        { "ColourSetting.WindowBorder:Inactive", "Border Inactive" },
-        { "ColourSetting.Button.Background", "Button" },
-        { "ColourSetting.Button.Background:Hover", "Button Hover" },
-        { "ColourSetting.Button.Background:Inactive", "Button Disabled" },
-        { "ColourSetting.FlareImageColour", "Image" },
-
-        { "ColourEditorWindow.Title", "Colour Editor" },
-        { "ColourSettings.PresetListHeader", "Presets" },
-        { "ColourSettings.Header", "Colour Settings" },
-
-        { "Config.LanguageSettingsBar.Header.Title", "Language Settings (restart plugin to take effect)" },
-    };
-
-    static Dictionary<string, string> GermanTranslations = new Dictionary<string, string>()
-    {
-
-    };
-
-    static Dictionary<string, string> FrenchTranslations = new Dictionary<string, string>()
-    {
-        
-    };
-
-    static Dictionary<string, string> JapaneseTranslations = new Dictionary<string, string>()
-    {
-       
-    };
-
+    private static readonly Dictionary<string, string> FallbackTranslations = new Dictionary<string, string>();
+    private static readonly Dictionary<string, string> Translations         = new Dictionary<string, string>();
+    
     internal static void Initialise(DalamudServices dalamudServices, IPetServices petServices)
     {
         DalamudServices = dalamudServices;
         PetServices     = petServices;
+        
+        FillDictForLanguage(FallbackTranslations, PetNicknamesLanguage.English);
+        
+        UpdateLanguage();
     }
 
     internal static string GetLine(string identifier)
     {
-        ClientLanguage?       language  = DalamudServices?.ClientState.ClientLanguage;
-        PetNicknamesLanguage? pLanguage = (PetNicknamesLanguage?)PetServices?.Configuration.languageSettings;
-
-        if (language == null)
+        if (Translations.TryGetValue(identifier, out string? translation))
         {
-            return GetTranslation(ref EnglishTranslations, identifier);
+            return translation;
         }
         
-        if (pLanguage != PetNicknamesLanguage.Default)
+        if (FallbackTranslations.TryGetValue(identifier, out string? fTranslation))
         {
-            if      (pLanguage == PetNicknamesLanguage.English)  language = ClientLanguage.English;
-            else if (pLanguage == PetNicknamesLanguage.German)   language = ClientLanguage.German;
-            else if (pLanguage == PetNicknamesLanguage.French)   language = ClientLanguage.French;
-            else if (pLanguage == PetNicknamesLanguage.Japanese) language = ClientLanguage.Japanese;
+            if (PetServices?.Configuration.debugModeActive ?? false)
+            {
+                fTranslation = $"@@{fTranslation}@@";
+            }
+            
+            return fTranslation;
         }
-
-        if (language == ClientLanguage.German)   return GetTranslation(ref GermanTranslations, identifier);
-        if (language == ClientLanguage.French)   return GetTranslation(ref FrenchTranslations, identifier);
-        if (language == ClientLanguage.Japanese) return GetTranslation(ref JapaneseTranslations, identifier);
-
-        return GetTranslation(ref EnglishTranslations, identifier);
+        
+        return $"%%{identifier}%%";
     }
-
-    static string GetTranslation(ref Dictionary<string, string> translationDictionary, string identifier)
+    
+    private static readonly string[] FileNames =
+        [
+            "en_UK.json",
+            "de_DE.json",
+            "fr_FR.json",
+            "ja_JP.json",
+            "nl_NL.json",
+        ];
+    
+    private static string GetFileName(PetNicknamesLanguage language)
     {
-        if (translationDictionary.TryGetValue(identifier, out string? translation)) return translation;
-        if (EnglishTranslations.TryGetValue(identifier, out string? englishTranslations)) return englishTranslations;
+        if (language == PetNicknamesLanguage.Default)
+        {
+            ClientLanguage? cLanguage = DalamudServices?.ClientState.ClientLanguage;
+                
+            if (cLanguage == null)
+            {
+                return FileNames[0];
+            }
+            
+            return cLanguage.Value switch
+            {
+                ClientLanguage.English  => FileNames[0],
+                ClientLanguage.German   => FileNames[1],
+                ClientLanguage.French   => FileNames[2],
+                ClientLanguage.Japanese => FileNames[3],
+                _                       => FileNames[0],
+            };
+        }
+        
+        return language switch
+        {
+            PetNicknamesLanguage.English  => FileNames[0],
+            PetNicknamesLanguage.German   => FileNames[1],
+            PetNicknamesLanguage.French   => FileNames[2],
+            PetNicknamesLanguage.Japanese => FileNames[3],
+            PetNicknamesLanguage.Dutch    => FileNames[4],
+            _                             => FileNames[0],
+        };
+    }
+    
+    private static void FillDictForLanguage(Dictionary<string, string> dictionary, PetNicknamesLanguage language)
+    {
+        if (DalamudServices == null)
+        {
+            return;
+        }
+        
+        dictionary.Clear();
+        
+        
+        string fileName = GetFileName(language);
 
-        return identifier;
+        try
+        {
+            FileInfo[] files = new DirectoryInfo(DalamudServices.DalamudPlugin.AssemblyLocation.DirectoryName!).GetFiles( "*.json");
+            
+            FileInfo? foundFile = null;
+            
+            foreach (FileInfo file in files)
+            {
+                if (file.Name != fileName)
+                {
+                    continue;
+                }
+                
+                foundFile = file;
+                
+                DalamudServices.PluginLog.Info("File Found: " + file.Name);
+                
+                break;
+            }
+
+            if (foundFile == null)
+            {
+                DalamudServices.PluginLog.Error("Translation file not found");
+                
+                return;
+            }
+            
+            string translationFile = File.ReadAllText(foundFile.FullName);
+            
+            Dictionary<string, string> dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(translationFile)
+                                              ?? throw new($"Failed to parse translation file {foundFile.FullName}");
+            
+            foreach ((string key, string value) in dict) 
+            {
+                dictionary[key] = value;
+            }
+        }
+        catch (Exception e)
+        {
+            DalamudServices?.PluginLog.Error(e, "Error when loading language file");
+        }
+    }
+    
+    public static void UpdateLanguage()
+    {
+        PetNicknamesLanguage? pLanguage = PetServices?.Configuration.currentLanguage;
+        
+        if (pLanguage == null)
+        {
+            return;
+        }
+        
+        FillDictForLanguage(Translations, pLanguage.Value);
     }
 }
 
@@ -198,4 +164,5 @@ internal enum PetNicknamesLanguage
     German,
     French,
     Japanese,
+    Dutch,
 }

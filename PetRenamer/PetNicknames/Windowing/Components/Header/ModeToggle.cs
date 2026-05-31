@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
@@ -7,9 +8,17 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
 internal static class ModeToggle
 {
-    static float cutHeight;
-    static float expanedHeight;
+    private static float cutHeight;
+    private static float expanedHeight;
 
+    private static string CreateStringFromMode(PetWindowMode mode)
+    {
+        string petModeLine = Translator.GetLine("PetMode");
+        string speciesLine = Translator.GetLine($"PetRenameNode.Species{(int)mode}");
+        
+        return string.Format(petModeLine, speciesLine);
+    }
+    
     public static void Draw(in PetWindow petWindow)
     {
         Vector2 lastCursorPos = ImGui.GetCursorPos();
@@ -30,10 +39,12 @@ internal static class ModeToggle
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.3f, 0.3f, 1f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.36f, 0.36f, 1f, 1f));
         DrawFor(in petWindow, PetWindowMode.Minion);
+        
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
-            ImGui.SetTooltip("Minion Mode");
+            ImGui.SetTooltip(CreateStringFromMode(PetWindowMode.Minion));
         }
+        
         ImGui.PopStyleColor(3);
 
         ImGui.SameLine(0, 0);
@@ -44,7 +55,7 @@ internal static class ModeToggle
         DrawFor(in petWindow, PetWindowMode.BattlePet);
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
-            ImGui.SetTooltip("Battle Pet Mode");
+            ImGui.SetTooltip(CreateStringFromMode(PetWindowMode.BattlePet));
         }
         ImGui.PopStyleColor(3);
 
@@ -52,7 +63,7 @@ internal static class ModeToggle
     }
 
 
-    static void DrawFor(in PetWindow petWindow, PetWindowMode mode)
+    private static void DrawFor(in PetWindow petWindow, PetWindowMode mode)
     {
         if (petWindow.CurrentMode == mode)
         {
@@ -70,9 +81,9 @@ internal static class ModeToggle
         }
     }
 
-    static void SetMode(in PetWindow petWindow, PetWindowMode mode)
+    private static void SetMode(in PetWindow petWindow, PetWindowMode mode)
     {
         petWindow.RequestsModeChange = true;
-        petWindow.NewMode = mode;
+        petWindow.NewMode            = mode;
     }
 }

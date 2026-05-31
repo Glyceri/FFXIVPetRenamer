@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface;
-using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
@@ -10,21 +9,22 @@ internal static class ColourPicker
 {
     static Vector3? colourHolder = Vector3.One;
 
-    public static bool Draw(string ID, string tooltip, ref Vector3? colour, Vector2 size)
+    public static bool Draw(string id, string tooltip, ref Vector3? colour, Vector2 size)
     {
         bool edited = false;
 
         ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
         ImGui.PushStyleColor(ImGuiCol.Border, 0xFF404040);
 
-        bool shouldOpen = ImGui.ColorButton(ID, new Vector4(colour ?? Vector3.One, 1), ImGuiColorEditFlags.NoTooltip, size);
+        bool shouldOpen = ImGui.ColorButton(id, new Vector4(colour ?? Vector3.One, 1), ImGuiColorEditFlags.NoTooltip, size);
 
         ImGui.PopStyleColor(1);
         ImGui.PopStyleVar(1);
 
         if (colour == null)
         {
-            var dl = ImGui.GetWindowDrawList();
+            ImDrawListPtr dl = ImGui.GetWindowDrawList();
+            
             dl.AddLine(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), 0xFF0000FF, 3f * WindowHandler.GlobalScale);
             dl.AddLine(ImGui.GetItemRectMin() + new Vector2(ImGui.GetItemRectSize().X, 0), ImGui.GetItemRectMin() + new Vector2(0, ImGui.GetItemRectSize().Y), 0xFF0000FF, 3f * WindowHandler.GlobalScale);
         }
@@ -39,19 +39,21 @@ internal static class ColourPicker
         {
             colourHolder = colour;
             ImGui.CloseCurrentPopup();
-            ImGui.OpenPopup(ID, ImGuiPopupFlags.MouseButtonLeft);
+            
+            ImGui.OpenPopup(id);
         }
 
-        if (ImGui.BeginPopup(ID))
+        if (ImGui.BeginPopup(id))
         {
             Vector3 temporaryColour = colourHolder ?? Vector3.One;
 
-            if (EraserButton.Draw(size, Translator.GetLine("ClearButton.ColourLabel"), "Clear Colour"))
+            if (EraserButton.Draw(size, Translator.GetLine("ClearButton.ColourLabel"), Translator.GetLine("ColourPicker.ClearColour")))
             {
                 colour = null;
                 edited = true;
                 ImGui.CloseCurrentPopup();
             }
+            
             ImGui.SameLine();
 
             ImGui.BeginDisabled(colourHolder == colour);

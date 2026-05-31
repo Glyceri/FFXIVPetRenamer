@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using PetRenamer.Core.Serialization;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PN.S;
 using System;
 
@@ -13,7 +14,7 @@ namespace PetRenamer;
 internal class Configuration : IPluginConfiguration
 {
     [JsonIgnore]
-    public const int currentSaveFileVersion = 12;
+    public const int currentSaveFileVersion = 13;
 
     [JsonIgnore]
     private IDalamudPluginInterface? PetNicknamesPlugin;
@@ -33,7 +34,7 @@ internal class Configuration : IPluginConfiguration
 
     // ------------------------- Global Settings -------------------------
     public bool downloadProfilePictures = true;
-    public int languageSettings = 0;
+    public PetNicknamesLanguage currentLanguage = PetNicknamesLanguage.Default;
     public bool showCommandFeedback = true;
     public bool showNotifications = true;
     
@@ -51,6 +52,7 @@ internal class Configuration : IPluginConfiguration
     public ColourConfig ShowOnTargetBarsColour      = new ColourConfig();
     public ColourConfig ShowOnPartyListColour       = new ColourConfig();
     
+    public bool allowPartySummonCutoff = true;
     public bool showOnIslandPets = true;
     public bool useContextMenus  = true;
     
@@ -160,6 +162,8 @@ internal class Configuration : IPluginConfiguration
     public bool showOnTargetBars = true;
     [Obsolete]
     public bool showOnPartyList = true;
+    [Obsolete]
+    public int languageSettings = 0;
     
 #pragma warning restore IDE1006
 

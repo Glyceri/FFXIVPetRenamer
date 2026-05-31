@@ -13,13 +13,18 @@ internal static class BoxedImage
 {
     public static void Draw(IDalamudTextureWrap textureWrap, Vector2 size)
     {
-        if (Listbox.Begin("##image", size))
+        if (!Listbox.Begin("##image", size))
         {
-            ImGuiStylePtr style = ImGui.GetStyle();
-            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(style.FramePadding.X, style.FramePadding.Y));
-            IconImage.Draw(textureWrap, ImGui.GetContentRegionAvail() - style.FramePadding);
-            Listbox.End();
+            return;
         }
+
+        ImGuiStylePtr style = ImGui.GetStyle();
+        
+        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(style.FramePadding.X, style.FramePadding.Y));
+        
+        IconImage.Draw(textureWrap, ImGui.GetContentRegionAvail() - style.FramePadding);
+        
+        Listbox.End();
     }
 
     public static void DrawMinion(IPetSheetData data, DalamudServices dalamudServices, Configuration configuration, Vector2 size)
@@ -46,7 +51,7 @@ internal static class BoxedImage
             }
 
             textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon + adder).GetWrapOrEmpty();
-            raceIcon    = RaceIconHelper.GetFromRaceID(data?.RaceId ?? 0);
+            raceIcon    = RaceIconHelper.GetFromRaceId(data?.RaceId ?? 0);
         }
 
         

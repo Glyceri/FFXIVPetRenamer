@@ -1,8 +1,11 @@
 ﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -16,10 +19,6 @@ internal class PetConfigWindow : PetWindow
 
     protected override bool     HasModeToggle   { get; } = true;
 
-    private static readonly string[] _listIconTypes = ["Both", "Sharing", "List Only"];
-    private static readonly string[] _iconMenuTypes = ["Action", "Notebook", "Item"];
-    private static readonly string[] _colourDisplay = ["Everyone", "Only Myself", "No Colours"];
-
     private readonly Dictionary<string, bool> ThirdPartySupported = new Dictionary<string, bool>()
     {
         { "Penumbra", false },
@@ -31,6 +30,11 @@ internal class PetConfigWindow : PetWindow
         PetServices.PluginWatcher.RegisterListener(OnPluginChanged);
     }
 
+    private static readonly string[] _listIconTypes   = ["ListIconType.Both", "ListIconType.Sharing", "ListIconType.ListOnly"];
+    private static readonly string[] _iconMenuTypes   = ["MenuType.Action", "MenuType.Notebook", "MenuType.Item"];
+    private static readonly string[] _colourDisplay   = ["ColourDisplay.Everyone", "ColourDisplay.OnlyMyself", "ColourDisplay.NoColours"];
+    private static readonly string[] _languageOptions = ["Language.Default", "Language.English", "Language.German", "Language.French", "Language.Japanese", "Language.Dutch"];
+    
     protected override void OnDraw()
     {
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
@@ -39,7 +43,7 @@ internal class PetConfigWindow : PetWindow
             
             DrawBasicToggle(Translator.GetLine("Config.ProfilePictures"), ref PetServices.Configuration.downloadProfilePictures);
             
-            DrawEnumMenu("Name Colours", _colourDisplay, ref PetServices.Configuration.SelectedColourMode);
+            DrawEnumMenu(Translator.GetLine("Config.ColourSettings"), _colourDisplay, ref PetServices.Configuration.SelectedColourMode);
             
             ImGui.Spacing();
         }
@@ -47,6 +51,14 @@ internal class PetConfigWindow : PetWindow
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.UISettings")))
         {
             ImGui.Spacing();
+            
+            if (DrawEnumMenu(Translator.GetLine("Config.Language"),   _languageOptions, ref PetServices.Configuration.currentLanguage))
+            {
+                Translator.UpdateLanguage();
+            }
+            
+            ImGui.Separator();
+            
             DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref PetServices.Configuration.showKofiButton);
             DrawBasicToggle(Translator.GetLine("Config.Toggle"),            ref PetServices.Configuration.quickButtonsToggle);
             
@@ -66,9 +78,9 @@ internal class PetConfigWindow : PetWindow
             
             ImGui.Spacing();
 
-            DrawMenu("List Button Type", _listIconTypes, ref PetServices.Configuration.listButtonLayout);
-            DrawMenu("Icon Type",        _iconMenuTypes, ref PetServices.Configuration.minionIconType);
-            
+            DrawMenu(Translator.GetLine("Config.ListButtonType"), _listIconTypes,   ref PetServices.Configuration.listButtonLayout);
+            DrawMenu(Translator.GetLine("Config.IconType"),       _iconMenuTypes,   ref PetServices.Configuration.minionIconType);
+                
             ImGui.Spacing();
         }
 
@@ -85,6 +97,8 @@ internal class PetConfigWindow : PetWindow
             DrawColourConfig(Translator.GetLine("Config.Targetbar"),    ref PetServices.Configuration.ShowOnTargetBarsColour);
             DrawColourConfig(Translator.GetLine("Config.Partylist"),    ref PetServices.Configuration.ShowOnPartyListColour);
             
+            DrawBasicToggle (Translator.GetLine("Config.PartyCutoff"),  ref PetServices.Configuration.allowPartySummonCutoff);
+            DrawInfoHover(Translator.GetLine("Config.PartyCutoff.Help"));
             DrawBasicToggle (Translator.GetLine("Config.IslandPets"),   ref PetServices.Configuration.showOnIslandPets);
             DrawBasicToggle (Translator.GetLine("Config.ContextMenu"),  ref PetServices.Configuration.useContextMenus);
             
@@ -101,7 +115,7 @@ internal class PetConfigWindow : PetWindow
             ImGui.Spacing();
         }
 
-        if (ImGui.CollapsingHeader(Translator.GetLine("Debug")))
+        if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.Debug")))
         {
             ImGui.Spacing();
             
@@ -109,10 +123,13 @@ internal class PetConfigWindow : PetWindow
 
             ImGui.BeginDisabled(!keyComboPressed && !PetServices.Configuration.debugModeActive);
 
-            DrawBasicToggle("Enable Debug Mode.",           ref PetServices.Configuration.debugModeActive);
-            DrawBasicToggle("Open Debug Window On Start.",  ref PetServices.Configuration.openDebugWindowOnStart);
-            DrawBasicToggle("Show chat code.",              ref PetServices.Configuration.debugShowChatCode);
-
+            DrawBasicToggle(Translator.GetLine("Config.DebugMode"),      ref PetServices.Configuration.debugModeActive);
+            DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
+            DrawBasicToggle(Translator.GetLine("Config.OpenDebugMode"),  ref PetServices.Configuration.openDebugWindowOnStart);
+            DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
+            DrawBasicToggle(Translator.GetLine("Config.DebugChatcode"),  ref PetServices.Configuration.debugShowChatCode);
+            DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
+            
             ImGui.EndDisabled();
             
             ImGui.Spacing();
@@ -137,13 +154,13 @@ internal class PetConfigWindow : PetWindow
 
         ImGui.SetNextItemWidth(width);
 
-        if (ImGui.BeginCombo(title, elements[configurationInt], ImGuiComboFlags.PopupAlignLeft))
+        if (ImGui.BeginCombo(title,  Translator.GetLine(elements[configurationInt]), ImGuiComboFlags.PopupAlignLeft))
         {
             for (int i = 0; i < elements.Length; i++)
             {
                 bool elementIsCurrent = i == configurationInt;
 
-                if (ImGui.Selectable(elements[i], elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
+                if (ImGui.Selectable(Translator.GetLine(elements[i]), elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
                 {
                     configurationInt = i;
 
@@ -155,7 +172,8 @@ internal class PetConfigWindow : PetWindow
         }
     }
     
-    private void DrawEnumMenu(string title, string[] elements, ref Configuration.ColourMode enumValue, float width = 150) 
+    private bool DrawEnumMenu<T>(string title, string[] elements, ref T enumValue, float width = 150)
+        where T : struct, Enum
     {
         if (width <= 0)
         {
@@ -167,23 +185,29 @@ internal class PetConfigWindow : PetWindow
         }
         
         ImGui.SetNextItemWidth(width);
-
-        if (ImGui.BeginCombo(title, elements[(int)enumValue], ImGuiComboFlags.PopupAlignLeft))
+        
+        bool changed = false;
+        
+        if (ImGui.BeginCombo(title, Translator.GetLine(elements[enumValue.GetEnumIndex()]), ImGuiComboFlags.PopupAlignLeft))
         {
             for (int i = 0; i < elements.Length; i++)
             {
-                bool elementIsCurrent = i == (int)enumValue;
+                bool elementIsCurrent = i == enumValue.GetEnumIndex();
 
-                if (ImGui.Selectable(elements[i], elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
+                if (ImGui.Selectable(Translator.GetLine(elements[i]), elementIsCurrent, ImGuiSelectableFlags.AllowDoubleClick))
                 {
-                    enumValue = (Configuration.ColourMode)i;
+                    enumValue = (T)Enum.ToObject(typeof(T), i);
 
                     SavePlugin();
+                    
+                    changed = true;
                 }
             }
 
             ImGui.EndCombo();
         }
+        
+        return changed;
     }
 
     private bool DrawThirdPartyHeader(string internalName, string? displayTitle = null)
@@ -211,6 +235,26 @@ internal class PetConfigWindow : PetWindow
         }
 
         SavePlugin();
+    }
+    
+    private void DrawInfoHover(string infoText)
+    {
+        ImGui.SameLine();
+        
+        ImGui.BeginDisabled();
+        ImGui.PushFont(UiBuilder.IconFont);
+        
+        ImGui.Text($"{FontAwesomeIcon.Question.ToIconString()}");
+
+        ImGui.PopFont();
+        ImGui.EndDisabled();
+
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.BeginDisabled(false);
+            ImGui.SetTooltip(infoText);
+            ImGui.EndDisabled();
+        }
     }
     
     private void DrawColourConfig(string title, ref Configuration.ColourConfig colourConfig)

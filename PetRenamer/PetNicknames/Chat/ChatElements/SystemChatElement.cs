@@ -64,11 +64,6 @@ internal class SystemChatElement : LogChatElement
             return;
         }
         
-        if (!chatMessage.Message.TextValue.Contains(PetServices.HoverService.CurrentlyHoveredPet.Singular, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return;
-        }
-        
         PetServices.StringHelper.ReplaceChat(PetServices.Configuration.ShowNamesInActionLogColour, chatMessage, PetServices.HoverService.CurrentlyHoveredPet, PetServices.HoverService.CurrentNameType, PetServices.UserList.LocalPlayer);
     }
 }

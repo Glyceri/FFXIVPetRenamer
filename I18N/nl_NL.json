@@ -1,0 +1,149 @@
+{
+  "...": "…",
+  "Name": "Gebruikersnaam",
+  "Homeworld": "Thuiswereld",
+  "Petcount": "Aantal Bijnamen",
+
+  "Search": "Zoeken",
+  "DateTime.Unkown": "Datum Onbekend",
+  "Version.Unkown": "Versie Onbekend",
+
+  "Language.Default": "“Client” Taal",
+  "Language.English": "Engels",
+  "Language.German": "Duits",
+  "Language.French": "Frans",
+  "Language.Japanese": "Japans",
+  "Language.Dutch": "Nederlands",
+
+  "ContextMenu.Rename": "Geef Bijnaam",
+
+  "PetMode": "{0} Modus",
+
+  "PetRenameNode.Species1": "Huisdier",
+  "PetRenameNode.Species2": "Strijddier",
+  "PetRenameNode.Species3": "Beastmaster Dier",
+
+  "PetRenameNode.Race": "Type",
+  "PetRenameNode.Behaviour": "Gedrag",
+  "PetRenameNode.Nickname": "Bijnaam",
+  "PetRenameNode.Id": "Identificatie",
+
+  "PetRenameNode.Edit": "Aanpassen",
+  "PetRenameNode.Clear": "Wissen",
+  "PetRenameNode.Save": "Opslaan",
+  "PetRenameNode.Cancel": "Stoppen",
+
+  "PetRenameNode.PleaseSummonWarningLabel": "Waarschuwing",
+  "PetRenameNode.PleaseSummonWarning": "Roep a.u.b. een {0} op.",
+  
+  "PetDev.Title": "Pet Nicknames Ontwikkeling",
+
+  "PetList.Title": "Huisdierenlijst",
+  "PetList.Navigation": "Navigatie",
+  "PetList.UserList": "Gebruikerslijst",
+  "PetList.MyList": "Mijn lijst",
+  "PetList.Sharing": "Delen",
+
+  "PetListWindow.ListHeaderPersonalMinion": "Jouw Huisieren",
+  "PetListWindow.ListHeaderPersonalBattlePet": "Jouw Strijddieren",
+  "PetListWindow.ListHeaderOtherMinion": "{0}’s Huisdieren",
+  "PetListWindow.ListHeaderOtherBattlePet": "{0}’s Strijddieren",
+
+  "ColourPicker.EdgeColour": "Randkleur",
+  "ColourPicker.TextColour": "Tekstkleur",
+  "ColourPicker.ClearColour": "Wis Kleur",
+
+  "ClearButton.Label": "Houd “Left Ctrl” + “Left Shift” ingedrukt om deze registratie te verwijderen.",
+  "ClearButton.ColourLabel": "Houd “Left Ctrl” + “Left Shift” ingedrukt om de kleur te mogen wissen.",
+
+  "UserListElement.WarningIPC": "Deze gebruiker is toegevoegd via een externe plugin, en wordt dus niet opgeslagen.",
+  "UserListElement.WarningOldUser": "Deze gebruiker komt van een oude versie.\nOntmoet hem/haar in het spel om het te upgraden naar de nieuwe versie.",
+
+  "IslandWarning": "Het was niet mogelijk voor Pet Nicknames om de eigenaar van het eiland te vinden.\nKeer a.u.b. opnieuw terug naar het eiland.",
+  "IslandWarningGlobal": "Geen Eiland Eigenaar Gevonden",
+
+  "ShareWindow.ExportError": "Geen data beschikbaar.\nLog a.u.b. in met een karakter.",
+  "ShareWindow.ExportSuccess": "Data is geëxporteerd naar je clipboard.",
+  "ShareWindow.ExportErrorGlobal": "Geen Data Beschikbaar",
+  "ShareWindow.ExportSuccessGlobal": "Data geëxporteerd",
+
+  "ShareWindow.ImportError": "Data Importeren Mislukt: {0}",
+  "ShareWindow.ImportSuccess": "Data geïmporteerd van: {0}",
+  "ShareWindow.ImportErrorGlobal": "Data Importeren Mislukt",
+  "ShareWindow.ImportSuccessGlobal": "Data Importeren Gelukt",
+
+  "Download.Redownload": "Opnieuw Downloaden",
+  "Download.Cancel": "Download Stoppen",
+
+  "Config.Title": "Instellingen",
+
+  "Config.Header.GeneralSettings": "Generieke Instellingen",
+  "Config.Header.UISettings": "UI Instellingen",
+  "Config.Header.NativeSettings": "Game Gerelateerde Instellingen",
+  "Config.Header.Debug": "Ontwikkeling",
+  
+  "Config.ProfilePictures": "Download automatisch Profielfotos",
+  "Config.Toggle": "Snelle Knoppen schakelen i.p.v. openen.",
+  "Config.Kofi": "Laat de Ko-fi knop zien.",
+  "Config.Nameplate": "Laat bijnamen op “Nameplates” zien.",
+  "Config.Castbar": "Laat bijnamen op “Cast Bars” zien.",
+  "Config.BattleChat": "Laat bijnamen in “Chat” zien",
+  "Config.Emote": "Laat bijnamen voor “Emotes” zien",
+  "Config.Flyout": "Laat bijnamen in “Flyout Text” zien",
+  "Config.Tooltip": "Laat bijnamen in “Tooltips” zien.",
+  "Config.Notebook": "Laat bijnamen in de “Minion Notebook” zien.",
+  "Config.ActionLog": "Laat bijnamen in de “Action List” zien.",
+  "Config.Targetbar": "Laat bijnamen voor “Targets” zien.",
+  "Config.Partylist": "Laat bijnamen in de “Party List” zien.",
+  "Config.IslandPets": "Laat bijnamen zien voor “Island Pets”.",
+  
+  "Config.DebugMode": "Ontwikkelmodus Aanzetten",
+  "Config.OpenDebugMode": "Automatisch Ontwikkelscherm Openen",
+  "Config.DebugChatcode": "Voeg Code's toe in de Chat.",
+  "Config.DebugMode.Help": "Houd “Left Ctrl” + “Left Shift” ingedrukt om deze knop te mogen gebruiken.",
+
+  "Config.ColourSettings": "Globale Kleurinstellingen",
+
+  "Config.ContextMenu": "Sta “Context Menus” toe.",
+  "Config.ShowNotification": "Laat Notificaties zien.",
+  "Config.IslandWarning": "Laat een waarschuwing zien als de eigenaar van een Eiland niet gevonden is.",
+  "Config.PartyCutoff": "Lange “Casts” mogen worden ingekort..",
+  "Config.PartyCutoff.Help": "Je “Castbars” gaan waarschijnlijk buiten beeld, Pet Nicknames maakt dit probleem erger.\nMet deze instelling worden deze gevallen ingekort.\n\n(Dit is een bug uit de game zelf).",
+
+  "Config.Penumbra.AttachToPCP": "Voeg Pet Nicknames data toe “Penumbra .pcp” bestanden.",
+  "Config.Penumbra.ReadFromPCP": "Lees Pet Nicknames data van “Penumbra .pcp” bestanden uit.",
+
+  "Config.Label.OverrideColour": "Overschrijvende Kleur",
+  "Config.Label.OverrideColourLabel": "Kleur Modus",
+
+  "Kofi.Title": "Ko-fi",
+  "Kofi.Line1": "Dit gaat om echt geld.",
+  "Kofi.Line2": "Hiervan zal ik kattenspeeltjes kopen!",
+  "Kofi.TakeMe": "Naar Ko-fi gaan",
+
+  "Command.Petname": "Open het “Pet Rename” scherm.\n        Typ “/petname help” voor meer informatie over het gebruik van “Commands”.",
+  "Command.Petlist": "Open het “Pet List” scherm.",
+  "Command.PetSettings": "Open het Instellingenscherm.",
+  "Command.PetSharing": "Open het “Sharing” scherm.",
+
+  "ListIconType.Both": "Beide",
+  "ListIconType.Sharing": "Alleen Delen",
+  "ListIconType.ListOnly": "Alleen Lijst",
+
+  "MenuType.Action": "“Action”",
+  "MenuType.Notebook": "“Notebook”",
+  "MenuType.Item": "“Item”",
+
+  "ColourDisplay.Everyone": "Iedereen",
+  "ColourDisplay.OnlyMyself": "Alleen Ik",
+  "ColourDisplay.NoColours": "Niemand",
+
+  "Config.Language": "Plugin Taal",
+  "Config.IconType": "Icoon Type",
+  "Config.ListButtonType": "“List” Knop Type",
+
+  "ShareWindow.Export": "Exporteer naar het Clipboard",
+  "ShareWindow.Import": "Importeer van het Clipboard",
+  "ShareWindow.Explain1": "Je kan bijnamen exporteren naar je Clipboard om deze vervolgens naar een vriend(in) te sturen.",
+  "ShareWindow.Explain2": "Je vriend(in) kan deze vervolgens weer importeren."
+}

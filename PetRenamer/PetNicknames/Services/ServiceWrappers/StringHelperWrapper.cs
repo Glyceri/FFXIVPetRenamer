@@ -2,7 +2,6 @@
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -167,101 +166,111 @@ internal class StringHelperWrapper : IStringHelper
         return true;
     }
     
-    public unsafe void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {
-            return;
+            return false;
         }
         
-        ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
+        bool madeReplacement = ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
 
         atkNode->SetText(seString.EncodeWithNullTerminator());
+        
+        return madeReplacement;
     }
     
-    public unsafe void ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
+    public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
     {
         if (!MakeSeString(atkNode, out SeString? seString))
         {
-            return;
+            return false;
         }
         
-        ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
+        bool madeReplacement = ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
 
         atkNode->SetText(seString.EncodeWithNullTerminator());
+        
+        return madeReplacement;
     }
 
-    public void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
+    public bool ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
     {
         SeString seString = chatMessage.Message;
         
-        ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
+        bool madeReplacement = ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
         
         chatMessage.Message = seString;
+        
+        return madeReplacement;
     }
     
-    public void ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public bool ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         SeString seString = chatMessage.Message;
         
-        ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
+        bool madeReplacement = ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
         
         chatMessage.Message = seString;
+        
+        return madeReplacement;
     }
     
-    private void ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPettablePet? pettablePet, NameType nameType)
+    private bool ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPettablePet? pettablePet, NameType nameType)
     {
         if (pettablePet == null)
         {
-            return;
+            return false;
         }
         
         IPettableUser? owner    = pettablePet.Owner;
         IPetSheetData? petData  = pettablePet.PetData;
         
-        ReplaceSeString(colourConfig, ref seString, petData, nameType, owner);
+        return ReplaceSeString(colourConfig, ref seString, petData, nameType, owner);
     }
     
-    private void ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    private bool ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
         if (petData == null)
         {
-            return;
+            return false;
         }
         
         if (!colourConfig.Enabled)
         {
-            return;
+            return false;
         }
         
         user ??= UserList.LocalPlayer;
         
         if (user == null)
         {
-            return;
+            return false;
         }
         
         string? baseName = PetServices.NameService.GetName(nameType, petData);
         
         if (baseName.IsNullOrWhitespace())
         {
-            return;
+            return false;
         }
         
         string? customName = user.GetCustomName(petData);
         
         if (customName.IsNullOrWhitespace())
         {
-            return;
+            return false;
         }
         
         user.GetDrawColours(petData, colourConfig, out Vector3? edgeColour, out Vector3? textColour);
         
-        ReplaceSeString(ref seString, baseName, customName, edgeColour, textColour);
+        return ReplaceSeString(ref seString, baseName, customName, edgeColour, textColour);
     }
     
-    private void ReplaceSeString(ref SeString seString, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
+    private bool ReplaceSeString(ref SeString seString, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
     {
+        bool hasMadeReplacement = false;
+        
         for (int i = 0; i < seString.Payloads.Count; i++)
         {
             Payload payload = seString.Payloads[i];
@@ -283,12 +292,16 @@ internal class StringHelperWrapper : IStringHelper
             
             List<Payload> newPayloads = CreatePayloadsFromReplace(textPayload.Text, baseString, replaceString, edgeColor, textColor);
             
+            hasMadeReplacement = (newPayloads.Count > 0);
+            
             seString.Payloads.RemoveAt(i);
             
             seString.Payloads.InsertRange(i, newPayloads);
             
             i += newPayloads.Count;
         }
+        
+        return hasMadeReplacement;
     }
 
     public string CleanupString(string str)

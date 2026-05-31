@@ -1,4 +1,7 @@
-﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+﻿using Dalamud.Utility;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Attributes;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using System;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -36,5 +39,57 @@ public readonly struct PetSkeleton : IEquatable<PetSkeleton>
         => HashCode.Combine(SkeletonId, SkeletonType);
 
     public override string ToString()
-        => $"{SkeletonType}: [{SkeletonId}]";
+        => (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}: ") + $"{SkeletonId}";
+    
+    public static PetSkeleton? Parse(string input)
+    {
+        if (input.IsNullOrWhitespace())
+        {
+            return CreateInvalid();
+        }
+        
+        if (input.Length < 2)
+        {
+            return CreateInvalid();
+        }
+        
+        char identifierChar = input[0];
+        
+        SkeletonType foundType = SkeletonType.Invalid;
+        
+        for (int i = 0; i < (int)SkeletonType.COUNT; i++)
+        {
+            SkeletonType skeletonType = (SkeletonType)i;
+            
+            char? symbol = skeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.SymbolChar;
+            
+            if (symbol == null)
+            {
+                continue;
+            }
+            
+            if (symbol != identifierChar)
+            {
+                continue;
+            }
+            
+            foundType = skeletonType;
+           
+            input = input.Remove(0, 1);
+            
+            break;
+        }
+        
+        if (foundType == SkeletonType.Invalid)
+        {
+            return CreateInvalid();
+        }
+        
+        if (!uint.TryParse(input, out uint value))
+        {
+            return CreateInvalid();
+        } 
+        
+        return new PetSkeleton(value, foundType);
+    }
 }

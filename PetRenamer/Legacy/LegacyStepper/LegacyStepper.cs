@@ -33,7 +33,8 @@ internal class LegacyStepper
         legacyStepperElements.Add(new LegacyNamingVer9(petServices));
         legacyStepperElements.Add(new LegacyNamingVer10());
         legacyStepperElements.Add(new LegacyNamingVer11());
-
+        legacyStepperElements.Add(new LegacyNamingVer12());
+        
         foreach (ILegacyStepperElement legacyStepperElement in legacyStepperElements)
         {
             if (legacyStepperElement.OldVersion != configuration.Version)

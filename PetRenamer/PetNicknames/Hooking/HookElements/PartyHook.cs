@@ -49,6 +49,7 @@ internal unsafe class PartyHook : HookableElement
         Update((AtkUnitBase*)args.Addon.Address);
 
         hasRegisteredListener = false;
+        
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
@@ -116,6 +117,8 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
+            member.CastingActionName->TextFlags &= ~(TextFlags.Ellipsis | TextFlags.OverflowHidden);
+            
             string castString = new ReadOnlySeStringSpan(member.CastingActionName->NodeText).ExtractText();
 
             if (castString == string.Empty)
@@ -139,7 +142,19 @@ internal unsafe class PartyHook : HookableElement
             
             data = PetServices.PetSheets.MakeSoft(user, data);
 
-            PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
+            bool replaced = PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnCastbarsColour, member.CastingActionName, data, NameType.Action, user);
+            
+            if (!PetServices.Configuration.allowPartySummonCutoff)
+            {
+                continue;
+            }
+            
+            if (!replaced)
+            {
+                continue;
+            }
+            
+            member.CastingActionName->TextFlags |= (TextFlags.Ellipsis | TextFlags.OverflowHidden);
         }
     }
 }

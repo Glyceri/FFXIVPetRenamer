@@ -3,6 +3,7 @@ using Dalamud.Interface.Windowing;
 using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Components.Header;
 using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
@@ -123,6 +124,9 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     protected virtual void OnModeChange() { }
     protected virtual void OnDispose()    { }
 
+    protected string SpeciesLine
+        => Translator.GetLine($"PetRenameNode.Species{(int)CurrentMode}");
+    
     protected void RequestPetModeChange(PetWindowMode newMode)
     {
         RequestsModeChange = true;

@@ -3,6 +3,7 @@ using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.TranslatorSystem;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Image;
@@ -18,7 +19,7 @@ internal static class PlayerImage
         
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Redownload Profile Picture");
+            ImGui.SetTooltip(Translator.GetLine("Download.Redownload"));
         }
     }
     
@@ -31,7 +32,7 @@ internal static class PlayerImage
         
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Cancel Download");
+            ImGui.SetTooltip(Translator.GetLine("Download.Cancel"));
         }
     }
     

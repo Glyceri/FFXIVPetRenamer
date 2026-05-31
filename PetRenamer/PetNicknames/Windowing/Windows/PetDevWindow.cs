@@ -28,6 +28,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
+using PetRenamer.PetNicknames.Windowing.Components.Image;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
 using System;
 using System.Collections.Generic;
@@ -264,7 +265,7 @@ internal class PetDevWindow : PetWindow
             ImGui.Text(pet.ActionName);
             
             ImGui.TableSetColumnIndex(3);
-            ImGui.Text(pet.Icon.ToString());
+            BoxedImage.DrawMinion(pet, DalamudServices, PetServices.Configuration, new Vector2(64, 64));
         }
         
         ImGui.EndTable();

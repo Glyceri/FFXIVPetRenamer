@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface;
-using Dalamud.Interface.Utility;
 using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -65,11 +64,11 @@ internal static class RenameLabel
 
         ImGui.SameLine();
 
-        shouldActivate |= ColourPicker.Draw($"##EdgeColourPicker_{WindowHandler.InternalCounter}", "Edge Colour", ref edgeColour, new Vector2(height, height));
+        shouldActivate |= ColourPicker.Draw($"##EdgeColourPicker_{WindowHandler.InternalCounter}", Translator.GetLine("ColourPicker.EdgeColour"), ref edgeColour, new Vector2(height, height));
 
         ImGui.SameLine();
 
-        shouldActivate |= ColourPicker.Draw($"##TextColourPicker_{WindowHandler.InternalCounter}", "Text Colour", ref textColour, new Vector2(height, height));
+        shouldActivate |= ColourPicker.Draw($"##TextColourPicker_{WindowHandler.InternalCounter}", Translator.GetLine("ColourPicker.TextColour"), ref textColour, new Vector2(height, height));
 
         return shouldActivate;
     }
