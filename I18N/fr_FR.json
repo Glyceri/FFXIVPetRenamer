@@ -1,3 +1,155 @@
 {
-  
+  "...": "…",
+  "Name": "Personnage",
+  "Homeworld": "Monde d'origine",
+  "Petcount": "Nombre de surnoms",
+
+  "Search": "Rechercher",
+  "DateTime.Unkown": "Date inconnue",
+  "Version.Unkown": "Version inconnue",
+
+  "Language.Default": "Langue du client",
+  "Language.English": "Anglais",
+  "Language.German": "Allemand",
+  "Language.French": "Français",
+  "Language.Japanese": "Japonais",
+  "Language.Dutch": "Néerlandais",
+
+  "ContextMenu.Rename": "Donner un surnom",
+
+  "PetMode": "Mode {0}",
+
+  "PetRenameNode.Species1": "Mascotte",
+  "PetRenameNode.Species2": "Familler",
+  "PetRenameNode.Species3": "Bête",
+
+  "PetRenameNode.Race": "Type",
+  "PetRenameNode.Behaviour": "Comportement",
+  "PetRenameNode.Nickname": "Surnom",
+  "PetRenameNode.Id": "Identifiant",
+
+  "PetRenameNode.Edit": "Modifier",
+  "PetRenameNode.Clear": "Effacer",
+  "PetRenameNode.Save": "Sauvegarder",
+  "PetRenameNode.Cancel": "Annuler",
+
+  "PetRenameNode.PleaseSummonWarningLabel": "Avertissement",
+  "PetRenameNode.PleaseSummonWarning": "Veuillez invoquer un {0}",
+
+  "WindowHandler.Title": "Pet Passport",
+  "PetDev.Title": "Pet Nicknames Development",
+
+  "PetList.Title": "Liste des familiers",
+  "PetList.Navigation": "Navigation",
+  "PetList.UserList": "Liste des personnages",
+  "PetList.MyList": "Ma liste",
+  "PetList.Sharing": "Partage",
+
+  "PetListWindow.ListHeaderPersonalMinion": "Mes mascotte",
+  "PetListWindow.ListHeaderPersonalBattlePet": "Mes familiers",
+  "PetListWindow.ListHeaderOtherMinion": "{0} mascottes",
+  "PetListWindow.ListHeaderOtherBattlePet": "{0} familiers",
+
+  "ColourPicker.EdgeColour": "Couleur des bordures",
+  "ColourPicker.TextColour": "Couleur du texte",
+  "ColourPicker.ClearColour": "Effacer la couleur",
+
+  "ClearButton.Label": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour effacer la saisie.",
+  "ClearButton.ColourLabel": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour effacer la couleur.",
+
+  "UserListElement.WarningIPC": "Ce personnage est temporairement ajouté depuis\nun module externe et ne sera pas enregistré.",
+  "UserListElement.WarningOldUser": "Ce personnage provient d'une ancienne sauvegarde\nVeuillez le croiser à nouveau dans le jeu pour mettre à jour.",
+
+  "IslandWarning": "Pet Nicknames n'a pas reussi à trouver le propriétaire de l'île. Veuillez visiter l'île à nouveau.",
+  "IslandWarningGlobal": "Aucun propriétaire d'île trouvé",
+
+  "ShareWindow.ExportError": "Aucune donnée disponible.{Environment.NewLine}Veuillez vous connecter à un personnage pour exporter vos données.",
+  "ShareWindow.ExportSuccess": "Les données ont été exportées dans votre presse-papiers.{Environment.NewLine}Assurez-vous de coller ces données ailleurs.",
+  "ShareWindow.ExportErrorGlobal": "Aucune donnée disponible",
+  "ShareWindow.ExportSuccessGlobal": "Données exportées avec succès",
+
+  "ShareWindow.ImportError": "Échec de l'importation des données: {0}",
+  "ShareWindow.ImportSuccess": "Données importées avec succès depuis {0}",
+  "ShareWindow.ImportErrorGlobal": "Échec de l'importation des données",
+  "ShareWindow.ImportSuccessGlobal": "Données importées avec succès",
+
+  "Download.Redownload": "Retélécharger l'image de profil",
+  "Download.Cancel": "Annuler le téléchargement",
+
+  "Config.Title": "Paramètres",
+
+  "Config.Header.GeneralSettings": "Paramètres généraux",
+  "Config.Header.UISettings": "Paramètres de l'interface",
+  "Config.Header.NativeSettings": "Paramètres d'affichage",
+  "Config.Header.Debug": "Debug",
+
+  "Config.PVPMessage": "Désactiver le message d'avertissement JcJ.",
+  "Config.ProfilePictures": "Télécharger automatiquement les photos de profil.",
+  "Config.UISettings.UIScale.Header.Title": "Custom UI Scale",
+  "Config.Toggle": "Les boutons rapides affichent/masquent au lieu d'ouvrir.",
+  "Config.Kofi": "Afficher le bouton Ko-fi.",
+  "Config.TransparentBackground": "Le fond devient transparent en cas d'inactivité.",
+  "Config.UIFlare": "Afficher les décorations supplémentaires de l'IU.",
+  "Config.Nameplate": "Afficher les surnoms sur les plaques de nom.",
+  "Config.Castbar": "Show nicknames on Cast bars.",
+  "Config.BattleChat": "Afficher les surnoms dans le chat de combat.",
+  "Config.Emote": "Afficher les surnoms pour les Emotes.",
+  "Config.Flyout": "Show nicknames on Flyout Text.",
+  "Config.Tooltip": "Show nicknames on Tooltips.",
+  "Config.Notebook": "Show nicknames in the Minion Notebook.",
+  "Config.ActionLog": "Show nicknames in the Action List.",
+  "Config.Targetbar": "Show nicknames for Targets.",
+  "Config.Partylist": "Show nicknames on the Party List.",
+
+  "Config.DebugMode": "Activer le mode de débogage",
+  "Config.OpenDebugMode": "Ouvrir automatiquement DebugWindow.",
+  "Config.DebugChatcode": "Insert Chatcodes.",
+  "Config.DebugMode.Help": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour interagir avec ce bouton.",
+
+  "Config.ColourSettings": "Couleurs globales",
+
+  "Config.ContextMenu": "Allow Context Menus.",
+  "Config.ShowNotification": "Afficher les notifications.",
+  "Config.IslandWarning": "Show a warning upon unresolved Island Owner.",
+  "Config.IslandPets": "Show names on Island Pets.",
+  "Config.PartyCutoff": "Allow Long Casts to be Truncated.",
+  "Config.PartyCutoff.Help": "Your castbars might go out of bounds in the party list, PetNicknames worsens this issue.\nWith this setting enabled the castbars will automatically truncate to not overflow the partylist.\n\n(This is a vanilla bug).",
+
+  "Config.Penumbra.AttachToPCP": "Attach Pet Nicknames data to Penumbra .pcp files.",
+  "Config.Penumbra.ReadFromPCP": "Read Pet Nicknames data from Penumbra .pcp files.",
+
+  "Config.Label.OverrideColour": "Override Colour",
+  "Config.Label.OverrideColourLabel": "Colour Mode",
+
+  "Kofi.Title": "Ko-fi",
+  "Kofi.Line1": "This is about real life money.",
+  "Kofi.Line2": "It will be used to my cat toys!",
+  "Kofi.TakeMe": "Take me",
+
+  "Command.Petname": "Opens the Pet Rename window.\n        Type '/petname help' for information on naming via command.",
+  "Command.Petlist": "Opens the Pet List window.",
+  "Command.PetSettings": "Opens the Settings window.",
+  "Command.PetSharing": "Opens the Sharing window.",
+  "Command.PetTheme": "Opens the Colour Editor window.",
+
+  "ListIconType.Both": "Les deux",
+  "ListIconType.Sharing": "Partage",
+  "ListIconType.ListOnly": "List Only",
+
+  "MenuType.Action": "Action",
+  "MenuType.Notebook": "Notebook",
+  "MenuType.Item": "Item",
+
+  "ColourDisplay.Everyone": "Everyone",
+  "ColourDisplay.OnlyMyself": "Only Myself",
+  "ColourDisplay.NoColours": "No Colours",
+
+  "Config.Language": "Plugin Language",
+  "Config.IconType": "Icon Type",
+  "Config.ListButtonType": "List Button Type",
+
+  "ShareWindow.Export": "Export to Clipboard",
+  "ShareWindow.Import": "Import from Clipboard",
+  "ShareWindow.Explain1": "You can export your petnames and send them to a friend.",
+  "ShareWindow.Explain2": "Your friend can in turn import them."
 }
