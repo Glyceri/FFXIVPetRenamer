@@ -10,10 +10,14 @@ internal interface IDirtyListener
     void RegisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry);
     void RegisterOnDirtyDatabase(Action<IPettableDatabase> onDatabase);
     void RegisterOnPlayerCharacterDirty(Action<IPettableUser> user);
+    void RegisterOnDirtyPet(Action<IPettablePet> pet);
+    void RegisterOnDirtyConfig(Action<Configuration> config);
 
     void UnregisterOnDirtyName(Action<INamesDatabase> onNamesDatabase);
     void UnregisterOnDirtyEntry(Action<IPettableDatabaseEntry> onEntry);
     void UnregisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry);
     void UnregisterOnDirtyDatabase(Action<IPettableDatabase> onDatabase);
     void UnregisterOnPlayerCharacterDirty(Action<IPettableUser> user);
+    void UnregisterOnDirtyConfig(Action<Configuration> config);
+    void UnregisterOnDirtyPet(Action<IPettablePet> pet);
 }

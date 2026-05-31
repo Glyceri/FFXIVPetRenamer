@@ -42,7 +42,7 @@ internal abstract class PetActionContextMenu : IContextMenuElement
 
         return _ =>
         {
-            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(petData.Model, true);
+            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(petData.Model);
         };
     }
 }

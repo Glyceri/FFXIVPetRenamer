@@ -11,6 +11,8 @@ internal class DirtyHandler : IDirtyListener, IDirtyCaller
     Action<IPettableDatabaseEntry>? OnClear     = _ => { };
     Action<INamesDatabase>?         OnName      = _ => { };
     Action<IPettableUser>?          OnUser      = _ => { };
+    Action<Configuration>?          OnConfig    = _ => { };
+    Action<IPettablePet>?           OnPet       = _ => { };
 
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {
@@ -35,6 +37,16 @@ internal class DirtyHandler : IDirtyListener, IDirtyCaller
     public void DirtyPlayer(IPettableUser user)
     {
         OnUser?.Invoke(user);   
+    }
+
+    public void DirtyConfig(Configuration configuration)
+    {
+        OnConfig?.Invoke(configuration);
+    }
+
+    public void DirtyPet(IPettablePet pet)
+    {
+        OnPet?.Invoke(pet);
     }
 
     public void RegisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry)
@@ -67,6 +79,18 @@ internal class DirtyHandler : IDirtyListener, IDirtyCaller
         OnUser += user;
     }
 
+    public void RegisterOnDirtyPet(Action<IPettablePet> pet)
+    {
+        OnPet -= pet;
+        OnPet += pet;
+    }
+
+    public void RegisterOnDirtyConfig(Action<Configuration> config)
+    {
+        OnConfig -= config;
+        OnConfig += config;
+    }
+    
     public void UnregisterOnClearEntry(Action<IPettableDatabaseEntry> onEntry)
     {
         OnClear -= onEntry;
@@ -90,5 +114,15 @@ internal class DirtyHandler : IDirtyListener, IDirtyCaller
     public void UnregisterOnPlayerCharacterDirty(Action<IPettableUser> user)
     {
         OnUser -= user;
+    }
+
+    public void UnregisterOnDirtyConfig(Action<Configuration> config)
+    {
+        OnConfig -= config;
+    }
+
+    public void UnregisterOnDirtyPet(Action<IPettablePet> pet)
+    {
+        OnPet -= pet;
     }
 }

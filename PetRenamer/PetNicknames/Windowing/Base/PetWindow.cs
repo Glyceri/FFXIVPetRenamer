@@ -1,40 +1,36 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
-using PetNicknames.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Components.Header;
-using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Base;
 
-internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
+internal abstract class PetWindow : Window, IPetWindow
 {
     private static readonly Vector2 windowPadding    = new Vector2(8, 8);
     private static readonly Vector2 framePadding     = new Vector2(4, 3);
     private static readonly Vector2 itemInnerSpacing = new Vector2(4, 4);
     private static readonly Vector2 itemSpacing      = new Vector2(4, 4);
 
-    public PetWindowMode CurrentMode { get; private set; }
+    public SkeletonType PetMode { get; private set; }
+        = SkeletonType.Minion;
 
     protected abstract Vector2 MinSize     { get; }
     protected abstract Vector2 MaxSize     { get; }
     protected abstract Vector2 DefaultSize { get; }
 
-    protected abstract bool HasModeToggle  { get; }
+    public abstract bool ShowQuickButtons { get; }
+    public abstract bool HasModeToggle    { get; }
 
     protected readonly DalamudServices DalamudServices;
     protected readonly WindowHandler   WindowHandler;
     protected readonly IPetServices    PetServices;
-
-    public bool RequestsModeChange { get; set; }
-
-    public PetWindowMode NewMode { get; set; } 
-        = PetWindowMode.Minion;
-
+    
     private float lastGlobalScale = 0;
 
     protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
@@ -42,7 +38,9 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
         WindowHandler   = windowHandler;
         DalamudServices = dalamudServices;
         PetServices     = petServices;
-
+        
+        PetServices.DirtyListener.RegisterOnDirtyConfig(OnDirtyConfig);
+        
         SizeCondition   = ImGuiCond.FirstUseEver;
         Size            = DefaultSize;
 
@@ -51,6 +49,23 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
             MinimumSize = MinSize,
             MaximumSize = MaxSize,
         };
+        
+        SetupTitlebar();
+    }
+    
+    private void OnDirtyConfig(Configuration _)
+        => SetupTitlebar();
+    
+    private void SetupTitlebar()
+    {
+        TitleBarButtons.Clear();
+    
+        if (!ShowQuickButtons)
+        {
+            return;
+        }
+        
+        TitleBarButtons = HeaderBar.HandleHeaderButtons(WindowHandler, PetServices);
     }
 
     public void Close() 
@@ -58,25 +73,29 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
 
     public void Open()
         => IsOpen = true;
-
-    public void DeclareModeChangedSeen() 
-        => RequestsModeChange = false;
-
-    public void SetPetMode(PetWindowMode mode)
+    
+    public void SetPetMode(SkeletonType mode)
     {
-        if (CurrentMode != mode)
+        if (PetMode == mode)
         {
-            CurrentMode = mode;
-            OnModeChange();
+            return;
         }
+        
+        PetMode = mode;
+        
+        OnModeChange();
     }
-
+    
+    public Vector2 CurrentPosition 
+        { get; private set; } = Vector2.Zero;
+    
     public sealed override void PreDraw()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,    windowPadding * WindowHandler.GlobalScale);
         ImGui.PushStyleVar(ImGuiStyleVar.FramePadding,     framePadding * WindowHandler.GlobalScale);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing,      itemSpacing * WindowHandler.GlobalScale);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing * WindowHandler.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowTitleAlign, new Vector2(0, 0.5f));
 
         float currentGlobalScale = WindowHandler.FontScale;
 
@@ -101,17 +120,21 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     {
         OnLateDraw();
 
-        ImGui.PopStyleVar(4);
+        ImGui.PopStyleVar(5);
     }
 
     public sealed override void Draw()
     {
-        if (HasModeToggle)
+        CurrentPosition = ImGui.GetWindowPos();
+        
+        OnDraw();
+        
+        if (WindowHandler.FocussedWindow != this)
         {
-            HeaderBar.Draw(PetServices, WindowHandler, this);
+            return;
         }
 
-        OnDraw();
+        ImGui.BeginPopup("RenameWindow", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration);
     }
 
     public void NotifyDirty() 
@@ -124,14 +147,11 @@ internal abstract partial class PetWindow : Window, IPetWindow, IPetMode
     protected virtual void OnModeChange() { }
     protected virtual void OnDispose()    { }
 
-    protected string SpeciesLine
-        => Translator.GetLine($"PetRenameNode.Species{(int)CurrentMode}");
+    public bool HasFocus
+        => IsFocused && IsOpen;
     
-    protected void RequestPetModeChange(PetWindowMode newMode)
-    {
-        RequestsModeChange = true;
-        NewMode            = newMode;
-    }
+    protected string SpeciesLine
+        => Translator.GetLine($"PetRenameNode.Species{(int)PetMode}");
 
     public void Dispose() 
         => OnDispose();

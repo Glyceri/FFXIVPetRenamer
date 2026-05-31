@@ -15,11 +15,15 @@ internal class KofiWindow : PetWindow
     protected override Vector2 MaxSize     { get; } = new Vector2(350, 136);
     protected override Vector2 DefaultSize { get; } = new Vector2(350, 136);
 
-    protected override bool HasModeToggle  { get; } = false;
-
     public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
-        : base(windowHandler, dalamudServices, petServices, "Pet Nicknames Kofi-Window") { }
+        : base(windowHandler, dalamudServices, petServices, "Ko-fi") { }
 
+    public override bool ShowQuickButtons
+        => false;
+    
+    public override bool HasModeToggle
+        => false;
+    
     protected override void OnDraw()
     {
         BasicLabel.Draw(Translator.GetLine("Kofi.Line1"), WindowHandler.StretchingBar);

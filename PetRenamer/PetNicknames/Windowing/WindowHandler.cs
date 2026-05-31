@@ -7,7 +7,6 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
-using PetRenamer.PetNicknames.Windowing.Enums;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
@@ -22,9 +21,7 @@ namespace PetRenamer.PetNicknames.Windowing;
 internal class WindowHandler : IWindowHandler
 {
     private static int _internalCounter;
-
-    private PetWindowMode _windowMode = PetWindowMode.Minion;
-
+    
     private readonly DalamudServices    DalamudServices;
     private readonly IPetServices       PetServices;
     private readonly IPettableDatabase  Database;
@@ -37,24 +34,25 @@ internal class WindowHandler : IWindowHandler
     private readonly IPronounHook       PronounHook;
 
     private bool isDirty;
-
+    
+    private IPetWindow? lastFocussedWindow = null;
+    
     public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook)
     {
-        DalamudServices   = dalamudServices;
-        PetServices       = petServices;
-        Database          = pettableDatabase;
-        LegacyDatabase    = legacyDatabase;
-        ImageDatabase     = imageDatabase;
-        DataParser        = dataParser;
-        DataWriter        = dataWriter;
-        SharingDictionary = sharingDictionary;
-        PronounHook       = pronounHook;
+        DalamudServices       = dalamudServices;
+        PetServices           = petServices;
+        Database              = pettableDatabase;
+        LegacyDatabase        = legacyDatabase;
+        ImageDatabase         = imageDatabase;
+        DataParser            = dataParser;
+        DataWriter            = dataWriter;
+        SharingDictionary     = sharingDictionary;
+        PronounHook           = pronounHook;
 
         PetServices.DirtyListener.RegisterOnClearEntry(HandleDirty);
         PetServices.DirtyListener.RegisterOnDirtyEntry(HandleDirty);
         PetServices.DirtyListener.RegisterOnDirtyName(HandleDirty);
-
-
+        
         WindowSystem = new WindowSystem(PluginConstants.pluginName);
 
         DalamudServices.DalamudPlugin.UiBuilder.Draw         += Draw;
@@ -65,6 +63,9 @@ internal class WindowHandler : IWindowHandler
 
         Register();
     }
+    
+    public IPetWindow? FocussedWindow 
+        { get; private set; } = null;
 
     public static int InternalCounter
         => _internalCounter++;
@@ -83,12 +84,6 @@ internal class WindowHandler : IWindowHandler
     public static Vector2 StretchingBar
         => new Vector2(ImGui.GetContentRegionAvail().X, BarHeight);
 
-    public PetWindowMode PetWindowMode
-    {
-        get => _windowMode;
-        set => SetWindowMode(value);
-    }
-
     private void Register()
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
@@ -96,19 +91,16 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
         AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
+        AddWindow(new PetModeWindow(this, DalamudServices, PetServices));
     }
 
     private void AddWindow(PetWindow window)
     {
         WindowSystem.AddWindow(window);
-
-        _ = DalamudServices.Framework.Run(() =>
-        {
-            window.SetPetMode(_windowMode);
-        });
     }
 
-    public void Open<T>() where T : IPetWindow
+    public void Open<T>() 
+        where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
@@ -121,7 +113,8 @@ internal class WindowHandler : IWindowHandler
         }
     }
 
-    public void Close<T>() where T : IPetWindow
+    public void Close<T>() 
+        where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
@@ -134,10 +127,12 @@ internal class WindowHandler : IWindowHandler
         }
     }
 
-    public T? GetWindow<T>() where T : PetWindow
+    public T? GetWindow<T>() 
+        where T : PetWindow
         => WindowSystem.Windows.OfType<T>().FirstOrDefault();
     
-    public void Toggle<T>() where T : IPetWindow
+    public void Toggle<T>() 
+        where T : IPetWindow
     {
         foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
         {
@@ -147,16 +142,6 @@ internal class WindowHandler : IWindowHandler
             }
 
             tWindow.Toggle();
-        }
-    }
-
-    public void SetWindowMode(PetWindowMode mode)
-    {
-        _windowMode = mode;
-
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            window.SetPetMode(mode);
         }
     }
 
@@ -171,17 +156,52 @@ internal class WindowHandler : IWindowHandler
         _internalCounter = 0;
 
         WindowSystem.Draw();
-
-        if (isDirty)
+        
+        HandleFocussedWindow();
+        
+        if (!isDirty)
         {
-            HandleDirty();
-
-            isDirty = false;
+            return;
         }
-
-        HandleModeChange();
+        
+        isDirty = false;
+        
+        HandleDirty();
     }
-
+    
+    private void HandleFocussedWindow()
+    {
+        FocussedWindow = null;
+        
+        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
+        {
+            if (!window.HasFocus || !window.HasModeToggle)
+            {
+                continue;
+            }
+            
+            FocussedWindow = window;
+            
+            break;
+        }
+        
+        if (lastFocussedWindow == FocussedWindow)
+        {
+            return;
+        }
+        
+        lastFocussedWindow = FocussedWindow;
+        
+        if (FocussedWindow != null)
+        {
+            Open<PetModeWindow>();
+        }
+        else
+        {
+            Close<PetModeWindow>();
+        }
+    }
+    
     private void HandleDirty()
     {
         foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
@@ -190,32 +210,12 @@ internal class WindowHandler : IWindowHandler
         }
     }
 
-    private void HandleModeChange()
-    {
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            if (!window.RequestsModeChange)
-            {
-                continue;
-            }
-
-            _ = DalamudServices.Framework.Run(() =>
-            {
-                SetWindowMode(window.NewMode);
-            });
-
-            window.DeclareModeChangedSeen();
-
-            break;
-        }
-    }
-
     public void Dispose()
     {
         DalamudServices.DalamudPlugin.UiBuilder.Draw -= Draw;
 
         ClearAllWindows();
-
+        
         ComponentLibrary.Dispose();
     }
 

@@ -13,23 +13,32 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetConfigWindow : PetWindow
 {
-    protected override Vector2  MinSize         { get; } = new Vector2(400, 200);
-    protected override Vector2  MaxSize         { get; } = new Vector2(400, 1200);
-    protected override Vector2  DefaultSize     { get; } = new Vector2(400, 500);
-
-    protected override bool     HasModeToggle   { get; } = true;
-
     private readonly Dictionary<string, bool> ThirdPartySupported = new Dictionary<string, bool>()
     {
         { "Penumbra", false },
     };
     
     public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
-        : base(windowHandler, dalamudServices, petServices, "Pet Config Window")
+        : base(windowHandler, dalamudServices, petServices, "Pet Settings")
     {
         PetServices.PluginWatcher.RegisterListener(OnPluginChanged);
     }
+    
+    public override bool ShowQuickButtons
+        => true;
+    
+    public override bool HasModeToggle
+        => false;
 
+    protected override Vector2 MinSize
+        => new Vector2(400, 200);
+    
+    protected override Vector2 MaxSize
+        => new Vector2(400, 1200);
+    
+    protected override Vector2 DefaultSize 
+        => new Vector2(400, 500);
+    
     private static readonly string[] _listIconTypes   = ["ListIconType.Both", "ListIconType.Sharing", "ListIconType.ListOnly"];
     private static readonly string[] _iconMenuTypes   = ["MenuType.Action", "MenuType.Notebook", "MenuType.Item"];
     private static readonly string[] _colourDisplay   = ["ColourDisplay.Everyone", "ColourDisplay.OnlyMyself", "ColourDisplay.NoColours"];
@@ -302,6 +311,7 @@ internal class PetConfigWindow : PetWindow
     
     private void SavePlugin()
     {
+        PetServices.DirtyCaller.DirtyConfig(PetServices.Configuration);
         PetServices.UserList.Recalculate();
         PetServices.Configuration.Save();
     }

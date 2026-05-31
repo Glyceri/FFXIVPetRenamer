@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -10,102 +11,126 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Image;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
-using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Numerics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using System;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetRenameWindow : PetWindow
 {
-    protected override Vector2 MinSize     { get; } = new Vector2(570, 250);
-    protected override Vector2 MaxSize     { get; } = new Vector2(1500, 250);
-    protected override Vector2 DefaultSize { get; } = new Vector2(570, 250);
-
-    protected override bool HasModeToggle  { get; } = true;
-
-    private IPettableUser?           ActiveUser;
-    private ulong                    lastContentID   = 0;
-    private PetSkeleton              activeSkeleton  = PetSkeleton.CreateInvalid();
-    private string?                  lastCustomName  = null!;
-    private bool                     isContextOpen   = false;
-
-    private string                   ActiveCustomName = string.Empty;
-    private string                   ActualCustomName = string.Empty;
-    private Vector3?                 ActiveEdgeColour = null;
-    private Vector3?                 ActiveTextColour = null;
-    private IPetSheetData?           ActivePetData;
-    private ISharedImmediateTexture? ActivePetTexture;
+    private PetSkeleton?             ActiveSkeleton;
+    
+    private string                   ActiveCustomName   = string.Empty;
+    private string                   EditableCustomName = string.Empty;
+    private Vector3?                 ActiveEdgeColour   = null;
+    private Vector3?                 ActiveTextColour   = null;
+    private IPetSheetData?           ActivePetData      = null;
+    private ISharedImmediateTexture? ActivePetTexture   = null;
 
     public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
-        : base(windowHandler, dalamudServices, petServices, "Pet Rename Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        : base(windowHandler, dalamudServices, petServices, "Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyPlayerChar);
+        PetServices.DirtyListener.RegisterOnDirtyPet(DirtyPet);
+        PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyUser);
+        PetServices.DirtyListener.RegisterOnDirtyName(DirtyName);
     }
 
     protected override void OnDispose()
     {
-        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(DirtyPlayerChar);
+        PetServices.DirtyListener.UnregisterOnDirtyName(DirtyName);
+        PetServices.DirtyListener.UnregisterOnDirtyPet(DirtyPet);
+        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(DirtyUser);
     }
 
-    public void SetRenameWindow(PetSkeleton forSkeleton, bool open)
+    public override bool HasModeToggle 
+        => true;
+    
+    public override bool ShowQuickButtons
+        => true;
+
+    protected override Vector2 MinSize  
+        => new Vector2(570, 210);
+    
+    protected override Vector2 MaxSize 
+        => new Vector2(1500, 210);
+    
+    protected override Vector2 DefaultSize
+        => MinSize;
+    
+    public void SetRenameWindow(PetSkeleton forSkeleton)
     {
-        activeSkeleton = forSkeleton;
-        isContextOpen  = true;
-        ActiveUser     = PetServices.UserList.LocalPlayer;
-        lastContentID  = ActiveUser?.ContentId ?? 0;
-
-        if (open)
+        switch (forSkeleton.SkeletonType)
         {
-            IsOpen = true;
+            case SkeletonType.Minion:      SetPetMode(SkeletonType.Minion);      break;
+            case SkeletonType.BattlePet:   SetPetMode(SkeletonType.BattlePet);   break;
+            case SkeletonType.BeastMaster: SetPetMode(SkeletonType.BeastMaster); break;
         }
+        
+        IsOpen         = true;
+        ActiveSkeleton = forSkeleton;
 
-        if (forSkeleton.SkeletonType == SkeletonType.Minion)
-        {
-            SetPetMode(PetWindowMode.Minion);
-        }
-        else
-        {
-            SetPetMode(PetWindowMode.BattlePet);
-        }
-
-        SetNewNode();
+        Refresh();
     }
 
     public override void OnOpen() 
     {
-        if (isContextOpen)
+        if (ActiveSkeleton != null)
         {
             return;
         }
-
-        OnDraw();
+        
         GetActiveSkeleton();
     }
 
-    private void DirtyPlayerChar(IPettableUser user)
+    private void DirtyName(INamesDatabase nameDatabase)
     {
-        if (user != ActiveUser)
+        if (ActiveSkeleton == null)
         {
             return;
         }
-
-        OnDirty();
+        
+        string? name = nameDatabase.GetName(ActiveSkeleton.Value);
+        
+        if (name == ActiveCustomName)
+        {
+            return;
+        }
+        
+        Refresh();
     }
-
-    protected override void OnDirty()
+    
+    private void DirtyUser(IPettableUser user)
     {
-        if (isContextOpen)
+        if (!user.IsLocalPlayer)
         {
-            SetNewNode();
-
+            return;
+        }
+        
+        Refresh();
+    }
+    
+    private void DirtyPet(IPettablePet pet)
+    {
+        if (ActiveSkeleton != null)
+        {
+            return;
+        }
+        
+        if (pet.Owner == null)
+        {
+            return;
+        }
+        
+        if (!pet.Owner.IsLocalPlayer)
+        {
             return;
         }
 
-        GetActiveSkeleton();
+        ActiveSkeleton = pet.SkeletonId;
+        
+        Refresh();
     }
 
     protected override void OnModeChange()
@@ -115,143 +140,105 @@ internal class PetRenameWindow : PetWindow
 
     protected override void OnDraw()
     {
-        Handle();
         DrawElement();
-    }
-
-    private void Handle()
-    {
-        ActiveUser = PetServices.UserList.LocalPlayer;
-
-        if (lastContentID != ActiveUser?.ContentId)
-        {
-            lastContentID = ActiveUser?.ContentId ?? 0;
-            isContextOpen = false;
-
-            GetActiveSkeleton();
-        }
     }
 
     private void GetActiveSkeleton()
     {
-        if (ActiveUser == null)
+        ActiveSkeleton = null;
+        
+        CleanOldNode();
+        
+        if (PetServices.UserList.LocalPlayer == null)
         {
-            CleanOldNode();
-
             return;
         }
-
-        IPettablePet? pet = ActiveUser.GetYoungestPet(CurrentMode == PetWindowMode.Minion ? SkeletonType.Minion : SkeletonType.BattlePet);
+        
+        IPettablePet? pet = PetServices.UserList.LocalPlayer.GetYoungestPet(PetMode);
         
         if (pet == null)
         {
-            activeSkeleton = PetSkeleton.CreateInvalid();
-
-            CleanOldNode();
-
             return;
         }
-
-        SetPet(pet);
+        
+        ActiveSkeleton = pet.SkeletonId;
+        
+        Refresh();
     }
-
-    private void SetPet(IPettablePet pet)
+    
+    private void Refresh()
     {
-        if (ActiveUser == null)
-        {
-            return;
-        }
-
-        bool dirty         = activeSkeleton != pet.SkeletonId;
-
-        string? customName = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
-
-        if (lastCustomName != customName)
-        {
-            lastCustomName = customName;
-            dirty          = true;
-        }
-
-        activeSkeleton = pet.SkeletonId;
-
-        if (dirty)
-        {
-            SetNewNode();
-        }
-    }
-
-    private void SetNewNode()
-    {
+        CleanOldNode();
+        
         if (!IsOpen)
         {
             return;
         }
-
-        if (ActiveUser == null)
+        
+        if (PetServices.UserList.LocalPlayer == null)
         {
             return;
         }
 
-        if (activeSkeleton.IsInvalid())
+        if (ActiveSkeleton == null)
         {
             return;
         }
-
-        IPetSheetData? data = PetServices.PetSheets.GetPet(activeSkeleton);
+        
+        IPetSheetData? data = PetServices.PetSheets.GetPet(ActiveSkeleton.Value);
 
         if (data == null)
         {
             return;
         }
+        
+        string? customName  = PetServices.UserList.LocalPlayer.DataBaseEntry.GetName(ActiveSkeleton.Value);
+        
+        Vector3? edgeColour = PetServices.UserList.LocalPlayer.DataBaseEntry.GetEdgeColour(ActiveSkeleton.Value);
+        Vector3? textColour = PetServices.UserList.LocalPlayer.DataBaseEntry.GetTextColour(ActiveSkeleton.Value);
 
-        string? customName  = ActiveUser.DataBaseEntry.GetName(activeSkeleton);
-
-        lastCustomName      = customName;
-
-        Vector3? edgeColour = ActiveUser.DataBaseEntry.GetEdgeColour(activeSkeleton);
-        Vector3? textColour = ActiveUser.DataBaseEntry.GetTextColour(activeSkeleton);
-
-        Setup(customName, edgeColour, textColour, in data);
+        Setup(customName, edgeColour, textColour, data);
     }
 
     private void CleanOldNode() 
         => Setup(null, null, null, null);
 
-    private void Setup(string? customName, Vector3? edgeColour, Vector3? textColour, in IPetSheetData? petData)
+    private void Setup(string? customName, Vector3? edgeColour, Vector3? textColour, IPetSheetData? petData)
     {
-        ActiveCustomName = customName ?? string.Empty;
-        ActualCustomName = ActiveCustomName;
-        ActiveEdgeColour = edgeColour;
-        ActiveTextColour = textColour;
-        ActivePetData    = petData;
-
-        if (petData != null)
+        ActiveCustomName   = customName ?? string.Empty;
+        EditableCustomName = ActiveCustomName;
+        ActiveEdgeColour   = edgeColour;
+        ActiveTextColour   = textColour;
+        ActivePetData      = petData;
+        ActivePetTexture   = null;
+        
+        if (ActivePetData == null)
         {
-            ActivePetTexture = DalamudServices.TextureProvider.GetFromGameIcon(petData.Icon);
+            return;
         }
-        else
-        {
-            ActivePetTexture = null;
-        }
+        
+        ActivePetTexture = DalamudServices.TextureProvider.GetFromGameIcon(ActivePetData.Icon);
     }
 
-    private void OnSave(string? newName, Vector3? edgeColour, Vector3? textColour)
-        => ActiveUser?.DataBaseEntry?.SetName(activeSkeleton, newName ?? string.Empty, edgeColour, textColour);
+    private void OnSave(PetSkeleton skeletonId, string? newName, Vector3? edgeColour, Vector3? textColour)
+        => PetServices.UserList.LocalPlayer?.DataBaseEntry.SetName(skeletonId, newName ?? string.Empty, edgeColour, textColour);
     
     private void DrawElement()
     {
         ImGuiStylePtr stylePtr = ImGui.GetStyle();
-        float framePaddingX    = stylePtr.ItemSpacing.X;
+        Vector2       region   = ImGui.GetContentRegionAvail();
+        
+        float   framePaddingX  = stylePtr.ItemSpacing.X;
+        float   regionHeight   = region.Y;
 
-        Vector2 region = ImGui.GetContentRegionAvail();
-        float regionHeight = region.Y;
-
-        if (Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
+        if (!Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
         {
-            DrawInternals();
-
-            Listbox.End();
+            return;
         }
+        
+        DrawInternals();
+
+        Listbox.End();
 
         ImGui.SameLine();
 
@@ -260,29 +247,36 @@ internal class PetRenameWindow : PetWindow
 
     private void DrawInternals()
     {
-        if (ActivePetData == null)
-        {
-            string summonWarningLine = Translator.GetLine("PetRenameNode.PleaseSummonWarning");
-            string outputLine        = string.Format(summonWarningLine, SpeciesLine);
-            
-            CenteredLabel.Draw(outputLine, new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, WindowHandler.BarHeight));
-        }
-        else
+        if (ActivePetData != null)
         {
             DrawPetData();
+            
+            return;
         }
+        
+        string summonWarningLine = Translator.GetLine("PetRenameNode.PleaseSummonWarning");
+        string outputLine        = string.Format(summonWarningLine, SpeciesLine);
+        
+        CenteredLabel.Draw(outputLine, new Vector2(ImGui.GetContentRegionAvail().X * 0.8f, WindowHandler.BarHeight));
     }
 
     private void DrawPetData()
     {
-        LabledLabel.Draw($"{SpeciesLine}:", ActivePetData?.Singular ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:", ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData?.RaceName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-
-        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == ActualCustomName, ref ActiveCustomName, ref ActiveEdgeColour, ref ActiveTextColour, WindowHandler.StretchingBar))
+        if (ActiveSkeleton == null)
         {
-            OnSave(ActiveCustomName, ActiveEdgeColour, ActiveTextColour);
+            return;
+        }
+        
+        LabledLabel.Draw($"{SpeciesLine}:",                                   ActivePetData?.Singular         ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:",        ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:",      ActivePetData?.RaceName         ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName    ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+
+        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == EditableCustomName, ref EditableCustomName, ref ActiveEdgeColour, ref ActiveTextColour, WindowHandler.StretchingBar))
+        {
+            EditableCustomName = EditableCustomName.Replace(Environment.NewLine, string.Empty);
+            
+            OnSave(ActiveSkeleton.Value, EditableCustomName, ActiveEdgeColour, ActiveTextColour);
         }
 
         ActiveCustomName = ActiveCustomName.Replace(Environment.NewLine, string.Empty);

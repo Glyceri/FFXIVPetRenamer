@@ -65,7 +65,7 @@ internal class TargetContextMenu : IContextMenuElement
 
         return _ =>
         {
-            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId, true);
+            WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId);
         };
     }
 }

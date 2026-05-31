@@ -1,17 +1,22 @@
-﻿using PetRenamer.PetNicknames.Windowing.Enums;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using System;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Interfaces;
 
 internal interface IPetWindow : IDisposable
 {
+    SkeletonType PetMode { get; }
+    
     void Open();
     void Close();
     void Toggle();
 
-    void SetPetMode(PetWindowMode mode);
+    void SetPetMode(SkeletonType mode);
     void NotifyDirty();
-    bool RequestsModeChange { get; set; }
-    PetWindowMode NewMode { get; set; }
-    void DeclareModeChangedSeen();
+    
+    bool HasFocus { get; }
+    bool HasModeToggle  { get; }
+    
+    Vector2 CurrentPosition { get; }
 }

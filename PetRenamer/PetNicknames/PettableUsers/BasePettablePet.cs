@@ -39,6 +39,8 @@ internal abstract unsafe class BasePettablePet : IPettablePet
             PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");
         }
 
+        PetServices.DirtyCaller.DirtyPet(this);
+        
         Recalculate();
     }
 

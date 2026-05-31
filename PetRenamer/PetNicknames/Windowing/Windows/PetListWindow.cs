@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -6,7 +7,6 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using System;
 using System.Numerics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Windowing.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
@@ -23,6 +23,7 @@ using Dalamud.Interface.ImGuiNotification;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -60,7 +61,7 @@ internal class PetListWindow : PetWindow
     private DateTime lastTime = DateTime.Now;
 
     public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
-        : base(windowHandler, dalamudServices, petServices, "Pet List Window")
+        : base(windowHandler, dalamudServices, petServices, "Pet List")
     {
         Database        = database;
         LegacyDatabase  = legacyDatabase;
@@ -78,9 +79,12 @@ internal class PetListWindow : PetWindow
     protected override Vector2 DefaultSize
         => new Vector2(800, 500);
 
-    protected override bool HasModeToggle
+    public override bool HasModeToggle
         => true;
 
+    public override bool ShowQuickButtons
+        => true;
+    
     public override void OnOpen()
     {
         ClearSearchBar();
@@ -581,7 +585,7 @@ internal class PetListWindow : PetWindow
         List<Vector3?>    validEdgeColours = [..names.EdgeColours];
         List<Vector3?>    validTextColours = [..names.TextColours];
 
-        if (isLocalEntry && PetWindowMode.BattlePet == CurrentMode)
+        if (isLocalEntry && SkeletonType.BattlePet == PetMode)
         {
             List<IPetSheetData> data = PetServices.PetSheets.GetMissingBattlePets(validIds);
 
@@ -598,19 +602,14 @@ internal class PetListWindow : PetWindow
 
         for (int i = 0; i < newLength; i++)
         {
-            PetSkeleton ID = validIds[i];
+            PetSkeleton id = validIds[i];
 
-            if (PetWindowMode.Minion == CurrentMode && ID.SkeletonType != SkeletonType.Minion)
+            if (id.SkeletonType != PetMode)
             {
                 continue;
             }
 
-            if (PetWindowMode.BattlePet == CurrentMode && ID.SkeletonType != SkeletonType.BattlePet)
-            {
-                continue;
-            }
-
-            IPetSheetData? petData = PetServices.PetSheets.GetPet(ID);
+            IPetSheetData? petData = PetServices.PetSheets.GetPet(id);
 
             if (petData == null)
             {
@@ -621,7 +620,7 @@ internal class PetListWindow : PetWindow
             Vector3? edgeColour = validEdgeColours[i];
             Vector3? textColour = validTextColours[i];
 
-            if (!(Valid(name) || Valid(ID.SkeletonId.ToString()) || Valid(petData.Singular)))
+            if (!(Valid(name) || Valid(id.SkeletonId.ToString()) || Valid(petData.Singular)))
             {
                 continue;
             }

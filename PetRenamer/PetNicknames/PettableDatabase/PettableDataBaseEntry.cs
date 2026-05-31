@@ -129,7 +129,6 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     public void SetName(PetSkeleton skeletonId, string? name, Vector3? edgeColour, Vector3? textColour)
         => ActiveDatabase.SetName(skeletonId, name, edgeColour, textColour);
-    
 
     public PetSkeleton? GetSoftSkeleton(int softIndex)
     {

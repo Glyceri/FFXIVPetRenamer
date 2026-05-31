@@ -37,7 +37,7 @@ internal interface IPettableDatabaseEntry
     Vector3? GetTextColour(PetSkeleton skeletonId);
     PetSkeleton? GetSoftSkeleton(int softIndex);
     void SetSoftSkeleton(int index, PetSkeleton softSkeleton);
-    void SetName(PetSkeleton skeletonId, string name, Vector3? edgeColour, Vector3? textColour);
+    void SetName(PetSkeleton skeletonId, string? name, Vector3? edgeColour, Vector3? textColour);
 
     void Clear(ParseSource parseSource);
     void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);

@@ -13,6 +13,7 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
+using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
@@ -47,7 +48,6 @@ internal class PetDevWindow : PetWindow
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 400);
-    protected override bool HasModeToggle { get; } = true;
 
     int currentActive = 0;
     List<DevStruct> devStructList = new List<DevStruct>();
@@ -59,6 +59,10 @@ internal class PetDevWindow : PetWindow
         PetServices = petServices;
         SharingDictionary = sharingDictionary;
         PronounHook = pronounHook;
+        
+        RespectCloseHotkey   = false;
+        DisableWindowSounds  = true;
+        DisableFadeInFadeOut = true;
         
         if (PetServices.Configuration.debugModeActive && PetServices.Configuration.openDebugWindowOnStart)
         {
@@ -75,10 +79,17 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Sheets",     DrawSheets));
         devStructList.Add(new DevStruct("Hover",      DrawHover));
         devStructList.Add(new DevStruct("Pronoun",    DrawPronoun));
+        devStructList.Add(new DevStruct("Windowing",  DrawWindowing));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
 
+    public override bool ShowQuickButtons
+        => true;
+    
+    public override bool HasModeToggle
+        => false;
+    
     public override void OnOpen()
     {
         if (devStructList.Count <= currentActive)
@@ -138,6 +149,11 @@ internal class PetDevWindow : PetWindow
         }
     }
 
+    private void DrawWindowing()
+    {
+        ImGui.Text($"Focussed Window: {WindowHandler.FocussedWindow}");
+    }
+    
     private void DrawPronoun()
     {
         ImGui.Text("Current Pronoun: ");

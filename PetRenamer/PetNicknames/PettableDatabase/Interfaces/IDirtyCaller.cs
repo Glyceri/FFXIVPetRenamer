@@ -9,4 +9,6 @@ internal interface IDirtyCaller
     void ClearEntry(in IPettableDatabaseEntry entry);
     void DirtyDatabase(in IPettableDatabase database);
     void DirtyPlayer(IPettableUser user);
+    void DirtyConfig(Configuration configuration);
+    void DirtyPet(IPettablePet pet);
 }

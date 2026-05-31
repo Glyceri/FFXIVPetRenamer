@@ -1,5 +1,6 @@
 ﻿using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.Text.SeStringHandling;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Labels;
