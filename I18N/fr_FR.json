@@ -34,7 +34,7 @@
   "PetRenameNode.Cancel": "Annuler",
 
   "PetRenameNode.PleaseSummonWarningLabel": "Avertissement",
-  "PetRenameNode.PleaseSummonWarning": "Veuillez invoquer un {0}",
+  "PetRenameNode.PleaseSummonWarning": "Veuillez invoquer un(e) {0}",
 
   "WindowHandler.Title": "Pet Passport",
   "PetDev.Title": "Pet Nicknames Development",
@@ -98,8 +98,8 @@
   "Config.Tooltip": "Show nicknames on Tooltips.",
   "Config.Notebook": "Show nicknames in the Minion Notebook.",
   "Config.ActionLog": "Show nicknames in the Action List.",
-  "Config.Targetbar": "Show nicknames for Targets.",
-  "Config.Partylist": "Show nicknames on the Party List.",
+  "Config.Targetbar": "Afficher les surnoms pour les cibles.",
+  "Config.Partylist": "Afficher les surnoms dans l'équipe.",
 
   "Config.DebugMode": "Activer le mode de débogage",
   "Config.OpenDebugMode": "Ouvrir automatiquement DebugWindow.",
@@ -108,48 +108,48 @@
 
   "Config.ColourSettings": "Couleurs globales",
 
-  "Config.ContextMenu": "Allow Context Menus.",
+  "Config.ContextMenu": "Autoriser les menus contextuels.",
   "Config.ShowNotification": "Afficher les notifications.",
-  "Config.IslandWarning": "Show a warning upon unresolved Island Owner.",
+  "Config.IslandWarning": "Afficher un avertissement un cas de propriétaire d'île introuvable.",
   "Config.IslandPets": "Show names on Island Pets.",
   "Config.PartyCutoff": "Allow Long Casts to be Truncated.",
   "Config.PartyCutoff.Help": "Your castbars might go out of bounds in the party list, PetNicknames worsens this issue.\nWith this setting enabled the castbars will automatically truncate to not overflow the partylist.\n\n(This is a vanilla bug).",
 
-  "Config.Penumbra.AttachToPCP": "Attach Pet Nicknames data to Penumbra .pcp files.",
-  "Config.Penumbra.ReadFromPCP": "Read Pet Nicknames data from Penumbra .pcp files.",
+  "Config.Penumbra.AttachToPCP": "Stocker les données Pet Nicknames dans les fichiers Penumbra .pcp.",
+  "Config.Penumbra.ReadFromPCP": "Récupérer les données de Pet Nicknames depuis des fichiers Penumbra .pcp.",
 
-  "Config.Label.OverrideColour": "Override Colour",
-  "Config.Label.OverrideColourLabel": "Colour Mode",
+  "Config.Label.OverrideColour": "Écraser la couleur",
+  "Config.Label.OverrideColourLabel": "Mode de couleur",
 
   "Kofi.Title": "Ko-fi",
   "Kofi.Line1": "This is about real life money.",
-  "Kofi.Line2": "It will be used to my cat toys!",
-  "Kofi.TakeMe": "Take me",
+  "Kofi.Line2": "Il sera utilisé pour les jouets de mes chats !",
+  "Kofi.TakeMe": "Je donne",
 
   "Command.Petname": "Opens the Pet Rename window.\n        Type '/petname help' for information on naming via command.",
   "Command.Petlist": "Opens the Pet List window.",
-  "Command.PetSettings": "Opens the Settings window.",
-  "Command.PetSharing": "Opens the Sharing window.",
-  "Command.PetTheme": "Opens the Colour Editor window.",
+  "Command.PetSettings": "Affiche la fenêtre des paramètres.",
+  "Command.PetSharing": "Affiche la fenêtre de partage.",
+  "Command.PetTheme": "Ouvre la fenêtre d'édition des couleurs.",
 
   "ListIconType.Both": "Les deux",
   "ListIconType.Sharing": "Partage",
-  "ListIconType.ListOnly": "List Only",
+  "ListIconType.ListOnly": "Liste uniquement",
 
   "MenuType.Action": "Action",
-  "MenuType.Notebook": "Notebook",
-  "MenuType.Item": "Item",
+  "MenuType.Notebook": "Bloc-notes",
+  "MenuType.Item": "Objet",
 
-  "ColourDisplay.Everyone": "Everyone",
-  "ColourDisplay.OnlyMyself": "Only Myself",
-  "ColourDisplay.NoColours": "No Colours",
+  "ColourDisplay.Everyone": "Tout le monde",
+  "ColourDisplay.OnlyMyself": "Moi uniquement",
+  "ColourDisplay.NoColours": "Aucune couleur",
 
-  "Config.Language": "Plugin Language",
-  "Config.IconType": "Icon Type",
+  "Config.Language": "Langue du plugin",
+  "Config.IconType": "Type d'icône",
   "Config.ListButtonType": "List Button Type",
 
-  "ShareWindow.Export": "Export to Clipboard",
-  "ShareWindow.Import": "Import from Clipboard",
-  "ShareWindow.Explain1": "You can export your petnames and send them to a friend.",
-  "ShareWindow.Explain2": "Your friend can in turn import them."
+  "ShareWindow.Export": "Exporter vers le presse-papiers",
+  "ShareWindow.Import": "Importer depuis le presse-papiers",
+  "ShareWindow.Explain1": "Vous pouvez exporter vos surnoms et les envoyer à un·e ami·e.",
+  "ShareWindow.Explain2": "Votre ami peut à son tour les importer."
 }
