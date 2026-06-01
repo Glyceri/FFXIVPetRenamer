@@ -36,7 +36,7 @@
   "PetRenameNode.PleaseSummonWarningLabel": "Avertissement",
   "PetRenameNode.PleaseSummonWarning": "Veuillez invoquer un(e) {0}",
 
-  "WindowHandler.Title": "Pet Passport",
+  "WindowHandler.Title": "Passeport du compagnon",
   "PetDev.Title": "Pet Nicknames Development",
 
   "PetList.Title": "Liste des familiers",
@@ -85,7 +85,7 @@
 
   "Config.PVPMessage": "Désactiver le message d'avertissement JcJ.",
   "Config.ProfilePictures": "Télécharger automatiquement les photos de profil.",
-  "Config.UISettings.UIScale.Header.Title": "Custom UI Scale",
+  "Config.UISettings.UIScale.Header.Title": "Taille personnalisée de l'IU",
   "Config.Toggle": "Les boutons rapides affichent/masquent au lieu d'ouvrir.",
   "Config.Kofi": "Afficher le bouton Ko-fi.",
   "Config.TransparentBackground": "Le fond devient transparent en cas d'inactivité.",
@@ -122,7 +122,7 @@
   "Config.Label.OverrideColourLabel": "Mode de couleur",
 
   "Kofi.Title": "Ko-fi",
-  "Kofi.Line1": "This is about real life money.",
+  "Kofi.Line1": "Cela concerne de l'argent réel.",
   "Kofi.Line2": "Il sera utilisé pour les jouets de mes chats !",
   "Kofi.TakeMe": "Je donne",
 
@@ -146,7 +146,7 @@
 
   "Config.Language": "Langue du plugin",
   "Config.IconType": "Type d'icône",
-  "Config.ListButtonType": "List Button Type",
+  "Config.ListButtonType": "Type de la liste des boutons",
 
   "ShareWindow.Export": "Exporter vers le presse-papiers",
   "ShareWindow.Import": "Importer depuis le presse-papiers",
