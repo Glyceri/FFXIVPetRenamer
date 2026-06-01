@@ -160,7 +160,7 @@ internal class PettableDatabase : IPettableDatabase
     {
         bool isFromIPC = parseSource == ParseSource.IPC;
 
-        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentID);
+        IPettableDatabaseEntry entry = GetEntry(parseResult.ContentId);
 
         entry.UpdateEntry(parseResult, parseSource);
 

@@ -83,8 +83,15 @@ internal class SheetsWrapper : IPetSheets
     public PetMirage? GetPetMirage(uint petMirageId)
         => petMirageId != 0 ? PetMirageSheet.GetRow(petMirageId) : null;
 
-    public string GetWorldName(ushort worldId) 
-        => WorldSheet.GetRow(worldId).InternalName.ExtractText();
+    public string GetWorldName(ushort worldId)
+    {
+        if (WorldSheet.TryGetRow(worldId, out World world))
+        {
+            return world.InternalName.ExtractText();
+        }
+        
+        return string.Empty;
+    }
 
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
         => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);

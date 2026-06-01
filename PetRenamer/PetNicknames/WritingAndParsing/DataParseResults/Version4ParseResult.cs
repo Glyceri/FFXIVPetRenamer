@@ -8,7 +8,7 @@ internal class Version4ParseResult : IModernParseResult
 {
     public string        UserName      { get; }
     public ushort        Homeworld     { get; }
-    public ulong         ContentID     { get; }
+    public ulong         ContentId     { get; }
     public PetSkeleton[] SoftSkeletons { get; }
     public PetSkeleton[] IDs           { get; }
 
@@ -20,7 +20,7 @@ internal class Version4ParseResult : IModernParseResult
     {
         UserName      = username;
         Homeworld     = homeworld;
-        ContentID     = contentID;
+        ContentId     = contentID;
         SoftSkeletons = softSkeletons;
         IDs           = ids;
         Names         = names;

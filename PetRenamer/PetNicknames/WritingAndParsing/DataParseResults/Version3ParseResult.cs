@@ -9,7 +9,7 @@ internal class Version3ParseResult : IModernParseResult
 {
     public string        UserName      { get; }
     public ushort        Homeworld     { get; }
-    public ulong         ContentID     { get; }
+    public ulong         ContentId     { get; }
     public PetSkeleton[] SoftSkeletons { get; }
     public PetSkeleton[] IDs           { get; }
 
@@ -21,7 +21,7 @@ internal class Version3ParseResult : IModernParseResult
     {
         UserName      = username;
         Homeworld     = homeworld;
-        ContentID     = contentID;
+        ContentId     = contentID;
         SoftSkeletons = PetSkeletonHelper.AsPetSkeletons(softSkeletons);
         IDs           = PetSkeletonHelper.AsPetSkeletons(ids);
         Names         = names;

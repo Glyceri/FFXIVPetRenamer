@@ -8,7 +8,6 @@ using System.IO;
 
 namespace PetRenamer.PetNicknames.TranslatorSystem;
 
-// Trying to stay away from statics, but in this case it just made MUCH more sense.
 internal static class Translator
 {
     private static DalamudServices? DalamudServices = null;
@@ -16,6 +15,15 @@ internal static class Translator
 
     private static readonly Dictionary<string, string> FallbackTranslations = new Dictionary<string, string>();
     private static readonly Dictionary<string, string> Translations         = new Dictionary<string, string>();
+    
+    private static readonly string[] FileNames =
+    [
+        "en_UK.json",
+        "de_DE.json",
+        "fr_FR.json",
+        "ja_JP.json",
+        "nl_NL.json",
+    ];
     
     internal static void Initialise(DalamudServices dalamudServices, IPetServices petServices)
     {
@@ -33,58 +41,50 @@ internal static class Translator
         {
             return translation;
         }
-        
-        if (FallbackTranslations.TryGetValue(identifier, out string? fTranslation))
+
+        if (!FallbackTranslations.TryGetValue(identifier, out string? fTranslation))
         {
-            if (PetServices?.Configuration.debugModeActive ?? false)
-            {
-                fTranslation = $"@@{fTranslation}@@";
-            }
-            
-            return fTranslation;
+            return $"%%{identifier}%%";
         }
-        
-        return $"%%{identifier}%%";
+
+        if (PetServices?.Configuration.debugModeActive ?? false)
+        {
+            return $"@@{fTranslation}@@";
+        }
+            
+        return fTranslation;
+
     }
-    
-    private static readonly string[] FileNames =
-        [
-            "en_UK.json",
-            "de_DE.json",
-            "fr_FR.json",
-            "ja_JP.json",
-            "nl_NL.json",
-        ];
     
     private static string GetFileName(PetNicknamesLanguage language)
     {
-        if (language == PetNicknamesLanguage.Default)
+        if (language != PetNicknamesLanguage.Default)
         {
-            ClientLanguage? cLanguage = DalamudServices?.ClientState.ClientLanguage;
-                
-            if (cLanguage == null)
+            return language switch
             {
-                return FileNames[0];
-            }
-            
-            return cLanguage.Value switch
-            {
-                ClientLanguage.English  => FileNames[0],
-                ClientLanguage.German   => FileNames[1],
-                ClientLanguage.French   => FileNames[2],
-                ClientLanguage.Japanese => FileNames[3],
-                _                       => FileNames[0],
+                PetNicknamesLanguage.English  => FileNames[0],
+                PetNicknamesLanguage.German   => FileNames[1],
+                PetNicknamesLanguage.French   => FileNames[2],
+                PetNicknamesLanguage.Japanese => FileNames[3],
+                PetNicknamesLanguage.Dutch    => FileNames[4],
+                _                             => FileNames[0],
             };
         }
-        
-        return language switch
+
+        ClientLanguage? cLanguage = DalamudServices?.ClientState.ClientLanguage;
+                
+        if (cLanguage == null)
         {
-            PetNicknamesLanguage.English  => FileNames[0],
-            PetNicknamesLanguage.German   => FileNames[1],
-            PetNicknamesLanguage.French   => FileNames[2],
-            PetNicknamesLanguage.Japanese => FileNames[3],
-            PetNicknamesLanguage.Dutch    => FileNames[4],
-            _                             => FileNames[0],
+            return FileNames[0];
+        }
+            
+        return cLanguage.Value switch
+        {
+            ClientLanguage.English  => FileNames[0],
+            ClientLanguage.German   => FileNames[1],
+            ClientLanguage.French   => FileNames[2],
+            ClientLanguage.Japanese => FileNames[3],
+            _                       => FileNames[0],
         };
     }
     
@@ -97,17 +97,21 @@ internal static class Translator
         
         dictionary.Clear();
         
-        
         string fileName = GetFileName(language);
 
         try
         {
-            FileInfo[] files = new DirectoryInfo(DalamudServices.DalamudPlugin.AssemblyLocation.DirectoryName!).GetFiles( "*.json");
+            FileInfo[] files = new DirectoryInfo(Path.Combine(DalamudServices.DalamudPlugin.AssemblyLocation.DirectoryName!, "I18N")).GetFiles("*.json" );
             
             FileInfo? foundFile = null;
             
             foreach (FileInfo file in files)
             {
+                if (PetServices?.Configuration.debugModeActive ?? false)
+                {
+                    PetServices.PetLog.LogVerbose(file.FullName);
+                }
+                
                 if (file.Name != fileName)
                 {
                     continue;
@@ -129,8 +133,14 @@ internal static class Translator
             
             string translationFile = File.ReadAllText(foundFile.FullName);
             
-            Dictionary<string, string> dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(translationFile)
-                                              ?? throw new($"Failed to parse translation file {foundFile.FullName}");
+            Dictionary<string, string>? dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(translationFile);
+            
+            if (dict == null)
+            {
+                DalamudServices.PluginLog.Error("Json failed to deserialize properly.");
+                
+                return;
+            }
             
             foreach ((string key, string value) in dict) 
             {

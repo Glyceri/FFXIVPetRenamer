@@ -11,6 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
@@ -31,6 +32,7 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
 using PetRenamer.PetNicknames.Windowing.Components.Image;
 using PetRenamer.PetNicknames.Windowing.Components.Labels;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -80,6 +82,7 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Hover",      DrawHover));
         devStructList.Add(new DevStruct("Pronoun",    DrawPronoun));
         devStructList.Add(new DevStruct("Windowing",  DrawWindowing));
+        devStructList.Add(new DevStruct("NameError",  DrawNameError));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -139,6 +142,21 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTabBar();
     }
 
+    private void DrawNameError()
+    {
+        IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
+
+        foreach (IPettableDatabaseEntry entry in entries)
+        {
+            if (entry.ActiveDatabase.LatestError == NameDatabaseError.NoError)
+            {
+                continue;
+            }
+            
+            ImGui.Text($"Error in: [{entry.Name}@{entry.HomeworldName}] [{entry.ActiveDatabase.LatestError}].");
+        }
+    }
+    
     void DrawDatabase()
     {
         IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
@@ -882,8 +900,26 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.DataBaseEntry.HomeworldName);
 
         ImGui.TableSetColumnIndex(2);
-        ImGui.TextUnformatted(user.IsActive ? "O" : "X");
-
+        if (user.IsActive)
+        {
+            if (ImGui.Button($"O###DEBUG_DEACTIVATE_{user.ContentId}"))
+            {
+                Database.GetEntry(user.ContentId).Clear(ParseSource.Manual);
+            }
+            
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("DONT CLICK THIS! IT WILL DELETE THE USER'S ENTRY");
+            }
+        }
+        else
+        {
+            if (ImGui.Button($"X###DEBUG_ACTIVATE_{user.ContentId}"))
+            {
+                user.DataBaseEntry.UpdateContentId(user.ContentId, true);
+            }
+        }
+        
         ImGui.TableSetColumnIndex(3);
         ImGui.TextUnformatted(user.DataBaseEntry.ActiveDatabase.Length.ToString());
 
@@ -895,10 +931,20 @@ internal class PetDevWindow : PetWindow
             ImGui.TextUnformatted($"{pet.SkeletonId}");
 
             ImGui.TableSetColumnIndex(1);
-            ImGui.TextUnformatted( ((BattleChara*)pet.Address)->NameString);
+            ImGui.TextUnformatted(((BattleChara*)pet.Address)->NameString);
 
             ImGui.TableSetColumnIndex(2);
-            ImGui.TextUnformatted(pet.PetData?.Singular);
+            string?  customName = pet.Owner?.DataBaseEntry.GetName(pet.SkeletonId);
+            Vector3? edgeColour = pet.Owner?.DataBaseEntry.GetEdgeColour(pet.SkeletonId);
+            Vector3? textColour = pet.Owner?.DataBaseEntry.GetTextColour(pet.SkeletonId);
+            SeString seString   = PetServices.StringHelper.WrapInColor(customName, edgeColour, textColour);
+            ImGuiHelpers.SeStringWrapped(seString.EncodeWithNullTerminator());
+            
+            ImGui.TableSetColumnIndex(3);
+            if (ImGui.Button($"Set Name###DEBUGSETNAME_{pet.SkeletonId}_{user.ContentId}"))
+            {
+                WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId, user.DataBaseEntry);
+            }
         }
 
         ImGui.EndTable();

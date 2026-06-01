@@ -107,12 +107,12 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SoftSkeletons = ImmutableArray.Create(softSkeletons);
     }
 
-    public void UpdateContentId(ulong contentId, bool removeIPCStatus = false)
+    public void UpdateContentId(ulong contentId, bool removeIpcStatus = false)
     {
         ContentId = contentId;
         IsActive  = true;
 
-        if (removeIPCStatus)
+        if (removeIpcStatus)
         {
             IsIpc = false;
         }
@@ -170,7 +170,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         UpdateEntryBase(parseResult, parseSource);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
-        UpdateContentId(parseResult.ContentID);
+        UpdateContentId(parseResult.ContentId);
     }
 
     public void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource)

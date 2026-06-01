@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -18,7 +19,7 @@ internal class PettableNameDatabase : INamesDatabase
     public string[]      Names       { get; private set; }
     public Vector3?[]    EdgeColours { get; private set; }
     public Vector3?[]    TextColours { get; private set; }
-
+    
     private readonly IPetServices PetServices;
 
     public PettableNameDatabase(IPetServices petServices, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours)
@@ -32,7 +33,10 @@ internal class PettableNameDatabase : INamesDatabase
 
     public int Length 
         => Ids.Length; 
-
+    
+    public NameDatabaseError LatestError { get; private set; }
+        = NameDatabaseError.NoError;
+    
     private int GetIndex(PetSkeleton id)
     {
         for (int i = 0; i < Length; i++)
@@ -164,6 +168,8 @@ internal class PettableNameDatabase : INamesDatabase
 
     private string? MakeNameValid(string? name)
     {
+        LatestError = NameDatabaseError.NoError;
+        
         if (name.IsNullOrWhitespace())
         {
             return null;
@@ -171,19 +177,43 @@ internal class PettableNameDatabase : INamesDatabase
 
         try
         {
+            string starter = name;
+            
             name = urlRegex.Replace(name, string.Empty);
+            
+            if (name != starter)
+            {
+                LatestError = NameDatabaseError.HadUrl;
+            }
         }
-        catch { }
+        catch(Exception e)
+        {
+            PetServices.PetLog.LogError(e, "Error in naming.");
+        }
 
         if (name.Length > PluginConstants.ffxivNameSize)
         {
             name = name[..PluginConstants.ffxivNameSize];
+            
+            LatestError = NameDatabaseError.TooLong;
         }
 
-        name = name.CleanString(PluginConstants.forbiddenCharacter.ToString());
-
+        if (name.Contains(PluginConstants.forbiddenCharacter.ToString()))
+        {
+            LatestError = NameDatabaseError.ContainedForbidden;
+            
+            name = name.CleanString(PluginConstants.forbiddenCharacter.ToString());
+        }
+        
+        int nameSize = name.Length;
+        
         name = name.Trim();
 
+        if (nameSize != name.Length)
+        {
+            LatestError = NameDatabaseError.GotTrimmed;
+        }
+        
         if (name.IsNullOrWhitespace())
         {
             return null;

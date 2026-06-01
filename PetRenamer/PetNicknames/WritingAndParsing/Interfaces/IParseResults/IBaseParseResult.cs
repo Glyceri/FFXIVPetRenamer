@@ -5,11 +5,11 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 
 internal interface IBaseParseResult : IDataParseResult
 {
-    public string        UserName    { get; }
-    public ushort        Homeworld   { get; }
+    string        UserName    { get; }
+    ushort        Homeworld   { get; }
 
-    public PetSkeleton[] IDs         { get; }
-    public string[]      Names       { get; }
-    public Vector3?[]    EdgeColous  { get; }
-    public Vector3?[]    TextColours { get; }
+    PetSkeleton[] IDs         { get; }
+    string[]      Names       { get; }
+    Vector3?[]    EdgeColous  { get; }
+    Vector3?[]    TextColours { get; }
 }

@@ -11,10 +11,21 @@ internal interface INamesDatabase
     Vector3?[]    TextColours { get; }
     int           Length      { get; }
     
+    NameDatabaseError LatestError { get; }
+    
     string?  GetName(PetSkeleton id);
     Vector3? GetEdgeColour(PetSkeleton id);
     Vector3? GetTextColour(PetSkeleton id);
     
     void SetName(PetSkeleton id, string? name, Vector3? edgeColour, Vector3? textColour);
     void Update(PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours);
+}
+
+internal enum NameDatabaseError
+{
+    NoError,
+    HadUrl,
+    TooLong,
+    ContainedForbidden,
+    GotTrimmed,
 }

@@ -25,12 +25,9 @@
      <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
      <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
    </ItemGroup>
-    
+
     <ItemGroup>
-        <Content Include="..\I18N\*.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>true</Visible>
-        </Content>
+        <Content Include="..\I18N\*.json" CopyToOutputDirectory="PreserveNewest" Visible="true" Link="I18N\%(Filename)%(Extension)"/>
     </ItemGroup>
     
 </Project>

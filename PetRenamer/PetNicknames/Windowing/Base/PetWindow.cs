@@ -33,7 +33,8 @@ internal abstract class PetWindow : Window, IPetWindow
     
     private float lastGlobalScale = 0;
 
-    protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) : base(name, windowFlags, true)
+    protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) 
+        : base(name, windowFlags, true)
     {
         WindowHandler   = windowHandler;
         DalamudServices = dalamudServices;
@@ -128,13 +129,6 @@ internal abstract class PetWindow : Window, IPetWindow
         CurrentPosition = ImGui.GetWindowPos();
         
         OnDraw();
-        
-        if (WindowHandler.FocussedWindow != this)
-        {
-            return;
-        }
-
-        ImGui.BeginPopup("RenameWindow", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration);
     }
 
     public void NotifyDirty() 

@@ -2,6 +2,6 @@
 
 internal interface IClearParseResult : IDataParseResult
 {
-    public ushort Homeworld { get; }
-    public string Name      { get; }
+    ushort Homeworld { get; }
+    string Name      { get; }
 }

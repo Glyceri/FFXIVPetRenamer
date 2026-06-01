@@ -36,6 +36,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     private readonly IWindowHandler         WindowHandler;
     private readonly IDataParser            DataParser;
     private readonly IDataWriter            DataWriter;
+    private readonly IDataChecker           DataChecker;
     private readonly IpcProvider            IpcProvider;
     private readonly IPenumbraIPC           PenumbraIPC;
     private readonly ContextMenuHandler     ContextMenuHandler;
@@ -65,8 +66,9 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         DataWriter         = new DataWriter(PetServices);
         DataParser         = new DataParser(DalamudServices, PetServices, PettableDatabase, LegacyDatabase);
-
-        IpcProvider        = new IpcProvider(DalamudServices, PetServices, DataParser, DataWriter);
+        DataChecker        = new DataChecker(PetServices);
+        
+        IpcProvider        = new IpcProvider(DalamudServices, PetServices, DataParser, DataWriter, DataChecker);
         PenumbraIPC        = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
 
         HookHandler        = new HookHandler(DalamudServices, PetServices, PettableDatabase, LegacyDatabase, SharingDictionary);

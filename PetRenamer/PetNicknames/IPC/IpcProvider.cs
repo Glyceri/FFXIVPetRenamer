@@ -12,7 +12,6 @@ using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
@@ -66,7 +65,7 @@ internal class IpcProvider : IIpcProvider
       * ----------------------END READ ME -----------------------
       */
     
-    public bool Enabled { get; set; }
+    public bool Enabled { get; private set; }
      
     private const string ApiNamespace       = "PetRenamer.";
     private const uint   MajorVersion       = 4;
@@ -77,48 +76,51 @@ internal class IpcProvider : IIpcProvider
     private float   releaseTimer            = ReleaseInterval;
     private bool    hasDataChange;
 
-    private readonly DalamudServices                    DalamudServices;
-    private readonly IDataWriter                        DataWriter;
-    private readonly IDataParser                        DataReader;
-    private readonly IPetServices                       PetServices;
-
-
+    private readonly DalamudServices                          DalamudServices;
+    private readonly IDataWriter                              DataWriter;
+    private readonly IDataParser                              DataReader;
+    private readonly IPetServices                             PetServices;
+    private readonly IDataChecker                             DataChecker;
+    
     // Notifications
-    private readonly ICallGateProvider<object>          Ready;
-    private readonly ICallGateProvider<object>          Disposing;
-    private readonly ICallGateProvider<string, object>  PlayerDataChanged;
+    private readonly ICallGateProvider<object>                Ready;
+    private readonly ICallGateProvider<object>                Disposing;
+    private readonly ICallGateProvider<string, object>        PlayerDataChanged;
 
     // Functions
-    private readonly ICallGateProvider<bool>            EnabledFunction;
-    private readonly ICallGateProvider<(uint, uint)>    ApiVersion;
-    private readonly ICallGateProvider<string>          GetPlayerData;
+    private readonly ICallGateProvider<bool>                  EnabledFunction;
+    private readonly ICallGateProvider<(uint, uint)>          ApiVersion;
+    private readonly ICallGateProvider<string>                GetPlayerData;
 
     // Actions
-    private readonly ICallGateProvider<string, object>  SetPlayerData;
-    private readonly ICallGateProvider<ushort, object>  ClearPlayerIPCData;
-    private readonly ICallGateProvider<nint, object>    ClearPlayerIPCDataV2;
+    private readonly ICallGateProvider<string, object>        SetPlayerData;
+    private readonly ICallGateProvider<ulong, string, object> SetPlayerDataV2;
+    private readonly ICallGateProvider<ushort, object>        ClearPlayerIPCData;
+    private readonly ICallGateProvider<nint, object>          ClearPlayerIPCDataV2;
     
-    public IpcProvider(DalamudServices dalamudServices, IPetServices petServices, IDataParser dataReader, IDataWriter dataWriter)
+    public IpcProvider(DalamudServices dalamudServices, IPetServices petServices, IDataParser dataReader, IDataWriter dataWriter, IDataChecker dataChecker)
     {
         DalamudServices      = dalamudServices;
         PetServices          = petServices;
         DataReader           = dataReader;
         DataWriter           = dataWriter;
-
+        DataChecker          = dataChecker;
+        
         // Notifiers
-        Ready                = dalamudServices.DalamudPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnReady");
-        Disposing            = dalamudServices.DalamudPlugin.GetIpcProvider<object>        ($"{ApiNamespace}OnDisposing");
-        PlayerDataChanged    = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>($"{ApiNamespace}OnPlayerDataChanged");
+        Ready                = dalamudServices.DalamudPlugin.GetIpcProvider<object>               ($"{ApiNamespace}OnReady");
+        Disposing            = dalamudServices.DalamudPlugin.GetIpcProvider<object>               ($"{ApiNamespace}OnDisposing");
+        PlayerDataChanged    = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>       ($"{ApiNamespace}OnPlayerDataChanged");
 
         // Functions
-        ApiVersion           = dalamudServices.DalamudPlugin.GetIpcProvider<(uint, uint)>  ($"{ApiNamespace}ApiVersion");
-        EnabledFunction      = dalamudServices.DalamudPlugin.GetIpcProvider<bool>          ($"{ApiNamespace}IsEnabled");
-        GetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string>        ($"{ApiNamespace}GetPlayerData");
+        ApiVersion           = dalamudServices.DalamudPlugin.GetIpcProvider<(uint, uint)>         ($"{ApiNamespace}ApiVersion");
+        EnabledFunction      = dalamudServices.DalamudPlugin.GetIpcProvider<bool>                 ($"{ApiNamespace}IsEnabled");
+        GetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string>               ($"{ApiNamespace}GetPlayerData");
 
         // Actions
-        SetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>($"{ApiNamespace}SetPlayerData");
-        ClearPlayerIPCData   = dalamudServices.DalamudPlugin.GetIpcProvider<ushort, object>($"{ApiNamespace}ClearPlayerData");
-        ClearPlayerIPCDataV2 = dalamudServices.DalamudPlugin.GetIpcProvider<nint, object>  ($"{ApiNamespace}ClearPlayerDataV2");
+        SetPlayerData        = dalamudServices.DalamudPlugin.GetIpcProvider<string, object>       ($"{ApiNamespace}SetPlayerData");
+        SetPlayerDataV2      = dalamudServices.DalamudPlugin.GetIpcProvider<ulong, string, object>($"{ApiNamespace}SetPlayerDataV2");
+        ClearPlayerIPCData   = dalamudServices.DalamudPlugin.GetIpcProvider<ushort, object>       ($"{ApiNamespace}ClearPlayerData");
+        ClearPlayerIPCDataV2 = dalamudServices.DalamudPlugin.GetIpcProvider<nint, object>         ($"{ApiNamespace}ClearPlayerDataV2");
     }
     
     public void Dispose()
@@ -129,6 +131,7 @@ internal class IpcProvider : IIpcProvider
 
         // Actions
         SetPlayerData.UnregisterAction();
+        SetPlayerDataV2.UnregisterAction();
         ClearPlayerIPCData.UnregisterAction();
         ClearPlayerIPCDataV2.UnregisterAction();
 
@@ -189,6 +192,7 @@ internal class IpcProvider : IIpcProvider
 
     private void RegsterActions()
     {
+        SetPlayerDataV2.RegisterAction(SetPlayerDataDetourV2);
         SetPlayerData.RegisterAction(SetPlayerDataDetour);
         ClearPlayerIPCData.RegisterAction(ClearIPCDataDetour);
         ClearPlayerIPCDataV2.RegisterAction(ClearIPCDataV2Detour);
@@ -211,6 +215,49 @@ internal class IpcProvider : IIpcProvider
             _ = DalamudServices.Framework.Run(() =>
             {
                 IDataParseResult result = DataReader.ParseData(data);
+                
+                if (result is IBaseParseResult parseResult)
+                {
+                    // This gets all checked in the apply branch too,
+                    // But it isn´t proper to send it invalid data, as it isn´t build with that in mind perse.
+                    if (!DataChecker.CheckData(parseResult))
+                    {
+                        DalamudServices.PluginLog.Debug("[IPC] DataChecker disallowed data: " + data);
+                        
+                        return;
+                    }
+                }
+                
+                _ = DataReader.ApplyParseData(result, ParseSource.IPC);
+            });
+        }
+        catch (Exception e)
+        {
+            DalamudServices.PluginLog.Error(e, "Error in Set Player Data");
+        }
+    }
+    
+    private void SetPlayerDataDetourV2(ulong contentId, string data)
+    {
+        DalamudServices.PluginLog.Debug("[IPC] Set Player Data V2: " + data);
+        
+        try
+        {
+            _ = DalamudServices.Framework.Run(() =>
+            {
+                IDataParseResult result = DataReader.ParseData(data);
+                
+                if (result is IModernParseResult modernParseResult)
+                {
+                    // This gets all checked in the apply branch too,
+                    // But it isn´t proper to send it invalid data, as it isn´t build with that in mind perse.
+                    if (!DataChecker.CheckModernData(contentId, modernParseResult))
+                    {
+                        DalamudServices.PluginLog.Debug("[IPC] ModernDataChecker disallowed data: " + data);
+                        
+                        return;
+                    }
+                }
                 
                 _ = DataReader.ApplyParseData(result, ParseSource.IPC);
             });

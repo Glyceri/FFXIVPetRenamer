@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility.Raii;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -20,15 +21,15 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetRenameWindow : PetWindow
 {
-    private PetSkeleton?             ActiveSkeleton;
-    
     private string                   ActiveCustomName   = string.Empty;
     private string                   EditableCustomName = string.Empty;
+    private IPettableDatabaseEntry?  ActiveEntry        = null;
+    private PetSkeleton?             ActiveSkeleton     = null;
     private Vector3?                 ActiveEdgeColour   = null;
     private Vector3?                 ActiveTextColour   = null;
     private IPetSheetData?           ActivePetData      = null;
     private ISharedImmediateTexture? ActivePetTexture   = null;
-
+    
     public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
         : base(windowHandler, dalamudServices, petServices, "Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
@@ -59,7 +60,7 @@ internal class PetRenameWindow : PetWindow
     protected override Vector2 DefaultSize
         => MinSize;
     
-    public void SetRenameWindow(PetSkeleton forSkeleton)
+    public void SetRenameWindow(PetSkeleton forSkeleton, IPettableDatabaseEntry? forEntry = null)
     {
         switch (forSkeleton.SkeletonType)
         {
@@ -70,6 +71,7 @@ internal class PetRenameWindow : PetWindow
         
         IsOpen         = true;
         ActiveSkeleton = forSkeleton;
+        ActiveEntry    = forEntry ?? PetServices.UserList.LocalPlayer?.DataBaseEntry;
 
         Refresh();
     }
@@ -86,6 +88,16 @@ internal class PetRenameWindow : PetWindow
 
     private void DirtyName(INamesDatabase nameDatabase)
     {
+        if (ActiveEntry == null)
+        {
+            return;
+        }
+        
+        if (ActiveEntry.ActiveDatabase != nameDatabase)
+        {
+            return;
+        }
+        
         if (ActiveSkeleton == null)
         {
             return;
@@ -108,6 +120,8 @@ internal class PetRenameWindow : PetWindow
             return;
         }
         
+        ActiveEntry = user.DataBaseEntry;
+        
         Refresh();
     }
     
@@ -123,7 +137,7 @@ internal class PetRenameWindow : PetWindow
             return;
         }
         
-        if (!pet.Owner.IsLocalPlayer)
+        if (pet.Owner.DataBaseEntry != ActiveEntry)
         {
             return;
         }
@@ -137,7 +151,7 @@ internal class PetRenameWindow : PetWindow
     {
         GetActiveSkeleton();
     }
-
+    
     protected override void OnDraw()
     {
         DrawElement();
@@ -146,6 +160,7 @@ internal class PetRenameWindow : PetWindow
     private void GetActiveSkeleton()
     {
         ActiveSkeleton = null;
+        ActiveEntry    = null;
         
         CleanOldNode();
         
@@ -153,6 +168,8 @@ internal class PetRenameWindow : PetWindow
         {
             return;
         }
+        
+        ActiveEntry = PetServices.UserList.LocalPlayer.DataBaseEntry;
         
         IPettablePet? pet = PetServices.UserList.LocalPlayer.GetYoungestPet(PetMode);
         
@@ -175,7 +192,7 @@ internal class PetRenameWindow : PetWindow
             return;
         }
         
-        if (PetServices.UserList.LocalPlayer == null)
+        if (ActiveEntry == null)
         {
             return;
         }
@@ -192,10 +209,10 @@ internal class PetRenameWindow : PetWindow
             return;
         }
         
-        string? customName  = PetServices.UserList.LocalPlayer.DataBaseEntry.GetName(ActiveSkeleton.Value);
+        string?  customName = ActiveEntry.GetName(ActiveSkeleton.Value);
         
-        Vector3? edgeColour = PetServices.UserList.LocalPlayer.DataBaseEntry.GetEdgeColour(ActiveSkeleton.Value);
-        Vector3? textColour = PetServices.UserList.LocalPlayer.DataBaseEntry.GetTextColour(ActiveSkeleton.Value);
+        Vector3? edgeColour = ActiveEntry.GetEdgeColour(ActiveSkeleton.Value);
+        Vector3? textColour = ActiveEntry.GetTextColour(ActiveSkeleton.Value);
 
         Setup(customName, edgeColour, textColour, data);
     }
@@ -221,7 +238,7 @@ internal class PetRenameWindow : PetWindow
     }
 
     private void OnSave(PetSkeleton skeletonId, string? newName, Vector3? edgeColour, Vector3? textColour)
-        => PetServices.UserList.LocalPlayer?.DataBaseEntry.SetName(skeletonId, newName ?? string.Empty, edgeColour, textColour);
+        => ActiveEntry?.SetName(skeletonId, newName ?? string.Empty, edgeColour, textColour);
     
     private void DrawElement()
     {
@@ -231,6 +248,17 @@ internal class PetRenameWindow : PetWindow
         float   framePaddingX  = stylePtr.ItemSpacing.X;
         float   regionHeight   = region.Y;
 
+        bool isLocalPlayer = ActiveEntry == PetServices.UserList.LocalPlayer?.DataBaseEntry;
+        
+        using ImRaii.ColorDisposable colour = ImRaii.PushColor(ImGuiCol.Border, new Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+        using ImRaii.StyleDisposable bStyle = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 1);
+        
+        if (isLocalPlayer)
+        {
+            colour.Dispose();
+            bStyle.Dispose();
+        }
+        
         if (!Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
         {
             return;

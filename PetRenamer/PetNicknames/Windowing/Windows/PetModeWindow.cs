@@ -27,7 +27,7 @@ internal class PetModeWindow : PetWindow
         IsOpen               = true;
     }
     
-    private static readonly Vector2 WindowSize = new Vector2(1000, 30);
+    private static readonly Vector2 WindowSize = new Vector2(1000, 32);
     
     protected override Vector2 MinSize       
         => WindowSize;

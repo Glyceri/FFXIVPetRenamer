@@ -38,7 +38,7 @@ internal class TargetContextMenu : IContextMenuElement
         {
             return null;
         }
-
+        
         IPettablePet? pet = localUser.GetPet(target.Address);
 
         if (pet == null)
