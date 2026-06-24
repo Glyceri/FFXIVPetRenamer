@@ -1,0 +1,156 @@
+{
+  "...": "…",
+  "Name": "用户名",
+  "Homeworld": "服务器",
+  "Petcount": "昵称数量",
+
+  "Search": "搜索",
+  "DateTime.Unkown": "日期未知",
+  "Version.Unkown": "版本未知",
+
+  "Language.Default": "客户端语言",
+  "Language.English": "英语",
+  "Language.German": "德语",
+  "Language.French": "法语",
+  "Language.Japanese": "日语",
+  "Language.Dutch": "荷兰语",
+  "Language.Chinese": "简体中文",
+
+  "ContextMenu.Rename": "设置昵称",
+
+  "PetMode": "{0}模式",
+
+  "PetRenameNode.Species1": "宠物",
+  "PetRenameNode.Species2": "召唤物",
+  "PetRenameNode.Species3": "驯兽师召唤物",
+
+  "PetRenameNode.Race": "种类",
+  "PetRenameNode.Behaviour": "行为",
+  "PetRenameNode.Nickname": "昵称",
+  "PetRenameNode.Id": "标识符",
+
+  "PetRenameNode.Edit": "编辑",
+  "PetRenameNode.Clear": "清除",
+  "PetRenameNode.Save": "保存",
+  "PetRenameNode.Cancel": "取消",
+
+  "PetRenameNode.PleaseSummonWarningLabel": "警告",
+  "PetRenameNode.PleaseSummonWarning": "请先召唤一个{0}",
+
+  "WindowHandler.Title": "宠物通行证",
+  "PetDev.Title": "Pet Nicknames 开发",
+
+  "PetList.Title": "宠物列表",
+  "PetList.Navigation": "导航",
+  "PetList.UserList": "用户列表",
+  "PetList.MyList": "我的列表",
+  "PetList.Sharing": "分享",
+
+  "PetListWindow.ListHeaderPersonalMinion": "你的宠物",
+  "PetListWindow.ListHeaderPersonalBattlePet": "你的召唤物",
+  "PetListWindow.ListHeaderOtherMinion": "{0}的宠物",
+  "PetListWindow.ListHeaderOtherBattlePet": "{0}的召唤物",
+
+  "ColourPicker.EdgeColour": "描边颜色",
+  "ColourPicker.TextColour": "文字颜色",
+  "ColourPicker.ClearColour": "清除颜色",
+
+  "ClearButton.Label": "按住“左Ctrl”+“左Shift”可删除条目。",
+  "ClearButton.ColourLabel": "按住“左Ctrl”+“左Shift”可清除颜色。",
+
+  "UserListElement.WarningIPC": "该用户由外部插件临时添加，\n不会被保存。",
+  "UserListElement.WarningOldUser": "该用户来自你的旧存档。\n请在游戏中与其相遇以更新数据。",
+
+  "IslandWarning": "Pet Nicknames 无法识别该无人岛的主人。请重新进入该无人岛。",
+  "IslandWarningGlobal": "未找到无人岛主人",
+
+  "ShareWindow.ExportError": "没有可用数据。{Environment.NewLine}你需要登录角色才能导出数据。",
+  "ShareWindow.ExportSuccess": "数据已成功导出到剪贴板。{Environment.NewLine}请确保将这些数据粘贴到其他地方。",
+  "ShareWindow.ExportErrorGlobal": "没有可用数据",
+  "ShareWindow.ExportSuccessGlobal": "数据导出成功",
+
+  "ShareWindow.ImportError": "导入数据失败：{0}",
+  "ShareWindow.ImportSuccess": "已成功从 {0} 导入数据",
+  "ShareWindow.ImportErrorGlobal": "导入数据失败",
+  "ShareWindow.ImportSuccessGlobal": "数据导入成功",
+
+  "Download.Redownload": "重新下载头像",
+  "Download.Cancel": "取消下载",
+
+  "Config.Title": "设置",
+
+  "Config.Header.GeneralSettings": "常规设置",
+  "Config.Header.UISettings": "界面设置",
+  "Config.Header.NativeSettings": "原生界面设置",
+  "Config.Header.Debug": "调试",
+
+  "Config.PVPMessage": "禁用 PVP 警告提示。",
+  "Config.ProfilePictures": "自动下载头像。",
+  "Config.UISettings.UIScale.Header.Title": "自定义界面缩放",
+  "Config.Toggle": "快捷按钮改为切换而非打开。",
+  "Config.Kofi": "显示 Ko-fi 按钮。",
+  "Config.TransparentBackground": "闲置时背景变透明。",
+  "Config.UIFlare": "显示额外的界面装饰。",
+  "Config.Nameplate": "在头顶名牌上显示昵称。",
+  "Config.Castbar": "在读条上显示昵称。",
+  "Config.BattleChat": "在战斗信息中显示昵称。",
+  "Config.Emote": "在情感动作中显示昵称。",
+  "Config.Flyout": "在飘出文字上显示昵称。",
+  "Config.Tooltip": "在提示框中显示昵称。",
+  "Config.Notebook": "在宠物笔记中显示昵称。",
+  "Config.ActionLog": "在技能列表中显示昵称。",
+  "Config.Targetbar": "为目标显示昵称。",
+  "Config.Partylist": "在小队列表中显示昵称。",
+
+  "Config.DebugMode": "启用调试模式",
+  "Config.OpenDebugMode": "自动打开调试窗口。",
+  "Config.DebugChatcode": "插入聊天代码。",
+  "Config.DebugMode.Help": "按住“左Ctrl”+“左Shift”以操作此按钮。",
+
+  "Config.ColourSettings": "全局颜色",
+
+  "Config.ContextMenu": "允许右键菜单。",
+  "Config.ShowNotification": "显示通知。",
+  "Config.IslandWarning": "无法识别无人岛主人时显示警告。",
+  "Config.IslandPets": "在无人岛宠物身上显示名称。",
+  "Config.PartyCutoff": "允许截断过长的读条。",
+  "Config.PartyCutoff.Help": "在小队列表中，你的读条可能会超出边界，PetNicknames 会加剧这个问题。\n启用此设置后，读条会自动截断以避免超出小队列表。\n\n（这是游戏本身的 bug）。",
+
+  "Config.Penumbra.AttachToPCP": "将 Pet Nicknames 数据附加到 Penumbra 的 .pcp 文件中。",
+  "Config.Penumbra.ReadFromPCP": "从 Penumbra 的 .pcp 文件中读取 Pet Nicknames 数据。",
+
+  "Config.Label.OverrideColour": "覆盖颜色",
+  "Config.Label.OverrideColourLabel": "颜色模式",
+
+  "Kofi.Title": "Ko-fi",
+  "Kofi.Line1": "这涉及真实货币。",
+  "Kofi.Line2": "它会被用来给我的猫买玩具！",
+  "Kofi.TakeMe": "带我去",
+
+  "Command.Petname": "打开宠物重命名窗口。\n        输入 '/petname help' 查看通过命令命名的相关信息。",
+  "Command.Petlist": "打开宠物列表窗口。",
+  "Command.PetSettings": "打开设置窗口。",
+  "Command.PetSharing": "打开分享窗口。",
+  "Command.PetTheme": "打开颜色编辑器窗口。",
+
+  "ListIconType.Both": "两者",
+  "ListIconType.Sharing": "分享",
+  "ListIconType.ListOnly": "仅列表",
+
+  "MenuType.Action": "技能",
+  "MenuType.Notebook": "笔记",
+  "MenuType.Item": "物品",
+
+  "ColourDisplay.Everyone": "所有人",
+  "ColourDisplay.OnlyMyself": "仅自己",
+  "ColourDisplay.NoColours": "无颜色",
+
+  "Config.Language": "插件语言",
+  "Config.IconType": "图标类型",
+  "Config.ListButtonType": "列表按钮类型",
+
+  "ShareWindow.Export": "导出到剪贴板",
+  "ShareWindow.Import": "从剪贴板导入",
+  "ShareWindow.Explain1": "你可以导出你的宠物昵称并发送给朋友。",
+  "ShareWindow.Explain2": "你的朋友也可以将它们导入。"
+}
