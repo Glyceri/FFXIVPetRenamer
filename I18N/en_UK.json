@@ -7,7 +7,7 @@
   "Search": "Search",
   "DateTime.Unkown": "Date Unknown",
   "Version.Unkown": "Version Unknown",
-
+  
   "Language.Default": "Client Language",
   "Language.English": "English",
   "Language.German": "German",
@@ -15,6 +15,13 @@
   "Language.Japanese": "Japanese",
   "Language.Dutch": "Dutch",
   "Language.Chinese": "Chinese",
+
+  "Language.English.Raw": "English",
+  "Language.German.Raw": "Deutsch",
+  "Language.French.Raw": "Français",
+  "Language.Japanese.Raw": "日本語",
+  "Language.Dutch.Raw": "Nederlands",
+  "Language.Chinese.Raw": "简体中文",
 
   "ContextMenu.Rename": "Give Nickname",
 
@@ -84,6 +91,7 @@
   "Config.Header.NativeSettings": "Native Settings",
   "Config.Header.Debug": "Debug",
 
+  "Config.RawLanguage": "Display Native Language",
   "Config.PVPMessage": "Disable PVP warning message.",
   "Config.ProfilePictures": "Automatically download profile pictures.",
   "Config.UISettings.UIScale.Header.Title": "Custom UI Scale",
@@ -106,7 +114,8 @@
   "Config.OpenDebugMode": "Automatically Open DebugWindow.",
   "Config.DebugChatcode": "Insert Chatcodes.",
   "Config.DebugMode.Help": "Hold \"Left Ctrl\" + \"Left Shift\" to interact with this button.",
-
+  "Config.DebugFailedTranslation": "Show Markers around Failed Translations.",
+  
   "Config.ColourSettings": "Global Colours",
 
   "Config.ContextMenu": "Allow Context Menus.",

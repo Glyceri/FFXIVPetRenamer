@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -33,7 +34,7 @@ internal abstract class PetWindow : Window, IPetWindow
     
     private float lastGlobalScale = 0;
     private float lastFontScale   = 0;
-
+    
     protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) 
         : base(name, windowFlags, true)
     {
@@ -74,15 +75,6 @@ internal abstract class PetWindow : Window, IPetWindow
         Vector2 defaultSize = DefaultSize * WindowHandler.FontScale;
         Vector2 minSize     = MinSize     * WindowHandler.FontScale;
         Vector2 maxSize     = MaxSize     * WindowHandler.FontScale;
-        
-        if (PetServices.Configuration.oldBarStyleLayout)
-        {
-            Vector2 adder   = new Vector2(0, ModeToggleNode.ButtonSize.Y + (ImGui.GetStyle().ItemSpacing.Y + ImGui.GetStyle().FramePadding.Y * 2) / WindowHandler.GlobalScale);
-            
-            defaultSize     += adder;
-            minSize         += adder;
-            maxSize         += adder;
-        }
         
         Size            = defaultSize;
 

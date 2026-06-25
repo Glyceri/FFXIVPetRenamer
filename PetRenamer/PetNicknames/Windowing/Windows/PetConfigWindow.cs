@@ -44,6 +44,28 @@ internal class PetConfigWindow : PetWindow
     private static readonly string[] _colourDisplay   = ["ColourDisplay.Everyone", "ColourDisplay.OnlyMyself", "ColourDisplay.NoColours"];
     private static readonly string[] _languageOptions = ["Language.Default", "Language.English", "Language.German", "Language.French", "Language.Japanese", "Language.Dutch", "Language.Chinese"];
     
+    private string[] AddRaw(string[] current)
+    {
+        if (!PetServices.Configuration.showLanguageAsNative)
+        {
+            return current;
+        }
+        
+        string[] newCurrent = new string[current.Length];
+        
+        for (int i = 0; i < newCurrent.Length; i++)
+        {
+            newCurrent[i] = current[i];
+        }
+        
+        for (int i = 1; i < newCurrent.Length; i++)
+        {
+            newCurrent[i] += ".Raw";
+        }
+        
+        return newCurrent;
+    }
+    
     protected override void OnDraw()
     {
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.GeneralSettings")))
@@ -61,7 +83,9 @@ internal class PetConfigWindow : PetWindow
         {
             ImGui.Spacing();
             
-            if (DrawEnumMenu(Translator.GetLine("Config.Language"),   _languageOptions, ref PetServices.Configuration.currentLanguage))
+            DrawBasicToggle(Translator.GetLine("Config.RawLanguage"), ref PetServices.Configuration.showLanguageAsNative);
+            
+            if (DrawEnumMenu(Translator.GetLine("Config.Language"),   AddRaw(_languageOptions), ref PetServices.Configuration.currentLanguage))
             {
                 Translator.UpdateLanguage();
             }
@@ -141,6 +165,8 @@ internal class PetConfigWindow : PetWindow
             DrawBasicToggle(Translator.GetLine("Config.OpenDebugMode"),  ref PetServices.Configuration.openDebugWindowOnStart);
             DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
             DrawBasicToggle(Translator.GetLine("Config.DebugChatcode"),  ref PetServices.Configuration.debugShowChatCode);
+            DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
+            DrawBasicToggle(Translator.GetLine("Config.DebugFailedTranslation"),  ref PetServices.Configuration.showFailedTranslations);
             DrawInfoHover(Translator.GetLine("Config.DebugMode.Help"));
             
             ImGui.EndDisabled();

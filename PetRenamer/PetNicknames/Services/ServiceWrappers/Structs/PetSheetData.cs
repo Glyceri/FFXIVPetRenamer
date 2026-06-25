@@ -7,7 +7,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
-internal struct PetSheetData : IPetSheetData
+internal readonly struct PetSheetData : IPetSheetData
 {
     public PetSkeleton  Model         { get; }
     public uint         Icon          { get; }
@@ -144,7 +144,7 @@ internal struct PetSheetData : IPetSheetData
         return new PetSheetData(skeleton, -1, petIcon, bnpcName.Value.Pronoun, name, actionName, actionRowId, dalamudServices);
     }
     
-    private readonly string GermanReplace(string baseString, sbyte pronoun)
+    private string GermanReplace(string baseString, sbyte pronoun)
     {
         if (pronoun < 0 || pronoun >= pronounList.Length)
         {
@@ -157,9 +157,9 @@ internal struct PetSheetData : IPetSheetData
         return baseString;
     }
 
-    public readonly bool IsPet(string name)
+    public bool IsPet(string name)
         => Singular.InvariantEquals(name);
 
-    public readonly bool IsAction(uint action) 
+    public bool IsAction(uint action) 
         => (ActionId == action);
 }

@@ -14,7 +14,8 @@
   "Language.French": "Frans",
   "Language.Japanese": "Japans",
   "Language.Dutch": "Nederlands",
-
+  "Language.Chinese": "Chinees",
+  
   "ContextMenu.Rename": "Geef Bijnaam",
 
   "PetMode": "{0} Modus",
@@ -81,7 +82,8 @@
   "Config.Header.UISettings": "UI Instellingen",
   "Config.Header.NativeSettings": "Game Gerelateerde Instellingen",
   "Config.Header.Debug": "Ontwikkeling",
-  
+
+  "Config.RawLanguage": "Laat als moedertaal zien.",
   "Config.ProfilePictures": "Download automatisch Profielfotos",
   "Config.Toggle": "Snelle Knoppen schakelen i.p.v. openen.",
   "Config.Kofi": "Laat de Ko-fi knop zien.",
@@ -101,7 +103,8 @@
   "Config.OpenDebugMode": "Automatisch Ontwikkelscherm Openen",
   "Config.DebugChatcode": "Voeg Code's toe in de Chat.",
   "Config.DebugMode.Help": "Houd “Left Ctrl” + “Left Shift” ingedrukt om deze knop te mogen gebruiken.",
-
+  "Config.DebugFailedTranslation": "Laat symbolen rondom mislukte vertalingen zien.",
+  
   "Config.ColourSettings": "Globale Kleurinstellingen",
 
   "Config.ContextMenu": "Sta “Context Menus” toe.",

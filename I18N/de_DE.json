@@ -6,12 +6,15 @@
   "Search": "Suchen",
   "DateTime.Unkown": "Unbekanntes Datum",
   "Version.Unkown": "Unbekannte Version",
+  
   "Language.Default": "Sprache",
-  "Language.English": "Englisch",
+  
+  "Language.English": "English",
   "Language.German": "Deutsch",
   "Language.French": "Französisch",
   "Language.Japanese": "Japanisch",
   "Language.Dutch": "Niederländisch",
+
   "ContextMenu.Rename": "Nickname vergeben",
   "PetMode": "{0} Modus",
   "PetRenameNode.Species1": "Begleiter",

@@ -42,19 +42,23 @@ internal static class Translator
         {
             return translation;
         }
-
+        
         if (!FallbackTranslations.TryGetValue(identifier, out string? fTranslation))
         {
             return $"%%{identifier}%%";
         }
-
-        if (PetServices?.Configuration.debugModeActive ?? false)
+        
+        if (!(PetServices?.Configuration.debugModeActive ?? false))
         {
-            return $"@@{fTranslation}@@";
+            return fTranslation;
         }
-            
-        return fTranslation;
-
+        
+        if (!(PetServices?.Configuration.showFailedTranslations ?? false))
+        {
+            return fTranslation;
+        }
+        
+        return $"@@{fTranslation}@@";
     }
     
     private static string GetFileName(PetNicknamesLanguage language)

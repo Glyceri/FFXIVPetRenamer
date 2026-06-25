@@ -63,6 +63,7 @@ internal class Configuration : IPluginConfiguration
     public int minionIconType = 1;
     public bool showIslandWarning = true;
     public bool oldBarStyleLayout = false;
+    public bool showLanguageAsNative = true;
     
     // ------------------------ PENUMBRA SETTINGS ------------------------
     public bool attachToPCP = true;
@@ -73,6 +74,7 @@ internal class Configuration : IPluginConfiguration
     public bool openDebugWindowOnStart = false;
     public bool debugShowChatCode      = false;
     public int  lastDebugTab           = 0;
+    public bool showFailedTranslations = true;
 
     public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {

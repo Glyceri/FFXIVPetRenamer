@@ -6,12 +6,14 @@
   "Search": "検索　",
   "DateTime.Unkown": "日付不明",
   "Version.Unkown": "バージョン不明",
+  
   "Language.Default": "クライアント言語",
   "Language.English": "英語",
   "Language.German": "ドイツ語",
   "Language.French": "フランス語",
   "Language.Japanese": "日本語",
   "Language.Dutch": "オランダ語",
+
   "ContextMenu.Rename": "ニックネームを設定",
   "PetMode": "{0}モード",
   "PetRenameNode.Species1": "ミニオン",
