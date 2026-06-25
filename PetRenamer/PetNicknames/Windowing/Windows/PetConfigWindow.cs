@@ -42,7 +42,7 @@ internal class PetConfigWindow : PetWindow
     private static readonly string[] _listIconTypes   = ["ListIconType.Both", "ListIconType.Sharing", "ListIconType.ListOnly"];
     private static readonly string[] _iconMenuTypes   = ["MenuType.Action", "MenuType.Notebook", "MenuType.Item"];
     private static readonly string[] _colourDisplay   = ["ColourDisplay.Everyone", "ColourDisplay.OnlyMyself", "ColourDisplay.NoColours"];
-    private static readonly string[] _languageOptions = ["Language.Default", "Language.English", "Language.German", "Language.French", "Language.Japanese", "Language.Dutch"];
+    private static readonly string[] _languageOptions = ["Language.Default", "Language.English", "Language.German", "Language.French", "Language.Japanese", "Language.Dutch", "Language.Chinese"];
     
     protected override void OnDraw()
     {

@@ -23,6 +23,7 @@ internal static class Translator
         "fr_FR.json",
         "ja_JP.json",
         "nl_NL.json",
+        "zh_CN.json",
     ];
     
     internal static void Initialise(DalamudServices dalamudServices, IPetServices petServices)
@@ -67,6 +68,7 @@ internal static class Translator
                 PetNicknamesLanguage.French   => FileNames[2],
                 PetNicknamesLanguage.Japanese => FileNames[3],
                 PetNicknamesLanguage.Dutch    => FileNames[4],
+                PetNicknamesLanguage.Chinese  => FileNames[5],
                 _                             => FileNames[0],
             };
         }
@@ -77,7 +79,19 @@ internal static class Translator
         {
             return FileNames[0];
         }
-            
+
+        // CN/KR/TW are absent from Dalamud's ClientLanguage (it falls back to English), but the
+        // Lumina game data language reports them correctly. These languages don't exist on global,
+        // so checking it here only affects those regions and is safe for global clients.
+        Lumina.Data.Language? excelLanguage = DalamudServices?.DataManager.GameData.Options.DefaultExcelLanguage;
+
+        switch (excelLanguage)
+        {
+            case Lumina.Data.Language.ChineseSimplified:  return FileNames[5];
+            // case Lumina.Data.Language.ChineseTraditional: return FileNames[6]; // Add once a zh_TW.json exists.
+            // case Lumina.Data.Language.Korean:             return FileNames[7]; // Add once a ko_KR.json exists.
+        }
+
         return cLanguage.Value switch
         {
             ClientLanguage.English  => FileNames[0],
@@ -174,4 +188,5 @@ internal enum PetNicknamesLanguage
     French,
     Japanese,
     Dutch,
+    Chinese,
 }
