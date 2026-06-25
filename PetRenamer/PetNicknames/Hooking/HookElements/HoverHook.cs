@@ -16,10 +16,7 @@ internal class HoverHook : HookableElement
     
     private static readonly NameTypeFactory HoverNameType = new NameTypeFactory()
     {
-        EnglishNameType  = NameType.Raw,
-        GermanNameType   = NameType.Pronoun,
-        FrenchNameType   = NameType.Raw,
-        JapaneseNameType = NameType.Raw,
+        GermanNameType = NameType.Pronoun,
     };
     
     public HoverHook(DalamudServices services, IPetServices petServices) 
@@ -46,7 +43,7 @@ internal class HoverHook : HookableElement
         
         petSheetData = PetServices.PetSheets.MakeSoft(PetServices.UserList.LocalPlayer, petSheetData);
         
-        NameType setNameType = HoverNameType;
+        NameType setNameType = HoverNameType.GetNameType(DalamudServices);
 
         if (petSheetData.Model.SkeletonType == SkeletonType.BattlePet)
         {

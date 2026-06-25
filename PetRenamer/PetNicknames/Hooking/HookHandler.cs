@@ -17,9 +17,8 @@ internal class HookHandler : IDisposable
     private readonly IPettableDatabase  Database;
     private readonly ILegacyDatabase    LegacyDatabase;
     private readonly ISharingDictionary SharingDictionary;
-
-    public IIslandHook  IslandHook        { get; private set; } = null!;
-    public IPronounHook PronounHook       { get; private set; } = null!;
+    
+    public IPronounHook PronounHook { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
@@ -48,11 +47,8 @@ internal class HookHandler : IDisposable
         Register(new TooltipHook(DalamudServices, PetServices, mapHook, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
-        
         Register(new TargetHook(DalamudServices, PetServices));
-        
-        IslandHook = new IslandHook(DalamudServices, PetServices);
-        Register(IslandHook);
+        Register(new IslandHook(DalamudServices, PetServices, Database));
         
         PetServices.NameService.RegisterPronounHook(PronounHook);
         
@@ -60,7 +56,7 @@ internal class HookHandler : IDisposable
         Register(new NamePlateHook(DalamudServices, PetServices));
         Register(new PartyHook(DalamudServices, PetServices));
         
-        Register(new CharacterManagerHook(DalamudServices, PetServices, Database, LegacyDatabase, SharingDictionary, IslandHook));
+        Register(new CharacterManagerHook(DalamudServices, PetServices, Database, LegacyDatabase, SharingDictionary));
     }
 
     private void Register(IHookableElement element)

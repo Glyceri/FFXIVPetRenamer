@@ -1,7 +1,7 @@
 ﻿using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
@@ -32,17 +32,15 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly IPettableDatabase  Database;
     private readonly ILegacyDatabase    LegacyDatabase;
     private readonly ISharingDictionary SharingDictionary;
-    private readonly IIslandHook        IslandHook;
 
     private readonly List<nint> temporaryPets = [];
 
-    public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IIslandHook islandHook) 
+    public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary) 
         : base(services, petServices)
     {
         Database          = database;
         LegacyDatabase    = legacyDatabase;
         SharingDictionary = sharingDictionary;
-        IslandHook        = islandHook;
 
         OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
         OnTerminateCompanionHook    = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.Terminate>        ((nint)Companion.StaticVirtualTablePointer->Terminate,          TerminateCompanion);
@@ -64,6 +62,8 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void FloodInitialList()
     {
+        PetServices.PetLog.LogInfo("Flooding initial object table.");
+        
         for (int i = 0; i < PlayerMaxInObjectTable; i++)
         {
             BattleChara* bChara = CharacterManager.Instance()->BattleCharas[i];
@@ -72,14 +72,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             {
                 continue;
             }
-
-            ObjectKind charaKind = bChara->GetObjectKind();
-
-            if (charaKind != ObjectKind.Pc && charaKind != ObjectKind.BattleNpc)
-            {
-                continue;
-            }
-
+            
             HandleAsCreated(bChara);
         }
     }
@@ -187,19 +180,17 @@ internal unsafe class CharacterManagerHook : HookableElement
             return;
         }
 
-        ObjectKind actualObjectKind = newBattleChara->ObjectKind;
+        ObjectKind actualObjectKind = newBattleChara->GetObjectKind();
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            _ = CreateUser(newBattleChara);
+            CreateUser(newBattleChara);
         }
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
             uint owner = newBattleChara->OwnerId;
-
-            bool gotOwner = false;
-
+            
             foreach (IPettableUser? user in PetServices.UserList)
             {
                 if (user == null)
@@ -207,6 +198,11 @@ internal unsafe class CharacterManagerHook : HookableElement
                     continue;
                 }
 
+                if (user.ObjectId.Id == PluginConstants.InvalidId)
+                {
+                    continue;
+                }
+                
                 if (user.ObjectId.ObjectId != owner)
                 {
                     continue;
@@ -214,70 +210,63 @@ internal unsafe class CharacterManagerHook : HookableElement
 
                 user.SetBattlePet(newBattleChara);
 
-                gotOwner = true;
-
                 break;
             }
-
-            if (!gotOwner)
-            {
-                if (!HandleAsIsland(newBattleChara))
-                {
-                    temporaryPets.Add((nint)newBattleChara);
-                }
-            }
+        }
+        
+        if (actualObjectKind == ObjectKind.EventNpc)
+        {
+            HandleAsIsland(newBattleChara);
         }
     }
 
-    private bool HandleAsIsland(BattleChara* newBattleChara)
+    private void HandleAsIsland(BattleChara* newBattleChara)
     {
-        if (!IslandHook.IsOnIsland)
+        if (!MJIManager.Instance()->IsPlayerInSanctuary)
         {
-            return false;
+            return;
         }
-
+        
         if (newBattleChara->SubKind != IslandPetSubKind)
         {
-            return false;
+            return;
         }
 
         if (newBattleChara->HomeWorld != ushort.MaxValue)
         {
-            return false;
+            return;
         }
 
         if (newBattleChara->CurrentWorld != ushort.MaxValue)
         {
-            return false;
+            return;
         }
 
         if (newBattleChara->OwnerId != PluginConstants.InvalidId)
         {
-            return false;
+            return;
         }
 
         PetSkeleton temporaryPetSkeleton = new PetSkeleton((uint)newBattleChara->ModelContainer.ModelCharaId, SkeletonType.Minion);
 
         if (PetServices.PetSheets.GetPet(temporaryPetSkeleton) == null)
         {
-            return false;
+            return;
         }
 
         IPettableUser? user = PetServices.UserList[IUserList.IslandIndex];
 
         if (user == null)
         {
-            return false;
+            return;
         }
 
         if (user is not IIslandUser islandUser)
         {
-            return false;
+            return;
         }
 
         islandUser.SetBattlePet(newBattleChara);
-
-        return true;
     }
 
     private void HandleAsDeleted(BattleChara* newBattleChara)
@@ -360,13 +349,13 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
-    private IPettableUser? CreateUser(BattleChara* newBattleChara)
+    private void CreateUser(BattleChara* newBattleChara)
     {
         int actualIndex = CreateActualIndex(newBattleChara->ObjectIndex);
 
         if (actualIndex < 0 || actualIndex >= PlayerMaxInObjectTable)
         {
-            return null;
+            return;
         }
 
         PettableUser newUser = new PettableUser(PetServices, SharingDictionary, Database, LegacyDatabase, newBattleChara);
@@ -375,12 +364,12 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         AddTempPetsToUser(newUser);
 
-        if (newBattleChara->CompanionData.CompanionObject != null)
+        if (newBattleChara->CompanionData.CompanionObject == null)
         {
-            newUser.SetCompanion(newBattleChara->CompanionData.CompanionObject);
+            return;
         }
-
-        return newUser;
+        
+        newUser.SetCompanion(newBattleChara->CompanionData.CompanionObject);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

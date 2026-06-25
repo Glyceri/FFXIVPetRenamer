@@ -14,10 +14,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
 {
     private static readonly NameTypeFactory NoteBookNameType = new NameTypeFactory()
     {
-        EnglishNameType  = NameType.Raw,
-        GermanNameType   = NameType.Pronoun,
-        FrenchNameType   = NameType.Raw,
-        JapaneseNameType = NameType.Raw,
+        GermanNameType = NameType.Pronoun,
     };
     
     public MinionNoteBookHook(DalamudServices services, IPetServices petServices) 
@@ -62,7 +59,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType);
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType.GetNameType(DalamudServices));
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)

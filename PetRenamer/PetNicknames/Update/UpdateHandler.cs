@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Dalamud.Plugin.Services;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.Lodestone;
@@ -21,8 +20,6 @@ internal class UpdateHandler : IDisposable
     private readonly IIpcProvider           IpcProvider;
     private readonly LodestoneNetworker     LodestoneNetworker;
     private readonly IPetServices           PetServices;
-    private readonly IIslandHook            IslandHook;
-    private readonly IPettableDatabase      Database;
     private readonly SaveHandler            SaveHandler;    
 
     private readonly List<IUpdatable>       _updatables = [];
@@ -33,8 +30,6 @@ internal class UpdateHandler : IDisposable
         LodestoneNetworker     lodestoneNetworker, 
         IIpcProvider           ipcProvider, 
         IImageDatabase         imageDatabase, 
-        IIslandHook            islandHook,
-        IPettableDatabase      database,
         SaveHandler            saveHandler)
     {
         DalamudServices     = dalamudServices;
@@ -42,8 +37,6 @@ internal class UpdateHandler : IDisposable
         ImageDatabase       = imageDatabase;
         IpcProvider         = ipcProvider;
         PetServices         = petServices;
-        IslandHook          = islandHook;
-        Database            = database;
         SaveHandler         = saveHandler;
 
         DalamudServices.Framework.Update += OnUpdate;
@@ -58,7 +51,7 @@ internal class UpdateHandler : IDisposable
 
     private void Setup()
     {
-        _updatables.Add(new PettableUserHandler(PetServices, IslandHook, Database));
+        _updatables.Add(new PettableUserHandler(PetServices));
         _updatables.Add(new LodestoneQueueHelper(LodestoneNetworker, ImageDatabase));
         _updatables.Add(new IPCPreparer(PetServices, IpcProvider));
         _updatables.Add(IpcProvider);

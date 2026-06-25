@@ -69,6 +69,9 @@ internal class Configuration : IPluginConfiguration
     public bool attachToPCP = true;
     public bool readFromPCP = true;
 
+    // --------------------------- STATE PRESERVING ---------------------------
+    public ulong LastIslandContentId = ulong.MinValue;
+    
     // ------------------------- Debug SETTINGS --------------------------
     public bool debugModeActive        = false;
     public bool openDebugWindowOnStart = false;

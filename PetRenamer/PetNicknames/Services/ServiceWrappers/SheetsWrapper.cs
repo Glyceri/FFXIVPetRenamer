@@ -34,7 +34,7 @@ internal class SheetsWrapper : IPetSheets
         ActionSheet      = dalamudServices.DataManager.GetExcelSheet<Action>();
         BNpcNameSheet    = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
         PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
-
+        
         SetupSheetDataCache();
     }
 

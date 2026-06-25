@@ -1,217 +1,136 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Interface.ImGuiNotification;
-using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Client.Game.MJI;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Text.ReadOnly;
-using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
+﻿using Dalamud.Hooking;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.Network;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.TranslatorSystem;
-using System.Text.RegularExpressions;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-internal unsafe class IslandHook : HookableElement, IIslandHook
+internal unsafe class IslandHook : HookableElement
 {
-    /*      German:
-     *      Zu deiner Insel fahren?
-     *      Zur Insel von <firstname lastname> übersetzen?
-     * 
-     *      English:
-     *      Travel to your island?
-     *      Travel to firstname lastname's island?
-     *      
-     *      French:
-     *      Voulez-vous aller sur votre île ?
-     *      Voulez-vous visitez l'île de <firstname lastname> ?
-     *      
-     *      Japanese:
-     *      あなたの島へ向かいますか？
-     *      
-     */
-
-    public bool     IsOnIsland          { get; private set; } = false;
-    public string?  VisitingFor         { get; private set; } = null;
-    public uint?    VisitingHomeworld   { get; private set; } = null;
-    public bool     IslandStatusChanged { get; private set; } = false;
-
-    private bool lastWasOnIsland = false;
-
-    private readonly Regex fullRegexEn  = new(@"Travel to your island\?", RegexOptions.Compiled);
-    private readonly Regex fullRegexJp  = new(@"あなたの島へ向かいますか？", RegexOptions.Compiled);
-    private readonly Regex fullRegexDe  = new(@"Zu deiner Insel fahren\?", RegexOptions.Compiled);
-    private readonly Regex fullRegexFr  = new(@"Voulez-vous aller sur votre île \?", RegexOptions.Compiled);
-
-    private readonly Regex visitRegexEn = new(@"^Travel to (?<firstname>\w+) (?<lastname>\w+)'s island\?$", RegexOptions.Compiled);
-    private readonly Regex visitRegexJp = new(@"^(?<firstname>\w+)\s(?<lastname>\w+)\s+の島へ移動します。よろしいですか？$", RegexOptions.Compiled);
-    private readonly Regex visitRegexDe = new(@"^Zur Insel von (?<firstname>\w+) (?<lastname>\w+) übersetzen\?$", RegexOptions.Compiled);
-    private readonly Regex visitRegexFr = new(@"^Voulez-vous visitez l'île de (?<firstname>\w+) (?<lastname>\w+) \?$", RegexOptions.Compiled);
-
-    private readonly Regex activeRegex;
-    private readonly Regex activeVisitRegex;
-
-    public IslandHook(DalamudServices services, IPetServices petServices) 
+    private readonly Hook<PacketDispatcher.Delegates.SendEventCompletePacket> SendEventCompletePacketHook;
+    
+    private readonly IPettableDatabase Database;
+    
+    public IslandHook(DalamudServices services, IPetServices petServices, IPettableDatabase database) 
         : base(services, petServices)
     {
-        activeRegex = DalamudServices.ClientState.ClientLanguage switch
-        {
-            ClientLanguage.Japanese => fullRegexJp,
-            ClientLanguage.English  => fullRegexEn,
-            ClientLanguage.German   => fullRegexDe,
-            ClientLanguage.French   => fullRegexFr,
-            _                       => fullRegexEn,
-        };
-
-        activeVisitRegex = DalamudServices.ClientState.ClientLanguage switch
-        {
-            ClientLanguage.Japanese => visitRegexJp,
-            ClientLanguage.English  => visitRegexEn,
-            ClientLanguage.German   => visitRegexDe,
-            ClientLanguage.French   => visitRegexFr,
-            _                       => visitRegexEn,
-        };
+        SendEventCompletePacketHook = DalamudServices.Hooking.HookFromAddress<PacketDispatcher.Delegates.SendEventCompletePacket>((nint)PacketDispatcher.Addresses.SendEventCompletePacket.Value, SendEventCompletePacketDetour);
+        Database                    = database;
     }
 
     public override void Init()
-        => DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "SelectYesno", LifeCycleUpdate);
+    { 
+        SendEventCompletePacketHook?.Enable();
+        
+        HandleForContentId(PetServices.Configuration.LastIslandContentId);
+    }
     
-    private void LifeCycleUpdate(AddonEvent addonEvent, AddonArgs addonArgs)
-        => Update((AtkUnitBase*)addonArgs.Addon.Address);
-
-    public void Update()
+    protected override void OnDispose()
     {
-        IslandStatusChanged = false;
-        IsOnIsland          = MJIManager.Instance()->IsPlayerInSanctuary;
-
-        if (lastWasOnIsland != IsOnIsland)
-        {
-            lastWasOnIsland     = IsOnIsland;
-            IslandStatusChanged = true;
-
-            OnIslandStatusChanged();
-        }
+        ClearIslandUser();
+        
+        SendEventCompletePacketHook?.Dispose();
     }
 
-    private void OnIslandStatusChanged()
+    private void SendEventCompletePacketDetour(EventId eventId, short scene, byte a3, uint* payload, byte payloadSize, void* a6)
     {
-        if (!IsOnIsland)
-        {
-            VisitingFor       = null;
-            VisitingHomeworld = null;
-        }
-        else
-        {
-            if ((VisitingFor == null || VisitingHomeworld == null))
-            {
-                return;
-            }
-
-
-            if (!PetServices.Configuration.showIslandWarning)
-            {
-                return;
-            }
-
-            _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("IslandWarningGlobal"), Translator.GetLine("IslandWarning"), 10);
-        }
-    }
-
-    private void Update(AtkUnitBase* addon)
-    {
-        if (addon == null)
-        {
-            return;
-        }
-
-        if (!addon->IsVisible)
+        SendEventCompletePacketHook.Original(eventId, scene, a3, payload, payloadSize, a6);
+        
+        if (eventId.EntryId != 798)
         {
             return;
         }
         
-        AtkTextNode* tNode = addon->GetTextNodeById(2);
-
-        if (tNode == null)
+        if (eventId.ContentId != EventHandlerContent.CustomTalk)
         {
             return;
         }
-
-        string text = new ReadOnlySeStringSpan(tNode->NodeText).ExtractText();
-
-        if (text.IsNullOrWhitespace())
-        {
-            return;
-        }
-
-        ParseText(text);
+        
+        DecodeIfLocal(scene, payload, payloadSize);
+        DecodeIfOther(scene, payload, payloadSize);
     }
-
-    private void ParseText(string text)
+    
+    private void DecodeIfLocal(short scene, uint* payload, byte payloadSize)
     {
-        Match match = activeRegex.Match(text);
-
-        if (match.Success)
+        if (scene != 0 && scene != 10)
         {
-            HandleSolo();
-
             return;
         }
-
-        Match match2 = activeVisitRegex.Match(text);
-
-        if (match2.Success)
+        
+        if (payloadSize != 1)
         {
-            HandleOther(match2);
-
             return;
         }
+        
+        if (payload[0] != 2)
+        { 
+            return;
+        }
+        
+        HandleForContentId(PlayerState.Instance()->ContentId);
     }
-
-    private void HandleSolo()
+    
+    private void DecodeIfOther(short scene, uint* payload, byte payloadSize)
     {
-        IPlayerCharacter? localPlayer = DalamudServices.ObjectTable.LocalPlayer;
-
-        if (localPlayer == null)
+        if (scene != 20)
         {
             return;
         }
-
-        string name     = localPlayer.Name.TextValue;
-        uint   curWorld = localPlayer.HomeWorld.ValueNullable?.RowId ?? 0;
-
-        SetFor(name, curWorld);
-    }
-
-    private void HandleOther(Match match)
-    {
-        IPlayerCharacter? localPlayer = DalamudServices.ObjectTable.LocalPlayer;
-
-        if (localPlayer == null)
+        
+        if (payloadSize != 3)
         {
             return;
         }
+        
+        if (payload[0] != 4)
+        {
+            return;
+        }
+        
+        ulong contentIdPart1 = (ulong)payload[1] << 32;
+        ulong contentIdPart2 = (ulong)payload[2];
+        ulong contentId      = contentIdPart1 | contentIdPart2;
 
-        string firstname = match.Groups["firstname"].Value;
-        string lastname  = match.Groups["lastname"].Value;
-        uint   curWorld  = localPlayer.CurrentWorld.ValueNullable?.RowId ?? 0;
-
-        SetFor(firstname, lastname, curWorld);
+        HandleForContentId(contentId);
     }
-
-    private void SetFor(string firstname, string lastname, uint homeworld) 
-        => SetFor($"{firstname} {lastname}", homeworld);
-
-    private void SetFor(string name, uint homeworld)
+    
+    private void HandleForContentId(ulong contentId)
     {
-        VisitingFor       = name;
-        VisitingHomeworld = homeworld;
-
-        PetServices.PetLog.LogVerbose("Visiting For: " + VisitingFor + ", at Homeworld: " + VisitingHomeworld);
+        PetServices.PetLog.Log("Handling island for contentId: " + contentId);
+        
+        SetupIslandUser(Database.GetEntryNoCreate(contentId));
+        
+        if (PetServices.Configuration.LastIslandContentId == contentId)
+        {
+            return;
+        }
+        
+        PetServices.Configuration.LastIslandContentId = contentId;
+        PetServices.Configuration.Save();
     }
-
-    protected override void OnDispose()
-        => DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+    
+    private void SetupIslandUser(IPettableDatabaseEntry? entry)
+    {
+        ClearIslandUser();
+        
+        if (entry == null)
+        {
+            return;
+        }
+        
+        PetServices.PetLog.LogVerbose("Island owner found: " +  entry.Name);
+        
+        PetServices.UserList[IUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
+    }
+    
+    private void ClearIslandUser()
+    {
+        PetServices.UserList[IUserList.IslandIndex]?.Dispose(Database);
+        PetServices.UserList[IUserList.IslandIndex] = null;
+    }
 }

@@ -83,6 +83,7 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Pronoun",    DrawPronoun));
         devStructList.Add(new DevStruct("Windowing",  DrawWindowing));
         devStructList.Add(new DevStruct("NameError",  DrawNameError));
+        devStructList.Add(new DevStruct("Island",     DrawIsland));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -142,6 +143,22 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTabBar();
     }
 
+    private void DrawIsland()
+    {
+        IPettableUser? islandUser = PetServices.UserList[IUserList.IslandIndex];
+        
+        if (islandUser == null)
+        {
+            ImGui.Text("No island user found!");
+        }
+        else
+        {
+            ImGui.Text("I think you're on the island for the user: " + islandUser.Name + "@" + islandUser.Homeworld);
+
+            NewDrawUser(islandUser);
+        }
+    }
+    
     private void DrawNameError()
     {
         IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
