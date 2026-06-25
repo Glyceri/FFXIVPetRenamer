@@ -3,8 +3,10 @@ using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
+using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Collections.Generic;
 using System.Numerics;
@@ -13,9 +15,23 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
 internal static class HeaderBar
 {
-    private static int  priority;
+    private static int priority;
     
     private static readonly List<TitleBarButton> titleBarButtons = [];
+    
+    public static void Draw(IPetWindow window, SkeletonType currentMode)
+    {
+        if (!Listbox.Begin($"###PetNicknamesHeaderbar_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, ModeToggleNode.ButtonSize.Y + ImGui.GetStyle().ItemSpacing.Y + ImGui.GetStyle().FramePadding.Y)))
+        {
+            return;
+        }
+        
+        ModeToggleNode.Draw(window, currentMode, SkeletonType.Minion,      PluginConstants.MinionColourHover, PluginConstants.MinionColourIdle, PluginConstants.MinionColourClick);
+        ModeToggleNode.Draw(window, currentMode, SkeletonType.BattlePet,   PluginConstants.BattlePetHover,    PluginConstants.BattlePetIdle,    PluginConstants.BattlePetClick);
+        ModeToggleNode.Draw(window, currentMode, SkeletonType.BeastMaster, PluginConstants.BeastmasterHover,  PluginConstants.BeastmasterIdle,  PluginConstants.BeastmasterClick);
+        
+        Listbox.End();
+    }
     
     public static List<TitleBarButton> HandleHeaderButtons(WindowHandler windowHandler, IPetServices petServices)
     {

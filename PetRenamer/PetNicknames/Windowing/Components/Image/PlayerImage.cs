@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.Text;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -63,7 +64,7 @@ internal static class PlayerImage
             return;
         }
 
-        Vector2 buttonSize = new Vector2(24, 24) * WindowHandler.GlobalScale;
+        Vector2 buttonSize = new Vector2(24, 24) * ImGuiHelpers.GlobalScale;
 
         ImGui.SameLine(0, 0);
         ImGui.SetCursorPos(ImGui.GetCursorPos() - new Vector2(buttonSize.X + framePaddingX, -(size - buttonSize.Y - framePaddingY)));

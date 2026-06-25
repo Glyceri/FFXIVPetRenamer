@@ -169,7 +169,6 @@ internal class PetListWindow : PetWindow
         {
             if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
             {
-
                 float contentAvailableX = ImGui.GetContentRegionAvail().X;
                 Vector2 barSize = WindowHandler.StretchingBar;
 

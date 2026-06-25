@@ -3,86 +3,65 @@
   "Name": "Personnage",
   "Homeworld": "Monde d'origine",
   "Petcount": "Nombre de surnoms",
-
   "Search": "Rechercher",
   "DateTime.Unkown": "Date inconnue",
   "Version.Unkown": "Version inconnue",
-
   "Language.Default": "Langue du client",
   "Language.English": "Anglais",
   "Language.German": "Allemand",
   "Language.French": "Français",
   "Language.Japanese": "Japonais",
   "Language.Dutch": "Néerlandais",
-
   "ContextMenu.Rename": "Donner un surnom",
-
   "PetMode": "Mode {0}",
-
   "PetRenameNode.Species1": "Mascotte",
-  "PetRenameNode.Species2": "Familler",
+  "PetRenameNode.Species2": "Familier",
   "PetRenameNode.Species3": "Bête",
-
   "PetRenameNode.Race": "Type",
   "PetRenameNode.Behaviour": "Comportement",
   "PetRenameNode.Nickname": "Surnom",
   "PetRenameNode.Id": "Identifiant",
-
   "PetRenameNode.Edit": "Modifier",
   "PetRenameNode.Clear": "Effacer",
   "PetRenameNode.Save": "Sauvegarder",
   "PetRenameNode.Cancel": "Annuler",
-
-  "PetRenameNode.PleaseSummonWarningLabel": "Avertissement",
+  "PetRenameNode.PleaseSummonWarningLabel": "Attention",
   "PetRenameNode.PleaseSummonWarning": "Veuillez invoquer un(e) {0}",
-
   "WindowHandler.Title": "Passeport du compagnon",
-  "PetDev.Title": "Pet Nicknames Development",
-
-  "PetList.Title": "Liste des familiers",
+  "PetDev.Title": "Développement de Pet Nicknames",
+  "PetList.Title": "Liste des compagnons",
   "PetList.Navigation": "Navigation",
   "PetList.UserList": "Liste des personnages",
-  "PetList.MyList": "Ma liste",
+  "PetList.MyList": "Ma Liste",
   "PetList.Sharing": "Partage",
-
-  "PetListWindow.ListHeaderPersonalMinion": "Mes mascotte",
+  "PetListWindow.ListHeaderPersonalMinion": "Mes mascottes",
   "PetListWindow.ListHeaderPersonalBattlePet": "Mes familiers",
   "PetListWindow.ListHeaderOtherMinion": "{0} mascottes",
   "PetListWindow.ListHeaderOtherBattlePet": "{0} familiers",
-
-  "ColourPicker.EdgeColour": "Couleur des bordures",
+  "ColourPicker.EdgeColour": "Couleur de la bordure",
   "ColourPicker.TextColour": "Couleur du texte",
   "ColourPicker.ClearColour": "Effacer la couleur",
-
   "ClearButton.Label": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour effacer la saisie.",
   "ClearButton.ColourLabel": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour effacer la couleur.",
-
   "UserListElement.WarningIPC": "Ce personnage est temporairement ajouté depuis\nun module externe et ne sera pas enregistré.",
   "UserListElement.WarningOldUser": "Ce personnage provient d'une ancienne sauvegarde\nVeuillez le croiser à nouveau dans le jeu pour mettre à jour.",
-
   "IslandWarning": "Pet Nicknames n'a pas reussi à trouver le propriétaire de l'île. Veuillez visiter l'île à nouveau.",
   "IslandWarningGlobal": "Aucun propriétaire d'île trouvé",
-
-  "ShareWindow.ExportError": "Aucune donnée disponible.{Environment.NewLine}Veuillez vous connecter à un personnage pour exporter vos données.",
-  "ShareWindow.ExportSuccess": "Les données ont été exportées dans votre presse-papiers.{Environment.NewLine}Assurez-vous de coller ces données ailleurs.",
+  "ShareWindow.ExportError": "Aucune donnée disponible.\nVeuillez vous connecter à un personnage pour exporter vos données.",
+  "ShareWindow.ExportSuccess": "Les données ont été exportées dans votre presse-papiers.\nAssurez-vous de coller ces données ailleurs.",
   "ShareWindow.ExportErrorGlobal": "Aucune donnée disponible",
   "ShareWindow.ExportSuccessGlobal": "Données exportées avec succès",
-
   "ShareWindow.ImportError": "Échec de l'importation des données: {0}",
   "ShareWindow.ImportSuccess": "Données importées avec succès depuis {0}",
   "ShareWindow.ImportErrorGlobal": "Échec de l'importation des données",
   "ShareWindow.ImportSuccessGlobal": "Données importées avec succès",
-
   "Download.Redownload": "Retélécharger l'image de profil",
   "Download.Cancel": "Annuler le téléchargement",
-
   "Config.Title": "Paramètres",
-
   "Config.Header.GeneralSettings": "Paramètres généraux",
   "Config.Header.UISettings": "Paramètres de l'interface",
   "Config.Header.NativeSettings": "Paramètres d'affichage",
   "Config.Header.Debug": "Debug",
-
   "Config.PVPMessage": "Désactiver le message d'avertissement JcJ.",
   "Config.ProfilePictures": "Télécharger automatiquement les photos de profil.",
   "Config.UISettings.UIScale.Header.Title": "Taille personnalisée de l'IU",
@@ -91,63 +70,51 @@
   "Config.TransparentBackground": "Le fond devient transparent en cas d'inactivité.",
   "Config.UIFlare": "Afficher les décorations supplémentaires de l'IU.",
   "Config.Nameplate": "Afficher les surnoms sur les plaques de nom.",
-  "Config.Castbar": "Show nicknames on Cast bars.",
+  "Config.Castbar": "Afficher le surnom dans la barre d'incantation.",
   "Config.BattleChat": "Afficher les surnoms dans le chat de combat.",
   "Config.Emote": "Afficher les surnoms pour les Emotes.",
-  "Config.Flyout": "Show nicknames on Flyout Text.",
-  "Config.Tooltip": "Show nicknames on Tooltips.",
-  "Config.Notebook": "Show nicknames in the Minion Notebook.",
-  "Config.ActionLog": "Show nicknames in the Action List.",
+  "Config.Flyout": "Afficher les surnoms sur le texte volant.",
+  "Config.Tooltip": "Afficher les surnoms sur l'info-bulle.",
+  "Config.Notebook": "Afficher les surnoms dans l'Encyclopédie des Mascottes.",
+  "Config.ActionLog": "Afficher le surnom dans la liste des actions.",
   "Config.Targetbar": "Afficher les surnoms pour les cibles.",
   "Config.Partylist": "Afficher les surnoms dans l'équipe.",
-
   "Config.DebugMode": "Activer le mode de débogage",
   "Config.OpenDebugMode": "Ouvrir automatiquement DebugWindow.",
-  "Config.DebugChatcode": "Insert Chatcodes.",
+  "Config.DebugChatcode": "Insérer les Codes de triche.",
   "Config.DebugMode.Help": "Maintenez \"Ctrl gauche\" + \"Maj gauche\" pour interagir avec ce bouton.",
-
   "Config.ColourSettings": "Couleurs globales",
-
   "Config.ContextMenu": "Autoriser les menus contextuels.",
   "Config.ShowNotification": "Afficher les notifications.",
   "Config.IslandWarning": "Afficher un avertissement un cas de propriétaire d'île introuvable.",
-  "Config.IslandPets": "Show names on Island Pets.",
-  "Config.PartyCutoff": "Allow Long Casts to be Truncated.",
-  "Config.PartyCutoff.Help": "Your castbars might go out of bounds in the party list, PetNicknames worsens this issue.\nWith this setting enabled the castbars will automatically truncate to not overflow the partylist.\n\n(This is a vanilla bug).",
-
+  "Config.IslandPets": "Afficher les noms des animaux de l'île.",
+  "Config.PartyCutoff": "Autoriser le troncage des incantations longues.",
+  "Config.PartyCutoff.Help": "Votre barre d'incantation pourrait dépasser la limite de la fenêtre d'équipe, PetNicknames aggrave ce problème.\nActiver ce paramètre permet de tronquer les barres d'incantation pour ne pas déborder sur la fenêtre d'équipe.\n\n(C'est un bug vanilla).",
   "Config.Penumbra.AttachToPCP": "Stocker les données Pet Nicknames dans les fichiers Penumbra .pcp.",
   "Config.Penumbra.ReadFromPCP": "Récupérer les données de Pet Nicknames depuis des fichiers Penumbra .pcp.",
-
   "Config.Label.OverrideColour": "Écraser la couleur",
   "Config.Label.OverrideColourLabel": "Mode de couleur",
-
   "Kofi.Title": "Ko-fi",
   "Kofi.Line1": "Cela concerne de l'argent réel.",
   "Kofi.Line2": "Il sera utilisé pour les jouets de mes chats !",
   "Kofi.TakeMe": "Je donne",
-
-  "Command.Petname": "Opens the Pet Rename window.\n        Type '/petname help' for information on naming via command.",
-  "Command.Petlist": "Opens the Pet List window.",
+  "Command.Petname": "Ouvre la fenêtre de renommage des familiers.\n        Tapez \"/petname help\" pour afficher des informations sur le renommage par commandes.",
+  "Command.Petlist": "Ouvre la fenêtre de la liste des compagnons.",
   "Command.PetSettings": "Affiche la fenêtre des paramètres.",
   "Command.PetSharing": "Affiche la fenêtre de partage.",
   "Command.PetTheme": "Ouvre la fenêtre d'édition des couleurs.",
-
   "ListIconType.Both": "Les deux",
   "ListIconType.Sharing": "Partage",
   "ListIconType.ListOnly": "Liste uniquement",
-
   "MenuType.Action": "Action",
   "MenuType.Notebook": "Bloc-notes",
   "MenuType.Item": "Objet",
-
   "ColourDisplay.Everyone": "Tout le monde",
   "ColourDisplay.OnlyMyself": "Moi uniquement",
   "ColourDisplay.NoColours": "Aucune couleur",
-
   "Config.Language": "Langue du plugin",
   "Config.IconType": "Type d'icône",
   "Config.ListButtonType": "Type de la liste des boutons",
-
   "ShareWindow.Export": "Exporter vers le presse-papiers",
   "ShareWindow.Import": "Importer depuis le presse-papiers",
   "ShareWindow.Explain1": "Vous pouvez exporter vos surnoms et les envoyer à un·e ami·e.",

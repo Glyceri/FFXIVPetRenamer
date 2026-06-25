@@ -73,6 +73,10 @@ internal class PetConfigWindow : PetWindow
             
             ImGui.Separator();
             
+            DrawBasicToggle(Translator.GetLine("Config.OldBarStyle"),       ref PetServices.Configuration.oldBarStyleLayout);
+            
+            ImGui.Separator();
+            
             ImGui.Spacing();
 
             DrawBasicToggle(Translator.GetLine("Config.ShowNotification"),  ref PetServices.Configuration.showNotifications);

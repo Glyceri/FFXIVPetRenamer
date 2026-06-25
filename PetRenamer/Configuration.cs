@@ -62,7 +62,8 @@ internal class Configuration : IPluginConfiguration
     public int listButtonLayout = 0;
     public int minionIconType = 1;
     public bool showIslandWarning = true;
-
+    public bool oldBarStyleLayout = false;
+    
     // ------------------------ PENUMBRA SETTINGS ------------------------
     public bool attachToPCP = true;
     public bool readFromPCP = true;

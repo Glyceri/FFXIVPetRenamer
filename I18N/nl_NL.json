@@ -96,7 +96,7 @@
   "Config.Targetbar": "Laat bijnamen voor “Targets” zien.",
   "Config.Partylist": "Laat bijnamen in de “Party List” zien.",
   "Config.IslandPets": "Laat bijnamen zien voor “Island Pets”.",
-  
+  "Config.OldBarStyle": "Gebruik de oude barstijl.",
   "Config.DebugMode": "Ontwikkelmodus Aanzetten",
   "Config.OpenDebugMode": "Automatisch Ontwikkelscherm Openen",
   "Config.DebugChatcode": "Voeg Code's toe in de Chat.",

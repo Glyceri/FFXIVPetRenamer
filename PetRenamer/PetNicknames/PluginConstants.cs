@@ -2,6 +2,7 @@
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames;
 
@@ -40,6 +41,19 @@ public static class PluginConstants
     public static readonly PetSkeleton BaseTitanEgiSkeleton   = TitanEgi;
     public static readonly PetSkeleton BaseGarudaEgiSkeleton  = GarudaEgi;
 
+    public static readonly Vector4 MinionColourHover = new Vector4(0.5f, 0.5f, 1.0f, 1.0f); 
+    public static readonly Vector4 MinionColourIdle  = new Vector4(0.36f, 0.36f, 1.0f,  1.0f);
+    public static readonly Vector4 MinionColourClick = new Vector4(0.3f, 0.3f, 0.45f, 1.0f);
+    
+    public static readonly Vector4 BattlePetHover    = new Vector4(0.5f, 1.0f, 0.5f, 1.0f);
+    public static readonly Vector4 BattlePetIdle     = new Vector4(0.36f, 1.0f,  0.36f, 1.0f);
+    public static readonly Vector4 BattlePetClick    = new Vector4(0.3f, 0.45f, 0.3f, 1.0f);
+        
+    public static readonly Vector4 BeastmasterHover  = new Vector4(1.0f, 0.5f, 0.5f, 1.0f);
+    public static readonly Vector4 BeastmasterIdle   = new Vector4(1.0f,  0.36f, 0.36f, 1.0f);
+    public static readonly Vector4 BeastmasterClick  = new Vector4(0.45f, 0.3f, 0.3f, 1.0f);
+
+    
     [Obsolete("I stopped using classes in 1.4")] 
     public const int LegacySummonerClassID = -2;
 

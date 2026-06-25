@@ -649,7 +649,7 @@ internal class PetDevWindow : PetWindow
     
     unsafe void DrawIPCTester()
     {
-        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
+        Vector2 size = new Vector2(ImGui.GetContentRegionAvail().X, 30 * ImGuiHelpers.GlobalScale);
 
         if (LabledLabel.DrawButton("Recollect Data", "Click here##recollectButton", size))
         {

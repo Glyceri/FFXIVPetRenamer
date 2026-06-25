@@ -2,7 +2,6 @@ using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components.Header;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
@@ -46,8 +45,11 @@ internal class PetModeWindow : PetWindow
     
     public override void Update()
     {
-        base.Update();
-        
+        if (PetServices.Configuration.oldBarStyleLayout)
+        {
+            return;
+        }
+
         if (WindowHandler.FocussedWindow is null)
         {
             return;
@@ -68,11 +70,16 @@ internal class PetModeWindow : PetWindow
     
     protected override void OnDraw()
     {
+        if (PetServices.Configuration.oldBarStyleLayout)
+        {
+            return;
+        }
+        
         _startPos = ImGui.GetCursorScreenPos();
         
-        DrawModeButton(SkeletonType.Minion,      new Vector4(0.5f, 0.5f, 1.0f, 1.0f), new Vector4(0.36f, 0.36f, 1.0f,  1.0f), new Vector4(0.3f, 0.3f, 0.45f, 1.0f));
-        DrawModeButton(SkeletonType.BattlePet,   new Vector4(0.5f, 1.0f, 0.5f, 1.0f), new Vector4(0.36f, 1.0f,  0.36f, 1.0f), new Vector4(0.3f, 0.45f, 0.3f, 1.0f));
-        DrawModeButton(SkeletonType.BeastMaster, new Vector4(1.0f, 0.5f, 0.5f, 1.0f), new Vector4(1.0f,  0.36f, 0.36f, 1.0f), new Vector4(0.45f, 0.3f, 0.3f, 1.0f));
+        DrawModeButton(SkeletonType.Minion,      PluginConstants.MinionColourHover, PluginConstants.MinionColourIdle, PluginConstants.MinionColourClick);
+        DrawModeButton(SkeletonType.BattlePet,   PluginConstants.BattlePetHover,    PluginConstants.BattlePetIdle,    PluginConstants.BattlePetClick);
+        DrawModeButton(SkeletonType.BeastMaster, PluginConstants.BeastmasterHover,  PluginConstants.BeastmasterIdle,  PluginConstants.BeastmasterClick);
         
         ImDrawListPtr drawList = ImGui.GetWindowDrawList();
         
@@ -91,7 +98,7 @@ internal class PetModeWindow : PetWindow
         
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
-            ImGui.SetTooltip(CreateStringFromMode(mode));
+            ImGui.SetTooltip(ModeToggleNode.CreateStringFromMode(mode));
         }
         
         ImGui.PopStyleColor(3);
@@ -99,19 +106,10 @@ internal class PetModeWindow : PetWindow
         ImGui.SameLine();
     }
     
-    private string CreateStringFromMode(SkeletonType mode)
-    {
-        string petModeLine = Translator.GetLine("PetMode");
-        string speciesLine = Translator.GetLine($"PetRenameNode.Species{(int)mode}");
-        
-        return string.Format(petModeLine, speciesLine);
-    }
-    
     private void DrawFor(SkeletonType mode, Vector4 hoverColour, Vector4 idleColour, Vector4 clickColour)
     {
         bool    buttonPressed = false;
-        Vector2 buttonSize    = new Vector2(50, 15) * WindowHandler.GlobalScale;
-        
+
         if (attachedTo == null)
         {
             return;
@@ -123,9 +121,9 @@ internal class PetModeWindow : PetWindow
         
         Vector2 startPos = ImGui.GetCursorScreenPos();
         
-        _endPos = startPos + buttonSize;
+        _endPos = startPos + ModeToggleNode.ButtonSize;
         
-        buttonPressed = ModeToggleNode.Draw(buttonSize);
+        buttonPressed = ImGui.Button($"##ModeToggle_{WindowHandler.InternalCounter}", ModeToggleNode.ButtonSize);
         
         ImGui.EndDisabled();
         
@@ -145,7 +143,7 @@ internal class PetModeWindow : PetWindow
         }
         
         drawList.AddRectFilled(startPos, _endPos, ImGui.GetColorU32(activeColour), style.FrameRounding);
-        drawList.AddRect(startPos, _endPos, ImGui.GetColorU32(style.Colors[(int)ImGuiCol.Border]), style.FrameRounding, style.FrameBorderSize);
+        drawList.AddRect(startPos,       _endPos, ImGui.GetColorU32(style.Colors[(int)ImGuiCol.Border]), style.FrameRounding, style.FrameBorderSize);
         
         if (!buttonPressed)
         {

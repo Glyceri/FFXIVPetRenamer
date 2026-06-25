@@ -32,6 +32,7 @@ internal abstract class PetWindow : Window, IPetWindow
     protected readonly IPetServices    PetServices;
     
     private float lastGlobalScale = 0;
+    private float lastFontScale   = 0;
 
     protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) 
         : base(name, windowFlags, true)
@@ -42,20 +43,17 @@ internal abstract class PetWindow : Window, IPetWindow
         
         PetServices.DirtyListener.RegisterOnDirtyConfig(OnDirtyConfig);
         
-        SizeCondition   = ImGuiCond.FirstUseEver;
-        Size            = DefaultSize;
-
-        SizeConstraints = new WindowSizeConstraints()
-        {
-            MinimumSize = MinSize,
-            MaximumSize = MaxSize,
-        };
-        
-        SetupTitlebar();
+        Reset();
     }
     
     private void OnDirtyConfig(Configuration _)
-        => SetupTitlebar();
+        => Reset();
+    
+    private void Reset()
+    {
+        SetupTitlebar();
+        SetupWindowSize();
+    }
     
     private void SetupTitlebar()
     {
@@ -67,6 +65,32 @@ internal abstract class PetWindow : Window, IPetWindow
         }
         
         TitleBarButtons = HeaderBar.HandleHeaderButtons(WindowHandler, PetServices);
+    }
+    
+    private void SetupWindowSize()
+    {
+        SizeCondition       = ImGuiCond.Appearing;
+        
+        Vector2 defaultSize = DefaultSize * WindowHandler.FontScale;
+        Vector2 minSize     = MinSize     * WindowHandler.FontScale;
+        Vector2 maxSize     = MaxSize     * WindowHandler.FontScale;
+        
+        if (PetServices.Configuration.oldBarStyleLayout)
+        {
+            Vector2 adder   = new Vector2(0, ModeToggleNode.ButtonSize.Y + (ImGui.GetStyle().ItemSpacing.Y + ImGui.GetStyle().FramePadding.Y * 2) / WindowHandler.GlobalScale);
+            
+            defaultSize     += adder;
+            minSize         += adder;
+            maxSize         += adder;
+        }
+        
+        Size            = defaultSize;
+
+        SizeConstraints = new WindowSizeConstraints()
+        {
+            MinimumSize = minSize,
+            MaximumSize = maxSize,
+        };
     }
 
     public void Close() 
@@ -92,26 +116,21 @@ internal abstract class PetWindow : Window, IPetWindow
     
     public sealed override void PreDraw()
     {
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,    windowPadding * WindowHandler.GlobalScale);
-        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding,     framePadding * WindowHandler.GlobalScale);
-        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing,      itemSpacing * WindowHandler.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,    windowPadding    * WindowHandler.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.FramePadding,     framePadding     * WindowHandler.GlobalScale);
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing,      itemSpacing      * WindowHandler.GlobalScale);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemInnerSpacing, itemInnerSpacing * WindowHandler.GlobalScale);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowTitleAlign, new Vector2(0, 0.5f));
 
         float currentGlobalScale = WindowHandler.FontScale;
-
-        if (lastGlobalScale != currentGlobalScale)
+        float currentFontScale   = WindowHandler.GlobalScale;
+        
+        if (lastGlobalScale != currentGlobalScale || lastFontScale != currentFontScale)
         {
             lastGlobalScale = currentGlobalScale;
-
-            SizeCondition   = ImGuiCond.FirstUseEver;
-            Size            = DefaultSize * currentGlobalScale;
-
-            SizeConstraints = new WindowSizeConstraints()
-            {
-                MinimumSize = MinSize * currentGlobalScale,
-                MaximumSize = MaxSize * currentGlobalScale,
-            };
+            lastFontScale   = currentFontScale;
+            
+            SetupWindowSize();
         }
 
         OnEarlyDraw();
@@ -127,6 +146,11 @@ internal abstract class PetWindow : Window, IPetWindow
     public sealed override void Draw()
     {
         CurrentPosition = ImGui.GetWindowPos();
+        
+        if (PetServices.Configuration.oldBarStyleLayout && HasModeToggle && ShowQuickButtons)
+        {
+            HeaderBar.Draw(this, PetMode);
+        }
         
         OnDraw();
     }

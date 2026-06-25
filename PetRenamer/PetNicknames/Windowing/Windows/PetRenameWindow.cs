@@ -36,6 +36,8 @@ internal class PetRenameWindow : PetWindow
         PetServices.DirtyListener.RegisterOnDirtyPet(DirtyPet);
         PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyUser);
         PetServices.DirtyListener.RegisterOnDirtyName(DirtyName);
+        
+        IsOpen = true;
     }
 
     protected override void OnDispose()
@@ -299,8 +301,8 @@ internal class PetRenameWindow : PetWindow
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:",        ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:",      ActivePetData?.RaceName         ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
         LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName    ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-
-        if (RenameLabel.Draw($"{Translator.GetLine("PetRenameNode.Nickname")}:", ActiveCustomName == EditableCustomName, ref EditableCustomName, ref ActiveEdgeColour, ref ActiveTextColour, WindowHandler.StretchingBar))
+        
+        if (RenameLabel.Draw(ActiveCustomName == EditableCustomName, ref EditableCustomName, ref ActiveEdgeColour, ref ActiveTextColour, WindowHandler.StretchingBar))
         {
             EditableCustomName = EditableCustomName.Replace(Environment.NewLine, string.Empty);
             

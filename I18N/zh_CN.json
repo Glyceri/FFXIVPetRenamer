@@ -64,8 +64,8 @@
   "IslandWarning": "Pet Nicknames 无法识别该无人岛的主人。请重新进入该无人岛。",
   "IslandWarningGlobal": "未找到无人岛主人",
 
-  "ShareWindow.ExportError": "没有可用数据。{Environment.NewLine}你需要登录角色才能导出数据。",
-  "ShareWindow.ExportSuccess": "数据已成功导出到剪贴板。{Environment.NewLine}请确保将这些数据粘贴到其他地方。",
+  "ShareWindow.ExportError": "没有可用数据。\n你需要登录角色才能导出数据。",
+  "ShareWindow.ExportSuccess": "数据已成功导出到剪贴板。\n请确保将这些数据粘贴到其他地方。",
   "ShareWindow.ExportErrorGlobal": "没有可用数据",
   "ShareWindow.ExportSuccessGlobal": "数据导出成功",
 

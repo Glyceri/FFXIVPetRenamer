@@ -64,8 +64,8 @@
   "IslandWarning": "Pet Nicknames was unable to resolve the owner of this island. Please rejoin this island.",
   "IslandWarningGlobal": "No Island Owner Found",
 
-  "ShareWindow.ExportError": "No data available.{Environment.NewLine}You need to log in to a character to export your data.",
-  "ShareWindow.ExportSuccess": "Data successfully exported to your clipboard.{Environment.NewLine}Make sure to paste this data elsewhere.",
+  "ShareWindow.ExportError": "No data available.\nYou need to log in to a character to export your data.",
+  "ShareWindow.ExportSuccess": "Data successfully exported to your clipboard.\nMake sure to paste this data elsewhere.",
   "ShareWindow.ExportErrorGlobal": "No Data Available",
   "ShareWindow.ExportSuccessGlobal": "Data Successfully Exported",
 
@@ -101,7 +101,7 @@
   "Config.ActionLog": "Show nicknames in the Action List.",
   "Config.Targetbar": "Show nicknames for Targets.",
   "Config.Partylist": "Show nicknames on the Party List.",
-
+  "Config.OldBarStyle": "Use the old Quick Bar Style.",
   "Config.DebugMode": "Enable Debug Mode",
   "Config.OpenDebugMode": "Automatically Open DebugWindow.",
   "Config.DebugChatcode": "Insert Chatcodes.",

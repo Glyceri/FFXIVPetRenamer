@@ -1,6 +1,7 @@
 ﻿using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Interface.Utility;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Labels;
@@ -11,7 +12,7 @@ internal static class LabledLabel
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        float actualWidth = labelWidth * WindowHandler.GlobalScale;
+        float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
 
         TextAligner.Align(TextAlignment.Left);
         BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);
@@ -28,7 +29,7 @@ internal static class LabledLabel
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
-        float actualWidth = labelWidth * WindowHandler.GlobalScale;
+        float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
 
         TextAligner.Align(TextAlignment.Left);
         BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);

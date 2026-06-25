@@ -73,7 +73,7 @@ internal class WindowHandler : IWindowHandler
     // The 16 is because this plugin was made for exlusively dalamud font size 12 (which is font scale 16 in ImGUI).
     // Scaling the whole UI thingy around it seems to work perfectly fine
     public static float FontScale 
-        => (ImGui.GetFontSize() / 16.0f);
+        => ((ImGui.GetFontSize() / 16.0f) / ImGuiHelpers.GlobalScale);
 
     public static float GlobalScale
         => ImGuiHelpers.GlobalScale * FontScale;
