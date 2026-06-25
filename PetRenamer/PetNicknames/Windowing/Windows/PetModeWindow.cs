@@ -14,7 +14,7 @@ internal class PetModeWindow : PetWindow
     private IPetWindow? attachedTo = null;
     
     public PetModeWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
-        : base(windowHandler, dalamudServices, petServices, "PetModeWindow", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration)
+        : base(windowHandler, dalamudServices, petServices, "PetModeWindow", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoNav)
     {
         DisableFadeInFadeOut = true;
         DisableWindowSounds  = true;

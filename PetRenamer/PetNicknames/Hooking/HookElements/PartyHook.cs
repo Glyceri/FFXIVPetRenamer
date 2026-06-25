@@ -118,6 +118,9 @@ internal unsafe class PartyHook : HookableElement
             }
 
             member.CastingActionName->TextFlags &= ~(TextFlags.Ellipsis | TextFlags.OverflowHidden);
+            member.CastingActionName->SetWidth(197);
+            member.CastingActionName->X = 0;
+            member.CastingActionName->IsDirty = true;
             
             string castString = new ReadOnlySeStringSpan(member.CastingActionName->NodeText).ExtractText();
 
@@ -154,7 +157,21 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
             
+            ushort baseWidth  = 0;
+            ushort baseHeight = 0;
+            
+            member.CastingActionName->GetTextDrawSize(&baseWidth, &baseHeight);
+            
+            ushort textboxWidth = member.CastingActionName->GetWidth();
+            
+            if (baseWidth < textboxWidth)
+            {
+                return;
+            }
+            
             member.CastingActionName->TextFlags |= (TextFlags.Ellipsis | TextFlags.OverflowHidden);
+            member.CastingActionName->SetWidth(197 - 22);
+            member.CastingActionName->X = 22;
         }
     }
 }
