@@ -103,7 +103,7 @@ internal unsafe class IslandHook : HookableElement
     {
         PetServices.PetLog.Log("Handling island for contentId: " + contentId);
         
-        SetupIslandUser(Database.GetEntryNoCreate(contentId));
+        SetupIslandUser(Database.GetEntry(contentId));
         
         if (PetServices.Configuration.LastIslandContentId == contentId)
         {

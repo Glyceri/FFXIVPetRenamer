@@ -190,6 +190,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         IsActive = false;
         IsLegacy = false;
+        IsIpc    = true;
 
         if (parseSource == ParseSource.IPC || 
             parseSource == ParseSource.None)

@@ -102,7 +102,7 @@ internal class PetDevWindow : PetWindow
             
             return;
         }
-
+        
         devStructList[currentActive].requestUpdate?.Invoke(true);
     }
 
@@ -133,12 +133,25 @@ internal class PetDevWindow : PetWindow
             
             PetServices.Configuration.lastDebugTab = i;
             PetServices.Configuration.Save();
-            
-            devStructList[lastActive].requestUpdate?.Invoke(false);
-            devStructList[currentActive].requestUpdate?.Invoke(true);
-        }
 
-        devStructList[currentActive].onSelected?.Invoke();
+            try
+            {
+                devStructList[lastActive].requestUpdate?.Invoke(false);
+            }
+            catch {}
+            
+            try
+            {
+                devStructList[currentActive].requestUpdate?.Invoke(true);
+            }
+            catch {}
+        }
+        
+        try
+        {
+            devStructList[currentActive].onSelected?.Invoke();
+        }
+        catch {}
 
         ImGui.EndTabBar();
     }

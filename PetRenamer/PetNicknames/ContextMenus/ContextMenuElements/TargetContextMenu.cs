@@ -50,6 +50,11 @@ internal class TargetContextMenu : IContextMenuElement
                 return null;
             }
 
+            if (islandUser.ContentId != PetServices.UserList.LocalPlayer?.ContentId)
+            {
+                return null;
+            }
+            
             pet = islandUser.GetPet(target.Address);
         }
 

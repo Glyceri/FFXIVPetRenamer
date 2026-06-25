@@ -25,7 +25,7 @@ internal interface IPettableDatabase
     /// </summary>
     /// <param name="name">Player Content ID</param>
     /// <returns>The Data Base Entry</returns>
-    IPettableDatabaseEntry GetEntry(ulong contentID);
+    IPettableDatabaseEntry GetEntry(ulong contentId);
     /// <summary>
     /// Removes the entry from the database.
     /// </summary>

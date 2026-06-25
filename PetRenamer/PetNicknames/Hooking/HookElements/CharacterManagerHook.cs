@@ -282,6 +282,8 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.Pc)
         {
+            bool foundOwner = false;
+            
             int index = -1;
             
             foreach (IPettableUser? user in PetServices.UserList)
@@ -302,7 +304,14 @@ internal unsafe class CharacterManagerHook : HookableElement
                 
                 PetServices.UserList[index] = null;
 
+                foundOwner = true;
+                
                 break;
+            }
+            
+            if (!foundOwner)
+            {
+                temporaryPets.Add(addressChara);
             }
         }
 
