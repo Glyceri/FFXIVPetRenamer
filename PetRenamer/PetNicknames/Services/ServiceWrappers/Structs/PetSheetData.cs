@@ -79,7 +79,6 @@ internal readonly struct PetSheetData : IPetSheetData
         int         modelId        = (int)model.Value.RowId;
         int         legacyModelId  = model.Value.Model;
         string      singular       = companion.Singular.ExtractText();
-        string      plural         = companion.Plural.ExtractText();
         PetSkeleton petSkeleton    = new PetSkeleton((uint)modelId, SkeletonType.Minion);
         
         if (legacyModelId == 0)
@@ -87,7 +86,7 @@ internal readonly struct PetSheetData : IPetSheetData
             return null;
         }
         
-        if (singular.IsNullOrWhitespace() || plural.IsNullOrWhitespace())
+        if (singular.IsNullOrWhitespace())
         {
             return null;
         }

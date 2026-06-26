@@ -310,7 +310,8 @@ internal class StringHelperWrapper : IStringHelper
                 "サモン・", 
                 "Summon ", 
                 "Invocation ", 
-                "-Beschwörung"
+                "-Beschwörung",
+                "召唤"
             ]);
     
     public string ToVector3String(Vector3 vector)
