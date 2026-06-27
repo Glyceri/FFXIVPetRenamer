@@ -6,5 +6,5 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 internal interface IPronounHook  : IHookableElement
 {
     SeString? LastGottenPronoun         { get; }
-    SeString? PreviousLastGottenPronoun { get;}
+    SeString? PreviousLastGottenPronoun { get; }
 }

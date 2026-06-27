@@ -59,7 +59,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType.GetNameType(DalamudServices));
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType.GetValue(DalamudServices));
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)
