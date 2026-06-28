@@ -1,9 +1,9 @@
-namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-
 using Lumina.Data;
+using System.Diagnostics.CodeAnalysis;
 
-internal class LanguageBasedFactory<T>
-    where T : struct
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased;
+
+internal class LanguageBasedValue<T>
 {
     public T EnglishNameType            { get; init; }
     public T GermanNameType             { get; init; }
@@ -28,6 +28,17 @@ internal class LanguageBasedFactory<T>
             _                           => EnglishNameType,
         };
     
-    public LanguageBasedFactory()
-        { }
+    [SetsRequiredMembers]
+    public LanguageBasedValue(T defaultTValue)
+    {
+        EnglishNameType            = defaultTValue;
+        GermanNameType             = defaultTValue;
+        FrenchNameType             = defaultTValue;
+        JapaneseNameType           = defaultTValue;
+        ChineseSimplifiedNameType  = defaultTValue;
+        ChineseTraditionalNameType = defaultTValue;
+        KoreanNameType             = defaultTValue;
+        TaiwaneseNameType          = defaultTValue;
+        
+    }
 }

@@ -146,7 +146,7 @@ internal class UserList : IUserList
                 continue;
             }
 
-            if (pUser.ContentId != contentId)
+            if (pUser.DataBaseEntry.ContentId != contentId)
             {
                 continue;
             }
@@ -173,7 +173,7 @@ internal class UserList : IUserList
                 continue;
             }
 
-            if (!pUser.Name.InvariantEquals(username))
+            if (!pUser.DataBaseEntry.Name.InvariantEquals(username))
             {
                 continue;
             }

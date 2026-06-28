@@ -21,13 +21,15 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class StringHelperWrapper : IStringHelper
 {
-    private readonly IPetServices      PetServices;
-    private readonly IUserList UserList;
+    private readonly IPetServices    PetServices;
+    private readonly IUserList       UserList;
+    private readonly DalamudServices DalamudServices;
 
-    public StringHelperWrapper(IPetServices petServices, IUserList userList) 
+    public StringHelperWrapper(IPetServices petServices, DalamudServices dalamudServices, IUserList userList) 
     { 
-        PetServices = petServices;
-        UserList    = userList;
+        PetServices     = petServices;
+        UserList        = userList;
+        DalamudServices = dalamudServices;
     }
 
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
@@ -304,15 +306,8 @@ internal class StringHelperWrapper : IStringHelper
         return hasMadeReplacement;
     }
 
-    public string CleanupString(string str)
-        => str.CleanString(
-            [
-                "サモン・", 
-                "Summon ", 
-                "Invocation ", 
-                "-Beschwörung",
-                "召唤"
-            ]);
+    public string CleanupActionString(string str)
+        => str.CleanString(PluginConstants.SummonLanguageValue.GetValue(DalamudServices));
     
     public string ToVector3String(Vector3 vector)
         => vector.ToString("G", CultureInfo.InvariantCulture) ?? "null";

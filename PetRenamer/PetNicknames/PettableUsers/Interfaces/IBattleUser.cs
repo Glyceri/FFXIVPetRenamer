@@ -2,8 +2,5 @@
 
 internal interface IBattleUser : IPettableBattleEntity
 {
-    string       Name          { get; }
-    ulong        ContentId     { get; }
-    ushort       Homeworld     { get; }
-    uint         CurrentCastId { get; }
+    uint CurrentCastId { get; }
 }

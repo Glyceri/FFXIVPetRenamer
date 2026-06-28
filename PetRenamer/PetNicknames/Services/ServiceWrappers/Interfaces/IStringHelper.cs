@@ -17,7 +17,7 @@ internal unsafe interface IStringHelper
     bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
     
-    string CleanupString(string str);
+    string CleanupActionString(string str);
     
     Vector3? ParseVector3(string? line);
     string ToVector3String(Vector3 vector);

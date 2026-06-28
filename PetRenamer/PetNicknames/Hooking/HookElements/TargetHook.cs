@@ -159,7 +159,7 @@ internal unsafe class TargetHook : HookableElement
         }
         else if (entity is IPettableUser user)
         {
-            PetServices.PetLog.LogVerbose($"{callSource} just got the target: {user.Name}.");
+            PetServices.PetLog.LogVerbose($"{callSource} just got the target: {user.DataBaseEntry.Name}.");
         }
     }
 

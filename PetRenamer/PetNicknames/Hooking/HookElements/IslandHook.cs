@@ -12,6 +12,8 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class IslandHook : HookableElement
 {
+    private const uint ISLAND_TERRITORY_ID = 1055;
+    
     private readonly Hook<PacketDispatcher.Delegates.SendEventCompletePacket> SendEventCompletePacketHook;
     
     private readonly IPettableDatabase Database;
@@ -25,18 +27,41 @@ internal unsafe class IslandHook : HookableElement
 
     public override void Init()
     { 
+        DalamudServices.ClientState.TerritoryChanged += OnTerritoryChanged;
+        
         SendEventCompletePacketHook?.Enable();
         
         HandleForContentId(PetServices.Configuration.LastIslandContentId);
+        
+        OnTerritoryChanged(DalamudServices.ClientState.TerritoryType);
     }
     
     protected override void OnDispose()
     {
+        DalamudServices.ClientState.TerritoryChanged -= OnTerritoryChanged;
+        
         ClearIslandUser();
         
         SendEventCompletePacketHook?.Dispose();
     }
-
+    
+    private void OnTerritoryChanged(uint territory)
+    {
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.Log($"Pet Nicknames detected a zone change: {territory}");
+        }
+        
+        if (territory == ISLAND_TERRITORY_ID)
+        {
+            HandleForContentId(PetServices.Configuration.LastIslandContentId);
+        }
+        else
+        {
+            ClearIslandUser();
+        }
+    }
+    
     private void SendEventCompletePacketDetour(EventId eventId, short scene, byte a3, uint* payload, byte payloadSize, void* a6)
     {
         SendEventCompletePacketHook.Original(eventId, scene, a3, payload, payloadSize, a6);

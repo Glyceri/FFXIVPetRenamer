@@ -13,7 +13,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 
@@ -74,7 +73,7 @@ internal class DataParser : IDataParser
         {
             if (localUser != null && (parseSource == ParseSource.IPC || parseSource == ParseSource.PCP))
             {
-                if (localUser.Name == baseParseResult.UserName && localUser.Homeworld == baseParseResult.Homeworld)
+                if (localUser.DataBaseEntry.Name == baseParseResult.UserName && localUser.DataBaseEntry.Homeworld == baseParseResult.Homeworld)
                 {
                     return false;
                 }

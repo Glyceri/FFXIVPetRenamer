@@ -5,7 +5,7 @@ using PetRenamer.PetNicknames.Update.Interfaces;
 
 namespace PetRenamer.PetNicknames.Update.Updatables;
 
-internal class IPCPreparer(IPetServices petServices, IIpcProvider ipcProvider) : IUpdatable
+internal class IpcPreparer(IPetServices petServices, IIpcProvider ipcProvider) : IUpdatable
 {
     public bool Enabled { get; private set; } 
         = true;

@@ -115,6 +115,14 @@ internal class PettableDatabase : IPettableDatabase
 
     public void RemoveEntry(IPettableDatabaseEntry entry, ParseSource parseSource)
     {
+        if (entry.EntryUsageCount > 0)
+        {
+            PetServices.PetLog.LogInfo($"Tried to remove the entry for: {entry.Name}@{entry.HomeworldName}.\nThis action could not be completed because it is still in use. (NOTE: This is normal if the user was an island user as well).");
+            
+            return;
+        }
+
+            
         for (int i = Entries.Count - 1; i >= 0; i--)
         {
             IPettableDatabaseEntry currentEntry = Entries[i];
@@ -158,17 +166,17 @@ internal class PettableDatabase : IPettableDatabase
 
     public void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource)
     {
-        bool isFromIPC = parseSource == ParseSource.IPC;
+        bool isFromIpc = parseSource == ParseSource.IPC;
 
         IPettableDatabaseEntry entry = GetEntry(parseResult.ContentId);
 
         entry.UpdateEntry(parseResult, parseSource);
 
-        if (isFromIPC)
+        if (isFromIpc)
         {
             return;
         }
-
+        
         SetDirty();
     }
 

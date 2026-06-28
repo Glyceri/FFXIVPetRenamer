@@ -49,9 +49,6 @@ internal class HookHandler : IDisposable
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
         Register(new IslandHook(DalamudServices, PetServices, Database));
-        
-        PetServices.NameService.RegisterPronounHook(PronounHook);
-        
         Register(new CastHook(DalamudServices, PetServices));
         Register(new NamePlateHook(DalamudServices, PetServices));
         Register(new PartyHook(DalamudServices, PetServices));

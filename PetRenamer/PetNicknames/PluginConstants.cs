@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Numerics;
 
 namespace PetRenamer.PetNicknames;
 
-public static class PluginConstants
+internal static class PluginConstants
 {
     public const string pluginName         = "Pet Nicknames";
 
@@ -53,18 +54,38 @@ public static class PluginConstants
     public static readonly Vector4 BeastmasterIdle   = new Vector4(1.0f,  0.36f, 0.36f, 1.0f);
     public static readonly Vector4 BeastmasterClick  = new Vector4(0.45f, 0.3f, 0.3f, 1.0f);
 
+    public const string EnglishSummonValue     = "Summon ";      // The space is important.
+    public const string GermanSummonValue      = "-Beschwörung"; // The - is important.
+    public const string FrenchSummonValue      = "Invocation ";  // The space is important.
+    public const string JapaneseSummonValue    = "サモン・";      // The ・ is important.
+    public const string ChineseSummonValue     =  "召唤";
+    public const string ChineseTradSummonValue =  "召唤";
+    public const string KoreanSummonValue      =  EnglishSummonValue; // TODO: FIGURE OUT THE ACTUAL KOREAN TEXT
+    public const string ThaiSummonValue        =  EnglishSummonValue; // TODO: FIGURE OUT THE ACTUAL THAI TEXT
+    
+    public static readonly SummonLanguageValue SummonLanguageValue = new SummonLanguageValue()
+    {
+        EnglishNameType            = EnglishSummonValue,
+        GermanNameType             = GermanSummonValue,
+        FrenchNameType             = FrenchSummonValue,
+        JapaneseNameType           = JapaneseSummonValue,
+        ChineseSimplifiedNameType  = ChineseSummonValue,
+        ChineseTraditionalNameType = ChineseTradSummonValue,
+        KoreanNameType             = KoreanSummonValue,
+        TaiwaneseNameType          = ThaiSummonValue,
+    };
     
     [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacySummonerClassID = -2;
+    public const int LegacySummonerClassId = -2;
 
     [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyScholarClassID = -3;
+    public const int LegacyScholarClassId = -3;
 
     [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyMachinistClassID = -4;
+    public const int LegacyMachinistClassId = -4;
 
     [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyDarkKnightClassID = -5;
+    public const int LegacyDarkKnightClassId = -5;
 
     // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
     // Soft Mapping is the most hardcoded thing in this plogon :c
@@ -153,7 +174,7 @@ public static class PluginConstants
     public static readonly Dictionary<int, PetSkeleton[]> BattlePetToClass = new Dictionary<int, PetSkeleton[]>()
     {
         {
-            LegacySummonerClassID, 
+            LegacySummonerClassId, 
             [
                 Carbuncle,
                 RubyCarbuncle,
@@ -171,7 +192,7 @@ public static class PluginConstants
             ]
         },
         {
-            LegacyScholarClassID, 
+            LegacyScholarClassId, 
             [
                 Eos,
                 Selene,
@@ -179,14 +200,14 @@ public static class PluginConstants
             ]
         },
         {
-            LegacyMachinistClassID,
+            LegacyMachinistClassId,
             [
                 RookAutoTurret,
                 AutomatonQueen,
             ]
         },
         {
-            LegacyDarkKnightClassID,
+            LegacyDarkKnightClassId,
             [
                 LivingShadow
             ]

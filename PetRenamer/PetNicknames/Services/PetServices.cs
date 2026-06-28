@@ -33,7 +33,7 @@ internal class PetServices : IPetServices
         PetLog              = new PetLogWrapper(services.PluginLog);
         Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
         UserList            = new UserList();
-        StringHelper        = new StringHelperWrapper(this, UserList);
+        StringHelper        = new StringHelperWrapper(this, services, UserList);
         NameService         = new NameService(StringHelper);
         PetSheets           = new SheetsWrapper(services);
         PetCastHelper       = new PetCastWrapper(UserList);

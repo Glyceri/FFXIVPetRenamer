@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -36,6 +37,8 @@ internal unsafe class PettableIslandUser : IIslandUser
         ContentId       = entry.ContentId;
         Homeworld       = entry.Homeworld;
         EntityId        = (uint)PluginConstants.InvalidId;
+        
+        entry.RegisterUsage();
     }
 
     public bool IsActive
@@ -114,12 +117,16 @@ internal unsafe class PettableIslandUser : IIslandUser
         => null;
 
     public void OnLastCastChanged(uint cast) { } // Unused
-    public void Dispose(IPettableDatabase d) { } // Unused
     public void Update() { } // Unused
     public void SetCompanion(Companion* companion) { } // Unused
     public void RemoveCompanion() { } // Unused
     public void Recalculate() { } // unused
 
+    public void Dispose(IPettableDatabase d)
+    {
+        DataBaseEntry.DeregisterUsage();
+    }
+    
     public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;

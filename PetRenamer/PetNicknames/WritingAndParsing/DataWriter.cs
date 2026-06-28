@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace PetRenamer.PetNicknames.ReadingAndParsing;
+namespace PetRenamer.PetNicknames.WritingAndParsing;
 
 internal class DataWriter : IDataWriter
 {

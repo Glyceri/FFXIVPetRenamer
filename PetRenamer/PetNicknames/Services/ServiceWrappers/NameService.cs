@@ -19,7 +19,7 @@ internal class NameService : INameService
         => PronounHook?.LastGottenPronoun?.TextValue;
     
     private string GetActionName(IPetSheetData petData)
-        => StringHelper.CleanupString(petData.ActionName);
+        => StringHelper.CleanupActionString(petData.ActionName);
     
     public string? GetName(NameType nameType, IPetSheetData petData)
         => nameType switch

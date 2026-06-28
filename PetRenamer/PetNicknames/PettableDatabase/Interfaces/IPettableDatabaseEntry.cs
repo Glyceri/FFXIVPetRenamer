@@ -1,5 +1,4 @@
-﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using PN.S;
@@ -19,13 +18,15 @@ internal interface IPettableDatabaseEntry
     bool IsIpc    { get; }
     bool IsLegacy { get; }
 
+    int EntryUsageCount { get; }
+    
     ImmutableArray<PetSkeleton> SoftSkeletons { get; }
 
     INamesDatabase   ActiveDatabase { get; }
     INamesDatabase[] AllDatabases   { get; }
 
     void UpdateContentId(ulong contentId, bool removeIpcStatus = false);
-    void UpdateEntry(IPettableUser pettableUser);
+    void UpdateEntry(string name, ushort homeworld, bool isLocalPlayer);
     /// <summary>
     /// Moves this entry into the new database.
     /// </summary>
@@ -43,5 +44,8 @@ internal interface IPettableDatabaseEntry
     void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);
     void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource);
 
+    void RegisterUsage();
+    void DeregisterUsage();
+    
     SerializableUserV6 SerializeEntry();
 }

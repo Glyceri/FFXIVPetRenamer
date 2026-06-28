@@ -14,9 +14,6 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableUser : IPettableUser
 {
-    public string       Name        { get; }
-    public ulong        ContentId   { get; }
-    public ushort       Homeworld   { get; }
     public GameObjectId ObjectId    { get; }
 
     public List<IPettablePet> PettablePets { get; } = [];
@@ -48,34 +45,31 @@ internal unsafe class PettableUser : IPettableUser
         Address         = (nint)BattleChara;
 
         IsLocalPlayer   = BattleChara->ObjectIndex == 0;
-        Name            = BattleChara->NameString;
-        ContentId       = BattleChara->ContentId;
-        Homeworld       = BattleChara->HomeWorld;
-
         ObjectId        = BattleChara->GetGameObjectId();
         EntityId        = BattleChara->EntityId;
 
-        IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(Name, Homeworld, false);
+        IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(BattleChara->NameString, BattleChara->HomeWorld, false);
 
         if (legacyEntry != null)
         {
-            legacyEntry.UpdateContentId(ContentId, true);
+            legacyEntry.UpdateContentId(BattleChara->ContentId, true);
             legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
             _ = legacyEntry.MoveToDataBase(dataBase);
             legacyDatabase.SetDirty();
         }
 
-        DataBaseEntry = dataBase.GetEntry(ContentId);
-        DataBaseEntry.UpdateEntry(this);
+        DataBaseEntry = dataBase.GetEntry(BattleChara->ContentId);
+        DataBaseEntry.RegisterUsage();
+        DataBaseEntry.UpdateEntry(BattleChara->NameString, BattleChara->HomeWorld, IsLocalPlayer);
 
         if (IsLocalPlayer)
         {
-            DataBaseEntry.UpdateContentId(ContentId, true);
+            DataBaseEntry.UpdateContentId(BattleChara->ContentId, true);
         }
 
         if (petServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Just created a new user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+            PetServices.PetLog.LogVerbose($"Just created a new user: {DataBaseEntry.ContentId}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
         }
     }
 
@@ -166,7 +160,7 @@ internal unsafe class PettableUser : IPettableUser
     {
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, and the ObjectID: {pet.ObjectId} to the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, and the ObjectID: {pet.ObjectId} to the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
         }
 
         if (index == -1)
@@ -244,9 +238,11 @@ internal unsafe class PettableUser : IPettableUser
     
     public void Dispose(IPettableDatabase database)
     {
+        DataBaseEntry.DeregisterUsage();
+        
         if (PetServices.Configuration.debugModeActive)
         {
-            PetServices.PetLog.LogVerbose($"Just removed the user: {Name}@{Homeworld}, Address: {Address}, ContentID: {ContentId}");
+            PetServices.PetLog.LogVerbose($"Just removed the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
         }
 
         PetServices.DirtyListener.UnregisterOnClearEntry(OnDirty);

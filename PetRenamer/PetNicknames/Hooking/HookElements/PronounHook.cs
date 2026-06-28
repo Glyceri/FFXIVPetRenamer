@@ -21,7 +21,10 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
     private readonly Hook<ProcessNounDelegate>? ProcessNounHook = null!;
     
     public PronounHook(DalamudServices services, IPetServices petServices) 
-        : base(services, petServices) { }
+        : base(services, petServices)
+    {
+        PetServices.NameService.RegisterPronounHook(this);
+    }
 
     public override void Init()
     {

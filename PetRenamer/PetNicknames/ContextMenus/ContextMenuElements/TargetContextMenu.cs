@@ -50,7 +50,7 @@ internal class TargetContextMenu : IContextMenuElement
                 return null;
             }
 
-            if (islandUser.ContentId != PetServices.UserList.LocalPlayer?.ContentId)
+            if (islandUser.DataBaseEntry.ContentId != PetServices.UserList.LocalPlayer?.DataBaseEntry.ContentId)
             {
                 return null;
             }

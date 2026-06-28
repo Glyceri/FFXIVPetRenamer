@@ -6,7 +6,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -14,7 +14,7 @@ internal class HoverHook : HookableElement
 {
     private uint lastIconId;
     
-    private static readonly NameTypeFactory HoverNameType = new NameTypeFactory()
+    private static readonly NameTypeValue HoverNameType = new NameTypeValue()
     { 
         GermanNameType  = NameType.Pronoun,
     };

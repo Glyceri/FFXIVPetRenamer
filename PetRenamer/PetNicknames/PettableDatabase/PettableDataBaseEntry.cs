@@ -1,5 +1,4 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -14,13 +13,15 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
-    public bool   IsActive      { get; private set; }
+    public bool   IsActive        { get; private set; }
 
-    public ulong  ContentId     { get; private set; }
-    public string Name          { get; private set; } = string.Empty;
-    public ushort Homeworld     { get; private set; }
-    public string HomeworldName { get; private set; } = string.Empty;
+    public ulong  ContentId       { get; private set; }
+    public string Name            { get; private set; } = string.Empty;
+    public ushort Homeworld       { get; private set; }
+    public string HomeworldName   { get; private set; } = string.Empty;
 
+    public int    EntryUsageCount { get; private set; }
+    
     public ImmutableArray<PetSkeleton> SoftSkeletons { get; private set; } = [];
 
     public INamesDatabase ActiveDatabase { get; }
@@ -49,17 +50,17 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public INamesDatabase[] AllDatabases 
         => [ActiveDatabase];
 
-    public void UpdateEntry(IPettableUser pettableUser)
+    public void UpdateEntry(string name, ushort homeworld, bool isLocalPlayer)
     {
-        SetName(pettableUser.Name);
-        SetHomeworld(pettableUser.Homeworld);
+        SetName(name);
+        SetHomeworld(homeworld);
 
         if (IsActive)
         {
             return;
         }
 
-        if (!pettableUser.IsLocalPlayer)
+        if (!isLocalPlayer)
         {
             return;
         }
@@ -170,7 +171,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         UpdateEntryBase(parseResult, parseSource);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
-        UpdateContentId(parseResult.ContentId);
+        UpdateContentId(parseResult.ContentId, (parseSource != ParseSource.IPC));
     }
 
     public void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource)
@@ -210,5 +211,15 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     private void MarkDirty()
     {
         PetServices.DirtyCaller.DirtyEntry(this);
+    }
+    
+    public void RegisterUsage()
+    {
+        EntryUsageCount++;
+    }
+    
+    public void DeregisterUsage()
+    {
+        EntryUsageCount--;   
     }
 }

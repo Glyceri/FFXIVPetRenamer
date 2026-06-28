@@ -158,6 +158,15 @@ internal class PetDevWindow : PetWindow
 
     private void DrawIsland()
     {
+        ImGui.Text("Last user contentId: " + PetServices.Configuration.LastIslandContentId);
+        
+        IPettableDatabaseEntry? entry = Database.GetEntryNoCreate(PetServices.Configuration.LastIslandContentId);
+        
+        if (entry != null)
+        {
+            DrawDatabaseUser(entry);
+        }
+        
         IPettableUser? islandUser = PetServices.UserList[IUserList.IslandIndex];
         
         if (islandUser == null)
@@ -166,7 +175,7 @@ internal class PetDevWindow : PetWindow
         }
         else
         {
-            ImGui.Text("I think you're on the island for the user: " + islandUser.Name + "@" + islandUser.Homeworld);
+            ImGui.Text("I think you're on the island for the user: " + islandUser.DataBaseEntry.Name + "@" + islandUser.DataBaseEntry.HomeworldName);
 
             NewDrawUser(islandUser);
         }
@@ -338,13 +347,13 @@ internal class PetDevWindow : PetWindow
     
     void DrawDatabaseUser(IPettableDatabaseEntry user)
     {
-        if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+        if (!ImGui.BeginTable($"##usersTable{WindowHandler.InternalCounter}", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
             return;
 
         ImGui.TableNextRow();
 
         ImGui.TableSetColumnIndex(0);
-        ImGui.TextUnformatted(user.IsActive ? "O" : "X");
+        ImGui.TextUnformatted("Is Active: " + (user.IsActive ? "O" : "X"));
 
         ImGui.TableSetColumnIndex(1);
         ImGui.TextUnformatted($"{user.Name}");
@@ -353,11 +362,14 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.Homeworld.ToString());
 
         ImGui.TableSetColumnIndex(3);
-        ImGui.TextUnformatted(user.IsIpc ? "O" : "X");
+        ImGui.TextUnformatted("IsIPC: " + (user.IsIpc ? "O" : "X"));
 
         ImGui.TableSetColumnIndex(4);
-        ImGui.TextUnformatted(PetServices.UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X");
+        ImGui.TextUnformatted("Found in Userlist: " + (PetServices.UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X"));
 
+        ImGui.TableSetColumnIndex(5);
+        ImGui.TextUnformatted("Entry Usage Count: " + user.EntryUsageCount.ToString());
+        
         ImGui.EndTable();
     }
 
@@ -421,7 +433,7 @@ internal class PetDevWindow : PetWindow
         => pet == null ? "No Pet" : $"{pet.SkeletonId}] [{pet.Address}";
     
     private string GetUserText(IPettableUser? user)
-        => user == null ? "No Player" : $"{user.Name}@{PetServices.PetSheets.GetWorldName(user.Homeworld)}] [{user.PettablePets.Count}";
+        => user == null ? "No Player" : $"{user.DataBaseEntry.Name}@{user.DataBaseEntry.HomeworldName}] [{user.PettablePets.Count}";
     
     private string GetTargetText(IPettableEntity? target)
     {
@@ -924,7 +936,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TableNextRow();
 
         ImGui.TableSetColumnIndex(0);
-        ImGui.TextUnformatted($"{user.Name}");
+        ImGui.TextUnformatted($"{user.DataBaseEntry.Name}");
 
         ImGui.TableSetColumnIndex(1);
         ImGui.TextUnformatted(user.DataBaseEntry.HomeworldName);
@@ -932,9 +944,9 @@ internal class PetDevWindow : PetWindow
         ImGui.TableSetColumnIndex(2);
         if (user.IsActive)
         {
-            if (ImGui.Button($"O###DEBUG_DEACTIVATE_{user.ContentId}"))
+            if (ImGui.Button($"O###DEBUG_DEACTIVATE_{user.DataBaseEntry.ContentId}"))
             {
-                Database.GetEntry(user.ContentId).Clear(ParseSource.Manual);
+                Database.GetEntry(user.DataBaseEntry.ContentId).Clear(ParseSource.Manual);
             }
             
             if (ImGui.IsItemHovered())
@@ -944,9 +956,9 @@ internal class PetDevWindow : PetWindow
         }
         else
         {
-            if (ImGui.Button($"X###DEBUG_ACTIVATE_{user.ContentId}"))
+            if (ImGui.Button($"X###DEBUG_ACTIVATE_{user.DataBaseEntry.ContentId}"))
             {
-                user.DataBaseEntry.UpdateContentId(user.ContentId, true);
+                user.DataBaseEntry.UpdateContentId(user.DataBaseEntry.ContentId, true);
             }
         }
         
@@ -971,7 +983,7 @@ internal class PetDevWindow : PetWindow
             ImGuiHelpers.SeStringWrapped(seString.EncodeWithNullTerminator());
             
             ImGui.TableSetColumnIndex(3);
-            if (ImGui.Button($"Set Name###DEBUGSETNAME_{pet.SkeletonId}_{user.ContentId}"))
+            if (ImGui.Button($"Set Name###DEBUGSETNAME_{pet.SkeletonId}_{user.DataBaseEntry.ContentId}"))
             {
                 WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.SkeletonId, user.DataBaseEntry);
             }

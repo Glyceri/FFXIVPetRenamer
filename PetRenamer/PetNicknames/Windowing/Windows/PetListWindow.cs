@@ -1,5 +1,4 @@
 ﻿using Dalamud.Bindings.ImGui;
-using Dalamud.Game.Text.SeStringHandling;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -23,7 +22,6 @@ using Dalamud.Interface.ImGuiNotification;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using Dalamud.Interface;
-using Dalamud.Interface.Utility;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -359,7 +357,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
 
-            if (user.Entry.ContentId == PetServices.UserList.LocalPlayer?.ContentId)
+            if (user.Entry.ContentId == PetServices.UserList.LocalPlayer?.DataBaseEntry.ContentId)
             {
                 if (LabledLabel.DrawButton($"{Translator.GetLine("Name")}:", user.Entry.Name, WindowHandler.StretchingBar))
                 {
@@ -533,7 +531,7 @@ internal class PetListWindow : PetWindow
     {
         if (PetServices.UserList.LocalPlayer != null && entry != null)
         {
-            return PetServices.UserList.LocalPlayer.ContentId == entry.ContentId;
+            return PetServices.UserList.LocalPlayer.DataBaseEntry.ContentId == entry.ContentId;
         }
         else
         {
