@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -109,8 +110,8 @@ internal unsafe class PettableIslandUser : IIslandUser
         return null;
     }
     
-    public string? GetCustomName(IPetSheetData sheetData) 
-        => DataBaseEntry.GetName(sheetData.Model);
+    public string? GetCustomName(PetSkeleton petSkeleton) 
+        => DataBaseEntry.GetName(petSkeleton);
 
     public IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None)
         => null;
@@ -126,7 +127,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         DataBaseEntry.DeregisterUsage();
     }
     
-    public void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
+    public void GetDrawColours(PetSkeleton petSkeleton, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)
     {
         edgeColour = null;
         textColour = null;
@@ -148,7 +149,7 @@ internal unsafe class PettableIslandUser : IIslandUser
             return;
         }
 
-        edgeColour = DataBaseEntry.GetEdgeColour(sheetData.Model);
-        textColour = DataBaseEntry.GetTextColour(sheetData.Model);
+        edgeColour = DataBaseEntry.GetEdgeColour(petSkeleton);
+        textColour = DataBaseEntry.GetTextColour(petSkeleton);
     }
 }

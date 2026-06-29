@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -16,6 +17,8 @@ internal unsafe interface IStringHelper
     
     bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
+    
+    bool ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, PetSkeleton petSkeleton, string baseName, IPettableUser? user = null);
     
     string CleanupActionString(string str);
     

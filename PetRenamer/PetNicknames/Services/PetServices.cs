@@ -24,6 +24,7 @@ internal class PetServices : IPetServices
     public IDirtyCaller         DirtyCaller         { get; }
     public IDirtyListener       DirtyListener       { get; }
     public IParty               Party               { get; }
+    public IChatRefresher       ChatRefresher       { get; }
 
     private readonly DirtyHandler DirtyHandler = new DirtyHandler();
     
@@ -36,7 +37,7 @@ internal class PetServices : IPetServices
         StringHelper        = new StringHelperWrapper(this, services, UserList);
         NameService         = new NameService(StringHelper);
         PetSheets           = new SheetsWrapper(services);
-        PetCastHelper       = new PetCastWrapper(UserList);
+        PetCastHelper       = new PetCastWrapper(this);
         TargetManager       = new TargetManagerWrapper(services, UserList);
         PluginWatcher       = new PluginWatcher(services);
         NotificationService = new NotificationService(services, Configuration);
@@ -44,6 +45,7 @@ internal class PetServices : IPetServices
         DirtyCaller         = DirtyHandler;
         DirtyListener       = DirtyHandler;
         Party               = new PartyService(UserList, services, DirtyListener);
+        ChatRefresher       = new ChatRefresher(DirtyListener);
         
         CheckConfigFailure();
     }
@@ -62,5 +64,6 @@ internal class PetServices : IPetServices
     {
         Party.Dispose();
         PluginWatcher.Dispose();
+        ChatRefresher.Dispose();
     }
 }

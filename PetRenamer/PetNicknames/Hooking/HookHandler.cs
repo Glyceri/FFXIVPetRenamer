@@ -44,6 +44,7 @@ internal class HookHandler : IDisposable
         PronounHook = new PronounHook(DalamudServices, PetServices);
         Register(PronounHook);
         
+        Register(new ChatHook(DalamudServices, PetServices, Database, PronounHook));
         Register(new TooltipHook(DalamudServices, PetServices, mapHook, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));

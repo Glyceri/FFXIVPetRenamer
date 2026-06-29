@@ -1,9 +1,7 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using Dalamud.Plugin.Services;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using System;
 using System.Collections.Generic;
 

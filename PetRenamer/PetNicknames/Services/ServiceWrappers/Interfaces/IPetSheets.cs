@@ -21,6 +21,7 @@ internal interface IPetSheets
     IPetSheetData       MakeSoft(IPettableUser user, IPetSheetData oldData);
     int?                CastToSoftIndex(uint castId);
     PetMirage?          GetPetMirage(uint petMirageId);
+    LogMessage?         GetLogMessage(uint logMessageId);
 
     /// <summary>
     /// CALL FOR DEBUG PURPOSES ONLY, IF YOU EVER USE THIS IN THE ACTUAL PLUGIN, YOU ARE DOING IT WRONG!

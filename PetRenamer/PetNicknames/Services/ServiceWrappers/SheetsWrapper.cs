@@ -23,6 +23,7 @@ internal class SheetsWrapper : IPetSheets
     private readonly ExcelSheet<Action>      ActionSheet;
     private readonly ExcelSheet<BNpcName>    BNpcNameSheet;
     private readonly ExcelSheet<PetMirage>   PetMirageSheet;
+    private readonly ExcelSheet<LogMessage>  LogMessageSheet;
 
     public SheetsWrapper(DalamudServices dalamudServices)
     {
@@ -34,6 +35,7 @@ internal class SheetsWrapper : IPetSheets
         ActionSheet      = dalamudServices.DataManager.GetExcelSheet<Action>();
         BNpcNameSheet    = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
         PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
+        LogMessageSheet  = dalamudServices.DataManager.GetExcelSheet<LogMessage>();
         
         SetupSheetDataCache();
     }
@@ -92,6 +94,9 @@ internal class SheetsWrapper : IPetSheets
         
         return string.Empty;
     }
+    
+    public LogMessage? GetLogMessage(uint logMessageId)
+        => LogMessageSheet.GetRow(logMessageId);
 
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
         => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);

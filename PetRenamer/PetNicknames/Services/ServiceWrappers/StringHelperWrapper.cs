@@ -9,6 +9,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -250,7 +251,19 @@ internal class StringHelperWrapper : IStringHelper
         {
             return false;
         }
+
+        string? baseName = PetServices.NameService.GetName(nameType, petData);
         
+        if (baseName.IsNullOrWhitespace())
+        {
+            return false;
+        }
+        
+        return ReplaceSeString(colourConfig, ref seString, petData.Model, baseName, user);
+    }
+    
+    public bool ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, PetSkeleton petSkeleton, string baseName, IPettableUser? user = null)
+    {
         if (!colourConfig.Enabled)
         {
             return false;
@@ -263,21 +276,14 @@ internal class StringHelperWrapper : IStringHelper
             return false;
         }
         
-        string? baseName = PetServices.NameService.GetName(nameType, petData);
-        
-        if (baseName.IsNullOrWhitespace())
-        {
-            return false;
-        }
-        
-        string? customName = user.GetCustomName(petData);
+        string? customName = user.GetCustomName(petSkeleton);
         
         if (customName.IsNullOrWhitespace())
         {
             return false;
         }
         
-        user.GetDrawColours(petData, colourConfig, out Vector3? edgeColour, out Vector3? textColour);
+        user.GetDrawColours(petSkeleton, colourConfig, out Vector3? edgeColour, out Vector3? textColour);
         
         return ReplaceSeString(ref seString, baseName, customName, edgeColour, textColour);
     }

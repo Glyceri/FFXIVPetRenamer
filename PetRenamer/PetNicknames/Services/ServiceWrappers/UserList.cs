@@ -157,7 +157,7 @@ internal class UserList : IUserList
         return null;
     }
     
-    public IPettableUser? GetUser(string username)
+    public IPettableUser? GetUser(string username, uint homeworld)
     {
         if (username.IsNullOrWhitespace())
         {
@@ -173,11 +173,16 @@ internal class UserList : IUserList
                 continue;
             }
 
+            if (pUser.DataBaseEntry.Homeworld != homeworld)
+            {
+                continue;
+            }
+            
             if (!pUser.DataBaseEntry.Name.InvariantEquals(username))
             {
                 continue;
             }
-
+            
             return pUser;
         }
 

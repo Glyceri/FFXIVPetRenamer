@@ -20,7 +20,7 @@ internal interface IUserList : IEnumerable<IPettableUser?>
     IPettableUser? GetUser(nint user, UserListFindType findType);
     IPettableUser? GetUserFromObjectId(GameObjectId objectId);
     IPettableUser? GetUserFromContentId(ulong contentId);
-    IPettableUser? GetUser(string username);
+    IPettableUser? GetUser(string username, uint homeworld);
     
     void Recalculate();
 }

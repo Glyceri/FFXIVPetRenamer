@@ -38,7 +38,7 @@ internal unsafe class PettableIslandPet : IIslandPet
             return;
         }
 
-        Owner.GetDrawColours(PetData, colourConfig, out edgeColour, out textColour);
+        Owner.GetDrawColours(PetData.Model, colourConfig, out edgeColour, out textColour);
     }
 
     public bool IsActive

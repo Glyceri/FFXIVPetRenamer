@@ -2,7 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -21,7 +21,7 @@ internal unsafe interface IPettableUser : IBattleUser
     IPettablePet? GetPet(GameObjectId gameObjectId);
     IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None);
 
-    string? GetCustomName(IPetSheetData sheetData);
+    string? GetCustomName(PetSkeleton petSkeleton);
 
     void OnLastCastChanged(uint cast);
     void Update();
@@ -30,6 +30,6 @@ internal unsafe interface IPettableUser : IBattleUser
     void SetCompanion(Companion* companion);
     void RemoveCompanion();
     void Dispose(IPettableDatabase database);
-    void GetDrawColours(IPetSheetData sheetData, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
+    void GetDrawColours(PetSkeleton petSkeleton, Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour);
     void Recalculate();
 }

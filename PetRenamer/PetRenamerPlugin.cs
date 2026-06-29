@@ -42,7 +42,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
     private readonly ContextMenuHandler     ContextMenuHandler;
     private readonly UpdateHandler          UpdateHandler;
     private readonly HookHandler            HookHandler;
-    private readonly ChatHandler            ChatHandler;
+    //private readonly ChatHandler            ChatHandler;
     private readonly CommandHandler         CommandHandler;
     private readonly LodestoneNetworker     LodestoneNetworker;
     private readonly SaveHandler            SaveHandler;
@@ -76,7 +76,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         SaveHandler        = new SaveHandler(PetServices, IpcProvider);
 
         UpdateHandler      = new UpdateHandler(DalamudServices, PetServices, LodestoneNetworker, IpcProvider, ImageDatabase, SaveHandler);
-        ChatHandler        = new ChatHandler(DalamudServices, PetServices, HookHandler.PronounHook);
+        //ChatHandler        = new ChatHandler(DalamudServices, PetServices, HookHandler.PronounHook);
 
         WindowHandler      = new WindowHandler(DalamudServices, PetServices, PettableDatabase, LegacyDatabase, ImageDatabase, DataParser, DataWriter, SharingDictionary, HookHandler.PronounHook);
 
@@ -96,7 +96,7 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
         ImageDatabase.Dispose();
         UpdateHandler.Dispose();
         HookHandler.Dispose();
-        ChatHandler.Dispose();
+        //ChatHandler.Dispose();
         CommandHandler.Dispose();
         WindowHandler.Dispose();
         SaveHandler.Dispose();

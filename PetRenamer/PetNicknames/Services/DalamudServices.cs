@@ -25,7 +25,8 @@ internal class DalamudServices
     [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
     [PluginService] internal ICondition                      Condition                   { get; private set; } = null!;
     [PluginService] internal IGameConfig                     GameConfig                  { get; private set; } = null!;
-
+    [PluginService] internal ISeStringEvaluator              StringEvaluator             { get; private set; } = null!;
+    
     public static DalamudServices Create(IDalamudPluginInterface plugin)
     {
         DalamudServices service = new DalamudServices();
