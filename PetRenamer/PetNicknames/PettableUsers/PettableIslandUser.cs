@@ -5,7 +5,6 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
 using System.Numerics;
 

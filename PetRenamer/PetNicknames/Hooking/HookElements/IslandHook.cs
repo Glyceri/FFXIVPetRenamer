@@ -12,7 +12,8 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class IslandHook : HookableElement
 {
-    private const uint ISLAND_TERRITORY_ID = 1055;
+    private const uint   ISLAND_TERRITORY_ID          = 1055;
+    private const ushort ISLAND_ENTER_PACKET_ENTRY_ID = 798;
     
     private readonly Hook<PacketDispatcher.Delegates.SendEventCompletePacket> SendEventCompletePacketHook;
     
@@ -21,7 +22,7 @@ internal unsafe class IslandHook : HookableElement
     public IslandHook(DalamudServices services, IPetServices petServices, IPettableDatabase database) 
         : base(services, petServices)
     {
-        SendEventCompletePacketHook = DalamudServices.Hooking.HookFromAddress<PacketDispatcher.Delegates.SendEventCompletePacket>((nint)PacketDispatcher.Addresses.SendEventCompletePacket.Value, SendEventCompletePacketDetour);
+        SendEventCompletePacketHook = DalamudServices.Hooking.HookFromAddress<PacketDispatcher.Delegates.SendEventCompletePacket>(PacketDispatcher.Addresses.SendEventCompletePacket.Value, SendEventCompletePacketDetour);
         Database                    = database;
     }
 
@@ -66,7 +67,7 @@ internal unsafe class IslandHook : HookableElement
     {
         SendEventCompletePacketHook.Original(eventId, scene, a3, payload, payloadSize, a6);
         
-        if (eventId.EntryId != 798)
+        if (eventId.EntryId != ISLAND_ENTER_PACKET_ENTRY_ID)
         {
             return;
         }
@@ -148,7 +149,10 @@ internal unsafe class IslandHook : HookableElement
             return;
         }
         
-        PetServices.PetLog.LogVerbose("Island owner found: " +  entry.Name);
+        if (PetServices.Configuration.debugModeActive)
+        {
+            PetServices.PetLog.Log("Island owner found: " +  entry.Name);
+        }
         
         PetServices.UserList[IUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
     }

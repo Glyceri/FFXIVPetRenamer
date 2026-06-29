@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,13 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal class StringHelperWrapper : IStringHelper
 {
+    private static readonly EmptySpaceValue ReplaceEmptySpaceFor = new EmptySpaceValue()
+    {
+        EnglishNameType = true,
+        GermanNameType  = true,
+        FrenchNameType  = true,
+    };
+    
     private readonly IPetServices    PetServices;
     private readonly IUserList       UserList;
     private readonly DalamudServices DalamudServices;
@@ -121,6 +129,11 @@ internal class StringHelperWrapper : IStringHelper
         string nodeText = baseString;
         
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
+        
+        if (ReplaceEmptySpaceFor.GetValue(DalamudServices))
+        {
+            regString = $"\\b" + regString + "\\b";
+        }
         
         nodeText = Regex.Replace(nodeText, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);
         
