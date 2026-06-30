@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
@@ -12,7 +14,8 @@ public static class EnumHelper
     /// <param name="enumVal">The enum value</param>
     /// <returns>The attribute of type T that exists on the enum value</returns>
     /// <example><![CDATA[string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description;]]></example>
-    public static T? GetAttributeOfType<T>(this Enum enumVal) where T:System.Attribute
+    public static T? GetAttributeOfType<T>(this Enum enumVal) 
+        where T:System.Attribute
     {
         Type         type       = enumVal.GetType();
         MemberInfo[] memInfo    = type.GetMember(enumVal.ToString());
@@ -23,7 +26,15 @@ public static class EnumHelper
     
     public static int GetEnumIndex<T>(this T value)
         where T : struct, Enum
+        => Array.IndexOf(Enum.GetValues<T>(), value);
+
+    public static string GetDescription(this Enum value)
     {
-        return Array.IndexOf(Enum.GetValues<T>(), value);
+        DescriptionAttribute? attribute = value.GetType()?
+            .GetField(value.ToString())?
+            .GetCustomAttributes(typeof(DescriptionAttribute), false)?
+            .SingleOrDefault() as DescriptionAttribute;
+
+        return attribute == null ? string.Empty : attribute.Description;
     }
 }

@@ -93,7 +93,7 @@ internal class PenumbraIPC : IPenumbraIPC
 
         int parsedVersion = versionToken.ToObject<int>();
 
-        PetServices.PetLog.Log($"Version is equal to: {parsedVersion}");
+        PetServices.PetLog.DevLog($"Version is equal to: {parsedVersion}");
 
         if (parsedVersion != 1) // If there are more version make this better... obviously
         {
@@ -120,11 +120,11 @@ internal class PenumbraIPC : IPenumbraIPC
             return;
         }
 
-        PetServices.PetLog.Log("Pet Nicknames is about to parse the Data object.");
+        PetServices.PetLog.DevLog("Pet Nicknames is about to parse the Data object.");
 
         IDataParseResult parseResult = DataParser.ParseData(data);
 
-        PetServices.PetLog.Log("Pet Nicknames is about to apply the parsed data.");
+        PetServices.PetLog.DevLog("Pet Nicknames is about to apply the parsed data.");
 
         bool parseWasSuccess = DataParser.ApplyParseData(parseResult, ParseSource.PCP);
 
@@ -180,10 +180,7 @@ internal class PenumbraIPC : IPenumbraIPC
 
         PetServices.PetLog.LogInfo("Pet Nicknames has successfully added data to the PCP JsonObject.");
 
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogVerbose(jsonObject.ToString());
-        }
+        PetServices.PetLog.DevLogVerbose(jsonObject.ToString());
     }
 
     public void Dispose()

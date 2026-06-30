@@ -50,7 +50,7 @@ internal class ChatHandler : IDisposable
         var start = *(int*)((nint)RaptureLogModule.Instance() + 0x18);
         var count = RaptureLogModule.Instance()->LogMessageCount - start;
         
-        PetServices.PetLog.LogWarning("CHAT MESSAGE: " + count + ", " + chatMessage.LogMessageId + ", "  + chatMessage.GameData.Value.LogKind.RowId + ", " + chatMessage.SourceEntity?.Name + ", " + chatMessage.TargetEntity?.Name);
+        PetServices.PetLog.DevLogWarning("CHAT MESSAGE: " + count + ", " + chatMessage.LogMessageId + ", "  + chatMessage.GameData.Value.LogKind.RowId + ", " + chatMessage.SourceEntity?.Name + ", " + chatMessage.TargetEntity?.Name);
     }
     
     private unsafe void OnChat2(IHandleableChatMessage chatMessage)
@@ -58,7 +58,7 @@ internal class ChatHandler : IDisposable
         var start = *(int*)((nint)RaptureLogModule.Instance() + 0x18);
         var count = RaptureLogModule.Instance()->LogMessageCount - start;
         
-        PetServices.PetLog.LogWarning("CHAT MESSAGE: " + count + ", " + chatMessage.Sender.TextValue);
+        PetServices.PetLog.DevLogWarning("CHAT MESSAGE: " + count + ", " + chatMessage.Sender.TextValue);
     }
 
     public void Dispose()

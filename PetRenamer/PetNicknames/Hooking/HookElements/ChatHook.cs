@@ -84,14 +84,11 @@ internal unsafe class ChatHook : HookableElement
         uint        messageId = GetMessageIdentifier(ChatKind.Log);
         XivChatType chatType  =  (XivChatType)logMessage.GameData.Value.LogKind.RowId;
         
-        PetServices.PetLog.LogWarning(messageId + " : " + logMessage.LogMessageId);
+        PetServices.PetLog.DevLogWarning(messageId + " : " + logMessage.LogMessageId);
         
         DebugChat(ChatKind.Log, messageId, chatType);
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log("OnChatLog: '" + PetServices.PetSheets.GetLogMessage(logMessage.LogMessageId)?.Text.ToDalamudString().TextValue + "', " + messageId);
-        }
+        PetServices.PetLog.DevLog("OnChatLog: '" + PetServices.PetSheets.GetLogMessage(logMessage.LogMessageId)?.Text.ToDalamudString().TextValue + "', " + messageId);
         
         _replaceNameType = NameType.Raw;
         _replaceData = null;
@@ -101,10 +98,10 @@ internal unsafe class ChatHook : HookableElement
         PetElement?    sourcePet    = ParsePet(chatType, logMessage.LogMessageId, sourcePlayer, logMessage.SourceEntity);
         PetElement?    targetPet    = ParsePet(chatType, logMessage.LogMessageId, sourcePlayer, logMessage.TargetEntity);
 
-        PetServices.PetLog.LogWarning("SOURCE PLAYER: " + sourcePlayer);
-        PetServices.PetLog.LogWarning("TARGET PLAYER: " + targetPlayer);
-        PetServices.PetLog.LogWarning("SOURCE PET: " + sourcePet);
-        PetServices.PetLog.LogWarning("TARGET PET: " + targetPet);
+        PetServices.PetLog.DevLogWarning("SOURCE PLAYER: " + sourcePlayer);
+        PetServices.PetLog.DevLogWarning("TARGET PLAYER: " + targetPlayer);
+        PetServices.PetLog.DevLogWarning("SOURCE PET: " + sourcePet);
+        PetServices.PetLog.DevLogWarning("TARGET PET: " + targetPet);
         
         if (_replaceData == null)
         {
@@ -135,10 +132,7 @@ internal unsafe class ChatHook : HookableElement
         
         DebugChat(ChatKind.Chat, messageId, chatType);
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log("OnChatMessage: '" + chatMessage.Message.TextValue + "', " + messageId);
-        }
+        PetServices.PetLog.DevLog("OnChatMessage: '" + chatMessage.Message.TextValue + "', " + messageId);
         
         if (chatType != XivChatType.StandardEmote)
         {
@@ -180,7 +174,7 @@ internal unsafe class ChatHook : HookableElement
     
     private void DebugChat(ChatKind chatKind, uint messageId, XivChatType chatType)
     {
-        PetServices.PetLog.LogFatal($"ChatDebug: {_lastIndex}, {chatKind}, {messageId}, {chatType}.");
+        PetServices.PetLog.DevLogFatal($"ChatDebug: {_lastIndex}, {chatKind}, {messageId}, {chatType}.");
     }
 
     private uint GetMessageIdentifier(ChatKind chatKind)
@@ -437,10 +431,7 @@ internal unsafe class ChatHook : HookableElement
     
     private nint ClearLogDetour(LogModule* logModule)
     {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogWarning($"Clear LogModule.");
-        }
+        PetServices.PetLog.DevLogWarning($"Clear LogModule.");
         
         _pets.Clear();
         _players.Clear();
@@ -486,10 +477,7 @@ internal unsafe class ChatHook : HookableElement
             return FormatLogMessageHook.OriginalDisposeSafe(thisPtr, logKindId, sender, message, timestamp, a6, a7, chatTabIndex);
         }
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log($"Trying to handle LogMessage for index: '{_lastIndex}'.");
-        }
+        PetServices.PetLog.DevLog($"Trying to handle LogMessage for index: '{_lastIndex}'.");
         
         ChatElement? chatElement = GetChatElement(_lastIndex);
         
@@ -512,7 +500,7 @@ internal unsafe class ChatHook : HookableElement
             return FormatLogMessageHook.OriginalDisposeSafe(thisPtr, logKindId, sender, message, timestamp, a6, a7, chatTabIndex);
         }
         
-        PetServices.PetLog.LogFatal("FOUND RIGHT CHAT ELEMENT: " + chatElement);
+        PetServices.PetLog.DevLogFatal("FOUND RIGHT CHAT ELEMENT: " + chatElement);
         
         using Utf8String editableString = new Utf8String();
         

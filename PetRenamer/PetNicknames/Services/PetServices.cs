@@ -31,8 +31,8 @@ internal class PetServices : IPetServices
     public PetServices(DalamudServices services) 
     {
         Version             = services.DalamudPlugin.Manifest.AssemblyVersion.ToString();
-        PetLog              = new PetLogWrapper(services.PluginLog);
         Configuration       = services.DalamudPlugin.GetPluginConfig() as Configuration ?? new Configuration();
+        PetLog              = new PetLogWrapper(services.PluginLog, Configuration);
         UserList            = new UserList();
         StringHelper        = new StringHelperWrapper(this, services, UserList);
         NameService         = new NameService(StringHelper);

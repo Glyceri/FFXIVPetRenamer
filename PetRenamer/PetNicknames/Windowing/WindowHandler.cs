@@ -63,7 +63,17 @@ internal class WindowHandler : IWindowHandler
 
         Register();
     }
-    
+
+    private void Register()
+    {
+        AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
+        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices));
+        AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
+        AddWindow(new KofiWindow(this, DalamudServices, PetServices));
+        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
+        AddWindow(new PetModeWindow(this, DalamudServices, PetServices));
+    }
+
     public IPetWindow? FocussedWindow 
         { get; private set; } = null;
 
@@ -84,66 +94,24 @@ internal class WindowHandler : IWindowHandler
     public static Vector2 StretchingBar
         => new Vector2(ImGui.GetContentRegionAvail().X, BarHeight);
 
-    private void Register()
-    {
-        AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
-        AddWindow(new KofiWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
-        AddWindow(new PetModeWindow(this, DalamudServices, PetServices));
-    }
-
     private void AddWindow(PetWindow window)
-    {
-        WindowSystem.AddWindow(window);
-    }
+        => WindowSystem.AddWindow(window);
+
+    public T? GetWindow<T>()
+        where T : IPetWindow
+        => WindowSystem.Windows.OfType<T>().FirstOrDefault();
 
     public void Open<T>() 
         where T : IPetWindow
-    {
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            if (window is not T tWindow)
-            {
-                continue;
-            }
-
-            tWindow.Open();
-        }
-    }
+         => GetWindow<T>()?.Open();
 
     public void Close<T>() 
         where T : IPetWindow
-    {
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            if (window is not T tWindow)
-            {
-                continue;
-            }
-
-            tWindow.Close();
-        }
-    }
-
-    public T? GetWindow<T>() 
-        where T : PetWindow
-        => WindowSystem.Windows.OfType<T>().FirstOrDefault();
+        => GetWindow<T>()?.Close();
     
-    public void Toggle<T>() 
+    public void Toggle<T>()
         where T : IPetWindow
-    {
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            if (window is not T tWindow)
-            {
-                continue;
-            }
-
-            tWindow.Toggle();
-        }
-    }
+         => GetWindow<T>()?.Toggle();
 
     private void HandleDirty(INamesDatabase namesDatabase)
         => isDirty = true;

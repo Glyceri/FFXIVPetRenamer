@@ -14,7 +14,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
 {
     private static readonly NameTypeValue NoteBookNameType = new NameTypeValue()
     {
-        GermanNameType = NameType.Pronoun,
+        GermanValue = NameType.Pronoun,
     };
     
     public MinionNoteBookHook(DalamudServices services, IPetServices petServices) 

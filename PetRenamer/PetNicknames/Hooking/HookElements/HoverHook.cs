@@ -16,7 +16,7 @@ internal class HoverHook : HookableElement
     
     private static readonly NameTypeValue HoverNameType = new NameTypeValue()
     { 
-        GermanNameType  = NameType.Pronoun,
+        GermanValue  = NameType.Pronoun,
     };
     
     public HoverHook(DalamudServices services, IPetServices petServices) 

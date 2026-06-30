@@ -5,7 +5,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using System.Collections.Generic;
@@ -15,18 +14,15 @@ namespace PetRenamer.PetNicknames.PettableUsers;
 
 internal unsafe class PettableUser : IPettableUser
 {
-    public GameObjectId ObjectId    { get; }
+    public nint         Address       { get; }
+    public BattleChara* BattleChara   { get; }
+    public GameObjectId ObjectId      { get; }
+    public uint         EntityId      { get; }
+    public uint         CurrentCastId { get; private set; }
+    public bool         IsLocalPlayer { get; }
 
-    public List<IPettablePet> PettablePets { get; } = [];
-
-    public nint         Address     { get; }
-    public BattleChara* BattleChara { get; }
-
+    public List<IPettablePet>     PettablePets  { get; } = [];
     public IPettableDatabaseEntry DataBaseEntry { get; }
-
-    public uint EntityId      { get; }
-    public uint CurrentCastId { get; private set; }
-    public bool IsLocalPlayer { get; }
 
     private uint _lastCast;
 
@@ -68,14 +64,40 @@ internal unsafe class PettableUser : IPettableUser
             DataBaseEntry.UpdateContentId(BattleChara->ContentId, true);
         }
 
-        if (petServices.Configuration.debugModeActive)
+        PetServices.PetLog.LogVerbose($"Just created a new user: {DataBaseEntry.ContentId}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
+    }
+
+    public void Dispose(IPettableDatabase database)
+    {
+        DataBaseEntry.DeregisterUsage();
+
+        PetServices.PetLog.DevLogVerbose($"Just removed the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
+
+        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirty);
+        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirty);
+        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirty);
+
+        if (DataBaseEntry.IsIpc)
         {
-            PetServices.PetLog.LogVerbose($"Just created a new user: {DataBaseEntry.ContentId}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
+            DataBaseEntry.Clear(ParseSource.IPC);
+        }
+
+        if (!IsActive)
+        {
+            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
+        }
+
+        foreach (IPettablePet pet in PettablePets)
+        {
+            pet.Dispose();
         }
     }
 
     public bool IsActive
         => DataBaseEntry.IsActive;
+
+    public string? GetCustomName(PetSkeleton petSkeleton)
+        => DataBaseEntry.GetName(petSkeleton);
 
     public void Update()
     {
@@ -159,10 +181,7 @@ internal unsafe class PettableUser : IPettableUser
 
     private void CreateNewPet(IPettablePet pet, int index = -1)
     {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogVerbose($"Added the pet: {pet.Address}, and the ObjectID: {pet.ObjectId} to the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
-        }
+        PetServices.PetLog.DevLogVerbose($"Added the pet: {pet.Address}, and the ObjectID: {pet.ObjectId} to the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
 
         if (index == -1)
         {
@@ -232,38 +251,6 @@ internal unsafe class PettableUser : IPettableUser
         }
 
         return null;
-    }
-
-    public string? GetCustomName(PetSkeleton petSkeleton) 
-        => DataBaseEntry.GetName(petSkeleton);
-    
-    public void Dispose(IPettableDatabase database)
-    {
-        DataBaseEntry.DeregisterUsage();
-        
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogVerbose($"Just removed the user: {DataBaseEntry.Name}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
-        }
-
-        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirty);
-        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirty);
-        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirty);
-
-        if (DataBaseEntry.IsIpc)
-        {
-            DataBaseEntry.Clear(ParseSource.IPC);
-        }
-
-        if (!IsActive)
-        {
-            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
-        }
-
-        foreach(IPettablePet pet in PettablePets)
-        {
-            pet.Dispose();
-        }
     }
 
     public void SetBattlePet(BattleChara* pointer)

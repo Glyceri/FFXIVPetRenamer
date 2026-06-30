@@ -1,5 +1,4 @@
 ﻿using Dalamud.Utility;
-using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -13,6 +12,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 

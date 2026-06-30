@@ -17,10 +17,7 @@ internal class PetCastWrapper : IPetCastHelper
         
     public void SetLatestCast(nint target, nint dealer, int lastCastId)
     {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log($"Setting latest cast for: {dealer}, {target}, {lastCastId}");
-        }
+        PetServices.PetLog.DevLog($"Setting latest cast for: {dealer}, {target}, {lastCastId}");
         
         LastCastDealer   = PetServices.UserList.GetUser(dealer, UserListFindType.Direct);
         LastCastDealer ??= PetServices.UserList.GetPet(dealer);

@@ -35,10 +35,7 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
     {
         uint returner = ProcessNounHook!.Original(self, a2, a3, a4, a5, a6, outputString);
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogInfo($"ProcessNounDetour: {outputString->ToString()}");
-        }
+        PetServices.PetLog.DevLogInfo($"ProcessNounDetour: {outputString->ToString()}");
         
         PreviousLastGottenPronoun = LastGottenPronoun;
         LastGottenPronoun         = outputString->StringPtr.AsDalamudSeString();

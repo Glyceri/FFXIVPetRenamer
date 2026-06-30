@@ -34,14 +34,18 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         SkeletonId          = new PetSkeleton(pet->ModelContainer.ModelCharaId, skeletonType);
         PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");
-        }
+        PetServices.PetLog.DevLogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");
 
         PetServices.DirtyCaller.DirtyPet(this);
         
         Recalculate();
+    }
+
+    public void Dispose()
+    {
+        PetServices.PetLog.DevLogVerbose($"Just removed the pet at Address: {Address}, and the ObjectID: {ObjectId}");
+
+        SharingDictionary.Set(ObjectId, null);
     }
 
     public bool IsActive
@@ -61,16 +65,6 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         }
         
         SharingDictionary.Set(ObjectId, Entry.GetName(SkeletonId), Address, edgeColour, textColour);
-    }
-
-    public void Dispose()
-    {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogVerbose($"Just removed the pet at Address: {Address}, and the ObjectID: {ObjectId}");
-        }
-
-        SharingDictionary.Set(ObjectId, null);
     }
 
     public void GetDrawColours(Configuration.ColourConfig colourConfig, out Vector3? edgeColour, out Vector3? textColour)

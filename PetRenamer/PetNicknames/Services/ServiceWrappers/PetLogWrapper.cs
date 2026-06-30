@@ -10,13 +10,14 @@ internal class PetLogWrapper : IPetLog
     // For debug purposes
     public static IPetLog? Instance;
 
-    private readonly IPluginLog PluginLog;
+    private readonly IPluginLog    PluginLog;
+    private readonly Configuration Configuration;
 
-    public PetLogWrapper(IPluginLog pluginLog) 
+    public PetLogWrapper(IPluginLog pluginLog, Configuration configuration) 
     {
-        Instance  = this;
-
-        PluginLog = pluginLog;
+        Instance      = this;
+        PluginLog     = pluginLog;
+        Configuration = configuration;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -46,4 +47,81 @@ internal class PetLogWrapper : IPetLog
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LogWarning(object? message)
         => PluginLog.Warning($"{message}");
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLog(object? message)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        Log(message);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogInfo(object? obj)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogInfo(obj);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogWarning(object? obj)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogWarning(obj);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogFatal(object? obj)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogFatal(obj);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogVerbose(object? obj)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogVerbose(obj);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogError(Exception e, object? obj)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogError(e, obj);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DevLogException(Exception e)
+    {
+        if (!Configuration.debugModeActive)
+        {
+            return;
+        }
+
+        LogException(e);
+    }
 }

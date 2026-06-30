@@ -1,28 +1,23 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal interface IPetLog
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Log(object? message);
+    void Log(object? message);
+    void LogInfo(object? obj);
+    void LogWarning(object? obj);
+    void LogFatal(object? obj);
+    void LogVerbose(object? obj);
+    void LogError(Exception e, object? obj);
+    void LogException(Exception e);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogInfo(object? obj);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogWarning(object? obj);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogFatal(object? obj);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogVerbose(object? obj);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogError(Exception e, object? obj);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LogException(Exception e);
+    void DevLog(object? message);
+    void DevLogInfo(object? obj);
+    void DevLogWarning(object? obj);
+    void DevLogFatal(object? obj);
+    void DevLogVerbose(object? obj);
+    void DevLogError(Exception e, object? obj);
+    void DevLogException(Exception e);
 }

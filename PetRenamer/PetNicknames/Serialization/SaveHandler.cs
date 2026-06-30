@@ -12,8 +12,6 @@ internal class SaveHandler : IUpdatable, IDisposable
 {
     private const double THROTTLE_DELAY = 8;
 
-    public bool Enabled { get; set; } = true;
-
     private readonly Configuration Configuration;
     private readonly IIpcProvider  IpcProvider;
     private readonly IPetServices  PetServices;
@@ -33,6 +31,17 @@ internal class SaveHandler : IUpdatable, IDisposable
         PetServices.DirtyListener.RegisterOnDirtyEntry(OnDirtyEntry);
         PetServices.DirtyListener.RegisterOnClearEntry(OnDirtyEntry);
     }
+
+    public void Dispose()
+    {
+        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirtyName);
+        PetServices.DirtyListener.UnregisterOnDirtyDatabase(OnDirtyDatabase);
+        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirtyEntry);
+        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirtyEntry);
+    }
+
+    public bool Enabled
+       => true;
 
     public void OnUpdate(IFramework framework)
     {
@@ -115,13 +124,5 @@ internal class SaveHandler : IUpdatable, IDisposable
     private void NotifyIPC()
     {
         IpcProvider.NotifyDataChanged();
-    }
-
-    public void Dispose()
-    {
-        PetServices.DirtyListener.UnregisterOnDirtyName(OnDirtyName);
-        PetServices.DirtyListener.UnregisterOnDirtyDatabase(OnDirtyDatabase);
-        PetServices.DirtyListener.UnregisterOnDirtyEntry(OnDirtyEntry);
-        PetServices.DirtyListener.UnregisterOnClearEntry(OnDirtyEntry);
     }
 }
