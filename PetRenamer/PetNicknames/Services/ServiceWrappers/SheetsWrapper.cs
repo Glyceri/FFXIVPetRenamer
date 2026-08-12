@@ -192,12 +192,17 @@ internal class SheetsWrapper : IPetSheets
 
     public IPetSheetData? GetPetFromAction(uint actionId)
     {
+        if (actionId == 0)
+        {
+            return null;
+        }
+        
         int sheetCount = PetSheetCache.Count;
 
         for (int i = 0; i < sheetCount; i++)
         {
             IPetSheetData pet = PetSheetCache[i];
-
+            
             if (!pet.IsAction(actionId))
             {
                 continue;

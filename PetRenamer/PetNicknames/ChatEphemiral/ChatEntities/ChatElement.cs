@@ -6,17 +6,19 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 
 internal class ChatElement : IEphemeralChatElement
 {
-    public uint         MessageId     { get; private set; }
-    public XivChatType  ChatType      { get; private set; }
+    public uint         MessageId     { get; }
+    public uint         LogMessageId  { get; }
+    public XivChatType  ChatType      { get; }
     public string       ReplaceString { get; private set; } = string.Empty;
-    public IChatPlayer? SourcePlayer  { get; private set; }
-    public IChatPlayer? TargetPlayer  { get; private set; }
-    public IChatPet?    SourcePet     { get; private set; }
-    public IChatPet?    TargetPet     { get; private set; }
+    public IChatPlayer? SourcePlayer  { get; }
+    public IChatPlayer? TargetPlayer  { get; }
+    public IChatPet?    SourcePet     { get; }
+    public IChatPet?    TargetPet     { get; }
 
-    public ChatElement(uint messageId, XivChatType chatType, string replaceString, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet)
+    public ChatElement(uint messageId, XivChatType chatType, uint logMessageId, string replaceString, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet)
     {
         MessageId     = messageId;
+        LogMessageId  = logMessageId;
         ChatType      = chatType;
         SourcePlayer  = sourcePlayer;
         TargetPlayer  = targetPlayer;

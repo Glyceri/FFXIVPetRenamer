@@ -16,6 +16,8 @@ using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
+using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC;
@@ -71,19 +73,20 @@ internal class PetDevWindow : PetWindow
             Open();
         }
 
-        devStructList.Add(new DevStruct("User List",  DrawUserList));
-        devStructList.Add(new DevStruct("Party",      DrawParty));
-        devStructList.Add(new DevStruct("Cast",       DrawCasts));
-        devStructList.Add(new DevStruct("Targeting",  DrawTargeting));
-        devStructList.Add(new DevStruct("Sharing Dict",  DrawSharing));
-        devStructList.Add(new DevStruct("IPC Tester", DrawIPCTester, OnIPCUpdate));
-        devStructList.Add(new DevStruct("Database",   DrawDatabase));
-        devStructList.Add(new DevStruct("Sheets",     DrawSheets));
-        devStructList.Add(new DevStruct("Hover",      DrawHover));
-        devStructList.Add(new DevStruct("Pronoun",    DrawPronoun));
-        devStructList.Add(new DevStruct("Windowing",  DrawWindowing));
-        devStructList.Add(new DevStruct("NameError",  DrawNameError));
-        devStructList.Add(new DevStruct("Island",     DrawIsland));
+        devStructList.Add(new DevStruct("User List",        DrawUserList));
+        devStructList.Add(new DevStruct("Party",            DrawParty));
+        devStructList.Add(new DevStruct("Cast",             DrawCasts));
+        devStructList.Add(new DevStruct("Targeting",        DrawTargeting));
+        devStructList.Add(new DevStruct("Sharing Dict",     DrawSharing));
+        devStructList.Add(new DevStruct("IPC Tester",       DrawIPCTester, OnIPCUpdate));
+        devStructList.Add(new DevStruct("Database",         DrawDatabase));
+        devStructList.Add(new DevStruct("Sheets",           DrawSheets));
+        devStructList.Add(new DevStruct("Hover",            DrawHover));
+        devStructList.Add(new DevStruct("Pronoun",          DrawPronoun));
+        devStructList.Add(new DevStruct("Windowing",        DrawWindowing));
+        devStructList.Add(new DevStruct("NameError",        DrawNameError));
+        devStructList.Add(new DevStruct("Island",           DrawIsland));
+        devStructList.Add(new DevStruct("Chat Database",    DrawChatDatabase));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -156,6 +159,30 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTabBar();
     }
 
+    private void DrawChatDatabase()
+    {
+        ImGui.Text("Chat Elements: "    + ChatDatabaseHandler.Instance?.ChatElementDatabase.Length());
+        
+        if (ImGui.BeginListBox("CHAT LISTBOX", new Vector2(ImGui.GetContentRegionAvail().X, 300)))
+        {
+            for (int i = 0; i < (ChatDatabaseHandler.Instance?.ChatElementDatabase.Length() ?? 0); i++)
+            {
+                IEphemeralChatElement? chatElement = ChatDatabaseHandler.Instance?.ChatElementDatabase.Elements[i];
+                
+                if (chatElement == null)
+                {
+                    continue;
+                }
+                
+                ImGui.Text(PetServices.PetSheets.GetLogMessage(chatElement.LogMessageId)?.Text.ToMacroString());
+            }
+            
+            ImGui.EndListBox();
+        }
+        ImGui.Text("Pet Elements: "     + ChatDatabaseHandler.Instance?.PetDatabase.Length());
+        ImGui.Text("Player Elements: "  + ChatDatabaseHandler.Instance?.PlayerDatabase.Length());
+    }
+    
     private void DrawIsland()
     {
         ImGui.Text("Last user contentId: " + PetServices.Configuration.LastIslandContentId);

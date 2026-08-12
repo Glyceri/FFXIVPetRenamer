@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Player;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ internal class ChatLogParser : IChatLogParser
         _replaceNameType = NameType.Raw;
         _replaceData     = null;
         
+        ResetParsers();
+        
         IChatPlayer? sourcePlayer = ChatLogPlayerParserElement.Parse(sourceEntity);
         IChatPlayer? targetPlayer = ChatLogPlayerParserElement.Parse(targetEntity);
         IChatPet?    sourcePet    = ParsePet(xivChatType, logMessageId, sourcePlayer, sourceEntity);
@@ -47,7 +50,7 @@ internal class ChatLogParser : IChatLogParser
             return;
         }
         
-        ChatDatabaseHandler.ChatElementDatabase.AddChatElement(_replaceNameType, _replaceData, messageId, xivChatType, sourcePlayer, targetPlayer, sourcePet, targetPet);
+        ChatDatabaseHandler.ChatElementDatabase.AddChatElement(_replaceNameType, _replaceData, messageId, logMessageId, xivChatType, sourcePlayer, targetPlayer, sourcePet, targetPet);
     }
     
     private IChatPet? ParsePet(XivChatType chatType, uint messageId, IChatPlayer? playerElement, ILogMessageEntity? logMessageEntity)
@@ -90,5 +93,13 @@ internal class ChatLogParser : IChatLogParser
         }
         
         return returner;
+    }
+    
+    private void ResetParsers()
+    {
+        foreach (IChatLogPetParserElement petParser in ChatLogPetParsers)
+        {
+            petParser.Reset();
+        }
     }
 }

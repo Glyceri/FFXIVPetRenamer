@@ -6,6 +6,7 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 internal interface IEphemeralChatElement
 {
     uint         MessageId     { get; }
+    uint         LogMessageId  { get; }
     XivChatType  ChatType      { get; }
     string       ReplaceString { get; }
     IChatPlayer? SourcePlayer  { get; }

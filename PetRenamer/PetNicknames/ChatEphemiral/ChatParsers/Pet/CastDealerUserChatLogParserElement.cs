@@ -2,11 +2,11 @@ using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
@@ -27,6 +27,9 @@ internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
     public IPetSheetData? UsedData 
         { get; private set; } = null;
 
+    public void Reset() 
+        => UsedData = null;
+    
     public bool IsMyParser(XivChatType chatType)
     {
         if (chatType != XivChatType.Action)
@@ -46,7 +49,17 @@ internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
     {
         UsedData = null;
         
+        if (chatPlayer == null)
+        {
+            return null;
+        }
+        
         if (PetServices.PetCastHelper.LastCastDealer is not IPettableUser user)
+        {
+            return null;
+        }
+        
+        if (user.DataBaseEntry.ContentId != chatPlayer.ContentId)
         {
             return null;
         }

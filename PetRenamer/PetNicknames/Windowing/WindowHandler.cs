@@ -1,4 +1,4 @@
-using Dalamud.Interface.Windowing;
+﻿using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
@@ -70,7 +70,7 @@ internal class WindowHandler : IWindowHandler
     private void Register()
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices));
+        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices, ChatHandlerGroup));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
         AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));

@@ -9,6 +9,7 @@ using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -79,14 +80,10 @@ internal unsafe class ChatHook : HookableElement
         ChatHandler.OnChatMessage(messageId, chatType);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void DebugChat(ChatKind chatKind, uint messageId, XivChatType chatType)
     {
-        if (!PetServices.Configuration.debugModeActive)
-        {
-            return;
-        }
-        
-        PetServices.PetLog.Log($"ChatDebug: {_lastIndex}, {chatKind}, {messageId}, {chatType}.");
+        PetServices.PetLog.DevLog($"ChatDebug: {_lastIndex}, {chatKind}, {messageId}, {chatType}.");
     }
 
     private uint GetMessageIdentifier(ChatKind chatKind)
@@ -97,6 +94,8 @@ internal unsafe class ChatHook : HookableElement
         int count = RaptureLogModule.Instance()->LogMessageCount - start;
         
         uint currentValue = (uint)(count - start);
+        
+        PetServices.PetLog.DevLogVerbose("[Start : Count : CurrentValue]: " + start + " : " + count + " : " + currentValue);
         
         if (_lastIndex == -1)
         {

@@ -53,7 +53,7 @@ internal class ChatElementDatabase : IChatElementDatabase
         Elements.Add(chatElement);
     }
 
-    public void AddChatElement(NameType replaceNameType, IPetSheetData? replaceData, uint messageId, XivChatType chatType, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet)
+    public void AddChatElement(NameType replaceNameType, IPetSheetData? replaceData, uint messageId, uint logMessageId, XivChatType chatType, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet)
     {
         if (replaceData == null)
         {
@@ -72,6 +72,6 @@ internal class ChatElementDatabase : IChatElementDatabase
             }
         }
         
-        Elements.Add(new ChatElement(messageId, chatType, replaceString, sourcePlayer, targetPlayer, sourcePet, targetPet));
+        Elements.Add(new ChatElement(messageId, chatType, logMessageId, replaceString, sourcePlayer, targetPlayer, sourcePet, targetPet));
     }
 }

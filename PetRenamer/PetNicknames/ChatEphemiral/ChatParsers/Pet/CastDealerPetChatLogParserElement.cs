@@ -2,7 +2,6 @@ using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -27,6 +26,9 @@ internal class CastDealerPetChatLogParserElement : IChatLogPetParserElement
     public IPetSheetData? UsedData
         { get; private set; } = null;
 
+    public void Reset() 
+        => UsedData = null;
+    
     public bool IsMyParser(XivChatType chatType)
     {
         if (chatType != XivChatType.Action)

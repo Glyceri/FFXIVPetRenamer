@@ -77,8 +77,7 @@ internal readonly struct PetSheetData : IPetSheetData
         {
             return null;
         }
-
-        uint        companionIndex = companion.RowId;
+        
         int         modelId        = (int)model.Value.RowId;
         int         legacyModelId  = model.Value.Model;
         string      singular       = companion.Singular.ExtractText();
@@ -102,7 +101,7 @@ internal readonly struct PetSheetData : IPetSheetData
         string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
         string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
         
-        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, companionIndex, dalamudServices);
+        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, 0, dalamudServices);
     }
     
     public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, DalamudServices dalamudServices, Pet pet)

@@ -9,7 +9,7 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 internal interface IChatElementDatabase : IChatDatabase<IEphemeralChatElement>
 {
     IEphemeralChatElement? GetChatElement(int id);
-    void                   AddChatElement(NameType replaceNameType, IPetSheetData? replaceData, uint messageId, XivChatType chatType, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet);
+    void                   AddChatElement(NameType replaceNameType, IPetSheetData? replaceData, uint messageId, uint logMessageId, XivChatType chatType, IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet);
     void                   AddChatElement(IEphemeralChatElement chatElement);
     void                   RemoveElement(IEphemeralChatElement chatElement);
 }

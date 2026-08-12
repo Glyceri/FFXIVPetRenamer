@@ -1,5 +1,4 @@
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 

@@ -36,6 +36,9 @@ internal class SystemChatLogParserElement : IChatLogPetParserElement
     public IPetSheetData? UsedData 
         { get; private set; } = null;
     
+    public void Reset() 
+        => UsedData = null;
+    
     public bool IsMyParser(XivChatType chatType)
     {
         return (chatType == XivChatType.SystemMessage || chatType == XivChatType.SystemError);
