@@ -12,6 +12,7 @@ using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Linq;
 using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
+using PetRenamer.PetNicknames.GroupHandling.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using System.Numerics;
@@ -32,12 +33,13 @@ internal class WindowHandler : IWindowHandler
     private readonly WindowSystem       WindowSystem;
     private readonly ISharingDictionary SharingDictionary;
     private readonly IPronounHook       PronounHook;
+    private readonly IHandlerGroup      ChatHandlerGroup;
 
     private bool isDirty;
     
     private IPetWindow? lastFocussedWindow = null;
     
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook, IHandlerGroup chatHandlerGroup)
     {
         DalamudServices       = dalamudServices;
         PetServices           = petServices;
@@ -48,6 +50,7 @@ internal class WindowHandler : IWindowHandler
         DataWriter            = dataWriter;
         SharingDictionary     = sharingDictionary;
         PronounHook           = pronounHook;
+        ChatHandlerGroup      = chatHandlerGroup;
 
         PetServices.DirtyListener.RegisterOnClearEntry(HandleDirty);
         PetServices.DirtyListener.RegisterOnDirtyEntry(HandleDirty);
@@ -87,7 +90,7 @@ internal class WindowHandler : IWindowHandler
     private void Register()
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices));
+        AddWindow(new PetConfigWindow(this, DalamudServices, PetServices, ChatHandlerGroup));
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
         AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));

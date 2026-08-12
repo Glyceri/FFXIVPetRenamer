@@ -157,7 +157,7 @@ internal class UserList : IUserList
         return null;
     }
     
-    public IPettableUser? GetUser(string username, uint homeworld)
+    public IPettableUser? GetUser(string username, uint homeworld = uint.MaxValue)
     {
         if (username.IsNullOrWhitespace())
         {
@@ -173,7 +173,7 @@ internal class UserList : IUserList
                 continue;
             }
 
-            if (pUser.DataBaseEntry.Homeworld != homeworld)
+            if (pUser.DataBaseEntry.Homeworld != homeworld && homeworld != uint.MaxValue)
             {
                 continue;
             }

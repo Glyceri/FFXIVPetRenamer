@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.Hooking.HookElements;
+﻿using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
+using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -12,23 +13,25 @@ namespace PetRenamer.PetNicknames.Hooking;
 
 internal class HookHandler : IDisposable
 {
-    private readonly DalamudServices    DalamudServices;
-    private readonly IPetServices       PetServices;
-    private readonly IPettableDatabase  Database;
-    private readonly ILegacyDatabase    LegacyDatabase;
-    private readonly ISharingDictionary SharingDictionary;
+    private readonly DalamudServices        DalamudServices;
+    private readonly IPetServices           PetServices;
+    private readonly IPettableDatabase      Database;
+    private readonly ILegacyDatabase        LegacyDatabase;
+    private readonly ISharingDictionary     SharingDictionary;
+    private readonly IEphemaralChatHandler  ChatHandler;
     
     public IPronounHook PronounHook { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
         Database          = database;
         LegacyDatabase    = legacyDatabase;
         SharingDictionary = sharingDictionary;
+        ChatHandler       = chatHandler;
 
         _Register();
     }
@@ -44,7 +47,7 @@ internal class HookHandler : IDisposable
         PronounHook = new PronounHook(DalamudServices, PetServices);
         Register(PronounHook);
         
-        Register(new ChatHook(DalamudServices, PetServices, Database, PronounHook));
+        Register(new ChatHook(DalamudServices, PetServices, ChatHandler));
         Register(new TooltipHook(DalamudServices, PetServices, mapHook, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
@@ -53,7 +56,6 @@ internal class HookHandler : IDisposable
         Register(new CastHook(DalamudServices, PetServices));
         Register(new NamePlateHook(DalamudServices, PetServices));
         Register(new PartyHook(DalamudServices, PetServices));
-        
         Register(new CharacterManagerHook(DalamudServices, PetServices, Database, LegacyDatabase, SharingDictionary));
     }
 

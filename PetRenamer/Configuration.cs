@@ -52,6 +52,8 @@ internal class Configuration : IPluginConfiguration
     public ColourConfig ShowOnTargetBarsColour      = new ColourConfig();
     public ColourConfig ShowOnPartyListColour       = new ColourConfig();
     
+    public GroupConfig  ChatModeGroup               = new GroupConfig();
+    
     public bool allowPartySummonCutoff = true;
     public bool showOnIslandPets = true;
     public bool useContextMenus  = true;
@@ -90,7 +92,9 @@ internal class Configuration : IPluginConfiguration
         LegacyInitialise();
         CurrentInitialise();
 
-        isSetup = true;
+        PetServices.DirtyCaller.DirtyConfig(this);
+        
+        isSetup         = true;
     }
 
     private void CurrentInitialise()
@@ -210,5 +214,17 @@ internal class Configuration : IPluginConfiguration
         All      = 0,
         Personal = 1,
         None     = 2,
+    }
+    
+    [Serializable]
+    public struct GroupConfig
+    {
+        public bool High = true;
+        
+        public GroupConfig()
+            { }
+        
+        public GroupConfig(bool high) 
+            => High = high;
     }
 }

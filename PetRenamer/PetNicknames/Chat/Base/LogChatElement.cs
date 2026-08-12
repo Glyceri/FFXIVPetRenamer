@@ -2,12 +2,13 @@ using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Chat.Base;
 
-internal abstract class LogChatElement : IChatElement, IDisposable
+internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnablableHandler
 {
     protected readonly DalamudServices DalamudServices;
     
@@ -18,14 +19,25 @@ internal abstract class LogChatElement : IChatElement, IDisposable
     protected LogChatElement(DalamudServices dalamudServices)
     {
         DalamudServices = dalamudServices;
+    }
+    
+    public sealed override void OnEnable()
+    {
+        chatMessages.Clear();
         
+        DalamudServices.ChatGui.LogMessage -= OnLogMessage;
         DalamudServices.ChatGui.LogMessage += OnLogMessage;
     }
     
-    public void Dispose()
+    public sealed override void OnDisable()
     {
+        chatMessages.Clear();
+        
         DalamudServices.ChatGui.LogMessage -= OnLogMessage;
     }
+    
+    public sealed override void OnDispose()
+        { }
     
     protected void Register(LogChatMessage logChatMessage)
         => chatMessages.Add(logChatMessage);

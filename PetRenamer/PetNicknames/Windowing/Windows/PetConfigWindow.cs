@@ -1,5 +1,6 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
+using PetRenamer.PetNicknames.GroupHandling.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
@@ -13,14 +14,18 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetConfigWindow : PetWindow
 {
+    private readonly IHandlerGroup ChatHandlerGroup;
+    
     private readonly Dictionary<string, bool> ThirdPartySupported = new Dictionary<string, bool>()
     {
         { "Penumbra", false },
     };
     
-    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IHandlerGroup handlerGroup) 
         : base(windowHandler, dalamudServices, petServices, "Pet Settings")
     {
+        ChatHandlerGroup = handlerGroup;
+        
         PetServices.PluginWatcher.RegisterListener(OnPluginChanged);
     }
     
@@ -123,6 +128,8 @@ internal class PetConfigWindow : PetWindow
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
+            DrawGroupConfig("Chat Replace Type", "Static", "Replaces the actual text in the chat.\nThis makes it persist even when the plugin turns off.", "Ephemeral", "(BETA MODE)\n\nFakes the appearance of the text in chat having been replaced.\nThis comes with the added benefit that names will update backwards in chat,\nAND they will disappear when the plugin turns off.", ChatHandlerGroup);
+            
             DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref PetServices.Configuration.ShowOnNameplatesColour);
             DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref PetServices.Configuration.ShowOnCastbarsColour);
             DrawColourConfig(Translator.GetLine("Config.BattleChat"),   ref PetServices.Configuration.ShowInBattleChatColour);
@@ -317,6 +324,63 @@ internal class PetConfigWindow : PetWindow
         ImGui.EndDisabled();
         
         ImGui.Separator();
+    }
+    
+    private void DrawGroupConfig(string title, string titleGroup1, string descGroup1, string titleGroup2, string descGroup2, IHandlerGroup groupConfig)
+    {
+        ImGui.Spacing();
+        
+        bool changed = false;
+        
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
+        
+        ref Configuration.GroupConfig configGroup = ref groupConfig.GetGroupConfig(PetServices.Configuration);
+        
+        ImGui.BeginDisabled(configGroup.High);
+        
+        if (ImGui.Button(titleGroup1 + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
+        {
+            changed = true;
+        }
+        
+        ImGui.EndDisabled();
+        
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip(descGroup1);
+        }
+        
+        ImGui.SameLine(0, 0);
+        
+        ImGui.BeginDisabled(!configGroup.High);
+        
+        if (ImGui.Button(titleGroup2 + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
+        {
+            changed = true;
+        }
+        
+        ImGui.EndDisabled();
+        
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip(descGroup2);
+        }
+        
+        ImGui.PopStyleVar();
+        
+        ImGui.SameLine();
+        
+        ImGui.Text(title);
+        
+        if (!changed)
+        {
+            return;
+        }
+        
+        configGroup.High = !configGroup.High;
+        groupConfig.SetGroupState(ref configGroup);
+        
+        SavePlugin();
     }
 
     private void OnPluginChanged(string[] internalPlugins)

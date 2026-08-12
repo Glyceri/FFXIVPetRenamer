@@ -22,8 +22,8 @@ internal class EmoteChatElement : IChatElement
         {
             return;
         }
-        
-        IPettableUser?   senderUser = PetServices.UserList.GetUser(chatMessage.Sender.TextValue, 0);
+
+        IPettableUser?   senderUser = PetServices.UserList.GetUser(chatMessage.Sender.TextValue);
         IPettableEntity? target     = PetServices.TargetManager.GetLeadingTarget(senderUser);
         
         if (target is not IPettablePet pet) 
