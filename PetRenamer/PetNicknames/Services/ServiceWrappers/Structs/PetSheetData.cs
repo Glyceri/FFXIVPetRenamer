@@ -27,7 +27,7 @@ internal readonly struct PetSheetData : IPetSheetData
     
     private static readonly string[] pronounList = ["er", "e", "es", "en"];
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
+    private PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
         : this(model, legacyModelId, icon, pronoun, singular, actionName, actionId, services)
     {
         RaceName      = raceName;
@@ -35,7 +35,7 @@ internal readonly struct PetSheetData : IPetSheetData
         RaceId        = raceId;
     }
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
+    private PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string actionName, uint actionId, DalamudServices services)
         : this(model, icon, pronoun, singular, services)
     {
         ActionId      = actionId;
@@ -60,7 +60,10 @@ internal readonly struct PetSheetData : IPetSheetData
             Singular = singular;
         }
     }
-    
+
+    public PetSheetData MakeSoft(IPetSheetData newData, DalamudServices dalamudServices)
+        => new PetSheetData(newData.Model, newData.LegacyModelId, newData.Icon, newData.Pronoun, Singular, ActionName, ActionId, dalamudServices);
+
     public static PetSheetData? CreatePetSheetData(DalamudServices dalamudServices, Companion companion)
     {
         if (!companion.Model.IsValid)

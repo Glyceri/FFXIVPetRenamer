@@ -242,22 +242,11 @@ internal class SheetsWrapper : IPetSheets
             return oldData;
         }
 
-        return new PetSheetData(softPetData.Model, softPetData.LegacyModelId, softPetData.Icon, softPetData.Pronoun, oldData.Singular, oldData.ActionName, oldData.ActionId, DalamudServices);
+        return oldData.MakeSoft(softPetData, DalamudServices);
     }
 
     public IPetSheetData[] GetLegacyPets(int legacyModelId)
         => PetSheetCache.Where(data => data.LegacyModelId == legacyModelId).ToArray();
-
-    [Obsolete]
-    public PetSkeleton[] GetObsoleteIDsFromClass(int classJob)
-    {
-        if (PluginConstants.BattlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
-        {
-            return id;
-        }
-
-        return [];  
-    }
 
     public List<IPetSheetData> GetMissingBattlePets(List<PetSkeleton> battlePetSkeletons)
     {
@@ -281,5 +270,16 @@ internal class SheetsWrapper : IPetSheets
         }
 
         return sheetData;
+    }
+
+    [Obsolete]
+    public PetSkeleton[] GetObsoleteIDsFromClass(int classJob)
+    {
+        if (PluginConstants.BattlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
+        {
+            return id;
+        }
+
+        return [];
     }
 }

@@ -2,5 +2,5 @@
 
 internal interface IDataWriter
 {
-    public string WriteData();
+    string WriteData();
 }

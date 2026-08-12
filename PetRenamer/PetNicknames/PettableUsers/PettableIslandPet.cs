@@ -44,6 +44,9 @@ internal unsafe class PettableIslandPet : IIslandPet
     public bool IsActive
         => (Owner?.IsActive ?? false);
 
-    public void Recalculate() { }
-    public void Dispose() { }
+    public void Recalculate() 
+        { } // Unused
+
+    public void Dispose() 
+        { } // Unused
 }

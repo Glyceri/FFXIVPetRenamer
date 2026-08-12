@@ -25,9 +25,9 @@ internal class StringHelperWrapper : IStringHelper
 {
     private static readonly EmptySpaceValue ReplaceEmptySpaceFor = new EmptySpaceValue()
     {
-        EnglishNameType = true,
-        GermanNameType  = true,
-        FrenchNameType  = true,
+        EnglishValue = true,
+        GermanValue  = true,
+        FrenchValue  = true,
     };
     
     private readonly IPetServices    PetServices;
@@ -125,7 +125,7 @@ internal class StringHelperWrapper : IStringHelper
             return newPayloads;
         }
         
-        PetServices.PetLog.LogVerbose($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
+        PetServices.PetLog.DevLogVerbose($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
 
         string nodeText = baseString;
         

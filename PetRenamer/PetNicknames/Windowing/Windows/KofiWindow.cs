@@ -11,12 +11,17 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class KofiWindow : PetWindow
 {
-    protected override Vector2 MinSize     { get; } = new Vector2(350, 136);
-    protected override Vector2 MaxSize     { get; } = new Vector2(350, 136);
-    protected override Vector2 DefaultSize { get; } = new Vector2(350, 136);
-
     public KofiWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
         : base(windowHandler, dalamudServices, petServices, "Ko-fi") { }
+
+    protected override Vector2 MinSize
+        => new Vector2(350, 136);
+
+    protected override Vector2 MaxSize
+        => new Vector2(350, 136);
+
+    protected override Vector2 DefaultSize
+        => new Vector2(350, 136);
 
     public override bool ShowQuickButtons
         => false;
@@ -33,9 +38,11 @@ internal class KofiWindow : PetWindow
 
         ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(ImGui.GetContentRegionAvail().X * 0.5f - width * 0.5f, 0));
 
-        if (ImGui.Button(Translator.GetLine("Kofi.TakeMe") + "##Kofi_{WindowHandler.InternalCounter}", new Vector2(width, WindowHandler.BarHeight)))
+        if (!ImGui.Button(Translator.GetLine("Kofi.TakeMe") + $"##Kofi_{WindowHandler.InternalCounter}", new Vector2(width, WindowHandler.BarHeight)))
         {
-            Util.OpenLink("https://ko-fi.com/glyceri");
+            return;
         }
+
+        Util.OpenLink(PluginConstants.KOFI_URL);
     }
 }

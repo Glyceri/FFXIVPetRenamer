@@ -4,5 +4,5 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 
 internal interface IDataParserElement
 {
-    public IDataParseResult Parse(string data);
+    IDataParseResult Parse(string data);
 }

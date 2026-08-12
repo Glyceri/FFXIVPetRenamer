@@ -14,8 +14,7 @@ internal unsafe interface IPettableUser : IBattleUser
     bool IsLocalPlayer   { get; }
 
     IPettableDatabaseEntry DataBaseEntry { get; }
-    
-    List<IPettablePet> PettablePets { get; }
+    List<IPettablePet>     PettablePets  { get; }
 
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);

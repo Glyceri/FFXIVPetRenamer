@@ -94,9 +94,6 @@ internal class MirageHook : HookableElement
         PetServices.UserList.LocalPlayer.DataBaseEntry.SetSoftSkeleton(3, ifritSkeleton);
         PetServices.UserList.LocalPlayer.DataBaseEntry.SetSoftSkeleton(4, eosSkeleton);
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogInfo($"Mirage Settings are: _carbuncleMirage: {carbuncleSkeleton}, _eosMirage: {eosSkeleton}, _egiGarudaMirage: {garudaSkeleton}, _egiTitanMirage: {titanSkeleton}, _egiIfritMirage: {ifritSkeleton}");
-        }
+        PetServices.PetLog.DevLogInfo($"Mirage Settings are: _carbuncleMirage: {carbuncleSkeleton}, _eosMirage: {eosSkeleton}, _egiGarudaMirage: {garudaSkeleton}, _egiTitanMirage: {titanSkeleton}, _egiIfritMirage: {ifritSkeleton}");
     }
 }

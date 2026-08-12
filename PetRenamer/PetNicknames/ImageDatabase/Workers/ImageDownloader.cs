@@ -67,7 +67,7 @@ internal class ImageDownloader : IImageDownloader
         tokenSource.Cancel();
         tokenSource.Dispose();
         
-        cancellationTokes.Remove(entry.ContentId);
+        _ = cancellationTokes.Remove(entry.ContentId);
     }
     
     public void DownloadImage(IPettableDatabaseEntry entry, Action<IPettableDatabaseEntry, IDalamudTextureWrap> success, Action<Exception> failure, bool comesFromAutomation = false)
@@ -87,13 +87,13 @@ internal class ImageDownloader : IImageDownloader
             return;
         }
 
-        Networker.SearchCharacter(entry, (entry, searchData) =>
+        _ = Networker.SearchCharacter(entry, (entry, searchData) =>
         {
             OnSuccess(entry, searchData, success, failure);
         }, 
         (e) =>
         {
-            PetServices.PetLog.LogVerbose(e);
+            PetServices.PetLog.DevLogException(e);
         });
     }
 
@@ -105,14 +105,14 @@ internal class ImageDownloader : IImageDownloader
         
         CancellationToken token = tokenSource.Token;
         
-        Task.Run(async () => await Download(entry, searchData, (entry, wrap) =>
+        _ = Task.Run(async () => await Download(entry, searchData, (entry, wrap) =>
         {
-            cancellationTokes.Remove(entry.ContentId);
+            _ = cancellationTokes.Remove(entry.ContentId);
             success?.Invoke(entry, wrap);
         },
         (e) =>
         {
-            cancellationTokes.Remove(entry.ContentId);
+            _ = cancellationTokes.Remove(entry.ContentId);
             failure?.Invoke(e);
         }, token), token);
     }

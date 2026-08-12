@@ -125,10 +125,7 @@ internal static class Translator
             
             foreach (FileInfo file in files)
             {
-                if (PetServices?.Configuration.debugModeActive ?? false)
-                {
-                    PetServices.PetLog.LogVerbose(file.FullName);
-                }
+                PetServices?.PetLog.DevLogVerbose(file.FullName);
                 
                 if (file.Name != fileName)
                 {

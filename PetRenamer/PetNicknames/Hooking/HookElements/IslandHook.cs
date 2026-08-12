@@ -48,10 +48,7 @@ internal unsafe class IslandHook : HookableElement
     
     private void OnTerritoryChanged(uint territory)
     {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log($"Pet Nicknames detected a zone change: {territory}");
-        }
+        PetServices.PetLog.DevLog($"Pet Nicknames detected a zone change: {territory}");
         
         if (territory == ISLAND_TERRITORY_ID)
         {
@@ -149,10 +146,7 @@ internal unsafe class IslandHook : HookableElement
             return;
         }
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log("Island owner found: " +  entry.Name);
-        }
+        PetServices.PetLog.DevLog("Island owner found: " +  entry.Name);
         
         PetServices.UserList[IUserList.IslandIndex] = new PettableIslandUser(PetServices, entry);
     }

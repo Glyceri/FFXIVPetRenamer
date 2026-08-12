@@ -119,10 +119,7 @@ internal unsafe class ChatHook : HookableElement
     
     private nint ClearLogDetour(LogModule* logModule)
     {
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.LogWarning($"Clear LogModule.");
-        }
+        PetServices.PetLog.DevLogWarning($"Clear LogModule.");
         
         ChatHandler.OnChatClear();
         
@@ -145,10 +142,7 @@ internal unsafe class ChatHook : HookableElement
             return FormatLogMessageHook.OriginalDisposeSafe(thisPtr, logKindId, sender, message, timestamp, a6, a7, chatTabIndex);
         }
         
-        if (PetServices.Configuration.debugModeActive)
-        {
-            PetServices.PetLog.Log($"Trying to handle LogMessage for index: '{_lastIndex}'.");
-        }
+        PetServices.PetLog.DevLog($"Trying to handle LogMessage for index: '{_lastIndex}'.");
         
         byte[]? data = ChatHandler.Replace(message, _lastIndex);
         

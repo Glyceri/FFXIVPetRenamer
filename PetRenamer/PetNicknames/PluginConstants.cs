@@ -16,6 +16,8 @@ internal static class PluginConstants
     
     public const ulong  InvalidId          = 0xE0000000;
 
+    public const string KOFI_URL           = "https://ko-fi.com/glyceri";
+
     public static readonly PetSkeleton Eos                    = new PetSkeleton(407,  SkeletonType.BattlePet);
     public static readonly PetSkeleton Selene                 = new PetSkeleton(408,  SkeletonType.BattlePet);
     public static readonly PetSkeleton EmeraldCarbuncle       = new PetSkeleton(409,  SkeletonType.BattlePet);
@@ -65,14 +67,14 @@ internal static class PluginConstants
     
     public static readonly SummonLanguageValue SummonLanguageValue = new SummonLanguageValue()
     {
-        EnglishNameType            = EnglishSummonValue,
-        GermanNameType             = GermanSummonValue,
-        FrenchNameType             = FrenchSummonValue,
-        JapaneseNameType           = JapaneseSummonValue,
-        ChineseSimplifiedNameType  = ChineseSummonValue,
-        ChineseTraditionalNameType = ChineseTradSummonValue,
-        KoreanNameType             = KoreanSummonValue,
-        TaiwaneseNameType          = ThaiSummonValue,
+        EnglishValue            = EnglishSummonValue,
+        GermanValue             = GermanSummonValue,
+        FrenchValue             = FrenchSummonValue,
+        JapaneseValue           = JapaneseSummonValue,
+        ChineseSimplifiedValue  = ChineseSummonValue,
+        ChineseTraditionalValue = ChineseTradSummonValue,
+        KoreanValue             = KoreanSummonValue,
+        TaiwaneseValue          = ThaiSummonValue,
     };
     
     [Obsolete("I stopped using classes in 1.4")] 

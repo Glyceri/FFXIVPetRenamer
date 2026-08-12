@@ -5,40 +5,40 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased;
 
 internal class LanguageBasedValue<T>
 {
-    public T EnglishNameType            { get; init; }
-    public T GermanNameType             { get; init; }
-    public T FrenchNameType             { get; init; }
-    public T JapaneseNameType           { get; init; }
-    public T ChineseSimplifiedNameType  { get; init; }
-    public T ChineseTraditionalNameType { get; init; }
-    public T KoreanNameType             { get; init; }
-    public T TaiwaneseNameType          { get; init; }
+    public required T EnglishValue            { get; init; }
+    public required T GermanValue             { get; init; }
+    public required T FrenchValue             { get; init; }
+    public required T JapaneseValue           { get; init; }
+    public required T ChineseSimplifiedValue  { get; init; }
+    public required T ChineseTraditionalValue { get; init; }
+    public required T KoreanValue             { get; init; }
+    public required T TaiwaneseValue          { get; init; }
     
     public T GetValue(DalamudServices dalamudServices)
         => dalamudServices.DataManager.GameData.Options.DefaultExcelLanguage switch
         {
-            Language.Japanese           => JapaneseNameType,
-            Language.English            => EnglishNameType,
-            Language.French             => FrenchNameType,
-            Language.German             => GermanNameType,
-            Language.Korean             => KoreanNameType,
-            Language.TraditionalChinese => TaiwaneseNameType,
-            Language.ChineseSimplified  => ChineseSimplifiedNameType, 
-            Language.ChineseTraditional => ChineseTraditionalNameType,
-            _                           => EnglishNameType,
+            Language.Japanese           => JapaneseValue,
+            Language.English            => EnglishValue,
+            Language.French             => FrenchValue,
+            Language.German             => GermanValue,
+            Language.Korean             => KoreanValue,
+            Language.TraditionalChinese => TaiwaneseValue,
+            Language.ChineseSimplified  => ChineseSimplifiedValue, 
+            Language.ChineseTraditional => ChineseTraditionalValue,
+            _                           => EnglishValue,
         };
     
     [SetsRequiredMembers]
     public LanguageBasedValue(T defaultTValue)
     {
-        EnglishNameType            = defaultTValue;
-        GermanNameType             = defaultTValue;
-        FrenchNameType             = defaultTValue;
-        JapaneseNameType           = defaultTValue;
-        ChineseSimplifiedNameType  = defaultTValue;
-        ChineseTraditionalNameType = defaultTValue;
-        KoreanNameType             = defaultTValue;
-        TaiwaneseNameType          = defaultTValue;
+        EnglishValue            = defaultTValue;
+        GermanValue             = defaultTValue;
+        FrenchValue             = defaultTValue;
+        JapaneseValue           = defaultTValue;
+        ChineseSimplifiedValue  = defaultTValue;
+        ChineseTraditionalValue = defaultTValue;
+        KoreanValue             = defaultTValue;
+        TaiwaneseValue          = defaultTValue;
         
     }
 }

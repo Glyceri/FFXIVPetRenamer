@@ -1,4 +1,4 @@
-﻿using PetRenamer.PetNicknames.Chat.ChatElements;
+using PetRenamer.PetNicknames.Chat.ChatElements;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Services;

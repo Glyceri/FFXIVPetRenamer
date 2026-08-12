@@ -224,7 +224,7 @@ internal unsafe class TooltipHook : HookableElement
             
         HandlePreDraw(addonName);
         
-        PetServices.PetLog.LogVerbose($"Showing tooltips: {addonName} {isAllowedPreDraw}");
+        PetServices.PetLog.DevLogVerbose($"Showing tooltips: {addonName} {isAllowedPreDraw}");
     }
     
     private void AtkTooltipManagerShowTooltipDetour(AtkTooltipManager* thisPtr, AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipManager.AtkTooltipArgs* tooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, AtkResNode*, void> unkDelegate, bool unk7, bool unk8)
