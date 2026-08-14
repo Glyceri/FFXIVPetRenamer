@@ -23,6 +23,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
     public override void Init()
     {
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostReceiveEvent, "MinionNoteBook",      HandlePostRefreshNoteBook);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh,      "MinionNoteBook",      HandlePostRefreshNoteBook);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh,      "MJIMinionNoteBook",   HandlePostRefreshMJINoteBook);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw,          "LovmPaletteEdit",     HandlePostRefreshLovmPaletteEdit);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw,          "LovmActionDetail",    HandlePostRefreshLovmActionDetail);
@@ -37,7 +38,12 @@ internal unsafe class MinionNoteBookHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshLovmActionDetail);
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshYKWNote);
     }
-    
+
+    public override void Refresh()
+    {
+        ForceRefreshAddon("MinionNoteBook");
+    }
+
     private void HandleBook(AtkUnitBase* atkUnitBase, uint textNodeIndex)
     {
         if (atkUnitBase == null)

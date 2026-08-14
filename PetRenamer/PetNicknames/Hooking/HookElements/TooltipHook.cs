@@ -62,6 +62,21 @@ internal unsafe class TooltipHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate,  "ActionDetail", OnActionTooltipRequestedUpdate);
     }
     
+    protected override void OnDispose()
+    { 
+        ShowTooltipHook.Dispose();
+        
+        DalamudServices.AddonLifecycle.UnregisterListener(OnTooltipPreDraw);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnTooltipRequestedUpdate);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnActionTooltipRequestedUpdate);
+    }
+
+    public override void Refresh()
+    {
+        RefreshAddon("Tooltip");
+        RefreshAddon("ActionDetail");
+    }
+
     private void SetText(AtkTextNode* textNode, AtkNineGridNode* backgroundNode)
     {
         if (PetServices.HoverService.CurrentlyHoveredPet == null)
@@ -232,14 +247,5 @@ internal unsafe class TooltipHook : HookableElement
         RelayShowTooltip(parentId);
 
         ShowTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
-    }
-    
-    protected override void OnDispose()
-    { 
-        ShowTooltipHook.Dispose();
-        
-        DalamudServices.AddonLifecycle.UnregisterListener(OnTooltipPreDraw);
-        DalamudServices.AddonLifecycle.UnregisterListener(OnTooltipRequestedUpdate);
-        DalamudServices.AddonLifecycle.UnregisterListener(OnActionTooltipRequestedUpdate);
     }
 }

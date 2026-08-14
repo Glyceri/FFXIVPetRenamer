@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.NativeWrapper;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -15,8 +16,6 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class PartyHook : HookableElement
 {
-    private bool hasRegisteredListener;
-    
     public PartyHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices) { }
 
@@ -25,33 +24,22 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "_PartyList", LifeCycleUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_PartyList", LifeCycleUpdate);
     }
+    
+    protected override void OnDispose()
+    {
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
+    }
 
     public override void Refresh()
     {
-        if (hasRegisteredListener)
-        {
-            return;
-        }
-
-        hasRegisteredListener = true;
-
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostDraw, "_PartyList", LifeCycleUpdateRefresh);
+        RefreshAddon("_PartyList");
     }
-
+    
     private bool CanContinue(AtkUnitBase* baseD) 
         => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
 
     private void LifeCycleUpdate(AddonEvent aEvent, AddonArgs args) 
         => Update((AtkUnitBase*)args.Addon.Address);
-
-    private void LifeCycleUpdateRefresh(AddonEvent aEvent, AddonArgs args)
-    {
-        Update((AtkUnitBase*)args.Addon.Address);
-
-        hasRegisteredListener = false;
-        
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
-    }
 
     private void Update(AtkUnitBase* baseD)
     {
@@ -62,12 +50,6 @@ internal unsafe class PartyHook : HookableElement
 
         SetPetName  ((AddonPartyList*)baseD);
         SetCastList ((AddonPartyList*)baseD);
-    }
-
-    protected override void OnDispose()
-    {
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
     private PartyListMemberStruct GetPet(AddonPartyList* partyList)

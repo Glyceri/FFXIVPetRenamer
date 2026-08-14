@@ -1,4 +1,6 @@
-﻿using PetRenamer.PetNicknames.Hooking.Interfaces;
+﻿using Dalamud.Game.NativeWrapper;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -21,6 +23,7 @@ internal abstract class HookableElement : IHookableElement
         PetServices.DirtyListener.RegisterOnDirtyEntry(OnPettableEntryChange);
         PetServices.DirtyListener.RegisterOnDirtyName(OnNameDatabaseChange);
         PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(OnPlayerDirty);
+        PetServices.DirtyListener.RegisterOnDirtyConfig(OnConfigChanged);
 
         DalamudServices.Hooking.InitializeFromAttributes(this);
     }
@@ -43,8 +46,49 @@ internal abstract class HookableElement : IHookableElement
     protected virtual void OnPlayerDirty(IPettableUser user)                           
         => Refresh();
 
+    protected virtual void OnConfigChanged(Configuration _)
+        => Refresh();
+    
     public virtual void Refresh() { }
 
+    protected unsafe void RefreshAddon(string addonName, int index = 1)
+    {
+        AtkUnitBasePtr unitBasePtr = DalamudServices.GameGui.GetAddonByName(addonName, index);
+        
+        if (unitBasePtr.IsNull)
+        {
+            return;
+        }
+        
+        AtkUnitBase* unitBase = (AtkUnitBase*)unitBasePtr.Address;
+
+        if (unitBase == null)
+        {
+            return;
+        }
+        
+        unitBase->OnRequestedUpdate(AtkStage.Instance()->GetNumberArrayData(), AtkStage.Instance()->GetStringArrayData());
+    }
+    
+    protected unsafe void ForceRefreshAddon(string addonName, int index = 1)
+    {
+        AtkUnitBasePtr unitBasePtr = DalamudServices.GameGui.GetAddonByName(addonName, index);
+        
+        if (unitBasePtr.IsNull)
+        {
+            return;
+        }
+        
+        AtkUnitBase* unitBase = (AtkUnitBase*)unitBasePtr.Address;
+
+        if (unitBase == null)
+        {
+            return;
+        }
+        
+        unitBase->OnRefresh(unitBase->AtkValuesCount, unitBase->AtkValues);
+    }
+    
     public void Dispose()
     {
         PetServices.DirtyListener.UnregisterOnDirtyDatabase(OnPettableDatabaseChange);

@@ -212,12 +212,4 @@ internal unsafe class TargetHook : HookableElement
         RefreshAddon("_TargetInfoMainTarget");
         RefreshAddon("_FocusTargetInfo");
     }
-    
-    private void RefreshAddon(string addonName)
-    {
-        AtkUnitBasePtr unitBasePtr = DalamudServices.GameGui.GetAddonByName(addonName);
-        AtkUnitBase*   unitBase    = (AtkUnitBase*)unitBasePtr.Address;
-
-        unitBase->OnRequestedUpdate(AtkStage.Instance()->GetNumberArrayData(), AtkStage.Instance()->GetStringArrayData());
-    }
 }

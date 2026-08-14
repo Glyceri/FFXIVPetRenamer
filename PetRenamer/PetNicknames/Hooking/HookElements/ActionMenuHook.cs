@@ -22,6 +22,13 @@ internal unsafe class ActionMenuHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "ActionMenuReplaceList",    LifeCycleUpdateReplaceMenu);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostSetup,           "ActionMenuActionSetting",  LifeCycleUpdateActionSetting);
     }
+    
+    protected override void OnDispose()
+    {
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionMenu);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateReplaceMenu);
+        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionSetting);
+    }
 
     private void LifeCycleUpdateActionMenu(AddonEvent addonEvent, AddonArgs addonArgs) 
         => UpdateActionMenu((AtkUnitBase*)addonArgs.Addon.Address);
@@ -30,7 +37,7 @@ internal unsafe class ActionMenuHook : HookableElement
         => UpdateReplaceMenu((AtkUnitBase*)addonArgs.Addon.Address);
     
     private void LifeCycleUpdateActionSetting(AddonEvent addonEvent, AddonArgs addonArgs) 
-        => UpdateActionSetting ((AtkUnitBase*)addonArgs.Addon.Address);
+        => UpdateActionSetting((AtkUnitBase*)addonArgs.Addon.Address);
 
     private void UpdateActionSetting(AtkUnitBase* baseD)
     {
@@ -514,12 +521,5 @@ internal unsafe class ActionMenuHook : HookableElement
         IPetSheetData softData = PetServices.PetSheets.MakeSoft(user, petSheet);
         
         PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInActionLogColour, textNode, softData, NameType.Action);
-    }
-
-    protected override void OnDispose()
-    {
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionMenu);
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateReplaceMenu);
-        DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateActionSetting);
     }
 }

@@ -108,9 +108,7 @@ internal unsafe class PettableUser : IPettableUser
         
         OnLastCastChanged(CurrentCastId);
     }
-
-    // TODO: This pet mirage system I think is bugged.
-    // Rethink it
+    
     public void OnLastCastChanged(uint cast)
     {
         if (!IsActive)
@@ -142,7 +140,7 @@ internal unsafe class PettableUser : IPettableUser
         int sIndex = softIndex.Value;
 
         IPettablePet? youngestPet = GetYoungestPet(SkeletonType.BattlePet);
-
+        
         if (youngestPet == null)
         {
             return;
