@@ -75,11 +75,11 @@ internal class Configuration : IPluginConfiguration
     public ulong LastIslandContentId = ulong.MinValue;
     
     // ------------------------- Debug SETTINGS --------------------------
-    public bool debugModeActive        = false;
-    public bool openDebugWindowOnStart = false;
-    public bool debugShowChatCode      = false;
-    public int  lastDebugTab           = 0;
-    public bool showFailedTranslations = true;
+    public bool   debugModeActive        = false;
+    public bool   openDebugWindowOnStart = false;
+    public bool   debugShowChatCode      = false;
+    public int    lastDebugTab           = 0;
+    public bool   showFailedTranslations = true;
 
     public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {

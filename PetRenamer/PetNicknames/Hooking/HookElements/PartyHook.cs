@@ -4,11 +4,11 @@ using PetRenamer.PetNicknames.Services.Interface;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonPartyList;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using Lumina.Text.ReadOnly;
-using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
@@ -60,8 +60,8 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
 
-        SetPetName  ((PetNicknamesAddonPartyList*)baseD);
-        SetCastlist ((AddonPartyList*)baseD);
+        SetPetName  ((AddonPartyList*)baseD);
+        SetCastList ((AddonPartyList*)baseD);
     }
 
     protected override void OnDispose()
@@ -70,7 +70,14 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdateRefresh);
     }
 
-    private void SetPetName(PetNicknamesAddonPartyList* partyNode)
+    private PartyListMemberStruct GetPet(AddonPartyList* partyList)
+    {
+        bool usePetSlot = PartyListNumberArray.Instance()->UsePetSlot;
+        
+        return (usePetSlot ? partyList->Pet : partyList->SpecialPet);
+    }
+    
+    private void SetPetName(AddonPartyList* partyNode)
     {
         IPettableUser? localPlayer = PetServices.UserList.LocalPlayer;
 
@@ -86,10 +93,12 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
         
-        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnPartyListColour, partyNode->Pet.Name, pet, NameType.Raw);
+        PartyListMemberStruct petMember = GetPet(partyNode);
+        
+        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnPartyListColour, petMember.Name, pet, NameType.Raw);
     }
 
-    private void SetCastlist(AddonPartyList* partyNode)
+    private void SetCastList(AddonPartyList* partyNode)
     {
         if (!PetServices.Configuration.ShowOnCastbarsColour.Enabled)
         {

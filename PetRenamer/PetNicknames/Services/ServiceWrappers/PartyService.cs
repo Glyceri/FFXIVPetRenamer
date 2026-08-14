@@ -16,11 +16,10 @@ internal class PartyService : IParty
 {
     private const string PARTY_ADDON_NAME = "_PartyList";
     
-    private readonly IUserList      UserList;
-    private readonly DalamudServices        DalamudServices;
-    private readonly IDirtyListener DirtyListener;
-    
-    private readonly IPettableUser?[]       Party = new IPettableUser?[IParty.MaxPartyLength];
+    private readonly IUserList        UserList;
+    private readonly DalamudServices  DalamudServices;
+    private readonly IDirtyListener   DirtyListener;
+    private readonly IPettableUser?[] Party = new IPettableUser?[IParty.MaxPartyLength];
     
     public PartyService(IUserList userList, DalamudServices dalamudServices, IDirtyListener dirtyListener)
     {
@@ -88,8 +87,8 @@ internal class PartyService : IParty
                 continue;
             }
             
-            // == 4 means "is player"
-            if (partyChara->BattleNpcSubKind != BattleNpcSubKind.NpcPartyMember && (byte)partyChara->BattleNpcSubKind != 4)
+            if (partyChara->BattleNpcSubKind != BattleNpcSubKind.NpcPartyMember && 
+                partyChara->BattleNpcSubKind != BattleNpcSubKind.Player)
             {
                 continue;
             }

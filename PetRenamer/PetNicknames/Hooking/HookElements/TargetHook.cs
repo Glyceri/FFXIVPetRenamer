@@ -1,6 +1,8 @@
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.NativeWrapper;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -18,7 +20,7 @@ internal unsafe class TargetHook : HookableElement
     
     public override void Init()
     {
-        PetServices.TargetManager.RegisterTargetChangedListener(OnTargetChanged);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnDirtyEntry);
         
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfo",           OnTargetInfo);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfoMainTarget", OnTargetInfoMainTarget);
@@ -29,7 +31,7 @@ internal unsafe class TargetHook : HookableElement
     
     protected override void OnDispose()
     {
-        PetServices.TargetManager.DeregisterTargetChangedListener(OnTargetChanged);
+        PetServices.DirtyListener.RegisterOnDirtyName(OnDirtyEntry);
         
         DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfo);
         DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfoMainTarget);
@@ -190,10 +192,32 @@ internal unsafe class TargetHook : HookableElement
         return returner;
     }
     
-    private void OnTargetChanged()
+    private void OnDirtyEntry(INamesDatabase _)
     {
-        PetServices.PetLog.LogVerbose("Received target status changed.");
+        DalamudServices.Framework.Run(OnDirtyEntryFramework);
+    }
+    
+    private void OnDirtyEntryFramework()
+    {
+        PetServices.PetLog.DevLogInfo("Names Database Changed, proceeding to refresh ui.");
         
-        // TODO: Make target text change c:
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
+        
+        if (localUser == null)
+        {
+            return;
+        }
+
+        RefreshAddon("_TargetInfo");
+        RefreshAddon("_TargetInfoMainTarget");
+        RefreshAddon("_FocusTargetInfo");
+    }
+    
+    private void RefreshAddon(string addonName)
+    {
+        AtkUnitBasePtr unitBasePtr = DalamudServices.GameGui.GetAddonByName(addonName);
+        AtkUnitBase*   unitBase    = (AtkUnitBase*)unitBasePtr.Address;
+
+        unitBase->OnRequestedUpdate(AtkStage.Instance()->GetNumberArrayData(), AtkStage.Instance()->GetStringArrayData());
     }
 }

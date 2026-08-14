@@ -7,6 +7,6 @@ public struct PetNicknamesLogModule
 {
     [FieldOffset(20)]
     public int LogMessageCount;
-    [FieldOffset(24)]
+    [FieldOffset(0x18)]
     public int NonLogMessageCount;
 }

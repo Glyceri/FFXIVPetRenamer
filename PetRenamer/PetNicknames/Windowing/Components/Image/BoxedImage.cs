@@ -29,15 +29,13 @@ internal static class BoxedImage
 
     public static void DrawMinion(IPetSheetData data, DalamudServices dalamudServices, Configuration configuration, Vector2 size)
     {
-        IDalamudTextureWrap textureWrap;
+        IDalamudTextureWrap? textureWrap = null;
 
         UldIcon? raceIcon = null;
         
-        if (data.Model.SkeletonType == SkeletonType.BattlePet) 
-        {
-            textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon).GetWrapOrEmpty(); 
-        }
-        else
+        uint iconIndex = data.Icon;
+        
+        if (data.Model.SkeletonType != SkeletonType.BattlePet) 
         {
             uint adder = 0;
 
@@ -50,10 +48,21 @@ internal static class BoxedImage
                 adder = 55000;
             }
 
-            textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(data.Icon + adder).GetWrapOrEmpty();
+            iconIndex = data.Icon + adder;
+            
             raceIcon    = RaceIconHelper.GetFromRaceId(data?.RaceId ?? 0);
         }
-
+        
+        try
+        {
+            textureWrap = dalamudServices.TextureProvider.GetFromGameIcon(iconIndex).GetWrapOrEmpty();
+        }
+        catch {}
+        
+        if (textureWrap == null)
+        {
+            return;
+        }
         
         IconImage.Draw(textureWrap, size);
         ImGui.SameLine(0, 0);

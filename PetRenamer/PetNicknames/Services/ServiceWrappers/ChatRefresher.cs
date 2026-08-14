@@ -18,7 +18,11 @@ internal class ChatRefresher : IChatRefresher
     }
     
     public void Dispose()
-        => RefreshChat();
+    {
+        DirtyListener.UnregisterOnDirtyConfig(OnDirtyConfig);
+        
+        RefreshChat();
+    }
     
     private void OnDirtyConfig(Configuration _)
         => RefreshChat();

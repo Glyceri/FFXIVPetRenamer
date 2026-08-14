@@ -238,12 +238,11 @@ internal partial class PetNameCommand : Command
             ThrowNewErrorException();
         }
 
-        string? currentName         = activeEntry!.GetName(activeData!.Model);
+        string?  currentName        = activeEntry!.GetName(activeData!.Model);
         Vector3? currentEdgeColour  = activeEntry!.GetEdgeColour(activeData!.Model);
         Vector3? currentTextColour  = activeEntry!.GetTextColour(activeData!.Model);
-
-        string? currentEdgeText = null;
-        string? currentTextText = null;
+        string?  currentEdgeText    = null;
+        string?  currentTextText    = null;
 
         if (currentEdgeColour != null)
         {

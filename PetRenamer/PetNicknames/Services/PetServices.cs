@@ -26,8 +26,6 @@ internal class PetServices : IPetServices
     public IParty               Party               { get; }
     public IChatRefresher       ChatRefresher       { get; }
 
-    private readonly DirtyHandler DirtyHandler = new DirtyHandler();
-    
     public PetServices(DalamudServices services) 
     {
         Version             = services.DalamudPlugin.Manifest.AssemblyVersion.ToString();
@@ -42,8 +40,12 @@ internal class PetServices : IPetServices
         PluginWatcher       = new PluginWatcher(services);
         NotificationService = new NotificationService(services, Configuration);
         HoverService        = new HoverService();
-        DirtyCaller         = DirtyHandler;
-        DirtyListener       = DirtyHandler;
+        
+        DirtyHandler dirtyHandler = new DirtyHandler(PetLog);
+        
+        DirtyCaller         = dirtyHandler;
+        DirtyListener       = dirtyHandler;
+        
         Party               = new PartyService(UserList, services, DirtyListener);
         ChatRefresher       = new ChatRefresher(DirtyListener);
         

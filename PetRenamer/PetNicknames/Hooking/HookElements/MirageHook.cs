@@ -82,11 +82,11 @@ internal class MirageHook : HookableElement
         // 2 --> Titan-Egi
         // 3 --> Ifrit-Egi
         // 4 --> Eos
-        PetSkeleton carbuncleSkeleton = GetPetSkeleton(_carbuncleMirage, PluginConstants.BaseSummonerSkeleton);
-        PetSkeleton garudaSkeleton    = GetPetSkeleton(_egiGarudaMirage, PluginConstants.BaseGarudaEgiSkeleton);
-        PetSkeleton titanSkeleton     = GetPetSkeleton(_egiTitanMirage,  PluginConstants.BaseTitanEgiSkeleton);
-        PetSkeleton ifritSkeleton     = GetPetSkeleton(_egiIfritMirage,  PluginConstants.BaseIfritEgiSkeleton);
-        PetSkeleton eosSkeleton       = GetPetSkeleton(_eosMirage,       PluginConstants.BaseScholarSkeleton);
+        PetSkeleton carbuncleSkeleton = GetPetSkeleton(_carbuncleMirage, PluginConstants.Carbuncle.PetSkeleton);
+        PetSkeleton garudaSkeleton    = GetPetSkeleton(_egiGarudaMirage, PluginConstants.GarudaEgi.PetSkeleton);
+        PetSkeleton titanSkeleton     = GetPetSkeleton(_egiTitanMirage,  PluginConstants.TitanEgi.PetSkeleton);
+        PetSkeleton ifritSkeleton     = GetPetSkeleton(_egiIfritMirage,  PluginConstants.IfritEgi.PetSkeleton);
+        PetSkeleton eosSkeleton       = GetPetSkeleton(_eosMirage,       PluginConstants.Eos.PetSkeleton);
         
         PetServices.UserList.LocalPlayer.DataBaseEntry.SetSoftSkeleton(0, carbuncleSkeleton);
         PetServices.UserList.LocalPlayer.DataBaseEntry.SetSoftSkeleton(1, garudaSkeleton);

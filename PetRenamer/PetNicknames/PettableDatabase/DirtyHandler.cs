@@ -1,51 +1,71 @@
 ﻿using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System;
 
 namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class DirtyHandler : IDirtyListener, IDirtyCaller
 {
-    Action<IPettableDatabase>?      OnDatabase  = _ => { };
-    Action<IPettableDatabaseEntry>? OnEntry     = _ => { };
-    Action<IPettableDatabaseEntry>? OnClear     = _ => { };
-    Action<INamesDatabase>?         OnName      = _ => { };
-    Action<IPettableUser>?          OnUser      = _ => { };
-    Action<Configuration>?          OnConfig    = _ => { };
-    Action<IPettablePet>?           OnPet       = _ => { };
+    private readonly IPetLog PetLog;
+    
+    private Action<IPettableDatabase>?      OnDatabase  = _ => { };
+    private Action<IPettableDatabaseEntry>? OnEntry     = _ => { };
+    private Action<IPettableDatabaseEntry>? OnClear     = _ => { };
+    private Action<INamesDatabase>?         OnName      = _ => { };
+    private Action<IPettableUser>?          OnUser      = _ => { };
+    private Action<Configuration>?          OnConfig    = _ => { };
+    private Action<IPettablePet>?           OnPet       = _ => { };
 
+    public DirtyHandler(IPetLog petLog)
+        => PetLog = petLog;
+    
     public void ClearEntry(in IPettableDatabaseEntry entry)
     {
+        PetLog.DevLog($"Invoked Dirty Database: {entry.Name}");
+        
         OnClear?.Invoke(entry);
     }
 
     public void DirtyDatabase(in IPettableDatabase database)
     {
+        PetLog.DevLog($"Invoked Dirty Database.");
+        
         OnDatabase?.Invoke(database);
     }
 
     public void DirtyEntry(in IPettableDatabaseEntry entry)
     {
+        PetLog.DevLog($"Invoked Dirty Entry: {entry.Name}.");
+        
         OnEntry?.Invoke(entry);
     }
 
     public void DirtyName(in INamesDatabase nameDatabase)
     {
+        PetLog.DevLog($"Invoked Dirty Name.");
+        
         OnName?.Invoke(nameDatabase);
     }
 
     public void DirtyPlayer(IPettableUser user)
     {
+        PetLog.DevLog($"Invoked Dirty Player: {user.DataBaseEntry.Name}.");
+        
         OnUser?.Invoke(user);   
     }
 
     public void DirtyConfig(Configuration configuration)
     {
+        PetLog.DevLog($"Invoked Dirty Config.");
+        
         OnConfig?.Invoke(configuration);
     }
 
     public void DirtyPet(IPettablePet pet)
     {
+        PetLog.DevLog($"Invoked Dirty Pet: {pet.PetData?.Singular}.");
+        
         OnPet?.Invoke(pet);
     }
 

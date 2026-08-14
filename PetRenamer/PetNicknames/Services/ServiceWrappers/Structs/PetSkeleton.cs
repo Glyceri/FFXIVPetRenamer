@@ -6,13 +6,14 @@ using System;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
-public readonly struct PetSkeleton : IEquatable<PetSkeleton>
+internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
 {
     public readonly uint         SkeletonId;
     public readonly SkeletonType SkeletonType;
 
     public PetSkeleton(int skeletonId, SkeletonType skeletonType)
-        : this((uint)skeletonId, skeletonType) { }
+        : this((uint)skeletonId, skeletonType) 
+        { }
 
     public PetSkeleton(uint skeletonId, SkeletonType skeletonType)
     {

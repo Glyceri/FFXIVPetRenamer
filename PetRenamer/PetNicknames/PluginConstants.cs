@@ -1,8 +1,6 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace PetRenamer.PetNicknames;
@@ -18,32 +16,63 @@ internal static class PluginConstants
 
     public const string KOFI_URL           = "https://ko-fi.com/glyceri";
 
-    public static readonly PetSkeleton Eos                    = new PetSkeleton(407,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton Selene                 = new PetSkeleton(408,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton EmeraldCarbuncle       = new PetSkeleton(409,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton RubyCarbuncle          = new PetSkeleton(410,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton Carbuncle              = new PetSkeleton(411,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton TopazCarbuncle         = new PetSkeleton(412,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton IfritEgi               = new PetSkeleton(415,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton TitanEgi               = new PetSkeleton(416,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton GarudaEgi              = new PetSkeleton(417,  SkeletonType.BattlePet);
-    public static readonly PetSkeleton RookAutoTurret         = new PetSkeleton(1027, SkeletonType.BattlePet);
-    public static readonly PetSkeleton Bahamut                = new PetSkeleton(1930, SkeletonType.BattlePet);
-    public static readonly PetSkeleton AutomatonQueen         = new PetSkeleton(2618, SkeletonType.BattlePet);
-    public static readonly PetSkeleton Seraph                 = new PetSkeleton(2619, SkeletonType.BattlePet);
-    public static readonly PetSkeleton Phoenix                = new PetSkeleton(2620, SkeletonType.BattlePet);
-    public static readonly PetSkeleton LivingShadow           = new PetSkeleton(2621, SkeletonType.BattlePet);
-    public static readonly PetSkeleton IffritII               = new PetSkeleton(3122, SkeletonType.BattlePet);
-    public static readonly PetSkeleton GarudaII               = new PetSkeleton(3123, SkeletonType.BattlePet);
-    public static readonly PetSkeleton TitanII                = new PetSkeleton(3124, SkeletonType.BattlePet);
-    public static readonly PetSkeleton SolarBahamut           = new PetSkeleton(4038, SkeletonType.BattlePet);
+    public  static readonly PetRegistration Eos                 = new PetRegistration(pet: 6,   modelChara: 407,   bnpcName: 1398,   action: 17215,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
+    private static readonly PetRegistration Selene              = new PetRegistration(pet: 7,   modelChara: 408,   bnpcName: 1399,   action: 17215,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
+    private static readonly PetRegistration Seraph              = new PetRegistration(pet: 21,  modelChara: 2619,  bnpcName: 8227,   action: 16545,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
+    
+    private static readonly PetRegistration EmeraldCarbuncle    = new PetRegistration(pet: 26,  modelChara: 409,   bnpcName: 1401,   action: 25804,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration RubyCarbuncle       = new PetRegistration(pet: 24,  modelChara: 410,   bnpcName: 4149,   action: 25802,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    public  static readonly PetRegistration Carbuncle           = new PetRegistration(pet: 23,  modelChara: 411,   bnpcName: 10261,  action: 25798,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration TopazCarbuncle      = new PetRegistration(pet: 25,  modelChara: 412,   bnpcName: 1400,   action: 25803,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    
+    public  static readonly PetRegistration IfritEgi            = new PetRegistration(pet: 27,  modelChara: 415,   bnpcName: 1402,   action: 25805,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    public  static readonly PetRegistration TitanEgi            = new PetRegistration(pet: 28,  modelChara: 416,   bnpcName: 1403,   action: 25806,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    public  static readonly PetRegistration GarudaEgi           = new PetRegistration(pet: 29,  modelChara: 417,   bnpcName: 1404,   action: 25807,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    
+    private static readonly PetRegistration IffritII            = new PetRegistration(pet: 30,  modelChara: 3122,  bnpcName: 10262,  action: 25838,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration GarudaII            = new PetRegistration(pet: 32,  modelChara: 3123,  bnpcName: 10263,  action: 25840,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration TitanII             = new PetRegistration(pet: 31,  modelChara: 3124,  bnpcName: 10264,  action: 25839,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    
+    private static readonly PetRegistration Phoenix             = new PetRegistration(pet: 14,  modelChara: 2620,  bnpcName: 8228,   action: 25831,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration Bahamut             = new PetRegistration(pet: 10,  modelChara: 1930,  bnpcName: 6566,   action: 7427,   SkeletonType.BattlePet, LegacySkeletonType.Summoner);
+    private static readonly PetRegistration SolarBahamut        = new PetRegistration(pet: 46,  modelChara: 4038,  bnpcName: 13159,  action: 36992,  SkeletonType.BattlePet, LegacySkeletonType.Summoner);
 
-    public static readonly PetSkeleton BaseScholarSkeleton    = Eos;
-    public static readonly PetSkeleton BaseSummonerSkeleton   = Carbuncle;
-    public static readonly PetSkeleton BaseIfritEgiSkeleton   = IfritEgi;
-    public static readonly PetSkeleton BaseTitanEgiSkeleton   = TitanEgi;
-    public static readonly PetSkeleton BaseGarudaEgiSkeleton  = GarudaEgi;
+    private static readonly PetRegistration RookAutoTurret      = new PetRegistration(pet: 8,   modelChara: 1027,  bnpcName: 3666,   action: 2864,   SkeletonType.BattlePet, LegacySkeletonType.Machinist);
+    private static readonly PetRegistration AutomatonQueen      = new PetRegistration(pet: 18,  modelChara: 2618,  bnpcName: 8230,   action: 16501,  SkeletonType.BattlePet, LegacySkeletonType.Machinist);
+    
+    private static readonly PetRegistration LivingShadow        = new PetRegistration(pet: 17,  modelChara: 2621,  bnpcName: 8229,   action: 16472,  SkeletonType.BattlePet, LegacySkeletonType.DarkKnight);
 
+    
+    public static readonly PetRegistration[] PetRegistrations = 
+    [
+        Eos,
+        Selene,
+        Seraph,
+        
+        EmeraldCarbuncle,
+        RubyCarbuncle,
+        Carbuncle,
+        TopazCarbuncle,
+        
+        IfritEgi,
+        TitanEgi,
+        GarudaEgi,
+        
+        IffritII,
+        GarudaII,
+        TitanII,
+        
+        Phoenix,
+        Bahamut,
+        SolarBahamut,
+        
+        RookAutoTurret,
+        AutomatonQueen,
+        
+        LivingShadow,
+    ];
+
+    
     public static readonly Vector4 MinionColourHover = new Vector4(0.5f, 0.5f, 1.0f, 1.0f); 
     public static readonly Vector4 MinionColourIdle  = new Vector4(0.36f, 0.36f, 1.0f,  1.0f);
     public static readonly Vector4 MinionColourClick = new Vector4(0.3f, 0.3f, 0.45f, 1.0f);
@@ -62,8 +91,8 @@ internal static class PluginConstants
     public const string JapaneseSummonValue    = "サモン・";      // The ・ is important.
     public const string ChineseSummonValue     =  "召唤";
     public const string ChineseTradSummonValue =  "召唤";
-    public const string KoreanSummonValue      =  EnglishSummonValue; // TODO: FIGURE OUT THE ACTUAL KOREAN TEXT
-    public const string ThaiSummonValue        =  EnglishSummonValue; // TODO: FIGURE OUT THE ACTUAL THAI TEXT
+    public const string KoreanSummonValue      =  " 소환";
+    public const string ThaiSummonValue        =  "召唤"; // TODO: FIGURE OUT THE ACTUAL THAI TEXT
     
     public static readonly SummonLanguageValue SummonLanguageValue = new SummonLanguageValue()
     {
@@ -76,18 +105,6 @@ internal static class PluginConstants
         KoreanValue             = KoreanSummonValue,
         TaiwaneseValue          = ThaiSummonValue,
     };
-    
-    [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacySummonerClassId = -2;
-
-    [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyScholarClassId = -3;
-
-    [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyMachinistClassId = -4;
-
-    [Obsolete("I stopped using classes in 1.4")] 
-    public const int LegacyDarkKnightClassId = -5;
 
     // Sheets wrapper explains why the order is like this... it's crucial it stays like this.
     // Soft Mapping is the most hardcoded thing in this plogon :c
@@ -97,122 +114,5 @@ internal static class PluginConstants
     // 3 --> Ifrit-Egi
     // 4 --> Eos
     public static readonly PetSkeleton[] BaseSkeletons 
-        = [BaseSummonerSkeleton, BaseGarudaEgiSkeleton, BaseTitanEgiSkeleton, BaseIfritEgiSkeleton, BaseScholarSkeleton];
-    
-    public static readonly Dictionary<PetSkeleton, uint> PetIdToAction = new()
-    {
-        { EmeraldCarbuncle , 25804 }, // Summon Emerald
-        { RubyCarbuncle    , 25802 }, // Summon Ruby
-        { Carbuncle        , 25798 }, // Summon Carbuncle
-        { TopazCarbuncle   , 25803 }, // Summon Topaz
-        { IfritEgi         , 25805 }, // Summon Ifrit
-        { TitanEgi         , 25806 }, // Summon Titan
-        { GarudaEgi        , 25807 }, // Summon Garuda
-        { Eos              , 17215 }, // Summon Eos
-        { Selene           , 17215 }, // Summon Eos
-        { AutomatonQueen   , 16501 }, // Automaton Queen
-        { Seraph           , 16545 }, // Summon Seraph
-        { Phoenix          , 25831 }, // Summon Phoenix
-        { LivingShadow     , 16472 }, // Living Shadow
-        { IffritII         , 25838 }, // Summon Ifrit II
-        { GarudaII         , 25840 }, // Summon Garuda II
-        { TitanII          , 25839 }, // Summon Titan II
-        { Bahamut          , 7427  }, // Summon Bahamut
-        { RookAutoTurret   , 2864  }, // Rook Autoturret
-        { SolarBahamut     , 36992 }, // Summon Solar Bahamut        
-    };
-    
-    public static readonly Dictionary<PetSkeleton, uint> BattlePetToBNpcName = new()
-    {
-        { EmeraldCarbuncle , 1401  },
-        { RubyCarbuncle    , 4149  },
-        { Carbuncle        , 10261 },
-        { TopazCarbuncle   , 1400  },
-        { IfritEgi         , 1402  },
-        { TitanEgi         , 1403  },
-        { GarudaEgi        , 1404  },
-        { Eos              , 1398  },
-        { Selene           , 1399  },
-        { AutomatonQueen   , 8230  },
-        { Seraph           , 8227  },
-        { Phoenix          , 8228  },
-        { LivingShadow     , 8229  },
-        { IffritII         , 10262 },
-        { GarudaII         , 10263 },
-        { TitanII          , 10264 },
-        { Bahamut          , 6566  },
-        { RookAutoTurret   , 3666  },
-        { SolarBahamut     , 13159 },
-    };
-
-    public static readonly Dictionary<uint, PetSkeleton> BattlePetRemap = new()
-    {
-        { 6,  Eos              },
-        { 7,  Selene           },
-
-        { 1,  EmeraldCarbuncle },
-        { 38, RubyCarbuncle    },
-        { 2,  TopazCarbuncle   },
-        { 36, Carbuncle        },
-
-        { 27, IfritEgi         },
-        { 28, TitanEgi         },
-        { 29, GarudaEgi        },
-
-        { 8,  RookAutoTurret   },
-        { 21, Seraph           },
-        { 18, AutomatonQueen   },
-        { 17, LivingShadow     },
-
-        { 14, Phoenix          },
-        { 10, Bahamut          },
-        { 32, GarudaII         },
-        { 31, TitanII          },
-        { 30, IffritII         },
-        { 46, SolarBahamut     },
-    };
-    
-    [Obsolete("Classes have been obsolete since 1.4")]
-    public static readonly Dictionary<int, PetSkeleton[]> BattlePetToClass = new Dictionary<int, PetSkeleton[]>()
-    {
-        {
-            LegacySummonerClassId, 
-            [
-                Carbuncle,
-                RubyCarbuncle,
-                TopazCarbuncle,
-                EmeraldCarbuncle,
-                IfritEgi,
-                TitanEgi,
-                GarudaEgi,
-                IffritII,
-                GarudaII,
-                TitanII,
-                Phoenix,
-                Bahamut,
-                SolarBahamut
-            ]
-        },
-        {
-            LegacyScholarClassId, 
-            [
-                Eos,
-                Selene,
-                Seraph
-            ]
-        },
-        {
-            LegacyMachinistClassId,
-            [
-                RookAutoTurret,
-                AutomatonQueen,
-            ]
-        },
-        {
-            LegacyDarkKnightClassId,
-            [
-                LivingShadow
-            ]
-        }
-    };
+        = [Carbuncle.PetSkeleton, GarudaEgi.PetSkeleton, TitanEgi.PetSkeleton, IfritEgi.PetSkeleton, Eos.PetSkeleton];
 }

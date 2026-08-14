@@ -118,7 +118,7 @@ internal unsafe class ChatHook : HookableElement
     
     private nint ClearLogDetour(LogModule* logModule)
     {
-        PetServices.PetLog.DevLogWarning($"Clear LogModule.");
+        PetServices.PetLog.DevLogInfo($"Cleared LogModule.");
         
         ChatHandler.OnChatClear();
         

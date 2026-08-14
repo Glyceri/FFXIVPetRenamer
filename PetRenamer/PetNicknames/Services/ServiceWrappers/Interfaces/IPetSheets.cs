@@ -1,5 +1,6 @@
 ﻿using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
@@ -29,5 +30,8 @@ internal interface IPetSheets
     /// <returns>All Registered Pets</returns>
     IPetSheetData[]     AllPets { get; }
     
-    [Obsolete] PetSkeleton[] GetObsoleteIDsFromClass(int classJob);
+    Pet?                GetSheetPet(uint index);
+    XBMPet?             GetSheetXBMPet(uint index);
+    
+    [Obsolete] PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob);
 }

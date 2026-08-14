@@ -45,7 +45,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 internal class PetDevWindow : PetWindow
 {
     readonly IPettableDatabase Database;
-    readonly IPetServices      PetServices;
     readonly ISharingDictionary SharingDictionary;
     readonly IPronounHook PronounHook;
 
@@ -59,10 +58,9 @@ internal class PetDevWindow : PetWindow
     public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary, IPronounHook pronounHook) 
         : base(windowHandler, dalamudServices, petServices, "Pet Dev Window")
     {
-        Database    = database;
-        PetServices = petServices;
+        Database          = database;
         SharingDictionary = sharingDictionary;
-        PronounHook = pronounHook;
+        PronounHook       = pronounHook;
         
         RespectCloseHotkey   = false;
         DisableWindowSounds  = true;
@@ -90,7 +88,7 @@ internal class PetDevWindow : PetWindow
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
-
+    
     public override bool ShowQuickButtons
         => true;
     
@@ -340,7 +338,7 @@ internal class PetDevWindow : PetWindow
     {
         DrawSearchbar();
         
-        if (!ImGui.BeginTable($"##petTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingMask))
+        if (!ImGui.BeginTable($"##petTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable, ImGui.GetContentRegionAvail()))
             return;
         
         foreach (IPetSheetData pet in PetServices.PetSheets.AllPets)
@@ -355,16 +353,16 @@ internal class PetDevWindow : PetWindow
             
             ImGui.TableNextRow();
             
-            ImGui.TableSetColumnIndex(0);
+            if (ImGui.TableNextColumn())
             ImGui.Text(pet.Model.ToString());
             
-            ImGui.TableSetColumnIndex(1);
+            if (ImGui.TableNextColumn())
             ImGui.Text(pet.Singular);
             
-            ImGui.TableSetColumnIndex(2);
+            if (ImGui.TableNextColumn())
             ImGui.Text(pet.ActionName);
             
-            ImGui.TableSetColumnIndex(3);
+            if (ImGui.TableNextColumn())
             BoxedImage.DrawMinion(pet, DalamudServices, PetServices.Configuration, new Vector2(64, 64));
         }
         

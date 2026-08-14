@@ -128,6 +128,7 @@ internal class PetConfigWindow : PetWindow
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
+            // TODO: MAKE TRANSLATIONS FOR THIS
             DrawGroupConfig("Chat Replace Type", "Static", "Replaces the actual text in the chat.\nThis makes it persist even when the plugin turns off.", "Ephemeral", "(BETA MODE)\n\nFakes the appearance of the text in chat having been replaced.\nThis comes with the added benefit that names will update backwards in chat,\nAND they will disappear when the plugin turns off.", ChatHandlerGroup);
             
             DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref PetServices.Configuration.ShowOnNameplatesColour);

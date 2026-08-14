@@ -23,5 +23,5 @@ internal interface IPetSheetData
     bool        IsPet(string name);
     bool        IsAction(uint action);
 
-    PetSheetData MakeSoft(IPetSheetData newData, DalamudServices dalamudServices);
+    PetSheetData MakeSoft(IPetSheetData newData);
 }

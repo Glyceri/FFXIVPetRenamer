@@ -29,7 +29,7 @@ internal class LanguageBasedValue<T>
         };
     
     [SetsRequiredMembers]
-    public LanguageBasedValue(T defaultTValue)
+    protected LanguageBasedValue(T defaultTValue)
     {
         EnglishValue            = defaultTValue;
         GermanValue             = defaultTValue;
@@ -39,6 +39,5 @@ internal class LanguageBasedValue<T>
         ChineseTraditionalValue = defaultTValue;
         KoreanValue             = defaultTValue;
         TaiwaneseValue          = defaultTValue;
-        
     }
 }

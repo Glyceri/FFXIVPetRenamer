@@ -361,14 +361,14 @@ internal unsafe class MapHook : HookableElement
 
         pets.Sort((pet1, pet2) =>
         {
-            BattleChara* p1 = (BattleChara*)pet1.Address;
-            BattleChara* p2 = (BattleChara*)pet2.Address;
+            BattleChara* p1     = (BattleChara*)pet1.Address;
+            BattleChara* p2     = (BattleChara*)pet2.Address;
 
-            Vector3 p1p = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
-            Vector3 p2p = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;
+            Vector3      p1p    = p1->Character.DrawObject != null ? p1->Character.DrawObject->Position : default;
+            Vector3      p2p    = p2->Character.DrawObject != null ? p2->Character.DrawObject->Position : default;
 
-            Vector2 pos1 = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
-            Vector2 pos2 = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
+            Vector2      pos1   = flatPlayerPos - new Vector2(p1p.X, p1p.Z);
+            Vector2      pos2   = flatPlayerPos - new Vector2(p2p.X, p2p.Z);
 
             return pos1.Length().CompareTo(pos2.Length());
         });

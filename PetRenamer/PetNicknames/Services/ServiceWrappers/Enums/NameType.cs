@@ -1,6 +1,6 @@
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
-internal enum NameType
+internal enum NameType : byte
 {
     Raw     = 0,
     Pronoun = 1,

@@ -2,6 +2,7 @@
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Factory;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
@@ -24,11 +25,12 @@ internal class SheetsWrapper : IPetSheets
     private readonly ExcelSheet<BNpcName>    BNpcNameSheet;
     private readonly ExcelSheet<PetMirage>   PetMirageSheet;
     private readonly ExcelSheet<LogMessage>  LogMessageSheet;
+    private readonly ExcelSheet<XBMPet>      XBMPetSheet;
 
     public SheetsWrapper(DalamudServices dalamudServices)
     {
         DalamudServices  = dalamudServices;
-
+        
         PetSheet         = dalamudServices.DataManager.GetExcelSheet<Companion>();
         WorldSheet       = dalamudServices.DataManager.GetExcelSheet<World>();
         BattlePetSheet   = dalamudServices.DataManager.GetExcelSheet<Pet>();
@@ -36,6 +38,7 @@ internal class SheetsWrapper : IPetSheets
         BNpcNameSheet    = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
         PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
         LogMessageSheet  = dalamudServices.DataManager.GetExcelSheet<LogMessage>();
+        XBMPetSheet      = dalamudServices.DataManager.GetExcelSheet<XBMPet>();
         
         SetupSheetDataCache();
     }
@@ -50,7 +53,7 @@ internal class SheetsWrapper : IPetSheets
     {
         foreach (Companion companion in PetSheet)
         {
-            IPetSheetData? petSheetData = PetSheetData.CreatePetSheetData(DalamudServices, companion);
+            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(DalamudServices, companion);
             
             if (petSheetData == null)
             {
@@ -65,7 +68,7 @@ internal class SheetsWrapper : IPetSheets
     {
         foreach (Pet pet in BattlePetSheet)
         {
-            IPetSheetData? petSheetData = PetSheetData.CreatePetSheetData(this, DalamudServices, pet);
+            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(this, pet);
             
             if (petSheetData == null)
             {
@@ -148,20 +151,8 @@ internal class SheetsWrapper : IPetSheets
         {
             return null;
         }
-
-        PetSkeleton? foundSkeleton = null;
         
-        foreach (KeyValuePair<PetSkeleton, uint> keyValuePair in PluginConstants.PetIdToAction)
-        {
-            if (keyValuePair.Value != castId)
-            {
-                continue;
-            }
-             
-            foundSkeleton = keyValuePair.Key;
-            
-            break;
-        }
+        PetSkeleton? foundSkeleton = PetRegistration.GetRegistrationFromAction(castId)?.PetSkeleton;
         
         if (foundSkeleton == null)
         {
@@ -247,7 +238,7 @@ internal class SheetsWrapper : IPetSheets
             return oldData;
         }
 
-        return oldData.MakeSoft(softPetData, DalamudServices);
+        return oldData.MakeSoft(softPetData);
     }
 
     public IPetSheetData[] GetLegacyPets(int legacyModelId)
@@ -277,14 +268,23 @@ internal class SheetsWrapper : IPetSheets
         return sheetData;
     }
 
+    public Pet? GetSheetPet(uint index)
+        => BattlePetSheet.GetRow(index);
+    
+    public XBMPet? GetSheetXBMPet(uint index)
+        => XBMPetSheet.GetRow(index);
+    
     [Obsolete]
-    public PetSkeleton[] GetObsoleteIDsFromClass(int classJob)
+    public PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob)
     {
-        if (PluginConstants.BattlePetToClass.TryGetValue(classJob, out PetSkeleton[]? id))
+        PetRegistration[] registrations = PetRegistration.GetRegistrationsFromClass(classJob);
+        PetSkeleton[]     skeletons     = new PetSkeleton[registrations.Length];
+        
+        for (int i = 0; i < registrations.Length; i++)
         {
-            return id;
+            skeletons[i] = registrations[i].PetSkeleton;
         }
 
-        return [];
+        return skeletons;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
-public enum SkeletonType
+internal enum SkeletonType : byte
 {
     Invalid     = 0,
     None        = 0,

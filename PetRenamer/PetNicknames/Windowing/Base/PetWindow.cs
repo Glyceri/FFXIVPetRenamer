@@ -1,5 +1,4 @@
 ﻿using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -36,7 +35,7 @@ internal abstract class PetWindow : Window, IPetWindow
     private float lastFontScale   = 0;
     
     protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) 
-        : base(name, windowFlags, true)
+        : base($"{name} [v{petServices.Version}]", windowFlags, true)
     {
         WindowHandler   = windowHandler;
         DalamudServices = dalamudServices;
@@ -56,7 +55,7 @@ internal abstract class PetWindow : Window, IPetWindow
         SetupWindowSize();
     }
     
-    private void SetupTitlebar()
+    protected virtual void SetupTitlebar()
     {
         TitleBarButtons.Clear();
     

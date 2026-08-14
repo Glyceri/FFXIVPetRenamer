@@ -3,6 +3,7 @@
 using PetRenamer.Core.Serialization;
 using PetRenamer.Legacy.LegacyStepper.LegacyElements.Interfaces;
 using PetRenamer.PetNicknames.Services;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System.Collections.Generic;
@@ -49,9 +50,8 @@ internal class LegacyNamingVer7 : ILegacyStepperElement
                     
                     continue;
                 }
-
-
-                PetSkeleton[] remappedIds = PetServices.PetSheets.GetObsoleteIDsFromClass(id);
+                
+                PetSkeleton[] remappedIds = PetServices.PetSheets.GetObsoleteIDsFromClass((LegacySkeletonType)id);
 
                 foreach(PetSkeleton remappedId in remappedIds)
                 {

@@ -17,7 +17,6 @@ internal unsafe class PettableUser : IPettableUser
     public nint         Address       { get; }
     public BattleChara* BattleChara   { get; }
     public GameObjectId ObjectId      { get; }
-    public uint         EntityId      { get; }
     public uint         CurrentCastId { get; private set; }
     public bool         IsLocalPlayer { get; }
 
@@ -43,7 +42,6 @@ internal unsafe class PettableUser : IPettableUser
 
         IsLocalPlayer   = BattleChara->ObjectIndex == 0;
         ObjectId        = BattleChara->GetGameObjectId();
-        EntityId        = BattleChara->EntityId;
 
         IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(BattleChara->NameString, BattleChara->HomeWorld, false);
 
@@ -111,6 +109,8 @@ internal unsafe class PettableUser : IPettableUser
         OnLastCastChanged(CurrentCastId);
     }
 
+    // TODO: This pet mirage system I think is bugged.
+    // Rethink it
     public void OnLastCastChanged(uint cast)
     {
         if (!IsActive)
