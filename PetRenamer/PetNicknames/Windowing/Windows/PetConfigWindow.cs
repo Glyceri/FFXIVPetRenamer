@@ -102,7 +102,7 @@ internal class PetConfigWindow : PetWindow
             
             ImGui.Separator();
             
-            DrawBasicToggle(Translator.GetLine("Config.OldBarStyle"),       ref PetServices.Configuration.oldBarStyleLayout);
+            DrawBasicToggle(Translator.GetLine("Config.OldBarStyle"),       ref PetServices.Configuration.useNewBarStyle);
             
             ImGui.Separator();
             
@@ -128,8 +128,11 @@ internal class PetConfigWindow : PetWindow
 
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
-            // TODO: MAKE TRANSLATIONS FOR THIS
-            DrawGroupConfig("Chat Replace Type", "Static", "Replaces the actual text in the chat.\nThis makes it persist even when the plugin turns off.", "Ephemeral", "(BETA MODE)\n\nFakes the appearance of the text in chat having been replaced.\nThis comes with the added benefit that names will update backwards in chat,\nAND they will disappear when the plugin turns off.", ChatHandlerGroup);
+            ImGui.Spacing();
+            
+            DrawGroupConfig(ChatHandlerGroup);
+            
+            ImGui.Separator();
             
             DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref PetServices.Configuration.ShowOnNameplatesColour);
             DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref PetServices.Configuration.ShowOnCastbarsColour);
@@ -327,7 +330,7 @@ internal class PetConfigWindow : PetWindow
         ImGui.Separator();
     }
     
-    private void DrawGroupConfig(string title, string titleGroup1, string descGroup1, string titleGroup2, string descGroup2, IHandlerGroup groupConfig)
+    private void DrawGroupConfig(IHandlerGroup groupConfig)
     {
         ImGui.Spacing();
         
@@ -339,7 +342,7 @@ internal class PetConfigWindow : PetWindow
         
         ImGui.BeginDisabled(configGroup.High);
         
-        if (ImGui.Button(titleGroup1 + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
+        if (ImGui.Button(Translator.GetLine(groupConfig.GetTitle(EnabledState.Enabled)) + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
         {
             changed = true;
         }
@@ -348,14 +351,14 @@ internal class PetConfigWindow : PetWindow
         
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
-            ImGui.SetTooltip(descGroup1);
+            ImGui.SetTooltip(Translator.GetLine(groupConfig.GetDescription(EnabledState.Enabled)));
         }
         
         ImGui.SameLine(0, 0);
         
         ImGui.BeginDisabled(!configGroup.High);
         
-        if (ImGui.Button(titleGroup2 + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
+        if (ImGui.Button(Translator.GetLine(groupConfig.GetTitle(EnabledState.Disabled)) + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
         {
             changed = true;
         }
@@ -364,14 +367,14 @@ internal class PetConfigWindow : PetWindow
         
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
-            ImGui.SetTooltip(descGroup2);
+            ImGui.SetTooltip(Translator.GetLine(groupConfig.GetDescription(EnabledState.Disabled)));
         }
         
         ImGui.PopStyleVar();
         
         ImGui.SameLine();
         
-        ImGui.Text(title);
+        ImGui.Text(Translator.GetLine(groupConfig.GetHandlerTitle()));
         
         if (!changed)
         {

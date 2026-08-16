@@ -44,16 +44,16 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetDevWindow : PetWindow
 {
-    readonly IPettableDatabase Database;
-    readonly ISharingDictionary SharingDictionary;
-    readonly IPronounHook PronounHook;
+    private readonly IPettableDatabase  Database;
+    private readonly ISharingDictionary SharingDictionary;
+    private readonly IPronounHook       PronounHook;
 
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 400);
 
-    int currentActive = 0;
-    List<DevStruct> devStructList = new List<DevStruct>();
+    private int currentActive = 0;
+    private readonly List<DevStruct> devStructList = new List<DevStruct>();
 
     public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary, IPronounHook pronounHook) 
         : base(windowHandler, dalamudServices, petServices, "Pet Dev Window")
@@ -81,10 +81,10 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Sheets",           DrawSheets));
         devStructList.Add(new DevStruct("Hover",            DrawHover));
         devStructList.Add(new DevStruct("Pronoun",          DrawPronoun));
-        devStructList.Add(new DevStruct("Windowing",        DrawWindowing));
         devStructList.Add(new DevStruct("NameError",        DrawNameError));
         devStructList.Add(new DevStruct("Island",           DrawIsland));
         devStructList.Add(new DevStruct("Chat Database",    DrawChatDatabase));
+        devStructList.Add(new DevStruct("Translator",       DrawTranslatorHelp));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -157,6 +157,25 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTabBar();
     }
 
+    private void DrawTranslatorHelp()
+    {
+        if (!Translator.HasMissingTranslations)
+        {
+            ImGui.Text("No Missing Translations");
+            
+            return;
+        }
+        
+        ImGui.Text($"The translation for: [{Translator.SelectedLanguage}] is missing [{Translator.MissingTranslationLines}] translations.");
+        
+        ImGui.Separator();
+        
+        foreach (string missingKey in Translator.MissingTranslationKeys)
+        {
+            ImGui.Text($"Missing Translation: '{missingKey}'.");
+        }
+    }
+    
     private void DrawChatDatabase()
     {
         ImGui.Text("Chat Elements: "    + ChatDatabaseHandler.Instance?.ChatElementDatabase.Length());
@@ -229,11 +248,6 @@ internal class PetDevWindow : PetWindow
         {
             DrawDatabaseUser(entry);
         }
-    }
-
-    private void DrawWindowing()
-    {
-        ImGui.Text($"Focussed Window: {WindowHandler.FocussedWindow}");
     }
     
     private void DrawPronoun()

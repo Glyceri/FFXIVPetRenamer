@@ -1,7 +1,6 @@
 ﻿using Dalamud.IoC;
 using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
-using Dalamud.Storage.Assets;
 
 namespace PetRenamer.PetNicknames.Services;
 

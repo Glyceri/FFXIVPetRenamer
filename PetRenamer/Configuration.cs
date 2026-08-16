@@ -33,12 +33,12 @@ internal class Configuration : IPluginConfiguration
     public SerializableUserV3[]? serializableUsersV3 = null;
 
     // ------------------------- Global Settings -------------------------
-    public bool downloadProfilePictures = true;
-    public PetNicknamesLanguage currentLanguage = PetNicknamesLanguage.Default;
-    public bool showCommandFeedback = true;
-    public bool showNotifications = true;
+    public bool downloadProfilePictures             = true;
+    public PetNicknamesLanguage currentLanguage     = PetNicknamesLanguage.Default;
+    public bool showCommandFeedback                 = true;
+    public bool showNotifications                   = true;
     
-    public ColourMode SelectedColourMode = ColourMode.All;
+    public ColourMode SelectedColourMode            = ColourMode.All;
     // ------------------------------- Pet -------------------------------
     
     public ColourConfig ShowOnNameplatesColour      = new ColourConfig();
@@ -54,18 +54,18 @@ internal class Configuration : IPluginConfiguration
     
     public GroupConfig  ChatModeGroup               = new GroupConfig(false);
     
-    public bool allowPartySummonCutoff = true;
-    public bool showOnIslandPets = true;
-    public bool useContextMenus  = true;
+    public bool allowPartySummonCutoff              = true;
+    public bool showOnIslandPets                    = true;
+    public bool useContextMenus                     = true;
     
     // --------------------------- UI SETTINGS ---------------------------
-    public bool showKofiButton = true;
-    public bool quickButtonsToggle = true;
-    public int listButtonLayout = 0;
-    public int minionIconType = 1;
-    public bool showIslandWarning = true;
-    public bool oldBarStyleLayout = false;
-    public bool showLanguageAsNative = true;
+    public bool showKofiButton                      = true;
+    public bool quickButtonsToggle                  = true;
+    public int listButtonLayout                     = 0;
+    public int minionIconType                       = 1;
+    public bool showIslandWarning                   = true;
+    public bool useNewBarStyle                      = false;
+    public bool showLanguageAsNative                = true;
     
     // ------------------------ PENUMBRA SETTINGS ------------------------
     public bool attachToPCP = true;
@@ -110,7 +110,7 @@ internal class Configuration : IPluginConfiguration
             return;
         }
 
-        PetServices?.PetLog.LogVerbose("Pet Nicknames will now attempt to save");   // I need to add more verbose logging, pet nicknames is kind of silent.
+        PetServices?.PetLog.LogVerbose("Pet Nicknames will now attempt to save");
 
         SerializableUsersV6 = Database!.SerializeDatabase();
 
@@ -126,6 +126,9 @@ internal class Configuration : IPluginConfiguration
         {
             PetServices?.PetLog.LogError(ex, "Pet Nicknames failed to save. This is actually a bit of a problem :bceStare2: and I am sorry if this causes issues :c");
         }
+        
+        SerializableUsersV6 = [];
+        serializableUsersV3 = [];
     }
 
     #region OBSOLETE

@@ -15,7 +15,7 @@ internal static class Translator
 
     private static readonly Dictionary<string, string> FallbackTranslations = new Dictionary<string, string>();
     private static readonly Dictionary<string, string> Translations         = new Dictionary<string, string>();
-    
+
     private static readonly string[] FileNames =
     [
         "en_UK.json",
@@ -25,6 +25,17 @@ internal static class Translator
         "nl_NL.json",
         "zh_CN.json",
     ];
+    
+    public static uint MissingTranslationLines 
+        { get; private set; } = 0;
+    
+    public static bool HasMissingTranslations 
+        => MissingTranslationLines != 0;
+    
+    public static PetNicknamesLanguage SelectedLanguage
+        { get; private set; } = PetNicknamesLanguage.English;
+    
+    public static readonly List<string> MissingTranslationKeys = [];
     
     internal static void Initialise(DalamudServices dalamudServices, IPetServices petServices)
     {
@@ -108,6 +119,8 @@ internal static class Translator
     
     private static void FillDictForLanguage(Dictionary<string, string> dictionary, PetNicknamesLanguage language)
     {
+        SelectedLanguage = language;
+        
         if (DalamudServices == null)
         {
             return;
@@ -168,6 +181,23 @@ internal static class Translator
         }
     }
     
+    private static void CompareLanguages()
+    {
+        MissingTranslationLines = 0;
+        MissingTranslationKeys.Clear();
+        
+        foreach (string key in FallbackTranslations.Keys)
+        {
+            if (Translations.ContainsKey(key))
+            {
+                continue;
+            }
+            
+            MissingTranslationKeys.Add(key);
+            MissingTranslationLines++;
+        }
+    }
+    
     public static void UpdateLanguage()
     {
         PetNicknamesLanguage? pLanguage = PetServices?.Configuration.currentLanguage;
@@ -178,6 +208,7 @@ internal static class Translator
         }
         
         FillDictForLanguage(Translations, pLanguage.Value);
+        CompareLanguages();
     }
 }
 

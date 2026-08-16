@@ -98,7 +98,7 @@
   "Config.Targetbar": "Laat bijnamen voor “Targets” zien.",
   "Config.Partylist": "Laat bijnamen in de “Party List” zien.",
   "Config.IslandPets": "Laat bijnamen zien voor “Island Pets”.",
-  "Config.OldBarStyle": "Gebruik de oude barstijl.",
+  "Config.OldBarStyle": "(BETA) Gebruik de nieuwe barstijl.",
   "Config.DebugMode": "Ontwikkelmodus Aanzetten",
   "Config.OpenDebugMode": "Automatisch Ontwikkelscherm Openen",
   "Config.DebugChatcode": "Voeg Code's toe in de Chat.",
@@ -148,5 +148,11 @@
   "ShareWindow.Export": "Exporteer naar het Clipboard",
   "ShareWindow.Import": "Importeer van het Clipboard",
   "ShareWindow.Explain1": "Je kan bijnamen exporteren naar je Clipboard om deze vervolgens naar een vriend(in) te sturen.",
-  "ShareWindow.Explain2": "Je vriend(in) kan deze vervolgens weer importeren."
+  "ShareWindow.Explain2": "Je vriend(in) kan deze vervolgens weer importeren.",
+
+  "Enablable.ChatReplaceType.Title": "Chat Vervang Type",
+  "Enablable.StaticChat.Title": "Direct",
+  "Enablable.StaticChat.Description": "Vervangt de tekst in de chat direct.",
+  "Enablable.EphemeralChat.Title": "Tijdelijk (BETA)",
+  "Enablable.EphemeralChat.Description": "Vervangt tijdelijk de tekst in de chat.\nDit met het bijkomende effect dat namen met terugwerkendekracht zullen verschijnen.\nOok verdwijnen deze weer zodra de plugin wordt uitgeschakelt."
 }

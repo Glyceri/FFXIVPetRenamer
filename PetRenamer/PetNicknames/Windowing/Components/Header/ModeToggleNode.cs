@@ -9,7 +9,7 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 internal static class ModeToggleNode
 {
     public static Vector2 ButtonSize
-        => new Vector2(50, 15) * WindowHandler.GlobalScale;
+        => new Vector2(50, ImGui.GetContentRegionAvail().Y) * WindowHandler.GlobalScale;
     
     public static void Draw(IPetWindow window, SkeletonType windowSkeletonType, SkeletonType drawForType, Vector4 hoverColour, Vector4 idleColour, Vector4 clickColour)
     { 

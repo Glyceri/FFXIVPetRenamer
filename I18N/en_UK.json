@@ -109,7 +109,7 @@
   "Config.ActionLog": "Show nicknames in the Action List.",
   "Config.Targetbar": "Show nicknames for Targets.",
   "Config.Partylist": "Show nicknames on the Party List.",
-  "Config.OldBarStyle": "Use the old Quick Bar Style.",
+  "Config.OldBarStyle": "(BETA) Use the new Quick Bar Style.",
   "Config.DebugMode": "Enable Debug Mode",
   "Config.OpenDebugMode": "Automatically Open DebugWindow.",
   "Config.DebugChatcode": "Insert Chatcodes.",
@@ -161,5 +161,11 @@
   "ShareWindow.Export": "Export to Clipboard",
   "ShareWindow.Import": "Import from Clipboard",
   "ShareWindow.Explain1": "You can export your petnames and send them to a friend.",
-  "ShareWindow.Explain2": "Your friend can in turn import them."
+  "ShareWindow.Explain2": "Your friend can in turn import them.",
+  
+  "Enablable.ChatReplaceType.Title": "Chat Replace Type",
+  "Enablable.StaticChat.Title": "Static",
+  "Enablable.StaticChat.Description": "Replaces the raw text in the chat.\nThis makes it persist even when the plugin is turned off.",
+  "Enablable.EphemeralChat.Title": "Ephemeral (BETA)",
+  "Enablable.EphemeralChat.Description": "Fakes the appearance of text in chat been replaced.\nThis comes with the added benefit that names will retroactively update and appear in chat.\nThey will also disappear when the plugin is turned off."
 }

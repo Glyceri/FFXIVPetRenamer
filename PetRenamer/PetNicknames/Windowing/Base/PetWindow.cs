@@ -55,11 +55,11 @@ internal abstract class PetWindow : Window, IPetWindow
         SetupWindowSize();
     }
     
-    protected virtual void SetupTitlebar()
+    private void SetupTitlebar()
     {
         TitleBarButtons.Clear();
     
-        if (!ShowQuickButtons)
+        if (!ShowQuickButtons || !PetServices.Configuration.useNewBarStyle)
         {
             return;
         }
@@ -74,13 +74,13 @@ internal abstract class PetWindow : Window, IPetWindow
         Vector2 defaultSize = DefaultSize * WindowHandler.FontScale;
         Vector2 minSize     = MinSize     * WindowHandler.FontScale;
         Vector2 maxSize     = MaxSize     * WindowHandler.FontScale;
-        
-        Size            = defaultSize;
 
-        SizeConstraints = new WindowSizeConstraints()
+        Size                = defaultSize;
+
+        SizeConstraints     = new WindowSizeConstraints()
         {
-            MinimumSize = minSize,
-            MaximumSize = maxSize,
+            MinimumSize     = minSize,
+            MaximumSize     = maxSize,
         };
     }
 
@@ -138,10 +138,7 @@ internal abstract class PetWindow : Window, IPetWindow
     {
         CurrentPosition = ImGui.GetWindowPos();
         
-        if (PetServices.Configuration.oldBarStyleLayout && HasModeToggle && ShowQuickButtons)
-        {
-            HeaderBar.Draw(this, PetMode);
-        }
+        HeaderBar.Draw(this, PetMode, HasModeToggle, ShowQuickButtons);
         
         OnDraw();
     }

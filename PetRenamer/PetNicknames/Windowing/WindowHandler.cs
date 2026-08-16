@@ -37,8 +37,6 @@ internal class WindowHandler : IWindowHandler
 
     private bool isDirty;
     
-    private IPetWindow? lastFocussedWindow = null;
-    
     public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook, IHandlerGroup chatHandlerGroup)
     {
         DalamudServices       = dalamudServices;
@@ -74,11 +72,7 @@ internal class WindowHandler : IWindowHandler
         AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
         AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
-        AddWindow(new PetModeWindow(this, DalamudServices, PetServices));
     }
-
-    public IPetWindow? FocussedWindow 
-        { get; private set; } = null;
 
     public static int InternalCounter
         => _internalCounter++;
@@ -128,8 +122,6 @@ internal class WindowHandler : IWindowHandler
 
         WindowSystem.Draw();
         
-        HandleFocussedWindow();
-        
         if (!isDirty)
         {
             return;
@@ -138,39 +130,6 @@ internal class WindowHandler : IWindowHandler
         isDirty = false;
         
         HandleDirty();
-    }
-    
-    private void HandleFocussedWindow()
-    {
-        FocussedWindow = null;
-        
-        foreach (IPetWindow window in WindowSystem.Windows.Cast<PetWindow>())
-        {
-            if (!window.HasFocus || !window.HasModeToggle)
-            {
-                continue;
-            }
-            
-            FocussedWindow = window;
-            
-            break;
-        }
-        
-        if (lastFocussedWindow == FocussedWindow)
-        {
-            return;
-        }
-        
-        lastFocussedWindow = FocussedWindow;
-        
-        if (FocussedWindow != null)
-        {
-            Open<PetModeWindow>();
-        }
-        else
-        {
-            Close<PetModeWindow>();
-        }
     }
     
     private void HandleDirty()

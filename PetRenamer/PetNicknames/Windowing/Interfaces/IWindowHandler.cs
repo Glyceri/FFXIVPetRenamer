@@ -15,6 +15,4 @@ internal interface IWindowHandler : IDisposable
 
     T? GetWindow<T>() 
         where T : IPetWindow;
-    
-    IPetWindow? FocussedWindow { get; }
 }

@@ -13,14 +13,14 @@ internal abstract class EnablableHandler : IEnablableHandler
     
     public void Dispose()
     {
-        SetEnabled(false);
+        SetEnabled(EnabledState.Disabled);
         
         OnDispose();
     }
     
-    public void SetEnabled(bool enabled)
+    public void SetEnabled(EnabledState enabled)
     {
-        Enabled      = enabled;
+        Enabled      = (enabled == EnabledState.Enabled);
         _lastEnabled = !Enabled;
         
         HandleEnabledState();
@@ -28,12 +28,12 @@ internal abstract class EnablableHandler : IEnablableHandler
     
     public void Enable()
     {
-        SetEnabled(true);
+        SetEnabled(EnabledState.Enabled);
     }
     
     public void Disable()
     {
-        SetEnabled(false);
+        SetEnabled(EnabledState.Disabled);
     }
     
     private void HandleEnabledState()

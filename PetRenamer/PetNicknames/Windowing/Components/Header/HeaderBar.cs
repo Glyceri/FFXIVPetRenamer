@@ -9,7 +9,6 @@ using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
@@ -19,9 +18,14 @@ internal static class HeaderBar
     
     private static readonly List<TitleBarButton> titleBarButtons = [];
     
-    public static void Draw(IPetWindow window, SkeletonType currentMode)
+    public static void Draw(IPetWindow window, SkeletonType currentMode, bool hasModeToggle, bool showQuickButtons)
     {
-        if (!Listbox.Begin($"###PetNicknamesHeaderbar_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, ModeToggleNode.ButtonSize.Y + ImGui.GetStyle().ItemSpacing.Y + ImGui.GetStyle().FramePadding.Y)))
+        if (!hasModeToggle && !showQuickButtons)
+        {
+            return;
+        }
+        
+        if (!Listbox.Begin($"###PetNicknamesHeaderbar_{WindowHandler.InternalCounter}", WindowHandler.StretchingBar))
         {
             return;
         }

@@ -6,7 +6,7 @@ internal interface IEnablableHandler : IHandler
 {
     void OnEnable();
     void OnDisable();
-    void SetEnabled(bool enabled);
+    void SetEnabled(EnabledState enabled);
     void Enable();
     void Disable();
 }
