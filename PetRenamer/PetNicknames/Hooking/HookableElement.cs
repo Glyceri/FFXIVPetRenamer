@@ -32,24 +32,27 @@ internal abstract class HookableElement : IHookableElement
     protected abstract void OnDispose();
 
     protected virtual void OnNameDatabaseChange(INamesDatabase nameDatabase)            
-        => Refresh();
+        => InternalRefresh();
 
     protected virtual void OnPettableDatabaseChange(IPettableDatabase pettableDatabase) 
-        => Refresh();
+        => InternalRefresh();
 
     protected virtual void OnPettableEntryChange(IPettableDatabaseEntry pettableEntry)  
-        => Refresh();
+        => InternalRefresh();
 
     protected virtual void OnPettableEntryClear(IPettableDatabaseEntry pettableEntry)   
-        => Refresh();
+        => InternalRefresh();
 
     protected virtual void OnPlayerDirty(IPettableUser user)                           
-        => Refresh();
+        => InternalRefresh();
 
     protected virtual void OnConfigChanged(Configuration _)
-        => Refresh();
+        => InternalRefresh();
     
-    public virtual void Refresh() { }
+    public void InternalRefresh()
+        => DalamudServices.Framework.Run(Refresh);
+    
+    protected virtual void Refresh() { }
 
     protected unsafe void RefreshAddon(string addonName, int index = 1)
     {

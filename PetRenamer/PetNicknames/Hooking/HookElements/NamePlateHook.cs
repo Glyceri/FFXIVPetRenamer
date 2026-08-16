@@ -38,7 +38,7 @@ internal unsafe class NamePlateHook : HookableElement
         NameplateMinionHook?.Dispose();
     }
 
-    public override void Refresh()
+    protected override void Refresh()
     {
         AtkUnitBasePtr namePlateAddon = DalamudServices.GameGui.GetAddonByName("NamePlate");
 

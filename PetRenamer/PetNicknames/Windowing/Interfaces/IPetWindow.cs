@@ -1,6 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using System;
-using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Interfaces;
 
@@ -15,8 +14,6 @@ internal interface IPetWindow : IDisposable
     void SetPetMode(SkeletonType mode);
     void NotifyDirty();
     
-    bool HasFocus { get; }
-    bool HasModeToggle  { get; }
-    
-    Vector2 CurrentPosition { get; }
+    bool ShowQuickButtons { get; }
+    bool HasModeToggle    { get; }
 }

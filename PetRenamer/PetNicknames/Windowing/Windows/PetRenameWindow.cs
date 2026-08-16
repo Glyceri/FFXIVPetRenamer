@@ -52,10 +52,10 @@ internal class PetRenameWindow : PetWindow
         => true;
 
     protected override Vector2 MinSize  
-        => new Vector2(570, 210);
+        => new Vector2(570, 252);
     
     protected override Vector2 MaxSize 
-        => new Vector2(1500, 210);
+        => new Vector2(1500, 252);
     
     protected override Vector2 DefaultSize
         => MinSize;

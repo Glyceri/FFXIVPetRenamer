@@ -33,53 +33,53 @@ internal class Configuration : IPluginConfiguration
     public SerializableUserV3[]? serializableUsersV3 = null;
 
     // ------------------------- Global Settings -------------------------
-    public bool downloadProfilePictures             = true;
-    public PetNicknamesLanguage currentLanguage     = PetNicknamesLanguage.Default;
-    public bool showCommandFeedback                 = true;
-    public bool showNotifications                   = true;
+    public bool                 downloadProfilePictures     = true;
+    public PetNicknamesLanguage currentLanguage             = PetNicknamesLanguage.Default;
+    public bool                 showCommandFeedback         = true;
+    public bool                 showNotifications           = true;
     
-    public ColourMode SelectedColourMode            = ColourMode.All;
+    public ColourMode           SelectedColourMode          = ColourMode.All;
     // ------------------------------- Pet -------------------------------
     
-    public ColourConfig ShowOnNameplatesColour      = new ColourConfig();
-    public ColourConfig ShowOnCastbarsColour        = new ColourConfig();
-    public ColourConfig ShowInBattleChatColour      = new ColourConfig();
-    public ColourConfig ShowOnFlyoutColour          = new ColourConfig();
-    public ColourConfig ShowOnEmotesColour          = new ColourConfig();
-    public ColourConfig ShowOnTooltipColour         = new ColourConfig();
-    public ColourConfig ShowNamesInMinionBookColour = new ColourConfig();
-    public ColourConfig ShowNamesInActionLogColour  = new ColourConfig();
-    public ColourConfig ShowOnTargetBarsColour      = new ColourConfig();
-    public ColourConfig ShowOnPartyListColour       = new ColourConfig();
+    public ColourConfig         ShowOnNameplatesColour      = new ColourConfig();
+    public ColourConfig         ShowOnCastbarsColour        = new ColourConfig();
+    public ColourConfig         ShowInBattleChatColour      = new ColourConfig();
+    public ColourConfig         ShowOnFlyoutColour          = new ColourConfig();
+    public ColourConfig         ShowOnEmotesColour          = new ColourConfig();
+    public ColourConfig         ShowOnTooltipColour         = new ColourConfig();
+    public ColourConfig         ShowNamesInMinionBookColour = new ColourConfig();
+    public ColourConfig         ShowNamesInActionLogColour  = new ColourConfig();
+    public ColourConfig         ShowOnTargetBarsColour      = new ColourConfig();
+    public ColourConfig         ShowOnPartyListColour       = new ColourConfig();
     
-    public GroupConfig  ChatModeGroup               = new GroupConfig(false);
+    public GroupConfig          ChatModeGroup               = new GroupConfig(false);
     
-    public bool allowPartySummonCutoff              = true;
-    public bool showOnIslandPets                    = true;
-    public bool useContextMenus                     = true;
+    public bool                 allowPartySummonCutoff      = true;
+    public bool                 showOnIslandPets            = true;
+    public bool                 useContextMenus             = true;
     
     // --------------------------- UI SETTINGS ---------------------------
-    public bool showKofiButton                      = true;
-    public bool quickButtonsToggle                  = true;
-    public int listButtonLayout                     = 0;
-    public int minionIconType                       = 1;
-    public bool showIslandWarning                   = true;
-    public bool useNewBarStyle                      = false;
-    public bool showLanguageAsNative                = true;
+    public bool                 showKofiButton              = true;
+    public bool                 quickButtonsToggle          = true;
+    public int                  listButtonLayout            = 0;
+    public int                  minionIconType              = 1;
+    public bool                 showIslandWarning           = true;
+    public bool                 useNewBarStyle              = false;
+    public bool                 showLanguageAsNative        = true;
     
     // ------------------------ PENUMBRA SETTINGS ------------------------
-    public bool attachToPCP = true;
-    public bool readFromPCP = true;
+    public bool                 attachToPCP                 = true;
+    public bool                 readFromPCP                 = true;
 
     // --------------------------- STATE PRESERVING ---------------------------
-    public ulong LastIslandContentId = ulong.MinValue;
+    public ulong                LastIslandContentId         = ulong.MinValue;
     
     // ------------------------- Debug SETTINGS --------------------------
-    public bool   debugModeActive        = false;
-    public bool   openDebugWindowOnStart = false;
-    public bool   debugShowChatCode      = false;
-    public int    lastDebugTab           = 0;
-    public bool   showFailedTranslations = true;
+    public bool                 debugModeActive             = false;
+    public bool                 openDebugWindowOnStart      = false;
+    public bool                 debugShowChatCode           = false;
+    public int                  lastDebugTab                = 0;
+    public bool                 showFailedTranslations      = true;
 
     public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
     {

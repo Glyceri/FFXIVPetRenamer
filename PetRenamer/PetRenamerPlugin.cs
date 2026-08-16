@@ -1,3 +1,4 @@
+using Dalamud.IoC;
 using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.PettableDatabase;
@@ -24,38 +25,41 @@ using PetRenamer.PetNicknames.GroupHandling.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PetRenamer;
 
 // ReSharper disable once UnusedType.Global
-public sealed class PetRenamerPlugin : IDalamudPlugin
+public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
 {
-    private readonly DalamudServices        DalamudServices;
-    private readonly IPetServices           PetServices;
-    private readonly ISharingDictionary     SharingDictionary;
-    private readonly IPettableDatabase      PettableDatabase;
-    private readonly ILegacyDatabase        LegacyDatabase;
-    private readonly IImageDatabase         ImageDatabase;
-    private readonly IWindowHandler         WindowHandler;
-    private readonly IDataParser            DataParser;
-    private readonly IDataWriter            DataWriter;
-    private readonly IDataChecker           DataChecker;
-    private readonly IpcProvider            IpcProvider;
-    private readonly IPenumbraIPC           PenumbraIPC;
-    private readonly ContextMenuHandler     ContextMenuHandler;
-    private readonly UpdateHandler          UpdateHandler;
-    private readonly HookHandler            HookHandler;
-    private readonly IChatHandler           ChatHandler;
-    private readonly ChatEphemeralHandler   EphemeralChatHandler;
-    private readonly CommandHandler         CommandHandler;
-    private readonly LodestoneNetworker     LodestoneNetworker;
-    private readonly SaveHandler            SaveHandler;
-
-    private readonly IHandlerGroup          ChatHandlerGroup;
+    [PluginService] internal static IDalamudPluginInterface PluginInterface { get; set; } = null!;
     
-    public PetRenamerPlugin(IDalamudPluginInterface dalamud)
+    private DalamudServices        DalamudServices      = null!;
+    private IPetServices           PetServices          = null!;
+    private ISharingDictionary     SharingDictionary    = null!;
+    private IPettableDatabase      PettableDatabase     = null!;
+    private ILegacyDatabase        LegacyDatabase       = null!;
+    private IImageDatabase         ImageDatabase        = null!;
+    private IWindowHandler         WindowHandler        = null!;
+    private IDataParser            DataParser           = null!;
+    private IDataWriter            DataWriter           = null!;
+    private IDataChecker           DataChecker          = null!;
+    private IpcProvider            IpcProvider          = null!;
+    private IPenumbraIPC           PenumbraIPC          = null!;
+    private ContextMenuHandler     ContextMenuHandler   = null!;
+    private UpdateHandler          UpdateHandler        = null!;
+    private HookHandler            HookHandler          = null!;
+    private IChatHandler           ChatHandler          = null!;
+    private ChatEphemeralHandler   EphemeralChatHandler = null!;
+    private CommandHandler         CommandHandler       = null!;
+    private LodestoneNetworker     LodestoneNetworker   = null!;
+    private SaveHandler            SaveHandler          = null!;
+    private IHandlerGroup          ChatHandlerGroup     = null!;
+    
+    public async Task LoadAsync(CancellationToken cancellationToken)
     {
-        DalamudServices         = DalamudServices.Create(dalamud);
+        DalamudServices         = DalamudServices.Create(PluginInterface);
 
         PetServices             = new PetServices(DalamudServices);
 
@@ -95,8 +99,8 @@ public sealed class PetRenamerPlugin : IDalamudPlugin
 
         PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
     }
-
-    public void Dispose()
+    
+    public async ValueTask DisposeAsync()
     {
         SharingDictionary.Dispose();
         ContextMenuHandler.Dispose();

@@ -71,7 +71,7 @@ internal unsafe class TooltipHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(OnActionTooltipRequestedUpdate);
     }
 
-    public override void Refresh()
+    protected override void Refresh()
     {
         RefreshAddon("Tooltip");
         RefreshAddon("ActionDetail");
@@ -221,7 +221,7 @@ internal unsafe class TooltipHook : HookableElement
 
         PetServices.HoverService.SetHoveredPet(null);
         
-        MapHook.Refresh();
+        MapHook.InternalRefresh();
         
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(parentId);
         

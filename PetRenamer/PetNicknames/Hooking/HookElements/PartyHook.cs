@@ -30,7 +30,7 @@ internal unsafe class PartyHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
     }
 
-    public override void Refresh()
+    protected override void Refresh()
     {
         RefreshAddon("_PartyList");
     }

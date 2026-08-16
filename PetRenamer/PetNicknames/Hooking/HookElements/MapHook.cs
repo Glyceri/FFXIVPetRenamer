@@ -41,7 +41,7 @@ internal unsafe class MapHook : HookableElement
     private void AreaMapUpdate(AddonEvent type, AddonArgs args) 
         => MapDetour((AddonAreaMap*)args.Addon.Address);
 
-    public override void Refresh() 
+    protected override void Refresh() 
         => lastIndex = -1;
 
     private bool PrepareMap(int index)

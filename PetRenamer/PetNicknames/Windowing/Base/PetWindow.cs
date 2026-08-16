@@ -35,7 +35,7 @@ internal abstract class PetWindow : Window, IPetWindow
     private float lastFontScale   = 0;
     
     protected PetWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, string name, ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None) 
-        : base($"{name} [v{petServices.Version}]", windowFlags, true)
+        : base($"{name}", windowFlags, true)
     {
         WindowHandler   = windowHandler;
         DalamudServices = dalamudServices;
@@ -59,7 +59,12 @@ internal abstract class PetWindow : Window, IPetWindow
     {
         TitleBarButtons.Clear();
     
-        if (!ShowQuickButtons || !PetServices.Configuration.useNewBarStyle)
+        if (!PetServices.Configuration.useNewBarStyle)
+        {
+            return;
+        }
+        
+        if (!ShowQuickButtons)
         {
             return;
         }
@@ -102,9 +107,6 @@ internal abstract class PetWindow : Window, IPetWindow
         OnModeChange();
     }
     
-    public Vector2 CurrentPosition 
-        { get; private set; } = Vector2.Zero;
-    
     public sealed override void PreDraw()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,    windowPadding    * WindowHandler.GlobalScale);
@@ -136,9 +138,7 @@ internal abstract class PetWindow : Window, IPetWindow
 
     public sealed override void Draw()
     {
-        CurrentPosition = ImGui.GetWindowPos();
-        
-        HeaderBar.Draw(this, PetMode, HasModeToggle, ShowQuickButtons);
+        HeaderBar.Draw(this, PetServices, WindowHandler);
         
         OnDraw();
     }

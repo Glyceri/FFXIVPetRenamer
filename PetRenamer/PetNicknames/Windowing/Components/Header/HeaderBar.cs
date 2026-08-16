@@ -3,96 +3,175 @@ using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.TranslatorSystem;
-using PetRenamer.PetNicknames.Windowing.Base;
+using PetRenamer.PetNicknames.Windowing.Components.Header.Structs;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Windows;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Header;
 
 internal static class HeaderBar
 {
+    private const float HEADER_BAR_HEIGHT = 35;
+    
+    private static readonly List<TitleBarButton>             _titleBarButtons = [];
+    private static readonly List<TitleBarButtonRegistration> Registrations    =
+    [
+        new TitleBarButtonRegistration<PetDevWindow>    ("PetDev.Title",        FontAwesomeIcon.Biohazard,  configuration => configuration.debugModeActive),
+        new TitleBarButtonRegistration<KofiWindow>      ("Kofi.Title",          FontAwesomeIcon.Coffee,     configuration => configuration.showKofiButton),
+        new TitleBarButtonRegistration<PetConfigWindow> ("Config.Title",        FontAwesomeIcon.Cog),
+        new TitleBarButtonRegistration<PetListWindow>   ("PetList.Sharing",     FontAwesomeIcon.FileExport, configuration => configuration.listButtonLayout is 0 or 1),
+        new TitleBarButtonRegistration<PetListWindow>   ("PetList.Title",       FontAwesomeIcon.List,       configuration => configuration.listButtonLayout is 0 or 2),
+        new TitleBarButtonRegistration<PetRenameWindow> ("ContextMenu.Rename",  FontAwesomeIcon.PenSquare)
+    ];
+    
     private static int priority;
     
-    private static readonly List<TitleBarButton> titleBarButtons = [];
-    
-    public static void Draw(IPetWindow window, SkeletonType currentMode, bool hasModeToggle, bool showQuickButtons)
+    public static void Draw(IPetWindow window, IPetServices petServices, WindowHandler windowHandler)
     {
-        if (!hasModeToggle && !showQuickButtons)
+        if (!window.HasModeToggle && !window.ShowQuickButtons)
         {
             return;
         }
         
-        if (!Listbox.Begin($"###PetNicknamesHeaderbar_{WindowHandler.InternalCounter}", WindowHandler.StretchingBar))
+        Vector2 contentSize = ImGui.GetContentRegionAvail();
+
+        contentSize.Y = HEADER_BAR_HEIGHT * WindowHandler.GlobalScale;
+
+        if (!Listbox.Begin($"##headerbar_{WindowHandler.InternalCounter}", contentSize))
         {
             return;
         }
         
-        ModeToggleNode.Draw(window, currentMode, SkeletonType.Minion,      PluginConstants.MinionColourHover, PluginConstants.MinionColourIdle, PluginConstants.MinionColourClick);
-        ModeToggleNode.Draw(window, currentMode, SkeletonType.BattlePet,   PluginConstants.BattlePetHover,    PluginConstants.BattlePetIdle,    PluginConstants.BattlePetClick);
-        ModeToggleNode.Draw(window, currentMode, SkeletonType.BeastMaster, PluginConstants.BeastmasterHover,  PluginConstants.BeastmasterIdle,  PluginConstants.BeastmasterClick);
+        ModeToggle.Draw(window, petServices);
+        
+        if (!petServices.Configuration.useNewBarStyle && window.ShowQuickButtons)
+        {
+            ImGui.SameLine(0, 0);
+            
+            int[] indexes   = GetValidIndexes(petServices);
+            
+            float newY      = ImGui.GetContentRegionAvail().Y * 0.25f;
+            
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - newY);
+            
+            float newX      = ImGui.GetContentRegionAvail().X - (indexes.Length * ImGui.GetContentRegionAvail().Y);
+            
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + newX);
+
+            int arraySize   = indexes.Length;
+            
+            for (int i = 0; i < arraySize; i++)
+            {
+                int index = indexes[i];
+                
+                DrawButton(index, petServices, windowHandler);
+                
+                if (i == arraySize - 1)
+                {
+                    continue;
+                }
+                
+                ImGui.SameLine(0, 0);
+                
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() - newY);
+            }
+        }
         
         Listbox.End();
+    }
+    
+    private static void DrawButton(int index, IPetServices petServices, WindowHandler windowHandler)
+    {
+        TitleBarButtonRegistration registration = Registrations[index];
+        
+        bool isActive = registration.IsOpen(windowHandler);
+        
+        ImGui.BeginDisabled(isActive && !petServices.Configuration.quickButtonsToggle);
+
+        float size = ImGui.GetContentRegionAvail().Y;
+
+        ImGui.PushFont(UiBuilder.IconFont);
+        
+        TextAligner.Align(TextAlignment.Centre);
+        
+        bool shouldDoWindow = ImGui.Button($"{registration.Icon.ToIconString()}##quickButton_{WindowHandler.InternalCounter}", new Vector2(size, size));
+        
+        TextAligner.PopAlignment();
+        
+        ImGui.PopFont();
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(Translator.GetLine(registration.TitleKey));
+        }
+
+        ImGui.EndDisabled();
+
+        if (!shouldDoWindow)
+        {
+            return;
+        }
+        
+        registration.HandleClick(windowHandler, petServices.Configuration, ImGuiMouseButton.Left);
+    }
+    
+    private static int[] GetValidIndexes(IPetServices petServices)
+    {
+        List<int> validIndexes = [];
+        int       index        = 0;
+        
+        foreach (TitleBarButtonRegistration registration in Registrations)
+        {
+            if (!(registration.ButtonValidator?.Invoke(petServices.Configuration) ?? true))
+            {
+                continue;
+            } 
+            
+            validIndexes.Add(index);
+            
+            index++;
+        }
+        
+        return [.. validIndexes];
     }
     
     public static List<TitleBarButton> HandleHeaderButtons(WindowHandler windowHandler, IPetServices petServices)
     {
         priority = 0;
-        titleBarButtons.Clear();
         
-        CreateTitleBarButton<PetDevWindow>   (windowHandler, petServices, "PetDev.Title",       FontAwesomeIcon.Biohazard,  petServices.Configuration.debugModeActive);
-        CreateTitleBarButton<KofiWindow>     (windowHandler, petServices, "Kofi.Title",         FontAwesomeIcon.Coffee,     petServices.Configuration.showKofiButton);
-        CreateTitleBarButton<PetConfigWindow>(windowHandler, petServices, "Config.Title",       FontAwesomeIcon.Cog);
-        CreateTitleBarButton<PetListWindow>  (windowHandler, petServices, "PetList.Sharing",    FontAwesomeIcon.FileExport, petServices.Configuration.listButtonLayout is 0 or 1);
-        CreateTitleBarButton<PetListWindow>  (windowHandler, petServices, "PetList.Title",      FontAwesomeIcon.List,       petServices.Configuration.listButtonLayout is 0 or 2);
-        CreateTitleBarButton<PetRenameWindow>(windowHandler, petServices, "ContextMenu.Rename", FontAwesomeIcon.PenSquare);
+        _titleBarButtons.Clear();
         
-        return titleBarButtons;
+        foreach (int index in GetValidIndexes(petServices))
+        {
+            CreateTitleBarButton(Registrations[index], windowHandler, petServices);
+        }
+            
+        return _titleBarButtons;
     }
     
-    private static void CreateTitleBarButton<T>(WindowHandler windowHandler, IPetServices petServices, string tooltipUntranslated, FontAwesomeIcon icon, bool isActive = true)
-        where T : PetWindow 
+    private static void CreateTitleBarButton(TitleBarButtonRegistration titleButton, WindowHandler windowHandler, IPetServices petServices)
     {
-        if (!isActive)
+        if (!(titleButton.ButtonValidator?.Invoke(petServices.Configuration) ?? true))
         {
             return;
         } 
         
-        titleBarButtons.Add(new TitleBarButton
+        _titleBarButtons.Add(new TitleBarButton
         {
-            Icon        = icon,
+            Icon        = titleButton.Icon,
             IconOffset  = new(0, 1),
             ShowTooltip = () =>
             {
                 using ImRaii.TooltipDisposable tooltip = ImRaii.Tooltip();
                 
-                ImGui.Text(Translator.GetLine(tooltipUntranslated));
+                ImGui.Text(Translator.GetLine(titleButton.TitleKey));
             },
             Click = button =>
             {
-                if (button == ImGuiMouseButton.Left)
-                {
-                    if (petServices.Configuration.quickButtonsToggle)
-                    {
-                        windowHandler.GetWindow<T>()?.Toggle();
-                    }
-                    else
-                    {
-                        windowHandler.GetWindow<T>()?.Open();
-                    }
-                }
-                
-                if (button == ImGuiMouseButton.Right)
-                {
-                    windowHandler.GetWindow<T>()?.Close();
-                }
-                
-                if (button == ImGuiMouseButton.Middle)
-                {
-                    windowHandler.GetWindow<T>()?.Toggle();
-                }
+                titleButton.HandleClick(windowHandler, petServices.Configuration, button);
             },
             Priority = priority++,
         });

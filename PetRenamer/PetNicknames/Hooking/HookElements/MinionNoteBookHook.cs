@@ -39,7 +39,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshYKWNote);
     }
 
-    public override void Refresh()
+    protected override void Refresh()
     {
         ForceRefreshAddon("MinionNoteBook");
     }

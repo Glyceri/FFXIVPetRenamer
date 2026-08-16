@@ -73,17 +73,14 @@ internal static class PluginConstants
     ];
 
     
-    public static readonly Vector4 MinionColourHover = new Vector4(0.5f, 0.5f, 1.0f, 1.0f); 
-    public static readonly Vector4 MinionColourIdle  = new Vector4(0.36f, 0.36f, 1.0f,  1.0f);
-    public static readonly Vector4 MinionColourClick = new Vector4(0.3f, 0.3f, 0.45f, 1.0f);
+    public static readonly ModeToggleRegistration MinionModeToggle 
+        = new ModeToggleRegistration(SkeletonType.Minion, new Vector3(0.5f, 0.5f, 1.0f), new Vector3(0.36f, 0.36f, 1.0f), new Vector3(0.3f, 0.3f, 0.45f));
     
-    public static readonly Vector4 BattlePetHover    = new Vector4(0.5f, 1.0f, 0.5f, 1.0f);
-    public static readonly Vector4 BattlePetIdle     = new Vector4(0.36f, 1.0f,  0.36f, 1.0f);
-    public static readonly Vector4 BattlePetClick    = new Vector4(0.3f, 0.45f, 0.3f, 1.0f);
-        
-    public static readonly Vector4 BeastmasterHover  = new Vector4(1.0f, 0.5f, 0.5f, 1.0f);
-    public static readonly Vector4 BeastmasterIdle   = new Vector4(1.0f,  0.36f, 0.36f, 1.0f);
-    public static readonly Vector4 BeastmasterClick  = new Vector4(0.45f, 0.3f, 0.3f, 1.0f);
+    public static readonly ModeToggleRegistration BattleModeToggle
+        = new ModeToggleRegistration(SkeletonType.BattlePet, new Vector3(0.5f, 1.0f, 0.5f), new Vector3(0.36f, 1.0f,  0.36f), new Vector3(0.3f, 0.45f, 0.3f));
+    
+    public static readonly ModeToggleRegistration BeastMasterModeToggle
+        = new ModeToggleRegistration(SkeletonType.BeastMaster, new Vector3(1.0f, 0.5f, 0.5f), new Vector3(1.0f,  0.36f, 0.36f), new Vector3(0.45f, 0.3f, 0.3f));
 
     public const string EnglishSummonValue     = "Summon ";      // The space is important.
     public const string GermanSummonValue      = "-Beschwörung"; // The - is important.

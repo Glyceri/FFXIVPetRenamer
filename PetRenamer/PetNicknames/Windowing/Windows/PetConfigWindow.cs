@@ -39,7 +39,7 @@ internal class PetConfigWindow : PetWindow
         => new Vector2(400, 200);
     
     protected override Vector2 MaxSize
-        => new Vector2(400, 1200);
+        => new Vector2(800, 1200);
     
     protected override Vector2 DefaultSize 
         => new Vector2(400, 500);
@@ -409,9 +409,10 @@ internal class PetConfigWindow : PetWindow
     
     private void SavePlugin()
     {
-        PetServices.DirtyCaller.DirtyConfig(PetServices.Configuration);
         PetServices.UserList.Recalculate();
         PetServices.Configuration.Save();
+        
+        PetServices.DirtyCaller.DirtyConfig(PetServices.Configuration);
     }
 
     protected override void OnDispose()
