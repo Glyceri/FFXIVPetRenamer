@@ -35,6 +35,9 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private readonly List<nint> temporaryPets = [];
 
+    // TODO: When the plugin reloads in a loading screen with a battle pet out,
+    // I find that it doesnt always properly reload them.
+    
     public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary) 
         : base(services, petServices)
     {

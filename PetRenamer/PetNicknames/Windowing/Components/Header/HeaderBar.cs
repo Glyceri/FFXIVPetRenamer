@@ -121,18 +121,18 @@ internal static class HeaderBar
     private static int[] GetValidIndexes(IPetServices petServices)
     {
         List<int> validIndexes = [];
-        int       index        = 0;
+        int       index        = -1;
         
         foreach (TitleBarButtonRegistration registration in Registrations)
         {
+            index++;
+            
             if (!(registration.ButtonValidator?.Invoke(petServices.Configuration) ?? true))
             {
                 continue;
             } 
             
             validIndexes.Add(index);
-            
-            index++;
         }
         
         return [.. validIndexes];
