@@ -45,7 +45,7 @@ internal abstract unsafe class BasePettablePet : IPettablePet
     {
         PetServices.PetLog.DevLogVerbose($"Just removed the pet at Address: {Address}, and the ObjectID: {ObjectId}");
 
-        SharingDictionary.Set(ObjectId, null);
+        SharingDictionary.Set(ObjectId, null, Address);
     }
 
     public bool IsActive

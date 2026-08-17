@@ -134,7 +134,7 @@ internal class SharingDictionary : ISharingDictionary
         }
     }
     
-    public void Set(GameObjectId gameObjectId, string? customName, nint address = 0, Vector3? edgeColour = null, Vector3? textColour = null)
+    public void Set(GameObjectId gameObjectId, string? customName, nint address, Vector3? edgeColour = null, Vector3? textColour = null)
     {
         HandleLegacyDict(gameObjectId, customName);
         

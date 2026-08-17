@@ -9,6 +9,8 @@ using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -60,6 +62,9 @@ internal class IpcProvider : IIpcProvider
       *      - ClearPlayerDataV2 <nint>:
       *          Call this action to clear the IPC data of the given nint battleChara pointer of the player to clear.
       *
+      *      - CrashGame:
+      *          Crashes the game as is customary for Pet Nicknames.
+      *
       * Also take a look in SharingDictionary.cs to see if that file contains what you need.
       * 
       * ----------------------END READ ME -----------------------
@@ -97,6 +102,7 @@ internal class IpcProvider : IIpcProvider
     private readonly ICallGateProvider<ulong, string, object> SetPlayerDataV2;
     private readonly ICallGateProvider<ushort, object>        ClearPlayerIPCData;
     private readonly ICallGateProvider<nint, object>          ClearPlayerIPCDataV2;
+    private readonly ICallGateProvider<object>                CrashGame;
     
     public IpcProvider(DalamudServices dalamudServices, IPetServices petServices, IDataParser dataReader, IDataWriter dataWriter, IDataChecker dataChecker)
     {
@@ -121,6 +127,7 @@ internal class IpcProvider : IIpcProvider
         SetPlayerDataV2      = dalamudServices.DalamudPlugin.GetIpcProvider<ulong, string, object>($"{ApiNamespace}SetPlayerDataV2");
         ClearPlayerIPCData   = dalamudServices.DalamudPlugin.GetIpcProvider<ushort, object>       ($"{ApiNamespace}ClearPlayerData");
         ClearPlayerIPCDataV2 = dalamudServices.DalamudPlugin.GetIpcProvider<nint, object>         ($"{ApiNamespace}ClearPlayerDataV2");
+        CrashGame            = dalamudServices.DalamudPlugin.GetIpcProvider<object>               ($"{ApiNamespace}CrashGame");
     }
     
     public void Dispose()
@@ -134,6 +141,7 @@ internal class IpcProvider : IIpcProvider
         SetPlayerDataV2.UnregisterAction();
         ClearPlayerIPCData.UnregisterAction();
         ClearPlayerIPCDataV2.UnregisterAction();
+        CrashGame.UnregisterAction();
 
         // Functions
         ApiVersion.UnregisterFunc();
@@ -196,6 +204,7 @@ internal class IpcProvider : IIpcProvider
         SetPlayerData.RegisterAction(SetPlayerDataDetour);
         ClearPlayerIPCData.RegisterAction(ClearIPCDataDetour);
         ClearPlayerIPCDataV2.RegisterAction(ClearIPCDataV2Detour);
+        CrashGame.RegisterAction(CrashGameDetour);
     }
 
     private void RegisterFunctions()
@@ -206,6 +215,14 @@ internal class IpcProvider : IIpcProvider
     }
 
     // Actions
+    private unsafe void CrashGameDetour()
+    {
+        PetServices.PetLog.LogFatal("The game is about to close.");
+        
+        Framework* clientStructsFramework = Framework.Instance();
+        clientStructsFramework->UIModule  = null;
+    }
+    
     private void SetPlayerDataDetour(string data)
     {
         DalamudServices.PluginLog.Debug("[IPC] Set Player Data: " + data);

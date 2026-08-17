@@ -6,7 +6,7 @@ namespace PetRenamer.PetNicknames.IPC.Interfaces;
 
 internal interface ISharingDictionary : IDisposable
 {
-    void Set(GameObjectId gameObjectId, string? customName, nint address = 0, Vector3? edgeColour = null, Vector3? textColour = null);
+    void Set(GameObjectId gameObjectId, string? customName, nint address, Vector3? edgeColour = null, Vector3? textColour = null);
     
     ulong[]    GetLegacySkeletons();
     string[]   GetLegacyCustomNames();
