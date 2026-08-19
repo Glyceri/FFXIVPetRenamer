@@ -3,11 +3,16 @@
   "Name": "Gebruikersnaam",
   "Homeworld": "Thuiswereld",
   "Petcount": "Aantal Bijnamen",
+  "AppliedFrom": "Toegevoegd via",
+  "ChangeUser": "Verander van Gebruiker",
+  "DefaultUser": "Keer Naar je Eigen Profiel Terug",
 
   "Search": "Zoeken",
   "DateTime.Unkown": "Datum Onbekend",
   "Version.Unkown": "Versie Onbekend",
 
+  "Warning.NoContextFound": "Onbekende bron van Toevoegen.",
+  
   "Language.Default": "“Client” Taal",
   "Language.English": "Engels",
   "Language.German": "Duits",
@@ -104,6 +109,8 @@
   "Config.DebugChatcode": "Voeg Code's toe in de Chat.",
   "Config.DebugMode.Help": "Houd “Left Ctrl” + “Left Shift” ingedrukt om deze knop te mogen gebruiken.",
   "Config.DebugFailedTranslation": "Laat symbolen rondom mislukte vertalingen zien.",
+  "Config.ReturnToDefault": "Keer terug naar de locale gebruiker in de Pet List.",
+  "Config.ReturnToDefault.Help": "Als je van gebruiker verandert in de Pet List\nkeer dan automatisch terug naar de locale gebruiker.",
   
   "Config.ColourSettings": "Globale Kleurinstellingen",
 

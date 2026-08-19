@@ -10,11 +10,11 @@ using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using System;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
 namespace PetRenamer;
@@ -214,7 +214,15 @@ internal class IpcProvider : IIpcProvider
         GetPlayerData.RegisterFunc(GetPlayerDataDetour);
     }
 
-    // Actions
+    /*
+     * ----------------------------------------------
+     * |                   Actions                  |
+     * ----------------------------------------------
+     */
+    
+    /// <summary>
+    /// I have to live up to my name.
+    /// </summary>
     private unsafe void CrashGameDetour()
     {
         PetServices.PetLog.LogFatal("The game is about to close.");
@@ -225,7 +233,9 @@ internal class IpcProvider : IIpcProvider
     
     private void SetPlayerDataDetour(string data)
     {
-        DalamudServices.PluginLog.Debug("[IPC] Set Player Data: " + data);
+        string? pluginName = SetPlayerData.GetContext()?.SourcePlugin?.Name;
+        
+        DalamudServices.PluginLog.Debug($"[IPC] Set Player Data: [{data}].\nFrom the plugin: [{pluginName}].");
         
         try
         {
@@ -245,7 +255,7 @@ internal class IpcProvider : IIpcProvider
                     }
                 }
                 
-                _ = DataReader.ApplyParseData(result, ParseSource.IPC);
+                _ = DataReader.ApplyParseData(result, new ParseContext(ParseSource.IPC, pluginName));
             });
         }
         catch (Exception e)
@@ -256,7 +266,9 @@ internal class IpcProvider : IIpcProvider
     
     private void SetPlayerDataDetourV2(ulong contentId, string data)
     {
-        DalamudServices.PluginLog.Debug("[IPC] Set Player Data V2: " + data);
+        string? pluginName = SetPlayerDataV2.GetContext()?.SourcePlugin?.Name;
+        
+        DalamudServices.PluginLog.Debug($"[IPC] Set Player Data V2: [{data}].\nFrom the plugin: [{pluginName}].");
         
         try
         {
@@ -276,7 +288,7 @@ internal class IpcProvider : IIpcProvider
                     }
                 }
                 
-                _ = DataReader.ApplyParseData(result, ParseSource.IPC);
+                _ = DataReader.ApplyParseData(result, new ParseContext(ParseSource.IPC, pluginName));
             });
         }
         catch (Exception e)
@@ -287,6 +299,8 @@ internal class IpcProvider : IIpcProvider
 
     private void ClearIPCDataDetour(ushort objectIndex)
     {
+        string? pluginName = ClearPlayerIPCData.GetContext()?.SourcePlugin?.Name;
+        
         DalamudServices.PluginLog.Debug("[IPC] Clear Player Data: " + objectIndex);
         
         try
@@ -303,7 +317,7 @@ internal class IpcProvider : IIpcProvider
                     return;
                 }
 
-                _ = DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), ParseSource.IPC);
+                _ = DataReader.ApplyParseData(new ClearParseResult(pc.Name.TextValue, (ushort)(pc.HomeWorld.ValueNullable?.RowId ?? 0)), new ParseContext(ParseSource.IPC, pluginName));
             });
         }
         catch(Exception e)
@@ -329,7 +343,13 @@ internal class IpcProvider : IIpcProvider
         user.DataBaseEntry.Clear(ParseSource.IPC);
     }
 
-    // Functions
+    /*
+     * ----------------------------------------------
+     * |                  Functions                 |
+     * ----------------------------------------------
+     */
+    
+    
     private (uint, uint) VersionDetour()
     {
         return (MajorVersion, MinorVersion);
@@ -350,7 +370,13 @@ internal class IpcProvider : IIpcProvider
         return lastData;
     }
 
-    // Notifications
+
+    /*
+     * ----------------------------------------------
+     * |                Notifications               |
+     * ----------------------------------------------
+     */
+    
     private void NotifyReady()
     {
         try
@@ -387,7 +413,12 @@ internal class IpcProvider : IIpcProvider
         }
     }
 
-    // Interface Functions
+    /*
+     * ----------------------------------------------
+     * |             Interface Functions            |
+     * ----------------------------------------------
+     */
+    
     public void NotifyDataChanged()
     {
         RefreshLastData();

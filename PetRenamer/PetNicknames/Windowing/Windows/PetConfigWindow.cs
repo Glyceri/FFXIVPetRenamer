@@ -123,6 +123,11 @@ internal class PetConfigWindow : PetWindow
             DrawMenu(Translator.GetLine("Config.ListButtonType"), _listIconTypes,   ref PetServices.Configuration.listButtonLayout);
             DrawMenu(Translator.GetLine("Config.IconType"),       _iconMenuTypes,   ref PetServices.Configuration.minionIconType);
                 
+            ImGui.Separator();
+            
+            DrawBasicToggle(Translator.GetLine("Config.ReturnToDefault"),     ref PetServices.Configuration.returnToDefaultUserProfile);
+            DrawInfoHover(Translator.GetLine("Config.ReturnToDefault.Help"));
+            
             ImGui.Spacing();
         }
 

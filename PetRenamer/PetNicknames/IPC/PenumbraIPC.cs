@@ -8,6 +8,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using System;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure (Named like this for easier IPC access)
@@ -126,7 +127,7 @@ internal class PenumbraIPC : IPenumbraIPC
 
         PetServices.PetLog.DevLog("Pet Nicknames is about to apply the parsed data.");
 
-        bool parseWasSuccess = DataParser.ApplyParseData(parseResult, ParseSource.PCP);
+        bool parseWasSuccess = DataParser.ApplyParseData(parseResult, new ParseContext(ParseSource.PCP, "Penumbra"));
 
         if (!parseWasSuccess)
         {

@@ -1,6 +1,7 @@
 ﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using PN.S;
 using System.Collections.Immutable;
 using System.Numerics;
@@ -9,10 +10,11 @@ namespace PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 
 internal interface IPettableDatabaseEntry
 {
-    ulong  ContentId     { get; }
-    string Name          { get; }
-    ushort Homeworld     { get; }
-    string HomeworldName { get; }
+    ulong   ContentId     { get; }
+    string  Name          { get; }
+    ushort  Homeworld     { get; }
+    string  HomeworldName { get; }
+    string? PluginSource  { get; }
     
     bool IsActive { get; }
     bool IsIpc    { get; }
@@ -41,8 +43,8 @@ internal interface IPettableDatabaseEntry
     void SetName(PetSkeleton skeletonId, string? name, Vector3? edgeColour, Vector3? textColour);
 
     void Clear(ParseSource parseSource);
-    void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource);
-    void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource);
+    void UpdateEntry(IModernParseResult parseResult, ParseContext parseContext);
+    void UpdateEntryBase(IBaseParseResult parseResult, ParseContext parseContext);
 
     void RegisterUsage();
     void DeregisterUsage();

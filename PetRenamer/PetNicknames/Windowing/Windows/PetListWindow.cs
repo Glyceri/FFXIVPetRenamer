@@ -27,6 +27,7 @@ using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using Dalamud.Interface.Utility.Raii;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -87,6 +88,13 @@ internal class PetListWindow : PetWindow
     {
         ClearSearchBar();
 
+        if (!PetServices.Configuration.returnToDefaultUserProfile)
+        {
+            SetUser(ActiveEntry);
+            
+            return;
+        }
+
         SetUser(PetServices.UserList.LocalPlayer?.DataBaseEntry);
     }
 
@@ -142,11 +150,18 @@ internal class PetListWindow : PetWindow
                 {
                     if (!inUserMode)
                     {
-                        ImGui.SetTooltip(Translator.GetLine("PetList.UserList"));
+                        ImGui.SetTooltip(Translator.GetLine("ChangeUser"));
                     }
                     else
                     {
-                        ImGui.SetTooltip(Translator.GetLine("PetList.Title"));
+                        if (PetServices.Configuration.returnToDefaultUserProfile)
+                        {
+                            ImGui.SetTooltip(Translator.GetLine("DefaultUser"));
+                        }
+                        else
+                        {
+                            ImGui.SetTooltip(Translator.GetLine("ChangeUser"));
+                        }
                     }
                 }
 
@@ -203,7 +218,7 @@ internal class PetListWindow : PetWindow
 
                     IDataParseResult parseResult = DataParser.ParseData(ImGui.GetClipboardText());
 
-                    if (!DataParser.ApplyParseData(parseResult, ParseSource.Manual))
+                    if (!DataParser.ApplyParseData(parseResult, new ParseContext(ParseSource.Manual)))
                     {
                         string error = string.Empty;
 
@@ -339,7 +354,9 @@ internal class PetListWindow : PetWindow
     {
         foreach (PetListUser user in petListDrawables.OfType<PetListUser>())
         {
-            using ImRaii.ListBoxDisposable listBox = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale));
+            uint defaultSize = 144;
+            
+            using ImRaii.ListBoxDisposable listBox = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, defaultSize * WindowHandler.GlobalScale));
 
             if (!listBox.Success)
             {
@@ -429,6 +446,7 @@ internal class PetListWindow : PetWindow
 
             LabledLabel.Draw($"{Translator.GetLine("Homeworld")}:", user.Entry.HomeworldName, WindowHandler.StretchingBar);
             LabledLabel.Draw($"{Translator.GetLine("Petcount")}:", user.Entry.ActiveDatabase.Length.ToString(), WindowHandler.StretchingBar);
+            LabledLabel.Draw($"{Translator.GetLine("AppliedFrom")}:", user.Entry.PluginSource ?? Translator.GetLine("Warning.NoContextFound"), WindowHandler.StretchingBar);
         }
     }
     
@@ -488,7 +506,7 @@ internal class PetListWindow : PetWindow
     {
         inUserMode = !inUserMode;
 
-        if (!inUserMode && PetServices.UserList.LocalPlayer != null)
+        if (!inUserMode && PetServices.UserList.LocalPlayer != null && PetServices.Configuration.returnToDefaultUserProfile)
         {
             ActiveEntry = PetServices.UserList.LocalPlayer?.DataBaseEntry;
         }

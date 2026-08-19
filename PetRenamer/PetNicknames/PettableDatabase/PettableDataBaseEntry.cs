@@ -4,6 +4,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using PN.S;
 using System.Collections.Immutable;
 using System.Linq;
@@ -13,14 +14,14 @@ namespace PetRenamer.PetNicknames.PettableDatabase;
 
 internal class PettableDataBaseEntry : IPettableDatabaseEntry
 {
-    public bool   IsActive        { get; private set; }
+    public bool    IsActive        { get; private set; }
 
-    public ulong  ContentId       { get; private set; }
-    public string Name            { get; private set; } = string.Empty;
-    public ushort Homeworld       { get; private set; }
-    public string HomeworldName   { get; private set; } = string.Empty;
-
-    public int    EntryUsageCount { get; private set; }
+    public ulong   ContentId       { get; private set; }
+    public string  Name            { get; private set; } = string.Empty;
+    public ushort  Homeworld       { get; private set; }
+    public string  HomeworldName   { get; private set; } = string.Empty;
+    
+    public int     EntryUsageCount { get; private set; }
     
     public ImmutableArray<PetSkeleton> SoftSkeletons { get; private set; } = [];
 
@@ -31,6 +32,8 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
     private readonly IPetServices PetServices;
 
+    private string? _pluginSource = null;
+    
     public PettableDataBaseEntry(IPetServices petServices, ulong contentId, string name, ushort homeworld, PetSkeleton[] ids, string[] names, Vector3?[] edgeColours, Vector3?[] textColours, PetSkeleton[] softSkeletons, bool active, bool isLegacy = false)
     {
         PetServices    = petServices;
@@ -47,6 +50,9 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetHomeworld(homeworld);
     }
 
+    public string? PluginSource
+        => _pluginSource ?? PluginConstants.pluginName;
+    
     public INamesDatabase[] AllDatabases 
         => [ActiveDatabase];
 
@@ -113,10 +119,12 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         ContentId = contentId;
         IsActive  = true;
 
-        if (removeIpcStatus)
+        if (!removeIpcStatus)
         {
-            IsIpc = false;
+            return;
         }
+        
+        ClearIpc();
     }
 
     public string? GetName(PetSkeleton skeletonId)
@@ -166,21 +174,22 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
     public SerializableUserV6 SerializeEntry()
         => new SerializableUserV6(this);
 
-    public void UpdateEntry(IModernParseResult parseResult, ParseSource parseSource)
+    public void UpdateEntry(IModernParseResult parseResult, ParseContext parseContext)
     {
-        UpdateEntryBase(parseResult, parseSource);
+        UpdateEntryBase(parseResult, parseContext);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
-        UpdateContentId(parseResult.ContentId, (parseSource != ParseSource.IPC));
+        UpdateContentId(parseResult.ContentId, !parseContext.IsFromIPC);
     }
 
-    public void UpdateEntryBase(IBaseParseResult parseResult, ParseSource parseSource)
+    public void UpdateEntryBase(IBaseParseResult parseResult, ParseContext parseContext)
     {
         SetActiveDatabase(parseResult.IDs, parseResult.Names, parseResult.EdgeColous, parseResult.TextColours);
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        IsIpc = (parseSource == ParseSource.IPC);
+        IsIpc         = parseContext.IsFromIPC;
+        _pluginSource = parseContext.FromPlugin;
 
         MarkDirty();        
     }
@@ -201,6 +210,12 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
 
         MarkCleared();
         MarkDirty();
+    }
+    
+    private void ClearIpc()
+    {
+        IsIpc         = false;
+        _pluginSource = null;
     }
 
     private void MarkCleared()

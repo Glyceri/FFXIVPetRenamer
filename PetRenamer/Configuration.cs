@@ -66,6 +66,7 @@ internal class Configuration : IPluginConfiguration
     public bool                 showIslandWarning           = true;
     public bool                 useNewBarStyle              = false;
     public bool                 showLanguageAsNative        = true;
+    public bool                 returnToDefaultUserProfile  = true;
     
     // ------------------------ PENUMBRA SETTINGS ------------------------
     public bool                 attachToPCP                 = true;

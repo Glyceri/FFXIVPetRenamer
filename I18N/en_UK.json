@@ -3,10 +3,15 @@
   "Name": "Username",
   "Homeworld": "Homeworld",
   "Petcount": "Amount of Nicknames",
-
+  "AppliedFrom": "Applied From",
+  "ChangeUser": "Change User",
+  "DefaultUser": "Return to Your Profile",
+  
   "Search": "Search",
   "DateTime.Unkown": "Date Unknown",
   "Version.Unkown": "Version Unknown",
+  
+  "Warning.NoContextFound": "Unknown Application Source",
   
   "Language.Default": "Client Language",
   "Language.English": "English",
@@ -115,6 +120,8 @@
   "Config.DebugChatcode": "Insert Chatcodes.",
   "Config.DebugMode.Help": "Hold \"Left Ctrl\" + \"Left Shift\" to interact with this button.",
   "Config.DebugFailedTranslation": "Show Markers around Failed Translations.",
+  "Config.ReturnToDefault": "Return to Local User in the Pet List.",
+  "Config.ReturnToDefault.Help": "When switching users in the Pet List you will automatically return\nto the local user instead of the selected target.",
   
   "Config.ColourSettings": "Global Colours",
 

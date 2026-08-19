@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 
@@ -41,7 +42,7 @@ internal class DataParser : IDataParser
         DataParserVersion4 = new DataParserVersion4(petServices);
     }
 
-    public bool ApplyParseData(IDataParseResult result, ParseSource parseSource)
+    public bool ApplyParseData(IDataParseResult result, ParseContext parseContext)
     {
         IPettableUser? localUser = PetServices.UserList.LocalPlayer;
 
@@ -71,7 +72,7 @@ internal class DataParser : IDataParser
 
         if (result is IBaseParseResult baseParseResult)
         {
-            if (localUser != null && (parseSource == ParseSource.IPC || parseSource == ParseSource.PCP))
+            if (localUser != null && (parseContext.ParseSource == ParseSource.IPC || parseContext.ParseSource == ParseSource.PCP))
             {
                 if (localUser.DataBaseEntry.Name == baseParseResult.UserName && localUser.DataBaseEntry.Homeworld == baseParseResult.Homeworld)
                 {
@@ -79,14 +80,14 @@ internal class DataParser : IDataParser
                 }
             }
 
-            if (baseParseResult is IModernParseResult version2ParseResult)
+            if (baseParseResult is IModernParseResult modernParseResult)
             {
-                Database.ApplyParseResult(version2ParseResult, parseSource);
+                Database.ApplyParseResult(modernParseResult, parseContext);
 
                 return true;
             }
 
-            LegacyDatabase.ApplyParseResult(baseParseResult, parseSource);
+            LegacyDatabase.ApplyParseResult(baseParseResult, parseContext);
         }
 
         return true;

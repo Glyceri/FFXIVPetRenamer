@@ -3,6 +3,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using PN.S;
 using System.Collections.Generic;
 
@@ -164,15 +165,13 @@ internal class PettableDatabase : IPettableDatabase
         return users.ToArray();
     }
 
-    public void ApplyParseResult(IModernParseResult parseResult, ParseSource parseSource)
+    public void ApplyParseResult(IModernParseResult parseResult, ParseContext parseContext)
     {
-        bool isFromIpc = parseSource == ParseSource.IPC;
-
         IPettableDatabaseEntry entry = GetEntry(parseResult.ContentId);
 
-        entry.UpdateEntry(parseResult, parseSource);
+        entry.UpdateEntry(parseResult, parseContext);
 
-        if (isFromIpc)
+        if (parseContext.IsFromIPC)
         {
             return;
         }

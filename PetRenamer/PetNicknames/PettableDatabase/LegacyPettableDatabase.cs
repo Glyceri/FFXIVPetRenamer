@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -40,7 +41,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
         }
     }
 
-    public void ApplyParseResult(IBaseParseResult parseResult, ParseSource parseSource)
+    public void ApplyParseResult(IBaseParseResult parseResult, ParseContext parseContext)
     {
         IPettableDatabaseEntry? entry = GetEntry(parseResult.UserName, parseResult.Homeworld, true);
 
@@ -49,7 +50,7 @@ internal class LegacyPettableDatabase : PettableDatabase, ILegacyDatabase
             return;
         }
 
-        entry.UpdateEntryBase(parseResult, parseSource);
+        entry.UpdateEntryBase(parseResult, parseContext);
 
         SetDirty();
     }

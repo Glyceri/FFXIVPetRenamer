@@ -401,7 +401,7 @@ internal class PetDevWindow : PetWindow
         ImGui.TextUnformatted(user.Homeworld.ToString());
 
         ImGui.TableSetColumnIndex(3);
-        ImGui.TextUnformatted("IsIPC: " + (user.IsIpc ? "O" : "X"));
+        ImGui.TextUnformatted("IsIPC: " + (user.IsIpc ? $"O {user.PluginSource}" : "X"));
 
         ImGui.TableSetColumnIndex(4);
         ImGui.TextUnformatted("Found in Userlist: " + (PetServices.UserList.GetUserFromContentId(user.ContentId) != null ? "O" : "X"));
