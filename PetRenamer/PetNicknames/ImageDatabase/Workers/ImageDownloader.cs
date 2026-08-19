@@ -142,8 +142,7 @@ internal class ImageDownloader : IImageDownloader
             {
                 int    bufferSize = response.Content.Headers.ContentLength > 1024 * 1024 ? 4096 : 1024;
                 byte[] buffer     = new byte[bufferSize];
-
-                int bytesRead = 0;
+                int    bytesRead  = 0;
                 
                 while ((bytesRead = await (await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false)).ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
                 {

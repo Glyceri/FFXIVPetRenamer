@@ -1,82 +1,31 @@
-﻿using Dalamud.Utility;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.ReadingAndParsing.Enums;
-using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
-using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
-using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
+using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
+using PetRenamer.PetNicknames.WritingAndParsing.WriterElements;
 
 namespace PetRenamer.PetNicknames.WritingAndParsing;
 
 internal class DataWriter : IDataWriter
 {
-    private readonly IPetServices PetServices;
-
-    public DataWriter(IPetServices petServices)
+    private readonly IDataWriterElement[] DataWriters =
+    [
+        new WriterElementVersion2(),
+        new WriterElementVersion3(),
+        new WriterElementVersion4(),
+    ];
+    
+    public string? WriteData(IPettableUser forUser, ParseVersion forVersion = ParseVersion.COUNT - 1)
     {
-        PetServices = petServices;
-    }
-
-    private string GetStringFromPetSkeleton(PetSkeleton petSkeleton)
-        => $"{petSkeleton.SkeletonId}{PluginConstants.forbiddenCharacter}{(int)petSkeleton.SkeletonType}";
-
-    public string WriteData()
-    {
-        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
-
-        if (localUser == null)
+        foreach (IDataWriterElement dataWriterElement in DataWriters)
         {
-            return string.Empty;
-        }
-
-        ParseVersion newestVersion = ParseVersion.COUNT - 1;
-
-        string header = newestVersion.GetDescription();
-
-        IPettableDatabaseEntry entry = localUser.DataBaseEntry;
-
-        string userName      = entry.Name;
-        string homeworldID   = entry.Homeworld.ToString();
-        string contentID     = entry.ContentId.ToString();
-        string SoftSkeletons = $"[{GetStringFromPetSkeleton(entry.SoftSkeletons[0])},{GetStringFromPetSkeleton(entry.SoftSkeletons[1])},{GetStringFromPetSkeleton(entry.SoftSkeletons[2])},{GetStringFromPetSkeleton(entry.SoftSkeletons[3])},{GetStringFromPetSkeleton(entry.SoftSkeletons[4])}]";
-
-        INamesDatabase database = entry.ActiveDatabase;
-        int length = database.Length;
-
-        List<string> petLines = [header, userName, homeworldID, contentID, SoftSkeletons];
-
-        for (int i = 0; i < length; i++)
-        {
-            string name       = database.Names[i];
-            PetSkeleton id    = database.Ids[i];
-            string edgeColour = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
-            string textColour = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
-
-            if (id.SkeletonType == SkeletonType.Invalid)
+            if (dataWriterElement.WriteVersion != forVersion)
             {
                 continue;
             }
-
-            if (name.IsNullOrWhitespace())
-            {
-                continue;
-            }
-
-            string newLine = $"{GetStringFromPetSkeleton(id)}{PluginConstants.forbiddenCharacter}{name}{PluginConstants.forbiddenCharacter}{edgeColour}{PluginConstants.forbiddenCharacter}{textColour}";
-
-            petLines.Add(newLine);
+            
+            return dataWriterElement.WriteData(forUser);
         }
-
-        string outcome = string.Join(Environment.NewLine, petLines);
-
-        outcome = Convert.ToBase64String(Encoding.Unicode.GetBytes(outcome));
-
-        return outcome;
+        
+        return null;
     }
 }

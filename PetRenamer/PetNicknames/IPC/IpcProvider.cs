@@ -3,7 +3,6 @@ using Dalamud.Plugin.Ipc;
 using Dalamud.Utility;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
-using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
@@ -202,7 +201,7 @@ internal class IpcProvider : IIpcProvider
     {
         SetPlayerDataV2.RegisterAction(SetPlayerDataDetourV2);
         SetPlayerData.RegisterAction(SetPlayerDataDetour);
-        ClearPlayerIPCData.RegisterAction(ClearIPCDataDetour);
+        ClearPlayerIPCData.RegisterAction(ClearIpcDataDetour);
         ClearPlayerIPCDataV2.RegisterAction(ClearIPCDataV2Detour);
         CrashGame.RegisterAction(CrashGameDetour);
     }
@@ -278,8 +277,6 @@ internal class IpcProvider : IIpcProvider
                 
                 if (result is IModernParseResult modernParseResult)
                 {
-                    // This gets all checked in the apply branch too,
-                    // But it isn´t proper to send it invalid data, as it isn´t build with that in mind perse.
                     if (!DataChecker.CheckModernData(contentId, modernParseResult))
                     {
                         DalamudServices.PluginLog.Debug("[IPC] ModernDataChecker disallowed data: " + data);
@@ -297,7 +294,7 @@ internal class IpcProvider : IIpcProvider
         }
     }
 
-    private void ClearIPCDataDetour(ushort objectIndex)
+    private void ClearIpcDataDetour(ushort objectIndex)
     {
         string? pluginName = ClearPlayerIPCData.GetContext()?.SourcePlugin?.Name;
         
@@ -428,9 +425,22 @@ internal class IpcProvider : IIpcProvider
 
     private void RefreshLastData()
     {
-        lock (lastData)
+        IPettableUser? localPlayer = PetServices.UserList.LocalPlayer;
+        
+        if (localPlayer == null)
         {
-            lastData = DataWriter.WriteData();
+            return;
+        }
+        
+        string? newData = DataWriter.WriteData(localPlayer);
+        
+        if (newData.IsNullOrWhitespace())
+        {
+            lastData = string.Empty;
+        }
+        else
+        {
+            lastData = newData;
         }
     }
 }

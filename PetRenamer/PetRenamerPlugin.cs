@@ -18,7 +18,6 @@ using PetRenamer.PetNicknames.ImageDatabase;
 using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing;
-using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.ContextMenus;
 using PetRenamer.PetNicknames.GroupHandling.Groups;
 using PetRenamer.PetNicknames.GroupHandling.Interfaces;
@@ -74,7 +73,7 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
 
         ImageDatabase           = new ImageDatabase(DalamudServices, PetServices, LodestoneNetworker);
 
-        DataWriter              = new DataWriter(PetServices);
+        DataWriter              = new DataWriter();
         DataParser              = new DataParser(DalamudServices, PetServices, PettableDatabase, LegacyDatabase);
         DataChecker             = new DataChecker(PetServices);
         

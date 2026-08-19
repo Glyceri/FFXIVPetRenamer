@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
-using PetRenamer.PetNicknames.ReadingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Windowing.Windows.PetList.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Components;
@@ -190,17 +189,23 @@ internal class PetListWindow : PetWindow
 
                 if (ImGui.Button($"{Translator.GetLine("ShareWindow.Export")}##clipboardExport{WindowHandler.InternalCounter}", new Vector2(contentAvailableX / 2, barSize.Y)))
                 {
-                    string data = DataWriter.WriteData();
-
-                    if (data.IsNullOrWhitespace())
+                    IPettableUser? localUser = PetServices.UserList.LocalPlayer;
+                    
+                    // TODO: This is not perse a todo, but if you want to go crazy bonkers and a bit ??? you could just straight up make this parse the selected user (but htat means people can send other peoples data and thats not a vibe).
+                    if (localUser != null)
                     {
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ExportErrorGlobal"), Translator.GetLine("ShareWindow.ExportError"), 8);
-                    }
-                    else
-                    {
-                        _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ExportSuccessGlobal"), Translator.GetLine("ShareWindow.ExportSuccess"), 5);
+                        string? data = DataWriter.WriteData(localUser);
 
-                        ImGui.SetClipboardText(data);
+                        if (data.IsNullOrWhitespace())
+                        {
+                            _ = PetServices.NotificationService.ShowNotification(NotificationType.Warning, Translator.GetLine("ShareWindow.ExportErrorGlobal"), Translator.GetLine("ShareWindow.ExportError"), 8);
+                        }
+                        else
+                        {
+                            _ = PetServices.NotificationService.ShowNotification(NotificationType.Success, Translator.GetLine("ShareWindow.ExportSuccessGlobal"), Translator.GetLine("ShareWindow.ExportSuccess"), 5);
+
+                            ImGui.SetClipboardText(data);
+                        }
                     }
                 }
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
