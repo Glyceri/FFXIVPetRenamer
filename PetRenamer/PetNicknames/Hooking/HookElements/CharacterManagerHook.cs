@@ -34,9 +34,6 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly ISharingDictionary SharingDictionary;
 
     private readonly List<nint> temporaryPets = [];
-
-    // TODO: When the plugin reloads in a loading screen with a battle pet out,
-    // I find that it doesnt always properly reload them.
     
     public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary) 
         : base(services, petServices)
@@ -154,7 +151,7 @@ internal unsafe class CharacterManagerHook : HookableElement
         {
             PetServices.PetLog.LogException(e);
         }
-
+        
         return null;
     }
 
@@ -192,6 +189,8 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
+            bool ownerFound = false;
+            
             uint owner = newBattleChara->OwnerId;
             
             foreach (IPettableUser? user in PetServices.UserList)
@@ -213,7 +212,14 @@ internal unsafe class CharacterManagerHook : HookableElement
 
                 user.SetBattlePet(newBattleChara);
 
+                ownerFound = true;
+                
                 break;
+            }
+            
+            if (!ownerFound)
+            {
+                temporaryPets.Add((nint)newBattleChara);
             }
         }
         
@@ -274,6 +280,8 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void HandleAsDeleted(BattleChara* newBattleChara)
     {
+        temporaryPets.Remove((nint)newBattleChara);
+        
         if (newBattleChara == null)
         {
             return;
@@ -285,8 +293,6 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            bool foundOwner = false;
-            
             int index = -1;
             
             foreach (IPettableUser? user in PetServices.UserList)
@@ -306,22 +312,13 @@ internal unsafe class CharacterManagerHook : HookableElement
                 user.Dispose(Database);
                 
                 PetServices.UserList[index] = null;
-
-                foundOwner = true;
                 
                 break;
-            }
-            
-            if (!foundOwner)
-            {
-                temporaryPets.Add(addressChara);
             }
         }
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
-            _ = temporaryPets.Remove(addressChara);
-
             IPettableUser? user = PetServices.UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
 
             if (user == null)
@@ -355,7 +352,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             {
                 continue;
             }
-
+            
             user.SetBattlePet(tempPet);
             temporaryPets.RemoveAt(i);
         }
