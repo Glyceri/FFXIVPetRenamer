@@ -10,15 +10,18 @@ internal class PetDevCommand : Command
     public PetDevCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) 
         : base(dalamudServices, windowHandler) { }
 
-    public override string CommandCode 
+    protected override string CommandCode 
         => "/petdev";
-    
-    public override string Description 
+
+    protected override string[] Aliases
+        => ["/pdev"];
+
+    protected override string Description 
         => "Opens the Pet Dev Window";
     
-    public override bool ShowInHelp 
+    protected override bool ShowInHelp 
         => false;
 
-    public override void OnCommand(string command, string args)
+    protected override void OnCommand(string command, string args)
         => WindowHandler.Open<PetDevWindow>();
 }

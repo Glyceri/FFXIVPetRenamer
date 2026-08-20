@@ -13,7 +13,7 @@ internal class CommandHandler : ICommandHandler
     private readonly IWindowHandler     WindowHandler;
     private readonly IPetServices       PetServices;
 
-    private readonly List<ICommand>     Commands = [];
+    private readonly HashSet<ICommand>  _commands = [];
 
     public CommandHandler(DalamudServices dalamudServices, IPetServices petServices, IWindowHandler windowHandler)
     {
@@ -24,6 +24,16 @@ internal class CommandHandler : ICommandHandler
         RegisterCommands();
     }
 
+    public void Dispose()
+    {
+        foreach(ICommand command in _commands)
+        {
+            command.Dispose();
+        }   
+
+        _commands.Clear();
+    }
+    
     private void RegisterCommands()
     {
         RegisterCommand(new PetNameCommand      (DalamudServices, WindowHandler, PetServices));
@@ -35,16 +45,6 @@ internal class CommandHandler : ICommandHandler
 
     private void RegisterCommand(ICommand command)
     {
-        Commands.Add(command);
-    }
-
-    public void Dispose()
-    {
-        foreach(ICommand command in Commands)
-        {
-            command?.Dispose();
-        }   
-
-        Commands.Clear();
+        _commands.Add(command);
     }
 }

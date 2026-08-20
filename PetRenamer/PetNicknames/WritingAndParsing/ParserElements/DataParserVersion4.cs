@@ -1,4 +1,5 @@
 ﻿using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -86,7 +87,10 @@ internal class DataParserVersion4 : IDataParserElement
                 edgeColours.Add(PetServices.StringHelper.ParseVector3(splitNickname[3]));
                 textColours.Add(PetServices.StringHelper.ParseVector3(splitNickname[4]));
             }
-            catch { }
+            catch(Exception e)
+            {
+                PetLogWrapper.Instance?.LogException(e);
+            }
         }
 
         int idCount           = ids.Count;

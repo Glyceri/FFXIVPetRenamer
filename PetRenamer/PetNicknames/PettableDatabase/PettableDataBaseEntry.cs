@@ -179,7 +179,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         UpdateEntryBase(parseResult, parseContext);
 
         SetSoftSkeletons(parseResult.SoftSkeletons);
-        UpdateContentId(parseResult.ContentId, !parseContext.IsFromIPC);
+        UpdateContentId(parseResult.ContentId, !parseContext.IsFromIpc);
     }
 
     public void UpdateEntryBase(IBaseParseResult parseResult, ParseContext parseContext)
@@ -188,7 +188,7 @@ internal class PettableDataBaseEntry : IPettableDatabaseEntry
         SetName(parseResult.UserName);
         SetHomeworld(parseResult.Homeworld);
 
-        IsIpc         = parseContext.IsFromIPC;
+        IsIpc         = parseContext.IsFromIpc;
         _pluginSource = parseContext.FromPlugin;
 
         MarkDirty();        

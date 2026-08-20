@@ -11,15 +11,18 @@ internal class PetListCommand : Command
     public PetListCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) 
         : base(dalamudServices, windowHandler) { }
 
-    public override string CommandCode 
+    protected override string CommandCode 
         => "/petlist";
     
-    public override string Description 
+    protected override string[] Aliases
+        => ["/plist"];
+    
+    protected override string Description 
         => Translator.GetLine("Command.Petlist");
     
-    public override bool ShowInHelp
+    protected override bool ShowInHelp
         => true;
 
-    public override void OnCommand(string command, string args) 
+    protected override void OnCommand(string command, string args) 
         => WindowHandler.Open<PetListWindow>();
 }

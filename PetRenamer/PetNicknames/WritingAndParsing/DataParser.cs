@@ -31,15 +31,15 @@ internal class DataParser : IDataParser
 
     public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase)
     {
-        DalamudServices = dalamudServices;
-        PetServices     = petServices;
-        Database        = database;
-        LegacyDatabase  = legacyDatabase;
+        DalamudServices     = dalamudServices;
+        PetServices         = petServices;
+        Database            = database;
+        LegacyDatabase      = legacyDatabase;
 
-        DataParserVersion1 = new DataParserVersion1();
-        DataParserVersion2 = new DataParserVersion2();
-        DataParserVersion3 = new DataParserVersion3(petServices);
-        DataParserVersion4 = new DataParserVersion4(petServices);
+        DataParserVersion1  = new DataParserVersion1();
+        DataParserVersion2  = new DataParserVersion2();
+        DataParserVersion3  = new DataParserVersion3(petServices);
+        DataParserVersion4  = new DataParserVersion4(petServices);
     }
 
     public bool ApplyParseData(IDataParseResult result, ParseContext parseContext)

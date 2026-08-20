@@ -171,7 +171,7 @@ internal class PettableDatabase : IPettableDatabase
 
         entry.UpdateEntry(parseResult, parseContext);
 
-        if (parseContext.IsFromIPC)
+        if (parseContext.IsFromIpc)
         {
             return;
         }

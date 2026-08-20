@@ -90,9 +90,8 @@ internal unsafe class ChatHook : HookableElement
     {
         PetNicknamesLogModule* logModule = (PetNicknamesLogModule*)RaptureLogModule.Instance();
         
-        int start = logModule->NonLogMessageCount;
-        int count = RaptureLogModule.Instance()->LogMessageCount - start;
-        
+        int  start        = logModule->NonLogMessageCount;
+        int  count        = RaptureLogModule.Instance()->LogMessageCount - start;
         uint currentValue = (uint)(count - start);
         
         PetServices.PetLog.DevLogVerbose("[Start : Count : CurrentValue]: " + start + " : " + count + " : " + currentValue);

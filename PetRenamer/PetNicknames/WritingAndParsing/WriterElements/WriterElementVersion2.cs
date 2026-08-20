@@ -23,14 +23,14 @@ internal class WriterElementVersion2 : IDataWriterElement
         IPettableDatabaseEntry entry = forUser.DataBaseEntry;
 
         string userName         = entry.Name;
-        string homeworldID      = entry.Homeworld.ToString();
-        string contentID        = entry.ContentId.ToString();
-        string SoftSkeletons    = $"[{entry.SoftSkeletons[0]},{entry.SoftSkeletons[1]},{entry.SoftSkeletons[2]},{entry.SoftSkeletons[3]},{entry.SoftSkeletons[4]}]";
+        string homeworldId      = entry.Homeworld.ToString();
+        string contentId        = entry.ContentId.ToString();
+        string softSkeletons    = $"[{entry.SoftSkeletons[0]},{entry.SoftSkeletons[1]},{entry.SoftSkeletons[2]},{entry.SoftSkeletons[3]},{entry.SoftSkeletons[4]}]";
 
         INamesDatabase database = entry.ActiveDatabase;
-        int length = database.Length;
+        int            length   = database.Length;
 
-        List<string> petLines = [header, userName, homeworldID, contentID, SoftSkeletons];
+        List<string>   petLines = [header, userName, homeworldId, contentId, softSkeletons];
 
         for (int i = 0; i < length; i++)
         {

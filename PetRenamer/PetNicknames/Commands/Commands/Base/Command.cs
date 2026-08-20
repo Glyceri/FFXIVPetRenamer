@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.Commands.Interfaces;
+﻿using Dalamud.Game.Command;
+using PetRenamer.PetNicknames.Commands.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 
@@ -6,23 +7,41 @@ namespace PetRenamer.PetNicknames.Commands.Commands.Base;
 
 internal abstract class Command : ICommand
 {
-    public abstract string Description { get; }
-    public abstract bool   ShowInHelp  { get; }
-    public abstract string CommandCode { get; }
+    protected abstract string   Description { get; }
+    protected abstract bool     ShowInHelp  { get; }
+    protected abstract string   CommandCode { get; }
+    protected abstract string[] Aliases     { get; }
     
     protected readonly DalamudServices DalamudServices;
     protected readonly IWindowHandler  WindowHandler;
 
-    public Command(DalamudServices dalamudServices, IWindowHandler windowHandler)
+    protected Command(DalamudServices dalamudServices, IWindowHandler windowHandler)
     {
         DalamudServices = dalamudServices;
         WindowHandler   = windowHandler;
 
-        DalamudServices.CommandManager.AddHandler(CommandCode, new Dalamud.Game.Command.CommandInfo(OnCommand)
+        RegisterCommand(CommandCode, Description, ShowInHelp);
+        
+        foreach (string alias in Aliases)
         {
-            HelpMessage = Description,
-            ShowInHelp  = ShowInHelp,
-        });
+            RegisterCommand(alias, Description);
+        }
+    }
+    
+    private void RegisterCommand(string command, string description, bool showInHelp = false)
+    {
+        CommandInfo commandInfo = new CommandInfo(OnCommand)
+        {
+            HelpMessage = description,
+            ShowInHelp  = showInHelp,
+        };
+        
+        if (DalamudServices.CommandManager.AddHandler(command, commandInfo))
+        {
+            return;
+        }
+        
+        DalamudServices.PluginLog.Warning($"Failed to register the command: [{command}].");
     }
 
     public void Dispose()
@@ -30,5 +49,5 @@ internal abstract class Command : ICommand
         DalamudServices.CommandManager.RemoveHandler(CommandCode);
     }
     
-    public abstract void OnCommand(string command, string args);
+    protected abstract void OnCommand(string command, string args);
 }

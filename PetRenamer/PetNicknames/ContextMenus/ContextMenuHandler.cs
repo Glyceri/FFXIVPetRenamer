@@ -13,10 +13,10 @@ namespace PetRenamer.PetNicknames.ContextMenus;
 
 internal class ContextMenuHandler : IDisposable
 {
-    private readonly DalamudServices            DalamudServices;
-    private readonly IPetServices               PetServices;
-    private readonly IWindowHandler             WindowHandler;
-    private readonly List<IContextMenuElement>  ContextMenuElements = [];
+    private readonly DalamudServices                DalamudServices;
+    private readonly IPetServices                   PetServices;
+    private readonly IWindowHandler                 WindowHandler;
+    private readonly HashSet<IContextMenuElement>   ContextMenuElements = [];
 
     public ContextMenuHandler(DalamudServices dalamudServices, IPetServices petServices, IWindowHandler windowHandler)
     {
@@ -28,13 +28,18 @@ internal class ContextMenuHandler : IDisposable
 
         _Register();
     }
-
+    
     private void _Register()
     {
         Register(new TargetContextMenu           (PetServices, WindowHandler));
         Register(new MinionNoteBookContextMenu   (PetServices, WindowHandler));
         Register(new MJIMinionNotebookContextMenu(PetServices, WindowHandler));
         Register(new QuickPanelContextMenu       (PetServices, WindowHandler));
+    }
+    
+    public void Dispose()
+    {
+        DalamudServices.ContextMenu.OnMenuOpened -= OnOpenMenu;
     }
 
     private void Register(IContextMenuElement contextMenuElement)
@@ -44,7 +49,7 @@ internal class ContextMenuHandler : IDisposable
 
     private void OnOpenMenu(IMenuOpenedArgs args)
     {
-        PetServices.PetLog.LogVerbose($"Tried to open the context menu for: '{args.AddonName}'.");
+        PetServices.PetLog.DevLog($"Tried to open the context menu for: '{args.AddonName}'.");
 
         if (!PetServices.Configuration.useContextMenus)
         {
@@ -65,7 +70,7 @@ internal class ContextMenuHandler : IDisposable
                 continue;
             }
 
-            PetServices.PetLog.LogVerbose($"Pet Nicknames registered a contextmenu callback for: '{args.AddonName}' that came from: '{contextMenuElement.GetType().Name}'.");
+            PetServices.PetLog.LogInfo($"Pet Nicknames registered a contextmenu callback for: '{args.AddonName}' that came from: '{contextMenuElement.GetType().Name}'.");
 
             RegisterCallback(args, callback);
         }
@@ -73,17 +78,12 @@ internal class ContextMenuHandler : IDisposable
 
     private void RegisterCallback(IMenuOpenedArgs args, Action<IMenuItemClickedArgs> callback)
     {
-        args.AddMenuItem(new MenuItem()
+        args.AddMenuItem(new MenuItem
         {
             Name        = Translator.GetLine("ContextMenu.Rename"),
             Prefix      = SeIconChar.BoxedLetterP,
             PrefixColor = 0,
             OnClicked   = callback
         });
-    }
-
-    public void Dispose()
-    {
-        DalamudServices.ContextMenu.OnMenuOpened -= OnOpenMenu;
     }
 }

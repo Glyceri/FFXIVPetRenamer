@@ -37,16 +37,19 @@ internal partial class PetNameCommand : Command
         PetServices = petServices;
     }
 
-    public override string CommandCode
+    protected override string CommandCode
         => "/petname";
     
-    public override string Description
+    protected override string[] Aliases
+        => ["/pname"];
+    
+    protected override string Description
         => Translator.GetLine("Command.Petname");
     
-    public override bool ShowInHelp
+    protected override bool ShowInHelp
         => true;
 
-    public override void OnCommand(string command, string args)
+    protected override void OnCommand(string command, string args)
     {
         if (args.IsNullOrWhitespace())
         {

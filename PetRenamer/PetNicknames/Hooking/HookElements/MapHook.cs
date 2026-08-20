@@ -34,6 +34,12 @@ internal unsafe class MapHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "_NaviMap", NaviMapUpdate);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "AreaMap", AreaMapUpdate);
     }
+    
+    protected override void OnDispose()
+    {
+        DalamudServices.AddonLifecycle.UnregisterListener(NaviMapUpdate);
+        DalamudServices.AddonLifecycle.UnregisterListener(AreaMapUpdate);
+    }
 
     private void NaviMapUpdate(AddonEvent type, AddonArgs args) 
         => MiniMapDetour((AddonNaviMap*)args.Addon.Address);
@@ -415,11 +421,5 @@ internal unsafe class MapHook : HookableElement
 
             pets.Add(pet);
         }
-    }
-
-    protected override void OnDispose()
-    {
-        DalamudServices.AddonLifecycle.UnregisterListener(NaviMapUpdate);
-        DalamudServices.AddonLifecycle.UnregisterListener(AreaMapUpdate);
     }
 }

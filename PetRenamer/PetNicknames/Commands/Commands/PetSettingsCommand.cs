@@ -11,15 +11,18 @@ internal class PetSettingsCommand : Command
     public PetSettingsCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) 
         : base(dalamudServices, windowHandler) { }
 
-    public override string CommandCode  
+    protected override string CommandCode  
         => "/petsettings";
     
-    public override string Description 
+    protected override string[] Aliases
+        => ["/psettings", "/petconfig", "/pconfig"];
+    
+    protected override string Description 
         => Translator.GetLine("Command.PetSettings");
     
-    public override bool ShowInHelp 
+    protected override bool ShowInHelp 
         => true;
 
-    public override void OnCommand(string command, string args) 
+    protected override void OnCommand(string command, string args) 
         => WindowHandler.Open<PetConfigWindow>();
 }

@@ -11,15 +11,18 @@ internal class PetSharingCommand : Command
     public PetSharingCommand(DalamudServices dalamudServices, IWindowHandler windowHandler) 
         : base(dalamudServices, windowHandler) { }
 
-    public override string CommandCode  
+    protected override string CommandCode  
         => "/petsharing";
     
-    public override string Description  
+    protected override string[] Aliases
+        => ["/psharing"];
+    
+    protected override string Description  
         => Translator.GetLine("Command.PetSharing");
     
-    public override bool ShowInHelp 
+    protected override bool ShowInHelp 
         => true;
 
-    public override void OnCommand(string command, string args) 
+    protected override void OnCommand(string command, string args) 
         => WindowHandler.Open<PetListWindow>();
 }

@@ -13,9 +13,9 @@ internal readonly struct ParseContext
         FromPlugin  = fromPlugin;
     }
     
-    public readonly bool IsFromIPC
+    public readonly bool IsFromIpc
         => ParseSource == ParseSource.IPC;
     
-    override public string ToString()
+    public override string ToString()
         => $"ParseContext: [{ParseSource}, {FromPlugin}]";
 }

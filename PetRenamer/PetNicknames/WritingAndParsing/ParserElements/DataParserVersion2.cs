@@ -1,6 +1,8 @@
-﻿using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
+﻿using PetRenamer.PetNicknames.Services.ServiceWrappers;
+using PetRenamer.PetNicknames.WritingAndParsing.DataParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -62,7 +64,10 @@ internal class DataParserVersion2 : IDataParserElement
                 ids.Add(ID);
                 names.Add(nickname);
             }
-            catch { }
+            catch(Exception e)
+            {
+                PetLogWrapper.Instance?.LogException(e);
+            }
         }
 
         if (ids.Count != names.Count)

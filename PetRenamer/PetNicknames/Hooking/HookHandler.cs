@@ -34,8 +34,17 @@ internal class HookHandler : IDisposable
         ChatHandler       = chatHandler;
 
         _Register();
+        _Initialize();
     }
 
+    public void Dispose()
+    {
+        foreach (IHookableElement hookableElement in hookableElements)
+        {
+            hookableElement.Dispose();
+        }
+    }
+    
     private void _Register()
     {
         Register(new TextElementHook(DalamudServices, PetServices));
@@ -64,15 +73,13 @@ internal class HookHandler : IDisposable
     private void Register(IHookableElement element)
     {
         hookableElements.Add(element);
-
-        element?.Init();
     }
-
-    public void Dispose()
+    
+    private void _Initialize()
     {
         foreach (IHookableElement hookableElement in hookableElements)
         {
-            hookableElement.Dispose();
+            hookableElement?.Init();
         }
     }
 }

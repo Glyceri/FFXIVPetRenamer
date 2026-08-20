@@ -32,16 +32,16 @@ internal class WriterElementVersion4 : IDataWriterElement
         string contentId     = entry.ContentId.ToString();
         string softSkeletons = $"[{GetStringFromPetSkeleton(entry.SoftSkeletons[0])},{GetStringFromPetSkeleton(entry.SoftSkeletons[1])},{GetStringFromPetSkeleton(entry.SoftSkeletons[2])},{GetStringFromPetSkeleton(entry.SoftSkeletons[3])},{GetStringFromPetSkeleton(entry.SoftSkeletons[4])}]";
 
-        INamesDatabase database = entry.ActiveDatabase;
-        int            length   = database.Length;
-        List<string>   petLines = [header, userName, homeworldId, contentId, softSkeletons];
+        INamesDatabase  database = entry.ActiveDatabase;
+        int             length   = database.Length;
+        List<string>    petLines = [header, userName, homeworldId, contentId, softSkeletons];
 
         for (int i = 0; i < length; i++)
         {
-            string name       = database.Names[i];
-            PetSkeleton id    = database.Ids[i];
-            string edgeColour = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
-            string textColour = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
+            string      name       = database.Names[i];
+            PetSkeleton id         = database.Ids[i];
+            string      edgeColour = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
+            string      textColour = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
 
             if (id.SkeletonType == SkeletonType.Invalid)
             {
