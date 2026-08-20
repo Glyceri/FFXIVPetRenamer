@@ -297,12 +297,22 @@ internal unsafe class CharacterManagerHook : HookableElement
     {
         int floorIndex = CreateActualIndex(newBattleChara->ObjectIndex);
         
+        if (floorIndex < 0 || floorIndex >= PlayerMaxInObjectTable)
+        {
+            return;
+        }
+        
         _temporaryPets[floorIndex] = nint.Zero;
     }
     
     private void AssignNewBattleChara(BattleChara* newBattleChara)
     {
         int floorIndex = CreateActualIndex(newBattleChara->ObjectIndex);
+        
+        if (floorIndex < 0 || floorIndex >= PlayerMaxInObjectTable)
+        {
+            return;
+        }
         
         _temporaryPets[floorIndex] = (nint)newBattleChara;
     }
