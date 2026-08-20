@@ -13,7 +13,6 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
@@ -29,11 +28,11 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly Hook<BattleChara.Delegates.Terminate>?     OnTerminateBattleCharaHook;
     private readonly Hook<BattleChara.Delegates.Dtor>?          OnDestroyBattleCharaHook;
 
-    private readonly IPettableDatabase  Database;
-    private readonly ILegacyDatabase    LegacyDatabase;
-    private readonly ISharingDictionary SharingDictionary;
+    private readonly IPettableDatabase                          Database;
+    private readonly ILegacyDatabase                            LegacyDatabase;
+    private readonly ISharingDictionary                         SharingDictionary;
 
-    private readonly List<nint> temporaryPets = [];
+    private readonly nint[] _temporaryPets = new nint[PlayerMaxInObjectTable];
     
     public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary) 
         : base(services, petServices)
@@ -62,7 +61,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void FloodInitialList()
     {
-        PetServices.PetLog.LogInfo("Flooding initial object table.");
+        PetServices.PetLog.LogInfo("Flooding Initial Object Table.");
         
         for (int i = 0; i < PlayerMaxInObjectTable; i++)
         {
@@ -219,7 +218,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             
             if (!ownerFound)
             {
-                temporaryPets.Add((nint)newBattleChara);
+                AssignNewBattleChara(newBattleChara);
             }
         }
         
@@ -280,63 +279,81 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     private void HandleAsDeleted(BattleChara* newBattleChara)
     {
-        temporaryPets.Remove((nint)newBattleChara);
-        
         if (newBattleChara == null)
         {
             return;
         }
 
-        nint addressChara = (nint)newBattleChara;
-
-        ObjectKind actualObjectKind = newBattleChara->ObjectKind;
-
-        if (actualObjectKind == ObjectKind.Pc)
+        switch (newBattleChara->ObjectKind)
         {
-            int index = -1;
-            
-            foreach (IPettableUser? user in PetServices.UserList)
-            {
-                index++;
-                
-                if (user == null)
-                {
-                    continue;
-                }
-
-                if (user.BattleChara != newBattleChara)
-                {
-                    continue;
-                }
-
-                user.Dispose(Database);
-                
-                PetServices.UserList[index] = null;
-                
-                break;
-            }
+            case ObjectKind.Pc:        HandleDeleteAsPc(newBattleChara);        break;
+            case ObjectKind.BattleNpc: HandleDeleteAsBattleNpc(newBattleChara); break;
         }
-
-        if (actualObjectKind == ObjectKind.BattleNpc)
+        
+        CleanBattleChara(newBattleChara);
+    }
+    
+    private void CleanBattleChara(BattleChara* newBattleChara)
+    {
+        int floorIndex = CreateActualIndex(newBattleChara->ObjectIndex);
+        
+        _temporaryPets[floorIndex] = nint.Zero;
+    }
+    
+    private void AssignNewBattleChara(BattleChara* newBattleChara)
+    {
+        int floorIndex = CreateActualIndex(newBattleChara->ObjectIndex);
+        
+        _temporaryPets[floorIndex] = (nint)newBattleChara;
+    }
+    
+    private void HandleDeleteAsPc(BattleChara* newBattleChara)
+    {
+        int index = -1;
+            
+        foreach (IPettableUser? user in PetServices.UserList)
         {
-            IPettableUser? user = PetServices.UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
-
+            index++;
+                
             if (user == null)
             {
-                return;
+                continue;
             }
 
-            user.RemoveBattlePet(newBattleChara);
+            if (user.BattleChara != newBattleChara)
+            {
+                continue;
+            }
+
+            user.Dispose(Database);
+                
+            PetServices.UserList[index] = null;
+                
+            break;
         }
+    }
+    
+    private void HandleDeleteAsBattleNpc(BattleChara* newBattleChara)
+    {
+        nint addressChara = (nint)newBattleChara;
+        
+        IPettableUser? user = PetServices.UserList.GetUser(addressChara, UserListFindType.PetMeansOwner);
+
+        if (user == null)
+        {
+            return;
+        }
+
+        user.RemoveBattlePet(newBattleChara);
     }
 
     private void AddTempPetsToUser(IPettableUser user)
     {
-        for (int i = temporaryPets.Count - 1; i >= 0; i--)
+        for (int i = (int)PlayerMaxInObjectTable - 1; i >= 0; i--)
         {
-            nint tempPetPtr = temporaryPets[i];
+            nint tempPetPtr = _temporaryPets[i];
 
-            if (tempPetPtr == 0)
+            if (tempPetPtr == nint.Zero)
             {
                 continue;
             }
@@ -354,7 +371,8 @@ internal unsafe class CharacterManagerHook : HookableElement
             }
             
             user.SetBattlePet(tempPet);
-            temporaryPets.RemoveAt(i);
+            
+            _temporaryPets[i] = nint.Zero;
         }
     }
 
@@ -383,7 +401,7 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int CreateActualIndex(ushort index)
-        => (int)MathF.Floor(index * 0.5f);
+        => (int)Math.Floor(index * 0.5f);
     
     protected override void OnDispose()
     {
