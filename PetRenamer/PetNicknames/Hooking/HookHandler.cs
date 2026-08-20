@@ -38,6 +38,8 @@ internal class HookHandler : IDisposable
 
     private void _Register()
     {
+        Register(new TextElementHook(DalamudServices, PetServices));
+        
         Register(new MirageHook(DalamudServices, PetServices));
         Register(new HoverHook(DalamudServices, PetServices));
         

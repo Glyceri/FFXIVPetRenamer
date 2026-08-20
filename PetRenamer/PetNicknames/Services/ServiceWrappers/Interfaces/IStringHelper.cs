@@ -24,4 +24,9 @@ internal unsafe interface IStringHelper
     
     Vector3? ParseVector3(string? line);
     string ToVector3String(Vector3 vector);
+    
+    bool Add(nint address);
+    bool Remove(nint address);
+    bool OurReplace { get; }
+    int Size { get; }
 }

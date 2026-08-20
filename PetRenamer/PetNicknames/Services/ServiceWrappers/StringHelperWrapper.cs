@@ -10,7 +10,6 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.LanguageBased.Values;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -34,6 +33,8 @@ internal class StringHelperWrapper : IStringHelper
     private readonly IUserList       UserList;
     private readonly DalamudServices DalamudServices;
 
+    private readonly HashSet<nint>   _alreaydSetElements = [];
+    
     public StringHelperWrapper(IPetServices petServices, DalamudServices dalamudServices, IUserList userList) 
     { 
         PetServices     = petServices;
@@ -41,6 +42,18 @@ internal class StringHelperWrapper : IStringHelper
         DalamudServices = dalamudServices;
     }
 
+    public bool Add(nint address)
+        => _alreaydSetElements.Add(address);
+    
+    public bool Remove(nint address)
+        => _alreaydSetElements.Remove(address);
+    
+    public bool OurReplace 
+        { get; private set; } = false;
+    
+    public int Size
+        => _alreaydSetElements.Count;
+    
     private bool GetFloat(string? stringValue, [NotNullWhen(true)] out float value)
         => float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
 
@@ -86,7 +99,7 @@ internal class StringHelperWrapper : IStringHelper
         }
 
         LSeStringBuilder builder = new LSeStringBuilder();
-
+        
         if (textColor != null)
         {
             _ = builder.PushColorRgba(new Vector4(textColor.Value, 1f));
@@ -127,8 +140,7 @@ internal class StringHelperWrapper : IStringHelper
         
         PetServices.PetLog.DevLogVerbose($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
 
-        string nodeText = baseString;
-        
+        string nodeText  = baseString;
         string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
         
         if (ReplaceEmptySpaceFor.GetValue(DalamudServices))
@@ -184,31 +196,29 @@ internal class StringHelperWrapper : IStringHelper
     
     public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
     {
-        if (!MakeSeString(atkNode, out SeString? seString))
+        if (_alreaydSetElements.Contains((nint)atkNode))
         {
             return false;
         }
         
+        if (!MakeSeString(atkNode, out SeString? seString))
+        {
+            return false;
+        }
+
         bool madeReplacement = ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
 
+        OurReplace = true;
+        
         atkNode->SetText(seString.EncodeWithNullTerminator());
+        
+        OurReplace = false;
         
         return madeReplacement;
     }
     
     public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType)
-    {
-        if (!MakeSeString(atkNode, out SeString? seString))
-        {
-            return false;
-        }
-        
-        bool madeReplacement = ReplaceSeString(colourConfig, ref seString, pettablePet, nameType);
-
-        atkNode->SetText(seString.EncodeWithNullTerminator());
-        
-        return madeReplacement;
-    }
+        => ReplaceAtkString(colourConfig, atkNode, pettablePet?.PetData, nameType, pettablePet?.Owner);
 
     public bool ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType)
     {
@@ -291,7 +301,7 @@ internal class StringHelperWrapper : IStringHelper
     private bool ReplaceSeString(ref SeString seString, string baseString, string replaceString, Vector3? edgeColor, Vector3? textColor)
     {
         bool hasMadeReplacement = false;
-        
+
         for (int i = 0; i < seString.Payloads.Count; i++)
         {
             Payload payload = seString.Payloads[i];
@@ -306,7 +316,7 @@ internal class StringHelperWrapper : IStringHelper
                 continue;
             }
             
-            if (textPayload.Text?.Contains(replaceString, StringComparison.InvariantCultureIgnoreCase) ?? true)
+            if (textPayload.Text == null)
             {
                 continue;
             }

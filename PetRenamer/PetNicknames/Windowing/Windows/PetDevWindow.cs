@@ -85,6 +85,7 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Island",           DrawIsland));
         devStructList.Add(new DevStruct("Chat Database",    DrawChatDatabase));
         devStructList.Add(new DevStruct("Translator",       DrawTranslatorHelp));
+        devStructList.Add(new DevStruct("TextReplacer",     DrawTextReplacer));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -157,6 +158,11 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTabBar();
     }
 
+    private void DrawTextReplacer()
+    {
+        ImGui.Text("List Size: " + PetServices.StringHelper.Size.ToString());
+    }
+    
     private void DrawTranslatorHelp()
     {
         if (!Translator.HasMissingTranslations)
