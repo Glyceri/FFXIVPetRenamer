@@ -21,11 +21,15 @@ internal unsafe class TargetHook : HookableElement
     {
         PetServices.DirtyListener.RegisterOnDirtyName(OnDirtyEntry);
         
+        
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfo",           OnTargetInfo);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfoMainTarget", OnTargetInfoMainTarget);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_FocusTargetInfo",      OnFocusTargetInfo);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_CastBar",              OnCastBar);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_TargetInfoCastBar",    OnTargetInfoCastBar);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_LovmTargetInfo",       OnLovmTargetInfo);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "_MBAction",             OnMbAction);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostReceiveEvent,    "_MBAction",             OnMbAction);
     }
     
     protected override void OnDispose()
@@ -37,6 +41,8 @@ internal unsafe class TargetHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(OnFocusTargetInfo);
         DalamudServices.AddonLifecycle.UnregisterListener(OnCastBar);
         DalamudServices.AddonLifecycle.UnregisterListener(OnTargetInfoCastBar);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnLovmTargetInfo);
+        DalamudServices.AddonLifecycle.UnregisterListener(OnMbAction);
     }
     
     private void HandleTarget(AddonArgs args, uint textNodeIndex, IPettableEntity? target)
@@ -128,10 +134,15 @@ internal unsafe class TargetHook : HookableElement
         HandleTarget(args, 7,  TargetOfTarget());
     }
     
+    private void OnLovmTargetInfo(AddonEvent addonEvent, AddonArgs args)
+    {
+        HandleTarget(args, 4, Target());
+    }
+    
     private void OnFocusTargetInfo(AddonEvent addonEvent, AddonArgs args)
     {
         HandleTarget       (args, 10, FocusTarget());
-        HandleTargetCastBar(args, 5, FocusTarget());
+        HandleTargetCastBar(args, 5,  FocusTarget());
     }
     
     private void OnCastBar(AddonEvent addonEvent, AddonArgs args)
@@ -142,6 +153,11 @@ internal unsafe class TargetHook : HookableElement
     private void OnTargetInfoCastBar(AddonEvent addonEvent, AddonArgs args)
     {
         HandleTargetCastBar(args, 4, PetServices.UserList.LocalPlayer);
+    }
+    
+    private void OnMbAction(AddonEvent addonEvent, AddonArgs args)
+    {
+        HandleTarget(args, 5, Target());
     }
     
     [Conditional("DEBUG")]

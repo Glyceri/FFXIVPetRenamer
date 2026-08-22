@@ -22,6 +22,9 @@ internal unsafe class TooltipHook : HookableElement
         "_ActionCross",
         "_ActionDoubleCrossL",
         "_ActionDoubleCrossR",
+        "LovmPartyList",
+        "LovmPalette",
+        "LovmPaletteEdit",
     ];
     
     private static readonly string[] AllowPreDrawAddonsStarts =

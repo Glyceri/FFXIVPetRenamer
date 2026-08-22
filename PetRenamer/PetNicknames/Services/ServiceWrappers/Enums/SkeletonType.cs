@@ -8,6 +8,7 @@ internal enum SkeletonType : byte
     None        = 0,
     [SkeletonTypeSymbol('+')]
     Minion      = 1,
+    LovmPet     = 1,
     [SkeletonTypeSymbol('-')]
     BattlePet   = 2,
     [SkeletonTypeSymbol('#')]

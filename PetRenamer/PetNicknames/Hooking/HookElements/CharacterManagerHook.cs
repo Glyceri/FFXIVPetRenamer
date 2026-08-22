@@ -183,43 +183,12 @@ internal unsafe class CharacterManagerHook : HookableElement
 
         if (actualObjectKind == ObjectKind.Pc)
         {
-            CreateUser(newBattleChara);
+            HandleAsCreatedPc(newBattleChara);
         }
 
         if (actualObjectKind == ObjectKind.BattleNpc)
         {
-            bool ownerFound = false;
-            
-            uint owner = newBattleChara->OwnerId;
-            
-            foreach (IPettableUser? user in PetServices.UserList)
-            {
-                if (user == null)
-                {
-                    continue;
-                }
-
-                if (user.ObjectId.Id == PluginConstants.InvalidId)
-                {
-                    continue;
-                }
-                
-                if (user.ObjectId.ObjectId != owner)
-                {
-                    continue;
-                }
-
-                user.SetBattlePet(newBattleChara);
-
-                ownerFound = true;
-                
-                break;
-            }
-            
-            if (!ownerFound)
-            {
-                AssignNewBattleChara(newBattleChara);
-            }
+            HandleAsCreatedPet(newBattleChara);
         }
         
         if (actualObjectKind == ObjectKind.EventNpc)
@@ -228,6 +197,52 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
     }
 
+    private void HandleAsLovmPet(BattleChara* bChara)
+    {
+        
+    }
+    
+    private void HandleAsCreatedPc(BattleChara* newBattleChara)
+    {
+        CreateUser(newBattleChara);
+    }
+    
+    private void HandleAsCreatedPet(BattleChara* newBattleChara)
+    {
+        bool ownerFound = false;
+            
+        uint owner      = newBattleChara->OwnerId;
+            
+        foreach (IPettableUser? user in PetServices.UserList)
+        {
+            if (user == null)
+            {
+                continue;
+            }
+
+            if (user.ObjectId.Id == PluginConstants.InvalidId)
+            {
+                continue;
+            }
+                
+            if (user.ObjectId.ObjectId != owner)
+            {
+                continue;
+            }
+
+            user.SetBattlePet(newBattleChara);
+
+            ownerFound = true;
+                
+            break;
+        }
+            
+        if (!ownerFound)
+        {
+            AssignNewBattleChara(newBattleChara);
+        }
+    }
+    
     private void HandleAsIsland(BattleChara* newBattleChara)
     {
         if (!MJIManager.Instance()->IsPlayerInSanctuary)

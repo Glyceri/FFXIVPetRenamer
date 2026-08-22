@@ -265,7 +265,12 @@ internal unsafe class PettableUser : IPettableUser
             return;
         }
 
-        CreateNewPet(new PettableBattlePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
+        switch (pointer->BattleNpcSubKind)
+        {
+            case BattleNpcSubKind.Buddy:      CreateNewPet(new PettableChocoboPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices)); break;
+            case BattleNpcSubKind.Pet:        CreateNewPet(new PettablePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));        break;
+            case BattleNpcSubKind.LovmMinion: CreateNewPet(new PettableLovmPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));    break;
+        }
     }
 
     public void RemoveBattlePet(BattleChara* pointer)
