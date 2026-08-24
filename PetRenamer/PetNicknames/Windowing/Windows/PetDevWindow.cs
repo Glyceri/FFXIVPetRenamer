@@ -17,8 +17,11 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
+using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
+using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Hooking;
+using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.IPC;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -79,7 +82,6 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("IPC Tester",       DrawIPCTester, OnIPCUpdate));
         devStructList.Add(new DevStruct("Database",         DrawDatabase));
         devStructList.Add(new DevStruct("Sheets",           DrawSheets));
-        devStructList.Add(new DevStruct("Hover",            DrawHover));
         devStructList.Add(new DevStruct("Pronoun",          DrawPronoun));
         devStructList.Add(new DevStruct("NameError",        DrawNameError));
         devStructList.Add(new DevStruct("Island",           DrawIsland));
@@ -182,28 +184,51 @@ internal class PetDevWindow : PetWindow
         }
     }
     
-    private void DrawChatDatabase()
+    private void DrawElement<T, TT>(string title, TT? database, Action<T> drawElement)
+        where TT : IChatDatabase<T>
+        where T  : IChatObject
     {
-        ImGui.Text("Chat Elements: "    + ChatDatabaseHandler.Instance?.ChatElementDatabase.Length());
-        
-        if (ImGui.BeginListBox("CHAT LISTBOX", new Vector2(ImGui.GetContentRegionAvail().X, 300)))
+        if (database == null)
         {
-            for (int i = 0; i < (ChatDatabaseHandler.Instance?.ChatElementDatabase.Length() ?? 0); i++)
+            return;
+        }
+        
+        ImGui.Text($"{title}: " + database.Length());
+        
+        if (ImGui.BeginListBox($"###{title}_LISTBOX", new Vector2(ImGui.GetContentRegionAvail().X, 300)))
+        {
+            for (int i = 0; i < database.Length(); i++)
             {
-                IEphemeralChatElement? chatElement = ChatDatabaseHandler.Instance?.ChatElementDatabase.Elements[i];
+                T? chatElement = database.Elements[i];
                 
                 if (chatElement == null)
                 {
                     continue;
                 }
                 
-                ImGui.Text(PetServices.PetSheets.GetLogMessage(chatElement.LogMessageId)?.Text.ToMacroString());
+                drawElement(chatElement);
             }
             
             ImGui.EndListBox();
         }
-        ImGui.Text("Pet Elements: "     + ChatDatabaseHandler.Instance?.PetDatabase.Length());
-        ImGui.Text("Player Elements: "  + ChatDatabaseHandler.Instance?.PlayerDatabase.Length());
+    }
+    
+    private void DrawChatDatabase()
+    {
+        DrawElement<IEphemeralChatElement, IChatElementDatabase>("Chat Elements", ChatDatabaseHandler.Instance?.ChatElementDatabase, (chatElement) =>
+        {
+            ImGui.Text(chatElement.MessageId + ": " + PetServices.PetSheets.GetLogMessage(chatElement.LogMessageId)?.Text.ToMacroString());
+        });
+        
+        DrawElement<IChatPet, IChatPetDatabase>("Pet Elements", ChatDatabaseHandler.Instance?.PetDatabase, (chatElement) =>
+        {
+            ImGui.Text(chatElement.Pet + ": " + chatElement.LastUsedAt.ToString());
+        });
+        
+        DrawElement<IChatPlayer, IChatPlayerDatabase>("Player Elements", ChatDatabaseHandler.Instance?.PlayerDatabase, (chatElement) =>
+        {
+            ImGui.Text(chatElement.PlayerName + ": " + chatElement.LastUsedAt.ToString());
+        });
     }
     
     private void DrawIsland()
@@ -267,19 +292,6 @@ internal class PetDevWindow : PetWindow
         ImGui.SameLine();
         
         ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PronounHook.PreviousLastGottenPronoun}].");
-    }
-    
-    private void DrawHover()
-    {
-        ImGui.Text("Currently Hovered Pet: ");
-        ImGui.SameLine();
-        
-        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PetServices.HoverService.CurrentlyHoveredPet?.Model}, {PetServices.HoverService.CurrentlyHoveredPet?.Singular}].");
-        
-        ImGui.Text($"Currently Hovered Nametype: ");
-        ImGui.SameLine();
-        
-        ImGui.TextColored(new Vector4(1, 0.5f, 1, 1), $"[{PetServices.HoverService.CurrentNameType}].");
     }
     
     private string SearchText = string.Empty;

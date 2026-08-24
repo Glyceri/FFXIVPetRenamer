@@ -52,6 +52,21 @@ internal unsafe class ChatEphemeralHandler : EnablableHandler, IEphemaralChatHan
         ChatDatabaseHandler.Clear();
     }
     
+    public bool HasChatMessage(uint messageId)
+    {
+        foreach (IEphemeralChatElement chatElement in ChatDatabaseHandler.ChatElementDatabase.Elements)
+        {
+            if (chatElement.MessageId != messageId)
+            {
+                continue;
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
     public void OnChatLog(uint messageId, XivChatType xivChatType, uint logMessageId, ILogMessageEntity? sourceEntity, ILogMessageEntity? targetEntity)
     {
         ChatLogParser.OnChatLog(messageId, xivChatType, logMessageId, sourceEntity, targetEntity);

@@ -1,15 +1,16 @@
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
 
-internal class ChatPlayerDatabase : IChatPlayerDatabase
+internal class ChatPlayerDatabase : ChatEntityDatabase, IChatPlayerDatabase
 {
+    // TODO: Implement overflow protec for player and pet like you did for chatElement
+    
     public List<IChatPlayer> Elements { get; } = [];
     
     private readonly IPettableDatabase Database;
@@ -55,6 +56,7 @@ internal class ChatPlayerDatabase : IChatPlayerDatabase
         
         foundElement.UpdatePlayerData(playerName, homeworld);
         
+        // TODO: realistically should be hashset
         Elements.Remove(foundElement);
         Elements.Add(foundElement);
         

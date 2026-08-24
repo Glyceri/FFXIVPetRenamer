@@ -17,8 +17,6 @@ internal unsafe class TooltipHook : HookableElement
 {
     private static readonly string[] AllowedPreDrawAddons =
     [
-        "AreaMap",
-        "_NaviMap",
         "_ActionCross",
         "_ActionDoubleCrossL",
         "_ActionDoubleCrossR",
@@ -73,7 +71,7 @@ internal unsafe class TooltipHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(OnTooltipRequestedUpdate);
         DalamudServices.AddonLifecycle.UnregisterListener(OnActionTooltipRequestedUpdate);
     }
-
+    
     protected override void Refresh()
     {
         RefreshAddon("Tooltip");
@@ -224,8 +222,6 @@ internal unsafe class TooltipHook : HookableElement
 
         PetServices.HoverService.SetHoveredPet(null);
         
-        MapHook.InternalRefresh();
-        
         AtkUnitBase* hoveredOverAddon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById(parentId);
         
         if (hoveredOverAddon == null)
@@ -247,6 +243,9 @@ internal unsafe class TooltipHook : HookableElement
     
     private void AtkTooltipManagerShowTooltipDetour(AtkTooltipManager* thisPtr, AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipManager.AtkTooltipArgs* tooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, AtkResNode*, void> unkDelegate, bool unk7, bool unk8)
     {
+        PetServices.HoverService.SetHoveredPet(null);
+        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
+        
         RelayShowTooltip(parentId);
 
         ShowTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);

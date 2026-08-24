@@ -1,6 +1,5 @@
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Enums;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 
@@ -10,6 +9,7 @@ internal class ChatPlayer : IChatPlayer
     public string          PlayerName { get; private set; }
     public ushort          Homeworld  { get; private set; }
     public ulong           ContentId  { get; private set; }
+    public uint            LastUsedAt { get; set; }
     
     public ChatPlayer(string playerName, ushort homeworld)
     {

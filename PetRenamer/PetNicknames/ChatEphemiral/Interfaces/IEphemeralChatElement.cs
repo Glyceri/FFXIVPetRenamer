@@ -3,7 +3,7 @@ using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 
-internal interface IEphemeralChatElement
+internal interface IEphemeralChatElement : IChatObject
 {
     uint         MessageId     { get; }
     uint         LogMessageId  { get; }

@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Player;
 using PetRenamer.PetNicknames.Services.Interface;
-using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ internal class ChatLogParser : IChatLogParser
     public ChatLogParser(IChatDatabaseHandler chatDatabase, IPetServices petServices)
     {
         ChatDatabaseHandler        = chatDatabase;
-        ChatLogPlayerParserElement = new PlayerChatLogParserElement(chatDatabase.PlayerDatabase);
+        ChatLogPlayerParserElement = new PlayerChatLogParserElement(chatDatabase.PlayerDatabase, chatDatabase.ChatElementDatabase);
         
         ChatLogPetParsers.Add(new CastDealerPetChatLogParserElement(chatDatabase.PetDatabase, petServices));
         ChatLogPetParsers.Add(new CastDealerUserChatLogParserElement(chatDatabase.PetDatabase, petServices));

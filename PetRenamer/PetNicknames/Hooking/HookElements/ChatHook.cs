@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Log;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
-using PetRenamer.PetNicknames.Hooking.Structs;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System.Runtime.CompilerServices;
@@ -27,16 +26,13 @@ internal unsafe class ChatHook : HookableElement
     private readonly Hook<RaptureLogModule.Delegates.FormatLogMessage> FormatLogMessageHook;
     private readonly IEphemaralChatHandler ChatHandler;
     
-    private int  _lastIndex         = -1;
-    private uint _lastIdentifier    = 0;
-    private uint _lastSubIdentifier = 0;
-    private bool _myCall            = false;
+    private int  _lastIndex = -1;
+    private bool _myCall    = false;
     
     public ChatHook(DalamudServices services, IPetServices petServices, IEphemaralChatHandler ephemaralChatHandler) 
         : base(services, petServices)
     {
-        ChatHandler = ephemaralChatHandler;
-        
+        ChatHandler          = ephemaralChatHandler;
         FormatLogMessageHook = DalamudServices.Hooking.HookFromAddress<RaptureLogModule.Delegates.FormatLogMessage>(RaptureLogModule.MemberFunctionPointers.FormatLogMessage, FormatLogMessageDetour);
     }
 
@@ -86,33 +82,24 @@ internal unsafe class ChatHook : HookableElement
         PetServices.PetLog.DevLog($"ChatDebug: {_lastIndex}, {chatKind}, {messageId}, {chatType}.");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ExistAlready(uint messageId) 
+        => ChatHandler.HasChatMessage(messageId);
+    
     private uint GetMessageIdentifier(ChatKind chatKind)
     {
-        PetNicknamesLogModule* logModule = (PetNicknamesLogModule*)RaptureLogModule.Instance();
+        uint count    = (uint)RaptureLogModule.Instance()->LogMessageCount;
+        uint newCount = count;
         
-        int  start        = logModule->NonLogMessageCount;
-        int  count        = RaptureLogModule.Instance()->LogMessageCount - start;
-        uint currentValue = (uint)(count - start);
-        
-        PetServices.PetLog.DevLogVerbose("[Start : Count : CurrentValue]: " + start + " : " + count + " : " + currentValue);
-        
-        if (_lastIndex == -1)
+        if (chatKind == ChatKind.Log)
         {
-            _lastIndex = (int)currentValue - 1;
+            while (ExistAlready(newCount))
+            {
+                newCount++;
+            }
         }
         
-        if (currentValue == _lastIdentifier && chatKind == ChatKind.Log)
-        {
-            _lastSubIdentifier++;
-        }
-        else
-        {
-            _lastSubIdentifier = 0;
-        }
-        
-        _lastIdentifier = currentValue;
-        
-        return (uint)(count - start) + _lastSubIdentifier;
+        return newCount;
     }
     
     private nint ClearLogDetour(LogModule* logModule)

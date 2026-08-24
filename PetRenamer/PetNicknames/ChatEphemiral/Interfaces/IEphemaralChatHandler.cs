@@ -7,6 +7,7 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 
 internal unsafe interface IEphemaralChatHandler : IEnablableHandler
 {
+    bool HasChatMessage(uint messageId);
     void OnChatLog(uint messageId, XivChatType xivChatType, uint logMessageId, ILogMessageEntity? sourceEntity, ILogMessageEntity? targetEntity);
     void OnChatMessage(uint messageId, XivChatType xivChatType);
     byte[]? Replace(Utf8String* message, int index);

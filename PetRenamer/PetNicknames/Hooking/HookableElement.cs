@@ -49,7 +49,7 @@ internal abstract class HookableElement : IHookableElement
     protected virtual void OnConfigChanged(Configuration _)
         => InternalRefresh();
     
-    public void InternalRefresh()
+    private void InternalRefresh()
         => DalamudServices.Framework.Run(Refresh);
     
     protected virtual void Refresh() { }

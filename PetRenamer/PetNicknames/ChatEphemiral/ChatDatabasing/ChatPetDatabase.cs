@@ -1,14 +1,13 @@
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
 
-internal class ChatPetDatabase : IChatPetDatabase
+internal class ChatPetDatabase : ChatEntityDatabase, IChatPetDatabase
 {
     public List<IChatPet> Elements { get; } = [];
     

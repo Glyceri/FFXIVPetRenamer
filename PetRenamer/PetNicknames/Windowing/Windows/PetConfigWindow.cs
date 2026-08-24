@@ -95,6 +95,8 @@ internal class PetConfigWindow : PetWindow
                 Translator.UpdateLanguage();
             }
             
+            DrawInfoHover(Translator.GetLine("Language.MissingWarning"));
+            
             ImGui.Separator();
             
             DrawBasicToggle(Translator.GetLine("Config.Kofi"),              ref PetServices.Configuration.showKofiButton);

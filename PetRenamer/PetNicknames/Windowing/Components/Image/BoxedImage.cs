@@ -49,8 +49,7 @@ internal static class BoxedImage
             }
 
             iconIndex = data.Icon + adder;
-            
-            raceIcon    = RaceIconHelper.GetFromRaceId(data?.RaceId ?? 0);
+            raceIcon  = RaceIconHelper.GetFromRaceId(data?.RaceId ?? 0);
         }
         
         try

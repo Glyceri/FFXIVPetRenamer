@@ -20,7 +20,9 @@
   "Language.Japanese": "Japans",
   "Language.Dutch": "Nederlands",
   "Language.Chinese": "Chinees",
-  
+
+  "Language.MissingWarning": "Is jouw taal niet compleet of te vinden in de lijst?\nStuur mij een bericht op Discord of GitHub.",
+
   "ContextMenu.Rename": "Geef Bijnaam",
 
   "PetMode": "{0} Modus",

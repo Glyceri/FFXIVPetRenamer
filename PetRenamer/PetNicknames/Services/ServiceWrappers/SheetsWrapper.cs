@@ -53,7 +53,7 @@ internal class SheetsWrapper : IPetSheets
     {
         foreach (Companion companion in PetSheet)
         {
-            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(DalamudServices, companion);
+            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(this, DalamudServices, companion);
             
             if (petSheetData == null)
             {

@@ -1,7 +1,4 @@
-using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+using Dalamud.Game.Gui;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -12,8 +9,6 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal class HoverHook : HookableElement
 {
-    private uint lastIconId;
-    
     private static readonly NameTypeValue HoverNameType = new NameTypeValue()
     { 
         GermanValue  = NameType.Pronoun,
@@ -24,15 +19,22 @@ internal class HoverHook : HookableElement
     
     public override void Init()
     {
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, OnEvent);
+        DalamudServices.GameGui.HoveredActionChanged -= OnHoverAction;
+        DalamudServices.GameGui.HoveredActionChanged += OnHoverAction;
     }
     
-    private void HandlePetSheetData(IPetSheetData? petSheetData)
+    protected override void OnDispose()
     {
-        if (petSheetData == null)
+        DalamudServices.GameGui.HoveredActionChanged -= OnHoverAction;
+    }
+    
+    private void OnHoverAction(object? _, HoveredAction? action)
+    {
+        PetServices.HoverService.SetHoveredPet(null);
+        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
+        
+        if (action == null)
         {
-            PetServices.HoverService.SetHoveredPet(null);
-            
             return;
         }
         
@@ -41,159 +43,23 @@ internal class HoverHook : HookableElement
             return;
         }
         
-        petSheetData = PetServices.PetSheets.MakeSoft(PetServices.UserList.LocalPlayer, petSheetData);
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(action.ActionId);
         
-        NameType setNameType = HoverNameType.GetValue(DalamudServices);
-
-        if (petSheetData.Model.SkeletonType == SkeletonType.BattlePet)
-        {
-            setNameType = NameType.Action;
-        }
-        
-        PetServices.HoverService.SetCurrentNameType(setNameType);
-        PetServices.HoverService.SetHoveredPet(petSheetData);
-    }
-    
-    private unsafe void HandleAsComponentIcon(AtkComponentIcon* componentIcon)
-    {
-        if (componentIcon == null)
+        if (petData == null)
         {
             return;
         }
         
-        if (lastIconId == componentIcon->IconId)
-        {
-            lastIconId = 0;
-            
-            return;
-        }
+        IPetSheetData softData = PetServices.PetSheets.MakeSoft(PetServices.UserList.LocalPlayer, petData);
         
-        lastIconId = componentIcon->IconId;
-
-        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromIcon(componentIcon->IconId);
-      
-        HandlePetSheetData(petSheetData);
-    }
-    
-    private unsafe bool HandleAsDragDropNode(AtkResNode* parentNode, AtkComponentBase* componentBase)
-    {
-        if (componentBase->GetComponentType() != ComponentType.DragDrop)
-        {
-            return false;
-        }
-
-        AtkComponentDragDrop* dragDropComponent = parentNode->GetAsAtkComponentDragDrop();
-
-        if (dragDropComponent == null)
-        {
-            return false;
-        }
-
-        HandleAsComponentIcon(dragDropComponent->AtkComponentIcon);
+        PetServices.HoverService.SetHoveredPet(softData);
+        PetServices.HoverService.SetCurrentNameType(HoverNameType.GetValue(DalamudServices));
         
-        return true;
-    }
-    
-    private unsafe bool HandleAsListItemRenderedNode(AtkResNode* parentNode, AtkComponentBase* componentBase)
-    {
-        if (componentBase->GetComponentType() != ComponentType.ListItemRenderer)
-        {
-            return false;
-        }
-        
-        AtkComponentListItemRenderer* listItemRenderer = parentNode->GetAsAtkComponentListItemRenderer();
-        
-        if (listItemRenderer == null)
-        {
-            return false;
-        }
-        
-        AtkResNode* resNode = listItemRenderer->GetNodeById(6);
-        
-        if (resNode == null)
-        {
-            return false;
-        }
-        
-        AtkTextNode* atkTextNode = listItemRenderer->GetTextNodeById(6);
-        
-        if (atkTextNode == null)
-        {
-            return false;
-        }
-       
-        if (!atkTextNode->OriginalTextPointer.HasValue)
-        {
-            return false;   
-        }
-        
-        IPetSheetData? petSheetData = PetServices.PetSheets.GetPetFromName(atkTextNode->OriginalTextPointer.AsDalamudSeString().TextValue);
-        
-        HandlePetSheetData(petSheetData);
-        
-        return true;
-    }
-    
-    private unsafe void OnEvent(AddonEvent type, AddonArgs args)
-    {
-        AtkStage* atkStage = AtkStage.Instance();
-
-        if (atkStage == null)
-        {
-            return;
-        }
-
-        AtkCollisionManager* collisionManager = AtkStage.Instance()->AtkCollisionManager;
-
-        if (collisionManager == null)
-        {
-            return;
-        }
-
-        AtkCollisionNode* collisionNode = collisionManager->IntersectingCollisionNode;
-
-        if (collisionNode == null)
-        {
-            return;
-        }
-
-        AtkResNode* resNode    = &collisionNode->AtkResNode;
-        AtkResNode* parentNode = resNode->ParentNode;
-
-        if (parentNode == null)
-        {
-            return;
-        }
-
-        if (parentNode->GetNodeType() != NodeType.Component)
-        {
-            return;
-        }
-
-        AtkComponentNode* componentNode = parentNode->GetAsAtkComponentNode();
-
-        if (componentNode == null)
-        {
-            return;
-        }
-
-        AtkComponentBase* componentBase = componentNode->Component;
-
-        if (componentBase == null)
-        {
-            return;
-        }
-
-        if (HandleAsDragDropNode(parentNode, componentBase))
+        if (softData.Model.SkeletonType != SkeletonType.BattlePet)
         {
             return;
         }
         
-        _ = HandleAsListItemRenderedNode(parentNode, componentBase);
-    }
-
-    protected override void OnDispose()
-    {
-        DalamudServices.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, OnEvent);
+        PetServices.HoverService.SetCurrentNameType(NameType.Action);
     }
 }

@@ -73,5 +73,42 @@ internal class ChatElementDatabase : IChatElementDatabase
         }
         
         Elements.Add(new ChatElement(messageId, chatType, logMessageId, replaceString, sourcePlayer, targetPlayer, sourcePet, targetPet));
+        
+        IChatPlayer? selectedPlayer = sourcePlayer ?? targetPlayer;
+        IChatPet?    selectedPet    = sourcePet ?? targetPet;
+
+        selectedPlayer?.LastUsedAt  = messageId;
+        selectedPet?.LastUsedAt     = messageId;
+        
+        if (Elements.Count <= IChatElementDatabase.MAX_CHAT_ELEMENTS)
+        {
+            return;
+        }
+        
+        CleanUp();
+    }
+
+    public void CleanUp()
+    {
+        if (Elements.Count <= 0)
+        {
+            return;
+        }
+        
+        IEphemeralChatElement highestChatElement = Elements[^1];
+        
+        uint clearBelow = highestChatElement.MessageId - IChatElementDatabase.CLEANUP_COUNT;
+        
+        for (int i = Elements.Count - 1; i >= 0; i--)
+        {
+            IEphemeralChatElement chatElement = Elements[i];
+            
+            if (chatElement.MessageId >= clearBelow)
+            {
+                continue;
+            }
+            
+            Elements.RemoveAt(i);
+        }
     }
 }

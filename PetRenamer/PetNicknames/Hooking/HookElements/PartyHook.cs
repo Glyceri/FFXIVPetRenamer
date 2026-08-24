@@ -156,7 +156,7 @@ internal unsafe class PartyHook : HookableElement
             
             if (baseWidth < textboxWidth)
             {
-                return;
+                continue;
             }
             
             member.CastingActionName->TextFlags |= (TextFlags.Ellipsis | TextFlags.OverflowHidden);
