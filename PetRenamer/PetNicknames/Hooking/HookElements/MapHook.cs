@@ -70,7 +70,15 @@ internal unsafe class MapHook : HookableElement
     {
         MapTooltipType mapTooltipType = (MapTooltipType)(tooltipContext >> 24);
         
-        if ((mapTooltipType == MapTooltipType.BattleChara))
+        uint objectIndex = tooltipContext & 0xFFFFFF;
+        
+        // In the vanilla code the object index is used like this:
+        // 'agentMap->UIModuleInterface->GetUI3DModule()->MemberInfoPointers[(int)objectIndex].Value->BattleChara->GetName()'
+        // Well... it actually calls the vtable function on it, but it corresponds to this.
+        
+        PetServices.PetLog.DevLogVerbose($"ContextTooltipHandleDetour: [TooltipType:{mapTooltipType}], [ObjectIndex: {objectIndex}]");
+        
+        if ((mapTooltipType == MapTooltipType.BattleCharaMarker))
         {
             GetNameHook.Enable();
         }

@@ -52,14 +52,13 @@ internal class HookHandler : IDisposable
         Register(new MirageHook(DalamudServices, PetServices));
         Register(new HoverHook(DalamudServices, PetServices));
         
-        MapHook mapHook = new MapHook(DalamudServices, PetServices);
-        Register(mapHook);
+        Register(new MapHook(DalamudServices, PetServices));
         
         PronounHook = new PronounHook(DalamudServices, PetServices);
         Register(PronounHook);
         
         Register(new ChatHook(DalamudServices, PetServices, ChatHandler));
-        Register(new TooltipHook(DalamudServices, PetServices, mapHook, PronounHook));
+        Register(new TooltipHook(DalamudServices, PetServices, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
@@ -79,7 +78,7 @@ internal class HookHandler : IDisposable
     {
         foreach (IHookableElement hookableElement in hookableElements)
         {
-            hookableElement?.Init();
+            hookableElement.Init();
         }
     }
 }

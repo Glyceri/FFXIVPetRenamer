@@ -5,7 +5,7 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 
 internal interface IChatDatabase<T>
     where T : IChatObject
-{
+{ 
     List<T> Elements { get; }
     
     void Clear()

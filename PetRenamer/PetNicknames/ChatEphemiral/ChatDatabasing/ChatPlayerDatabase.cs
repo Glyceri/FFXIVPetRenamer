@@ -56,7 +56,6 @@ internal class ChatPlayerDatabase : ChatEntityDatabase, IChatPlayerDatabase
         
         foundElement.UpdatePlayerData(playerName, homeworld);
         
-        // TODO: realistically should be hashset
         Elements.Remove(foundElement);
         Elements.Add(foundElement);
         

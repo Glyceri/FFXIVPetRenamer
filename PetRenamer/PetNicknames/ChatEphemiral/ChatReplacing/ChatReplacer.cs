@@ -56,7 +56,6 @@ internal unsafe class ChatReplacer : IChatReplacer
         
         SeString editableSeString = SeString.Parse(editableString.AsReadOnlySeString());
         
-        
         // TODO: This colour config stuff works for now, but ofc isnt scalable in case I want finer control later.
         Configuration.ColourConfig colourConfig = PetServices.Configuration.ShowInBattleChatColour;
         

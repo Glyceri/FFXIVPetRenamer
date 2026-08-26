@@ -191,7 +191,6 @@ internal class PetListWindow : PetWindow
                 {
                     IPettableUser? localUser = PetServices.UserList.LocalPlayer;
                     
-                    // TODO: This is not perse a todo, but if you want to go crazy bonkers and a bit ??? you could just straight up make this parse the selected user (but htat means people can send other peoples data and thats not a vibe).
                     if (localUser != null)
                     {
                         string? data = DataWriter.WriteData(localUser);

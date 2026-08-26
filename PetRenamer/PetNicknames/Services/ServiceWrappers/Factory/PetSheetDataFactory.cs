@@ -44,7 +44,7 @@ internal static class PetSheetDataFactory
         singular = singular.ToTitleCase();
         
         uint   icon          = companion.Icon;
-        uint   action        = companion.Icon - (uint)4400;
+        uint   action        = companion.RowId;
         sbyte  pronoun       = companion.Pronoun;
         uint   raceId        = companion.MinionRace.ValueNullable?.RowId ?? 0;
         string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;

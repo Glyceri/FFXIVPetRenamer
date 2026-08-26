@@ -4,7 +4,6 @@ using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using FFXIVClientStructs.FFXIV.Component.Log;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -14,8 +13,8 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class ChatHook : HookableElement
 {
-    private delegate nint GetLogMessageRawDelegate(LogModule* logModule, int index, nint unk3);
-    private delegate nint ClearLogDelegate(LogModule* logModule);
+    private delegate nint GetLogMessageRawDelegate(RaptureLogModule* logModule, int index, nint unk3);
+    private delegate nint ClearLogDelegate(RaptureLogModule* logModule);
     
     [Signature("E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 49 8B 9E", DetourName = nameof(GetLogMessageRawDetour))]
     private readonly Hook<GetLogMessageRawDelegate>? GetLogMessageRawHook = null;
@@ -102,7 +101,7 @@ internal unsafe class ChatHook : HookableElement
         return newCount;
     }
     
-    private nint ClearLogDetour(LogModule* logModule)
+    private nint ClearLogDetour(RaptureLogModule* logModule)
     {
         PetServices.PetLog.DevLogInfo($"Cleared LogModule.");
         
@@ -113,7 +112,7 @@ internal unsafe class ChatHook : HookableElement
         return ClearLogHook!.OriginalDisposeSafe(logModule);
     }
     
-    private nint GetLogMessageRawDetour(LogModule* logModule, int index, nint unk3)
+    private nint GetLogMessageRawDetour(RaptureLogModule* logModule, int index, nint unk3)
     {
         _lastIndex = index;
         

@@ -35,7 +35,6 @@ internal unsafe class TooltipHook : HookableElement
     private ushort lastParentId     = ushort.MaxValue;
     private bool   isAllowedPreDraw = false;
     
-    private readonly HookableElement MapHook;
     private readonly IPronounHook    PronounHook;
     
     private SeString?  previousPronoun;
@@ -44,10 +43,9 @@ internal unsafe class TooltipHook : HookableElement
     private SeString?  lastPreviousPronoun;
     private SeString?  lastCurrentPronoun;
     
-    public TooltipHook(DalamudServices services, IPetServices petServices, HookableElement mapHook, IPronounHook pronounHook) 
+    public TooltipHook(DalamudServices services, IPetServices petServices, IPronounHook pronounHook) 
         : base(services, petServices)
     {
-        MapHook     = mapHook;
         PronounHook = pronounHook;
         
         ShowTooltipHook = DalamudServices.Hooking.HookFromAddress<AtkTooltipManager.Delegates.ShowTooltip>(AtkTooltipManager.Addresses.ShowTooltip.Value, AtkTooltipManagerShowTooltipDetour);
@@ -243,9 +241,6 @@ internal unsafe class TooltipHook : HookableElement
     
     private void AtkTooltipManagerShowTooltipDetour(AtkTooltipManager* thisPtr, AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipManager.AtkTooltipArgs* tooltipArgs, delegate* unmanaged[Stdcall]<float*, float*, AtkResNode*, void> unkDelegate, bool unk7, bool unk8)
     {
-        PetServices.HoverService.SetHoveredPet(null);
-        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
-        
         RelayShowTooltip(parentId);
 
         ShowTooltipHook!.Original(thisPtr, type, parentId, targetNode, tooltipArgs, unkDelegate, unk7, unk8);
