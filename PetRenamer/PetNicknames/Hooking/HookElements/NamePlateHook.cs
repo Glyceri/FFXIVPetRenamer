@@ -54,7 +54,7 @@ internal unsafe class NamePlateHook : HookableElement
             return;
         }
 
-        addonNamePlate->DoFullUpdate = 1;
+        addonNamePlate->UpdateAllNamePlates();
     }
 
     private int UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)

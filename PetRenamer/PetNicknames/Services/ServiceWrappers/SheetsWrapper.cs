@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Action = Lumina.Excel.Sheets.Action;
+using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 

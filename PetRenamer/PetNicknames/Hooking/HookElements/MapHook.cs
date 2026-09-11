@@ -3,10 +3,10 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility;
-using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using InteropGenerator.Runtime;
 using PetRenamer.PetNicknames.Hooking.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -20,17 +20,9 @@ internal unsafe class MapHook : HookableElement
     private const uint MinimapIconHoverEvent = 1;
     private const uint AreaMapIconHoverEvent = 9;
     
-    private delegate nint ContextTooltipHandleDelegate(AgentMap* agentMap, Utf8String* tooltipString, uint tooltipContext);
-    private delegate int  GetEventTypeDelegate(nint a1);
-    
-    // This hook isn't per se necessary, but I like having proper context.
-    [Signature("E8 ?? ?? ?? ?? 8B F8 83 C0 ?? 83 F8 ?? 77 ?? 48 63 C8", DetourName = nameof(GetEventTypeDetour))]
-    private readonly Hook<GetEventTypeDelegate> GetEventTypeHook = null!;
-    
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 57 41 56 41 57 48 83 EC ?? 41 8B D8", DetourName = nameof(ContextTooltipHandleDetour))]
-    private readonly Hook<ContextTooltipHandleDelegate> ContextTooltipHandleHook = null!;
-    
-    private readonly Hook<BattleChara.Delegates.GetName> GetNameHook;
+    private readonly Hook<AtkValue.Delegates.GetInt>        GetInt;
+    private readonly Hook<AgentMap.Delegates.CreateTooltip> ContextTooltipHandleHook;
+    private readonly Hook<BattleChara.Delegates.GetName>    GetNameHook;
     
     private uint          _expectedEvent = 0;
     private IPettablePet? _selectedPet   = null;
@@ -38,7 +30,9 @@ internal unsafe class MapHook : HookableElement
     public MapHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices)
     {
-        GetNameHook = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.GetName>((nint)BattleChara.StaticVirtualTablePointer->GetName, GetNameDetour);
+        GetInt                   = DalamudServices.Hooking.HookFromAddress<AtkValue.Delegates.GetInt>((nint)AtkValue.MemberFunctionPointers.GetInt, GetIntDetour);
+        ContextTooltipHandleHook = DalamudServices.Hooking.HookFromAddress<AgentMap.Delegates.CreateTooltip>((nint)AgentMap.MemberFunctionPointers.CreateTooltip, ContextTooltipHandleDetour);
+        GetNameHook              = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.GetName>((nint)BattleChara.StaticVirtualTablePointer->GetName, GetNameDetour);
     }
 
     public override void Init()
@@ -53,7 +47,7 @@ internal unsafe class MapHook : HookableElement
     {
         GetNameHook.Dispose();
         ContextTooltipHandleHook.Dispose();
-        GetEventTypeHook.Dispose();
+        GetInt.Dispose();
         
         DalamudServices.AddonLifecycle.UnregisterListener(AreaMapUpdate);
         DalamudServices.AddonLifecycle.UnregisterListener(NaviMapUpdate);
@@ -66,7 +60,7 @@ internal unsafe class MapHook : HookableElement
         return GetNameHook.OriginalDisposeSafe(gameObject);
     }
     
-    private nint ContextTooltipHandleDetour(AgentMap* agentMap, Utf8String* tooltipString, uint tooltipContext)
+    private bool ContextTooltipHandleDetour(AgentMap* agentMap, Utf8String* tooltipString, uint tooltipContext)
     {
         MapTooltipType mapTooltipType = (MapTooltipType)(tooltipContext >> 24);
         
@@ -83,7 +77,7 @@ internal unsafe class MapHook : HookableElement
             GetNameHook.Enable();
         }
         
-        nint returner = ContextTooltipHandleHook.OriginalDisposeSafe(agentMap, tooltipString, tooltipContext);
+        bool returner = ContextTooltipHandleHook.OriginalDisposeSafe(agentMap, tooltipString, tooltipContext);
 
         HandleTooltipRename(tooltipString);
         
@@ -92,11 +86,11 @@ internal unsafe class MapHook : HookableElement
         return returner;
     }
     
-    private int GetEventTypeDetour(nint a1)
+    private int GetIntDetour(AtkValue* atkValue)
     {
         ContextTooltipHandleHook.Disable();
         
-        int returner = GetEventTypeHook.Original(a1);
+        int returner = GetInt.Original(atkValue);
         
         if (returner != _expectedEvent)
         {
@@ -114,11 +108,11 @@ internal unsafe class MapHook : HookableElement
         
         if (type == AddonEvent.PreUpdate)
         {
-            GetEventTypeHook.Enable();
+            GetInt.Enable();
         }
         else
         {
-            GetEventTypeHook.Disable();
+            GetInt.Disable();
             ContextTooltipHandleHook.Disable();
         }
     }

@@ -37,6 +37,7 @@ internal unsafe class TextElementHook : HookableElement
         PetServices.StringHelper.Remove((nint)textNode);
     }
     
+    // Gets called surprisingly little, only in bulk when you open a menu.
     private void SetTextDetour(AtkTextNode* textNode, CStringPointer stringPtr)
     {
         if (!PetServices.StringHelper.OurReplace)

@@ -13,17 +13,17 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class ChatHook : HookableElement
 {
-    private delegate nint GetLogMessageRawDelegate(RaptureLogModule* logModule, int index, nint unk3);
-    private delegate nint ClearLogDelegate(RaptureLogModule* logModule);
-    
-    [Signature("E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 49 8B 9E", DetourName = nameof(GetLogMessageRawDetour))]
-    private readonly Hook<GetLogMessageRawDelegate>? GetLogMessageRawHook = null;
-    
-    [Signature("E8 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 84 E4", DetourName = nameof(ClearLogDetour))]
-    private readonly Hook<ClearLogDelegate>? ClearLogHook = null;
+    private delegate nint GetLogMessageRawDelegate(RaptureLogModule* logModule, int index, nint unk3); 
+    private delegate nint ClearLogDelegate(RaptureLogModule* logModule); 
+     
+    [Signature("E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 49 8B 9E", DetourName = nameof(GetLogMessageRawDetour))] 
+    private readonly Hook<GetLogMessageRawDelegate>? GetLogMessageRawHook = null; 
+     
+    [Signature("E8 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 84 E4", DetourName = nameof(ClearLogDetour))] 
+    private readonly Hook<ClearLogDelegate>? ClearLogHook = null; 
     
     private readonly Hook<RaptureLogModule.Delegates.FormatLogMessage> FormatLogMessageHook;
-    private readonly IEphemaralChatHandler ChatHandler;
+    private readonly IEphemaralChatHandler                             ChatHandler;
     
     private int  _lastIndex = -1;
     private bool _myCall    = false;

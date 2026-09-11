@@ -22,11 +22,11 @@ internal unsafe class CharacterManagerHook : HookableElement
     private const uint PlayerMaxInObjectTable = 100;
     private const byte IslandPetSubKind       = 10;
     
-    private readonly Hook<Companion.Delegates.OnInitialize>?    OnInitializeCompanionHook;
-    private readonly Hook<Companion.Delegates.Terminate>?       OnTerminateCompanionHook;
-    private readonly Hook<BattleChara.Delegates.OnInitialize>?  OnInitializeBattleCharaHook;
-    private readonly Hook<BattleChara.Delegates.Terminate>?     OnTerminateBattleCharaHook;
-    private readonly Hook<BattleChara.Delegates.Dtor>?          OnDestroyBattleCharaHook;
+    private readonly Hook<Companion.Delegates.OnInitialize>    OnInitializeCompanionHook;
+    private readonly Hook<Companion.Delegates.Terminate>       OnTerminateCompanionHook;
+    private readonly Hook<BattleChara.Delegates.OnInitialize>  OnInitializeBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Terminate>     OnTerminateBattleCharaHook;
+    private readonly Hook<BattleChara.Delegates.Dtor>          OnDestroyBattleCharaHook;
 
     private readonly IPettableDatabase                          Database;
     private readonly ILegacyDatabase                            LegacyDatabase;
@@ -50,15 +50,24 @@ internal unsafe class CharacterManagerHook : HookableElement
 
     public override void Init()
     {
-        OnInitializeCompanionHook?.Enable();
-        OnTerminateCompanionHook?.Enable();
-        OnInitializeBattleCharaHook?.Enable();
-        OnTerminateBattleCharaHook?.Enable();
-        OnDestroyBattleCharaHook?.Enable();
+        OnInitializeCompanionHook.Enable();
+        OnTerminateCompanionHook.Enable();
+        OnInitializeBattleCharaHook.Enable();
+        OnTerminateBattleCharaHook.Enable();
+        OnDestroyBattleCharaHook.Enable();
 
         FloodInitialList();
     }
 
+    protected override void OnDispose()
+    {
+        OnInitializeCompanionHook.Dispose();
+        OnTerminateCompanionHook.Dispose();
+        OnInitializeBattleCharaHook.Dispose();
+        OnTerminateBattleCharaHook.Dispose();
+        OnDestroyBattleCharaHook.Dispose();
+    }
+    
     private void FloodInitialList()
     {
         PetServices.PetLog.LogInfo("Flooding Initial Object Table.");
@@ -427,13 +436,4 @@ internal unsafe class CharacterManagerHook : HookableElement
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int CreateActualIndex(ushort index)
         => (int)Math.Floor(index * 0.5f);
-    
-    protected override void OnDispose()
-    {
-        OnInitializeCompanionHook?.Dispose();
-        OnTerminateCompanionHook?.Dispose();
-        OnInitializeBattleCharaHook?.Dispose();
-        OnTerminateBattleCharaHook?.Dispose();
-        OnDestroyBattleCharaHook?.Dispose();
-    }
 }

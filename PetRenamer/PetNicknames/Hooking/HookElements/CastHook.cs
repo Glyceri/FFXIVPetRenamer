@@ -1,8 +1,6 @@
-using Dalamud.Game.Gui.FlyText;
 using Dalamud.Hooking;
-using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -12,44 +10,44 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class CastHook : HookableElement
 {
-    private const int SuccessFullCastFlag = 534;
+    private const int UsedLogMessageId = 534; // <head(<if([gstr1=gstr2],you,<if(gnum7,<ennoun(ObjStr,2,gnum7,1,1)>,gstr2)>)>)> <if([gstr1=gstr2],cast,casts)> <string(lstr1)>.
     
-    private delegate void AddToScreenLogWithLogMessageIdDelegate(BattleChara* a1, BattleChara* a2, int logMessageId, char unk4, int castId, int statusId, int stackCount, int damageType);
-
-    [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B9 9E 64 00 00", DetourName = nameof(AddToScreenLogWithLogMessageIdDetour))]
-    private readonly Hook<AddToScreenLogWithLogMessageIdDelegate>? AddToScreenLogWithLogMessageIdHook = null;
+    private readonly Hook<BattleLog.Delegates.AddToScreenLogWithLogMessageId> AddToScreenLogWithLogMessageIdHook;
     
     public CastHook(DalamudServices services, IPetServices petServices) 
-        : base(services, petServices) { }
+        : base(services, petServices)
+    {
+        AddToScreenLogWithLogMessageIdHook = DalamudServices.Hooking.HookFromAddress<BattleLog.Delegates.AddToScreenLogWithLogMessageId>((nint)BattleLog.MemberFunctionPointers.AddToScreenLogWithLogMessageId, AddToScreenLogWithLogMessageIdDetour);
+    }
 
     public override void Init()
     {
-        AddToScreenLogWithLogMessageIdHook?.Enable();
+        AddToScreenLogWithLogMessageIdHook.Enable();
     }
     
     protected override void OnDispose()
     {
-        AddToScreenLogWithLogMessageIdHook?.Dispose();
+        AddToScreenLogWithLogMessageIdHook.Dispose();
     }
     
-    private void AddToScreenLogWithLogMessageIdDetour(BattleChara* target, BattleChara* castDealer, int logMessageId, char a4, int castId, int a6, int a7, int a8)
+    private void AddToScreenLogWithLogMessageIdDetour(BattleChara* target, BattleChara* source, int logMessageId, byte actionKind, uint actionId, int value1, int value2, int value3)
     {
-        PetServices.PetCastHelper.SetLatestCast((nint)target, (nint)castDealer, castId);
+        PetServices.PetCastHelper.SetLatestCast((nint)target, (nint)source, (int)actionId);
         
-        AddToScreenLogWithLogMessageIdHook?.Original(target, castDealer, logMessageId, a4, castId, a6, a7, a8);
+        AddToScreenLogWithLogMessageIdHook?.Original(target, source, logMessageId, actionKind, actionId, value1, value2, value3);
         
-        if (logMessageId != SuccessFullCastFlag)
+        if (logMessageId != UsedLogMessageId)
         {
             return;
         }
 
-        IPettableUser? user = PetServices.UserList.GetUser((nint)castDealer, UserListFindType.PetMeansOwner);
+        IPettableUser? user = PetServices.UserList.GetUser((nint)source, UserListFindType.PetMeansOwner);
 
         if (user == null)
         {
             return;
         }
         
-        user.OnLastCastChanged((uint)castId);
+        user.OnLastCastChanged(actionId);
     }
 }

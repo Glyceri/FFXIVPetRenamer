@@ -1,8 +1,6 @@
 using Dalamud.Hooking;
 using Dalamud.Utility;
-using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.Completion;
 using FFXIVClientStructs.FFXIV.Component.Text;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
@@ -20,16 +18,15 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
     public DalamudSeString? LastGottenPronoun         { get; private set; }
     public DalamudSeString? PreviousLastGottenPronoun { get; private set; }
     
-    private delegate uint LocalizeProcessNounDelegate(Localize* localize, Utf8String* sheetName, Utf8String* outcomeString);
-    
-    [Signature("E8 ?? ?? ?? ?? 84 C0 74 ?? ?? ?? ?? 4C 8D 4D", DetourName = nameof(LocalizeProcessNounDetour))]
-    private readonly Hook<LocalizeProcessNounDelegate>? LocalizeProcessNounHook = null!;
+    private readonly Hook<Localize.Delegates.ProcessNoun> LocalizeProcessNounHook;
     
     private readonly List<string> AllowedSheetNames = [];
     
     public PronounHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices)
     {
+        LocalizeProcessNounHook = DalamudServices.Hooking.HookFromAddress<Localize.Delegates.ProcessNoun>((nint)Localize.MemberFunctionPointers.ProcessNoun, LocalizeProcessNounDetour);
+        
         Register<Companion>();
         Register<BNpcName>();
         Register<Pet>();
@@ -48,26 +45,31 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
         LocalizeProcessNounHook?.Dispose();
     }
     
-    private uint LocalizeProcessNounDetour(Localize* localize, Utf8String* sheetName, Utf8String* outcomeString)
+    private bool LocalizeProcessNounDetour(Localize* localize, Localize.NounParams* nounParams, Utf8String* outString)
     {
-        uint returner = LocalizeProcessNounHook!.OriginalDisposeSafe(localize, sheetName, outcomeString);
+        bool returner = LocalizeProcessNounHook!.OriginalDisposeSafe(localize, nounParams, outString);
         
-        if (sheetName == null)
+        if (nounParams == null)
         {
             return returner;
         }
         
-        string sheetString = sheetName->ExtractText();
+        if (nounParams->SheetName.IsEmpty)
+        {
+            return returner;
+        }
+        
+        string sheetString = nounParams->SheetName.ExtractText();
         
         if (!AllowedSheetNames.Contains(sheetString))
         {
             return returner;
         }
         
-        PetServices.PetLog.DevLogInfo($"ProcessNounDetour: [{sheetName->ToString()}] [{outcomeString->ToString()}].");
+        PetServices.PetLog.DevLogInfo($"ProcessNounDetour: [{nounParams->SheetName.ToString()}] [{outString->ToString()}].");
         
         PreviousLastGottenPronoun = LastGottenPronoun;
-        LastGottenPronoun         = outcomeString->StringPtr.AsDalamudSeString();
+        LastGottenPronoun         = outString->StringPtr.AsDalamudSeString();
         
         return returner;
     }
