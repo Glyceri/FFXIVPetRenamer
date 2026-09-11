@@ -43,7 +43,7 @@ internal static class PluginConstants
     private static readonly PetRegistration LivingShadow        = new PetRegistration(pet: 17,  modelChara: 2621,  bnpcName: 8229,   action: 16472,  SkeletonType.BattlePet, LegacySkeletonType.DarkKnight);
 
     
-    public static readonly PetRegistration[] PetRegistrations = 
+    public static readonly PetRegistration[] BattlePetRegistrations = 
     [
         Eos,
         Selene,
@@ -112,4 +112,68 @@ internal static class PluginConstants
     // 4 --> Eos
     public static readonly PetSkeleton[] BaseSkeletons 
         = [Carbuncle.PetSkeleton, GarudaEgi.PetSkeleton, TitanEgi.PetSkeleton, IfritEgi.PetSkeleton, Eos.PetSkeleton];
+    
+    
+    // Cu Sith, 4867
+    // Salamander, 151
+    // Treant, 104
+    // Cu Sith, 4867
+    // Squirrel, 25
+    // Lamb, 287
+    // Pugil, 356
+    // Opo-opo, 31
+    // Dodo, 173
+    // Coblyn, 176
+    // Diremite, 21
+    // Megalocrab, 148
+    // Wespe, 359
+    // Vulture, 39
+    // Mandragora, 297
+    // Geshunpest, 2185
+    // Puk, 130
+    // Crab, 355
+    // Mantis, 374
+    // Slime, 292
+    // Dullahan, 121
+    // Bat, 98
+    // Flying Trap, 48
+    // Ziz, 157
+    // Sabotender, 142
+    // Golem, 81
+    // Apkallu, 190
+    // Adamantoise, 94
+    // Buffalo, 138
+    // Uragnite, 364
+    // Worm, 238
+    // Spriggan, 109
+    // Goobbue, 198
+    // Gigantoad, 126
+    // Colibri, 360
+    // Coeurl, 65
+    // Raptor, 96
+    // Drake, 179
+    // Treant, 104
+    // Antling, 195
+    // Chimera, 197
+    // Morbol, 145
+    // Ghost, 264
+    // Salamander, 151
+    // Cobra, 235
+    // Hydra, 247
+    // Damselfly, 654
+    // Rotting Goobbue, 640
+    // Zu, 4925
+    // Ice Golem, 825
+    // Karlabos, 824
+    // Rafflesia, 655
+    // Behemoth, 165
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

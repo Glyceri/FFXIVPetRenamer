@@ -37,7 +37,7 @@ internal class WriterElementVersion2 : IDataWriterElement
             string      name = database.Names[i];
             PetSkeleton id   = database.Ids[i];
 
-            if (id.SkeletonId == 0)
+            if (id.LeadingSkeletonId == 0)
             {
                 continue;
             }

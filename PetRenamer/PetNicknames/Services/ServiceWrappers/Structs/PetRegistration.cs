@@ -2,8 +2,8 @@ using Lumina.Excel.Sheets;
 using Lumina.Extensions;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets;
 using System.Linq;
-using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
@@ -38,7 +38,7 @@ internal readonly struct PetRegistration
     public readonly Pet? GetBattlePet(IPetSheets sheets)
         => _skeletonType == SkeletonType.BattlePet ? sheets.GetSheetPet(_pet) : null;
     
-    public readonly XBMPet? GetBeastMasterPet(IPetSheets sheets)
+    public readonly XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere? GetBeastMasterPet(IPetSheets sheets)
         => _skeletonType == SkeletonType.BeastMaster ? sheets.GetSheetXBMPet(_pet) : null;
     
     public readonly BNpcName? GetBNPCName(IPetSheets sheets)
@@ -48,14 +48,14 @@ internal readonly struct PetRegistration
         => sheets.GetAction(_action);
     
     public static PetRegistration? GetRegistrationFromPet(uint pet)
-        => PluginConstants.PetRegistrations.FirstOrNull(x => x._pet == pet);
+        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._pet == pet);
     
     public static PetRegistration? GetRegistrationFromAction(uint action)
-        => PluginConstants.PetRegistrations.FirstOrNull(x => x._action == action);
+        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._action == action);
     
     public static PetRegistration? GetRegistrationFromBNPCName(uint bnpcName)
-        => PluginConstants.PetRegistrations.FirstOrNull(x => x._bnpcName == bnpcName);
+        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._bnpcName == bnpcName);
     
     public static PetRegistration[] GetRegistrationsFromClass(LegacySkeletonType classJob)
-        => PluginConstants.PetRegistrations.Where(x => x._legacySkeletonType == classJob).ToArray();
+        => PluginConstants.BattlePetRegistrations.Where(x => x._legacySkeletonType == classJob).ToArray();
 }

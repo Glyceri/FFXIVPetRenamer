@@ -4,12 +4,12 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Factory;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Action = Lumina.Excel.Sheets.Action;
-using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
@@ -26,7 +26,7 @@ internal class SheetsWrapper : IPetSheets
     private readonly ExcelSheet<BNpcName>    BNpcNameSheet;
     private readonly ExcelSheet<PetMirage>   PetMirageSheet;
     private readonly ExcelSheet<LogMessage>  LogMessageSheet;
-    private readonly ExcelSheet<XBMPet>      XBMPetSheet;
+    private readonly ExcelSheet<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>      XBMPetSheet;
 
     public SheetsWrapper(DalamudServices dalamudServices)
     {
@@ -39,7 +39,7 @@ internal class SheetsWrapper : IPetSheets
         BNpcNameSheet    = dalamudServices.DataManager.GetExcelSheet<BNpcName>();
         PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
         LogMessageSheet  = dalamudServices.DataManager.GetExcelSheet<LogMessage>();
-        XBMPetSheet      = dalamudServices.DataManager.GetExcelSheet<XBMPet>();
+        XBMPetSheet      = dalamudServices.DataManager.GetExcelSheet<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>();
         
         SetupSheetDataCache();
     }
@@ -67,9 +67,9 @@ internal class SheetsWrapper : IPetSheets
 
     private void SetupBattlePetSheet()
     {
-        foreach (Pet pet in BattlePetSheet)
+        foreach (PetRegistration petRegistration in PluginConstants.BattlePetRegistrations)
         {
-            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(this, pet);
+            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(this, petRegistration);
             
             if (petSheetData == null)
             {
@@ -133,7 +133,7 @@ internal class SheetsWrapper : IPetSheets
         
         for (int i = 0; i < PluginConstants.BaseSkeletons.Length; i++)
         {
-            if (PluginConstants.BaseSkeletons[i] != petSkeleton)
+            if (petSkeleton != PluginConstants.BaseSkeletons[i])
             {
                 continue;
             }
@@ -272,7 +272,7 @@ internal class SheetsWrapper : IPetSheets
     public Pet? GetSheetPet(uint index)
         => BattlePetSheet.GetRow(index);
     
-    public XBMPet? GetSheetXBMPet(uint index)
+    public XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere? GetSheetXBMPet(uint index)
         => XBMPetSheet.GetRow(index);
     
     [Obsolete]

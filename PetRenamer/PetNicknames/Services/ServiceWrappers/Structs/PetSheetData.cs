@@ -5,21 +5,21 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 internal readonly struct PetSheetData : IPetSheetData
 {
-    public PetSkeleton  Model         { get; }
-    public uint         Icon          { get; }
+    public PetSkeleton      Model         { get; }
+    public uint             Icon          { get; }
     
-    public string       Singular      { get; }
+    public string           Singular      { get; }
 
-    public sbyte        Pronoun       { get; }
+    public sbyte            Pronoun       { get; }
     
-    public string       ActionName    { get; } = string.Empty;
-    public uint         ActionId      { get; } = 0;
+    public string           ActionName    { get; } = string.Empty;
+    public uint             ActionId      { get; } = 0;
 
-    public int          LegacyModelId { get; }
+    public int              LegacyModelId { get; }
 
-    public uint         RaceId        { get; } = 0;
-    public string?      RaceName      { get; } = null;
-    public string?      BehaviourName { get; } = null;
+    public uint             RaceId        { get; } = 0;
+    public string?          RaceName      { get; } = null;
+    public string?          BehaviourName { get; } = null;
 
     public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, uint actionId)
         : this(model, legacyModelId, icon, pronoun, singular, actionName, actionId)

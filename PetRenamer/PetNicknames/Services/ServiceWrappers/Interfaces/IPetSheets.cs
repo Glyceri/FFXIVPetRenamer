@@ -1,11 +1,11 @@
 ﻿using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 using Action = Lumina.Excel.Sheets.Action;
-using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
@@ -32,7 +32,7 @@ internal interface IPetSheets
     IPetSheetData[]     AllPets { get; }
     
     Pet?                GetSheetPet(uint index);
-    XBMPet?             GetSheetXBMPet(uint index);
+    XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere?             GetSheetXBMPet(uint index);
     
     [Obsolete] PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob);
 }

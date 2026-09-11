@@ -16,7 +16,7 @@ namespace PetRenamer.PetNicknames.WritingAndParsing.WriterElements;
 internal class WriterElementVersion4 : IDataWriterElement
 {
     private string GetStringFromPetSkeleton(PetSkeleton petSkeleton)
-        => $"{petSkeleton.SkeletonId}{PluginConstants.forbiddenCharacter}{(int)petSkeleton.SkeletonType}";
+        => $"{petSkeleton.LeadingSkeletonId}{PluginConstants.forbiddenCharacter}{(int)petSkeleton.SkeletonType}";
 
     public ParseVersion WriteVersion
         => ParseVersion.Version4;

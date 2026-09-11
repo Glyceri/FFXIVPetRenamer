@@ -74,20 +74,21 @@ internal class PetDevWindow : PetWindow
             Open();
         }
 
-        devStructList.Add(new DevStruct("User List",        DrawUserList));
-        devStructList.Add(new DevStruct("Party",            DrawParty));
-        devStructList.Add(new DevStruct("Cast",             DrawCasts));
-        devStructList.Add(new DevStruct("Targeting",        DrawTargeting));
-        devStructList.Add(new DevStruct("Sharing Dict",     DrawSharing));
-        devStructList.Add(new DevStruct("IPC Tester",       DrawIPCTester, OnIPCUpdate));
-        devStructList.Add(new DevStruct("Database",         DrawDatabase));
-        devStructList.Add(new DevStruct("Sheets",           DrawSheets));
-        devStructList.Add(new DevStruct("Pronoun",          DrawPronoun));
-        devStructList.Add(new DevStruct("NameError",        DrawNameError));
-        devStructList.Add(new DevStruct("Island",           DrawIsland));
-        devStructList.Add(new DevStruct("Chat Database",    DrawChatDatabase));
-        devStructList.Add(new DevStruct("Translator",       DrawTranslatorHelp));
-        devStructList.Add(new DevStruct("TextReplacer",     DrawTextReplacer));
+        devStructList.Add(new DevStruct("User List",            DrawUserList));
+        devStructList.Add(new DevStruct("Party",                DrawParty));
+        devStructList.Add(new DevStruct("Cast",                 DrawCasts));
+        devStructList.Add(new DevStruct("Targeting",            DrawTargeting));
+        devStructList.Add(new DevStruct("Sharing Dict",         DrawSharing));
+        devStructList.Add(new DevStruct("IPC Tester",           DrawIPCTester, OnIPCUpdate));
+        devStructList.Add(new DevStruct("Database",             DrawDatabase));
+        devStructList.Add(new DevStruct("Sheets",               DrawSheets));
+        devStructList.Add(new DevStruct("Pronoun",              DrawPronoun));
+        devStructList.Add(new DevStruct("NameError",            DrawNameError));
+        devStructList.Add(new DevStruct("Island",               DrawIsland));
+        devStructList.Add(new DevStruct("Chat Database",        DrawChatDatabase));
+        devStructList.Add(new DevStruct("Translator",           DrawTranslatorHelp));
+        devStructList.Add(new DevStruct("TextReplacer",         DrawTextReplacer));
+        devStructList.Add(new DevStruct("Model Chara Sniffer",  DrawModelCharaSniffer));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -211,6 +212,55 @@ internal class PetDevWindow : PetWindow
             
             ImGui.EndListBox();
         }
+    }
+    
+    private unsafe void DrawModelCharaSniffer()
+    {
+        IPettableUser? localUser = PetServices.UserList.LocalPlayer;
+        
+        if (localUser == null)
+        {
+            ImGui.Text("No Local User");
+            
+            return;
+        }
+        
+        IPettableEntity? target = PetServices.TargetManager.GetLeadingTarget(localUser);
+        
+        if (target == null)
+        {
+            ImGui.Text("No Target");
+            
+            return;
+        }
+        
+        if (target is not IPettableBattlePet battlePet)
+        {
+            ImGui.Text("target is NOT IPettableBattlePet");
+            
+            return;
+        }
+        
+        BattleChara* battleChara = (BattleChara*)target.Address;
+        
+        if (battleChara == null)
+        {
+            ImGui.Text("battleChara is null");
+            
+            return;
+        }
+        
+        ImGui.Text("Target: " + battleChara->GetName().ExtractText());
+        ImGui.Text("Model Chara Id: " + battleChara->Character.ModelContainer.ModelCharaId);
+        
+        string copyText = $"// {battleChara->GetName().ExtractText()}, {battleChara->Character.ModelContainer.ModelCharaId}";
+        
+        if (ImGui.Button("Create quick clipboard copy"))
+        {
+            ImGui.SetClipboardText(copyText);
+        }
+        
+        ImGui.Text(copyText);
     }
     
     private void DrawChatDatabase()
@@ -358,7 +408,7 @@ internal class PetDevWindow : PetWindow
             return true;
         }
         
-        if (pet.Model.SkeletonId.ToString().Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase))
+        if (pet.Model.LeadingSkeletonId.ToString().Contains(activeSearchText, StringComparison.InvariantCultureIgnoreCase))
         {
             return true;
         }

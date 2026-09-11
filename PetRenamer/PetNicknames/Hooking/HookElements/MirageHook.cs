@@ -45,7 +45,7 @@ internal class MirageHook : HookableElement
     }
     
     private PetSkeleton GetPetSkeleton(uint id, PetSkeleton baseSkeleton)
-        => new PetSkeleton(PetServices.PetSheets.GetPetMirage(id)?.ModelChara.RowId ?? PetServices.PetSheets.GetPet(baseSkeleton)?.Model.SkeletonId ?? 0, SkeletonType.BattlePet);
+        => new PetSkeleton(PetServices.PetSheets.GetPetMirage(id)?.ModelChara.RowId ?? PetServices.PetSheets.GetPet(baseSkeleton)?.Model.LeadingSkeletonId ?? 0, SkeletonType.BattlePet);
     
     private void OnConfigChanged(object? _, ConfigChangeEvent change)
     {  

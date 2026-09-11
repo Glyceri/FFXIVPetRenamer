@@ -4,24 +4,23 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
 internal interface IPetSheetData
 {
-    PetSkeleton Model         { get; }
-    uint        Icon          { get; }
+    PetSkeleton      Model         { get; }
+    uint             Icon          { get; }
 
-    string      Singular      { get; }
+    string           Singular      { get; }
 
-    sbyte       Pronoun       { get; }
+    sbyte            Pronoun       { get; }
     
-    uint        RaceId        { get; }
-    string?     RaceName      { get; }
-    string?     BehaviourName { get; }
+    uint             RaceId        { get; }
+    string?          RaceName      { get; }
+    string?          BehaviourName { get; }
 
-    string      ActionName    { get; }
-    uint        ActionId      { get; }
+    string           ActionName    { get; }
+    uint             ActionId      { get; }
 
-    int         LegacyModelId { get; }
+    int              LegacyModelId { get; }
 
-    bool        IsPet(string name);
-    bool        IsAction(uint action);
-
-    PetSheetData MakeSoft(IPetSheetData newData);
+    bool             IsPet(string name);
+    bool             IsAction(uint action);
+    PetSheetData     MakeSoft(IPetSheetData newData);
 }

@@ -40,7 +40,7 @@ internal class WriterElementVersion3 : IDataWriterElement
             string      edgeColour  = database.EdgeColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
             string      textColour  = database.TextColours[i]?.ToString("G", CultureInfo.InvariantCulture) ?? "null";
 
-            if (id.SkeletonId == 0)
+            if (id.LeadingSkeletonId == 0)
             {
                 continue;
             }

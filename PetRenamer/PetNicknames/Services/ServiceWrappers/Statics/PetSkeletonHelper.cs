@@ -12,7 +12,7 @@ internal static class PetSkeletonHelper
             return true;
         }
 
-        if (petSkeleton.SkeletonId == 0)
+        if (petSkeleton.LeadingSkeletonId == 0)
         {
             return true;
         }
@@ -22,7 +22,7 @@ internal static class PetSkeletonHelper
 
     public static void AsLegacy(this PetSkeleton petSkeleton, out int Id)
     {
-        Id = (int)petSkeleton.SkeletonId;
+        Id = (int)petSkeleton.LeadingSkeletonId;
 
         SkeletonType type = petSkeleton.SkeletonType;
 
@@ -46,7 +46,7 @@ internal static class PetSkeletonHelper
         {
             PetSkeleton skeleton = petSkeletonArray[i];
 
-            ids[i]            = (int)skeleton.SkeletonId;
+            ids[i]            = (int)skeleton.LeadingSkeletonId;
             SkeletonType type = skeleton.SkeletonType;
 
             if (type == SkeletonType.BattlePet)
@@ -71,7 +71,7 @@ internal static class PetSkeletonHelper
         {
             PetSkeleton skeleton = petSkeletonArray[i];
 
-            ids[i]           = (int)skeleton.SkeletonId;
+            ids[i]           = (int)skeleton.LeadingSkeletonId;
             skeletonTypes[i] = (int)skeleton.SkeletonType;
         }
     }

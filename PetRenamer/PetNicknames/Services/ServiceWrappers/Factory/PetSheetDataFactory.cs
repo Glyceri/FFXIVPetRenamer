@@ -61,19 +61,8 @@ internal static class PetSheetDataFactory
         return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, actionName, action);
     }
     
-    public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, Pet pet)
+    public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, PetRegistration petRegistration)
     {
-        uint sheetSkeleton = pet.RowId;
-
-        PetRegistration? registration = PetRegistration.GetRegistrationFromPet(sheetSkeleton);
-
-        if (registration == null)
-        {
-            return null;
-        }
-        
-        PetRegistration petRegistration = registration.Value;
-        
         Action? petAction = petRegistration.GetAction(petSheets);
         
         if (petAction == null)

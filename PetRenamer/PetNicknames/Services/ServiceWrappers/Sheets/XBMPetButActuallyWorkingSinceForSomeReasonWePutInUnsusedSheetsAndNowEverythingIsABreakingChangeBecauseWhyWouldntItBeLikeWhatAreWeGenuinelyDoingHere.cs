@@ -8,8 +8,8 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets;
 
 [GeneratedCode("Lumina.Excel.Generator", "2.0.0")]
 [Sheet("XBMPet", 0xED3C4185)]
-public readonly unsafe struct XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere(ExcelPage page, uint offset, uint row)
-    : IExcelRow<XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere>
+public readonly unsafe struct XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere(ExcelPage page, uint offset, uint row)
+    : IExcelRow<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>
 {
     public ExcelPage ExcelPage 
         => page;
@@ -76,6 +76,6 @@ public readonly unsafe struct XBMPetButActuallyWorkingSinceDalamudWontUpdateItLi
     private static bool InflictsStatusCtor(ExcelPage page, uint parentOffset, uint offset, uint i)
         => page.ReadBool(offset + 33 + i);
 
-    static XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere IExcelRow<XBMPetButActuallyWorkingSinceDalamudWontUpdateItLikeWhatAreWeGenuinelyDoingHere>.Create(ExcelPage page, uint offset, uint row) =>
+    static XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere IExcelRow<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>.Create(ExcelPage page, uint offset, uint row) =>
         new(page, offset, row);
 }

@@ -639,7 +639,7 @@ internal class PetListWindow : PetWindow
             Vector3? edgeColour = validEdgeColours[i];
             Vector3? textColour = validTextColours[i];
 
-            if (!(Valid(name) || Valid(id.SkeletonId.ToString()) || Valid(petData.Singular)))
+            if (!(Valid(name) || Valid(id.LeadingSkeletonId.ToString()) || Valid(petData.Singular)))
             {
                 continue;
             }
