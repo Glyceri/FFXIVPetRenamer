@@ -15,6 +15,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
@@ -54,7 +55,8 @@ internal class PetDevWindow : PetWindow
     protected override Vector2 MinSize { get; } = new Vector2(350, 136);
     protected override Vector2 MaxSize { get; } = new Vector2(2000, 2000);
     protected override Vector2 DefaultSize { get; } = new Vector2(800, 400);
-
+    protected override ImGuiCond AppearCond => ImGuiCond.FirstUseEver;
+    
     private int currentActive = 0;
     private readonly List<DevStruct> devStructList = new List<DevStruct>();
 
@@ -89,6 +91,8 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Translator",           DrawTranslatorHelp));
         devStructList.Add(new DevStruct("TextReplacer",         DrawTextReplacer));
         devStructList.Add(new DevStruct("Model Chara Sniffer",  DrawModelCharaSniffer));
+        devStructList.Add(new DevStruct("Horns",                DrawHorns));
+        devStructList.Add(new DevStruct("Hover Service",        DrawHoverService));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -701,6 +705,24 @@ internal class PetDevWindow : PetWindow
         }
     }
     
+    private unsafe void DrawHorns()
+    {
+        ActionManager* actionManager = ActionManager.Instance();
+        
+        if (actionManager == null)
+        {
+            return;
+        }
+        
+        ImGui.Text($"Raw: {actionManager->BeastmasterPets[0]}, {actionManager->BeastmasterPets[1]}, {actionManager->BeastmasterPets[2]}");
+        
+        ImGui.Separator();
+        
+        ImGui.Text($"[Service] Horn 1: {PetServices.HornService.GetPetForSlot(0)?.Pet.ValueNullable?.Name}");
+        ImGui.Text($"[Service] Horn 2: {PetServices.HornService.GetPetForSlot(1)?.Pet.ValueNullable?.Name}");
+        ImGui.Text($"[Service] Horn 3: {PetServices.HornService.GetPetForSlot(2)?.Pet.ValueNullable?.Name}");
+    }
+    
     unsafe void DrawCasts()
     {
         if (!CanDrawDebugMenu())
@@ -908,6 +930,12 @@ internal class PetDevWindow : PetWindow
         }
     }
 
+    private void DrawHoverService()
+    {
+       ImGui.Text(PetServices.HoverService.CurrentlyHoveredPet?.Singular);
+       ImGui.Text(PetServices.HoverService.CurrentNameType.ToString());
+    }
+    
     void ClearIPC(ulong chara)
     {
         try

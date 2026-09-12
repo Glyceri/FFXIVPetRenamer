@@ -67,7 +67,7 @@ internal unsafe class PartyHook : HookableElement
             return;
         }
 
-        IPettablePet? pet = localPlayer.GetYoungestPet(SkeletonType.BattlePet);
+        IPettablePet? pet = localPlayer.GetYoungestPet([SkeletonType.BattlePet, SkeletonType.BeastMaster]);
 
         if (pet == null)
         {

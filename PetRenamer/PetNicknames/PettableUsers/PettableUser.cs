@@ -251,6 +251,23 @@ internal unsafe class PettableUser : IPettableUser
         return null;
     }
 
+    public IPettablePet? GetYoungestPet(SkeletonType[] filter)
+    {
+        IPettablePet? youngestPet = null;
+        
+        int index = -1;
+        
+        while (++index < filter.Length && youngestPet == null)
+        {
+            SkeletonType skeletonType = filter[index];
+            
+            youngestPet = GetYoungestPet(skeletonType);
+        }
+        
+        return youngestPet;
+    }
+    
+    
     public void SetBattlePet(BattleChara* pointer)
     {
         for (int i = PettablePets.Count - 1; i >= 0; i--)
@@ -268,9 +285,38 @@ internal unsafe class PettableUser : IPettableUser
         switch (pointer->BattleNpcSubKind)
         {
             case BattleNpcSubKind.Buddy:      CreateNewPet(new PettableChocoboPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices)); break;
-            case BattleNpcSubKind.Pet:        CreateNewPet(new PettablePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));        break;
+            case BattleNpcSubKind.Pet:        HandleSubKindPet(pointer); break;
             case BattleNpcSubKind.LovmMinion: CreateNewPet(new PettableLovmPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));    break;
         }
+    }
+    
+    private void HandleSubKindPet(BattleChara* pointer)
+    {
+        int modelCharaId = pointer->ModelContainer.ModelCharaId;
+        
+        if (InList(modelCharaId, PluginConstants.BattlePetRegistrations))
+        {
+            CreateNewPet(new PettablePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
+        }
+        else if (InList(modelCharaId, PluginConstants.BeastMasterPetRegistrations))
+        {
+            CreateNewPet(new PettableBeastMasterPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
+        }
+    }
+    
+    private bool InList(int modelCharaId, PetRegistration[] petRegistrations)
+    {
+        foreach (PetRegistration petRegistration in petRegistrations)
+        {
+            if (petRegistration.PetSkeleton.LeadingSkeletonId != modelCharaId)
+            {
+                continue;
+            }
+        
+            return true;
+        }
+        
+        return false;
     }
 
     public void RemoveBattlePet(BattleChara* pointer)

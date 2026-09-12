@@ -205,11 +205,6 @@ internal unsafe class CharacterManagerHook : HookableElement
             HandleAsIsland(newBattleChara);
         }
     }
-
-    private void HandleAsLovmPet(BattleChara* bChara)
-    {
-        
-    }
     
     private void HandleAsCreatedPc(BattleChara* newBattleChara)
     {

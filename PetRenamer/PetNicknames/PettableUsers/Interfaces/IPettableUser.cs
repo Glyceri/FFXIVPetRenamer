@@ -19,7 +19,8 @@ internal unsafe interface IPettableUser : IBattleUser
     IPettablePet? GetPet(nint pet);
     IPettablePet? GetPet(GameObjectId gameObjectId);
     IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None);
-
+    IPettablePet? GetYoungestPet(SkeletonType[] filter);
+    
     string? GetCustomName(PetSkeleton petSkeleton);
 
     void OnLastCastChanged(uint cast);

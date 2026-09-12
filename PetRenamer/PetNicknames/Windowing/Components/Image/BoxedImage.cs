@@ -35,7 +35,7 @@ internal static class BoxedImage
         
         uint iconIndex = data.Icon;
         
-        if (data.Model.SkeletonType != SkeletonType.BattlePet) 
+        if (data.Model.SkeletonType == SkeletonType.Minion) 
         {
             uint adder = 0;
 

@@ -9,5 +9,5 @@ internal enum LegacySkeletonType : sbyte
     Summoner    = -2,
     Scholar     = -3,
     Machinist   = -4,
-    DarkKnight  = -5
+    DarkKnight  = -5,
 }

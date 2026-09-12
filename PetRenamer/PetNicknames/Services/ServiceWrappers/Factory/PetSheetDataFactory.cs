@@ -5,6 +5,7 @@ using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Factory;
 
@@ -83,6 +84,29 @@ internal static class PetSheetDataFactory
         uint   actionRowId       = petAction.Value.RowId;
         
         return new PetSheetData(petRegistration.PetSkeleton, -1, petIcon, bnpcName.Value.Pronoun, name, actionName, actionRowId);
+    }
+    
+    public static PetSheetData? CreatePetSheetDataBeastMaster(IPetSheets petSheets, PetRegistration petRegistration)
+    {
+        XBMPet? pet = petRegistration.GetBeastMasterPet(petSheets);
+        
+        if (pet == null)
+        {
+            return null;
+        }
+        
+        BNpcName? bnpcName = petRegistration.GetBNPCName(petSheets);
+
+        if (bnpcName == null)
+        {
+            return null;
+        }
+        
+        uint   iconId            = pet.Value.Icon;
+        sbyte  pronoun           = bnpcName.Value.Pronoun;
+        string name              = bnpcName.Value.Singular.ExtractText().ToTitleCase();
+        
+        return new PetSheetData(petRegistration.PetSkeleton, -1, iconId, pronoun, name, name, petRegistration.GetRawAction());
     }
     
     private static string GermanReplace(string baseString, sbyte pronoun)

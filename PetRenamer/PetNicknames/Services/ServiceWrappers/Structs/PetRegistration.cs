@@ -16,7 +16,7 @@ internal readonly struct PetRegistration
     private readonly LegacySkeletonType _legacySkeletonType;
     private readonly PetSkeleton        _petSkeleton;
     
-    public PetRegistration(uint pet, uint modelChara, uint bnpcName, uint action, SkeletonType skeletonType, LegacySkeletonType legacySkeletonType)
+    public PetRegistration(uint pet, uint modelChara, uint bnpcName, uint action, SkeletonType skeletonType, LegacySkeletonType legacySkeletonType = LegacySkeletonType.None)
     {
         _pet                = pet;
         _bnpcName           = bnpcName;
@@ -47,15 +47,18 @@ internal readonly struct PetRegistration
     public readonly Action? GetAction(IPetSheets sheets)
         => sheets.GetAction(_action);
     
+    public uint GetRawAction()
+        => _action;
+    
     public static PetRegistration? GetRegistrationFromPet(uint pet)
-        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._pet == pet);
+        => PluginConstants.AllRegistrations.FirstOrNull(x => x._pet == pet);
     
     public static PetRegistration? GetRegistrationFromAction(uint action)
-        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._action == action);
+        => PluginConstants.AllRegistrations.FirstOrNull(x => x._action == action);
     
     public static PetRegistration? GetRegistrationFromBNPCName(uint bnpcName)
-        => PluginConstants.BattlePetRegistrations.FirstOrNull(x => x._bnpcName == bnpcName);
+        => PluginConstants.AllRegistrations.FirstOrNull(x => x._bnpcName == bnpcName);
     
     public static PetRegistration[] GetRegistrationsFromClass(LegacySkeletonType classJob)
-        => PluginConstants.BattlePetRegistrations.Where(x => x._legacySkeletonType == classJob).ToArray();
+        => PluginConstants.AllRegistrations.Where(x => x._legacySkeletonType == classJob).ToArray();
 }

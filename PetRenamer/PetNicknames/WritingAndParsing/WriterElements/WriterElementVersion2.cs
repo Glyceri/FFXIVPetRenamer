@@ -57,6 +57,5 @@ internal class WriterElementVersion2 : IDataWriterElement
         outcome = Convert.ToBase64String(Encoding.Unicode.GetBytes(outcome));
 
         return outcome;
-        
     }
 }

@@ -31,10 +31,11 @@ internal class ContextMenuHandler : IDisposable
     
     private void _Register()
     {
-        Register(new TargetContextMenu           (PetServices, WindowHandler));
-        Register(new MinionNoteBookContextMenu   (PetServices, WindowHandler));
-        Register(new MJIMinionNotebookContextMenu(PetServices, WindowHandler));
-        Register(new QuickPanelContextMenu       (PetServices, WindowHandler));
+        Register(new TargetContextMenu            (PetServices, WindowHandler));
+        Register(new MinionNoteBookContextMenu    (PetServices, WindowHandler));
+        Register(new MJIMinionNotebookContextMenu (PetServices, WindowHandler));
+        Register(new QuickPanelContextMenu        (PetServices, WindowHandler));
+        Register(new XBMMonsterNoteBookContextMenu(PetServices, WindowHandler));
     }
     
     public void Dispose()

@@ -22,4 +22,5 @@ internal interface IPetServices : IDisposable
     IDirtyListener       DirtyListener       { get; }
     IParty               Party               { get; }
     IChatRefresher       ChatRefresher       { get; }
+    IHornService         HornService         { get; }
 }

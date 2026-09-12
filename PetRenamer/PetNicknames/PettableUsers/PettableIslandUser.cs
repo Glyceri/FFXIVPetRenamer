@@ -51,6 +51,9 @@ internal unsafe class PettableIslandUser : IIslandUser
     public IPettablePet? GetYoungestPet(SkeletonType filter = SkeletonType.None)
         => null;
 
+    public IPettablePet? GetYoungestPet(SkeletonType[] filter)
+        => null;
+    
     public void RemoveBattlePet(BattleChara* pointer)
     {
         if (pointer == null)

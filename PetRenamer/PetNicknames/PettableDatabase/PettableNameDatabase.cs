@@ -81,8 +81,7 @@ internal class PettableNameDatabase : INamesDatabase
         }
 
         string? validName = MakeNameValid(name);
-
-        int index = GetIndex(id);
+        int     index     = GetIndex(id);
 
         if (index != -1)
         {

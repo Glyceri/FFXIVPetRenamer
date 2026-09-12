@@ -25,6 +25,7 @@ internal class PetServices : IPetServices
     public IDirtyListener       DirtyListener       { get; }
     public IParty               Party               { get; }
     public IChatRefresher       ChatRefresher       { get; }
+    public IHornService         HornService         { get; }
 
     public PetServices(DalamudServices services) 
     {
@@ -48,6 +49,7 @@ internal class PetServices : IPetServices
         
         Party               = new PartyService(UserList, services, DirtyListener);
         ChatRefresher       = new ChatRefresher(DirtyListener);
+        HornService         = new HornService(PetSheets);
         
         CheckConfigFailure();
     }

@@ -48,6 +48,7 @@ internal class SheetsWrapper : IPetSheets
     {
         SetupCompanionSheet();
         SetupBattlePetSheet();
+        SetupBeastMasterSheet();
     }
     
     private void SetupCompanionSheet()
@@ -70,6 +71,21 @@ internal class SheetsWrapper : IPetSheets
         foreach (PetRegistration petRegistration in PluginConstants.BattlePetRegistrations)
         {
             IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetData(this, petRegistration);
+            
+            if (petSheetData == null)
+            {
+                continue;
+            }
+            
+            PetSheetCache.Add(petSheetData);
+        }
+    }
+    
+    private void SetupBeastMasterSheet()
+    {
+        foreach (PetRegistration petRegistration in PluginConstants.BeastMasterPetRegistrations)
+        {
+            IPetSheetData? petSheetData = PetSheetDataFactory.CreatePetSheetDataBeastMaster(this, petRegistration);
             
             if (petSheetData == null)
             {

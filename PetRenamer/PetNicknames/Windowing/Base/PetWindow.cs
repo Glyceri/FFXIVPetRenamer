@@ -20,9 +20,10 @@ internal abstract class PetWindow : Window, IPetWindow
     public SkeletonType PetMode { get; private set; }
         = SkeletonType.Minion;
 
-    protected abstract Vector2 MinSize     { get; }
-    protected abstract Vector2 MaxSize     { get; }
-    protected abstract Vector2 DefaultSize { get; }
+    protected abstract Vector2   MinSize     { get; }
+    protected abstract Vector2   MaxSize     { get; }
+    protected abstract Vector2   DefaultSize { get; }
+    protected virtual  ImGuiCond AppearCond  { get; } = ImGuiCond.Appearing;
 
     public abstract bool ShowQuickButtons { get; }
     public abstract bool HasModeToggle    { get; }
@@ -74,7 +75,7 @@ internal abstract class PetWindow : Window, IPetWindow
     
     private void SetupWindowSize()
     {
-        SizeCondition       = ImGuiCond.Appearing;
+        SizeCondition       = AppearCond;
         
         Vector2 defaultSize = DefaultSize * WindowHandler.FontScale;
         Vector2 minSize     = MinSize     * WindowHandler.FontScale;

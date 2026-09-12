@@ -1,4 +1,3 @@
-using Dalamud.Game.NativeWrapper;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility;
@@ -18,7 +17,7 @@ internal unsafe class NamePlateHook : HookableElement
 {
     private readonly Hook<RaptureAtkModule.Delegates.UpdateBattleCharaNameplates>? NameplateHook;
     private readonly Hook<RaptureAtkModule.Delegates.UpdateNpcNameplates>?         NameplateMinionHook;
-
+    
     public NamePlateHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices) 
     {
@@ -37,26 +36,7 @@ internal unsafe class NamePlateHook : HookableElement
         NameplateHook?.Dispose();
         NameplateMinionHook?.Dispose();
     }
-
-    protected override void Refresh()
-    {
-        AtkUnitBasePtr namePlateAddon = DalamudServices.GameGui.GetAddonByName("NamePlate");
-
-        if (namePlateAddon.IsNull)
-        {
-            return;
-        }
-
-        AddonNamePlate* addonNamePlate = (AddonNamePlate*)namePlateAddon.Address;
-
-        if (addonNamePlate == null)
-        {
-            return;
-        }
-
-        addonNamePlate->UpdateAllNamePlates();
-    }
-
+    
     private int UpdateNameplateDetour(RaptureAtkModule* raptureAtkModule, RaptureAtkModule.NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex)
     {
         try
@@ -85,6 +65,9 @@ internal unsafe class NamePlateHook : HookableElement
         return NameplateMinionHook!.Original(raptureAtkModule, namePlateInfo, numArray, stringArray, gameObject, numArrayIndex, stringArrayIndex);
     }
 
+    // For some reason pet nameplates (Companion and Battle Pets) now update every frame,
+    // Not only that, they reset every frame, so I have to re-set it every... single... frame...
+    // Yeah I'm not thrilled about it either.
     private void SetNameplate(RaptureAtkModule.NamePlateInfo* namePlateInfo, nint obj)
     {
         if (!PetServices.Configuration.ShowOnNameplatesColour.Enabled)
@@ -110,11 +93,12 @@ internal unsafe class NamePlateHook : HookableElement
         {
             return;
         }
-
+        
         pPet.GetDrawColours(PetServices.Configuration.ShowOnNameplatesColour, out Vector3? edgeColour, out Vector3? textColour);
 
         SeString colouredPetName = PetServices.StringHelper.WrapInColor(customPetName, edgeColour, textColour);
-
+        
         namePlateInfo->Name.SetString(colouredPetName.EncodeWithNullTerminator());
+        namePlateInfo->IsDirty = true;
     }
 }

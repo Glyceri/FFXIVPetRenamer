@@ -10,10 +10,10 @@ internal class HoverService : IHoverService
 
     public IPetSheetData? CurrentlyHoveredPet 
         { get; private set; }
-    
+
     public void SetHoveredPet(IPetSheetData? currentlyHoveredPet) 
         => CurrentlyHoveredPet = currentlyHoveredPet;
-    
+
     public void SetCurrentNameType(NameType nameType) 
         => CurrentNameType = nameType;
 }
