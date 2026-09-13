@@ -11,29 +11,38 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
     public readonly uint[]       MirageSkeletonIds;
     public readonly SkeletonType SkeletonType;
 
-    public PetSkeleton(int skeletonId, SkeletonType skeletonType)
-        : this((uint)skeletonId, skeletonType)
+    public PetSkeleton(SkeletonType skeletonType, int skeletonId)
+        : this(skeletonType, (uint)skeletonId)
         { }
 
-    public PetSkeleton(uint skeletonId, SkeletonType skeletonType)
-        : this(skeletonId, skeletonType, [])
-    { }
+    public PetSkeleton(SkeletonType skeletonType, uint skeletonId)
+        : this(skeletonType, skeletonId, [])
+        { }
     
-    public PetSkeleton(uint leadingSkeletonId, SkeletonType skeletonType, uint[] mirageSkeletonIds)
-    {
-        LeadingSkeletonId = leadingSkeletonId;
-        MirageSkeletonIds = mirageSkeletonIds;
-        SkeletonType      = skeletonType;
-    }
+    public PetSkeleton(SkeletonType skeletonType, uint leadingSkeletonId, uint[] mirageSkeletonIds)
+        : this(skeletonType, [leadingSkeletonId, ..mirageSkeletonIds])
+        { }
 
+    public PetSkeleton(SkeletonType skeletonType, uint[] skeletonIds)
+    {
+        if (skeletonIds.Length == 0)
+        {
+            throw new ArgumentException("skeletonIds must contain at least one ID.", nameof(skeletonIds));
+        }
+        
+        LeadingSkeletonId = skeletonIds[0];
+        SkeletonType      = skeletonType;
+        MirageSkeletonIds = skeletonIds[1..];
+    }
+    
     public static PetSkeleton CreateInvalid()
-        => new PetSkeleton(0, SkeletonType.Invalid);
+        => new PetSkeleton(SkeletonType.Invalid, 0);
 
     public static bool operator ==(PetSkeleton left, PetSkeleton right)
-        => left.LeadingSkeletonId == right.LeadingSkeletonId && left.SkeletonType == right.SkeletonType;
+        => ComparisonCheck(left, right);
 
     public static bool operator !=(PetSkeleton left, PetSkeleton right)
-        => left.LeadingSkeletonId != right.LeadingSkeletonId || left.SkeletonType != right.SkeletonType;
+        => !ComparisonCheck(left, right);
 
     public bool Equals(PetSkeleton other)
         => this == other;
@@ -45,5 +54,45 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
         => HashCode.Combine(LeadingSkeletonId, SkeletonType);
 
     public override string ToString()
-        => (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}: ") + $"{LeadingSkeletonId}";
+        => (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}:") + $" [{LeadingSkeletonId}], [{string.Join("", MirageSkeletonIds)}]";
+    
+    private static bool IsInMirage(PetSkeleton left, PetSkeleton right)
+    {
+        foreach (uint mirageId in left.MirageSkeletonIds)
+        {
+            if (right.LeadingSkeletonId != mirageId)
+            {
+                continue;
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private static bool ComparisonCheck(PetSkeleton left, PetSkeleton right)
+    {
+        if (left.SkeletonType != right.SkeletonType)
+        {
+            return false;
+        }
+        
+        if (left.LeadingSkeletonId == right.LeadingSkeletonId)
+        {
+            return true;
+        }
+        
+        if (IsInMirage(left, right))
+        {
+            return true;
+        }
+        
+        if (IsInMirage(right, left))
+        {
+            return true;
+        }
+        
+        return false;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Lumina.Excel;
+﻿using FFXIVClientStructs.FFXIV.Client.UI;
+using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -27,7 +28,9 @@ internal class SheetsWrapper : IPetSheets
     private readonly ExcelSheet<PetMirage>   PetMirageSheet;
     private readonly ExcelSheet<LogMessage>  LogMessageSheet;
     private readonly ExcelSheet<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>      XBMPetSheet;
-
+    private readonly ExcelSheet<XBMElement>  XBMElements;
+    private readonly ExcelSheet<Addon>       AddonSheet;
+    
     public SheetsWrapper(DalamudServices dalamudServices)
     {
         DalamudServices  = dalamudServices;
@@ -40,6 +43,8 @@ internal class SheetsWrapper : IPetSheets
         PetMirageSheet   = dalamudServices.DataManager.GetExcelSheet<PetMirage>();
         LogMessageSheet  = dalamudServices.DataManager.GetExcelSheet<LogMessage>();
         XBMPetSheet      = dalamudServices.DataManager.GetExcelSheet<XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere>();
+        XBMElements      = dalamudServices.DataManager.GetExcelSheet<XBMElement>();
+        AddonSheet       = dalamudServices.DataManager.GetExcelSheet<Addon>();
         
         SetupSheetDataCache();
     }
@@ -117,7 +122,7 @@ internal class SheetsWrapper : IPetSheets
     
     public LogMessage? GetLogMessage(uint logMessageId)
         => LogMessageSheet.GetRow(logMessageId);
-
+    
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
         => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);
 
@@ -291,6 +296,12 @@ internal class SheetsWrapper : IPetSheets
     public XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere? GetSheetXBMPet(uint index)
         => XBMPetSheet.GetRow(index);
     
+    public XBMElement? GetXBMElement(uint index)
+        => XBMElements.GetRow(index);
+    
+    public string GetAddonString(uint index)
+        => AddonSheet.GetRow(index).Text.ExtractText();
+
     [Obsolete]
     public PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob)
     {

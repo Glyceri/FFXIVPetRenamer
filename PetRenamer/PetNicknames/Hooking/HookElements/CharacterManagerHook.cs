@@ -274,8 +274,8 @@ internal unsafe class CharacterManagerHook : HookableElement
             return;
         }
 
-        PetSkeleton temporaryPetSkeleton = new PetSkeleton((uint)newBattleChara->ModelContainer.ModelCharaId, SkeletonType.Minion);
-
+        PetSkeleton temporaryPetSkeleton = new PetSkeleton(SkeletonType.Minion, (uint)newBattleChara->ModelContainer.ModelCharaId);
+        
         if (PetServices.PetSheets.GetPet(temporaryPetSkeleton) == null)
         {
             return;

@@ -46,6 +46,7 @@ internal class PetConfigWindow : PetWindow
     
     private static readonly string[] _listIconTypes   = ["ListIconType.Both", "ListIconType.Sharing", "ListIconType.ListOnly"];
     private static readonly string[] _iconMenuTypes   = ["MenuType.Action", "MenuType.Notebook", "MenuType.Item"];
+    private static readonly string[] _beastIconTypes  = ["BeastIconType.Blob", "BeastIconType.Action"];
     private static readonly string[] _colourDisplay   = ["ColourDisplay.Everyone", "ColourDisplay.OnlyMyself", "ColourDisplay.NoColours"];
     private static readonly string[] _languageOptions = ["Language.Default", "Language.English", "Language.German", "Language.French", "Language.Japanese", "Language.Dutch", "Language.Chinese"];
     
@@ -123,8 +124,9 @@ internal class PetConfigWindow : PetWindow
             ImGui.Spacing();
 
             DrawMenu(Translator.GetLine("Config.ListButtonType"), _listIconTypes,   ref PetServices.Configuration.listButtonLayout);
-            DrawMenu(Translator.GetLine("Config.IconType"),       _iconMenuTypes,   ref PetServices.Configuration.minionIconType);
-                
+            DrawEnumMenu(Translator.GetLine("Config.IconType"), _iconMenuTypes, ref PetServices.Configuration.IconTypeMinion);
+            DrawEnumMenu(Translator.GetLine("Config.BeastIconType"), _beastIconTypes, ref PetServices.Configuration.IconTypeBeast);
+            
             ImGui.Separator();
             
             DrawBasicToggle(Translator.GetLine("Config.ReturnToDefault"),     ref PetServices.Configuration.returnToDefaultUserProfile);

@@ -62,7 +62,8 @@ internal class Configuration : IPluginConfiguration
     public bool                 showKofiButton              = true;
     public bool                 quickButtonsToggle          = true;
     public int                  listButtonLayout            = 0;
-    public int                  minionIconType              = 1;
+    public MinionIconType       IconTypeMinion              = MinionIconType.Notebook;
+    public BeastIconType        IconTypeBeast               = BeastIconType.Blob;
     public bool                 showIslandWarning           = true;
     public bool                 useNewBarStyle              = false;
     public bool                 showLanguageAsNative        = true;
@@ -178,6 +179,8 @@ internal class Configuration : IPluginConfiguration
     public bool showOnPartyList = true;
     [Obsolete]
     public int languageSettings = 0;
+    [Obsolete]
+    public int minionIconType = 1;
     
 #pragma warning restore IDE1006
 
@@ -193,6 +196,21 @@ internal class Configuration : IPluginConfiguration
 #pragma warning restore CS0618 // Type or member is obsolete
 
     #endregion
+    
+    [Serializable]
+    public enum MinionIconType
+    {
+        Action   = 0,
+        Notebook = 1,
+        Item     = 2,
+    }
+    
+    [Serializable]
+    public enum BeastIconType
+    {
+        Blob,
+        Action,
+    }
     
     [Serializable]
     public struct ColourConfig

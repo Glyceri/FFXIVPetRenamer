@@ -3,7 +3,6 @@ using Dalamud.Bindings.ImGui;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
-using PetRenamer.PetNicknames.Windowing.Components.Texture;
 using System.Numerics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 
@@ -30,8 +29,7 @@ internal static class BoxedImage
     public static void DrawMinion(IPetSheetData data, DalamudServices dalamudServices, Configuration configuration, Vector2 size)
     {
         IDalamudTextureWrap? textureWrap = null;
-
-        UldIcon? raceIcon = null;
+        IDalamudTextureWrap? raceIcon    = null;
         
         uint iconIndex = data.Icon;
         
@@ -72,7 +70,7 @@ internal static class BoxedImage
             Vector2 calculation = new Vector2(iconSize.X * 1.54f, -iconSize.Y * 0.1f);
             Vector2 cursorPos = ImGui.GetCursorPos();
             ImGui.SetCursorPos(ImGui.GetCursorPos() - calculation);
-            IconImage.DrawUld(raceIcon.Value, iconSize);
+            ImGui.Image(raceIcon.Handle, iconSize);
             ImGui.SetCursorPos(cursorPos);
         }
     }

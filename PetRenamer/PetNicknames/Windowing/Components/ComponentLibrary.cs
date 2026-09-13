@@ -6,14 +6,15 @@ namespace PetRenamer.PetNicknames.Windowing.Components;
 
 internal static class ComponentLibrary
 {
-    public static void Initialise(in DalamudServices dalamudServices)
+    public static void Initialise(DalamudServices dalamudServices)
     {
-        SearchImage.Constructor(in dalamudServices);
-        RaceIconHelper.Constructor(in dalamudServices);
+        RaceIconHelper.Constructor(dalamudServices);
+        XBMIconHelper.Constructor(dalamudServices);
     }
 
     public static void Dispose()
     {
         RaceIconHelper.Dispose();
+        XBMIconHelper.Dispose();
     }
 }

@@ -31,7 +31,7 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         Address             = (nint)pet;
         Owner               = owner;
         ObjectId            = pet->GetGameObjectId();
-        SkeletonId          = new PetSkeleton(pet->ModelContainer.ModelCharaId, skeletonType);
+        SkeletonId          = new PetSkeleton(skeletonType, pet->ModelContainer.ModelCharaId);
         PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
         PetServices.PetLog.DevLogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");

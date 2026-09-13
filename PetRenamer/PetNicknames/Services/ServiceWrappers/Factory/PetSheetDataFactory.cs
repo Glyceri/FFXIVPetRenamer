@@ -30,7 +30,7 @@ internal static class PetSheetDataFactory
         int         modelId        = (int)model.Value.RowId;
         int         legacyModelId  = model.Value.Model;
         string      singular       = companion.Singular.ExtractText();
-        PetSkeleton petSkeleton    = new PetSkeleton((uint)modelId, SkeletonType.Minion);
+        PetSkeleton petSkeleton    = new PetSkeleton(SkeletonType.Minion, (uint)modelId);
         
         if (legacyModelId == 0)
         {
@@ -105,8 +105,10 @@ internal static class PetSheetDataFactory
         uint   iconId            = pet.Value.Icon;
         sbyte  pronoun           = bnpcName.Value.Pronoun;
         string name              = bnpcName.Value.Singular.ExtractText().ToTitleCase();
+        byte   aspect            = pet.Value.Action.Value.Aspect;
+        string kin               = petSheets.GetAddonString(17740 + (uint)pet.Value.Classification);
         
-        return new PetSheetData(petRegistration.PetSkeleton, -1, iconId, pronoun, name, name, petRegistration.GetRawAction());
+        return new PetSheetData(petRegistration.PetSkeleton, -1, iconId, kin, aspect, null, pronoun, name, name, petRegistration.GetRawAction());
     }
     
     private static string GermanReplace(string baseString, sbyte pronoun)

@@ -23,7 +23,7 @@ internal unsafe class PettableIslandPet : IIslandPet
         BattleChara = pet;
         Address     = (nint)pet;
         Owner       = owner;
-        SkeletonId  = new PetSkeleton((uint)pet->Character.ModelContainer.ModelCharaId, SkeletonType.Minion);
+        SkeletonId  = new PetSkeleton(SkeletonType.Minion, (uint)pet->Character.ModelContainer.ModelCharaId);
         ObjectId    = pet->GetGameObjectId();
         PetData     = petServices.PetSheets.GetPet(SkeletonId);
     }

@@ -17,13 +17,17 @@ internal readonly struct PetRegistration
     private readonly PetSkeleton        _petSkeleton;
     
     public PetRegistration(uint pet, uint modelChara, uint bnpcName, uint action, SkeletonType skeletonType, LegacySkeletonType legacySkeletonType = LegacySkeletonType.None)
+        : this (pet, [modelChara], bnpcName, action, skeletonType, legacySkeletonType) 
+        { }
+    
+    public PetRegistration(uint pet, uint[] modelCharas, uint bnpcName, uint action, SkeletonType skeletonType, LegacySkeletonType legacySkeletonType = LegacySkeletonType.None)
     {
         _pet                = pet;
         _bnpcName           = bnpcName;
         _action             = action;
         _skeletonType       = skeletonType;
         _legacySkeletonType = legacySkeletonType;
-        _petSkeleton        = new PetSkeleton(modelChara, _skeletonType);
+        _petSkeleton        = new PetSkeleton(_skeletonType, modelCharas);
     }
     
     public readonly PetSkeleton PetSkeleton

@@ -7,7 +7,7 @@ internal static class PetSkeletonHelper
 {
     public static bool IsInvalid(this PetSkeleton petSkeleton)
     {
-        if (petSkeleton.SkeletonType == SkeletonType.Invalid)
+        if (petSkeleton.SkeletonType == (SkeletonType)0)
         {
             return true;
         }
@@ -84,7 +84,7 @@ internal static class PetSkeletonHelper
 
         for (int i = 0; i < arrayLength; i++)
         {
-            newSkeletons[i] = new PetSkeleton((uint)skeletons[i], (SkeletonType)skeletonTypes[i]);
+            newSkeletons[i] = new PetSkeleton((SkeletonType)skeletonTypes[i], (uint)skeletons[i]);
         }
 
         return newSkeletons;
@@ -111,7 +111,7 @@ internal static class PetSkeletonHelper
             skeletonType = SkeletonType.Minion;
         }
 
-        return new PetSkeleton(newSkeletonId, skeletonType);
+        return new PetSkeleton(skeletonType, newSkeletonId);
     }
 
     public static PetSkeleton[] AsPetSkeletons(this int[] skeletonArray)
@@ -142,7 +142,7 @@ internal static class PetSkeletonHelper
                 skeletonType = SkeletonType.Minion;
             }
 
-            newSkeletons[i] = new PetSkeleton(skeletonId, skeletonType);
+            newSkeletons[i] = new PetSkeleton(skeletonType, skeletonId);
         }
 
         return newSkeletons;

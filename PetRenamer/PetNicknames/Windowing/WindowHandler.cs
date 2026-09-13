@@ -59,7 +59,7 @@ internal class WindowHandler : IWindowHandler
         DalamudServices.DalamudPlugin.UiBuilder.OpenMainUi   += Open<PetRenameWindow>;
         DalamudServices.DalamudPlugin.UiBuilder.OpenConfigUi += Open<PetConfigWindow>;
 
-        ComponentLibrary.Initialise(in dalamudServices);
+        ComponentLibrary.Initialise(dalamudServices);
 
         Register();
     }

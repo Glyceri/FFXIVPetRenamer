@@ -155,16 +155,20 @@
   "ListIconType.Sharing": "Sharing",
   "ListIconType.ListOnly": "List Only",
 
+  "Config.IconType": "Minion Icon Type",
   "MenuType.Action": "Action",
   "MenuType.Notebook": "Notebook",
   "MenuType.Item": "Item",
+
+  "Config.BeastIconType": "Beast Icon Type",
+  "BeastIconType.Blob": "Blob",
+  "BeastIconType.Action": "Action",
 
   "ColourDisplay.Everyone": "Everyone",
   "ColourDisplay.OnlyMyself": "Only Myself",
   "ColourDisplay.NoColours": "No Colours",
 
   "Config.Language": "Plugin Language",
-  "Config.IconType": "Icon Type",
   "Config.ListButtonType": "List Button Type",
 
   "ShareWindow.Export": "Export to Clipboard",

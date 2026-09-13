@@ -25,6 +25,9 @@ internal static class PluginConstants
         44894
     ];
     
+    // Dont think I write most these things by hand,
+    // I have generators for that XD
+    
     public  static readonly PetRegistration Eos                 = new PetRegistration(pet: 6,   modelChara: 407,   bnpcName: 1398,   action: 17215,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
     private static readonly PetRegistration Selene              = new PetRegistration(pet: 7,   modelChara: 408,   bnpcName: 1399,   action: 17215,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
     private static readonly PetRegistration Seraph              = new PetRegistration(pet: 21,  modelChara: 2619,  bnpcName: 8227,   action: 16545,  SkeletonType.BattlePet, LegacySkeletonType.Scholar);
@@ -53,56 +56,56 @@ internal static class PluginConstants
     
     
     
-    private static readonly PetRegistration BMCuSith            = new PetRegistration(pet: 1, modelChara: 4867, bnpcName: 14407,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMSquirrel          = new PetRegistration(pet: 2, modelChara: 25, bnpcName: 14408,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMLamb              = new PetRegistration(pet: 3, modelChara: 287, bnpcName: 14409,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMPugil             = new PetRegistration(pet: 4, modelChara: 356, bnpcName: 14410,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMOpoOpo            = new PetRegistration(pet: 5, modelChara: 31, bnpcName: 14411,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMDodo              = new PetRegistration(pet: 6, modelChara: 173, bnpcName: 14412,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMCoblyn            = new PetRegistration(pet: 7, modelChara: 176, bnpcName: 14413,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMDiremite          = new PetRegistration(pet: 8, modelChara: 21, bnpcName: 14414,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMMegalocrab        = new PetRegistration(pet: 9, modelChara: 148, bnpcName: 14415,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMWespe             = new PetRegistration(pet: 10, modelChara: 359, bnpcName: 14416,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMVulture           = new PetRegistration(pet: 11, modelChara: 39, bnpcName: 14417,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMMandragora        = new PetRegistration(pet: 12, modelChara: 297, bnpcName: 14418,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMGeshunpest        = new PetRegistration(pet: 13, modelChara: 2185, bnpcName: 14419,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMPuk               = new PetRegistration(pet: 14, modelChara: 130, bnpcName: 14420,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMCrab              = new PetRegistration(pet: 15, modelChara: 355, bnpcName: 14421,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMMantis            = new PetRegistration(pet: 16, modelChara: 374, bnpcName: 14422,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMSlime             = new PetRegistration(pet: 17, modelChara: 292, bnpcName: 14423,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMDullahan          = new PetRegistration(pet: 18, modelChara: 121, bnpcName: 14424,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMBat               = new PetRegistration(pet: 19, modelChara: 98, bnpcName: 14425,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMFlyingTrap        = new PetRegistration(pet: 20, modelChara: 48, bnpcName: 14426,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMZiz               = new PetRegistration(pet: 21, modelChara: 157, bnpcName: 14427,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMSabotender        = new PetRegistration(pet: 22, modelChara: 142, bnpcName: 14428,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMGolem             = new PetRegistration(pet: 23, modelChara: 81, bnpcName: 14429,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMApkallu           = new PetRegistration(pet: 24, modelChara: 190, bnpcName: 14430,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMAdamantoise       = new PetRegistration(pet: 25, modelChara: 94, bnpcName: 14431,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMBuffalo           = new PetRegistration(pet: 26, modelChara: 138, bnpcName: 14432,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMUragnite          = new PetRegistration(pet: 27, modelChara: 364, bnpcName: 14433,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMWorm              = new PetRegistration(pet: 28, modelChara: 238, bnpcName: 14434,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMSpriggan          = new PetRegistration(pet: 29, modelChara: 109, bnpcName: 14435,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMGoobbue           = new PetRegistration(pet: 30, modelChara: 198, bnpcName: 14436,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMGigantoad         = new PetRegistration(pet: 31, modelChara: 126, bnpcName: 14437,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMColibri           = new PetRegistration(pet: 32, modelChara: 360, bnpcName: 14438,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMCoeurl            = new PetRegistration(pet: 33, modelChara: 65, bnpcName: 14439,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMRaptor            = new PetRegistration(pet: 34, modelChara: 96, bnpcName: 14440,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMDrake             = new PetRegistration(pet: 35, modelChara: 179, bnpcName: 14441,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMTreant            = new PetRegistration(pet: 36, modelChara: 104, bnpcName: 14442,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMAntling           = new PetRegistration(pet: 37, modelChara: 195, bnpcName: 14443,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMChimera           = new PetRegistration(pet: 38, modelChara: 197, bnpcName: 14444,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMMorbol            = new PetRegistration(pet: 39, modelChara: 145, bnpcName: 14445,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMGhost             = new PetRegistration(pet: 40, modelChara: 264, bnpcName: 14446,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMSalamander        = new PetRegistration(pet: 41, modelChara: 151, bnpcName: 14447,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMCobra             = new PetRegistration(pet: 42, modelChara: 235, bnpcName: 14448,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMHydra             = new PetRegistration(pet: 43, modelChara: 247, bnpcName: 14449,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMDamselfly         = new PetRegistration(pet: 44, modelChara: 654, bnpcName: 14450,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMRottingGoobbue    = new PetRegistration(pet: 45, modelChara: 640, bnpcName: 14451,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMZu                = new PetRegistration(pet: 46, modelChara: 4925, bnpcName: 14452,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMIceGolem          = new PetRegistration(pet: 47, modelChara: 825, bnpcName: 14453,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMKarlabos          = new PetRegistration(pet: 48, modelChara: 824, bnpcName: 14454,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMRafflesia         = new PetRegistration(pet: 49, modelChara: 655, bnpcName: 14455,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
-    private static readonly PetRegistration BMBehemoth          = new PetRegistration(pet: 50, modelChara: 165, bnpcName: 14456,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMCuSith            = new PetRegistration(pet: 1,  modelCharas: [4867, 4868],   bnpcName: 14407,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMSquirrel          = new PetRegistration(pet: 2,  modelCharas: [25,   27],     bnpcName: 14408,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMLamb              = new PetRegistration(pet: 3,  modelCharas: [287,  291],    bnpcName: 14409,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMPugil             = new PetRegistration(pet: 4,  modelCharas: [356,  861],    bnpcName: 14410,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMOpoOpo            = new PetRegistration(pet: 5,  modelCharas: [31,   32],     bnpcName: 14411,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMDodo              = new PetRegistration(pet: 6,  modelCharas: [173,  174],    bnpcName: 14412,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMCoblyn            = new PetRegistration(pet: 7,  modelCharas: [176,  178],    bnpcName: 14413,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMDiremite          = new PetRegistration(pet: 8,  modelCharas: [21,   23],     bnpcName: 14414,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMMegalocrab        = new PetRegistration(pet: 9,  modelCharas: [148,  149],    bnpcName: 14415,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMWespe             = new PetRegistration(pet: 10, modelCharas: [359,  657],    bnpcName: 14416,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMVulture           = new PetRegistration(pet: 11, modelCharas: [39,   41],     bnpcName: 14417,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMMandragora        = new PetRegistration(pet: 12, modelCharas: [297,  1046],   bnpcName: 14418,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMGeshunpest        = new PetRegistration(pet: 13, modelCharas: [2185, 4859],   bnpcName: 14419,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMPuk               = new PetRegistration(pet: 14, modelCharas: [130,  131],    bnpcName: 14420,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMCrab              = new PetRegistration(pet: 15, modelCharas: [355,  4860],   bnpcName: 14421,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMMantis            = new PetRegistration(pet: 16, modelCharas: [374,  376],    bnpcName: 14422,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMSlime             = new PetRegistration(pet: 17, modelCharas: [292,  293],    bnpcName: 14423,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMDullahan          = new PetRegistration(pet: 18, modelCharas: [121,  770],    bnpcName: 14424,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMBat               = new PetRegistration(pet: 19, modelCharas: [98,   99],     bnpcName: 14425,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMFlyingTrap        = new PetRegistration(pet: 20, modelCharas: [48,   49],     bnpcName: 14426,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMZiz               = new PetRegistration(pet: 21, modelCharas: [157,  155],    bnpcName: 14427,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMSabotender        = new PetRegistration(pet: 22, modelCharas: [142,  143],    bnpcName: 14428,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMGolem             = new PetRegistration(pet: 23, modelCharas: [81,   82],     bnpcName: 14429,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMApkallu           = new PetRegistration(pet: 24, modelCharas: [190,  4861],   bnpcName: 14430,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMAdamantoise       = new PetRegistration(pet: 25, modelCharas: [94,   95],     bnpcName: 14431,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMBuffalo           = new PetRegistration(pet: 26, modelCharas: [138,  140],    bnpcName: 14432,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMUragnite          = new PetRegistration(pet: 27, modelCharas: [364,  1053],   bnpcName: 14433,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMWorm              = new PetRegistration(pet: 28, modelCharas: [238,  242],    bnpcName: 14434,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMSpriggan          = new PetRegistration(pet: 29, modelCharas: [109,  4866],   bnpcName: 14435,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMGoobbue           = new PetRegistration(pet: 30, modelCharas: [198,  4864],   bnpcName: 14436,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMGigantoad         = new PetRegistration(pet: 31, modelCharas: [126,  128],    bnpcName: 14437,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMColibri           = new PetRegistration(pet: 32, modelCharas: [360,  1155],   bnpcName: 14438,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMCoeurl            = new PetRegistration(pet: 33, modelCharas: [65,   67],     bnpcName: 14439,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMRaptor            = new PetRegistration(pet: 34, modelCharas: [96,   97],     bnpcName: 14440,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMDrake             = new PetRegistration(pet: 35, modelCharas: [179,  181],    bnpcName: 14441,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMTreant            = new PetRegistration(pet: 36, modelCharas: [104,  106],    bnpcName: 14442,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMAntling           = new PetRegistration(pet: 37, modelCharas: [195,  194],    bnpcName: 14443,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMChimera           = new PetRegistration(pet: 38, modelCharas: [197,  968],    bnpcName: 14444,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMMorbol            = new PetRegistration(pet: 39, modelCharas: [145,  147],    bnpcName: 14445,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMGhost             = new PetRegistration(pet: 40, modelCharas: [264,  265],    bnpcName: 14446,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMSalamander        = new PetRegistration(pet: 41, modelCharas: [151,  152],    bnpcName: 14447,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMCobra             = new PetRegistration(pet: 42, modelCharas: [235,  1905],   bnpcName: 14448,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMHydra             = new PetRegistration(pet: 43, modelCharas: [247,  244],    bnpcName: 14449,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMDamselfly         = new PetRegistration(pet: 44, modelCharas: [654,  1851],   bnpcName: 14450,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMRottingGoobbue    = new PetRegistration(pet: 45, modelCharas: [640,  4865],   bnpcName: 14451,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMZu                = new PetRegistration(pet: 46, modelCharas: [4925, 1421],   bnpcName: 14452,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMIceGolem          = new PetRegistration(pet: 47, modelCharas: [825,  4888],   bnpcName: 14453,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMKarlabos          = new PetRegistration(pet: 48, modelCharas: [824,  1057],   bnpcName: 14454,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMRafflesia         = new PetRegistration(pet: 49, modelCharas: [655,  1034],   bnpcName: 14455,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
+    private static readonly PetRegistration BMBehemoth          = new PetRegistration(pet: 50, modelCharas: [165,  1752],   bnpcName: 14456,  action: LOCAL_BATTLE_HORN_ABILITY_REPLACEMENT, SkeletonType.BeastMaster);
     
     public static readonly PetRegistration[] BeastMasterPetRegistrations =
     [

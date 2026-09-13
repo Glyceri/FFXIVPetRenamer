@@ -16,6 +16,7 @@ internal class LegacyNamingVer12 : ILegacyStepperElement
         configuration.Version         = 13;
 
         configuration.currentLanguage = (PetNicknamesLanguage)configuration.languageSettings;
+        configuration.IconTypeMinion        = (Configuration.MinionIconType)configuration.minionIconType;
     }
 }
 

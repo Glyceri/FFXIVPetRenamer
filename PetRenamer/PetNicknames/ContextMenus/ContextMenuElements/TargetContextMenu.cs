@@ -62,7 +62,7 @@ internal class TargetContextMenu : IContextMenuElement
         {
             return null;
         }
-
+        
         if (PetServices.PetSheets.GetPet(pet.SkeletonId) == null)
         {
             return null;

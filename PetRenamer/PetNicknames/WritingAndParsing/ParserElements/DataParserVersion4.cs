@@ -139,7 +139,7 @@ internal class DataParserVersion4 : IDataParserElement
             return null;
         }
 
-        return new PetSkeleton((uint)id, (SkeletonType)skeletonType);
+        return new PetSkeleton((SkeletonType)skeletonType, (uint)id);
     }
 
     private PetSkeleton[]? ParseSoftSkeletons(string data)

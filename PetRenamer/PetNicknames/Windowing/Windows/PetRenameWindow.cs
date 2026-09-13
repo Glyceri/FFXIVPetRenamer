@@ -36,6 +36,8 @@ internal class PetRenameWindow : PetWindow
         PetServices.DirtyListener.RegisterOnDirtyPet(DirtyPet);
         PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyUser);
         PetServices.DirtyListener.RegisterOnDirtyName(DirtyName);
+        
+        Open();
     }
 
     protected override void OnDispose()
@@ -196,7 +198,7 @@ internal class PetRenameWindow : PetWindow
         {
             return;
         }
-
+ 
         if (ActiveSkeleton == null)
         {
             return;
@@ -270,7 +272,7 @@ internal class PetRenameWindow : PetWindow
 
         ImGui.SameLine();
 
-        DrawImageInternals(regionHeight);
+        DrawImageInternals();
     }
 
     private void DrawInternals()
@@ -310,27 +312,8 @@ internal class PetRenameWindow : PetWindow
         ActiveCustomName = ActiveCustomName.Replace(Environment.NewLine, string.Empty);
     }
 
-    private void DrawImageInternals(float regionHeight)
+    private void DrawImageInternals()
     {
-        Vector2 size = new Vector2(regionHeight, regionHeight);
-
-        if (ActivePetTexture == null)
-        {
-            IDalamudTextureWrap? searchTexture = SearchImage.SearchTextureWrap;
-
-            if (searchTexture != null)
-            {
-                BoxedImage.Draw(searchTexture, size);
-            }
-        }
-        else if (ActivePetData != null)
-        {
-            if (Listbox.Begin("##image", size))
-            {
-                BoxedImage.DrawMinion(ActivePetData, DalamudServices, PetServices.Configuration, ImGui.GetContentRegionAvail());
-
-                Listbox.End();
-            }
-        }
+        PetBoxImage.DrawPet(PetServices, DalamudServices, ImGui.GetContentRegionAvail(), ActivePetData);
     }
 }

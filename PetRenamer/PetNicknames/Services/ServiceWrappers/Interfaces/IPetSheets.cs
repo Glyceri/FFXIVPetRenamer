@@ -33,6 +33,8 @@ internal interface IPetSheets
     
     Pet?                GetSheetPet(uint index);
     XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere?             GetSheetXBMPet(uint index);
+    XBMElement?         GetXBMElement(uint index);
+    string              GetAddonString(uint index);
     
     [Obsolete] PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob);
 }
