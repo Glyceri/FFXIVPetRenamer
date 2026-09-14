@@ -40,6 +40,8 @@
 
   "PetRenameNode.Race": "Type",
   "PetRenameNode.Behaviour": "Behaviour",
+  "PetRenameNode.SignatureAbility": "Signature Ability",
+  "PetRenameNode.Classification": "Classification",
   "PetRenameNode.Nickname": "Nickname",
   "PetRenameNode.Id": "Identifier",
 

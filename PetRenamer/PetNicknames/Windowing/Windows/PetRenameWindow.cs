@@ -1,7 +1,10 @@
-﻿using Dalamud.Interface.Textures;
-using Dalamud.Interface.Textures.TextureWraps;
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Interface.ImGuiSeStringRenderer;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
+using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
@@ -28,7 +31,7 @@ internal class PetRenameWindow : PetWindow
     private Vector3?                 ActiveEdgeColour   = null;
     private Vector3?                 ActiveTextColour   = null;
     private IPetSheetData?           ActivePetData      = null;
-    private ISharedImmediateTexture? ActivePetTexture   = null;
+    private Vector2                  _lastDrawSize      = Vector2.Zero;
     
     public PetRenameWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
         : base(windowHandler, dalamudServices, petServices, "Pet Nicknames", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -229,14 +232,6 @@ internal class PetRenameWindow : PetWindow
         ActiveEdgeColour   = edgeColour;
         ActiveTextColour   = textColour;
         ActivePetData      = petData;
-        ActivePetTexture   = null;
-        
-        if (ActivePetData == null)
-        {
-            return;
-        }
-        
-        ActivePetTexture = DalamudServices.TextureProvider.GetFromGameIcon(ActivePetData.Icon);
     }
 
     private void OnSave(PetSkeleton skeletonId, string? newName, Vector3? edgeColour, Vector3? textColour)
@@ -297,10 +292,52 @@ internal class PetRenameWindow : PetWindow
             return;
         }
         
-        LabledLabel.Draw($"{SpeciesLine}:",                                   ActivePetData?.Singular         ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:",        ActivePetData?.Model.ToString() ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:",      ActivePetData?.RaceName         ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
-        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName    ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        if (ActivePetData == null)
+        {
+            return;
+        }
+        
+        LabledLabel.Draw($"{SpeciesLine}:",                              ActivePetData.Singular,                              WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Id")}:",   ActivePetData.Model.ToString(),                      WindowHandler.StretchingBar);
+        LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Race")}:", ActivePetData.RaceName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+       
+        if (ActivePetData?.Model.SkeletonType == SkeletonType.Minion)
+        {
+            LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Behaviour")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        }
+        else if (ActivePetData?.Model.SkeletonType == SkeletonType.BattlePet)
+        {
+            LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.SignatureAbility")}:", ActivePetData?.BehaviourName ?? Translator.GetLine("..."), WindowHandler.StretchingBar);
+        }
+        else if (ActivePetData?.Model.SkeletonType == SkeletonType.BeastMaster)
+        {
+            XBMElement? element = PetServices.PetSheets.GetXBMElement(ActivePetData.RaceId);
+            
+            if (element == null)
+            {
+                LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Classification")}:", Translator.GetLine("..."), WindowHandler.StretchingBar);
+            }
+            else
+            {
+                Vector2 cursorPosPre = ImGui.GetCursorScreenPos();
+                
+                Vector2 size = WindowHandler.StretchingBar;
+                
+                LabledLabel.Draw($"{Translator.GetLine("PetRenameNode.Classification")}:", string.Empty, size);
+                
+                Vector2 newCursorPos = ImGui.GetCursorScreenPos();
+                
+                ImGui.SameLine();
+                
+                ImGui.SetCursorScreenPos(cursorPosPre + size - new Vector2(_lastDrawSize.X + ImGui.GetStyle().FramePadding.X, size.Y * 0.85f));
+                
+                SeStringDrawResult result = ImGuiHelpers.SeStringWrapped(element.Value.Unknown0.AsSpan().Data, new SeStringDrawParams() { WrapWidth = 500 });
+                
+                _lastDrawSize = result.Size;
+                
+                ImGui.SetCursorScreenPos(newCursorPos);
+            }
+        }
         
         if (RenameLabel.Draw(ActiveCustomName == EditableCustomName, ref EditableCustomName, ref ActiveEdgeColour, ref ActiveTextColour, WindowHandler.StretchingBar))
         {

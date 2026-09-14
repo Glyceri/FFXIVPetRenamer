@@ -10,7 +10,8 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
     public readonly uint         LeadingSkeletonId;
     public readonly uint[]       MirageSkeletonIds;
     public readonly SkeletonType SkeletonType;
-
+    public readonly string       Symbol;
+    
     public PetSkeleton(SkeletonType skeletonType, int skeletonId)
         : this(skeletonType, (uint)skeletonId)
         { }
@@ -33,6 +34,7 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
         LeadingSkeletonId = skeletonIds[0];
         SkeletonType      = skeletonType;
         MirageSkeletonIds = skeletonIds[1..];
+        Symbol            = (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}:");
     }
     
     public static PetSkeleton CreateInvalid()
@@ -95,13 +97,8 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
     
     public override string ToString()
     {
-        string newString = (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}:") + $" [{LeadingSkeletonId}]";
+        uint[] skeletons = [LeadingSkeletonId, .. MirageSkeletonIds];
         
-        if (MirageSkeletonIds.Length > 0)
-        {
-            newString += $", [{string.Join(", ", MirageSkeletonIds)}]";
-        }
-        
-        return newString;
+        return Symbol + string.Join($" {Symbol}", skeletons);
     }
 }

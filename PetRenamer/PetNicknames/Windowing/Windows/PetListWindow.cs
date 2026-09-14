@@ -132,7 +132,7 @@ internal class PetListWindow : PetWindow
     {
         if (Listbox.Begin($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
-            PlayerImage.Draw(ActiveEntry, ImageDatabase);
+            PlayerImage.Draw(ActiveEntry, ImageDatabase, DalamudServices);
 
             ImGui.SameLine();
 
@@ -328,8 +328,10 @@ internal class PetListWindow : PetWindow
             
             float size = ImGui.GetContentRegionAvail().Y;
             
-            BoxedImage.DrawMinion(pet.PetSheetData, DalamudServices, PetServices.Configuration, new Vector2(size, size));
+            PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(size, size), pet.PetSheetData, ActiveEntry);
 
+            ImGui.SameLine();
+            
             using ImRaii.ListBoxDisposable listBox2 = ImRaii.ListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail());
             
             if (!listBox2.Success)
@@ -367,7 +369,7 @@ internal class PetListWindow : PetWindow
                 continue;
             }
             
-            PlayerImage.Draw(user.Entry, ImageDatabase);
+            PlayerImage.Draw(user.Entry, ImageDatabase, DalamudServices);
 
             ImGui.SameLine();
 

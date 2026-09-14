@@ -1,5 +1,6 @@
 using Dalamud.Game;
 using Dalamud.Utility;
+using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -78,12 +79,40 @@ internal static class PetSheetDataFactory
             return null;
         }
         
-        ushort petIcon           = petAction.Value.Icon;
-        string name              = bnpcName.Value.Singular.ExtractText().ToTitleCase();
-        string actionName        = petAction.Value.Name.ExtractText();
-        uint   actionRowId       = petAction.Value.RowId;
+        ushort  petIcon         = petAction.Value.Icon;
+        string  name            = bnpcName.Value.Singular.ExtractText().ToTitleCase();
+        string  actionName      = petAction.Value.Name.ExtractText();
+        uint    actionRowId     = petAction.Value.RowId;
+        string  petType         = petSheets.GetAddonString(8588);
+        Pet?    petReg          = petRegistration.GetBattlePet(petSheets);
+        Action? signatureAction = GetAction(petReg);
         
-        return new PetSheetData(petRegistration.PetSkeleton, -1, petIcon, bnpcName.Value.Pronoun, name, actionName, actionRowId);
+        return new PetSheetData(petRegistration.PetSkeleton, -1, petIcon, petType, 0, signatureAction?.Name.ExtractText() ?? null, bnpcName.Value.Pronoun, name, actionName, actionRowId);
+    }
+    
+    private static Action? GetAction(Pet? pet)
+    {
+        if (pet == null)
+        {
+            return null;
+        }
+        
+        if (pet.Value.AutoAction.RowId != 0)
+        {
+            return pet.Value.AutoAction.ValueNullable;
+        }
+        
+        foreach (RowRef<Action> petAction in pet.Value.Abilities)
+        {
+            if (petAction.RowId == 0)
+            {
+                continue;
+            }
+            
+            return petAction.ValueNullable;
+        }
+        
+        return null;
     }
     
     public static PetSheetData? CreatePetSheetDataBeastMaster(IPetSheets petSheets, PetRegistration petRegistration)

@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface.Textures;
-using Dalamud.Interface.Textures.TextureWraps;
+﻿using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.PetNicknames.ImageDatabase.Interfaces;
 using PetRenamer.PetNicknames.ImageDatabase.Texture;
 using PetRenamer.PetNicknames.ImageDatabase.Workers;
@@ -19,24 +18,22 @@ internal class ImageDatabase : IImageDatabase
 
     private readonly DalamudServices         DalamudServices;
     private readonly IPetServices            PetServices;
-    private readonly ISharedImmediateTexture SearchTexture;
     private readonly ILodestoneNetworker     Networker;
     private readonly IImageDownloader        ImageDownloader;
 
-    public ImageDatabase(in DalamudServices dalamudServices, in IPetServices petServices, in ILodestoneNetworker networker)
+    public ImageDatabase(DalamudServices dalamudServices, IPetServices petServices, ILodestoneNetworker networker)
     {
         DalamudServices = dalamudServices;
         PetServices     = petServices;
         Networker       = networker;
         ImageDownloader = new ImageDownloader(DalamudServices, PetServices, Networker);
-        SearchTexture   = DalamudServices.TextureProvider.GetFromGameIcon(66310);
     }
 
     public IDalamudTextureWrap? GetWrapFor(IPettableDatabaseEntry? databaseEntry)
     {
         if (databaseEntry == null)
         {
-            return SearchTexture.GetWrapOrEmpty();
+            return null;
         }
 
         lock (_imageDatabase)
@@ -53,7 +50,7 @@ internal class ImageDatabase : IImageDatabase
                 {
                     wrap.Refresh();
                     
-                    return (wrap.TextureWrap ?? SearchTexture.GetWrapOrEmpty());
+                    return wrap.TextureWrap;
                 }
             }
 
@@ -62,7 +59,7 @@ internal class ImageDatabase : IImageDatabase
 
         ImageDownloader.DownloadImage(databaseEntry, OnSuccess, PetServices.PetLog.LogException, true);
 
-        return SearchTexture.GetWrapOrEmpty();
+        return null;
     }
 
     public void Cancel(IPettableDatabaseEntry entry)

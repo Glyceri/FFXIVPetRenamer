@@ -181,7 +181,7 @@ internal class StringHelperWrapper : IStringHelper
             return false;
         }
         
-        if (atkNode->OriginalTextPointer.HasValue)
+        if (atkNode->OriginalTextPointer.HasValue && atkNode->TextFlags.HasFlag(TextFlags.Ellipsis))
         {
             // This is so text that gets cut off like Emerald Carbu... gets a chance to replace properly still.
             seString = atkNode->OriginalTextPointer.AsDalamudSeString();
@@ -205,7 +205,7 @@ internal class StringHelperWrapper : IStringHelper
         {
             return false;
         }
-
+        
         bool madeReplacement = ReplaceSeString(colourConfig, ref seString, petData, nameType, user);
 
         OurReplace = true;

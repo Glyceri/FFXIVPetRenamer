@@ -9,7 +9,7 @@ internal static class PluginConstants
 {
     public const string pluginName         = "Pet Nicknames";
 
-    public const int    ffxivNameSize      = 32;
+    public const int    ffxivNameSize      = 20;
     public const char   forbiddenCharacter = '^';
     
     public const ulong  InvalidId          = 0xE0000000;
