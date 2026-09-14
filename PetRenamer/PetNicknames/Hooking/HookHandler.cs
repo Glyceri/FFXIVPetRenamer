@@ -48,7 +48,6 @@ internal class HookHandler : IDisposable
     private void _Register()
     {
         Register(new TextElementHook(DalamudServices, PetServices));
-        
         Register(new MirageHook(DalamudServices, PetServices));
         Register(new HoverHook(DalamudServices, PetServices));
         
@@ -60,6 +59,7 @@ internal class HookHandler : IDisposable
         Register(new ChatHook(DalamudServices, PetServices, ChatHandler));
         Register(new TooltipHook(DalamudServices, PetServices, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
+        Register(new XBMActivePetHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
         Register(new IslandHook(DalamudServices, PetServices, Database));

@@ -153,6 +153,7 @@ internal class PetConfigWindow : PetWindow
             DrawColourConfig(Translator.GetLine("Config.ActionLog"),    ref PetServices.Configuration.ShowNamesInActionLogColour);
             DrawColourConfig(Translator.GetLine("Config.Targetbar"),    ref PetServices.Configuration.ShowOnTargetBarsColour);
             DrawColourConfig(Translator.GetLine("Config.Partylist"),    ref PetServices.Configuration.ShowOnPartyListColour);
+            DrawColourConfig(Translator.GetLine("Config.XBMActivePet"), ref PetServices.Configuration.ShowNamesInActivePetColour);
             
             DrawBasicToggle (Translator.GetLine("Config.PartyCutoff"),  ref PetServices.Configuration.allowPartySummonCutoff);
             DrawInfoHover(Translator.GetLine("Config.PartyCutoff.Help"));

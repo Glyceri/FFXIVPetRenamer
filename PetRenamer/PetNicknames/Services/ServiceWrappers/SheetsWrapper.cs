@@ -1,5 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.UI;
-using Lumina.Excel;
+﻿using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -102,13 +101,13 @@ internal class SheetsWrapper : IPetSheets
     }
     
     public Action? GetAction(uint actionId) 
-        => ActionSheet.GetRow(actionId);
+        => ActionSheet.GetRowOrDefault(actionId);
 
     public BNpcName? GetBNpcName(uint bnpcId) 
-        => BNpcNameSheet.GetRow(bnpcId);
+        => BNpcNameSheet.GetRowOrDefault(bnpcId);
 
     public PetMirage? GetPetMirage(uint petMirageId)
-        => petMirageId != 0 ? PetMirageSheet.GetRow(petMirageId) : null;
+        => petMirageId != 0 ? PetMirageSheet.GetRowOrDefault(petMirageId) : null;
 
     public string GetWorldName(ushort worldId)
     {
@@ -121,7 +120,7 @@ internal class SheetsWrapper : IPetSheets
     }
     
     public LogMessage? GetLogMessage(uint logMessageId)
-        => LogMessageSheet.GetRow(logMessageId);
+        => LogMessageSheet.GetRowOrDefault(logMessageId);
     
     public IPetSheetData? GetPet(PetSkeleton skeletonId)
         => PetSheetCache.FirstOrDefault(t => t.Model == skeletonId);
@@ -291,17 +290,23 @@ internal class SheetsWrapper : IPetSheets
     }
 
     public Pet? GetSheetPet(uint index)
-        => BattlePetSheet.GetRow(index);
+        => BattlePetSheet.GetRowOrDefault(index);
     
     public XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere? GetSheetXBMPet(uint index)
-        => XBMPetSheet.GetRow(index);
+        => XBMPetSheet.GetRowOrDefault(index);
     
     public XBMElement? GetXBMElement(uint index)
-        => XBMElements.GetRow(index);
+        => XBMElements.GetRowOrDefault(index);
     
     public string GetAddonString(uint index)
-        => AddonSheet.GetRow(index).Text.ExtractText();
+        => AddonSheet.GetRowOrDefault(index)?.Text.ExtractText() ?? string.Empty;
 
+    public Companion? GetSheetCompanion(uint index)
+        => PetSheet.GetRowOrDefault(index);
+    
+    public IPetSheetData? GetPetFromBnpcName(uint bNpcId)
+        => PetSheetCache.FirstOrDefault(p => string.Equals(p.Singular, GetBNpcName(bNpcId)?.Singular.ExtractText(), StringComparison.InvariantCultureIgnoreCase));
+            
     [Obsolete]
     public PetSkeleton[] GetObsoleteIDsFromClass(LegacySkeletonType classJob)
     {

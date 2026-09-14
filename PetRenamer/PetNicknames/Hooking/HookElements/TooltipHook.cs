@@ -170,6 +170,18 @@ internal unsafe class TooltipHook : HookableElement
     {
         HandlePronounChange(addonEvent);
         
+        if (PetServices.HoverService.CurrentlyHoveredPet == null)
+        {
+            return;
+        }
+        
+        uint textNodeId = 5;
+        
+        if (PetServices.HoverService.CurrentlyHoveredPet.Model.SkeletonType == SkeletonType.BeastMaster)
+        {
+            textNodeId = 19;
+        }
+        
         AtkUnitBase* addonActionTooltip =  (AtkUnitBase*)addonArgs.Addon.Address;
         
         if (addonActionTooltip == null)
@@ -177,7 +189,7 @@ internal unsafe class TooltipHook : HookableElement
             return;
         }
 
-        AtkTextNode* textNode = addonActionTooltip->GetTextNodeById(5);
+        AtkTextNode* textNode = addonActionTooltip->GetTextNodeById(textNodeId);
         
         if (textNode == null)
         {

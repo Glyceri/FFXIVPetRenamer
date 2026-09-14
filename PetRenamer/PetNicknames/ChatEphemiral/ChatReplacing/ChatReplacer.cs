@@ -64,7 +64,6 @@ internal unsafe class ChatReplacer : IChatReplacer
             colourConfig = PetServices.Configuration.ShowOnEmotesColour;
         }
         
-        
         if (!PetServices.StringHelper.ReplaceSeString(colourConfig, ref editableSeString, pet.Pet, chatElement.ReplaceString, user))
         {
             return null;

@@ -30,7 +30,7 @@ internal class EmoteChatLogParserElement : IChatLogPetParserElement
     public void Reset() 
         => UsedData = null;
 
-    public bool IsMyParser(XivChatType chatType)
+    public bool IsMyParser(XivChatType chatType, uint messageId)
     {
         return (chatType == XivChatType.StandardEmote);
     }

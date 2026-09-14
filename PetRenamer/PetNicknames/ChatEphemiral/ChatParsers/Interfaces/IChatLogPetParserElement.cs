@@ -11,6 +11,6 @@ internal interface IChatLogPetParserElement : IChatLogParserElement
     IPetSheetData? UsedData        { get; }
     
     void      Reset();
-    bool      IsMyParser(XivChatType chatType);
+    bool      IsMyParser(XivChatType chatType, uint messageId);
     IChatPet? Parse(uint messageId, IChatPlayer? chatPlayer); 
 }

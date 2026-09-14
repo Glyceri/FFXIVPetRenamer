@@ -6,7 +6,6 @@ using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
@@ -30,7 +29,7 @@ internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
     public void Reset() 
         => UsedData = null;
     
-    public bool IsMyParser(XivChatType chatType)
+    public bool IsMyParser(XivChatType chatType, uint messageId)
     {
         if (chatType != XivChatType.Action)
         {

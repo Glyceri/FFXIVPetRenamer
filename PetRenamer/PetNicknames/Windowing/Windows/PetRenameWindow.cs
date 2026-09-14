@@ -314,6 +314,6 @@ internal class PetRenameWindow : PetWindow
 
     private void DrawImageInternals()
     {
-        PetBoxImage.DrawPet(PetServices, DalamudServices, ImGui.GetContentRegionAvail(), ActivePetData);
+        PetBoxImage.DrawPet(PetServices, DalamudServices, ImGui.GetContentRegionAvail(), ActivePetData, ActiveEntry);
     }
 }

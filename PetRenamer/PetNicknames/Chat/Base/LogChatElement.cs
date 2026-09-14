@@ -12,9 +12,8 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
 {
     protected readonly DalamudServices DalamudServices;
     
-    private readonly HashSet<LogChatMessage> chatMessages = [];
-    
-    private int expectedLogCount = 0;
+    private readonly HashSet<LogChatMessage> chatMessages        = [];
+    private readonly List<LogChatMessage>    logChatMessageQueue = [];
     
     protected LogChatElement(DalamudServices dalamudServices)
     {
@@ -27,6 +26,8 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
         
         DalamudServices.ChatGui.LogMessage -= OnLogMessage;
         DalamudServices.ChatGui.LogMessage += OnLogMessage;
+        
+        SetupChatMessages();
     }
     
     public sealed override void OnDisable()
@@ -39,12 +40,14 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
     public sealed override void OnDispose()
         { }
     
+    protected abstract void SetupChatMessages();
+    
     protected void Register(LogChatMessage logChatMessage)
         => chatMessages.Add(logChatMessage);
     
     private void OnLogMessage(ILogMessage message)
     {
-        bool expects = false;
+        LogChatMessage? expectsMessage = null;
         
         foreach (LogChatMessage chatMessage in chatMessages)
         {
@@ -52,29 +55,27 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
             {
                 continue;
             }
-        
-            expects = true;
+            
+            expectsMessage = chatMessage;
             
             break;
         }
         
-        if (!expects)
+        if (expectsMessage == null)
         {
             return;
         }
         
-        expectedLogCount++;
+        logChatMessageQueue.Add(expectsMessage.Value);
     }
     
     public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
-        if (expectedLogCount <= 0)
+        if (logChatMessageQueue.Count <= 0)
         {
-            expectedLogCount = 0;
-            
             return;
         }
-
+        
         foreach (LogChatMessage logMessage in chatMessages)
         {
             if (logMessage.LogKind != chatMessage.LogKind || logMessage.SourceKind != chatMessage.SourceKind)
@@ -82,7 +83,12 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
                 continue;
             }
             
-            expectedLogCount--;
+            if (logChatMessageQueue[0].LogId != logMessage.LogId)
+            {
+                continue;
+            }
+            
+            logChatMessageQueue.RemoveAt(0);
             
             logMessage.Callback(chatMessage);
             

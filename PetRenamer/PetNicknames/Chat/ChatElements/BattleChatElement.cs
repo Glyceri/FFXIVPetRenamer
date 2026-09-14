@@ -17,6 +17,13 @@ internal class BattleChatElement : RestrictedChatElement
         PetServices = petServices;
         
         RegisterChat(XivChatType.Action);
+        RegisterChat(XivChatType.Miss);
+        RegisterChat(XivChatType.Damage);
+        RegisterChat(XivChatType.Healing);
+        RegisterChat(XivChatType.GainBuff);
+        RegisterChat(XivChatType.GainDebuff);
+        RegisterChat(XivChatType.LoseBuff);
+        RegisterChat(XivChatType.LoseDebuff);
     }
     
     private void HandleAsPet(IHandleableChatMessage chatMessage, IPettablePet pet)

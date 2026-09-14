@@ -52,9 +52,6 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
 
     public override int GetHashCode()
         => HashCode.Combine(LeadingSkeletonId, SkeletonType);
-
-    public override string ToString()
-        => (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}:") + $" [{LeadingSkeletonId}], [{string.Join("", MirageSkeletonIds)}]";
     
     private static bool IsInMirage(PetSkeleton left, PetSkeleton right)
     {
@@ -94,5 +91,17 @@ internal readonly struct PetSkeleton : IEquatable<PetSkeleton>
         }
         
         return false;
+    }
+    
+    public override string ToString()
+    {
+        string newString = (SkeletonType.GetAttributeOfType<SkeletonTypeSymbolAttribute>()?.Symbol ?? $"{SkeletonType}:") + $" [{LeadingSkeletonId}]";
+        
+        if (MirageSkeletonIds.Length > 0)
+        {
+            newString += $", [{string.Join(", ", MirageSkeletonIds)}]";
+        }
+        
+        return newString;
     }
 }

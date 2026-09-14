@@ -1,9 +1,8 @@
 using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
-using Lumina.Excel.Sheets;
+using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -18,8 +17,13 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Image;
 
 internal static class PetBoxImage
 {
-    public static void DrawPet(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, IPetSheetData? petSheetData, IPettableUser? forUser = null)
+    public static void DrawPet(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, IPetSheetData? petSheetData, IPettableDatabaseEntry? forUser = null)
     {
+        if (XBMIconHelper.BeastActionBlock == null)
+        {
+            return;
+        }
+        
         Vector2 position = ImGui.GetCursorScreenPos();
         
         DrawPaperPlate(size, position);
@@ -41,10 +45,15 @@ internal static class PetBoxImage
     
     private static void DrawBattlePet(DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData)
     {
+        if (XBMIconHelper.ActionBlock == null)
+        {
+            return;
+        }
+        
         DrawActionBox(size, position, XBMIconHelper.ActionBlock, dalamudServices.TextureProvider.GetFromGameIcon(petSheetData.Icon).GetWrapOrEmpty());
     }
     
-    private static void DrawBeast(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData, IPettableUser? forUser)
+    private static void DrawBeast(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData, IPettableDatabaseEntry? forUser)
     {
         if (petServices.Configuration.IconTypeBeast == Configuration.BeastIconType.Blob)
         {
@@ -54,10 +63,17 @@ internal static class PetBoxImage
         {
             DrawBeastAction(dalamudServices, size, position, petSheetData);
         }
+        
+        DrawHorn(petServices, dalamudServices, size, position, petSheetData, forUser);
     }
     
     private static void DrawBeastBlob(DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData)
     {
+        if (XBMIconHelper.BlobImagePart == null)
+        {
+            return;
+        }
+        
         ImDrawListPtr windowDrawList = ImGui.GetWindowDrawList();
         
         ISharedImmediateTexture petWrap = dalamudServices.TextureProvider.GetFromGameIcon(petSheetData.Icon);
@@ -68,14 +84,78 @@ internal static class PetBoxImage
         
         windowDrawList.AddImage(XBMIconHelper.BlobImagePart.Handle, position, position + size, Vector2.Zero, Vector2.One);
         windowDrawList.AddImage(petWrap.GetWrapOrEmpty().Handle, usedInsetPos, usedInsetPos + usedInsetScale, Vector2.Zero, Vector2.One);
-        
-        
     }
     
     private static void DrawBeastAction(DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData)
     {
+        if (XBMIconHelper.BeastActionBlock == null)
+        {
+            return;
+        }
+        
         DrawActionBox(size, position, XBMIconHelper.BeastActionBlock, dalamudServices.TextureProvider.GetFromGameIcon(petSheetData.Icon).GetWrapOrEmpty());
-
+    }
+    
+    private static void DrawHorn(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, Vector2 basePosition, IPetSheetData data, IPettableDatabaseEntry? forUser)
+    {
+        if (forUser == null)
+        {
+            return;
+        }
+        
+        IPettableUser? localPlayer = petServices.UserList.LocalPlayer;
+        
+        if (localPlayer == null)
+        {
+            return;
+        }
+        
+        if (localPlayer.DataBaseEntry.ContentId != forUser.ContentId)
+        {
+            return;
+        }
+        
+        int hornIndex = -1;
+        
+        for (byte i = 0; i < IHornService.AmountOfSlots; i++)
+        {
+            if (!petServices.HornService.TryGetPetForSlot(i, out XBMPet? pet))
+            {
+                continue;
+            }
+            
+            if (data.Icon != pet.Value.Icon)
+            {
+                continue;
+            }
+            
+            hornIndex = i;
+            
+            break;
+        }
+        
+        if (hornIndex < 0)
+        {
+            return;
+        }
+        
+        IDalamudTextureWrap? horn = XBMIconHelper.GetHornTexture(hornIndex);
+        
+        if (horn == null)
+        {
+            return;
+        }
+        
+        size *= 0.55f;
+        basePosition += new Vector2(90, 90) * WindowHandler.GlobalScale;
+        
+        Vector2 insetScale = new Vector2(12);
+        
+        ImScaler.CreateScale(insetScale, size, basePosition, out Vector2 usedInsetScale, out Vector2 usedInsetPos);
+        
+        ImDrawListPtr windowDrawList = ImGui.GetWindowDrawList();
+        
+        windowDrawList.AddImage(horn.Handle, usedInsetPos, usedInsetPos + usedInsetScale, Vector2.Zero, Vector2.One);
     }
     
     private static void DrawMinion(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData)
@@ -125,11 +205,21 @@ internal static class PetBoxImage
     
     private static void DrawMinionOther(DalamudServices dalamudServices, Vector2 size, Vector2 position, uint iconId)
     {
+        if (XBMIconHelper.ActionBlock == null)
+        {
+            return;
+        }
+        
         DrawActionBox(size, position, XBMIconHelper.ActionBlock, dalamudServices.TextureProvider.GetFromGameIcon(iconId).GetWrapOrEmpty());
     }
     
     private static void DrawActionBox(Vector2 size, Vector2 position, IDalamudTextureWrap customBoxWrap, IDalamudTextureWrap? internalDrawElement)
     {
+        if (XBMIconHelper.ActionBacker == null)
+        {
+            return;
+        }
+        
         ImDrawListPtr windowDrawList = ImGui.GetWindowDrawList();
         
         Vector2 borderImageSize = new Vector2(48, 48);
@@ -138,6 +228,10 @@ internal static class PetBoxImage
         Vector2 insetScale      = new Vector2(8);
         
         ImScaler.CreateScale(insetScale, size, position, out Vector2 usedInsetScale, out Vector2 usedInsetPos);
+        
+        Vector4 colour = new Vector4(104, 96, 84, 102) / new Vector4(255);
+        
+        windowDrawList.AddImage(XBMIconHelper.ActionBacker.Handle, usedInsetPos, usedInsetPos + usedInsetScale, Vector2.Zero, Vector2.One, ImGui.GetColorU32(colour));
         
         if (internalDrawElement != null)
         {
@@ -152,6 +246,11 @@ internal static class PetBoxImage
     
     public static void DrawPaperPlate(Vector2 size, Vector2 position)
     {
+        if (XBMIconHelper.TopLeft == null || XBMIconHelper.TopRight == null || XBMIconHelper.BottomLeft == null || XBMIconHelper.BottomRight == null)
+        {
+            return;
+        }
+        
         Vector2 scaling = new Vector2(-12);
         
         IDalamudTextureWrap topLeft     = XBMIconHelper.TopLeft;

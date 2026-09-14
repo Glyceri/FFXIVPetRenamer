@@ -6,40 +6,44 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 
 internal static class XBMIconHelper
 {
-    public static IDalamudTextureWrap TopRight          { get; private set; } = null!;
-    public static IDalamudTextureWrap BottomRight       { get; private set; } = null!;
-    public static IDalamudTextureWrap BottomLeft        { get; private set; } = null!;
-    public static IDalamudTextureWrap TopLeft           { get; private set; } = null!;
-    public static IDalamudTextureWrap ActionBlock       { get; private set; } = null!;
-    public static IDalamudTextureWrap BeastActionBlock  { get; private set; } = null!;
-    public static IDalamudTextureWrap BlobImagePart     { get; private set; } = null!;
+    public static IDalamudTextureWrap?  TopRight          { get; private set; }
+    public static IDalamudTextureWrap?  BottomRight       { get; private set; }
+    public static IDalamudTextureWrap?  BottomLeft        { get; private set; }
+    public static IDalamudTextureWrap?  TopLeft           { get; private set; }
+    public static IDalamudTextureWrap?  ActionBlock       { get; private set; }
+    public static IDalamudTextureWrap?  BeastActionBlock  { get; private set; }
+    public static IDalamudTextureWrap?  BlobImagePart     { get; private set; }
+    public static IDalamudTextureWrap?  ActionBacker      { get; private set; }
     
-    private static IDalamudTextureWrap Horn1Texture = null!;
-    private static IDalamudTextureWrap Horn2Texture = null!;
-    private static IDalamudTextureWrap Horn3Texture = null!;
+    private static IDalamudTextureWrap? Horn1Texture;
+    private static IDalamudTextureWrap? Horn2Texture;
+    private static IDalamudTextureWrap? Horn3Texture;
     
-    private static UldWrapper XBMNoteBookWrapper = null!;
+    private static UldWrapper?          XBMNoteBookWrapper;
+    private static UldWrapper?          XBMNoteDetailWrapper;
     
     public static void Constructor(DalamudServices dalamudServices)
     {
-        XBMNoteBookWrapper  = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/XBMMonsterBookDetail.uld");
+        XBMNoteDetailWrapper = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/XBMMonsterBookDetail.uld");
+        XBMNoteBookWrapper   = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/XBMActivePet.uld");
         
-        TopLeft             = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 0)!;
-        TopRight            = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 1)!;
-        BottomLeft          = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 2)!;
-        BottomRight         = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 3)!;
+        TopLeft             = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 0);
+        TopRight            = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 1);
+        BottomLeft          = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 2);
+        BottomRight         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 3);
         
-        BlobImagePart       = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  1)!;
+        BlobImagePart       = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  1);
+        ActionBacker        = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/AozNoteBook_hr1.tex",   8);
         
-        ActionBlock         = XBMNoteBookWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   0)!;
-        BeastActionBlock    = XBMNoteBookWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   4)!;
+        ActionBlock         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   0);
+        BeastActionBlock    = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   4);
         
-        Horn1Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex", 2)!;
-        Horn2Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex", 3)!;
-        Horn3Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex", 4)!;
+        Horn1Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  1);
+        Horn2Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  2);
+        Horn3Texture        = XBMNoteBookWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  3);
     }
     
-    public static IDalamudTextureWrap? GetHornTexture(sbyte hornSlot)
+    public static IDalamudTextureWrap? GetHornTexture(int hornSlot)
     {
         switch (hornSlot)
         {
@@ -68,5 +72,6 @@ internal static class XBMIconHelper
         Horn3Texture?.Dispose();
         
         XBMNoteBookWrapper?.Dispose();
+        XBMNoteDetailWrapper?.Dispose();
     }
 }

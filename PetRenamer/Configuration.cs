@@ -51,6 +51,7 @@ internal class Configuration : IPluginConfiguration
     public ColourConfig         ShowNamesInActionLogColour  = new ColourConfig();
     public ColourConfig         ShowOnTargetBarsColour      = new ColourConfig();
     public ColourConfig         ShowOnPartyListColour       = new ColourConfig();
+    public ColourConfig         ShowNamesInActivePetColour  = new ColourConfig();
     
     public GroupConfig          ChatModeGroup               = new GroupConfig(false);
     

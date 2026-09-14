@@ -2,35 +2,32 @@ using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
-using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
+using System.Linq;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
-internal class SystemChatLogParserElement : IChatLogPetParserElement
+internal class SystemChatNotebookLogParserElement : IChatLogPetParserElement
 {
     private static readonly uint[] ValidMessageIds =
     [
-        640,        // <head(<ennoun(BNpcName,2,lnum1,1,1)>)> withdraws from the battlefield.
-        642,        // You give <ennoun(BNpcName,2,lnum1,1,1)> the order “<sheet(PetAction,lnum2,0)>.”
-        3840,       // The next <string(lstr1)> summoned will appear glamoured as <string(lstr2)>.
-        3841        // The next <string(lstr1)> summoned will appear unglamoured.
+        4500, // <colortype(500)><edgecolortype(501)><head(<sheet(Companion,lnum1,0)>)><edgecolortype(0)><colortype(0)> was added to your favorites.
+        4504, // <colortype(500)><edgecolortype(501)><head(<sheet(Companion,lnum1,0)>)><edgecolortype(0)><colortype(0)> was removed from your favorites.
     ];
     
     private readonly IPetServices     PetServices;
     private readonly IChatPetDatabase PetDatabase;
     
-    public SystemChatLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public SystemChatNotebookLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
     {
         PetDatabase = petDatabase;
         PetServices = petServices;
     }
     
     public NameType ReplaceNameType
-        => NameType.Raw;
+        { get; private set; } = NameType.Raw;
     
     public IPetSheetData? UsedData 
         { get; private set; } = null;
@@ -45,14 +42,15 @@ internal class SystemChatLogParserElement : IChatLogPetParserElement
             return false;
         }
         
-        return (chatType == XivChatType.SystemMessage || chatType == XivChatType.SystemError);
+        return chatType == XivChatType.SystemMessage;
     }
 
     public IChatPet? Parse(uint messageId, IChatPlayer? chatPlayer)
     {
-        UsedData = null;
+        UsedData        = null;
+        ReplaceNameType = NameType.Raw;
         
-        if (!ValidMessageIds.Contains(messageId))
+        if (chatPlayer == null)
         {
             return null;
         }
@@ -62,15 +60,14 @@ internal class SystemChatLogParserElement : IChatLogPetParserElement
             return null;
         }
         
-        IPettablePet? pettablePet = PetServices.UserList.LocalPlayer.GetYoungestPet([SkeletonType.BattlePet, SkeletonType.BeastMaster]);
-        
-        if (pettablePet == null)
+        if (PetServices.HoverService.CurrentlyHoveredPet == null)
         {
             return null;
         }
         
-        UsedData = pettablePet.PetData;
+        ReplaceNameType = PetServices.HoverService.CurrentNameType;
+        UsedData        = PetServices.HoverService.CurrentlyHoveredPet;
         
-        return PetDatabase.MakeChatPet(pettablePet.SkeletonId, PetServices.UserList.LocalPlayer.DataBaseEntry.Name, PetServices.UserList.LocalPlayer.DataBaseEntry.Homeworld);
+        return PetDatabase.MakeChatPet(PetServices.HoverService.CurrentlyHoveredPet.Model, chatPlayer);
     }
 }

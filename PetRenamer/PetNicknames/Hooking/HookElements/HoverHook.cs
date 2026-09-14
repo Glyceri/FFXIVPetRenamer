@@ -70,9 +70,7 @@ internal class HoverHook : HookableElement
             return;
         }
         
-        XBMPet? pet = PetServices.HornService.GetPetForSlot((byte)hornIndex);
-        
-        if (pet == null)
+        if (!PetServices.HornService.TryGetPetForSlot((byte)hornIndex, out XBMPet? pet))
         {
             return;
         }
@@ -83,8 +81,6 @@ internal class HoverHook : HookableElement
         {
             return;
         }
-        
-        // TODO: Probably have to do some sort of softening for beast master pets
         
         PetServices.HoverService.SetHoveredPet(petData);
         PetServices.HoverService.SetCurrentNameType(NameType.Action);

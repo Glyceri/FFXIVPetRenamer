@@ -6,4 +6,5 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 internal interface IChatLogPlayerParserElement : IChatLogParserElement
 {
     IChatPlayer? Parse(ILogMessageEntity? logMessageEntity);
+    IChatPlayer? MakeFromLocalPlayer();
 }

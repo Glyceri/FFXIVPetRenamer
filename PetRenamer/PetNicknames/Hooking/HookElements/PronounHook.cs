@@ -7,9 +7,14 @@ using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DalamudSeString = Dalamud.Game.Text.SeStringHandling.SeString;
+using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -20,17 +25,17 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
     
     private readonly Hook<Localize.Delegates.ProcessNoun> LocalizeProcessNounHook;
     
-    private readonly List<string> AllowedSheetNames = [];
+    private readonly List<(string, Func<IPetSheets, uint, bool>)> AllowedSheetNames = [];
     
     public PronounHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices)
     {
         LocalizeProcessNounHook = DalamudServices.Hooking.HookFromAddress<Localize.Delegates.ProcessNoun>((nint)Localize.MemberFunctionPointers.ProcessNoun, LocalizeProcessNounDetour);
         
-        Register<Companion>();
-        Register<BNpcName>();
-        Register<Pet>();
-        Register<XBMPet>();
+        Register<Companion>(HandleValidCompanion);
+        Register<BNpcName>(HandleValidPet);
+        Register<Pet>(HandleValidPet);
+        Register<XBMPet>(HandleValidXBMPet);
         
         PetServices.NameService.RegisterPronounHook(this);
     }
@@ -61,12 +66,33 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
         
         string sheetString = nounParams->SheetName.ExtractText();
         
-        if (!AllowedSheetNames.Contains(sheetString))
+        bool contains = false;
+        int  index    = 0;
+        
+        for (int i = 0; i < AllowedSheetNames.Count; i++)
+        {
+            if (!string.Equals(AllowedSheetNames[i].Item1, sheetString, StringComparison.InvariantCultureIgnoreCase))
+            {
+                continue;
+            }
+            
+            contains = true;
+            index    = i;
+            
+            break;
+        }
+        
+        if (!contains)
         {
             return returner;
         }
         
-        PetServices.PetLog.DevLogInfo($"ProcessNounDetour: [{nounParams->SheetName.ToString()}] [{outString->ToString()}].");
+        PetServices.PetLog.DevLogInfo($"ProcessNounDetour: [{nounParams->SheetName.ToString()}] [{outString->ToString()}] [RowId: {nounParams->RowId}, ArticleType: {nounParams->ArticleType}, GrammaticalCase: {nounParams->GrammaticalCase}, LinkMarker: {nounParams->LinkMarker}].");
+        
+        if (!AllowedSheetNames[index].Item2(PetServices.PetSheets, (uint)nounParams->RowId))
+        {
+            return returner;
+        }
         
         PreviousLastGottenPronoun = LastGottenPronoun;
         LastGottenPronoun         = outString->StringPtr.AsDalamudSeString();
@@ -74,7 +100,7 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
         return returner;
     }
     
-    private void Register<T>()
+    private void Register<T>(Func<IPetSheets, uint, bool> checkFunc)
         where T : struct, IExcelRow<T>
     {
         SheetAttribute? sheetAttribute = typeof(T).GetCustomAttribute<SheetAttribute>();
@@ -89,6 +115,37 @@ internal unsafe class PronounHook : HookableElement, IPronounHook
             return;
         }
         
-        AllowedSheetNames.Add(sheetAttribute.Name);
+        AllowedSheetNames.Add((sheetAttribute.Name, checkFunc));
+    }
+    
+    private static bool HandleValidCompanion(IPetSheets petSheets, uint rowId)
+    {
+        Companion? companion = petSheets.GetSheetCompanion(rowId);
+        
+        if (companion == null)
+        {
+            return false;
+        }
+        
+        IPetSheetData? petSheetData = petSheets.GetPet(new PetSkeleton(SkeletonType.Minion, companion.Value.Model.RowId));
+        
+        return petSheetData != null;
+    }
+    
+    private static bool HandleValidPet(IPetSheets petSheets, uint rowId)
+        => petSheets.GetPetFromBnpcName(rowId) != null;
+    
+    private static bool HandleValidXBMPet(IPetSheets petSheets, uint rowId)
+    {
+        XBMPet? pet = petSheets.GetSheetXBMPet(rowId);
+        
+        if (pet == null)
+        {
+            return false;
+        }
+        
+        IPetSheetData? petSheetData = petSheets.GetPetFromIcon(pet.Value.Icon);
+        
+        return petSheetData != null;
     }
 }

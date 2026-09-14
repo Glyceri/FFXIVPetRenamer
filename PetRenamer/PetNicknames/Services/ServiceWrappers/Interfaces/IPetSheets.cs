@@ -18,6 +18,7 @@ internal interface IPetSheets
     IPetSheetData[]     GetLegacyPets(int legacyModelId);
     List<IPetSheetData> GetMissingBattlePets(List<PetSkeleton> battlePetSkeletons);
     IPetSheetData?      GetPetFromName(string name);
+    IPetSheetData?      GetPetFromBnpcName(uint bNpcId);
     IPetSheetData?      GetPetFromIcon(uint iconId);
     IPetSheetData?      GetPetFromAction(uint actionId);
     IPetSheetData       MakeSoft(IPettableUser user, IPetSheetData oldData);
@@ -32,6 +33,7 @@ internal interface IPetSheets
     IPetSheetData[]     AllPets { get; }
     
     Pet?                GetSheetPet(uint index);
+    Companion?          GetSheetCompanion(uint index);
     XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere?             GetSheetXBMPet(uint index);
     XBMElement?         GetXBMElement(uint index);
     string              GetAddonString(uint index);

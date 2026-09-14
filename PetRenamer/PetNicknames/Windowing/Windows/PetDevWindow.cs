@@ -43,6 +43,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using XBMPet = PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets.XBMPetButActuallyWorkingSinceForSomeReasonWePutInUnsusedSheetsAndNowEverythingIsABreakingChangeBecauseWhyWouldntItBeLikeWhatAreWeGenuinelyDoingHere;
 
 namespace PetRenamer.PetNicknames.Windowing.Windows;
 
@@ -718,9 +719,17 @@ internal class PetDevWindow : PetWindow
         
         ImGui.Separator();
         
-        ImGui.Text($"[Service] Horn 1: {PetServices.HornService.GetPetForSlot(0)?.Pet.ValueNullable?.Name}");
-        ImGui.Text($"[Service] Horn 2: {PetServices.HornService.GetPetForSlot(1)?.Pet.ValueNullable?.Name}");
-        ImGui.Text($"[Service] Horn 3: {PetServices.HornService.GetPetForSlot(2)?.Pet.ValueNullable?.Name}");
+        XBMPet? pet;
+        
+        for (byte i = 0; i < IHornService.AmountOfSlots; i++)
+        {
+            if (!PetServices.HornService.TryGetPetForSlot(i, out pet))
+            {
+                continue;
+            }
+            
+            ImGui.Text($"[Service] Horn {i + 1}: {pet.Value.Pet.Value.Name.ExtractText()}");
+        }
     }
     
     unsafe void DrawCasts()

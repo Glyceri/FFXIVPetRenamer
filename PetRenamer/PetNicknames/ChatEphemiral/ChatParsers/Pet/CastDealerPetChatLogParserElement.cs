@@ -29,9 +29,16 @@ internal class CastDealerPetChatLogParserElement : IChatLogPetParserElement
     public void Reset() 
         => UsedData = null;
     
-    public bool IsMyParser(XivChatType chatType)
+    public bool IsMyParser(XivChatType chatType, uint messageId)
     {
-        if (chatType != XivChatType.Action)
+        if (chatType != XivChatType.Action && 
+            chatType != XivChatType.Miss &&
+            chatType != XivChatType.Damage &&
+            chatType != XivChatType.Healing &&
+            chatType != XivChatType.GainBuff &&
+            chatType != XivChatType.GainDebuff &&
+            chatType != XivChatType.LoseBuff &&
+            chatType != XivChatType.LoseDebuff)
         {
             return false;
         }
