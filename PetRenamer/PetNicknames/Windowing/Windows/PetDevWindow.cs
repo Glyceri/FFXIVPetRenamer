@@ -450,7 +450,7 @@ internal class PetDevWindow : PetWindow
             ImGui.Text(pet.ActionName);
             
             if (ImGui.TableNextColumn())
-            PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(64, 64), pet, PetServices.UserList.LocalPlayer?.DataBaseEntry);
+            PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(200, 200), pet, PetServices.UserList.LocalPlayer?.DataBaseEntry);
         }
         
         ImGui.EndTable();

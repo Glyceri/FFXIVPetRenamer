@@ -42,7 +42,7 @@ internal unsafe class PettableIslandUser : IIslandUser
     public bool IsLocalPlayer
         => false;
     
-    public void SetBattlePet(BattleChara* pointer)
+    public void AddBattlePet(BattleChara* pointer)
         => PettablePets.Add(new PettableIslandPet(pointer, this, PetServices));
 
     public string? GetCustomName(PetSkeleton petSkeleton)

@@ -325,8 +325,8 @@ internal static class PetBoxImage
             return;
         }
         
-        Vector2 iconSize       = new Vector2(size.X * 0.193f, size.Y * 0.191f);
-        Vector2 calculation    = new Vector2(iconSize.X * 3.17f, 0);
+        Vector2 iconSize       = new Vector2(usedInsetScale.X * 0.2f, usedInsetScale.Y * 0.2f);
+        Vector2 calculation    = new Vector2(usedInsetScale.X * 0.698f, usedInsetScale.Y * 0.005f);
         Vector2 offsetPosition = usedInsetPos + calculation;
         
         windowDrawList.AddImage(raceIcon.Handle, offsetPosition, offsetPosition + iconSize, Vector2.Zero, Vector2.One);

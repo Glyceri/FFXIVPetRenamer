@@ -25,7 +25,7 @@ internal unsafe interface IPettableUser : IBattleUser
 
     void OnLastCastChanged(uint cast);
     void Update();
-    void SetBattlePet(BattleChara* battlePet);
+    void AddBattlePet(BattleChara* battlePet);
     void RemoveBattlePet(BattleChara* battlePet);
     void SetCompanion(Companion* companion);
     void RemoveCompanion();

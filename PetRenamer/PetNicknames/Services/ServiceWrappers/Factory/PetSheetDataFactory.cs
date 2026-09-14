@@ -46,12 +46,10 @@ internal static class PetSheetDataFactory
         singular = singular.ToTitleCase();
         
         uint   icon          = companion.Icon;
-        uint   action        = companion.RowId;
         sbyte  pronoun       = companion.Pronoun;
         uint   raceId        = companion.MinionRace.ValueNullable?.RowId ?? 0;
         string raceName      = companion.MinionRace.ValueNullable?.Name.ExtractText() ?? string.Empty;
         string behaviourName = companion.Behavior.ValueNullable?.Name.ExtractText() ?? string.Empty;
-        string actionName    = petSheets.GetAction(action)?.Name.ExtractText() ?? string.Empty;
         
         ClientLanguage clientLanguage = dalamudServices.ClientState.ClientLanguage;
 
@@ -60,7 +58,7 @@ internal static class PetSheetDataFactory
             singular = GermanReplace(singular, pronoun);
         }
         
-        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, actionName, action);
+        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, companion.RowId);
     }
     
     public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, PetRegistration petRegistration)

@@ -234,7 +234,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                 continue;
             }
 
-            user.SetBattlePet(newBattleChara);
+            user.AddBattlePet(newBattleChara);
 
             ownerFound = true;
                 
@@ -293,7 +293,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return;
         }
 
-        islandUser.SetBattlePet(newBattleChara);
+        islandUser.AddBattlePet(newBattleChara);
     }
 
     private void HandleAsDeleted(BattleChara* newBattleChara)
@@ -399,7 +399,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                 continue;
             }
             
-            user.SetBattlePet(tempPet);
+            user.AddBattlePet(tempPet);
             
             _temporaryPets[i] = nint.Zero;
         }

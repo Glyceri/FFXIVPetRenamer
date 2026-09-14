@@ -66,6 +66,8 @@ internal class PetListWindow : PetWindow
         ImageDatabase   = imageDatabase;
         DataParser      = dataParser;
         DataWriter      = dataWriter;
+        
+        Open();
     }
 
     protected override Vector2 MinSize

@@ -7,6 +7,7 @@ using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -267,8 +268,7 @@ internal unsafe class PettableUser : IPettableUser
         return youngestPet;
     }
     
-    
-    public void SetBattlePet(BattleChara* pointer)
+    public void AddBattlePet(BattleChara* pointer)
     {
         for (int i = PettablePets.Count - 1; i >= 0; i--)
         {
@@ -292,23 +292,23 @@ internal unsafe class PettableUser : IPettableUser
     
     private void HandleSubKindPet(BattleChara* pointer)
     {
-        int modelCharaId = pointer->ModelContainer.ModelCharaId;
+        uint modelCharaId = (uint)pointer->ModelContainer.ModelCharaId;
         
-        if (InList(modelCharaId, PluginConstants.BattlePetRegistrations))
+        if (InList(new PetSkeleton(SkeletonType.BattlePet, modelCharaId), PluginConstants.BattlePetRegistrations))
         {
             CreateNewPet(new PettablePet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
         }
-        else if (InList(modelCharaId, PluginConstants.BeastMasterPetRegistrations))
+        else if (InList(new PetSkeleton(SkeletonType.BeastMaster, modelCharaId), PluginConstants.BeastMasterPetRegistrations))
         {
             CreateNewPet(new PettableBeastMasterPet(pointer, this, SharingDictionary, DataBaseEntry, PetServices));
         }
     }
     
-    private bool InList(int modelCharaId, PetRegistration[] petRegistrations)
+    private bool InList(PetSkeleton petSkeleton, PetRegistration[] petRegistrations)
     {
         foreach (PetRegistration petRegistration in petRegistrations)
         {
-            if (petRegistration.PetSkeleton.LeadingSkeletonId != modelCharaId)
+            if (petRegistration.PetSkeleton != petSkeleton)
             {
                 continue;
             }
