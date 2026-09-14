@@ -15,9 +15,6 @@ using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
-// TODO: When the AreaMap is open, hovering over an action that is
-// meant for renaming it renames to the first tooltip of the map, its a bit weird.
-
 internal unsafe class MapHook : HookableElement
 {
     private const uint MinimapIconHoverEvent = 1;

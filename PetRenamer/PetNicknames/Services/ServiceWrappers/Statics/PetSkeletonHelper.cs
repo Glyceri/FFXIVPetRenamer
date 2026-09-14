@@ -5,21 +5,6 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
 internal static class PetSkeletonHelper
 {
-    public static bool IsInvalid(this PetSkeleton petSkeleton)
-    {
-        if (petSkeleton.SkeletonType == (SkeletonType)0)
-        {
-            return true;
-        }
-
-        if (petSkeleton.LeadingSkeletonId == 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     public static void AsLegacy(this PetSkeleton petSkeleton, out int Id)
     {
         Id = (int)petSkeleton.LeadingSkeletonId;

@@ -11,5 +11,5 @@ internal unsafe class PettableBeastMasterPet : PettableBattlePet
 {
     public PettableBeastMasterPet(BattleChara* battlePet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices) 
         : base(battlePet, owner, sharingDictionary, entry, petServices, SkeletonType.BeastMaster)
-    { }
+        { }
 }

@@ -128,7 +128,7 @@
   "Config.ReturnToDefault.Help": "When switching users in the Pet List you will automatically return\nto the local user instead of the selected target.",
   
   "Config.ColourSettings": "Global Colours",
-  "Config.XBMActivePet": "Show nicknames in the Battlehorn Settings.",
+  "Config.XBMActivePet": "Show nicknames for Beast Master UI.",
   
   "Config.ContextMenu": "Allow Context Menus.",
   "Config.ShowNotification": "Show Notifications.",

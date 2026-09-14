@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
-using PetRenamer.PetNicknames.WritingAndParsing.Enums;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces.IParseResults;
 using PetRenamer.PetNicknames.WritingAndParsing.Structs;
 using System.Collections.Generic;

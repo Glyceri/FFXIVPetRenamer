@@ -39,8 +39,6 @@ internal class PetRenameWindow : PetWindow
         PetServices.DirtyListener.RegisterOnDirtyPet(DirtyPet);
         PetServices.DirtyListener.RegisterOnPlayerCharacterDirty(DirtyUser);
         PetServices.DirtyListener.RegisterOnDirtyName(DirtyName);
-        
-        Open();
     }
 
     protected override void OnDispose()

@@ -66,8 +66,6 @@ internal class PetListWindow : PetWindow
         ImageDatabase   = imageDatabase;
         DataParser      = dataParser;
         DataWriter      = dataWriter;
-        
-        Open();
     }
 
     protected override Vector2 MinSize
@@ -330,7 +328,18 @@ internal class PetListWindow : PetWindow
             
             float size = ImGui.GetContentRegionAvail().Y;
             
-            PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(size, size), pet.PetSheetData, ActiveEntry);
+            bool isValidUser = ActiveEntry?.ContentId == PetServices.UserList.LocalPlayer?.DataBaseEntry.ContentId;
+                
+            if (PetServices.Configuration.debugModeActive)
+            {
+                isValidUser = true;
+            }
+            
+            if (PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(size, size), pet.PetSheetData, ActiveEntry) && isValidUser)
+            {
+                WindowHandler.GetWindow<PetRenameWindow>()?.SetRenameWindow(pet.PetSheetData.Model, ActiveEntry);
+                WindowHandler.GetWindow<PetRenameWindow>()?.RequestFocus = true;
+            }
 
             ImGui.SameLine();
             

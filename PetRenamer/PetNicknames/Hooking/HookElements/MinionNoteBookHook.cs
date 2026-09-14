@@ -46,7 +46,7 @@ internal unsafe class MinionNoteBookHook : HookableElement
         ForceRefreshAddon("MinionNoteBook");
     }
 
-    private void HandleBook(AtkUnitBase* atkUnitBase, uint textNodeIndex)
+    private void HandleBook(AtkUnitBase* atkUnitBase, uint textNodeIndex, Configuration.ColourConfig colourConfig)
     {
         if (atkUnitBase == null)
         {
@@ -67,24 +67,24 @@ internal unsafe class MinionNoteBookHook : HookableElement
         
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromName(textNode->NodeText.ExtractText());
         
-        PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInMinionBookColour, textNode, petData, NoteBookNameType.GetValue(DalamudServices));
+        PetServices.StringHelper.ReplaceAtkString(colourConfig, textNode, petData, NoteBookNameType.GetValue(DalamudServices));
     }
     
     private void HandlePostRefreshNoteBook(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 67);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 67, PetServices.Configuration.ShowNamesInMinionBookColour);
 
     private void HandlePostRefreshMJINoteBook(AddonEvent addonEvent, AddonArgs args) 
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 65);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 65, PetServices.Configuration.ShowNamesInMinionBookColour);
     
     private void HandlePostRefreshLovmPaletteEdit(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 48);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 48, PetServices.Configuration.ShowNamesInMinionBookColour);
     
     private void HandlePostRefreshLovmActionDetail(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 4);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 4, PetServices.Configuration.ShowNamesInMinionBookColour);
     
     private void HandlePostRefreshYKWNote(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 28);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 28, PetServices.Configuration.ShowNamesInMinionBookColour);
     
     private void HandlePostRefreshXBM(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 13);
+        => HandleBook((AtkUnitBase*)args.Addon.Address, 13, PetServices.Configuration.ShowNamesInActivePetColour);
 }

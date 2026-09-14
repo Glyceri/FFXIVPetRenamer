@@ -172,7 +172,7 @@ internal class StringHelperWrapper : IStringHelper
         return newPayloads;
     }
     
-    private unsafe bool MakeSeString(AtkTextNode* atkNode, [NotNullWhen(true)] out SeString? seString)
+    private unsafe bool MakeSeString(AtkTextNode* atkNode, bool allowOriginalPointer, [NotNullWhen(true)] out SeString? seString)
     {
         seString = null;
         
@@ -181,7 +181,7 @@ internal class StringHelperWrapper : IStringHelper
             return false;
         }
         
-        if (atkNode->OriginalTextPointer.HasValue && atkNode->TextFlags.HasFlag(TextFlags.Ellipsis))
+        if (atkNode->OriginalTextPointer.HasValue && allowOriginalPointer)
         {
             // This is so text that gets cut off like Emerald Carbu... gets a chance to replace properly still.
             seString = atkNode->OriginalTextPointer.AsDalamudSeString();
@@ -194,14 +194,14 @@ internal class StringHelperWrapper : IStringHelper
         return true;
     }
     
-    public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null)
+    public unsafe bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null, bool allowOriginalPointer = true)
     {
         if (_alreaydSetElements.Contains((nint)atkNode))
         {
             return false;
         }
         
-        if (!MakeSeString(atkNode, out SeString? seString))
+        if (!MakeSeString(atkNode, allowOriginalPointer, out SeString? seString))
         {
             return false;
         }

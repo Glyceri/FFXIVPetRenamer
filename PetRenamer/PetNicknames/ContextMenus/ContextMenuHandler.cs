@@ -36,6 +36,7 @@ internal class ContextMenuHandler : IDisposable
         Register(new MJIMinionNotebookContextMenu (PetServices, WindowHandler));
         Register(new QuickPanelContextMenu        (PetServices, WindowHandler));
         Register(new XBMMonsterNoteBookContextMenu(PetServices, WindowHandler));
+        Register(new XBMPetPartyContextMenu       (PetServices, WindowHandler));
     }
     
     public void Dispose()

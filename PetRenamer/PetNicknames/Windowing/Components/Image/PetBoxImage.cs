@@ -19,11 +19,11 @@ namespace PetRenamer.PetNicknames.Windowing.Components.Image;
 
 internal static class PetBoxImage
 {
-    public static void DrawPet(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, IPetSheetData? petSheetData, IPettableDatabaseEntry? forUser = null)
+    public static bool DrawPet(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, IPetSheetData? petSheetData, IPettableDatabaseEntry? forUser = null)
     {
         InternalDrawPet(petServices, dalamudServices, size, petSheetData, forUser);
         
-        ImGui.InvisibleButton($"###PETINVIS_{WindowHandler.InternalCounter}", size);
+        return ImGui.InvisibleButton($"###PETINVIS_{WindowHandler.InternalCounter}", size);
     }
     
     private static void InternalDrawPet(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, IPetSheetData? petSheetData, IPettableDatabaseEntry? forUser = null)
@@ -208,14 +208,14 @@ internal static class PetBoxImage
             return;
         }
         
-        DrawIcon(XBMIconHelper.MinionIcon, basePosition, size, 10);
+        DrawIcon(XBMIconHelper.MinionIcon, basePosition, size);
     }
     
     private static void DrawBattlePetIcon(DalamudServices dalamudServices, Vector2 size, Vector2 basePosition)
     {
         ISharedImmediateTexture iconThing = dalamudServices.TextureProvider.GetFromGameIcon(62045);
         
-        DrawIcon(iconThing.GetWrapOrEmpty(), basePosition, size, 10);
+        DrawIcon(iconThing.GetWrapOrEmpty(), basePosition, size);
     }
     
     private static void DrawHorn(IPetServices petServices, Vector2 size, Vector2 basePosition, IPetSheetData data, IPettableDatabaseEntry? forUser)
@@ -228,11 +228,6 @@ internal static class PetBoxImage
         IPettableUser? localPlayer = petServices.UserList.LocalPlayer;
         
         if (localPlayer == null)
-        {
-            return;
-        }
-        
-        if (localPlayer.DataBaseEntry.ContentId != forUser.ContentId)
         {
             return;
         }
@@ -256,6 +251,11 @@ internal static class PetBoxImage
             break;
         }
         
+        if (localPlayer.DataBaseEntry.ContentId != forUser.ContentId)
+        {
+            hornIndex = -1;
+        }
+        
         IDalamudTextureWrap? horn = XBMIconHelper.GetHornTexture(hornIndex);
         
         if (horn == null)
@@ -268,21 +268,17 @@ internal static class PetBoxImage
             return;
         }
         
-        DrawIcon(horn, basePosition, size, 12);
+        DrawIcon(horn, basePosition, size);
     }
     
-    private static void DrawIcon(IDalamudTextureWrap texture, Vector2 basePosition, Vector2 size, int inset)
+    private static void DrawIcon(IDalamudTextureWrap texture, Vector2 basePosition, Vector2 size)
     {
-        size *= 0.45f;
-        basePosition += new Vector2(-10, -10) * WindowHandler.GlobalScale;
-        
-        Vector2 insetScale = new Vector2(inset);
-        
-        ImScaler.CreateScale(insetScale, size, basePosition, out Vector2 usedInsetScale, out Vector2 usedInsetPos);
+        size         *= 0.4f;
+        basePosition += new Vector2(2, 2) * WindowHandler.GlobalScale;
         
         ImDrawListPtr windowDrawList = ImGui.GetWindowDrawList();
         
-        windowDrawList.AddImage(texture.Handle, usedInsetPos, usedInsetPos + usedInsetScale, Vector2.Zero, Vector2.One);
+        windowDrawList.AddImage(texture.Handle, basePosition, basePosition + size, Vector2.Zero, Vector2.One);
     }
     
     private static void DrawMinion(IPetServices petServices, DalamudServices dalamudServices, Vector2 size, Vector2 position, IPetSheetData petSheetData)

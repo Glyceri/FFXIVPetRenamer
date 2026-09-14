@@ -31,7 +31,7 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         Address             = (nint)pet;
         Owner               = owner;
         ObjectId            = pet->GetGameObjectId();
-        SkeletonId          = new PetSkeleton(skeletonType, pet->ModelContainer.ModelCharaId);
+        SkeletonId          = CreatePetSkeleton(skeletonType, (uint)pet->ModelContainer.ModelCharaId);
         PetData             = petServices.PetSheets.GetPet(SkeletonId);
         
         PetServices.PetLog.DevLogVerbose($"Just created a new pet at Address: {Address}, and the ObjectID: {ObjectId}");
@@ -78,5 +78,29 @@ internal abstract unsafe class BasePettablePet : IPettablePet
         }
 
         Owner.GetDrawColours(PetData.Model, colourConfig, out edgeColour, out textColour);
+    }
+    
+    private PetSkeleton CreatePetSkeleton(SkeletonType type, uint modelCharaId)
+    {
+        if (type != SkeletonType.BeastMaster)
+        {
+            return new PetSkeleton(type, modelCharaId);
+        }
+        
+        PetSkeleton beastSkeleton = new PetSkeleton(type, modelCharaId);
+        
+        foreach (PetRegistration petSkeleton in PluginConstants.BeastMasterPetRegistrations)
+        {
+            if (petSkeleton.PetSkeleton != beastSkeleton)
+            {
+                continue;
+            }
+            
+            return petSkeleton.PetSkeleton;
+        }
+        
+        PetServices.PetLog.LogFatal("Just created a beast pet skeleton with a raw ID, this is NOT good.");
+        
+        return beastSkeleton;
     }
 }

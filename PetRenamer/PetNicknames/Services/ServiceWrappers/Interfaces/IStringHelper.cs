@@ -15,7 +15,7 @@ internal unsafe interface IStringHelper
     bool ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
     bool ReplaceChat(Configuration.ColourConfig colourConfig, IHandleableChatMessage chatMessage, IPettablePet? pettablePet, NameType nameType);
     
-    bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null);
+    bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPetSheetData? petData, NameType nameType, IPettableUser? user = null, bool allowOriginalPointer = true);
     bool ReplaceAtkString(Configuration.ColourConfig colourConfig, AtkTextNode* atkNode, IPettablePet? pettablePet, NameType nameType);
     
     bool ReplaceSeString(Configuration.ColourConfig colourConfig, ref SeString seString, PetSkeleton petSkeleton, string baseName, IPettableUser? user = null);
