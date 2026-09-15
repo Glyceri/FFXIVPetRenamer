@@ -12,7 +12,8 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal unsafe class TargetManagerWrapper : ITargetManager
 {
-    public bool Enabled { get; set; } = true;
+    public bool Enabled
+        => true;
 
     private readonly DalamudServices DalamudServices;
     private readonly IUserList       UserList;

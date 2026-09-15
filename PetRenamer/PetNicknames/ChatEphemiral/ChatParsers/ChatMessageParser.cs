@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.ChatElement;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -11,9 +10,9 @@ internal class ChatMessageParser : IChatMessageParser
 {
     private readonly List<IChatMessageParserElement> ChatMessageParsers = [];
     
-    public ChatMessageParser(IChatDatabaseHandler chatDatabaseHandler, IPetServices petServices)
+    public ChatMessageParser(IPetServices petServices)
     {
-        ChatMessageParsers.Add(new EmoteChatMessageParserElement(petServices, chatDatabaseHandler.ChatElementDatabase));
+        ChatMessageParsers.Add(new EmoteChatMessageParserElement(petServices));
     }
     
     public void OnChatMessage(uint messageId, XivChatType xivChatType)

@@ -126,7 +126,7 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
-            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId);
+            IPetSheetData? data = PetServices.PetSheets.GetPetFromAction(user.CurrentAction);
 
             if (data == null)
             {

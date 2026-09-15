@@ -1,41 +1,40 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatReplacing;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatReplacing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral;
 
+// Why did I decide I wanted THIS :sob:
+// But it is soooo cool :sob:
+// It like retroactively renames the pets, and if you change name
+// that reflects too. And if you close the plugin its gone, like it should have always been.
+// It's funny that the retroactive renaming is a restriction I can;t even really NOT do :icant:
 internal unsafe class ChatEphemeralHandler : EnablableHandler, IEphemaralChatHandler
 {
-    private readonly IChatDatabaseHandler ChatDatabaseHandler;
-    private readonly IChatLogParser       ChatLogParser;
-    private readonly IChatMessageParser   ChatMessageParser;
-    private readonly IChatReplacer        ChatReplacer;
+    private readonly IPetServices       PetServices;
+    private readonly IChatLogParser     ChatLogParser;
+    private readonly IChatMessageParser ChatMessageParser;
+    private readonly IChatReplacer      ChatReplacer;
     
     private bool _handleLogs = false;
     
-    public ChatEphemeralHandler(IPetServices petServices, IPettableDatabase database)
+    public ChatEphemeralHandler(IPetServices petServices)
     {
-        ChatDatabaseHandler = new ChatDatabaseHandler(database, petServices);
-        
-        ChatMessageParser   = new ChatMessageParser(ChatDatabaseHandler, petServices);
-        ChatLogParser       = new ChatLogParser(ChatDatabaseHandler, petServices);
-        ChatReplacer        = new ChatReplacer(ChatDatabaseHandler, petServices);
+        PetServices       = petServices;
+        ChatMessageParser = new ChatMessageParser(petServices);
+        ChatLogParser     = new ChatLogParser(petServices);
+        ChatReplacer      = new ChatReplacer(petServices);
     }
     
     public override void OnDispose()
-    {
-        ChatDatabaseHandler.Dispose();
-    }
+        { }
     
     public override void OnEnable()
     {
@@ -47,14 +46,9 @@ internal unsafe class ChatEphemeralHandler : EnablableHandler, IEphemaralChatHan
         _handleLogs = false;
     }
     
-    public void OnChatClear()
-    {
-        ChatDatabaseHandler.Clear();
-    }
-    
     public bool HasChatMessage(uint messageId)
     {
-        foreach (IEphemeralChatElement chatElement in ChatDatabaseHandler.ChatElementDatabase.Elements)
+        foreach (IEphemeralChatElement chatElement in PetServices.ChatDatabaseService.ChatElementDatabase.Elements)
         {
             if (chatElement.MessageId != messageId)
             {

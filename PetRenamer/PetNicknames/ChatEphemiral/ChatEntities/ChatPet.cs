@@ -5,13 +5,18 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 
 internal class ChatPet : IChatPet
 {
-    public PetSkeleton Pet          { get; private set; }
-    public IChatPlayer Owner        { get; private set; }
-    public uint        LastUsedAt   { get; set; }
+    public PetSkeleton Pet   { get; }
+    public IChatPlayer Owner { get; }
     
     public ChatPet(PetSkeleton pet, IChatPlayer owner)
     {
         Pet   = pet;
         Owner = owner;
+    }
+    
+    public uint LastUsedAt
+    {
+        get;
+        set => Owner.LastUsedAt = field = value;
     }
 }

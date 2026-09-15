@@ -1,6 +1,5 @@
 ﻿using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Utility;
 using System.Numerics;
 
@@ -38,7 +37,9 @@ internal static class LabledLabel
         ImGui.SameLine();
 
         TextAligner.Align(TextAlignment.Right);
+        
         bool returner = ImGui.Button(value, size - new Vector2(actualWidth + style.ItemSpacing.X, 0));
+        
         if (!tooltipValue.IsNullOrWhitespace())
         {
             if (ImGui.IsItemHovered())
@@ -46,6 +47,7 @@ internal static class LabledLabel
                 ImGui.SetTooltip(tooltipValue);
             }
         }
+        
         TextAligner.PopAlignment();
 
         return returner;

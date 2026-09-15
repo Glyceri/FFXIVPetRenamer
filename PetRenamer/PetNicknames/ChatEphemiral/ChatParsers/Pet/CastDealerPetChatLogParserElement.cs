@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -11,13 +10,11 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
 internal class CastDealerPetChatLogParserElement : IChatLogPetParserElement
 {    
-    private readonly IChatPetDatabase PetDatabase;
-    private readonly IPetServices     PetServices;
+    private readonly IPetServices PetServices;
     
-    public CastDealerPetChatLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public CastDealerPetChatLogParserElement(IPetServices petServices)
     {
         PetServices = petServices;
-        PetDatabase = petDatabase;
     }
 
     public NameType ReplaceNameType
@@ -62,6 +59,6 @@ internal class CastDealerPetChatLogParserElement : IChatLogPetParserElement
         
         UsedData = pet.PetData;
         
-        return PetDatabase.MakeChatPet(pet.SkeletonId, pet.Owner.DataBaseEntry.Name, pet.Owner.DataBaseEntry.Homeworld);
+        return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(pet.SkeletonId, pet.Owner.DataBaseEntry.Name, pet.Owner.DataBaseEntry.Homeworld);
     }
 }

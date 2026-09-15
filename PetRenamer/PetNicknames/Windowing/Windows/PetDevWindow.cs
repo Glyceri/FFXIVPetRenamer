@@ -32,6 +32,7 @@ using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
+using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
@@ -49,7 +50,6 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetDevWindow : PetWindow
 {
-    private readonly IPettableDatabase  Database;
     private readonly ISharingDictionary SharingDictionary;
     private readonly IPronounHook       PronounHook;
 
@@ -61,10 +61,9 @@ internal class PetDevWindow : PetWindow
     private int currentActive = 0;
     private readonly List<DevStruct> devStructList = new List<DevStruct>();
 
-    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ISharingDictionary sharingDictionary, IPronounHook pronounHook) 
+    public PetDevWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IPronounHook pronounHook) 
         : base(windowHandler, dalamudServices, petServices, "Pet Dev Window")
     {
-        Database          = database;
         SharingDictionary = sharingDictionary;
         PronounHook       = pronounHook;
         
@@ -270,17 +269,17 @@ internal class PetDevWindow : PetWindow
     
     private void DrawChatDatabase()
     {
-        DrawElement<IEphemeralChatElement, IChatElementDatabase>("Chat Elements", ChatDatabaseHandler.Instance?.ChatElementDatabase, (chatElement) =>
+        DrawElement<IEphemeralChatElement, IChatElementDatabase>("Chat Elements", PetServices.ChatDatabaseService.ChatElementDatabase, (chatElement) =>
         {
             ImGui.Text(chatElement.MessageId + ": " + PetServices.PetSheets.GetLogMessage(chatElement.LogMessageId)?.Text.ToMacroString());
         });
         
-        DrawElement<IChatPet, IChatPetDatabase>("Pet Elements", ChatDatabaseHandler.Instance?.PetDatabase, (chatElement) =>
+        DrawElement<IChatPet, IChatPetDatabase>("Pet Elements", PetServices.ChatDatabaseService.PetDatabase, (chatElement) =>
         {
-            ImGui.Text(chatElement.Pet + ": " + chatElement.LastUsedAt.ToString());
+            ImGui.Text(chatElement.Pet + " : " + chatElement.Owner.PlayerName + " : " + chatElement.LastUsedAt.ToString());
         });
         
-        DrawElement<IChatPlayer, IChatPlayerDatabase>("Player Elements", ChatDatabaseHandler.Instance?.PlayerDatabase, (chatElement) =>
+        DrawElement<IChatPlayer, IChatPlayerDatabase>("Player Elements", PetServices.ChatDatabaseService.PlayerDatabase, (chatElement) =>
         {
             ImGui.Text(chatElement.PlayerName + ": " + chatElement.LastUsedAt.ToString());
         });
@@ -290,7 +289,7 @@ internal class PetDevWindow : PetWindow
     {
         ImGui.Text("Last user contentId: " + PetServices.Configuration.LastIslandContentId);
         
-        IPettableDatabaseEntry? entry = Database.GetEntryNoCreate(PetServices.Configuration.LastIslandContentId);
+        IPettableDatabaseEntry? entry = PetServices.Database.GetEntryNoCreate(PetServices.Configuration.LastIslandContentId);
         
         if (entry != null)
         {
@@ -313,7 +312,7 @@ internal class PetDevWindow : PetWindow
     
     private void DrawNameError()
     {
-        IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
+        IPettableDatabaseEntry[] entries = PetServices.Database.DatabaseEntries;
 
         foreach (IPettableDatabaseEntry entry in entries)
         {
@@ -328,7 +327,7 @@ internal class PetDevWindow : PetWindow
     
     void DrawDatabase()
     {
-        IPettableDatabaseEntry[] entries = Database.DatabaseEntries;
+        IPettableDatabaseEntry[] entries = PetServices.Database.DatabaseEntries;
 
         foreach (IPettableDatabaseEntry entry in entries)
         {
@@ -425,7 +424,7 @@ internal class PetDevWindow : PetWindow
     {
         DrawSearchbar();
         
-        if (!ImGui.BeginTable($"##petTable{WindowHandler.InternalCounter}", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable, ImGui.GetContentRegionAvail()))
+        if (!ImGui.BeginTable($"##petTable{WindowHandler.InternalCounter}", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable, ImGui.GetContentRegionAvail()))
             return;
         
         foreach (IPetSheetData pet in PetServices.PetSheets.AllPets)
@@ -448,6 +447,9 @@ internal class PetDevWindow : PetWindow
             
             if (ImGui.TableNextColumn())
             ImGui.Text(pet.ActionName);
+            
+            if (ImGui.TableNextColumn()) 
+            ImGui.Text(pet.ActionData.ToString());
             
             if (ImGui.TableNextColumn())
             PetBoxImage.DrawPet(PetServices, DalamudServices, new Vector2(200, 200), pet, PetServices.UserList.LocalPlayer?.DataBaseEntry);
@@ -746,7 +748,7 @@ internal class PetDevWindow : PetWindow
                 continue;
             }
             
-            if (user.CurrentCastId == 0)
+            if (user.CurrentAction.ActionId == 0)
             {
                 continue;
             }
@@ -756,7 +758,7 @@ internal class PetDevWindow : PetWindow
             
             try
             {
-                ImGui.BulletText($"[{GetUserText(user)}]      [{PetServices.PetSheets.GetAction(user.CurrentCastId)?.Name}] [{(int)((curCastTime / totalCastTime) * 100)}%]");
+                ImGui.BulletText($"[{GetUserText(user)}]      [{PetServices.PetSheets.GetAction(user.CurrentAction.ActionId)?.Name}] [{(int)((curCastTime / totalCastTime) * 100)}%]");
             }
             catch {}
         }
@@ -841,7 +843,7 @@ internal class PetDevWindow : PetWindow
             lastData = string.Empty;
         }
 
-        if (Listbox.Begin("##IPCBox", new Vector2(ImGui.GetContentRegionAvail().X, 200)))
+        if (ImGui.BeginListBox("##IPCBox", new Vector2(ImGui.GetContentRegionAvail().X, 200)))
         {
             string cleanedData = lastData;
             if (!cleanedData.IsNullOrWhitespace())
@@ -850,7 +852,8 @@ internal class PetDevWindow : PetWindow
                 cleanedData = Encoding.Unicode.GetString(data);
                 ImGui.Text(cleanedData);
             }
-            Listbox.End();
+            
+            ImGui.EndListBox();
         }
 
         ImGui.NewLine();
@@ -879,7 +882,7 @@ internal class PetDevWindow : PetWindow
 
                 LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
 
-                if (Listbox.Begin("##TargetBox", ImGui.GetContentRegionAvail()))
+                if (ImGui.BeginListBox("##TargetBox", ImGui.GetContentRegionAvail()))
                 {
                     Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 
@@ -933,7 +936,7 @@ internal class PetDevWindow : PetWindow
                         clicked = LabledLabel.DrawButton("Apply Data", "Click here##applyDataIPC", sizeIn);
                     }
 
-                    Listbox.End();
+                    ImGui.EndListBox();
                 }
             }
         }
@@ -1090,7 +1093,7 @@ internal class PetDevWindow : PetWindow
         {
             if (ImGui.Button($"O###DEBUG_DEACTIVATE_{user.DataBaseEntry.ContentId}"))
             {
-                Database.GetEntry(user.DataBaseEntry.ContentId).Clear(ParseSource.Manual);
+                PetServices.Database.GetEntry(user.DataBaseEntry.ContentId).Clear(ParseSource.Manual);
             }
             
             if (ImGui.IsItemHovered())

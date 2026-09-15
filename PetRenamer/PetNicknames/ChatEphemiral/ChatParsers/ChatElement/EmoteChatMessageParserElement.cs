@@ -1,6 +1,5 @@
 using Dalamud.Game.Text;
 using Dalamud.Utility;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -11,13 +10,11 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.ChatElement;
 
 internal class EmoteChatMessageParserElement : IChatMessageParserElement
 {
-    private readonly IPetServices         PetServices;
-    private readonly IChatElementDatabase ChatElementDatabase;
+    private readonly IPetServices PetServices;
     
-    public EmoteChatMessageParserElement(IPetServices petServices, IChatElementDatabase chatElementDatabase)
+    public EmoteChatMessageParserElement(IPetServices petServices)
     {
-        PetServices         = petServices;
-        ChatElementDatabase = chatElementDatabase;
+        PetServices = petServices;
     }
     
     public bool IsMyMessage(XivChatType type)
@@ -27,14 +24,14 @@ internal class EmoteChatMessageParserElement : IChatMessageParserElement
 
     public void Parse(uint messageId, XivChatType type)
     {
-        IEphemeralChatElement? chatElement = ChatElementDatabase.GetChatElement((int)messageId);
+        IEphemeralChatElement? chatElement = PetServices.ChatDatabaseService.ChatElementDatabase.GetChatElement((int)messageId);
         
         if (chatElement == null)
         {
             return;
         }
         
-        ChatElementDatabase.RemoveElement(chatElement);
+        PetServices.ChatDatabaseService.ChatElementDatabase.RemoveElement(chatElement);
         
         if (chatElement.TargetPet == null)
         {
@@ -57,6 +54,6 @@ internal class EmoteChatMessageParserElement : IChatMessageParserElement
         
         chatElement.SetReplaceString(replaceString);
         
-        ChatElementDatabase.AddChatElement(chatElement);
+        PetServices.ChatDatabaseService.ChatElementDatabase.AddChatElement(chatElement);
     }
 }

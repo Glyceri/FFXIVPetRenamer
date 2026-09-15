@@ -36,7 +36,7 @@ internal class ContextMenuHandler : IDisposable
         Register(new MJIMinionNotebookContextMenu (PetServices, WindowHandler));
         Register(new QuickPanelContextMenu        (PetServices, WindowHandler));
         Register(new XBMMonsterNoteBookContextMenu(PetServices, WindowHandler));
-        Register(new XBMPetPartyContextMenu       (PetServices, WindowHandler));
+        //Register(new XBMPetPartyContextMenu       (PetServices, WindowHandler)); // TODO: Impossible currently due to a vanilla bug :erm: If you open the context menu the action detail thing flickers, and the context menu kinda fucks about as well.
     }
     
     public void Dispose()

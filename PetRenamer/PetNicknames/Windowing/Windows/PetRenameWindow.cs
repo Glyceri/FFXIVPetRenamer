@@ -1,9 +1,7 @@
 ﻿using Dalamud.Bindings.ImGui;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.ImGuiSeStringRenderer;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -254,14 +252,14 @@ internal class PetRenameWindow : PetWindow
             bStyle.Dispose();
         }
         
-        if (!Listbox.Begin("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
+        if (!ImGui.BeginListBox("##RenameHolder", ImGui.GetContentRegionAvail() - new Vector2(regionHeight + framePaddingX, 0)))
         {
             return;
         }
         
         DrawInternals();
 
-        Listbox.End();
+        ImGui.EndListBox();
 
         ImGui.SameLine();
 

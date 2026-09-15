@@ -3,7 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -27,18 +26,14 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly Hook<BattleChara.Delegates.OnInitialize>  OnInitializeBattleCharaHook;
     private readonly Hook<BattleChara.Delegates.Terminate>     OnTerminateBattleCharaHook;
     private readonly Hook<BattleChara.Delegates.Dtor>          OnDestroyBattleCharaHook;
-
-    private readonly IPettableDatabase                          Database;
-    private readonly ILegacyDatabase                            LegacyDatabase;
-    private readonly ISharingDictionary                         SharingDictionary;
+    
+    private readonly ISharingDictionary SharingDictionary;
 
     private readonly nint[] _temporaryPets = new nint[PlayerMaxInObjectTable];
     
-    public CharacterManagerHook(DalamudServices services, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary) 
+    public CharacterManagerHook(DalamudServices services, IPetServices petServices, ISharingDictionary sharingDictionary) 
         : base(services, petServices)
     {
-        Database          = database;
-        LegacyDatabase    = legacyDatabase;
         SharingDictionary = sharingDictionary;
 
         OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
@@ -354,7 +349,7 @@ internal unsafe class CharacterManagerHook : HookableElement
                 continue;
             }
 
-            user.Dispose(Database);
+            user.Dispose();
                 
             PetServices.UserList[index] = null;
                 
@@ -414,7 +409,7 @@ internal unsafe class CharacterManagerHook : HookableElement
             return;
         }
 
-        PettableUser newUser = new PettableUser(PetServices, SharingDictionary, Database, LegacyDatabase, newBattleChara);
+        PettableUser newUser = new PettableUser(PetServices, SharingDictionary, newBattleChara);
 
         PetServices.UserList[actualIndex] = newUser;
 

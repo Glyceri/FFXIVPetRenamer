@@ -19,13 +19,10 @@ internal class DalamudServices
     [PluginService] internal IPluginLog                      PluginLog                   { get; private set; } = null!;
     [PluginService] internal IGameInteropProvider            Hooking                     { get; private set; } = null!;
     [PluginService] internal IAddonLifecycle                 AddonLifecycle              { get; private set; } = null!;
-    [PluginService] internal IPartyList                      PartyList                   { get; private set; } = null!;
     [PluginService] internal IContextMenu                    ContextMenu                 { get; private set; } = null!;
     [PluginService] internal INotificationManager            NotificationManager         { get; private set; } = null!;
-    [PluginService] internal ITextureSubstitutionProvider    TextureSubstitutionProvider { get; private set; } = null!;
     [PluginService] internal ICondition                      Condition                   { get; private set; } = null!;
     [PluginService] internal IGameConfig                     GameConfig                  { get; private set; } = null!;
-    [PluginService] internal ISeStringEvaluator              StringEvaluator             { get; private set; } = null!;
     
     public static DalamudServices Create(IDalamudPluginInterface plugin)
     {

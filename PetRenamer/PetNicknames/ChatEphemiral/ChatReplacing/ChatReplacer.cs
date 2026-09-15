@@ -2,7 +2,6 @@ using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatReplacing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
@@ -13,13 +12,11 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatReplacing;
 
 internal unsafe class ChatReplacer : IChatReplacer
 {
-    private readonly IChatDatabaseHandler ChatDatabase;
-    private readonly IPetServices         PetServices;
+    private readonly IPetServices PetServices;
     
-    public ChatReplacer(IChatDatabaseHandler chatHandler, IPetServices petServices)
+    public ChatReplacer(IPetServices petServices)
     {
-        ChatDatabase = chatHandler;
-        PetServices  = petServices;
+        PetServices = petServices;
     }
     
     public byte[]? Replace(Utf8String* message, int index)
@@ -29,7 +26,7 @@ internal unsafe class ChatReplacer : IChatReplacer
             return null;
         }
         
-        IEphemeralChatElement? chatElement = ChatDatabase.ChatElementDatabase.GetChatElement(index);
+        IEphemeralChatElement? chatElement = PetServices.ChatDatabaseService.ChatElementDatabase.GetChatElement(index);
         
         if (chatElement == null)
         {

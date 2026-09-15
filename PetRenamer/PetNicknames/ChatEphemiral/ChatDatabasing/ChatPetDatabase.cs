@@ -1,21 +1,22 @@
 using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
+using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
 
-internal class ChatPetDatabase : ChatEntityDatabase, IChatPetDatabase
+internal class ChatPetDatabase : IChatPetDatabase
 {
     public List<IChatPet> Elements { get; } = [];
+
+    private readonly IPetServices PetServices;
     
-    private readonly IChatPlayerDatabase PlayerDatabase;
-    
-    public ChatPetDatabase(IChatPlayerDatabase playerDatabase)
+    public ChatPetDatabase(IPetServices petServices)
     {
-        PlayerDatabase = playerDatabase;
+        PetServices = petServices;
     }
     
     public IChatPet? FindChatPet(PetSkeleton petSkeleton, IChatPlayer owner)
@@ -52,9 +53,28 @@ internal class ChatPetDatabase : ChatEntityDatabase, IChatPetDatabase
         Elements.Remove(foundElement);
         Elements.Add(foundElement);
         
+        if (Elements.Count > IChatPetDatabase.MAX_CHAT_ELEMENTS)
+        {
+            CleanUp();
+        }
+        
         return foundElement;
     }
     
     public IChatPet MakeChatPet(PetSkeleton petSkeleton, string ownerName, ushort ownerHomeworld)
-        => MakeChatPet(petSkeleton, PlayerDatabase.MakeChatPlayer(ownerName, ownerHomeworld));
+        => MakeChatPet(petSkeleton, PetServices.ChatDatabaseService.PlayerDatabase.MakeChatPlayer(ownerName, ownerHomeworld));
+    
+    public void CleanUp()
+    {
+        if (Elements.Count <= 0)
+        {
+            return;
+        }
+        
+        // Sorts based on last used
+        Elements.Sort((pet1, pet2) => pet2.LastUsedAt.CompareTo(pet1.LastUsedAt));
+         
+        // Remove the last so many messages
+        Elements.RemoveRange(Elements.Count - (int)IChatPetDatabase.CLEANUP_COUNT - 1, (int)IChatPetDatabase.CLEANUP_COUNT);
+    }
 }

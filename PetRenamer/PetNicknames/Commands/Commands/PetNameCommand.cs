@@ -198,9 +198,9 @@ internal partial class PetNameCommand : Command
                 return false;
             }
 
+            // TODO: Should actually parse pet skeleton based on the symbol, not perse as an int, this doesnt work for beastmaster.
             if (int.TryParse(customName, out int id))
             {
-                // TODO: Technically uses it properly, but the AsPetSkeleton system is OLD
                 IPetSheetData? idData = PetServices.PetSheets.GetPet(PetSkeletonHelper.AsPetSkeleton(id));
 
                 if (idData == null)

@@ -1,6 +1,5 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatLogParsers;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatLogParsers.Interfaces;
@@ -18,24 +17,25 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers;
 internal class ChatLogParser : IChatLogParser
 {
     private readonly List<IChatLogChatParser>        ChatLogChatParsers = [];
-    private readonly IChatDatabaseHandler            ChatDatabaseHandler;
     private readonly IChatLogPlayerParserElement     ChatLogPlayerParserElement;
     private readonly List<IChatLogPetParserElement>  ChatLogPetParsers = [];
     
     private NameType       _replaceNameType = NameType.Raw;
     private IPetSheetData? _replaceData     = null;
     
-    public ChatLogParser(IChatDatabaseHandler chatDatabase, IPetServices petServices)
+    private readonly IPetServices PetServices;
+    
+    public ChatLogParser(IPetServices petServices)
     {
-        ChatDatabaseHandler        = chatDatabase;
-        ChatLogPlayerParserElement = new PlayerChatLogParserElement(petServices, chatDatabase.PlayerDatabase);
+        PetServices                = petServices;
+        ChatLogPlayerParserElement = new PlayerChatLogParserElement(petServices);
         
-        ChatLogPetParsers.Add(new CastDealerPetChatLogParserElement(chatDatabase.PetDatabase, petServices));
-        ChatLogPetParsers.Add(new CastDealerUserChatLogParserElement(chatDatabase.PetDatabase, petServices));
-        ChatLogPetParsers.Add(new EmoteChatLogParserElement(chatDatabase.PetDatabase, petServices));
-        ChatLogPetParsers.Add(new SystemChatLogParserElement(chatDatabase.PetDatabase, petServices));
-        ChatLogPetParsers.Add(new SystemChatNotebookLogParserElement(chatDatabase.PetDatabase, petServices));
-        ChatLogPetParsers.Add(new SystemChatXBMNotebookLogParserElement(chatDatabase.PetDatabase, petServices));
+        ChatLogPetParsers.Add(new CastDealerPetChatLogParserElement(petServices));
+        ChatLogPetParsers.Add(new CastDealerUserChatLogParserElement(petServices));
+        ChatLogPetParsers.Add(new EmoteChatLogParserElement(petServices));
+        ChatLogPetParsers.Add(new SystemChatLogParserElement(petServices));
+        ChatLogPetParsers.Add(new SystemChatNotebookLogParserElement(petServices));
+        ChatLogPetParsers.Add(new SystemChatXBMNotebookLogParserElement(petServices));
         
         ChatLogChatParsers.Add(new BasicChatLogParser(ChatLogPlayerParserElement, ChatLogPetParsers));
         ChatLogChatParsers.Add(new MinionNoteBookChatLogParser(ChatLogPlayerParserElement, ChatLogPetParsers));
@@ -65,7 +65,7 @@ internal class ChatLogParser : IChatLogParser
             _replaceData     = chatParser.ReplaceData;
             _replaceNameType = chatParser.ReplaceNameType;
             
-            PetLogWrapper.Instance?.DevLog(chatParser.GetType().Name);
+            PetLogWrapper.Instance?.DevLogVerbose(chatParser.GetType().Name);
             
             break;
         }
@@ -77,7 +77,7 @@ internal class ChatLogParser : IChatLogParser
             return;
         }
         
-        ChatDatabaseHandler.ChatElementDatabase.AddChatElement(_replaceNameType, _replaceData, messageId, logMessageId, xivChatType, sourcePlayer, targetPlayer, sourcePet, targetPet);
+        PetServices.ChatDatabaseService.ChatElementDatabase.AddChatElement(_replaceNameType, _replaceData, messageId, logMessageId, xivChatType, sourcePlayer, targetPlayer, sourcePet, targetPet);
     }
     
     private bool ParsesSucceeded(IChatPlayer? sourcePlayer, IChatPlayer? targetPlayer, IChatPet? sourcePet, IChatPet? targetPet)

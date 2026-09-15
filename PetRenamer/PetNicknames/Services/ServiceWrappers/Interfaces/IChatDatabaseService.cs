@@ -1,8 +1,9 @@
+using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using System;
 
-namespace PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
+namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
-internal interface IChatDatabaseHandler : IDisposable
+internal interface IChatDatabaseService : IDisposable
 {
     IChatPetDatabase     PetDatabase         { get; }
     IChatPlayerDatabase  PlayerDatabase      { get; }

@@ -17,13 +17,10 @@ internal unsafe class IslandHook : HookableElement
     
     private readonly Hook<PacketDispatcher.Delegates.SendEventCompletePacket> SendEventCompletePacketHook;
     
-    private readonly IPettableDatabase Database;
-    
-    public IslandHook(DalamudServices services, IPetServices petServices, IPettableDatabase database) 
+    public IslandHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices)
     {
         SendEventCompletePacketHook = DalamudServices.Hooking.HookFromAddress<PacketDispatcher.Delegates.SendEventCompletePacket>(PacketDispatcher.Addresses.SendEventCompletePacket.Value, SendEventCompletePacketDetour);
-        Database                    = database;
     }
 
     public override void Init()
@@ -126,7 +123,7 @@ internal unsafe class IslandHook : HookableElement
     {
         PetServices.PetLog.Log("Handling island for contentId: " + contentId);
         
-        SetupIslandUser(Database.GetEntry(contentId));
+        SetupIslandUser(PetServices.Database.GetEntry(contentId));
         
         if (PetServices.Configuration.LastIslandContentId == contentId)
         {
@@ -153,7 +150,7 @@ internal unsafe class IslandHook : HookableElement
     
     private void ClearIslandUser()
     {
-        PetServices.UserList[IUserList.IslandIndex]?.Dispose(Database);
+        PetServices.UserList[IUserList.IslandIndex]?.Dispose();
         PetServices.UserList[IUserList.IslandIndex] = null;
     }
 }

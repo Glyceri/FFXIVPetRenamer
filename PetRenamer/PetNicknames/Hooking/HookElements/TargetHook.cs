@@ -83,7 +83,7 @@ internal unsafe class TargetHook : HookableElement
             return;
         }
         
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(user.CurrentCastId);
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(user.CurrentAction);
         
         if (petData == null)
         {

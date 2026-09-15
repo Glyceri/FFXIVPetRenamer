@@ -20,21 +20,17 @@ namespace PetRenamer.PetNicknames.WritingAndParsing;
 internal class DataParser : IDataParser
 {
     private readonly DalamudServices    DalamudServices;
-    private readonly IPettableDatabase  Database;
     private readonly IPetServices       PetServices;
-    private readonly ILegacyDatabase    LegacyDatabase;
 
     private readonly IDataParserElement DataParserVersion1;
     private readonly IDataParserElement DataParserVersion2;
     private readonly IDataParserElement DataParserVersion3;
     private readonly IDataParserElement DataParserVersion4;
 
-    public DataParser(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase)
+    public DataParser(DalamudServices dalamudServices, IPetServices petServices)
     {
         DalamudServices     = dalamudServices;
         PetServices         = petServices;
-        Database            = database;
-        LegacyDatabase      = legacyDatabase;
 
         DataParserVersion1  = new DataParserVersion1();
         DataParserVersion2  = new DataParserVersion2();
@@ -60,7 +56,7 @@ internal class DataParser : IDataParser
                 return false;
             }
 
-            IPettableDatabaseEntry? entry = Database.GetEntry(clearParseResult.Name, clearParseResult.Homeworld, false);
+            IPettableDatabaseEntry? entry = PetServices.Database.GetEntry(clearParseResult.Name, clearParseResult.Homeworld, false);
 
             if (entry != null)
             {
@@ -82,12 +78,12 @@ internal class DataParser : IDataParser
 
             if (baseParseResult is IModernParseResult modernParseResult)
             {
-                Database.ApplyParseResult(modernParseResult, parseContext);
+                PetServices.Database.ApplyParseResult(modernParseResult, parseContext);
 
                 return true;
             }
 
-            LegacyDatabase.ApplyParseResult(baseParseResult, parseContext);
+            PetServices.LegacyDatabase.ApplyParseResult(baseParseResult, parseContext);
         }
 
         return true;

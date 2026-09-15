@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableUsers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -13,7 +14,7 @@ internal readonly struct PetSheetData : IPetSheetData
     public sbyte            Pronoun       { get; }
     
     public string           ActionName    { get; } = string.Empty;
-    public uint             ActionId      { get; } = 0;
+    public ActionData       ActionData    { get; }
 
     public int              LegacyModelId { get; }
 
@@ -21,36 +22,36 @@ internal readonly struct PetSheetData : IPetSheetData
     public string?          RaceName      { get; } = null;
     public string?          BehaviourName { get; } = null;
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, uint actionId)
-        : this(model, legacyModelId, icon, pronoun, singular, actionName, actionId)
+    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, string? raceName, uint raceId, string? behaviourName, sbyte pronoun, string singular, string actionName, ActionData actionData)
+        : this(model, legacyModelId, icon, pronoun, singular, actionName, actionData)
     {
         RaceName      = raceName;
         BehaviourName = behaviourName;
         RaceId        = raceId;
     }
 
-    public PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string actionName, uint actionId)
+    private PetSheetData(PetSkeleton model, int legacyModelId, uint icon, sbyte pronoun, string singular, string actionName, ActionData actionData)
         : this(model, icon, pronoun, singular)
     {
-        ActionId      = actionId;
+        ActionData    = actionData;
         ActionName    = actionName;
         LegacyModelId = legacyModelId;
     }
 
-    public PetSheetData(PetSkeleton model, uint icon, sbyte pronoun, string singular)
+    private PetSheetData(PetSkeleton model, uint icon, sbyte pronoun, string singular)
     {
-        Model    = model;
-        Icon     = icon;
-        Pronoun  = pronoun;
-        Singular = singular;
+        Model         = model;
+        Icon          = icon;
+        Pronoun       = pronoun;
+        Singular      = singular;
     }
 
     public PetSheetData MakeSoft(IPetSheetData newData)
-        => new PetSheetData(newData.Model, newData.LegacyModelId, newData.Icon, newData.Pronoun, Singular, ActionName, ActionId);
+        => new PetSheetData(newData.Model, newData.LegacyModelId, newData.Icon, newData.Pronoun, Singular, ActionName, ActionData);
 
     public bool IsPet(string name)
         => Singular.InvariantEquals(name);
 
-    public bool IsAction(uint action) 
-        => (ActionId == action);
+    public bool IsAction(ActionData action) 
+        => (ActionData == action);
 }

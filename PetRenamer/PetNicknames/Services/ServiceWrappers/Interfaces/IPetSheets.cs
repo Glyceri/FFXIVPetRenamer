@@ -1,5 +1,6 @@
 ﻿using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Sheets;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -20,7 +21,7 @@ internal interface IPetSheets
     IPetSheetData?      GetPetFromName(string name);
     IPetSheetData?      GetPetFromBnpcName(uint bNpcId);
     IPetSheetData?      GetPetFromIcon(uint iconId);
-    IPetSheetData?      GetPetFromAction(uint actionId);
+    IPetSheetData?      GetPetFromAction(ActionData actionData);
     IPetSheetData       MakeSoft(IPettableUser user, IPetSheetData oldData);
     int?                CastToSoftIndex(uint castId);
     PetMirage?          GetPetMirage(uint petMirageId);

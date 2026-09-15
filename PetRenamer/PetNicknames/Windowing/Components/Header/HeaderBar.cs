@@ -40,7 +40,7 @@ internal static class HeaderBar
 
         contentSize.Y = HEADER_BAR_HEIGHT * WindowHandler.GlobalScale;
 
-        if (!Listbox.Begin($"##headerbar_{WindowHandler.InternalCounter}", contentSize))
+        if (!ImGui.BeginListBox($"##headerbar_{WindowHandler.InternalCounter}", contentSize))
         {
             return;
         }
@@ -80,7 +80,7 @@ internal static class HeaderBar
             }
         }
         
-        Listbox.End();
+        ImGui.EndListBox();
     }
     
     private static void DrawButton(int index, IPetServices petServices, WindowHandler windowHandler)

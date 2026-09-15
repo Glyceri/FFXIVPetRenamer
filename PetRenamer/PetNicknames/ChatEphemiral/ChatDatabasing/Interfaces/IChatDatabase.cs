@@ -17,4 +17,6 @@ internal interface IChatDatabase<T>
     {
         return Elements.Count;
     }
+    
+    void CleanUp();
 }

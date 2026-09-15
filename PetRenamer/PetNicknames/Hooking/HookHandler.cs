@@ -3,7 +3,6 @@ using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using System;
@@ -15,8 +14,6 @@ internal class HookHandler : IDisposable
 {
     private readonly DalamudServices        DalamudServices;
     private readonly IPetServices           PetServices;
-    private readonly IPettableDatabase      Database;
-    private readonly ILegacyDatabase        LegacyDatabase;
     private readonly ISharingDictionary     SharingDictionary;
     private readonly IEphemaralChatHandler  ChatHandler;
     
@@ -24,12 +21,10 @@ internal class HookHandler : IDisposable
 
     private readonly List<IHookableElement> hookableElements = [];
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, ILegacyDatabase legacyDatabase, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
-        Database          = database;
-        LegacyDatabase    = legacyDatabase;
         SharingDictionary = sharingDictionary;
         ChatHandler       = chatHandler;
 
@@ -65,11 +60,11 @@ internal class HookHandler : IDisposable
         Register(new XBMPetPartyHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
-        Register(new IslandHook(DalamudServices, PetServices, Database));
+        Register(new IslandHook(DalamudServices, PetServices));
         Register(new CastHook(DalamudServices, PetServices));
         Register(new NamePlateHook(DalamudServices, PetServices));
         Register(new PartyHook(DalamudServices, PetServices));
-        Register(new CharacterManagerHook(DalamudServices, PetServices, Database, LegacyDatabase, SharingDictionary));
+        Register(new CharacterManagerHook(DalamudServices, PetServices, SharingDictionary));
     }
 
     private void Register(IHookableElement element)

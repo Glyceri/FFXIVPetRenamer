@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -11,12 +10,10 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
 internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
 {
-    private readonly IChatPetDatabase PetDatabase;
-    private readonly IPetServices     PetServices;
+    private readonly IPetServices PetServices;
     
-    public CastDealerUserChatLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public CastDealerUserChatLogParserElement(IPetServices petServices)
     {
-        PetDatabase = petDatabase;
         PetServices = petServices;
     }
 
@@ -63,15 +60,19 @@ internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
             return null;
         }
         
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction((uint)PetServices.PetCastHelper.LastCastId);
+        PetServices.PetLog.LogFatal(PetServices.PetCastHelper.LastAction);
+        
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(PetServices.PetCastHelper.LastAction);
         
         if (petData == null)
         {
             return null;
         }
         
+        PetServices.PetLog.LogFatal(petData.Singular);
+        
         UsedData = PetServices.PetSheets.MakeSoft(user, petData);
         
-        return PetDatabase.MakeChatPet(UsedData.Model, user.DataBaseEntry.Name, user.DataBaseEntry.Homeworld);
+        return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(UsedData.Model, user.DataBaseEntry.Name, user.DataBaseEntry.Homeworld);
     }
 }

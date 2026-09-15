@@ -1,6 +1,7 @@
 ﻿using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Factory;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
@@ -16,9 +17,7 @@ namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 internal class SheetsWrapper : IPetSheets
 {
     private readonly DalamudServices         DalamudServices;
-
     private readonly List<IPetSheetData>     PetSheetCache = [];
-
     private readonly ExcelSheet<Companion>   PetSheet;
     private readonly ExcelSheet<Pet>         BattlePetSheet;
     private readonly ExcelSheet<World>       WorldSheet;
@@ -33,7 +32,6 @@ internal class SheetsWrapper : IPetSheets
     public SheetsWrapper(DalamudServices dalamudServices)
     {
         DalamudServices  = dalamudServices;
-        
         PetSheet         = dalamudServices.DataManager.GetExcelSheet<Companion>();
         WorldSheet       = dalamudServices.DataManager.GetExcelSheet<World>();
         BattlePetSheet   = dalamudServices.DataManager.GetExcelSheet<Pet>();
@@ -202,9 +200,9 @@ internal class SheetsWrapper : IPetSheets
         return null;
     }
 
-    public IPetSheetData? GetPetFromAction(uint actionId)
+    public IPetSheetData? GetPetFromAction(ActionData actionData)
     {
-        if (actionId == 0)
+        if (actionData.ActionId == 0)
         {
             return null;
         }
@@ -215,7 +213,7 @@ internal class SheetsWrapper : IPetSheets
         {
             IPetSheetData pet = PetSheetCache[i];
             
-            if (!pet.IsAction(actionId))
+            if (!pet.IsAction(actionData))
             {
                 continue;
             }

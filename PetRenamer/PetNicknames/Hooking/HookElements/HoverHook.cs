@@ -1,4 +1,6 @@
+using Dalamud.Game;
 using Dalamud.Game.Gui;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
@@ -38,21 +40,28 @@ internal class HoverHook : HookableElement
     
     private void OnHoverAction(object? _, HoveredAction? action)
     {
-        PetServices.HoverService.SetHoveredPet(null);
-        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
-        
         if (action == null)
         {
             return;
         }
         
-        if (IsActionHorn(action))
+        PetServices.HoverService.SetHoveredPet(null);
+        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
+        
+        if (action.DetailKind == DetailKind.Action || action.DetailKind == DetailKind.Companion)
         {
-            HandleActionAsHorn(action);
+            if (IsActionHorn(action))
+            {
+                HandleActionAsHorn(action);
+            }
+            else
+            {
+                HandleActionStandard(action);
+            }
         }
-        else
+        else if (action.DetailKind == DetailKind.Unk62)
         {
-            HandleActionStandard(action);
+            HandleAsXBM(action);
         }
     }
     
@@ -93,15 +102,15 @@ internal class HoverHook : HookableElement
             return;
         }
         
-        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(action.ActionId);
+        IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(new ActionData(action.ActionId, action.DetailKind == DetailKind.Companion ? ActionKind.Companion : ActionKind.Action));
         
         if (petData == null)
         {
             return;
         }
-        
+
         IPetSheetData softData = PetServices.PetSheets.MakeSoft(PetServices.UserList.LocalPlayer, petData);
-       
+        
         PetServices.HoverService.SetHoveredPet(softData);
         PetServices.HoverService.SetCurrentNameType(HoverNameType.GetValue(DalamudServices));
         
@@ -111,5 +120,23 @@ internal class HoverHook : HookableElement
         }
         
         PetServices.HoverService.SetCurrentNameType(NameType.Action);
+    }
+    
+    private void HandleAsXBM(HoveredAction action)
+    {
+        if (PetServices.UserList.LocalPlayer == null)
+        {
+            return;
+        }
+        
+        XBMPet? pet = PetServices.PetSheets.GetSheetXBMPet(action.ActionId);
+        
+        if (pet == null)
+        {
+            return;
+        }
+        
+        PetServices.HoverService.SetHoveredPet(PetServices.PetSheets.GetPetFromIcon(pet.Value.Icon));
+        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
     }
 }

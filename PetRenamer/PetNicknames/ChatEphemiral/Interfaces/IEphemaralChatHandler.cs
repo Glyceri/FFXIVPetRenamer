@@ -11,5 +11,4 @@ internal unsafe interface IEphemaralChatHandler : IEnablableHandler
     void OnChatLog(uint messageId, XivChatType xivChatType, uint logMessageId, ILogMessageEntity? sourceEntity, ILogMessageEntity? targetEntity);
     void OnChatMessage(uint messageId, XivChatType xivChatType);
     byte[]? Replace(Utf8String* message, int index);
-    void OnChatClear();
 }

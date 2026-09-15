@@ -8,13 +8,11 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Player;
 
 internal class PlayerChatLogParserElement : IChatLogPlayerParserElement
 {
-    private readonly IPetServices         PetServices;
-    private readonly IChatPlayerDatabase  PlayerDatabase;
+    private readonly IPetServices PetServices;
     
-    public PlayerChatLogParserElement(IPetServices petServices, IChatPlayerDatabase playerDatabase)
+    public PlayerChatLogParserElement(IPetServices petServices)
     {
-        PlayerDatabase = playerDatabase;
-        PetServices    = petServices;
+        PetServices = petServices;
     }
     
     public IChatPlayer? Parse(ILogMessageEntity? logMessageEntity)
@@ -32,7 +30,7 @@ internal class PlayerChatLogParserElement : IChatLogPlayerParserElement
         string playerName = logMessageEntity.Name.ExtractText();
         ushort homeworld  = logMessageEntity.HomeWorldId;
         
-        return PlayerDatabase.MakeChatPlayer(playerName, homeworld);
+        return PetServices.ChatDatabaseService.PlayerDatabase.MakeChatPlayer(playerName, homeworld);
     }
     
     public IChatPlayer? MakeFromLocalPlayer()
@@ -45,7 +43,7 @@ internal class PlayerChatLogParserElement : IChatLogPlayerParserElement
         string playerName = PetServices.UserList.LocalPlayer.DataBaseEntry.Name;
         ushort homeworld  = PetServices.UserList.LocalPlayer.DataBaseEntry.Homeworld;
         
-        IChatPlayer player = PlayerDatabase.MakeChatPlayer(playerName, homeworld);
+        IChatPlayer player = PetServices.ChatDatabaseService.PlayerDatabase.MakeChatPlayer(playerName, homeworld);
 
         player.MakeStrong(PetServices.UserList.LocalPlayer.DataBaseEntry.ContentId);
         

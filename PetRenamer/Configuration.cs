@@ -2,7 +2,6 @@ using Dalamud.Configuration;
 using Dalamud.Plugin;
 using Newtonsoft.Json;
 using PetRenamer.Core.Serialization;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PN.S;
@@ -18,10 +17,6 @@ internal class Configuration : IPluginConfiguration
 
     [JsonIgnore]
     private IDalamudPluginInterface? PetNicknamesPlugin;
-    [JsonIgnore]
-    private IPettableDatabase? Database = null;
-    [JsonIgnore]
-    private ILegacyDatabase? LegacyDatabase = null;
     [JsonIgnore]
     private IPetServices? PetServices = null;
     [JsonIgnore]
@@ -84,20 +79,17 @@ internal class Configuration : IPluginConfiguration
     public int                  lastDebugTab                = 0;
     public bool                 showFailedTranslations      = true;
 
-    public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPettableDatabase database, ILegacyDatabase legacyDatabase, IPetServices petServices)
+    public void Initialise(IDalamudPluginInterface petNicknamesPlugin, IPetServices petServices)
     {
         PetNicknamesPlugin = petNicknamesPlugin;
-
-        Database        = database;
-        LegacyDatabase  = legacyDatabase;
-        PetServices     = petServices;
+        PetServices        = petServices;
 
         LegacyInitialise();
         CurrentInitialise();
 
         PetServices.DirtyCaller.DirtyConfig(this);
         
-        isSetup         = true;
+        isSetup = true;
     }
 
     private void CurrentInitialise()
@@ -115,10 +107,10 @@ internal class Configuration : IPluginConfiguration
 
         PetServices?.PetLog.LogVerbose("Pet Nicknames will now attempt to save");
 
-        SerializableUsersV6 = Database!.SerializeDatabase();
+        SerializableUsersV6 = PetServices!.Database!.SerializeDatabase();
 
 #pragma warning disable CS0618 // Oboslete (Legacy database is supposed to handle obsolete objects
-        serializableUsersV3 = LegacyDatabase!.SerializeLegacyDatabase();
+        serializableUsersV3 = PetServices!.LegacyDatabase!.SerializeLegacyDatabase();
 #pragma warning restore CS0618 // Obsolete
 
         try

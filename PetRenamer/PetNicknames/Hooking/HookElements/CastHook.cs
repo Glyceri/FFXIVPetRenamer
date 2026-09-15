@@ -1,8 +1,10 @@
+using Dalamud.Game;
 using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 
@@ -32,7 +34,11 @@ internal unsafe class CastHook : HookableElement
     
     private void AddToScreenLogWithLogMessageIdDetour(BattleChara* target, BattleChara* source, int logMessageId, byte actionKind, uint actionId, int value1, int value2, int value3)
     {
-        PetServices.PetCastHelper.SetLatestCast((nint)target, (nint)source, (int)actionId);
+        ActionData currentActionData = new ActionData(actionId, (ActionKind)actionKind);
+        
+        PetServices.PetLog.LogFatal("JUST SET ACTION TO: " + currentActionData);
+        
+        PetServices.PetCastHelper.SetLatestCast((nint)target, (nint)source, currentActionData);
         
         AddToScreenLogWithLogMessageIdHook?.Original(target, source, logMessageId, actionKind, actionId, value1, value2, value3);
         
@@ -48,6 +54,6 @@ internal unsafe class CastHook : HookableElement
             return;
         }
         
-        user.OnLastCastChanged(actionId);
+        user.OnLastCastChanged(currentActionData);
     }
 }

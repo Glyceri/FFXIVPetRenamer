@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -17,12 +16,10 @@ internal class SystemChatNotebookLogParserElement : IChatLogPetParserElement
         4504, // <colortype(500)><edgecolortype(501)><head(<sheet(Companion,lnum1,0)>)><edgecolortype(0)><colortype(0)> was removed from your favorites.
     ];
     
-    private readonly IPetServices     PetServices;
-    private readonly IChatPetDatabase PetDatabase;
+    private readonly IPetServices PetServices;
     
-    public SystemChatNotebookLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public SystemChatNotebookLogParserElement(IPetServices petServices)
     {
-        PetDatabase = petDatabase;
         PetServices = petServices;
     }
     
@@ -68,6 +65,6 @@ internal class SystemChatNotebookLogParserElement : IChatLogPetParserElement
         ReplaceNameType = PetServices.HoverService.CurrentNameType;
         UsedData        = PetServices.HoverService.CurrentlyHoveredPet;
         
-        return PetDatabase.MakeChatPet(PetServices.HoverService.CurrentlyHoveredPet.Model, chatPlayer);
+        return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(PetServices.HoverService.CurrentlyHoveredPet.Model, chatPlayer);
     }
 }

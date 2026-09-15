@@ -32,12 +32,9 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetListWindow : PetWindow
 {
-    private readonly IPettableDatabase Database;
-    private readonly IPettableDatabase LegacyDatabase;
-    private readonly IImageDatabase    ImageDatabase;
-
-    private readonly IDataParser DataParser;
-    private readonly IDataWriter DataWriter;
+    private readonly IImageDatabase ImageDatabase;
+    private readonly IDataParser    DataParser;
+    private readonly IDataWriter    DataWriter;
 
     private bool inUserMode;
     private bool lastInUserMode;
@@ -58,14 +55,12 @@ internal class PetListWindow : PetWindow
     
     private DateTime lastTime = DateTime.Now;
 
-    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase database, IPettableDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
+    public PetListWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter)
         : base(windowHandler, dalamudServices, petServices, "Pet List")
     {
-        Database        = database;
-        LegacyDatabase  = legacyDatabase;
-        ImageDatabase   = imageDatabase;
-        DataParser      = dataParser;
-        DataWriter      = dataWriter;
+        ImageDatabase = imageDatabase;
+        DataParser    = dataParser;
+        DataWriter    = dataWriter;
     }
 
     protected override Vector2 MinSize
@@ -130,13 +125,13 @@ internal class PetListWindow : PetWindow
 
     private void DrawHeader()
     {
-        if (Listbox.Begin($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
+        if (ImGui.BeginListBox($"##ListboxHolder_{WindowHandler.InternalCounter}", new Vector2(250, 110) * WindowHandler.GlobalScale))
         {
             PlayerImage.Draw(ActiveEntry, ImageDatabase, DalamudServices);
 
             ImGui.SameLine();
 
-            if (Listbox.Begin($"##ListboxNametags_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
+            if (ImGui.BeginListBox($"##ListboxNametags_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
             {
                 TextAligner.Align(TextAlignment.Left);
 
@@ -169,17 +164,17 @@ internal class PetListWindow : PetWindow
 
                 TextAligner.PopAlignment();
 
-                Listbox.End();
+                ImGui.EndListBox();
             }
 
-            Listbox.End();
+            ImGui.EndListBox();
         }
 
         ImGui.SameLine();
 
-        if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
+        if (ImGui.BeginListBox($"##Listbox_{WindowHandler.InternalCounter}", new Vector2(ImGui.GetContentRegionAvail().X, 110 * WindowHandler.GlobalScale)))
         {
-            if (Listbox.Begin($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
+            if (ImGui.BeginListBox($"##Listbox_{WindowHandler.InternalCounter}", ImGui.GetContentRegionAvail()))
             {
                 float contentAvailableX = ImGui.GetContentRegionAvail().X;
                 Vector2 barSize = WindowHandler.StretchingBar;
@@ -255,10 +250,10 @@ internal class PetListWindow : PetWindow
 
                 ImGui.EndDisabled();
 
-                Listbox.End();
+                ImGui.EndListBox();
             }
 
-            Listbox.End();
+            ImGui.EndListBox();
         }
     }
 
@@ -576,7 +571,7 @@ internal class PetListWindow : PetWindow
 
     private void HandleUserMode()
     {
-        IPettableDatabaseEntry[] entries = [.. Database.DatabaseEntries, .. LegacyDatabase.DatabaseEntries];
+        IPettableDatabaseEntry[] entries = [.. PetServices.Database.DatabaseEntries, .. PetServices.LegacyDatabase.DatabaseEntries];
 
         int length = entries.Length;
 

@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -20,12 +19,10 @@ internal class SystemChatLogParserElement : IChatLogPetParserElement
         3841        // The next <string(lstr1)> summoned will appear unglamoured.
     ];
     
-    private readonly IPetServices     PetServices;
-    private readonly IChatPetDatabase PetDatabase;
+    private readonly IPetServices PetServices;
     
-    public SystemChatLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public SystemChatLogParserElement(IPetServices petServices)
     {
-        PetDatabase = petDatabase;
         PetServices = petServices;
     }
     
@@ -71,6 +68,6 @@ internal class SystemChatLogParserElement : IChatLogPetParserElement
         
         UsedData = pettablePet.PetData;
         
-        return PetDatabase.MakeChatPet(pettablePet.SkeletonId, PetServices.UserList.LocalPlayer.DataBaseEntry.Name, PetServices.UserList.LocalPlayer.DataBaseEntry.Homeworld);
+        return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(pettablePet.SkeletonId, PetServices.UserList.LocalPlayer.DataBaseEntry.Name, PetServices.UserList.LocalPlayer.DataBaseEntry.Homeworld);
     }
 }

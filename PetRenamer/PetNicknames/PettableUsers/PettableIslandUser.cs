@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
@@ -15,7 +16,7 @@ internal unsafe class PettableIslandUser : IIslandUser
     public uint         EntityId      { get; }
     public BattleChara* BattleChara   { get; } = null;
     public GameObjectId ObjectId      { get; } = 0;
-    public uint         CurrentCastId { get; } = 0;
+    public ActionData   CurrentAction { get; } = new ActionData();
     public nint         Address       { get; } = 0;
     
     public IPettableDatabaseEntry DataBaseEntry { get; }
@@ -33,7 +34,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         entry.RegisterUsage();
     }
 
-    public void Dispose(IPettableDatabase d)
+    public void Dispose()
         => DataBaseEntry.DeregisterUsage();
 
     public bool IsActive
@@ -138,7 +139,7 @@ internal unsafe class PettableIslandUser : IIslandUser
         textColour = DataBaseEntry.GetTextColour(petSkeleton);
     }
 
-    public void OnLastCastChanged(uint cast) 
+    public void OnLastCastChanged(ActionData actionData)
         { } // Unused
 
     public void Update() 

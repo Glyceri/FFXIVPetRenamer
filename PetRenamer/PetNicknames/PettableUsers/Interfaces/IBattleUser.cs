@@ -1,6 +1,11 @@
-﻿namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
+﻿using PetRenamer.PetNicknames.PettableUsers.Structs;
+
+namespace PetRenamer.PetNicknames.PettableUsers.Interfaces;
 
 internal interface IBattleUser : IPettableBattleEntity
 {
-    uint CurrentCastId { get; }
+    ActionData CurrentAction { get; }
+    
+    void OnLastCastChanged(ActionData actionData);
+    void Update();
 }

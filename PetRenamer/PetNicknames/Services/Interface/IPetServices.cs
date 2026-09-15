@@ -23,4 +23,7 @@ internal interface IPetServices : IDisposable
     IParty               Party               { get; }
     IChatRefresher       ChatRefresher       { get; }
     IHornService         HornService         { get; }
+    IPettableDatabase    Database            { get; }
+    ILegacyDatabase      LegacyDatabase      { get; }
+    IChatDatabaseService ChatDatabaseService { get; }
 }

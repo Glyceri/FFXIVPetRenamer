@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.Services.Interface;
@@ -17,12 +16,10 @@ internal class SystemChatXBMNotebookLogParserElement : IChatLogPetParserElement
         11481, // Your <sheet(Pet,<sheet(XBMPet,lnum1,0)>,0)> is assigned to the <switch(lnum2,first battlehorn,second battlehorn,third battlehorn)>.
     ];
 
-    private readonly IPetServices     PetServices;
-    private readonly IChatPetDatabase PetDatabase;
+    private readonly IPetServices PetServices;
     
-    public SystemChatXBMNotebookLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public SystemChatXBMNotebookLogParserElement(IPetServices petServices)
     {
-        PetDatabase = petDatabase;
         PetServices = petServices;
     }
     
@@ -83,7 +80,7 @@ internal class SystemChatXBMNotebookLogParserElement : IChatLogPetParserElement
             
             UsedData = petData;
             
-            return PetDatabase.MakeChatPet(petData.Model, chatPlayer);
+            return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(petData.Model, chatPlayer);
         }
         
         return null;

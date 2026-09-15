@@ -1,8 +1,6 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using PetRenamer.PetNicknames.Hooking;
-using PetRenamer.PetNicknames.PettableDatabase;
-using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Update;
@@ -37,8 +35,6 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
     private DalamudServices        DalamudServices      = null!;
     private IPetServices           PetServices          = null!;
     private ISharingDictionary     SharingDictionary    = null!;
-    private IPettableDatabase      PettableDatabase     = null!;
-    private ILegacyDatabase        LegacyDatabase       = null!;
     private IImageDatabase         ImageDatabase        = null!;
     private IWindowHandler         WindowHandler        = null!;
     private IDataParser            DataParser           = null!;
@@ -68,21 +64,18 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
 
         LodestoneNetworker      = new LodestoneNetworker(PetServices);
 
-        PettableDatabase        = new PettableDatabase(PetServices);
-        LegacyDatabase          = new LegacyPettableDatabase(PetServices);
-
         ImageDatabase           = new ImageDatabase(DalamudServices, PetServices, LodestoneNetworker);
 
         DataWriter              = new DataWriter();
-        DataParser              = new DataParser(DalamudServices, PetServices, PettableDatabase, LegacyDatabase);
+        DataParser              = new DataParser(DalamudServices, PetServices);
         DataChecker             = new DataChecker(PetServices);
         
         IpcProvider             = new IpcProvider(DalamudServices, PetServices, DataParser, DataWriter, DataChecker);
         PenumbraIPC             = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
 
-        EphemeralChatHandler    = new ChatEphemeralHandler(PetServices, PettableDatabase);
+        EphemeralChatHandler    = new ChatEphemeralHandler(PetServices);
         
-        HookHandler             = new HookHandler(DalamudServices, PetServices, PettableDatabase, LegacyDatabase, SharingDictionary, EphemeralChatHandler);
+        HookHandler             = new HookHandler(DalamudServices, PetServices, SharingDictionary, EphemeralChatHandler);
 
         SaveHandler             = new SaveHandler(PetServices, IpcProvider);
 
@@ -91,12 +84,12 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
 
         ChatHandlerGroup        = new ChatGroup(ChatHandler, EphemeralChatHandler, PetServices.DirtyListener);
         
-        WindowHandler           = new WindowHandler(DalamudServices, PetServices, PettableDatabase, LegacyDatabase, ImageDatabase, DataParser, DataWriter, SharingDictionary, HookHandler.PronounHook, ChatHandlerGroup);
+        WindowHandler           = new WindowHandler(DalamudServices, PetServices, ImageDatabase, DataParser, DataWriter, SharingDictionary, HookHandler.PronounHook, ChatHandlerGroup);
 
         CommandHandler          = new CommandHandler(DalamudServices, PetServices, WindowHandler);
         ContextMenuHandler      = new ContextMenuHandler(DalamudServices, PetServices, WindowHandler);
 
-        PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PettableDatabase, LegacyDatabase, PetServices);
+        PetServices.Configuration.Initialise(DalamudServices.DalamudPlugin, PetServices);
     }
     
     public async ValueTask DisposeAsync()

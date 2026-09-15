@@ -1,5 +1,4 @@
 ﻿using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Windowing.Components.Image;
 using PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
 
 namespace PetRenamer.PetNicknames.Windowing.Components;

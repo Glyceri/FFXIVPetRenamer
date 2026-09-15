@@ -19,18 +19,23 @@ internal unsafe class XBMPetActionDetailHook : HookableElement
     public override void Init()
     {
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRequestedUpdate, "XBMPetActionDetail", XBMPetActionPostRefresh);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostHide,            "XBMPetActionDetail", XBMPetActionPostHide);
     }
 
     protected override void OnDispose()
     {
         DalamudServices.AddonLifecycle.UnregisterListener(XBMPetActionPostRefresh);   
+        DalamudServices.AddonLifecycle.UnregisterListener(XBMPetActionPostHide);   
+    }
+    
+    private void XBMPetActionPostHide(AddonEvent addonEvent, AddonArgs addonArgs)
+    {
+        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
+        PetServices.HoverService.SetHoveredPet(null);
     }
     
     private void XBMPetActionPostRefresh(AddonEvent addonEvent, AddonArgs addonArgs)
     {
-        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
-        PetServices.HoverService.SetHoveredPet(null);
-        
         AtkUnitBase* atkUnitBase = (AtkUnitBase*)addonArgs.Addon.Address;
         
         if (atkUnitBase == null)
@@ -58,9 +63,6 @@ internal unsafe class XBMPetActionDetailHook : HookableElement
         {
             return;
         }
-        
-        PetServices.HoverService.SetCurrentNameType(NameType.Raw);
-        PetServices.HoverService.SetHoveredPet(petData);
         
         PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowNamesInActivePetColour, textNode, petData, NameType.Raw, localPlayer);
     }

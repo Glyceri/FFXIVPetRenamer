@@ -1,13 +1,14 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+﻿using Dalamud.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.PettableDatabase.Interfaces;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.WritingAndParsing.Enums;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -18,7 +19,7 @@ internal unsafe class PettableUser : IPettableUser
     public nint         Address       { get; }
     public BattleChara* BattleChara   { get; }
     public GameObjectId ObjectId      { get; }
-    public uint         CurrentCastId { get; private set; }
+    public ActionData   CurrentAction { get; private set; } = new ActionData();
     public bool         IsLocalPlayer { get; }
 
     public List<IPettablePet>     PettablePets  { get; } = [];
@@ -29,7 +30,7 @@ internal unsafe class PettableUser : IPettableUser
     private readonly IPetServices       PetServices;
     private readonly ISharingDictionary SharingDictionary;
 
-    public PettableUser(IPetServices petServices, ISharingDictionary sharingDictionary, IPettableDatabase dataBase, ILegacyDatabase legacyDatabase, BattleChara* battleChara)
+    public PettableUser(IPetServices petServices, ISharingDictionary sharingDictionary, BattleChara* battleChara)
     {
         PetServices       = petServices;
         SharingDictionary = sharingDictionary;
@@ -44,17 +45,17 @@ internal unsafe class PettableUser : IPettableUser
         IsLocalPlayer   = BattleChara->ObjectIndex == 0;
         ObjectId        = BattleChara->GetGameObjectId();
 
-        IPettableDatabaseEntry? legacyEntry = legacyDatabase.GetEntry(BattleChara->NameString, BattleChara->HomeWorld, false);
+        IPettableDatabaseEntry? legacyEntry = PetServices.LegacyDatabase.GetEntry(BattleChara->NameString, BattleChara->HomeWorld, false);
 
         if (legacyEntry != null)
         {
             legacyEntry.UpdateContentId(BattleChara->ContentId, true);
-            legacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
-            _ = legacyEntry.MoveToDataBase(dataBase);
-            legacyDatabase.SetDirty();
+            PetServices.LegacyDatabase.RemoveEntry(legacyEntry, ParseSource.Manual);
+            _ = legacyEntry.MoveToDataBase(PetServices.Database);
+            PetServices.LegacyDatabase.SetDirty();
         }
 
-        DataBaseEntry = dataBase.GetEntry(BattleChara->ContentId);
+        DataBaseEntry = PetServices.Database.GetEntry(BattleChara->ContentId);
         DataBaseEntry.RegisterUsage();
         DataBaseEntry.UpdateEntry(BattleChara->NameString, BattleChara->HomeWorld, IsLocalPlayer);
 
@@ -66,7 +67,7 @@ internal unsafe class PettableUser : IPettableUser
         PetServices.PetLog.LogVerbose($"Just created a new user: {DataBaseEntry.ContentId}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
     }
 
-    public void Dispose(IPettableDatabase database)
+    public void Dispose()
     {
         DataBaseEntry.DeregisterUsage();
 
@@ -83,7 +84,7 @@ internal unsafe class PettableUser : IPettableUser
 
         if (!IsActive)
         {
-            database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
+            PetServices.Database.RemoveEntry(DataBaseEntry, ParseSource.IPC);
         }
 
         foreach (IPettablePet pet in PettablePets)
@@ -100,35 +101,33 @@ internal unsafe class PettableUser : IPettableUser
 
     public void Update()
     {
-        CurrentCastId = BattleChara->CastInfo.ActionId;
-
-        if (_lastCast == CurrentCastId)
+        if (_lastCast == BattleChara->CastInfo.ActionId)
         {
             return;
         }
         
-        OnLastCastChanged(CurrentCastId);
+        OnLastCastChanged(new ActionData(BattleChara->CastInfo.ActionId, (ActionKind)BattleChara->CastInfo.ActionType));
     }
     
-    public void OnLastCastChanged(uint cast)
+    public void OnLastCastChanged(ActionData actionData)
     {
         if (!IsActive)
         {
             return;
         }
 
-        CurrentCastId = cast;
+        CurrentAction = actionData;
 
-        if (_lastCast == CurrentCastId)
+        if (_lastCast == CurrentAction.ActionId)
         {
             return;
         }
         
         int? softIndex = PetServices.PetSheets.CastToSoftIndex(_lastCast);
 
-        _lastCast = CurrentCastId;
+        _lastCast = CurrentAction.ActionId;
 
-        if (CurrentCastId != 0)
+        if (CurrentAction.ActionId != 0)
         {
             return;
         }

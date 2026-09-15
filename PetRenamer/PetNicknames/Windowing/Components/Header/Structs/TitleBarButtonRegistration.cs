@@ -5,8 +5,6 @@ using System;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Header.Structs;
 
-// CreateTitleBarButton<PetDevWindow>   (windowHandler, petServices, "PetDev.Title",       FontAwesomeIcon.Biohazard,  petServices.Configuration.debugModeActive);
-
 internal abstract class TitleBarButtonRegistration
 {
     public readonly string                     TitleKey;

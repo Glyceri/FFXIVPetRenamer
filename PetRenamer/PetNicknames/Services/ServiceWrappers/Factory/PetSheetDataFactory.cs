@@ -2,6 +2,7 @@ using Dalamud.Game;
 using Dalamud.Utility;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
+using PetRenamer.PetNicknames.PettableUsers.Structs;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
@@ -58,7 +59,7 @@ internal static class PetSheetDataFactory
             singular = GermanReplace(singular, pronoun);
         }
         
-        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, companion.RowId);
+        return new PetSheetData(petSkeleton, legacyModelId, icon, raceName, raceId, behaviourName, pronoun, singular, singular, new ActionData(companion.RowId, ActionKind.Companion));
     }
     
     public static PetSheetData? CreatePetSheetData(IPetSheets petSheets, PetRegistration petRegistration)
@@ -85,7 +86,7 @@ internal static class PetSheetDataFactory
         Pet?    petReg          = petRegistration.GetBattlePet(petSheets);
         Action? signatureAction = GetAction(petReg);
         
-        return new PetSheetData(petRegistration.PetSkeleton, -1, petIcon, petType, 0, signatureAction?.Name.ExtractText() ?? null, bnpcName.Value.Pronoun, name, actionName, actionRowId);
+        return new PetSheetData(petRegistration.PetSkeleton, -1, petIcon, petType, 0, signatureAction?.Name.ExtractText() ?? null, bnpcName.Value.Pronoun, name, actionName, new ActionData(actionRowId, ActionKind.Action));
     }
     
     private static Action? GetAction(Pet? pet)
@@ -135,7 +136,7 @@ internal static class PetSheetDataFactory
         byte   aspect            = pet.Value.Action.Value.Aspect;
         string kin               = petSheets.GetAddonString(17740 + (uint)pet.Value.Classification);
         
-        return new PetSheetData(petRegistration.PetSkeleton, -1, iconId, kin, aspect, null, pronoun, name, name, petRegistration.GetRawAction());
+        return new PetSheetData(petRegistration.PetSkeleton, -1, iconId, kin, aspect, null, pronoun, name, name, new ActionData(petRegistration.GetRawAction(), ActionKind.Action));
     }
     
     private static string GermanReplace(string baseString, sbyte pronoun)

@@ -24,8 +24,6 @@ internal class WindowHandler : IWindowHandler
     
     private readonly DalamudServices    DalamudServices;
     private readonly IPetServices       PetServices;
-    private readonly IPettableDatabase  Database;
-    private readonly ILegacyDatabase    LegacyDatabase;
     private readonly IImageDatabase     ImageDatabase;
     private readonly IDataParser        DataParser;
     private readonly IDataWriter        DataWriter;
@@ -36,12 +34,10 @@ internal class WindowHandler : IWindowHandler
 
     private bool isDirty;
     
-    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IPettableDatabase pettableDatabase, ILegacyDatabase legacyDatabase, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook, IHandlerGroup chatHandlerGroup)
+    public WindowHandler(DalamudServices dalamudServices, IPetServices petServices, IImageDatabase imageDatabase, IDataParser dataParser, IDataWriter dataWriter, ISharingDictionary sharingDictionary, IPronounHook pronounHook, IHandlerGroup chatHandlerGroup)
     {
         DalamudServices       = dalamudServices;
         PetServices           = petServices;
-        Database              = pettableDatabase;
-        LegacyDatabase        = legacyDatabase;
         ImageDatabase         = imageDatabase;
         DataParser            = dataParser;
         DataWriter            = dataWriter;
@@ -68,9 +64,9 @@ internal class WindowHandler : IWindowHandler
     {
         AddWindow(new PetRenameWindow(this, DalamudServices, PetServices));
         AddWindow(new PetConfigWindow(this, DalamudServices, PetServices, ChatHandlerGroup));
-        AddWindow(new PetListWindow(this, DalamudServices, PetServices, Database, LegacyDatabase, ImageDatabase, DataParser, DataWriter));
+        AddWindow(new PetListWindow(this, DalamudServices, PetServices, ImageDatabase, DataParser, DataWriter));
         AddWindow(new KofiWindow(this, DalamudServices, PetServices));
-        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, Database, SharingDictionary, PronounHook));
+        AddWindow(new PetDevWindow(this, DalamudServices, PetServices, SharingDictionary, PronounHook));
     }
 
     public static int InternalCounter

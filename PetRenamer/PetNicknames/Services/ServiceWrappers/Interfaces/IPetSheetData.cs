@@ -1,4 +1,5 @@
-﻿using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
+﻿using PetRenamer.PetNicknames.PettableUsers.Structs;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
@@ -16,11 +17,11 @@ internal interface IPetSheetData
     string?          BehaviourName { get; }
 
     string           ActionName    { get; }
-    uint             ActionId      { get; }
+    ActionData       ActionData    { get; }
 
     int              LegacyModelId { get; }
 
     bool             IsPet(string name);
-    bool             IsAction(uint action);
+    bool             IsAction(ActionData actionData);
     PetSheetData     MakeSoft(IPetSheetData newData);
 }

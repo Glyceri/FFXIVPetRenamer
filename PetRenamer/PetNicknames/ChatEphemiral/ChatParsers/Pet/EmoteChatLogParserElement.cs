@@ -1,5 +1,4 @@
 using Dalamud.Game.Text;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Interfaces;
 using PetRenamer.PetNicknames.ChatEphemiral.Enums;
@@ -12,12 +11,10 @@ namespace PetRenamer.PetNicknames.ChatEphemiral.ChatParsers.Pet;
 
 internal class EmoteChatLogParserElement : IChatLogPetParserElement
 {
-    private readonly IPetServices     PetServices;
-    private readonly IChatPetDatabase PetDatabase;
+    private readonly IPetServices PetServices;
     
-    public EmoteChatLogParserElement(IChatPetDatabase petDatabase, IPetServices petServices)
+    public EmoteChatLogParserElement(IPetServices petServices)
     {
-        PetDatabase = petDatabase;
         PetServices = petServices;
     }
     
@@ -70,6 +67,6 @@ internal class EmoteChatLogParserElement : IChatLogPetParserElement
         
         UsedData = pet.PetData;
         
-        return PetDatabase.MakeChatPet(pet.SkeletonId, pet.Owner.DataBaseEntry.Name, pet.Owner.DataBaseEntry.Homeworld);
+        return PetServices.ChatDatabaseService.PetDatabase.MakeChatPet(pet.SkeletonId, pet.Owner.DataBaseEntry.Name, pet.Owner.DataBaseEntry.Homeworld);
     }
 }

@@ -14,14 +14,14 @@ namespace PetRenamer.PetNicknames.Update;
 
 internal class UpdateHandler : IDisposable
 {
-    private readonly DalamudServices        DalamudServices;
-    private readonly IImageDatabase         ImageDatabase;
-    private readonly IIpcProvider           IpcProvider;
-    private readonly LodestoneNetworker     LodestoneNetworker;
-    private readonly IPetServices           PetServices;
-    private readonly SaveHandler            SaveHandler;    
+    private readonly DalamudServices    DalamudServices;
+    private readonly IImageDatabase     ImageDatabase;
+    private readonly IIpcProvider       IpcProvider;
+    private readonly LodestoneNetworker LodestoneNetworker;
+    private readonly IPetServices       PetServices;
+    private readonly SaveHandler        SaveHandler;    
 
-    private readonly List<IUpdatable>       _updatables = [];
+    private readonly List<IUpdatable>   _updatables = [];
 
     public UpdateHandler(
         DalamudServices        dalamudServices, 
