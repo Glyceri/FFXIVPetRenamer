@@ -138,14 +138,14 @@ internal class StringHelperWrapper : IStringHelper
             return newPayloads;
         }
         
-        PetServices.PetLog.DevLogVerbose($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
+        PetServices.PetLog.DevLog($"Trying to replace: ['{toReplace}'] with ['{replaceWith}' {edgeColor} {textColor}] in ['{baseString}'].");
 
         string nodeText  = baseString;
-        string regString = toReplace.Replace("[", @"^\[").Replace("]", @"^\]\");
+        string regString = Regex.Escape(toReplace);
         
         if (ReplaceEmptySpaceFor.GetValue(DalamudServices))
         {
-            regString = $"\\b" + regString + "\\b";
+            regString = $@"(?<!\w){regString}(?!\w)";
         }
         
         nodeText = Regex.Replace(nodeText, regString, PluginConstants.forbiddenCharacter.ToString(), RegexOptions.IgnoreCase);

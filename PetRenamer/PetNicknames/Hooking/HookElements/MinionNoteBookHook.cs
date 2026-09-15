@@ -28,7 +28,6 @@ internal unsafe class MinionNoteBookHook : HookableElement
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw,             "LovmPaletteEdit",      HandlePostRefreshLovmPaletteEdit);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreDraw,             "LovmActionDetail",     HandlePostRefreshLovmActionDetail);
         DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostReceiveEvent,    "YKWNote",              HandlePostRefreshYKWNote);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh,         "XBMMonsterBookDetail", HandlePostRefreshXBM);
     }
     
     protected override void OnDispose()
@@ -38,7 +37,6 @@ internal unsafe class MinionNoteBookHook : HookableElement
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshLovmPaletteEdit);
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshLovmActionDetail);
         DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshYKWNote);
-        DalamudServices.AddonLifecycle.UnregisterListener(HandlePostRefreshXBM);
     }
 
     protected override void Refresh()
@@ -84,7 +82,4 @@ internal unsafe class MinionNoteBookHook : HookableElement
     
     private void HandlePostRefreshYKWNote(AddonEvent addonEvent, AddonArgs args)
         => HandleBook((AtkUnitBase*)args.Addon.Address, 28, PetServices.Configuration.ShowNamesInMinionBookColour);
-    
-    private void HandlePostRefreshXBM(AddonEvent addonEvent, AddonArgs args)
-        => HandleBook((AtkUnitBase*)args.Addon.Address, 13, PetServices.Configuration.ShowNamesInActivePetColour);
 }

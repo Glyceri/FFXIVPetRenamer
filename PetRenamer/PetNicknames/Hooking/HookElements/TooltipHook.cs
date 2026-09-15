@@ -28,7 +28,8 @@ internal unsafe class TooltipHook : HookableElement
     
     private static readonly string[] AllowPreDrawAddonsStarts =
     [
-        "_ActionBar"
+        "_ActionBar",
+        "QuickPanel",
     ];
     
     private readonly Hook<AtkTooltipManager.Delegates.ShowTooltip> ShowTooltipHook;

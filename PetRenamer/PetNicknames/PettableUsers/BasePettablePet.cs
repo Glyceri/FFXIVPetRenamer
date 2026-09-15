@@ -99,8 +99,6 @@ internal abstract unsafe class BasePettablePet : IPettablePet
             return petSkeleton.PetSkeleton;
         }
         
-        PetServices.PetLog.LogFatal("Just created a beast pet skeleton with a raw ID, this is NOT good.");
-        
         return beastSkeleton;
     }
 }

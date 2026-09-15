@@ -54,6 +54,7 @@ internal class HookHandler : IDisposable
         Register(new ChatHook(DalamudServices, PetServices, ChatHandler));
         Register(new TooltipHook(DalamudServices, PetServices, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
+        Register(new XBMMonsterNotebookHook(DalamudServices, PetServices));
         Register(new XBMActivePetHook(DalamudServices, PetServices));
         Register(new XBMPresetPreviewHook(DalamudServices, PetServices));
         Register(new XBMPetActionDetailHook(DalamudServices, PetServices));

@@ -60,16 +60,12 @@ internal class CastDealerUserChatLogParserElement : IChatLogPetParserElement
             return null;
         }
         
-        PetServices.PetLog.LogFatal(PetServices.PetCastHelper.LastAction);
-        
         IPetSheetData? petData = PetServices.PetSheets.GetPetFromAction(PetServices.PetCastHelper.LastAction);
         
         if (petData == null)
         {
             return null;
         }
-        
-        PetServices.PetLog.LogFatal(petData.Singular);
         
         UsedData = PetServices.PetSheets.MakeSoft(user, petData);
         

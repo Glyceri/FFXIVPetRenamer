@@ -35,9 +35,7 @@ internal unsafe class CastHook : HookableElement
     private void AddToScreenLogWithLogMessageIdDetour(BattleChara* target, BattleChara* source, int logMessageId, byte actionKind, uint actionId, int value1, int value2, int value3)
     {
         ActionData currentActionData = new ActionData(actionId, (ActionKind)actionKind);
-        
-        PetServices.PetLog.LogFatal("JUST SET ACTION TO: " + currentActionData);
-        
+
         PetServices.PetCastHelper.SetLatestCast((nint)target, (nint)source, currentActionData);
         
         AddToScreenLogWithLogMessageIdHook?.Original(target, source, logMessageId, actionKind, actionId, value1, value2, value3);
