@@ -34,6 +34,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using PetRenamer.PetNicknames.Services.ServiceWrappers.Structs;
 using PetRenamer.PetNicknames.TranslatorSystem;
 using PetRenamer.PetNicknames.Windowing.Base;
 using PetRenamer.PetNicknames.Windowing.Components;
@@ -93,6 +94,7 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Model Chara Sniffer",  DrawModelCharaSniffer));
         devStructList.Add(new DevStruct("Horns",                DrawHorns));
         devStructList.Add(new DevStruct("Hover Service",        DrawHoverService));
+        devStructList.Add(new DevStruct("EmoteLog",             DrawEmoteLog));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -1139,6 +1141,18 @@ internal class PetDevWindow : PetWindow
         ImGui.EndTable();
     }
 
+    private void DrawEmoteLog()
+    {
+        int index = -1;
+        
+        foreach (EmoteData data in PetServices.EmoteService.EmoteData)
+        {
+            index++;
+            
+            ImGui.Text($"[{index}] [Emote: {data.EmoteId}] [Source: {data.Source.DataBaseEntry.Name}:{data.Source.DataBaseEntry.HomeworldName}] [Target: {data.Target.SkeletonId}]");
+        }
+    }
+    
     protected override void OnDispose()
     {
         DeactivateIPC();

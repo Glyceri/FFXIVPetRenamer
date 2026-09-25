@@ -26,4 +26,5 @@ internal interface IPetServices : IDisposable
     IPettableDatabase    Database            { get; }
     ILegacyDatabase      LegacyDatabase      { get; }
     IChatDatabaseService ChatDatabaseService { get; }
+    IEmoteService        EmoteService        { get; }
 }

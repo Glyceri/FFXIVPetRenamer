@@ -106,6 +106,7 @@ internal unsafe class ChatHook : HookableElement
         PetServices.PetLog.DevLogInfo($"Cleared LogModule.");
         
         PetServices.ChatDatabaseService.Clear();
+        PetServices.EmoteService.ClearEmotes();
         
         _lastIndex = -1;
         

@@ -29,6 +29,7 @@ internal class PetServices : IPetServices
     public IPettableDatabase    Database            { get; }
     public ILegacyDatabase      LegacyDatabase      { get; }
     public IChatDatabaseService ChatDatabaseService { get; }
+    public IEmoteService        EmoteService        { get; }
 
     public PetServices(DalamudServices services) 
     {
@@ -58,6 +59,7 @@ internal class PetServices : IPetServices
         LegacyDatabase      = new LegacyPettableDatabase(this);
         
         ChatDatabaseService = new ChatDatabaseService(Database, this);
+        EmoteService        = new EmoteService();
         
         CheckConfigFailure();
     }

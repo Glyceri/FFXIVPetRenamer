@@ -60,6 +60,7 @@ internal class HookHandler : IDisposable
         Register(new XBMPetActionDetailHook(DalamudServices, PetServices));
         Register(new XBMPetPartyHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
+        Register(new EmoteHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
         Register(new IslandHook(DalamudServices, PetServices));
         Register(new CastHook(DalamudServices, PetServices));

@@ -59,7 +59,7 @@ internal class HoverHook : HookableElement
                 HandleActionStandard(action);
             }
         }
-        else if (action.DetailKind == DetailKind.Unk62)
+        else if (action.DetailKind == DetailKind.XBMPet)
         {
             HandleAsXBM(action);
         }
