@@ -28,14 +28,16 @@ internal unsafe class CharacterManagerHook : HookableElement
     private readonly Hook<BattleChara.Delegates.Dtor>          OnDestroyBattleCharaHook;
     
     private readonly ISharingDictionary SharingDictionary;
-
+    private readonly IIpcProvider       IpcProvider;
+    
     private readonly nint[] _temporaryPets = new nint[PlayerMaxInObjectTable];
     
-    public CharacterManagerHook(DalamudServices services, IPetServices petServices, ISharingDictionary sharingDictionary) 
+    public CharacterManagerHook(DalamudServices services, IPetServices petServices, ISharingDictionary sharingDictionary, IIpcProvider ipcProvider) 
         : base(services, petServices)
     {
         SharingDictionary = sharingDictionary;
-
+        IpcProvider       = ipcProvider;
+        
         OnInitializeCompanionHook   = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.OnInitialize>     ((nint)Companion.StaticVirtualTablePointer->OnInitialize,       InitializeCompanion);
         OnTerminateCompanionHook    = DalamudServices.Hooking.HookFromAddress<Companion.Delegates.Terminate>        ((nint)Companion.StaticVirtualTablePointer->Terminate,          TerminateCompanion);
         OnInitializeBattleCharaHook = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.OnInitialize>   ((nint)BattleChara.StaticVirtualTablePointer->OnInitialize,     InitializeBattleChara);
@@ -421,6 +423,13 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
         
         newUser.SetCompanion(newBattleChara->CompanionData.CompanionObject);
+        
+        if (!newUser.IsLocalPlayer)
+        {
+            return;
+        }
+        
+        IpcProvider.NotifyDataChanged();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

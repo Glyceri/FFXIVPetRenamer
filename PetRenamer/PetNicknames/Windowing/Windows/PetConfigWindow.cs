@@ -44,6 +44,9 @@ internal class PetConfigWindow : PetWindow
     protected override Vector2 DefaultSize 
         => new Vector2(400, 500);
     
+    protected override ImGuiCond AppearCond
+        => ImGuiCond.FirstUseEver;
+    
     private static readonly string[] _listIconTypes   = ["ListIconType.Both", "ListIconType.Sharing", "ListIconType.ListOnly"];
     private static readonly string[] _iconMenuTypes   = ["MenuType.Action", "MenuType.Notebook", "MenuType.Item"];
     private static readonly string[] _beastIconTypes  = ["BeastIconType.Blob", "BeastIconType.Action"];

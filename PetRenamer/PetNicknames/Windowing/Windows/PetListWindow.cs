@@ -77,7 +77,10 @@ internal class PetListWindow : PetWindow
 
     public override bool ShowQuickButtons
         => true;
-    
+
+    protected override ImGuiCond AppearCond
+        => ImGuiCond.FirstUseEver;
+
     public override void OnOpen()
     {
         ClearSearchBar();

@@ -400,6 +400,8 @@ internal class IpcProvider : IIpcProvider
 
     private void OnDataChanged()
     {
+        PetServices.PetLog.DevLogInfo("Data Changed on IPC: " + lastData);
+        
         try
         {
             PlayerDataChanged.SendMessage(lastData);

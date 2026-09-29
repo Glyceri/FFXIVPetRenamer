@@ -75,7 +75,7 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
 
         EphemeralChatHandler    = new ChatEphemeralHandler(PetServices);
         
-        HookHandler             = new HookHandler(DalamudServices, PetServices, SharingDictionary, EphemeralChatHandler);
+        HookHandler             = new HookHandler(DalamudServices, PetServices, SharingDictionary, EphemeralChatHandler, IpcProvider);
 
         SaveHandler             = new SaveHandler(PetServices, IpcProvider);
 

@@ -11,9 +11,5 @@ internal unsafe class PettableLovmPet : BasePettablePet
 {
     public PettableLovmPet(BattleChara* battlePet, IPettableUser owner, ISharingDictionary sharingDictionary, IPettableDatabaseEntry entry, IPetServices petServices) 
         : base(&battlePet->Character, owner, sharingDictionary, entry, petServices, SkeletonType.LovmPet)
-    {
-    }
-    
-    public BattleChara* BattleChara
-        => (BattleChara*)Address;
+        { }
 }

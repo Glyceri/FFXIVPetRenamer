@@ -29,7 +29,7 @@ internal unsafe class PettableUser : IPettableUser
 
     private readonly IPetServices       PetServices;
     private readonly ISharingDictionary SharingDictionary;
-
+    
     public PettableUser(IPetServices petServices, ISharingDictionary sharingDictionary, BattleChara* battleChara)
     {
         PetServices       = petServices;

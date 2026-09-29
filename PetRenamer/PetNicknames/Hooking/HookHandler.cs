@@ -16,17 +16,19 @@ internal class HookHandler : IDisposable
     private readonly IPetServices           PetServices;
     private readonly ISharingDictionary     SharingDictionary;
     private readonly IEphemaralChatHandler  ChatHandler;
+    private readonly IIpcProvider           IpcProvider;
     
     public IPronounHook PronounHook { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler, IIpcProvider ipcProvider)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
         SharingDictionary = sharingDictionary;
         ChatHandler       = chatHandler;
+        IpcProvider       = ipcProvider;
 
         _Register();
         _Initialize();
@@ -66,7 +68,7 @@ internal class HookHandler : IDisposable
         Register(new CastHook(DalamudServices, PetServices));
         Register(new NamePlateHook(DalamudServices, PetServices));
         Register(new PartyHook(DalamudServices, PetServices));
-        Register(new CharacterManagerHook(DalamudServices, PetServices, SharingDictionary));
+        Register(new CharacterManagerHook(DalamudServices, PetServices, SharingDictionary, IpcProvider));
     }
 
     private void Register(IHookableElement element)
