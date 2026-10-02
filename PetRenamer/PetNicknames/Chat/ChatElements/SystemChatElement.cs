@@ -22,10 +22,7 @@ internal class SystemChatElement : LogChatElement
     {
         PetServices     = petServices;
         PronounHook     = pronounHook;
-    }
-
-    protected override void SetupChatMessages()
-    {
+        
         Register(new LogChatMessage(640,   XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer, OnValidChatMessage)); // <head(<denoun(BNpcName,5,lnum1,1,1,1)>)> wurde fortgeschickt.
         Register(new LogChatMessage(642,   XivChatType.SystemError,   XivChatRelationKind.LocalPlayer, OnValidChatMessage)); // Du hast <denoun(BNpcName,5,lnum1,1,3,1)> den Befehl „<sheet(PetAction,lnum2,0)>“ gegeben.
         Register(new LogChatMessage(3840,  XivChatType.SystemMessage, XivChatRelationKind.LocalPlayer, OnValidChatMessage)); // <string(lstr1)> wird nächstes Mal als <string(lstr2)> erscheinen.
@@ -34,7 +31,7 @@ internal class SystemChatElement : LogChatElement
         Register(new LogChatMessage(4504,  XivChatType.SystemMessage, XivChatRelationKind.None,        OnValidNotebookChatMessage)); // <colortype(500)><edgecolortype(501)><head(<sheet(Companion,lnum1,0)>)><edgecolortype(0)><colortype(0)> was removed from your favorites.
         Register(new LogChatMessage(11481, XivChatType.SystemMessage, XivChatRelationKind.None,        OnValidHorn)); // Your <sheet(Pet,<sheet(XBMPet,lnum1,0)>,0)> is assigned to the <switch(lnum2,first battlehorn,second battlehorn,third battlehorn)>.
     }
-
+    
     private void OnValidChatMessage(IHandleableChatMessage chatMessage)
     {
         if (PronounHook.LastGottenPronoun == null)

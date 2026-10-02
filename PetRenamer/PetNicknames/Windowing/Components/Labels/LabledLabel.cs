@@ -14,13 +14,13 @@ internal static class LabledLabel
         float actualWidth = labelWidth * ImGuiHelpers.GlobalScale;
 
         TextAligner.Align(TextAlignment.Left);
-        BasicLabel.Draw(label, new Vector2(actualWidth, size.Y), tooltipLabel);
+        BasicLabel.Draw(label + $"###PET_NICKNAMES_LABEL_{WindowHandler.InternalCounter}", new Vector2(actualWidth, size.Y), tooltipLabel);
         TextAligner.PopAlignment();
 
         ImGui.SameLine();
 
         TextAligner.Align(TextAlignment.Right);
-        BasicLabel.Draw(value, size - new Vector2(actualWidth + style.ItemSpacing.X, 0), tooltipValue);
+        BasicLabel.Draw(value  + $"###PET_NICKNAMES__VALUE_LABEL_{WindowHandler.InternalCounter}", size - new Vector2(actualWidth + style.ItemSpacing.X, 0), tooltipValue);
         TextAligner.PopAlignment();
     }
 

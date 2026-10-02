@@ -7,7 +7,6 @@ using PetRenamer.PetNicknames.Update;
 using PetRenamer.PetNicknames.Windowing;
 using PetRenamer.PetNicknames.Chat;
 using PetRenamer.PetNicknames.Chat.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral;
 using PetRenamer.PetNicknames.Commands;
 using PetRenamer.PetNicknames.Windowing.Interfaces;
 using PetRenamer.PetNicknames.TranslatorSystem;
@@ -17,8 +16,6 @@ using PetRenamer.PetNicknames.Lodestone;
 using PetRenamer.PetNicknames.WritingAndParsing.Interfaces;
 using PetRenamer.PetNicknames.WritingAndParsing;
 using PetRenamer.PetNicknames.ContextMenus;
-using PetRenamer.PetNicknames.GroupHandling.Groups;
-using PetRenamer.PetNicknames.GroupHandling.Interfaces;
 using PetRenamer.PetNicknames.Serialization;
 using PetRenamer.PetNicknames.IPC.Interfaces;
 using PetRenamer.PetNicknames.IPC;
@@ -45,12 +42,10 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
     private ContextMenuHandler     ContextMenuHandler   = null!;
     private UpdateHandler          UpdateHandler        = null!;
     private HookHandler            HookHandler          = null!;
-    private IChatHandler           ChatHandler          = null!;
-    private ChatEphemeralHandler   EphemeralChatHandler = null!;
     private CommandHandler         CommandHandler       = null!;
     private LodestoneNetworker     LodestoneNetworker   = null!;
     private SaveHandler            SaveHandler          = null!;
-    private IHandlerGroup          ChatHandlerGroup     = null!;
+    private IChatHandler           ChatHandler          = null!;
     
     public async Task LoadAsync(CancellationToken cancellationToken)
     {
@@ -72,19 +67,16 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
         
         IpcProvider             = new IpcProvider(DalamudServices, PetServices, DataParser, DataWriter, DataChecker);
         PenumbraIPC             = new PenumbraIPC(PetServices, DalamudServices.DalamudPlugin, DataWriter, DataParser);
-
-        EphemeralChatHandler    = new ChatEphemeralHandler(PetServices);
         
-        HookHandler             = new HookHandler(DalamudServices, PetServices, SharingDictionary, EphemeralChatHandler, IpcProvider);
+        HookHandler             = new HookHandler(DalamudServices, PetServices, SharingDictionary, IpcProvider);
 
+        ChatHandler             = new ChatHandler(DalamudServices, PetServices, HookHandler.PronounHook);
+        
         SaveHandler             = new SaveHandler(PetServices, IpcProvider);
 
         UpdateHandler           = new UpdateHandler(DalamudServices, PetServices, LodestoneNetworker, IpcProvider, ImageDatabase, SaveHandler);
-        ChatHandler             = new ChatHandler(DalamudServices, PetServices, HookHandler.PronounHook);
 
-        ChatHandlerGroup        = new ChatGroup(ChatHandler, EphemeralChatHandler, PetServices.DirtyListener);
-        
-        WindowHandler           = new WindowHandler(DalamudServices, PetServices, ImageDatabase, DataParser, DataWriter, SharingDictionary, HookHandler.PronounHook, ChatHandlerGroup);
+        WindowHandler           = new WindowHandler(DalamudServices, PetServices, ImageDatabase, DataParser, DataWriter, SharingDictionary, HookHandler.PronounHook);
 
         CommandHandler          = new CommandHandler(DalamudServices, PetServices, WindowHandler);
         ContextMenuHandler      = new ContextMenuHandler(DalamudServices, PetServices, WindowHandler);
@@ -101,10 +93,8 @@ public sealed class PetRenamerPlugin : IAsyncDalamudPlugin
         LodestoneNetworker.Dispose();
         ImageDatabase.Dispose();
         UpdateHandler.Dispose();
+        ChatHandler.Dispose();
         HookHandler.Dispose();
-        
-        ChatHandlerGroup.Dispose();
-        
         CommandHandler.Dispose();
         WindowHandler.Dispose();
         SaveHandler.Dispose();

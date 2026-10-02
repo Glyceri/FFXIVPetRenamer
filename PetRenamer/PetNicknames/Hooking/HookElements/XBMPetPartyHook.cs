@@ -6,6 +6,7 @@ using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Enums;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
+using System;
 
 namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
@@ -41,12 +42,15 @@ internal unsafe class XBMPetPartyHook : HookableElement
             return;
         }
         
-        if (atkUnitBase->AtkValuesSpan.Length < 6)
+        Span<AtkValue> spanArray  = atkUnitBase->AtkValuesSpan;
+        int            spanLength = spanArray.Length;
+        
+        if (spanLength < 6)
         {
             return;
         }
         
-        AtkValue amountValue = atkUnitBase->AtkValuesSpan[5];
+        AtkValue amountValue = spanArray[5];
         
         if (amountValue.Type != AtkValueType.UInt)
         {
@@ -58,7 +62,19 @@ internal unsafe class XBMPetPartyHook : HookableElement
         
         for (int i = 0; i < amountOfPets; i++)
         {
-            AtkValue value = atkUnitBase->AtkValuesSpan[7 + (i * 77)];
+            if (i >= amountOfPets)
+            {
+                break;
+            }
+            
+            int index = (7 + (i * 77));
+            
+            if (index >= spanLength)
+            {
+                break;
+            }
+            
+            AtkValue value = spanArray[index];
             
             if (value.Type != AtkValueType.UInt)
             {
@@ -77,6 +93,11 @@ internal unsafe class XBMPetPartyHook : HookableElement
         
         for (int i = 0; i < componentList->AllocatedItemRendererListLength; i++)
         {
+            if (i >= amountOfPets)
+            {
+                break;
+            }
+            
             uint iconId = petIconIds[i];
             
             if (iconId == 0)

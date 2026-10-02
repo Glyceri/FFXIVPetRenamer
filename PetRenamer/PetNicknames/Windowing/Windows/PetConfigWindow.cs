@@ -1,6 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
-using PetRenamer.PetNicknames.GroupHandling.Interfaces;
 using PetRenamer.PetNicknames.Services;
 using PetRenamer.PetNicknames.Services.Interface;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Statics;
@@ -14,18 +13,14 @@ namespace PetRenamer.PetNicknames.Windowing.Windows;
 
 internal class PetConfigWindow : PetWindow
 {
-    private readonly IHandlerGroup ChatHandlerGroup;
-    
     private readonly Dictionary<string, bool> ThirdPartySupported = new Dictionary<string, bool>()
     {
         { "Penumbra", false },
     };
     
-    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices, IHandlerGroup handlerGroup) 
+    public PetConfigWindow(WindowHandler windowHandler, DalamudServices dalamudServices, IPetServices petServices) 
         : base(windowHandler, dalamudServices, petServices, "Pet Settings")
     {
-        ChatHandlerGroup = handlerGroup;
-        
         PetServices.PluginWatcher.RegisterListener(OnPluginChanged);
     }
     
@@ -141,10 +136,6 @@ internal class PetConfigWindow : PetWindow
         if (ImGui.CollapsingHeader(Translator.GetLine("Config.Header.NativeSettings")))
         {
             ImGui.Spacing();
-            
-            DrawGroupConfig(ChatHandlerGroup);
-            
-            ImGui.Separator();
             
             DrawColourConfig(Translator.GetLine("Config.Nameplate"),    ref PetServices.Configuration.ShowOnNameplatesColour);
             DrawColourConfig(Translator.GetLine("Config.Castbar"),      ref PetServices.Configuration.ShowOnCastbarsColour);
@@ -341,63 +332,6 @@ internal class PetConfigWindow : PetWindow
         ImGui.EndDisabled();
         
         ImGui.Separator();
-    }
-    
-    private void DrawGroupConfig(IHandlerGroup groupConfig)
-    {
-        ImGui.Spacing();
-        
-        bool changed = false;
-        
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
-        
-        ref Configuration.GroupConfig configGroup = ref groupConfig.GetGroupConfig(PetServices.Configuration);
-        
-        ImGui.BeginDisabled(configGroup.High);
-        
-        if (ImGui.Button(Translator.GetLine(groupConfig.GetTitle(EnabledState.Enabled)) + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
-        {
-            changed = true;
-        }
-        
-        ImGui.EndDisabled();
-        
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-        {
-            ImGui.SetTooltip(Translator.GetLine(groupConfig.GetDescription(EnabledState.Enabled)));
-        }
-        
-        ImGui.SameLine(0, 0);
-        
-        ImGui.BeginDisabled(!configGroup.High);
-        
-        if (ImGui.Button(Translator.GetLine(groupConfig.GetTitle(EnabledState.Disabled)) + $"###CONFIGGROUP{WindowHandler.InternalCounter}"))
-        {
-            changed = true;
-        }
-        
-        ImGui.EndDisabled();
-        
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-        {
-            ImGui.SetTooltip(Translator.GetLine(groupConfig.GetDescription(EnabledState.Disabled)));
-        }
-        
-        ImGui.PopStyleVar();
-        
-        ImGui.SameLine();
-        
-        ImGui.Text(Translator.GetLine(groupConfig.GetHandlerTitle()));
-        
-        if (!changed)
-        {
-            return;
-        }
-        
-        configGroup.High = !configGroup.High;
-        groupConfig.SetGroupState(ref configGroup);
-        
-        SavePlugin();
     }
 
     private void OnPluginChanged(string[] internalPlugins)

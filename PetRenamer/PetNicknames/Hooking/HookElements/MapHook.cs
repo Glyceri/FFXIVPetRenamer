@@ -6,7 +6,6 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using InteropGenerator.Runtime;
 using PetRenamer.PetNicknames.Hooking.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
@@ -17,54 +16,67 @@ namespace PetRenamer.PetNicknames.Hooking.HookElements;
 
 internal unsafe class MapHook : HookableElement
 {
-    private const uint MinimapIconHoverEvent = 1;
-    private const uint AreaMapIconHoverEvent = 9;
-    
-    private readonly Hook<AtkValue.Delegates.GetInt>        GetInt;
     private readonly Hook<AgentMap.Delegates.CreateTooltip> ContextTooltipHandleHook;
     private readonly Hook<BattleChara.Delegates.GetName>    GetNameHook;
     
-    private uint          _expectedEvent = 0;
-    private IPettablePet? _selectedPet   = null;
+    private IPettablePet? _selectedPet              = null;
+    private bool          _passContextTooltipHandle = false;
+    private bool          _passGetName              = false;
+    private bool          _handledGetName           = false;
     
     public MapHook(DalamudServices services, IPetServices petServices) 
         : base(services, petServices)
     {
-        GetInt                   = DalamudServices.Hooking.HookFromAddress<AtkValue.Delegates.GetInt>((nint)AtkValue.MemberFunctionPointers.GetInt, GetIntDetour);
         ContextTooltipHandleHook = DalamudServices.Hooking.HookFromAddress<AgentMap.Delegates.CreateTooltip>((nint)AgentMap.MemberFunctionPointers.CreateTooltip, ContextTooltipHandleDetour);
         GetNameHook              = DalamudServices.Hooking.HookFromAddress<BattleChara.Delegates.GetName>((nint)BattleChara.StaticVirtualTablePointer->GetName, GetNameDetour);
     }
 
     public override void Init()
     { 
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate,  "AreaMap",  AreaMapUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "AreaMap",  AreaMapUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate,  "_NaviMap", NaviMapUpdate);
-        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "AreaMap",  NaviMapUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate,  "AreaMap",  MapUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "AreaMap",  MapUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PreUpdate,  "_NaviMap", MapUpdate);
+        DalamudServices.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "AreaMap",  MapUpdate);
+        
+        ContextTooltipHandleHook.Enable();
+        GetNameHook.Enable();
     }
     
     protected override void OnDispose()
     {
         GetNameHook.Dispose();
         ContextTooltipHandleHook.Dispose();
-        GetInt.Dispose();
         
-        DalamudServices.AddonLifecycle.UnregisterListener(AreaMapUpdate);
-        DalamudServices.AddonLifecycle.UnregisterListener(NaviMapUpdate);
+        DalamudServices.AddonLifecycle.UnregisterListener(MapUpdate);
     }
     
     private CStringPointer GetNameDetour(BattleChara* gameObject)
     {
-        _selectedPet = PetServices.UserList.GetPet((nint)gameObject);
+        if (!_passGetName)
+        {
+            return GetNameHook.OriginalDisposeSafe(gameObject);
+        }
+        
+        _selectedPet   = PetServices.UserList.GetPet((nint)gameObject);
+        _handledGetName = true;
         
         return GetNameHook.OriginalDisposeSafe(gameObject);
     }
     
     private bool ContextTooltipHandleDetour(AgentMap* agentMap, Utf8String* tooltipString, uint tooltipContext)
     {
-        MapTooltipType mapTooltipType = (MapTooltipType)(tooltipContext >> 24);
+        if (!_passContextTooltipHandle)
+        {
+            return ContextTooltipHandleHook.OriginalDisposeSafe(agentMap, tooltipString, tooltipContext);
+        }
         
-        uint objectIndex = tooltipContext & 0xFFFFFF;
+        MapTooltipType mapTooltipType = (MapTooltipType)(tooltipContext >> 24);
+        uint           objectIndex    = tooltipContext & 0xFFFFFF;
+        
+        if (mapTooltipType != MapTooltipType.BattleCharaMarker)
+        {  
+            return ContextTooltipHandleHook.OriginalDisposeSafe(agentMap, tooltipString, tooltipContext);
+        }
         
         // In the vanilla code the object index is used like this:
         // 'agentMap->UIModuleInterface->GetUI3DModule()->MemberInfoPointers[(int)objectIndex].Value->BattleChara->GetName()'
@@ -72,67 +84,41 @@ internal unsafe class MapHook : HookableElement
         
         PetServices.PetLog.DevLogVerbose($"ContextTooltipHandleDetour: [TooltipType:{mapTooltipType}], [ObjectIndex: {objectIndex}]");
         
-        if ((mapTooltipType == MapTooltipType.BattleCharaMarker))
-        {
-            GetNameHook.Enable();
-        }
+        _passGetName    = true;
+        _handledGetName = false;
         
         bool returner = ContextTooltipHandleHook.OriginalDisposeSafe(agentMap, tooltipString, tooltipContext);
 
         HandleTooltipRename(tooltipString);
         
-        GetNameHook.Disable();
+        _handledGetName = false;
+        _passGetName    = false;
         
         return returner;
     }
     
-    private int GetIntDetour(AtkValue* atkValue)
+    private void MapUpdate(AddonEvent type, AddonArgs _)
     {
-        ContextTooltipHandleHook.Disable();
-        
-        int returner = GetInt.Original(atkValue);
-        
-        if (returner != _expectedEvent)
-        {
-            return returner;
-        }
-        
-        ContextTooltipHandleHook.Enable();
-        
-        return returner;
-    }
-    
-    private void MapUpdate(AddonEvent type)
-    {
-        _selectedPet   = null;
+        _selectedPet = null;
         
         if (type == AddonEvent.PreUpdate)
         {
-            GetInt.Enable();
+            _passContextTooltipHandle = true;
         }
-        else
+        else if (type == AddonEvent.PostUpdate)
         {
-            GetInt.Disable();
-            ContextTooltipHandleHook.Disable();
+            _passContextTooltipHandle = false;
+            _passGetName              = false;
         }
-    }
-    
-    private void AreaMapUpdate(AddonEvent type, AddonArgs _)
-    {
-        _expectedEvent = AreaMapIconHoverEvent;
-        
-        MapUpdate(type);
-    }
-    
-    private void NaviMapUpdate(AddonEvent type, AddonArgs _)
-    {
-        _expectedEvent = MinimapIconHoverEvent;
-        
-        MapUpdate(type);
     }
     
     private void HandleTooltipRename(Utf8String* tooltipString)
     {
+        if (!_handledGetName)
+        {
+            return;
+        }
+        
         if (_selectedPet == null)
         {
             return;

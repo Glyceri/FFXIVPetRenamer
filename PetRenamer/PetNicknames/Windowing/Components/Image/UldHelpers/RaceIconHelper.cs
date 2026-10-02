@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface;
-using Dalamud.Interface.Textures.TextureWraps;
+﻿using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.PetNicknames.Services;
 
 namespace PetRenamer.PetNicknames.Windowing.Components.Image.UldHelpers;
@@ -13,14 +12,12 @@ internal static class RaceIconHelper
 
     public static void Constructor(DalamudServices dalamudServices)
     {
-        UldWrapper uldWrapper = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/LovmActionDetail.uld");
+        using UldFile uldWrapper = new UldFile(dalamudServices, "ui/uld/LovmActionDetail.uld");
         
         TierIcon    = uldWrapper.LoadTexturePart("ui/uld/iconVerminion_hr1.tex", 0);
         ApparatIcon = uldWrapper.LoadTexturePart("ui/uld/iconVerminion_hr1.tex", 1);
         PuppeIcon   = uldWrapper.LoadTexturePart("ui/uld/iconVerminion_hr1.tex", 2);
         MonsterIcon = uldWrapper.LoadTexturePart("ui/uld/iconVerminion_hr1.tex", 3);
-        
-        uldWrapper.Dispose();
     }
 
     public static IDalamudTextureWrap? GetFromRaceId(uint raceId)

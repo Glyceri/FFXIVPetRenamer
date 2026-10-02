@@ -1,4 +1,3 @@
-using Dalamud.Interface;
 using Dalamud.Interface.Textures.TextureWraps;
 using PetRenamer.PetNicknames.Services;
 
@@ -24,31 +23,31 @@ internal static class XBMIconHelper
     
     public static void Constructor(DalamudServices dalamudServices)
     {
-        using UldWrapper XBMNoteDetailWrapper  = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/XBMMonsterBookDetail.uld");
-        using UldWrapper XBMActivePetWrapper   = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/XBMActivePet.uld");
-        using UldWrapper MinionNotebookWrapper = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/MinionNoteBook.uld");
-        using UldWrapper XBMNoteBookWrapper    = dalamudServices.DalamudPlugin.UiBuilder.LoadUld("ui/uld/MJIMinionNoteBook.uld");
+        using UldFile XBMNoteDetailWrapper  = new UldFile(dalamudServices, "ui/uld/XBMMonsterBookDetail.uld");
+        using UldFile XBMActivePetWrapper   = new UldFile(dalamudServices, "ui/uld/XBMActivePet.uld");
+        using UldFile MinionNotebookWrapper = new UldFile(dalamudServices, "ui/uld/MinionNoteBook.uld");
+        using UldFile XBMNoteBookWrapper    = new UldFile(dalamudServices, "ui/uld/MJIMinionNoteBook.uld");
         
-        TopLeft             = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 0);
-        TopRight            = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 1);
-        BottomLeft          = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 2);
-        BottomRight         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail_hr1.tex", 3);
+        TopLeft             = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail.tex",   0);
+        TopRight            = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail.tex",   1);
+        BottomLeft          = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail.tex",   2);
+        BottomRight         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteDetail.tex",   3);
         
-        BlobImagePart       = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",  1);
-        ActionBacker        = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/AozNoteBook_hr1.tex",   8);
+        BlobImagePart       = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/XBMNoteParts.tex",    1);
+        ActionBacker        = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/AozNoteBook.tex",     8);
         
-        ActionBlock         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   0);
-        BeastActionBlock    = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame_hr1.tex",   4);
+        ActionBlock         = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame.tex",     0);
+        BeastActionBlock    = XBMNoteDetailWrapper.LoadTexturePart("ui/uld/IconA_Frame.tex",     4);
         
-        Horn1Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",    1);
-        Horn2Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",    2);
-        Horn3Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts_hr1.tex",    3);
+        Horn1Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts.tex",     1);
+        Horn2Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts.tex",     2);
+        Horn3Texture        = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMNoteParts.tex",     3);
         
-        XBMEmpty            = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMEmpty_hr1.tex",        0); 
+        XBMEmpty            = XBMActivePetWrapper.LoadTexturePart("ui/uld/XBMEmpty.tex",         0); 
         
-        Button              = XBMNoteBookWrapper.LoadTexturePart("ui/uld/Mji_Window.tex",       26); 
+        Button              = XBMNoteBookWrapper.LoadTexturePart("ui/uld/Mji_Window.tex",        26); 
         
-        MinionIcon          = MinionNotebookWrapper.LoadTexturePart("ui/uld/MinionNoteBook_hr1.tex", 2);
+        MinionIcon          = MinionNotebookWrapper.LoadTexturePart("ui/uld/MinionNoteBook.tex", 2);
     }
     
     public static IDalamudTextureWrap? GetHornTexture(int hornSlot)

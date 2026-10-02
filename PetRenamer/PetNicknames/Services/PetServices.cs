@@ -24,12 +24,9 @@ internal class PetServices : IPetServices
     public IDirtyCaller         DirtyCaller         { get; }
     public IDirtyListener       DirtyListener       { get; }
     public IParty               Party               { get; }
-    public IChatRefresher       ChatRefresher       { get; }
     public IHornService         HornService         { get; }
     public IPettableDatabase    Database            { get; }
     public ILegacyDatabase      LegacyDatabase      { get; }
-    public IChatDatabaseService ChatDatabaseService { get; }
-    public IEmoteService        EmoteService        { get; }
 
     public PetServices(DalamudServices services) 
     {
@@ -52,14 +49,10 @@ internal class PetServices : IPetServices
         DirtyListener       = dirtyHandler;
         
         Party               = new PartyService(UserList, services, DirtyListener);
-        ChatRefresher       = new ChatRefresher(DirtyListener);
         HornService         = new HornService(PetSheets);
         
         Database            = new PettableDatabase.PettableDatabase(this);
         LegacyDatabase      = new LegacyPettableDatabase(this);
-        
-        ChatDatabaseService = new ChatDatabaseService(Database, this);
-        EmoteService        = new EmoteService();
         
         CheckConfigFailure();
     }
@@ -78,7 +71,5 @@ internal class PetServices : IPetServices
     {
         Party.Dispose();
         PluginWatcher.Dispose();
-        ChatRefresher.Dispose();
-        ChatDatabaseService.Dispose();
     }
 }

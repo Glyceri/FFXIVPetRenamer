@@ -1,5 +1,5 @@
-using PetRenamer.PetNicknames.Services.Interface;
+using System;
 
 namespace PetRenamer.PetNicknames.Chat.Interfaces;
 
-internal interface IChatHandler : IEnablableHandler;
+internal interface IChatHandler : IDisposable;

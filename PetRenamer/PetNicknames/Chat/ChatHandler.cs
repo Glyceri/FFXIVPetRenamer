@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Chat;
 
-internal class ChatHandler : EnablableHandler, IChatHandler
+internal class ChatHandler : IChatHandler
 {
     private readonly DalamudServices    DalamudServices;
     private readonly IPetServices       PetServices;
@@ -33,7 +33,7 @@ internal class ChatHandler : EnablableHandler, IChatHandler
         Register(new SystemChatElement(DalamudServices, PetServices, PronounHook));
     }
 
-    public override void OnDispose()
+    public void Dispose()
     {
         foreach(IChatElement chatElement in _chatElements)
         {
@@ -49,36 +49,8 @@ internal class ChatHandler : EnablableHandler, IChatHandler
     private void Register(IChatElement chatElement)
     {
         _chatElements.Add(chatElement);
-    }
-
-    public override void OnEnable()
-    {
-        foreach(IChatElement chatElement in _chatElements)
-        {
-            DalamudServices.ChatGui.ChatMessage -= chatElement.OnChatMessage;
-            DalamudServices.ChatGui.ChatMessage += chatElement.OnChatMessage;
-            
-            if (chatElement is not IEnablableHandler enablableHandler)
-            {
-                continue;
-            }
-            
-            enablableHandler.Enable();
-        }
-    }
-
-    public override void OnDisable()
-    {
-        foreach(IChatElement chatElement in _chatElements)
-        {
-            DalamudServices.ChatGui.ChatMessage -= chatElement.OnChatMessage;
-            
-            if (chatElement is not IEnablableHandler enablableHandler)
-            {
-                continue;
-            }
-            
-            enablableHandler.Disable();
-        }
+        
+        DalamudServices.ChatGui.ChatMessage -= chatElement.OnChatMessage;
+        DalamudServices.ChatGui.ChatMessage += chatElement.OnChatMessage;
     }
 }

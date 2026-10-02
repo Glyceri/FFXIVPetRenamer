@@ -21,10 +21,7 @@ internal interface IPetServices : IDisposable
     IDirtyCaller         DirtyCaller         { get; }
     IDirtyListener       DirtyListener       { get; }
     IParty               Party               { get; }
-    IChatRefresher       ChatRefresher       { get; }
     IHornService         HornService         { get; }
     IPettableDatabase    Database            { get; }
     ILegacyDatabase      LegacyDatabase      { get; }
-    IChatDatabaseService ChatDatabaseService { get; }
-    IEmoteService        EmoteService        { get; }
 }

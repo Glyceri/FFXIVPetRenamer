@@ -17,10 +17,6 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatDatabasing.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.ChatEntities.Interfaces;
-using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
 using PetRenamer.PetNicknames.Hooking;
 using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
@@ -88,13 +84,11 @@ internal class PetDevWindow : PetWindow
         devStructList.Add(new DevStruct("Pronoun",              DrawPronoun));
         devStructList.Add(new DevStruct("NameError",            DrawNameError));
         devStructList.Add(new DevStruct("Island",               DrawIsland));
-        devStructList.Add(new DevStruct("Chat Database",        DrawChatDatabase));
         devStructList.Add(new DevStruct("Translator",           DrawTranslatorHelp));
         devStructList.Add(new DevStruct("TextReplacer",         DrawTextReplacer));
         devStructList.Add(new DevStruct("Model Chara Sniffer",  DrawModelCharaSniffer));
         devStructList.Add(new DevStruct("Horns",                DrawHorns));
         devStructList.Add(new DevStruct("Hover Service",        DrawHoverService));
-        devStructList.Add(new DevStruct("EmoteLog",             DrawEmoteLog));
         
         currentActive = PetServices.Configuration.lastDebugTab;
     }
@@ -191,35 +185,6 @@ internal class PetDevWindow : PetWindow
         }
     }
     
-    private void DrawElement<T, TT>(string title, TT? database, Action<T> drawElement)
-        where TT : IChatDatabase<T>
-        where T  : IChatObject
-    {
-        if (database == null)
-        {
-            return;
-        }
-        
-        ImGui.Text($"{title}: " + database.Length());
-        
-        if (ImGui.BeginListBox($"###{title}_LISTBOX", new Vector2(ImGui.GetContentRegionAvail().X, 300)))
-        {
-            for (int i = 0; i < database.Length(); i++)
-            {
-                T? chatElement = database.Elements[i];
-                
-                if (chatElement == null)
-                {
-                    continue;
-                }
-                
-                drawElement(chatElement);
-            }
-            
-            ImGui.EndListBox();
-        }
-    }
-    
     private unsafe void DrawModelCharaSniffer()
     {
         IPettableUser? localUser = PetServices.UserList.LocalPlayer;
@@ -267,24 +232,6 @@ internal class PetDevWindow : PetWindow
         }
         
         ImGui.Text(copyText);
-    }
-    
-    private void DrawChatDatabase()
-    {
-        DrawElement<IEphemeralChatElement, IChatElementDatabase>("Chat Elements", PetServices.ChatDatabaseService.ChatElementDatabase, (chatElement) =>
-        {
-            ImGui.Text(chatElement.MessageId + ": " + PetServices.PetSheets.GetLogMessage(chatElement.LogMessageId)?.Text.ToMacroString());
-        });
-        
-        DrawElement<IChatPet, IChatPetDatabase>("Pet Elements", PetServices.ChatDatabaseService.PetDatabase, (chatElement) =>
-        {
-            ImGui.Text(chatElement.Pet + " : " + chatElement.Owner.PlayerName + " : " + chatElement.LastUsedAt.ToString());
-        });
-        
-        DrawElement<IChatPlayer, IChatPlayerDatabase>("Player Elements", PetServices.ChatDatabaseService.PlayerDatabase, (chatElement) =>
-        {
-            ImGui.Text(chatElement.PlayerName + ": " + chatElement.LastUsedAt.ToString());
-        });
     }
     
     private void DrawIsland()
@@ -1139,18 +1086,6 @@ internal class PetDevWindow : PetWindow
         }
 
         ImGui.EndTable();
-    }
-
-    private void DrawEmoteLog()
-    {
-        int index = -1;
-        
-        foreach (EmoteData data in PetServices.EmoteService.EmoteData)
-        {
-            index++;
-            
-            ImGui.Text($"[{index}] [Emote: {data.EmoteId}] [Source: {data.Source.DataBaseEntry.Name}:{data.Source.DataBaseEntry.HomeworldName}] [Target: {data.Target.SkeletonId}]");
-        }
     }
     
     protected override void OnDispose()

@@ -47,9 +47,7 @@ internal class Configuration : IPluginConfiguration
     public ColourConfig         ShowOnTargetBarsColour      = new ColourConfig();
     public ColourConfig         ShowOnPartyListColour       = new ColourConfig();
     public ColourConfig         ShowNamesInActivePetColour  = new ColourConfig();
-    
-    public GroupConfig          ChatModeGroup               = new GroupConfig(false);
-    
+
     public bool                 allowPartySummonCutoff      = true;
     public bool                 showOnIslandPets            = true;
     public bool                 useContextMenus             = true;

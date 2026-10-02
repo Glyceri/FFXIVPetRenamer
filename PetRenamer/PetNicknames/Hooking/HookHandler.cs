@@ -1,5 +1,4 @@
-﻿using PetRenamer.PetNicknames.ChatEphemiral.Interfaces;
-using PetRenamer.PetNicknames.Hooking.HookElements;
+﻿using PetRenamer.PetNicknames.Hooking.HookElements;
 using PetRenamer.PetNicknames.Hooking.HookElements.Interfaces;
 using PetRenamer.PetNicknames.Hooking.Interfaces;
 using PetRenamer.PetNicknames.IPC.Interfaces;
@@ -15,19 +14,17 @@ internal class HookHandler : IDisposable
     private readonly DalamudServices        DalamudServices;
     private readonly IPetServices           PetServices;
     private readonly ISharingDictionary     SharingDictionary;
-    private readonly IEphemaralChatHandler  ChatHandler;
     private readonly IIpcProvider           IpcProvider;
     
     public IPronounHook PronounHook { get; private set; } = null!;
 
     private readonly List<IHookableElement> hookableElements = [];
 
-    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IEphemaralChatHandler chatHandler, IIpcProvider ipcProvider)
+    public HookHandler(DalamudServices dalamudServices, IPetServices petServices, ISharingDictionary sharingDictionary, IIpcProvider ipcProvider)
     {
         DalamudServices   = dalamudServices;
         PetServices       = petServices;
         SharingDictionary = sharingDictionary;
-        ChatHandler       = chatHandler;
         IpcProvider       = ipcProvider;
 
         _Register();
@@ -53,7 +50,6 @@ internal class HookHandler : IDisposable
         PronounHook = new PronounHook(DalamudServices, PetServices);
         Register(PronounHook);
         
-        Register(new ChatHook(DalamudServices, PetServices, ChatHandler));
         Register(new TooltipHook(DalamudServices, PetServices, PronounHook));
         Register(new ActionMenuHook(DalamudServices, PetServices));
         Register(new XBMMonsterNotebookHook(DalamudServices, PetServices));
@@ -62,7 +58,6 @@ internal class HookHandler : IDisposable
         Register(new XBMPetActionDetailHook(DalamudServices, PetServices));
         Register(new XBMPetPartyHook(DalamudServices, PetServices));
         Register(new MinionNoteBookHook(DalamudServices, PetServices));
-        Register(new EmoteHook(DalamudServices, PetServices));
         Register(new TargetHook(DalamudServices, PetServices));
         Register(new IslandHook(DalamudServices, PetServices));
         Register(new CastHook(DalamudServices, PetServices));

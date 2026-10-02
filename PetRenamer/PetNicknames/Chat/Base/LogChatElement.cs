@@ -2,52 +2,37 @@ using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using PetRenamer.PetNicknames.Chat.Interfaces;
 using PetRenamer.PetNicknames.Services;
-using PetRenamer.PetNicknames.Services.Interface;
 using System;
 using System.Collections.Generic;
 
 namespace PetRenamer.PetNicknames.Chat.Base;
 
-internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnablableHandler
+internal abstract class LogChatElement : IChatElement, IDisposable
 {
     protected readonly DalamudServices DalamudServices;
     
-    private readonly HashSet<LogChatMessage> chatMessages        = [];
-    private readonly List<LogChatMessage>    logChatMessageQueue = [];
+    private readonly HashSet<LogChatMessage> chatMessages = [];
+    
+    private int expectedLogCount = 0;
     
     protected LogChatElement(DalamudServices dalamudServices)
     {
         DalamudServices = dalamudServices;
-    }
-    
-    public sealed override void OnEnable()
-    {
-        chatMessages.Clear();
         
-        DalamudServices.ChatGui.LogMessage -= OnLogMessage;
         DalamudServices.ChatGui.LogMessage += OnLogMessage;
-        
-        SetupChatMessages();
     }
     
-    public sealed override void OnDisable()
+    public void Dispose()
     {
-        chatMessages.Clear();
-        
         DalamudServices.ChatGui.LogMessage -= OnLogMessage;
     }
-    
-    public sealed override void OnDispose()
-        { }
-    
-    protected abstract void SetupChatMessages();
     
     protected void Register(LogChatMessage logChatMessage)
         => chatMessages.Add(logChatMessage);
     
     private void OnLogMessage(ILogMessage message)
     {
-        LogChatMessage? expectsMessage = null;
+        bool expects = false;
         
         foreach (LogChatMessage chatMessage in chatMessages)
         {
@@ -55,27 +40,29 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
             {
                 continue;
             }
-            
-            expectsMessage = chatMessage;
+        
+            expects = true;
             
             break;
         }
         
-        if (expectsMessage == null)
+        if (!expects)
         {
             return;
         }
         
-        logChatMessageQueue.Add(expectsMessage.Value);
+        expectedLogCount++;
     }
     
     public void OnChatMessage(IHandleableChatMessage chatMessage)
     {
-        if (logChatMessageQueue.Count <= 0)
+        if (expectedLogCount <= 0)
         {
+            expectedLogCount = 0;
+            
             return;
         }
-        
+
         foreach (LogChatMessage logMessage in chatMessages)
         {
             if (logMessage.LogKind != chatMessage.LogKind || logMessage.SourceKind != chatMessage.SourceKind)
@@ -83,12 +70,7 @@ internal abstract class LogChatElement : EnablableHandler, IChatElement, IEnabla
                 continue;
             }
             
-            if (logChatMessageQueue[0].LogId != logMessage.LogId)
-            {
-                continue;
-            }
-            
-            logChatMessageQueue.RemoveAt(0);
+            expectedLogCount--;
             
             logMessage.Callback(chatMessage);
             
