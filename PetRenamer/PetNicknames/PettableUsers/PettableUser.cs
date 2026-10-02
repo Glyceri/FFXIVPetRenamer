@@ -63,7 +63,7 @@ internal unsafe class PettableUser : IPettableUser
         {
             DataBaseEntry.UpdateContentId(BattleChara->ContentId, true);
         }
-
+        
         PetServices.PetLog.LogVerbose($"Just created a new user: {DataBaseEntry.ContentId}@{DataBaseEntry.HomeworldName}, Address: {Address}, ContentID: {DataBaseEntry.ContentId}");
     }
 

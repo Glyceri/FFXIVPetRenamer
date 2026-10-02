@@ -127,6 +127,10 @@ internal class IpcProvider : IIpcProvider
         ClearPlayerIPCData   = dalamudServices.DalamudPlugin.GetIpcProvider<ushort, object>       ($"{ApiNamespace}ClearPlayerData");
         ClearPlayerIPCDataV2 = dalamudServices.DalamudPlugin.GetIpcProvider<nint, object>         ($"{ApiNamespace}ClearPlayerDataV2");
         CrashGame            = dalamudServices.DalamudPlugin.GetIpcProvider<object>               ($"{ApiNamespace}CrashGame");
+        
+        petServices.DirtyListener.RegisterOnPlayerCharacterDirty(OnCharacterDirty);
+        
+        PetServices.PetLog.LogInfo("Initialized Pet Nicknames IPC (this does not mean it is active yet).");
     }
     
     public void Dispose()
@@ -135,6 +139,8 @@ internal class IpcProvider : IIpcProvider
 
         NotifyDisposing();
 
+        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(OnCharacterDirty);
+        
         // Actions
         SetPlayerData.UnregisterAction();
         SetPlayerDataV2.UnregisterAction();
@@ -146,6 +152,18 @@ internal class IpcProvider : IIpcProvider
         ApiVersion.UnregisterFunc();
         EnabledFunction.UnregisterFunc();
         GetPlayerData.UnregisterFunc();
+    }
+    
+    private void OnCharacterDirty(IPettableUser pettableUser)
+    {
+        if (!pettableUser.IsLocalPlayer)
+        {
+            return;
+        }
+        
+        Prepare();
+        
+        PetServices.DirtyListener.UnregisterOnPlayerCharacterDirty(OnCharacterDirty);
     }
 
     public void OnUpdate(IFramework framework)
@@ -181,13 +199,13 @@ internal class IpcProvider : IIpcProvider
         OnDataChanged();
     }
 
-    public void Prepare()
+    private void Prepare()
     {
         if (Enabled)
         {
             return;
         }
-
+        
         RegsterActions();
         RegisterFunctions();
 
@@ -195,6 +213,8 @@ internal class IpcProvider : IIpcProvider
 
         NotifyReady();
         NotifyDataChanged();
+        
+        PetServices.PetLog.LogInfo("Has Prepared Pet Nicknames IPC.");
     }
 
     private void RegsterActions()

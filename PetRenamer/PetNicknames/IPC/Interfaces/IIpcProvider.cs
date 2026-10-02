@@ -5,6 +5,5 @@ namespace PetRenamer.PetNicknames.IPC.Interfaces;
 
 internal interface IIpcProvider : IUpdatable, IDisposable
 {
-    void Prepare();
     void NotifyDataChanged();
 }

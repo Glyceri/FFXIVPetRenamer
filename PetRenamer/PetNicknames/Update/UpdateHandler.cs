@@ -52,7 +52,6 @@ internal class UpdateHandler : IDisposable
     {
         _updatables.Add(new PettableUserHandler(PetServices));
         _updatables.Add(new LodestoneQueueHelper(LodestoneNetworker, ImageDatabase));
-        _updatables.Add(new IpcPreparer(PetServices, IpcProvider));
         _updatables.Add(IpcProvider);
         _updatables.Add(SaveHandler);
         _updatables.Add(PetServices.TargetManager);

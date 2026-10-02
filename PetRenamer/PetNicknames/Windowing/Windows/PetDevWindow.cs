@@ -792,14 +792,21 @@ internal class PetDevWindow : PetWindow
             lastData = string.Empty;
         }
 
-        if (ImGui.BeginListBox("##IPCBox", new Vector2(ImGui.GetContentRegionAvail().X, 200)))
+        if (ImGui.BeginListBox("###PET_NICKNAMES_IPCBox", new Vector2(ImGui.GetContentRegionAvail().X, 200)))
         {
             string cleanedData = lastData;
             if (!cleanedData.IsNullOrWhitespace())
             {
-                byte[] data = Convert.FromBase64String(cleanedData);
-                cleanedData = Encoding.Unicode.GetString(data);
-                ImGui.Text(cleanedData);
+                try
+                {
+                    byte[] data = Convert.FromBase64String(cleanedData);
+                    cleanedData = Encoding.Unicode.GetString(data);
+                    ImGui.Text(cleanedData);
+                }
+                catch (Exception e)
+                {
+                    ImGui.TextColored(new Vector4(1, 0.5f, 0.5f, 1), $"Data: '{lastData}'\nException: {e.Message}");
+                }
             }
             
             ImGui.EndListBox();
@@ -831,7 +838,7 @@ internal class PetDevWindow : PetWindow
 
                 LabledLabel.Draw("Target Available", hasTarget ? "Yes" : "No", size);
 
-                if (ImGui.BeginListBox("##TargetBox", ImGui.GetContentRegionAvail()))
+                if (ImGui.BeginListBox("###TargetBox_PetNicknames", ImGui.GetContentRegionAvail()))
                 {
                     Vector2 sizeIn = new Vector2(ImGui.GetContentRegionAvail().X, 30 * WindowHandler.GlobalScale);
 

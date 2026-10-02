@@ -412,9 +412,15 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
 
         PettableUser newUser = new PettableUser(PetServices, SharingDictionary, newBattleChara);
-
+        
         PetServices.UserList[actualIndex] = newUser;
 
+        if (newUser.IsLocalPlayer)
+        {
+            IpcProvider.NotifyDataChanged();
+            PetServices.DirtyCaller.DirtyPlayer(newUser);
+        }
+        
         AddTempPetsToUser(newUser);
 
         if (newBattleChara->CompanionData.CompanionObject == null)
@@ -423,13 +429,6 @@ internal unsafe class CharacterManagerHook : HookableElement
         }
         
         newUser.SetCompanion(newBattleChara->CompanionData.CompanionObject);
-        
-        if (!newUser.IsLocalPlayer)
-        {
-            return;
-        }
-        
-        IpcProvider.NotifyDataChanged();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

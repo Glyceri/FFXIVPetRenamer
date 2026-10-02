@@ -38,7 +38,7 @@ internal static class LabledLabel
 
         TextAligner.Align(TextAlignment.Right);
         
-        bool returner = ImGui.Button(value, size - new Vector2(actualWidth + style.ItemSpacing.X, 0));
+        bool returner = ImGui.Button(value + $"###PET_NICKNAMES_LABEL_BUTTON_{WindowHandler.InternalCounter}", size - new Vector2(actualWidth + style.ItemSpacing.X, 0));
         
         if (!tooltipValue.IsNullOrWhitespace())
         {
