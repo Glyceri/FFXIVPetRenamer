@@ -28,11 +28,6 @@ internal unsafe class PartyHook : HookableElement
     {
         DalamudServices.AddonLifecycle.UnregisterListener(LifeCycleUpdate);
     }
-
-    protected override void Refresh()
-    {
-        RefreshAddon("_PartyList");
-    }
     
     private bool CanContinue(AtkUnitBase* baseD) 
         => baseD != null && baseD->IsFullyLoaded() && baseD->IsVisible;
@@ -76,6 +71,11 @@ internal unsafe class PartyHook : HookableElement
         
         PartyListMemberStruct petMember = GetPet(partyNode);
         
+        if (petMember.Name == null)
+        {
+            return;
+        }
+        
         PetServices.StringHelper.ReplaceAtkString(PetServices.Configuration.ShowOnPartyListColour, petMember.Name, pet, NameType.Raw);
     }
 
@@ -107,6 +107,11 @@ internal unsafe class PartyHook : HookableElement
                 continue;
             }
 
+            if (member.CastingActionName == null)
+            {
+                continue;
+            }
+            
             member.CastingActionName->TextFlags &= ~(TextFlags.Ellipsis | TextFlags.OverflowHidden);
             member.CastingActionName->SetWidth(197);
             member.CastingActionName->X = 0;

@@ -1,28 +1,16 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using PetRenamer.PetNicknames.PettableUsers.Enums;
 using PetRenamer.PetNicknames.PettableUsers.Interfaces;
 using PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
-using System;
-using System.Collections.Generic;
 using ITargetManager = PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces.ITargetManager;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers;
 
 internal unsafe class TargetManagerWrapper : ITargetManager
 {
-    public bool Enabled
-        => true;
-
     private readonly DalamudServices DalamudServices;
     private readonly IUserList       UserList;
-    
-    private readonly List<Action>    _callbacks = [];
-
-    private nint? LastTarget;
-    private nint? LastSoftTarget;
-    private nint? LastFocusTarget;
 
     public TargetManagerWrapper(DalamudServices dalamudServices, IUserList userList)
     {
@@ -87,47 +75,6 @@ internal unsafe class TargetManagerWrapper : ITargetManager
 
         return UserList.GetPet(address);
     }
-
-    private bool TargetChanged(ref nint? lastTarget, IGameObject? newTarget)
-    {
-        nint? newTargetId = newTarget?.Address;
-
-        if (lastTarget == newTargetId)
-        {
-            return false;
-        }
-
-        lastTarget = newTargetId;
-
-        return true;
-    }
-
-    public void OnUpdate(IFramework framework)
-    {
-        bool changed = false;
-
-        changed |= TargetChanged(ref LastTarget,      DalamudServices.TargetManager.Target);
-        changed |= TargetChanged(ref LastSoftTarget,  DalamudServices.TargetManager.SoftTarget);
-        changed |= TargetChanged(ref LastFocusTarget, DalamudServices.TargetManager.FocusTarget);
-
-        if (!changed)
-        {
-            return;
-        }
-
-        OnTargetStatusChanged();
-    }
-
-    private void OnTargetStatusChanged()
-    {
-        DalamudServices.PluginLog.Verbose("Target status changed. Callbacks will be invoked");
-
-        foreach (Action callback in _callbacks)
-        {
-            callback?.Invoke();
-        }
-    }
-    
     
     private IPettableEntity? PettableEntityFromTargetId(GameObjectId targetId)
     {
@@ -182,16 +129,4 @@ internal unsafe class TargetManagerWrapper : ITargetManager
 
     public IPettableEntity? GetSoftTargetOfSoftTarget(IPettableBattleEntity? battleEntity)
         => GetSoftTarget(AsBattleEntity(GetSoftTarget(battleEntity)));
-
-    public void RegisterTargetChangedListener(Action callback)
-    {
-        _ = _callbacks.Remove(callback);
-
-        _callbacks.Add(callback);
-    }
-
-    public void DeregisterTargetChangedListener(Action callback)
-    {
-        _ = _callbacks.Remove(callback);
-    }
 }
