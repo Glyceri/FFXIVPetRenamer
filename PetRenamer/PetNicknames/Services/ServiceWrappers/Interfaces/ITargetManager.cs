@@ -1,10 +1,8 @@
 ﻿using PetRenamer.PetNicknames.PettableUsers.Interfaces;
-using PetRenamer.PetNicknames.Update.Interfaces;
-using System;
 
 namespace PetRenamer.PetNicknames.Services.ServiceWrappers.Interfaces;
 
-internal interface ITargetManager : IUpdatable
+internal interface ITargetManager
 {
     IPettableEntity? Target                       { get; }
     IPettableEntity? SoftTarget                   { get; }
@@ -34,8 +32,4 @@ internal interface ITargetManager : IUpdatable
 
     IPettableEntity? GetTargetOfSoftTarget(IPettableBattleEntity? battleEntity);
     IPettableEntity? GetSoftTargetOfSoftTarget(IPettableBattleEntity? battleEntity);
-    
-    
-    void RegisterTargetChangedListener(Action callback);
-    void DeregisterTargetChangedListener(Action callback);
 }
